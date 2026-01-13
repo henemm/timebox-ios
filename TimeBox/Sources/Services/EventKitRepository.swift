@@ -100,6 +100,18 @@ final class EventKitRepository: @unchecked Sendable {
 
         try eventStore.save(event, span: .thisEvent)
     }
+
+    func markReminderComplete(reminderID: String) throws {
+        guard reminderAuthStatus == .fullAccess else {
+            throw EventKitError.notAuthorized
+        }
+        guard let reminder = eventStore.calendarItem(withIdentifier: reminderID) as? EKReminder else {
+            return // Silent fail if reminder not found
+        }
+        reminder.isCompleted = true
+        reminder.completionDate = Date()
+        try eventStore.save(reminder, commit: true)
+    }
 }
 
 enum EventKitError: Error, LocalizedError {
