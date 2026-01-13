@@ -4,6 +4,14 @@ struct EventBlock: View {
     let event: CalendarEvent
     let hourHeight: CGFloat
     let startHour: Int
+    let onTap: (() -> Void)?
+
+    init(event: CalendarEvent, hourHeight: CGFloat, startHour: Int, onTap: (() -> Void)? = nil) {
+        self.event = event
+        self.hourHeight = hourHeight
+        self.startHour = startHour
+        self.onTap = onTap
+    }
 
     var body: some View {
         let yOffset = calculateYOffset()
@@ -27,6 +35,10 @@ struct EventBlock: View {
             .padding(.leading, 55)
             .padding(.trailing, 8)
             .offset(y: yOffset)
+            .contentShape(Rectangle())
+            .onTapGesture {
+                onTap?()
+            }
     }
 
     private var timeRangeText: String {

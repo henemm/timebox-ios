@@ -87,7 +87,7 @@ final class EventKitRepository: @unchecked Sendable {
         return events.map { CalendarEvent(from: $0) }
     }
 
-    func createCalendarEvent(title: String, startDate: Date, endDate: Date) throws {
+    func createCalendarEvent(title: String, startDate: Date, endDate: Date, reminderID: String? = nil) throws {
         guard calendarAuthStatus == .fullAccess else {
             throw EventKitError.notAuthorized
         }
@@ -98,7 +98,22 @@ final class EventKitRepository: @unchecked Sendable {
         event.endDate = endDate
         event.calendar = eventStore.defaultCalendarForNewEvents
 
+        // Store reminderID in notes for later unscheduling
+        if let reminderID {
+            event.notes = "reminderID:\(reminderID)"
+        }
+
         try eventStore.save(event, span: .thisEvent)
+    }
+
+    func deleteCalendarEvent(eventID: String) throws {
+        guard calendarAuthStatus == .fullAccess else {
+            throw EventKitError.notAuthorized
+        }
+        guard let event = eventStore.event(withIdentifier: eventID) else {
+            return // Silent fail if event not found
+        }
+        try eventStore.remove(event, span: .thisEvent)
     }
 
     func markReminderComplete(reminderID: String) throws {
@@ -110,6 +125,18 @@ final class EventKitRepository: @unchecked Sendable {
         }
         reminder.isCompleted = true
         reminder.completionDate = Date()
+        try eventStore.save(reminder, commit: true)
+    }
+
+    func markReminderIncomplete(reminderID: String) throws {
+        guard reminderAuthStatus == .fullAccess else {
+            throw EventKitError.notAuthorized
+        }
+        guard let reminder = eventStore.calendarItem(withIdentifier: reminderID) as? EKReminder else {
+            return // Silent fail if reminder not found
+        }
+        reminder.isCompleted = false
+        reminder.completionDate = nil
         try eventStore.save(reminder, commit: true)
     }
 }

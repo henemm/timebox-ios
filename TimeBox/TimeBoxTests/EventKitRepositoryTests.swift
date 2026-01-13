@@ -37,4 +37,90 @@ final class EventKitRepositoryTests: XCTestCase {
             // We just verify it's callable
         }
     }
+
+    // MARK: - TDD RED: Step 6 - Event Editing Tests
+
+    /// GIVEN: An invalid reminder ID
+    /// WHEN: markReminderIncomplete is called
+    /// THEN: No error is thrown (silent fail)
+    func testMarkReminderIncompleteWithInvalidIDDoesNotThrow() throws {
+        XCTAssertNoThrow(try eventKitRepo.markReminderIncomplete(reminderID: "invalid-id"))
+    }
+
+    /// GIVEN: An invalid event ID
+    /// WHEN: deleteCalendarEvent is called
+    /// THEN: No error is thrown (silent fail)
+    func testDeleteCalendarEventWithInvalidIDDoesNotThrow() throws {
+        XCTAssertNoThrow(try eventKitRepo.deleteCalendarEvent(eventID: "invalid-event-id"))
+    }
+
+    /// GIVEN: createCalendarEvent with reminderID parameter
+    /// WHEN: Method is called
+    /// THEN: Method is callable with new signature
+    func testCreateCalendarEventWithReminderIDExists() throws {
+        do {
+            try eventKitRepo.createCalendarEvent(
+                title: "Test",
+                startDate: Date(),
+                endDate: Date().addingTimeInterval(3600),
+                reminderID: "test-reminder-id"
+            )
+        } catch {
+            // Expected: notAuthorized in test environment
+        }
+    }
+}
+
+// MARK: - CalendarEvent Tests
+
+final class CalendarEventTests: XCTestCase {
+
+    /// GIVEN: CalendarEvent with notes containing reminderID
+    /// WHEN: Accessing reminderID property
+    /// THEN: Returns the parsed reminderID
+    func testReminderIDParsesFromNotes() {
+        // This test will FAIL because CalendarEvent doesn't have notes/reminderID yet
+        let event = CalendarEvent(
+            id: "test-id",
+            title: "Test Event",
+            startDate: Date(),
+            endDate: Date().addingTimeInterval(3600),
+            isAllDay: false,
+            calendarColor: nil,
+            notes: "reminderID:abc123"
+        )
+        XCTAssertEqual(event.reminderID, "abc123")
+    }
+
+    /// GIVEN: CalendarEvent with nil notes
+    /// WHEN: Accessing reminderID property
+    /// THEN: Returns nil
+    func testReminderIDReturnsNilWhenNoNotes() {
+        let event = CalendarEvent(
+            id: "test-id",
+            title: "Test Event",
+            startDate: Date(),
+            endDate: Date().addingTimeInterval(3600),
+            isAllDay: false,
+            calendarColor: nil,
+            notes: nil
+        )
+        XCTAssertNil(event.reminderID)
+    }
+
+    /// GIVEN: CalendarEvent with notes NOT containing reminderID prefix
+    /// WHEN: Accessing reminderID property
+    /// THEN: Returns nil
+    func testReminderIDReturnsNilWhenWrongFormat() {
+        let event = CalendarEvent(
+            id: "test-id",
+            title: "Test Event",
+            startDate: Date(),
+            endDate: Date().addingTimeInterval(3600),
+            isAllDay: false,
+            calendarColor: nil,
+            notes: "Some random notes"
+        )
+        XCTAssertNil(event.reminderID)
+    }
 }

@@ -4,15 +4,22 @@ struct TimelineView: View {
     let date: Date
     let events: [CalendarEvent]
     let onScheduleTask: ((PlanItemTransfer, Date) -> Void)?
+    let onEventTap: ((CalendarEvent) -> Void)?
 
     private let hourHeight: CGFloat = 60
     private let startHour = 6
     private let endHour = 22
 
-    init(date: Date, events: [CalendarEvent], onScheduleTask: ((PlanItemTransfer, Date) -> Void)? = nil) {
+    init(
+        date: Date,
+        events: [CalendarEvent],
+        onScheduleTask: ((PlanItemTransfer, Date) -> Void)? = nil,
+        onEventTap: ((CalendarEvent) -> Void)? = nil
+    ) {
         self.date = date
         self.events = events
         self.onScheduleTask = onScheduleTask
+        self.onEventTap = onEventTap
     }
 
     var body: some View {
@@ -36,7 +43,8 @@ struct TimelineView: View {
                         EventBlock(
                             event: event,
                             hourHeight: hourHeight,
-                            startHour: startHour
+                            startHour: startHour,
+                            onTap: onEventTap != nil ? { onEventTap?(event) } : nil
                         )
                     }
                 }

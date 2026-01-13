@@ -10,6 +10,8 @@ struct PlanningView: View {
     @State private var isLoading = false
     @State private var errorMessage: String?
     @State private var scheduleFeedback = false
+    @State private var selectedEvent: CalendarEvent?
+    @State private var showEventActions = false
 
     var body: some View {
         NavigationStack {
@@ -30,7 +32,11 @@ struct PlanningView: View {
                     TimelineView(
                         date: selectedDate,
                         events: calendarEvents,
-                        onScheduleTask: scheduleTask
+                        onScheduleTask: scheduleTask,
+                        onEventTap: { event in
+                            selectedEvent = event
+                            showEventActions = true
+                        }
                     )
 
                     if !unscheduledTasks.isEmpty {
@@ -52,6 +58,23 @@ struct PlanningView: View {
                 }
             }
             .sensoryFeedback(.success, trigger: scheduleFeedback)
+            .confirmationDialog(
+                selectedEvent?.title ?? "Event",
+                isPresented: $showEventActions,
+                titleVisibility: .visible
+            ) {
+                if let event = selectedEvent {
+                    if event.reminderID != nil {
+                        Button("Unschedule (zurück in Backlog)") {
+                            unscheduleEvent(event)
+                        }
+                    }
+                    Button("Löschen", role: .destructive) {
+                        deleteEvent(event)
+                    }
+                    Button("Abbrechen", role: .cancel) {}
+                }
+            }
         }
         .task {
             await loadData()
@@ -102,7 +125,8 @@ struct PlanningView: View {
                 try eventKitRepo.createCalendarEvent(
                     title: transfer.title,
                     startDate: startTime,
-                    endDate: endTime
+                    endDate: endTime,
+                    reminderID: transfer.id
                 )
 
                 // Mark reminder as complete
@@ -114,6 +138,39 @@ struct PlanningView: View {
 
             } catch {
                 errorMessage = "Event konnte nicht erstellt werden."
+            }
+        }
+    }
+
+    private func unscheduleEvent(_ event: CalendarEvent) {
+        Task {
+            do {
+                // Delete the calendar event
+                try eventKitRepo.deleteCalendarEvent(eventID: event.id)
+
+                // Mark reminder as incomplete (back to backlog)
+                if let reminderID = event.reminderID {
+                    try eventKitRepo.markReminderIncomplete(reminderID: reminderID)
+                }
+
+                // Reload data
+                await loadData()
+                scheduleFeedback.toggle()
+
+            } catch {
+                errorMessage = "Event konnte nicht entfernt werden."
+            }
+        }
+    }
+
+    private func deleteEvent(_ event: CalendarEvent) {
+        Task {
+            do {
+                try eventKitRepo.deleteCalendarEvent(eventID: event.id)
+                await loadData()
+                scheduleFeedback.toggle()
+            } catch {
+                errorMessage = "Event konnte nicht gelöscht werden."
             }
         }
     }
