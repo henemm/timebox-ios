@@ -5,6 +5,11 @@ import Foundation
 final class EventKitRepository: @unchecked Sendable {
     private let eventStore = EKEventStore()
 
+    /// Check if running in UI test mode
+    static var isUITesting: Bool {
+        ProcessInfo.processInfo.arguments.contains("-UITesting")
+    }
+
     var reminderAuthStatus: EKAuthorizationStatus {
         EKEventStore.authorizationStatus(for: .reminder)
     }
@@ -40,12 +45,18 @@ final class EventKitRepository: @unchecked Sendable {
     }
 
     func requestAccess() async throws -> Bool {
+        if Self.isUITesting { return true }
         let reminders = try await requestReminderAccess()
         let calendar = try await requestCalendarAccess()
         return reminders && calendar
     }
 
     func fetchIncompleteReminders() async throws -> [ReminderData] {
+        // Return mock data for UI tests
+        if Self.isUITesting {
+            return Self.mockReminders
+        }
+
         guard reminderAuthStatus == .fullAccess else {
             throw EventKitError.notAuthorized
         }
@@ -65,6 +76,14 @@ final class EventKitRepository: @unchecked Sendable {
             }
         }
     }
+
+    /// Mock reminders for UI testing
+    static let mockReminders: [ReminderData] = [
+        ReminderData(id: "mock-1", title: "Design Review #30min"),
+        ReminderData(id: "mock-2", title: "Team Standup #15min"),
+        ReminderData(id: "mock-3", title: "Code Review"),
+        ReminderData(id: "mock-4", title: "Documentation #60min")
+    ]
 
     func fetchCalendarEvents(for date: Date) throws -> [CalendarEvent] {
         guard calendarAuthStatus == .fullAccess else {

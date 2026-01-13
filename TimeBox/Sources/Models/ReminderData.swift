@@ -13,4 +13,12 @@ struct ReminderData: Identifiable, Sendable {
         self.isCompleted = reminder.isCompleted
         self.priority = reminder.priority
     }
+
+    // For testing
+    init(id: String, title: String, isCompleted: Bool = false, priority: Int = 0) {
+        self.id = id
+        self.title = title
+        self.isCompleted = isCompleted
+        self.priority = priority
+    }
 }
