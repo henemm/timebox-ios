@@ -1,0 +1,24 @@
+TDD Artifact: Step 1 Foundation - Initial Project Setup
+=======================================================
+
+Phase: Greenfield Project Setup (no existing code)
+
+Expected Test: Manual verification after implementation
+- App compiles successfully
+- Console output shows PlanItems list
+- Reminders are fetched from Apple EventKit
+
+Current State: RED (code not yet written)
+- TaskMetadata: NOT IMPLEMENTED
+- PlanItem: NOT IMPLEMENTED
+- EventKitRepository: NOT IMPLEMENTED
+- SyncEngine: NOT IMPLEMENTED
+- ContentView: NOT IMPLEMENTED
+
+Test Plan:
+1. Build project with xcodebuild
+2. Run on simulator
+3. Grant reminder permissions
+4. Verify console output shows PlanItems
+
+This artifact documents the expected failing state before implementation.

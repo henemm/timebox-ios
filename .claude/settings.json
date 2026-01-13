@@ -1,0 +1,112 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash",
+      "WebSearch",
+      "WebFetch"
+    ],
+    "deny": [],
+    "ask": []
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 /Users/hem/Documents/opt/my-daily-sprints/.claude/hooks/claude_md_protection.py",
+            "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "python3 /Users/hem/Documents/opt/my-daily-sprints/.claude/hooks/domain_pattern_guard.py",
+            "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "python3 /Users/hem/Documents/opt/my-daily-sprints/.claude/hooks/plan_validator.py",
+            "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "python3 /Users/hem/Documents/opt/my-daily-sprints/.claude/hooks/post_implementation_gate.py",
+            "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "python3 /Users/hem/Documents/opt/my-daily-sprints/.claude/hooks/red_test_gate.py",
+            "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "python3 /Users/hem/Documents/opt/my-daily-sprints/.claude/hooks/scope_guard.py",
+            "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "python3 /Users/hem/Documents/opt/my-daily-sprints/.claude/hooks/spec_enforcement.py",
+            "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "python3 /Users/hem/Documents/opt/my-daily-sprints/.claude/hooks/tdd_enforcement.py",
+            "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "python3 /Users/hem/Documents/opt/my-daily-sprints/.claude/hooks/track_changes.py",
+            "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "python3 /Users/hem/Documents/opt/my-daily-sprints/.claude/hooks/ui_screenshot_gate.py",
+            "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "python3 /Users/hem/Documents/opt/my-daily-sprints/.claude/hooks/workflow_gate.py",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 /Users/hem/Documents/opt/my-daily-sprints/.claude/hooks/pre_commit_gate.py",
+            "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "python3 /Users/hem/Documents/opt/my-daily-sprints/.claude/hooks/secrets_guard.py",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 /Users/hem/Documents/opt/my-daily-sprints/.claude/hooks/notify_sound.py",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 /Users/hem/Documents/opt/my-daily-sprints/.claude/hooks/workflow_state_updater.py",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}

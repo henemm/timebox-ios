@@ -1,0 +1,54 @@
+{
+  "version": "2.0",
+  "workflows": {
+    "step2-backlogview": {
+      "current_phase": "phase6_implement",
+      "created": "2026-01-13T12:53:39.858140",
+      "last_updated": "2026-01-13T13:00:32.782107",
+      "spec_file": null,
+      "spec_approved": false,
+      "context_file": null,
+      "test_artifacts": [],
+      "affected_files": [],
+      "red_test_done": false,
+      "red_test_result": null,
+      "green_test_done": false,
+      "green_test_result": null,
+      "analysis_findings": null,
+      "phases_completed": []
+    },
+    "step3-planningview": {
+      "current_phase": "phase6_implement",
+      "created": "2026-01-13T13:14:15.690408",
+      "last_updated": "2026-01-13T13:16:10.527546",
+      "spec_file": null,
+      "spec_approved": false,
+      "context_file": null,
+      "test_artifacts": [],
+      "affected_files": [],
+      "red_test_done": false,
+      "red_test_result": null,
+      "green_test_done": false,
+      "green_test_result": null,
+      "analysis_findings": null,
+      "phases_completed": []
+    },
+    "step3b-dragdrop": {
+      "current_phase": "phase6_implement",
+      "created": "2026-01-13T13:48:36.924868",
+      "last_updated": "2026-01-13T13:48:44.753437",
+      "spec_file": null,
+      "spec_approved": false,
+      "context_file": null,
+      "test_artifacts": [],
+      "affected_files": [],
+      "red_test_done": false,
+      "red_test_result": null,
+      "green_test_done": false,
+      "green_test_result": null,
+      "analysis_findings": null,
+      "phases_completed": []
+    }
+  },
+  "active_workflow": "step3b-dragdrop"
+}

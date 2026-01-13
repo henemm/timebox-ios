@@ -1,0 +1,30 @@
+	 Executed 4 tests, with 0 failures (0 unexpected) in 25.272 (25.274) seconds
+Test Suite 'TimeBoxUITests.xctest' passed at 2026-01-13 14:56:15.945.
+	 Executed 7 tests, with 0 failures (0 unexpected) in 53.468 (53.483) seconds
+Test Suite 'All tests' passed at 2026-01-13 14:56:15.946.
+	 Executed 7 tests, with 0 failures (0 unexpected) in 53.468 (53.484) seconds
+Test Suite 'All tests' started at 2026-01-13 14:56:18.245.
+Test Suite 'TimeBoxTests.xctest' started at 2026-01-13 14:56:18.246.
+Test Suite 'SyncEngineTests' started at 2026-01-13 14:56:18.246.
+Test Case '-[TimeBoxTests.SyncEngineTests testUpdateDurationResetSetsNil]' started.
+Test Case '-[TimeBoxTests.SyncEngineTests testUpdateDurationResetSetsNil]' passed (0.059 seconds).
+Test Case '-[TimeBoxTests.SyncEngineTests testUpdateDurationSetsManualDuration]' started.
+Test Case '-[TimeBoxTests.SyncEngineTests testUpdateDurationSetsManualDuration]' passed (0.010 seconds).
+Test Case '-[TimeBoxTests.SyncEngineTests testUpdateDurationWithNonexistentIDDoesNotCrash]' started.
+Test Case '-[TimeBoxTests.SyncEngineTests testUpdateDurationWithNonexistentIDDoesNotCrash]' passed (0.005 seconds).
+Test Suite 'SyncEngineTests' passed at 2026-01-13 14:56:18.321.
+	 Executed 3 tests, with 0 failures (0 unexpected) in 0.075 (0.076) seconds
+Test Suite 'TimeBoxTests.xctest' passed at 2026-01-13 14:56:18.323.
+	 Executed 3 tests, with 0 failures (0 unexpected) in 0.075 (0.077) seconds
+Test Suite 'All tests' passed at 2026-01-13 14:56:18.323.
+	 Executed 3 tests, with 0 failures (0 unexpected) in 0.075 (0.078) seconds
+2026-01-13 14:56:18.633 xcodebuild[59848:12074770] [MT] IDETestOperationsObserverDebug: 59.872 elapsed -- Testing started completed.
+2026-01-13 14:56:18.633 xcodebuild[59848:12074770] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2026-01-13 14:56:18.633 xcodebuild[59848:12074770] [MT] IDETestOperationsObserverDebug: 59.872 sec, +59.872 sec -- end
+
+Test session results, code coverage, and logs:
+	/Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Logs/Test/Test-TimeBox-2026.01.13_14-55-16-+0100.xcresult
+
+** TEST SUCCEEDED **
+
+Testing started

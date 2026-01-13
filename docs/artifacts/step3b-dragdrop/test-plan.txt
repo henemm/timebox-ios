@@ -1,0 +1,20 @@
+TDD Artifact: Step 3b Drag & Drop
+=================================
+
+Test Plan:
+1. MiniBacklogView shows unscheduled tasks horizontally
+2. Tasks are draggable from MiniBacklogView
+3. Timeline accepts drops
+4. Dropping creates calendar event
+5. Task marked as scheduled after drop
+
+Current State: RED - Test failed: Drag & Drop NOT IMPLEMENTED
+- MiniBacklogView: NOT IMPLEMENTED
+- PlanItemTransfer: NOT IMPLEMENTED
+- Drop handling: NOT IMPLEMENTED
+- Calendar event creation: NOT IMPLEMENTED
+
+Expected behavior after implementation:
+- Drag task from bottom bar to timeline
+- Drop creates new calendar event at drop position
+- Visual feedback during drag

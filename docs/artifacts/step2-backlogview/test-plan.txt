@@ -1,0 +1,20 @@
+TDD Artifact: Step 2 BacklogView
+=================================
+
+Phase: Implementation
+
+Test Plan:
+1. BacklogView zeigt alle PlanItems in sortierter Reihenfolge
+2. Drag & Drop verschiebt Items
+3. Neue Reihenfolge wird in SwiftData persistiert
+4. Nach App-Neustart: Reihenfolge bleibt erhalten
+5. Duration Badge zeigt korrekte Farbe (gelb=default, blau=custom)
+6. Haptisches Feedback beim Drop
+
+Current State: RED (views not yet implemented)
+- BacklogView: NOT IMPLEMENTED
+- BacklogRow: NOT IMPLEMENTED
+- DurationBadge: NOT IMPLEMENTED
+- SyncEngine.reorder(): NOT IMPLEMENTED
+
+Validation: Screenshot comparison before/after drag operation

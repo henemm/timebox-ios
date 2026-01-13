@@ -1,0 +1,29 @@
+{
+  "files_changed": [
+    "TimeBox/Sources/TimeBoxApp.swift",
+    "TimeBox/Sources/Models/TaskMetadata.swift",
+    "TimeBox/Sources/Models/PlanItem.swift",
+    "TimeBox/Sources/Services/EventKitRepository.swift",
+    "TimeBox/Sources/Services/SyncEngine.swift",
+    "TimeBox/Sources/Views/ContentView.swift",
+    "TimeBox/Sources/Models/ReminderData.swift",
+    "TimeBox/Sources/Views/DurationBadge.swift",
+    "TimeBox/Sources/Views/BacklogRow.swift",
+    "TimeBox/Sources/Views/BacklogView.swift",
+    "TimeBox/Sources/Models/CalendarEvent.swift",
+    "TimeBox/Sources/Views/HourRow.swift",
+    "TimeBox/Sources/Views/EventBlock.swift",
+    "TimeBox/Sources/Views/TimelineView.swift",
+    "TimeBox/Sources/Views/PlanningView.swift",
+    "TimeBox/Sources/Views/MainTabView.swift",
+    "TimeBox/TimeBoxUITests/PlanningViewUITests.swift",
+    "TimeBox/Sources/Models/PlanItemTransfer.swift",
+    "TimeBox/Sources/Views/MiniTaskCard.swift",
+    "TimeBox/Sources/Views/MiniBacklogView.swift",
+    "TimeBox/TimeBoxTests/SyncEngineTests.swift",
+    "TimeBox/TimeBoxUITests/DurationEditingUITests.swift",
+    "TimeBox/Sources/Views/DurationPicker.swift"
+  ],
+  "last_validation": null,
+  "last_change": "2026-01-13T14:49:55.636242"
+}
