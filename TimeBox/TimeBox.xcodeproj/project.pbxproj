@@ -31,6 +31,7 @@
 		C3F49C8B0CD3C6552054BE7D /* EventKitRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4451B46B76517090C636FA94 /* EventKitRepository.swift */; };
 		C89E9F957213671FF1B0DC91 /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4383C656C07E4B4F56335921 /* MainTabView.swift */; };
 		CF2E7692295B675D8541312A /* BacklogViewUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 339BBA1A3799CB0C6CF5897A /* BacklogViewUITests.swift */; };
+		D23F767C76495B0CA789C0B4 /* TaskAssignmentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0461CA6D7F62F83512E8AD05 /* TaskAssignmentView.swift */; };
 		D4D7EAC3019BD5B643DC70F8 /* CalendarEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7B0BE54BB8E4DC5B9F85C28 /* CalendarEvent.swift */; };
 		D4EB0D97525927CB36D81D07 /* PlanItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9826FCF9A087183038C6ACED /* PlanItem.swift */; };
 		DE5811F4F48BE79B9EB7C818 /* PlanningViewUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C40AFBB545C0FA15517B9CE4 /* PlanningViewUITests.swift */; };
@@ -58,6 +59,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		0461CA6D7F62F83512E8AD05 /* TaskAssignmentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskAssignmentView.swift; sourceTree = "<group>"; };
 		0A9FDDCD2C501D3A6679FA58 /* TimeBox.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = TimeBox.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1177F32AD2A8E3DE065A8945 /* FocusBlockTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusBlockTests.swift; sourceTree = "<group>"; };
 		1430133DDF6FA76E9E129534 /* MiniBacklogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MiniBacklogView.swift; sourceTree = "<group>"; };
@@ -146,6 +148,7 @@
 				1430133DDF6FA76E9E129534 /* MiniBacklogView.swift */,
 				C439255FDECD6C6CB2377237 /* MiniTaskCard.swift */,
 				8537E6312F33871F310A843F /* PlanningView.swift */,
+				0461CA6D7F62F83512E8AD05 /* TaskAssignmentView.swift */,
 				C945F5092F6FFB66C11FD4C2 /* TimelineView.swift */,
 			);
 			path = Views;
@@ -307,6 +310,7 @@
 				EA6560340794C06D21D9CD85 /* PlanningView.swift in Sources */,
 				878D5818BD3563CCE351CEE8 /* ReminderData.swift in Sources */,
 				53697A70444E5ECF3B760A1C /* SyncEngine.swift in Sources */,
+				D23F767C76495B0CA789C0B4 /* TaskAssignmentView.swift in Sources */,
 				6E8284A6F06C79DBE93A383E /* TaskMetadata.swift in Sources */,
 				88FB3AEEAE86741E5EA6AC42 /* TimeBoxApp.swift in Sources */,
 				1B489799D0D38661913FCC34 /* TimelineView.swift in Sources */,

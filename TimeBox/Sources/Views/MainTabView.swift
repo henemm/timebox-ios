@@ -13,7 +13,7 @@ struct MainTabView: View {
                     Label("Blöcke", systemImage: "rectangle.split.3x1")
                 }
 
-            PlanningView()
+            TaskAssignmentView()
                 .tabItem {
                     Label("Zuordnen", systemImage: "arrow.up.and.down.text.horizontal")
                 }
