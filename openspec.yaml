@@ -80,7 +80,7 @@ protected_paths:
     spec_type: "modules"
   - pattern: "src/.*\\.js$"
     spec_type: "modules"
-  - pattern: "src/.*\\.swift$"
+  - pattern: ".*\\.swift$"
     spec_type: "modules"
   - pattern: "lib/.*\\.py$"
     spec_type: "modules"
@@ -259,9 +259,9 @@ output_specs:
 
 # Pre-commit Gate Configuration
 pre_commit:
-  enabled: false
-  # test_command: ["xcodebuild", "test", "-project", "TimeBox/TimeBox.xcodeproj", "-scheme", "TimeBox", "-destination", "platform=iOS Simulator,name=iPhone 17 Pro", "-only-testing:TimeBoxTests", "-quiet"]
-  timeout: 300
+  enabled: false  # Disabled: xcodebuild tests take 7+ minutes, run manually
+  test_command: ["xcodebuild", "test", "-scheme", "TimeBox", "-destination", "platform=iOS Simulator,name=iPhone 17 Pro", "-quiet"]
+  timeout: 120
   allow_amend: true
   ui_patterns:
     - "web/pages/"
