@@ -177,6 +177,43 @@ final class EventKitRepository: @unchecked Sendable {
         event.endDate = newEndDate
         try eventStore.save(event, span: .thisEvent)
     }
+
+    // MARK: - Focus Block Methods
+
+    func createFocusBlock(startDate: Date, endDate: Date) throws -> String {
+        guard calendarAuthStatus == .fullAccess else {
+            throw EventKitError.notAuthorized
+        }
+
+        let event = EKEvent(eventStore: eventStore)
+        let formatter = DateFormatter()
+        formatter.timeStyle = .short
+        event.title = "Focus Block \(formatter.string(from: startDate))"
+        event.startDate = startDate
+        event.endDate = endDate
+        event.calendar = eventStore.defaultCalendarForNewEvents
+        event.notes = FocusBlock.serializeToNotes(taskIDs: [], completedTaskIDs: [])
+
+        try eventStore.save(event, span: .thisEvent)
+        return event.eventIdentifier ?? ""
+    }
+
+    func updateFocusBlock(eventID: String, taskIDs: [String], completedTaskIDs: [String]) throws {
+        guard calendarAuthStatus == .fullAccess else {
+            throw EventKitError.notAuthorized
+        }
+        guard let event = eventStore.event(withIdentifier: eventID) else {
+            return
+        }
+
+        event.notes = FocusBlock.serializeToNotes(taskIDs: taskIDs, completedTaskIDs: completedTaskIDs)
+        try eventStore.save(event, span: .thisEvent)
+    }
+
+    func fetchFocusBlocks(for date: Date) throws -> [FocusBlock] {
+        let events = try fetchCalendarEvents(for: date)
+        return events.compactMap { FocusBlock(from: $0) }
+    }
 }
 
 enum EventKitError: Error, LocalizedError {

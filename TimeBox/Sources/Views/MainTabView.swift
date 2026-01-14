@@ -8,9 +8,20 @@ struct MainTabView: View {
                     Label("Backlog", systemImage: "list.bullet")
                 }
 
+            BlockPlanningView()
+                .tabItem {
+                    Label("Blöcke", systemImage: "rectangle.split.3x1")
+                }
+
             PlanningView()
                 .tabItem {
-                    Label("Planen", systemImage: "calendar")
+                    Label("Zuordnen", systemImage: "arrow.up.and.down.text.horizontal")
+                }
+
+            // Focus Live View - Phase 3
+            Text("Fokus")
+                .tabItem {
+                    Label("Fokus", systemImage: "target")
                 }
         }
     }

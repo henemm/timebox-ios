@@ -40,4 +40,35 @@ struct CalendarEvent: Identifiable, Sendable {
         guard let notes, notes.hasPrefix("reminderID:") else { return nil }
         return String(notes.dropFirst("reminderID:".count))
     }
+
+    // MARK: - Focus Block Support
+
+    /// Check if this event is a Focus Block
+    var isFocusBlock: Bool {
+        guard let notes else { return false }
+        return notes.contains("focusBlock:true")
+    }
+
+    /// Get task IDs assigned to this focus block
+    var focusBlockTaskIDs: [String] {
+        guard let notes else { return [] }
+        return parseNotesLine(prefix: "tasks:", from: notes)
+    }
+
+    /// Get completed task IDs for this focus block
+    var focusBlockCompletedIDs: [String] {
+        guard let notes else { return [] }
+        return parseNotesLine(prefix: "completed:", from: notes)
+    }
+
+    /// Parse a line from notes with format "prefix:id1|id2|id3"
+    private func parseNotesLine(prefix: String, from notes: String) -> [String] {
+        let lines = notes.components(separatedBy: "\n")
+        guard let line = lines.first(where: { $0.hasPrefix(prefix) }) else {
+            return []
+        }
+        let value = String(line.dropFirst(prefix.count))
+        guard !value.isEmpty else { return [] }
+        return value.components(separatedBy: "|")
+    }
 }
