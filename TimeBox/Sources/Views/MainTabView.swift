@@ -18,8 +18,7 @@ struct MainTabView: View {
                     Label("Zuordnen", systemImage: "arrow.up.and.down.text.horizontal")
                 }
 
-            // Focus Live View - Phase 3
-            Text("Fokus")
+            FocusLiveView()
                 .tabItem {
                     Label("Fokus", systemImage: "target")
                 }
