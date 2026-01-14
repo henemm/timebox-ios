@@ -1,0 +1,31 @@
+Test Suite 'Selected tests' started at 2026-01-14 12:08:14.254.
+Test Suite 'TimeBoxTests.xctest' started at 2026-01-14 12:08:14.255.
+Test Suite 'FocusBlockTests' started at 2026-01-14 12:08:14.255.
+Test Case '-[TimeBoxTests.FocusBlockTests testFocusBlockCompletedIDsParsesPipeSeparatedIDs]' started.
+Test Case '-[TimeBoxTests.FocusBlockTests testFocusBlockCompletedIDsParsesPipeSeparatedIDs]' passed (0.002 seconds).
+Test Case '-[TimeBoxTests.FocusBlockTests testFocusBlockCreationFromCalendarEvent]' started.
+Test Case '-[TimeBoxTests.FocusBlockTests testFocusBlockCreationFromCalendarEvent]' passed (0.003 seconds).
+Test Case '-[TimeBoxTests.FocusBlockTests testFocusBlockCreationReturnsNilForNonFocusBlock]' started.
+Test Case '-[TimeBoxTests.FocusBlockTests testFocusBlockCreationReturnsNilForNonFocusBlock]' passed (0.001 seconds).
+Test Case '-[TimeBoxTests.FocusBlockTests testFocusBlockTaskIDsParsesPipeSeparatedIDs]' started.
+Test Case '-[TimeBoxTests.FocusBlockTests testFocusBlockTaskIDsParsesPipeSeparatedIDs]' passed (0.001 seconds).
+Test Case '-[TimeBoxTests.FocusBlockTests testFocusBlockTaskIDsReturnsEmptyForNoTasksLine]' started.
+Test Case '-[TimeBoxTests.FocusBlockTests testFocusBlockTaskIDsReturnsEmptyForNoTasksLine]' passed (0.049 seconds).
+Test Case '-[TimeBoxTests.FocusBlockTests testIsFocusBlockReturnsFalseForNilNotes]' started.
+Test Case '-[TimeBoxTests.FocusBlockTests testIsFocusBlockReturnsFalseForNilNotes]' passed (0.001 seconds).
+Test Case '-[TimeBoxTests.FocusBlockTests testIsFocusBlockReturnsFalseForRegularEvent]' started.
+Test Case '-[TimeBoxTests.FocusBlockTests testIsFocusBlockReturnsFalseForRegularEvent]' passed (0.001 seconds).
+Test Case '-[TimeBoxTests.FocusBlockTests testIsFocusBlockReturnsTrueForFocusBlockEvent]' started.
+Test Case '-[TimeBoxTests.FocusBlockTests testIsFocusBlockReturnsTrueForFocusBlockEvent]' passed (0.001 seconds).
+Test Case '-[TimeBoxTests.FocusBlockTests testSerializeToNotesCreatesCorrectFormat]' started.
+Test Case '-[TimeBoxTests.FocusBlockTests testSerializeToNotesCreatesCorrectFormat]' passed (0.001 seconds).
+Test Case '-[TimeBoxTests.FocusBlockTests testSerializeToNotesOmitsEmptyLists]' started.
+Test Case '-[TimeBoxTests.FocusBlockTests testSerializeToNotesOmitsEmptyLists]' passed (0.001 seconds).
+Test Suite 'FocusBlockTests' passed at 2026-01-14 12:08:14.319.
+	 Executed 10 tests, with 0 failures (0 unexpected) in 0.060 (0.064) seconds
+Test Suite 'TimeBoxTests.xctest' passed at 2026-01-14 12:08:14.320.
+	 Executed 10 tests, with 0 failures (0 unexpected) in 0.060 (0.065) seconds
+Test Suite 'Selected tests' passed at 2026-01-14 12:08:14.320.
+	 Executed 10 tests, with 0 failures (0 unexpected) in 0.060 (0.066) seconds
+
+** TEST SUCCEEDED **

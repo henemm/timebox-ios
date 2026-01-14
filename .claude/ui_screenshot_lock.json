@@ -1,7 +1,7 @@
 {
-  "file": "/Users/hem/Documents/opt/my-daily-sprints/TimeBox/Sources/Views/BacklogView.swift",
-  "before_screenshot": "/Users/hem/Documents/opt/my-daily-sprints/docs/artifacts/step4-duration-editing/screenshots/before-duration-picker.png",
-  "timestamp": "2026-01-13T14:52:14.905731",
-  "workflow": "step4-duration-editing",
+  "file": "/Users/hem/Documents/opt/my-daily-sprints/TimeBox/Sources/Views/FocusLiveView.swift",
+  "before_screenshot": "/Users/hem/Documents/opt/my-daily-sprints/docs/artifacts/calendar-selection/screenshots/before-settings.png",
+  "timestamp": "2026-01-14T19:08:16.524521",
+  "workflow": "calendar-selection",
   "awaiting_after": true
 }

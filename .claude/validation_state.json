@@ -22,8 +22,22 @@
     "TimeBox/Sources/Views/MiniBacklogView.swift",
     "TimeBox/TimeBoxTests/SyncEngineTests.swift",
     "TimeBox/TimeBoxUITests/DurationEditingUITests.swift",
-    "TimeBox/Sources/Views/DurationPicker.swift"
+    "TimeBox/Sources/Views/DurationPicker.swift",
+    "TimeBox/TimeBoxTests/EventKitRepositoryTests.swift",
+    "TimeBox/TimeBoxUITests/BacklogViewUITests.swift",
+    "TimeBox/TimeBoxUITests/SchedulingUITests.swift",
+    "TimeBox/TimeBoxUITests/ErrorStateUITests.swift",
+    "TimeBox/Sources/Models/CalendarEventTransfer.swift",
+    "TimeBox/Sources/Models/FocusBlock.swift",
+    "TimeBox/Sources/Views/BlockPlanningView.swift",
+    "TimeBox/TimeBoxTests/FocusBlockTests.swift",
+    "TimeBox/Sources/Views/TaskAssignmentView.swift",
+    "TimeBox/Sources/Views/FocusLiveView.swift",
+    "TimeBox/Sources/Views/SprintReviewSheet.swift",
+    "TimeBox/TimeBoxTests/CalendarSelectionTests.swift",
+    "TimeBox/Sources/Views/SettingsView.swift",
+    "TimeBox/Sources/Views/SettingsToolbarModifier.swift"
   ],
   "last_validation": null,
-  "last_change": "2026-01-13T14:49:55.636242"
+  "last_change": "2026-01-14T19:04:54.067604"
 }
