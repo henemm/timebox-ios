@@ -11,29 +11,29 @@ final class PlanningViewUITests: XCTestCase {
     }
 
     func testTabNavigationExists() throws {
-        // Verify both tabs exist
+        // Verify tabs exist
         let backlogTab = app.tabBars.buttons["Backlog"]
-        let planenTab = app.tabBars.buttons["Planen"]
+        let bloeckeTab = app.tabBars.buttons["Blöcke"]
 
         XCTAssertTrue(backlogTab.exists, "Backlog tab should exist")
-        XCTAssertTrue(planenTab.exists, "Planen tab should exist")
+        XCTAssertTrue(bloeckeTab.exists, "Blöcke tab should exist")
     }
 
-    func testCanSwitchToPlanenTab() throws {
-        // Tap on Planen tab
-        let planenTab = app.tabBars.buttons["Planen"]
-        planenTab.tap()
+    func testCanSwitchToBloeckeTab() throws {
+        // Tap on Blöcke tab
+        let bloeckeTab = app.tabBars.buttons["Blöcke"]
+        bloeckeTab.tap()
 
         // Wait for navigation
-        let planenTitle = app.navigationBars["Planen"]
-        let exists = planenTitle.waitForExistence(timeout: 5)
+        let bloeckeTitle = app.navigationBars["Blöcke"]
+        let exists = bloeckeTitle.waitForExistence(timeout: 5)
 
-        XCTAssertTrue(exists, "Planen navigation bar should appear after tapping tab")
+        XCTAssertTrue(exists, "Blöcke navigation bar should appear after tapping tab")
     }
 
     func testTimelineShowsHours() throws {
-        // Switch to Planen tab
-        app.tabBars.buttons["Planen"].tap()
+        // Switch to Blöcke tab
+        app.tabBars.buttons["Blöcke"].tap()
 
         // Wait for content to load
         sleep(2)
@@ -45,15 +45,15 @@ final class PlanningViewUITests: XCTestCase {
         XCTAssertTrue(hour08.exists || hour12.exists, "Timeline should show hour labels")
     }
 
-    func testPlanenTabScreenshot() throws {
-        // Switch to Planen tab
-        app.tabBars.buttons["Planen"].tap()
+    func testBloeckeTabScreenshot() throws {
+        // Switch to Blöcke tab
+        app.tabBars.buttons["Blöcke"].tap()
         sleep(2)
 
         // Take screenshot
         let screenshot = app.screenshot()
         let attachment = XCTAttachment(screenshot: screenshot)
-        attachment.name = "Planen Tab"
+        attachment.name = "Blöcke Tab"
         attachment.lifetime = .keepAlways
         add(attachment)
     }

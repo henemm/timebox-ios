@@ -52,17 +52,17 @@ final class ErrorStateUITests: XCTestCase {
     }
 
     /// GIVEN: App is in any state
-    /// WHEN: Switching to PlanningView
+    /// WHEN: Switching to Zuordnen tab
     /// THEN: App should not crash and show appropriate UI
-    func testPlanningViewDoesNotCrash() throws {
-        // Switch to Planen tab
-        let planenTab = app.tabBars.buttons["Planen"]
-        XCTAssertTrue(planenTab.waitForExistence(timeout: 5))
-        planenTab.tap()
+    func testTaskAssignmentViewDoesNotCrash() throws {
+        // Switch to Zuordnen tab
+        let zuordnenTab = app.tabBars.buttons["Zuordnen"]
+        XCTAssertTrue(zuordnenTab.waitForExistence(timeout: 5))
+        zuordnenTab.tap()
 
-        // Should show Planen nav bar
-        let planenNav = app.navigationBars["Planen"]
-        XCTAssertTrue(planenNav.waitForExistence(timeout: 10), "Planen should load without crash")
+        // Should show Zuordnen nav bar
+        let zuordnenNav = app.navigationBars["Zuordnen"]
+        XCTAssertTrue(zuordnenNav.waitForExistence(timeout: 10), "Zuordnen should load without crash")
     }
 
     // MARK: - Loading State Tests
@@ -109,16 +109,16 @@ final class ErrorStateUITests: XCTestCase {
         backlogAttachment.lifetime = .keepAlways
         add(backlogAttachment)
 
-        // Switch to Planen
-        app.tabBars.buttons["Planen"].tap()
+        // Switch to Blöcke
+        app.tabBars.buttons["Blöcke"].tap()
         sleep(2)
 
-        // Planen state
-        let planenScreenshot = app.screenshot()
-        let planenAttachment = XCTAttachment(screenshot: planenScreenshot)
-        planenAttachment.name = "CurrentState-Planen"
-        planenAttachment.lifetime = .keepAlways
-        add(planenAttachment)
+        // Blöcke state
+        let bloeckeScreenshot = app.screenshot()
+        let bloeckeAttachment = XCTAttachment(screenshot: bloeckeScreenshot)
+        bloeckeAttachment.name = "CurrentState-Bloecke"
+        bloeckeAttachment.lifetime = .keepAlways
+        add(bloeckeAttachment)
     }
 
     // MARK: - Tab Bar Tests
@@ -131,15 +131,15 @@ final class ErrorStateUITests: XCTestCase {
         XCTAssertTrue(tabBar.exists, "Tab bar should exist")
 
         let backlogTab = app.tabBars.buttons["Backlog"]
-        let planenTab = app.tabBars.buttons["Planen"]
+        let bloeckeTab = app.tabBars.buttons["Blöcke"]
 
         XCTAssertTrue(backlogTab.exists, "Backlog tab should exist")
-        XCTAssertTrue(planenTab.exists, "Planen tab should exist")
+        XCTAssertTrue(bloeckeTab.exists, "Blöcke tab should exist")
 
         // Test tab switching
-        planenTab.tap()
+        bloeckeTab.tap()
         sleep(1)
-        XCTAssertTrue(app.navigationBars["Planen"].exists, "Should navigate to Planen")
+        XCTAssertTrue(app.navigationBars["Blöcke"].exists, "Should navigate to Blöcke")
 
         backlogTab.tap()
         sleep(1)
