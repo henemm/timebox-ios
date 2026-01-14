@@ -33,6 +33,7 @@ struct PlanningView: View {
                         date: selectedDate,
                         events: calendarEvents,
                         onScheduleTask: scheduleTask,
+                        onMoveEvent: moveEvent,
                         onEventTap: { event in
                             selectedEvent = event
                             showEventActions = true
@@ -172,6 +173,22 @@ struct PlanningView: View {
                 scheduleFeedback.toggle()
             } catch {
                 errorMessage = "Event konnte nicht gelöscht werden."
+            }
+        }
+    }
+
+    private func moveEvent(_ transfer: CalendarEventTransfer, to newStartTime: Date) {
+        Task {
+            do {
+                try eventKitRepo.moveCalendarEvent(
+                    eventID: transfer.id,
+                    to: newStartTime,
+                    duration: transfer.duration
+                )
+                await loadData()
+                scheduleFeedback.toggle()
+            } catch {
+                errorMessage = "Event konnte nicht verschoben werden."
             }
         }
     }

@@ -4,6 +4,7 @@ struct TimelineView: View {
     let date: Date
     let events: [CalendarEvent]
     let onScheduleTask: ((PlanItemTransfer, Date) -> Void)?
+    let onMoveEvent: ((CalendarEventTransfer, Date) -> Void)?
     let onEventTap: ((CalendarEvent) -> Void)?
     let onRefresh: (() async -> Void)?
 
@@ -15,12 +16,14 @@ struct TimelineView: View {
         date: Date,
         events: [CalendarEvent],
         onScheduleTask: ((PlanItemTransfer, Date) -> Void)? = nil,
+        onMoveEvent: ((CalendarEventTransfer, Date) -> Void)? = nil,
         onEventTap: ((CalendarEvent) -> Void)? = nil,
         onRefresh: (() async -> Void)? = nil
     ) {
         self.date = date
         self.events = events
         self.onScheduleTask = onScheduleTask
+        self.onMoveEvent = onMoveEvent
         self.onEventTap = onEventTap
         self.onRefresh = onRefresh
     }
@@ -36,7 +39,8 @@ struct TimelineView: View {
                                 hour: hour,
                                 hourHeight: hourHeight,
                                 date: date,
-                                onScheduleTask: onScheduleTask
+                                onScheduleTask: onScheduleTask,
+                                onMoveEvent: onMoveEvent
                             )
                         }
                     }
@@ -73,6 +77,7 @@ struct TimelineHourSlot: View {
     let hourHeight: CGFloat
     let date: Date
     let onScheduleTask: ((PlanItemTransfer, Date) -> Void)?
+    let onMoveEvent: ((CalendarEventTransfer, Date) -> Void)?
 
     var body: some View {
         VStack(spacing: 0) {
@@ -84,6 +89,7 @@ struct TimelineHourSlot: View {
                     slotHeight: hourHeight / 4,
                     date: date,
                     onScheduleTask: onScheduleTask,
+                    onMoveEvent: onMoveEvent,
                     showLabel: quarter == 0
                 )
             }
@@ -100,6 +106,7 @@ struct QuarterHourDropZone: View {
     let slotHeight: CGFloat
     let date: Date
     let onScheduleTask: ((PlanItemTransfer, Date) -> Void)?
+    let onMoveEvent: ((CalendarEventTransfer, Date) -> Void)?
     let showLabel: Bool
 
     @State private var isTargeted = false
@@ -167,6 +174,18 @@ struct QuarterHourDropZone: View {
                 return false
             }
             onSchedule(item, dropTime)
+            return true
+        } isTargeted: { targeted in
+            withAnimation(.easeInOut(duration: 0.15)) {
+                isTargeted = targeted
+            }
+        }
+        .dropDestination(for: CalendarEventTransfer.self) { items, _ in
+            guard let item = items.first,
+                  let onMove = onMoveEvent else {
+                return false
+            }
+            onMove(item, dropTime)
             return true
         } isTargeted: { targeted in
             withAnimation(.easeInOut(duration: 0.15)) {

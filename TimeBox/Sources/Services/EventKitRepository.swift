@@ -158,6 +158,25 @@ final class EventKitRepository: @unchecked Sendable {
         reminder.completionDate = nil
         try eventStore.save(reminder, commit: true)
     }
+
+    func moveCalendarEvent(eventID: String, to newStartDate: Date, duration: Int) throws {
+        guard calendarAuthStatus == .fullAccess else {
+            throw EventKitError.notAuthorized
+        }
+        guard let event = eventStore.event(withIdentifier: eventID) else {
+            return // Silent fail if event not found
+        }
+
+        let newEndDate = Calendar.current.date(
+            byAdding: .minute,
+            value: duration,
+            to: newStartDate
+        ) ?? newStartDate
+
+        event.startDate = newStartDate
+        event.endDate = newEndDate
+        try eventStore.save(event, span: .thisEvent)
+    }
 }
 
 enum EventKitError: Error, LocalizedError {

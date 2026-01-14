@@ -39,6 +39,7 @@ struct EventBlock: View {
             .onTapGesture {
                 onTap?()
             }
+            .draggable(CalendarEventTransfer(from: event))
     }
 
     private var timeRangeText: String {
