@@ -17,6 +17,7 @@
 		53697A70444E5ECF3B760A1C /* SyncEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34D186C26C7135F80A5E3B0B /* SyncEngine.swift */; };
 		586B7D1F1588622970BCEED8 /* MiniBacklogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1430133DDF6FA76E9E129534 /* MiniBacklogView.swift */; };
 		60EF444FADDBAC17F14380E0 /* FocusLiveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 710817B02FE720EDA21132FA /* FocusLiveView.swift */; };
+		65B5E7020B61B9C1785BD378 /* SettingsToolbarModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26CD9467C8156E2C66B2DC9C /* SettingsToolbarModifier.swift */; };
 		6E8284A6F06C79DBE93A383E /* TaskMetadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42790F5402B3E1F632874F5A /* TaskMetadata.swift */; };
 		83C779D1EFB193A3B7A2E5AD /* BlockPlanningView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20D808247CA55763ACF23BC5 /* BlockPlanningView.swift */; };
 		878D5818BD3563CCE351CEE8 /* ReminderData.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1F3228806B919AB0836326F /* ReminderData.swift */; };
@@ -29,6 +30,7 @@
 		B5253CB93F49550930B0AF7C /* FocusBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0B1EE7295AF0AD91CA0027A /* FocusBlock.swift */; };
 		B9D12D9BF22325ADDE757862 /* CalendarEventTransfer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D1F03B35977548B59D7269F /* CalendarEventTransfer.swift */; };
 		BDEDB5DE393186FC2D0BFF58 /* DurationEditingUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF402517A33C6BA497EFE1AC /* DurationEditingUITests.swift */; };
+		BFEDE0F6D0C383A49101B8D2 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F364C9B1BB1D787792360427 /* SettingsView.swift */; };
 		C2A1677B81BC3C8D2C548495 /* HourRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 821E6E3E951900DF99190196 /* HourRow.swift */; };
 		C3F49C8B0CD3C6552054BE7D /* EventKitRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4451B46B76517090C636FA94 /* EventKitRepository.swift */; };
 		C89E9F957213671FF1B0DC91 /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4383C656C07E4B4F56335921 /* MainTabView.swift */; };
@@ -41,6 +43,7 @@
 		E907CB03C20C1B55A48C4B1B /* BacklogRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92133F2683BB9B90566D7646 /* BacklogRow.swift */; };
 		E98A667A603886CE7A68D968 /* EventBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B77251F3B87AF26FD6473763 /* EventBlock.swift */; };
 		EA6560340794C06D21D9CD85 /* PlanningView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8537E6312F33871F310A843F /* PlanningView.swift */; };
+		EDE19804EA6D5CB9BCCB6981 /* CalendarSelectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1CCA00FEA15FD7BA149CDDE /* CalendarSelectionTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -67,6 +70,7 @@
 		1430133DDF6FA76E9E129534 /* MiniBacklogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MiniBacklogView.swift; sourceTree = "<group>"; };
 		14E16E8941781A7134CBEE3A /* SyncEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncEngineTests.swift; sourceTree = "<group>"; };
 		20D808247CA55763ACF23BC5 /* BlockPlanningView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockPlanningView.swift; sourceTree = "<group>"; };
+		26CD9467C8156E2C66B2DC9C /* SettingsToolbarModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsToolbarModifier.swift; sourceTree = "<group>"; };
 		31904CA661DB113E1D4F523F /* TimeBoxUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = TimeBoxUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		339BBA1A3799CB0C6CF5897A /* BacklogViewUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BacklogViewUITests.swift; sourceTree = "<group>"; };
 		34D186C26C7135F80A5E3B0B /* SyncEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncEngine.swift; sourceTree = "<group>"; };
@@ -95,6 +99,8 @@
 		D7ED51F72D6039EFAC3D85A3 /* SchedulingUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchedulingUITests.swift; sourceTree = "<group>"; };
 		DF402517A33C6BA497EFE1AC /* DurationEditingUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DurationEditingUITests.swift; sourceTree = "<group>"; };
 		E1F3228806B919AB0836326F /* ReminderData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReminderData.swift; sourceTree = "<group>"; };
+		F1CCA00FEA15FD7BA149CDDE /* CalendarSelectionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarSelectionTests.swift; sourceTree = "<group>"; };
+		F364C9B1BB1D787792360427 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		F7B0BE54BB8E4DC5B9F85C28 /* CalendarEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarEvent.swift; sourceTree = "<group>"; };
 		F91103B45CFB1388E6B12F3C /* DurationPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DurationPicker.swift; sourceTree = "<group>"; };
 		FDD319A3F7DEE05F6A8885FC /* DurationBadge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DurationBadge.swift; sourceTree = "<group>"; };
@@ -153,6 +159,8 @@
 				1430133DDF6FA76E9E129534 /* MiniBacklogView.swift */,
 				C439255FDECD6C6CB2377237 /* MiniTaskCard.swift */,
 				8537E6312F33871F310A843F /* PlanningView.swift */,
+				26CD9467C8156E2C66B2DC9C /* SettingsToolbarModifier.swift */,
+				F364C9B1BB1D787792360427 /* SettingsView.swift */,
 				B31CB18EF0C80E62953F34D6 /* SprintReviewSheet.swift */,
 				0461CA6D7F62F83512E8AD05 /* TaskAssignmentView.swift */,
 				C945F5092F6FFB66C11FD4C2 /* TimelineView.swift */,
@@ -174,6 +182,7 @@
 		A6B3805EF19D1B131D346DDD /* TimeBoxTests */ = {
 			isa = PBXGroup;
 			children = (
+				F1CCA00FEA15FD7BA149CDDE /* CalendarSelectionTests.swift */,
 				9DC26C4D8FDC4B811001FD2C /* EventKitRepositoryTests.swift */,
 				1177F32AD2A8E3DE065A8945 /* FocusBlockTests.swift */,
 				14E16E8941781A7134CBEE3A /* SyncEngineTests.swift */,
@@ -316,6 +325,8 @@
 				437A93B5161BFF7E7E5E73DC /* PlanItemTransfer.swift in Sources */,
 				EA6560340794C06D21D9CD85 /* PlanningView.swift in Sources */,
 				878D5818BD3563CCE351CEE8 /* ReminderData.swift in Sources */,
+				65B5E7020B61B9C1785BD378 /* SettingsToolbarModifier.swift in Sources */,
+				BFEDE0F6D0C383A49101B8D2 /* SettingsView.swift in Sources */,
 				991544877FDF4CD72B4F2DE4 /* SprintReviewSheet.swift in Sources */,
 				53697A70444E5ECF3B760A1C /* SyncEngine.swift in Sources */,
 				D23F767C76495B0CA789C0B4 /* TaskAssignmentView.swift in Sources */,
@@ -341,6 +352,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EDE19804EA6D5CB9BCCB6981 /* CalendarSelectionTests.swift in Sources */,
 				968A3087301F055E331E560C /* EventKitRepositoryTests.swift in Sources */,
 				480FAFAEB03560F38352900B /* FocusBlockTests.swift in Sources */,
 				3F9639915C12205F6DE53C7D /* SyncEngineTests.swift in Sources */,

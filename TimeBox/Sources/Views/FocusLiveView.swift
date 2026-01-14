@@ -37,6 +37,7 @@ struct FocusLiveView: View {
                 }
             }
             .navigationTitle("Fokus")
+            .withSettingsToolbar()
             .sensoryFeedback(.success, trigger: completionFeedback)
             .sheet(isPresented: $showSprintReview) {
                 if let block = activeBlock {

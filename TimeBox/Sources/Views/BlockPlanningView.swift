@@ -44,6 +44,7 @@ struct BlockPlanningView: View {
                     .labelsHidden()
                 }
             }
+            .withSettingsToolbar()
             .sheet(isPresented: $showCreateSheet) {
                 if let slot = selectedSlot {
                     CreateFocusBlockSheet(

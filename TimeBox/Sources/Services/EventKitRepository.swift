@@ -99,7 +99,7 @@ final class EventKitRepository: @unchecked Sendable {
         let predicate = eventStore.predicateForEvents(
             withStart: startOfDay,
             end: endOfDay,
-            calendars: nil
+            calendars: visibleCalendars()
         )
 
         let events = eventStore.events(matching: predicate)
@@ -115,7 +115,7 @@ final class EventKitRepository: @unchecked Sendable {
         event.title = title
         event.startDate = startDate
         event.endDate = endDate
-        event.calendar = eventStore.defaultCalendarForNewEvents
+        event.calendar = calendarForEvents()
 
         // Store reminderID in notes for later unscheduling
         if let reminderID {
@@ -191,7 +191,7 @@ final class EventKitRepository: @unchecked Sendable {
         event.title = "Focus Block \(formatter.string(from: startDate))"
         event.startDate = startDate
         event.endDate = endDate
-        event.calendar = eventStore.defaultCalendarForNewEvents
+        event.calendar = calendarForEvents()
         event.notes = FocusBlock.serializeToNotes(taskIDs: [], completedTaskIDs: [])
 
         try eventStore.save(event, span: .thisEvent)
@@ -213,6 +213,41 @@ final class EventKitRepository: @unchecked Sendable {
     func fetchFocusBlocks(for date: Date) throws -> [FocusBlock] {
         let events = try fetchCalendarEvents(for: date)
         return events.compactMap { FocusBlock(from: $0) }
+    }
+
+    // MARK: - Calendar Selection Methods
+
+    /// Returns all available calendars for events
+    func getAllCalendars() -> [EKCalendar] {
+        eventStore.calendars(for: .event)
+    }
+
+    /// Returns only calendars that allow content modifications (writable)
+    func getWritableCalendars() -> [EKCalendar] {
+        eventStore.calendars(for: .event)
+            .filter { $0.allowsContentModifications }
+    }
+
+    /// Returns the selected calendar for creating events, with fallback to default
+    func calendarForEvents() -> EKCalendar? {
+        if let id = UserDefaults.standard.string(forKey: "selectedCalendarID"),
+           !id.isEmpty,
+           let calendar = eventStore.calendar(withIdentifier: id),
+           calendar.allowsContentModifications {
+            return calendar
+        }
+        return eventStore.defaultCalendarForNewEvents
+    }
+
+    /// Returns the saved visible calendar IDs, or nil if not configured
+    func visibleCalendarIDs() -> [String]? {
+        UserDefaults.standard.array(forKey: "visibleCalendarIDs") as? [String]
+    }
+
+    /// Returns the visible calendars as EKCalendar array, or nil if not configured (show all)
+    func visibleCalendars() -> [EKCalendar]? {
+        guard let ids = visibleCalendarIDs(), !ids.isEmpty else { return nil }
+        return ids.compactMap { eventStore.calendar(withIdentifier: $0) }
     }
 }
 

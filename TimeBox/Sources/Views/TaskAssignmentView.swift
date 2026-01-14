@@ -54,6 +54,7 @@ struct TaskAssignmentView: View {
                     .labelsHidden()
                 }
             }
+            .withSettingsToolbar()
             .sensoryFeedback(.success, trigger: assignmentFeedback)
         }
         .task {

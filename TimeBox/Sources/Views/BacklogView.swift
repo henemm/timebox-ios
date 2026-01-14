@@ -47,6 +47,7 @@ struct BacklogView: View {
             .toolbar {
                 EditButton()
             }
+            .withSettingsToolbar()
             .sensoryFeedback(.impact(weight: .medium), trigger: reorderTrigger)
             .sensoryFeedback(.success, trigger: durationFeedback)
             .sheet(item: $selectedItemForDuration) { item in
