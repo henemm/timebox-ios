@@ -5,6 +5,7 @@ struct TimelineView: View {
     let events: [CalendarEvent]
     let onScheduleTask: ((PlanItemTransfer, Date) -> Void)?
     let onEventTap: ((CalendarEvent) -> Void)?
+    let onRefresh: (() async -> Void)?
 
     private let hourHeight: CGFloat = 60
     private let startHour = 6
@@ -14,12 +15,14 @@ struct TimelineView: View {
         date: Date,
         events: [CalendarEvent],
         onScheduleTask: ((PlanItemTransfer, Date) -> Void)? = nil,
-        onEventTap: ((CalendarEvent) -> Void)? = nil
+        onEventTap: ((CalendarEvent) -> Void)? = nil,
+        onRefresh: (() async -> Void)? = nil
     ) {
         self.date = date
         self.events = events
         self.onScheduleTask = onScheduleTask
         self.onEventTap = onEventTap
+        self.onRefresh = onRefresh
     }
 
     var body: some View {
@@ -52,6 +55,9 @@ struct TimelineView: View {
                 .frame(minHeight: CGFloat(endHour - startHour) * hourHeight)
             }
             .scrollIndicators(.hidden)
+            .refreshable {
+                await onRefresh?()
+            }
         }
     }
 

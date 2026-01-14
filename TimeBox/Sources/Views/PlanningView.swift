@@ -36,7 +36,8 @@ struct PlanningView: View {
                         onEventTap: { event in
                             selectedEvent = event
                             showEventActions = true
-                        }
+                        },
+                        onRefresh: loadData
                     )
 
                     if !unscheduledTasks.isEmpty {

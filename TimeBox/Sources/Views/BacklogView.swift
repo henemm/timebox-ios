@@ -38,6 +38,9 @@ struct BacklogView: View {
                         .onMove(perform: moveItems)
                     }
                     .listStyle(.plain)
+                    .refreshable {
+                        await loadTasks()
+                    }
                 }
             }
             .navigationTitle("Backlog")
