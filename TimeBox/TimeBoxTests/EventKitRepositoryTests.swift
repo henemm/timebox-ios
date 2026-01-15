@@ -1,13 +1,15 @@
 import XCTest
 @testable import TimeBox
 
-@MainActor
 final class EventKitRepositoryTests: XCTestCase {
 
-    var eventKitRepo: EventKitRepository!
+    var eventKitRepo: (any EventKitRepositoryProtocol)!
 
-    override func setUp() async throws {
-        eventKitRepo = EventKitRepository()
+    override func setUp() {
+        let mock = MockEventKitRepository()
+        mock.mockCalendarAuthStatus = .fullAccess
+        mock.mockReminderAuthStatus = .fullAccess
+        eventKitRepo = mock
     }
 
     override func tearDown() async throws {

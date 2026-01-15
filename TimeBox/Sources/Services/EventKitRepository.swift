@@ -2,7 +2,7 @@
 import Foundation
 
 @Observable
-final class EventKitRepository: @unchecked Sendable {
+final class EventKitRepository: EventKitRepositoryProtocol, @unchecked Sendable {
     private let eventStore = EKEventStore()
 
     /// Check if running in UI test mode
