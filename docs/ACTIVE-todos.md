@@ -45,7 +45,19 @@ _Keine offenen Bugs_
 - Status: OFFEN / SPEC READY / IN ARBEIT / ERLEDIGT / BLOCKIERT
 -->
 
-_Keine offenen Tasks_
+**Task 1: Mock EventKit Repository - Phase 2**
+- Beschreibung: View Dependency Injection + UI Test Fixes (8 Timeline Tests)
+- Umfang: ~10 Dateien (6 Views, TimeBoxApp, 8 UI Tests)
+- Prioritaet: Mittel
+- Status: OFFEN (Phase 1 abgeschlossen)
+- Hinweis: Phase 1 schafft Foundation, Phase 2 nutzt sie für UI Tests
+
+**Task 2: Test Validation auf Device**
+- Beschreibung: MockEventKitRepositoryTests auf echtem iPhone ausführen
+- Grund: Simulator crasht (Environment Issue)
+- Erwartung: 5 neue Tests + 1 Fix sollten passen
+- Prioritaet: Niedrig (Code Review + Build Success OK)
+- Status: OFFEN
 
 ---
 
@@ -60,6 +72,14 @@ _Keine Items mit fertiger Spec_
 ## Zuletzt erledigt
 
 <!-- Archiv der letzten erledigten Items -->
+
+**Feature: Mock EventKit Repository (Phase 1)**
+- Beschreibung: Protocol-basierte EventKit-Abstraktion mit Mock für Unit Tests
+- Implementiert: EventKitRepositoryProtocol, MockEventKitRepository, Test Refactoring
+- Tests: Build erfolgreich, 5 neue Mock Tests, 1 Fix (Device-Validation ausstehend)
+- Validation: 2026-01-15 (Build Success + Code Review)
+- Status: ERLEDIGT (Phase 1 - Unit Test Foundation)
+- Phase 2: View Injection + UI Tests (Future)
 
 **Feature: Multi-Source Task System**
 - Beschreibung: Task-Source Protocol System mit lokaler SwiftData Storage und CloudKit Sync
