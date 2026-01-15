@@ -1,0 +1,126 @@
+import Foundation
+import SwiftData
+
+/// TaskSource implementation for locally stored tasks using SwiftData.
+/// Supports CloudKit sync when enabled on the ModelContainer.
+@MainActor
+final class LocalTaskSource: @preconcurrency TaskSource, @preconcurrency TaskSourceWritable {
+    typealias TaskData = LocalTask
+
+    // MARK: - Static Properties
+
+    nonisolated static var sourceIdentifier: String { "local" }
+    nonisolated static var displayName: String { "Lokale Tasks" }
+
+    // MARK: - Properties
+
+    private let modelContext: ModelContext
+
+    nonisolated var isConfigured: Bool { true }
+
+    // MARK: - Initialization
+
+    init(modelContext: ModelContext) {
+        self.modelContext = modelContext
+    }
+
+    // MARK: - TaskSource
+
+    func requestAccess() async throws -> Bool {
+        // Local storage always has access
+        return true
+    }
+
+    func fetchIncompleteTasks() async throws -> [LocalTask] {
+        var descriptor = FetchDescriptor<LocalTask>(
+            predicate: #Predicate { !$0.isCompleted }
+        )
+        descriptor.sortBy = [SortDescriptor(\.sortOrder)]
+        return try modelContext.fetch(descriptor)
+    }
+
+    func markComplete(taskID: String) async throws {
+        guard let task = try findTask(byID: taskID) else { return }
+        task.isCompleted = true
+        try modelContext.save()
+    }
+
+    func markIncomplete(taskID: String) async throws {
+        guard let task = try findTask(byID: taskID) else { return }
+        task.isCompleted = false
+        try modelContext.save()
+    }
+
+    // MARK: - TaskSourceWritable
+
+    func createTask(
+        title: String,
+        category: String?,
+        dueDate: Date?,
+        priority: Int
+    ) async throws -> LocalTask {
+        let nextSortOrder = try await getNextSortOrder()
+
+        let task = LocalTask(
+            title: title,
+            priority: priority,
+            category: category,
+            dueDate: dueDate,
+            sortOrder: nextSortOrder
+        )
+        modelContext.insert(task)
+        try modelContext.save()
+        return task
+    }
+
+    func updateTask(
+        taskID: String,
+        title: String?,
+        category: String?,
+        dueDate: Date?,
+        priority: Int?
+    ) async throws {
+        guard let task = try findTask(byID: taskID) else { return }
+
+        if let title = title {
+            task.title = title
+        }
+        if let category = category {
+            task.category = category
+        }
+        if let dueDate = dueDate {
+            task.dueDate = dueDate
+        }
+        if let priority = priority {
+            task.priority = priority
+        }
+
+        try modelContext.save()
+    }
+
+    func deleteTask(taskID: String) async throws {
+        guard let task = try findTask(byID: taskID) else { return }
+        modelContext.delete(task)
+        try modelContext.save()
+    }
+
+    // MARK: - Private Helpers
+
+    private func findTask(byID id: String) throws -> LocalTask? {
+        guard let uuid = UUID(uuidString: id) else { return nil }
+
+        let descriptor = FetchDescriptor<LocalTask>(
+            predicate: #Predicate { $0.uuid == uuid }
+        )
+        return try modelContext.fetch(descriptor).first
+    }
+
+    private func getNextSortOrder() async throws -> Int {
+        var descriptor = FetchDescriptor<LocalTask>()
+        descriptor.sortBy = [SortDescriptor(\.sortOrder, order: .reverse)]
+        descriptor.fetchLimit = 1
+
+        let tasks = try modelContext.fetch(descriptor)
+        return (tasks.first?.sortOrder ?? -1) + 1
+    }
+}

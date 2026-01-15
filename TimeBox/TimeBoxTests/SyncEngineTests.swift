@@ -5,76 +5,116 @@ import SwiftData
 @MainActor
 final class SyncEngineTests: XCTestCase {
 
-    var modelContainer: ModelContainer!
-    var modelContext: ModelContext!
-    var eventKitRepo: EventKitRepository!
+    var container: ModelContainer!
+    var source: LocalTaskSource!
     var syncEngine: SyncEngine!
 
-    override func setUp() async throws {
+    override func setUpWithError() throws {
         let config = ModelConfiguration(isStoredInMemoryOnly: true)
-        modelContainer = try ModelContainer(for: TaskMetadata.self, configurations: config)
-        modelContext = modelContainer.mainContext
-        eventKitRepo = EventKitRepository()
-        syncEngine = SyncEngine(eventKitRepo: eventKitRepo, modelContext: modelContext)
+        container = try ModelContainer(for: LocalTask.self, configurations: config)
+        source = LocalTaskSource(modelContext: container.mainContext)
+        syncEngine = SyncEngine(taskSource: source, modelContext: container.mainContext)
     }
 
-    override func tearDown() async throws {
-        modelContainer = nil
-        modelContext = nil
-        eventKitRepo = nil
+    override func tearDownWithError() throws {
+        container = nil
+        source = nil
         syncEngine = nil
     }
 
-    // MARK: - TDD RED: updateDuration Tests
+    // MARK: - Sync Tests
 
-    /// GIVEN: TaskMetadata exists for a reminder
-    /// WHEN: updateDuration(itemID, 30) is called
-    /// THEN: manualDuration should be 30
-    func testUpdateDurationSetsManualDuration() throws {
-        // Setup: Create TaskMetadata
-        let reminderID = "test-reminder-123"
-        let metadata = TaskMetadata(reminderID: reminderID, sortOrder: 0)
-        modelContext.insert(metadata)
-        try modelContext.save()
+    func test_sync_returnsIncompleteTasks() async throws {
+        let context = container.mainContext
+        let task1 = LocalTask(title: "Task 1", priority: 0)
+        let task2 = LocalTask(title: "Task 2", priority: 0)
+        task2.isCompleted = true
+        let task3 = LocalTask(title: "Task 3", priority: 0)
 
-        // Act: Call updateDuration - THIS METHOD DOESN'T EXIST YET
-        try syncEngine.updateDuration(itemID: reminderID, minutes: 30)
+        context.insert(task1)
+        context.insert(task2)
+        context.insert(task3)
+        try context.save()
 
-        // Assert
-        let fetchDescriptor = FetchDescriptor<TaskMetadata>(
-            predicate: #Predicate { $0.reminderID == reminderID }
-        )
-        let results = try modelContext.fetch(fetchDescriptor)
-        XCTAssertEqual(results.first?.manualDuration, 30)
+        let planItems = try await syncEngine.sync()
+
+        XCTAssertEqual(planItems.count, 2)
+        XCTAssertTrue(planItems.allSatisfy { !$0.isCompleted })
     }
 
-    /// GIVEN: TaskMetadata exists with manualDuration == 30
-    /// WHEN: updateDuration(itemID, nil) is called (reset)
-    /// THEN: manualDuration should be nil
-    func testUpdateDurationResetSetsNil() throws {
-        // Setup: Create TaskMetadata with existing duration
-        let reminderID = "test-reminder-456"
-        let metadata = TaskMetadata(reminderID: reminderID, sortOrder: 0)
-        metadata.manualDuration = 30
-        modelContext.insert(metadata)
-        try modelContext.save()
+    func test_sync_sortsByRank() async throws {
+        let context = container.mainContext
+        let task1 = LocalTask(title: "Third", priority: 0)
+        task1.sortOrder = 2
+        let task2 = LocalTask(title: "First", priority: 0)
+        task2.sortOrder = 0
+        let task3 = LocalTask(title: "Second", priority: 0)
+        task3.sortOrder = 1
 
-        // Act: Call updateDuration with nil - THIS METHOD DOESN'T EXIST YET
-        try syncEngine.updateDuration(itemID: reminderID, minutes: nil)
+        context.insert(task1)
+        context.insert(task2)
+        context.insert(task3)
+        try context.save()
 
-        // Assert
-        let fetchDescriptor = FetchDescriptor<TaskMetadata>(
-            predicate: #Predicate { $0.reminderID == reminderID }
-        )
-        let results = try modelContext.fetch(fetchDescriptor)
-        XCTAssertNil(results.first?.manualDuration)
+        let planItems = try await syncEngine.sync()
+
+        XCTAssertEqual(planItems[0].title, "First")
+        XCTAssertEqual(planItems[1].title, "Second")
+        XCTAssertEqual(planItems[2].title, "Third")
     }
 
-    /// GIVEN: No TaskMetadata exists for the given ID
-    /// WHEN: updateDuration is called
-    /// THEN: Nothing crashes, operation is a no-op
-    func testUpdateDurationWithNonexistentIDDoesNotCrash() throws {
-        // Act: Call updateDuration for non-existent ID
-        XCTAssertNoThrow(try syncEngine.updateDuration(itemID: "nonexistent", minutes: 15))
+    // MARK: - updateDuration Tests
+
+    func test_updateDuration_setsManualDuration() async throws {
+        let context = container.mainContext
+        let task = LocalTask(title: "Task", priority: 0)
+        context.insert(task)
+        try context.save()
+
+        try await syncEngine.updateDuration(itemID: task.id, minutes: 30)
+
+        XCTAssertEqual(task.manualDuration, 30)
+    }
+
+    func test_updateDuration_resetsToNil() async throws {
+        let context = container.mainContext
+        let task = LocalTask(title: "Task", priority: 0)
+        task.manualDuration = 30
+        context.insert(task)
+        try context.save()
+
+        try await syncEngine.updateDuration(itemID: task.id, minutes: nil)
+
+        XCTAssertNil(task.manualDuration)
+    }
+
+    func test_updateDuration_withInvalidID_doesNotCrash() async throws {
+        try await syncEngine.updateDuration(itemID: "invalid-id", minutes: 15)
+        // No crash = success
+    }
+
+    // MARK: - updateSortOrder Tests
+
+    func test_updateSortOrder_updatesTasksSortOrder() async throws {
+        let context = container.mainContext
+        let task1 = LocalTask(title: "Task 1", priority: 0)
+        task1.sortOrder = 0
+        let task2 = LocalTask(title: "Task 2", priority: 0)
+        task2.sortOrder = 1
+
+        context.insert(task1)
+        context.insert(task2)
+        try context.save()
+
+        // Create PlanItems in reversed order
+        let planItems = [
+            PlanItem(localTask: task2),
+            PlanItem(localTask: task1)
+        ]
+
+        try await syncEngine.updateSortOrder(for: planItems)
+
+        XCTAssertEqual(task2.sortOrder, 0)
+        XCTAssertEqual(task1.sortOrder, 1)
     }
 }

@@ -131,7 +131,8 @@ struct TaskAssignmentView: View {
 
             focusBlocks = try eventKitRepo.fetchFocusBlocks(for: selectedDate)
 
-            let syncEngine = SyncEngine(eventKitRepo: eventKitRepo, modelContext: modelContext)
+            let taskSource = LocalTaskSource(modelContext: modelContext)
+            let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
             unscheduledTasks = try await syncEngine.sync()
 
         } catch {

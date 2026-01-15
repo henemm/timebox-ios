@@ -1,10 +1,12 @@
 import Foundation
 import SwiftData
 
+/// Metadata for tasks synced from external sources (e.g., Apple Reminders).
+/// Note: CloudKit requires all attributes to have default values.
 @Model
 final class TaskMetadata {
-    @Attribute(.unique) var reminderID: String
-    var sortOrder: Int
+    var reminderID: String = ""
+    var sortOrder: Int = 0
     var manualDuration: Int?
 
     init(reminderID: String, sortOrder: Int) {

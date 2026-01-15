@@ -24,6 +24,21 @@ struct PlanItem: Identifiable, Sendable {
         self.durationSource = source
     }
 
+    init(localTask: LocalTask) {
+        self.id = localTask.id
+        self.title = localTask.title
+        self.isCompleted = localTask.isCompleted
+        self.priority = localTask.priority
+        self.rank = localTask.sortOrder
+
+        let (duration, source) = Self.resolveDuration(
+            manual: localTask.manualDuration,
+            title: localTask.title
+        )
+        self.effectiveDuration = duration
+        self.durationSource = source
+    }
+
     private static func resolveDuration(manual: Int?, title: String?) -> (Int, DurationSource) {
         if let manual {
             return (manual, .manual)

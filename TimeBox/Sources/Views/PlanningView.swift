@@ -105,7 +105,8 @@ struct PlanningView: View {
             calendarEvents = try eventKitRepo.fetchCalendarEvents(for: selectedDate)
 
             // Load unscheduled tasks
-            let syncEngine = SyncEngine(eventKitRepo: eventKitRepo, modelContext: modelContext)
+            let taskSource = LocalTaskSource(modelContext: modelContext)
+            let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
             unscheduledTasks = try await syncEngine.sync()
 
         } catch {

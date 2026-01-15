@@ -277,7 +277,8 @@ struct FocusLiveView: View {
             let blocks = try eventKitRepo.fetchFocusBlocks(for: Date())
             activeBlock = blocks.first { $0.isActive }
 
-            let syncEngine = SyncEngine(eventKitRepo: eventKitRepo, modelContext: modelContext)
+            let taskSource = LocalTaskSource(modelContext: modelContext)
+            let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
             allTasks = try await syncEngine.sync()
 
         } catch {
