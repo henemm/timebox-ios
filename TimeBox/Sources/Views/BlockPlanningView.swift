@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct BlockPlanningView: View {
-    @State private var eventKitRepo = EventKitRepository()
+    @Environment(\.eventKitRepository) private var eventKitRepo
     @State private var selectedDate = Date()
     @State private var calendarEvents: [CalendarEvent] = []
     @State private var focusBlocks: [FocusBlock] = []

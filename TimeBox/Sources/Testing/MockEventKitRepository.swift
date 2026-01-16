@@ -1,7 +1,8 @@
-@testable import TimeBox
 import EventKit
 import Foundation
 
+/// Mock implementation of EventKitRepositoryProtocol for testing
+/// Available in both main and test targets for UI testing support
 final class MockEventKitRepository: EventKitRepositoryProtocol, @unchecked Sendable {
     // MARK: - Configurable Mock State
 

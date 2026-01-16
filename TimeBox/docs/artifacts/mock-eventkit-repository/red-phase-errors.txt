@@ -1,0 +1,10 @@
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxTests/MockEventKitRepositoryTests.swift:8:15: error: cannot find type 'MockEventKitRepository' in scope
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxTests/MockEventKitRepositoryTests.swift:8:15: error: cannot find type 'MockEventKitRepository' in scope
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxTests/MockEventKitRepositoryTests.swift:11:16: error: cannot find 'MockEventKitRepository' in scope
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxTests/MockEventKitRepositoryTests.swift:25:40: error: cannot infer contextual base in reference to member 'fullAccess'
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxTests/MockEventKitRepositoryTests.swift:26:40: error: cannot infer contextual base in reference to member 'fullAccess'
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxTests/MockEventKitRepositoryTests.swift:33:39: error: type 'Equatable' has no member 'fullAccess'
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxTests/MockEventKitRepositoryTests.swift:34:39: error: type 'Equatable' has no member 'fullAccess'
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxTests/MockEventKitRepositoryTests.swift:42:40: error: cannot infer contextual base in reference to member 'denied'
+	Cannot find type 'MockEventKitRepository' in scope
+	Cannot find 'MockEventKitRepository' in scope

@@ -22,9 +22,22 @@ struct TimeBoxApp: App {
         }
     }()
 
+    /// Repository based on launch mode (test vs production)
+    private let eventKitRepository: any EventKitRepositoryProtocol = {
+        if ProcessInfo.processInfo.arguments.contains("-UITesting") {
+            let mock = MockEventKitRepository()
+            mock.mockCalendarAuthStatus = .fullAccess
+            mock.mockReminderAuthStatus = .fullAccess
+            return mock
+        } else {
+            return EventKitRepository()
+        }
+    }()
+
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environment(\.eventKitRepository, eventKitRepository)
         }
         .modelContainer(sharedModelContainer)
     }

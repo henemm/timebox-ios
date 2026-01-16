@@ -7,6 +7,7 @@ final class PlanningViewUITests: XCTestCase {
     override func setUpWithError() throws {
         continueAfterFailure = false
         app = XCUIApplication()
+        app.launchArguments = ["-UITesting"]
         app.launch()
     }
 

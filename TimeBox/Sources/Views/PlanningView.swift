@@ -3,7 +3,7 @@ import SwiftData
 
 struct PlanningView: View {
     @Environment(\.modelContext) private var modelContext
-    @State private var eventKitRepo = EventKitRepository()
+    @Environment(\.eventKitRepository) private var eventKitRepo
     @State private var selectedDate = Date()
     @State private var calendarEvents: [CalendarEvent] = []
     @State private var unscheduledTasks: [PlanItem] = []
