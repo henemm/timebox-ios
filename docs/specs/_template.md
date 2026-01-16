@@ -1,8 +1,8 @@
 ---
 entity_id: entity_name
 type: module
-created: 2026-01-13
-updated: 2026-01-13
+created: 2026-01-14
+updated: 2026-01-14
 status: draft
 version: "1.0"
 tags: []
@@ -47,4 +47,4 @@ tags: []
 
 ## Changelog
 
-- 2026-01-13: Initial spec created
+- 2026-01-14: Initial spec created

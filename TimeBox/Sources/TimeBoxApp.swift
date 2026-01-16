@@ -25,11 +25,14 @@ struct TimeBoxApp: App {
     /// Repository based on launch mode (test vs production)
     private let eventKitRepository: any EventKitRepositoryProtocol = {
         if ProcessInfo.processInfo.arguments.contains("-UITesting") {
+            print("🟠 TimeBoxApp: -UITesting flag detected, using MockEventKitRepository")
             let mock = MockEventKitRepository()
             mock.mockCalendarAuthStatus = .fullAccess
             mock.mockReminderAuthStatus = .fullAccess
+            print("🟠 TimeBoxApp: Mock configured with .fullAccess permissions")
             return mock
         } else {
+            print("🟠 TimeBoxApp: Production mode, using EventKitRepository")
             return EventKitRepository()
         }
     }()

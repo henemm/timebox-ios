@@ -1,0 +1,20 @@
+BEFORE Screenshot Status - Mock EventKit Phase 2
+=================================================
+
+Date: 2026-01-16
+File: BlockPlanningView.swift
+
+CANNOT CAPTURE ACTUAL SCREENSHOTS:
+The app crashes in iOS Simulator when accessing EventKit without 
+device permissions. This is THE BUG we're fixing in Phase 2.
+
+Current State:
+- BlockPlanningView instantiates EventKitRepository directly
+- Simulator has no EventKit permissions
+- App hangs/crashes after 60s wait
+- UI tests fail: "Application com.henning.timebox is not running"
+
+This documentation serves as the BEFORE artifact.
+AFTER screenshots will be captured once Mock injection is working.
+
+See: docs/artifacts/mock-eventkit-repository/BEFORE-state.md

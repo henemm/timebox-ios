@@ -1,0 +1,21 @@
+TDD RED Phase - LocalTask Model Tests Compile Failure
+======================================================
+
+Date: 2026-01-15 08:41
+Test File: TimeBox/TimeBoxTests/LocalTaskTests.swift
+Command: xcodebuild test -scheme TimeBox -destination 'platform=iOS Simulator,name=iPhone 17 Pro' -only-testing:TimeBoxTests/LocalTaskTests
+
+COMPILE ERRORS (Expected - LocalTask model not yet implemented):
+
+Cannot find 'LocalTask' in scope
+Cannot find type 'LocalTask' in scope
+Generic parameter 'T' could not be inferred
+Main actor-isolated property 'mainContext' can not be referenced from a nonisolated context
+
+** TEST FAILED **
+
+This is the expected TDD RED result. The tests cannot compile because:
+1. LocalTask SwiftData model does not exist
+2. Tests need a @MainActor annotation for SwiftData context access
+
+Next Step: Implement LocalTask model in Sources/Models/LocalTask.swift (TDD GREEN)

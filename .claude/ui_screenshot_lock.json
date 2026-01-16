@@ -1,7 +1,7 @@
 {
-  "file": "/Users/hem/Documents/opt/my-daily-sprints/TimeBox/Sources/Views/FocusLiveView.swift",
-  "before_screenshot": "/Users/hem/Documents/opt/my-daily-sprints/docs/artifacts/calendar-selection/screenshots/before-settings.png",
-  "timestamp": "2026-01-14T19:08:16.524521",
-  "workflow": "calendar-selection",
+  "file": "/Users/hem/Documents/opt/my-daily-sprints/TimeBox/Sources/Views/BlockPlanningView.swift",
+  "before_screenshot": "/Users/hem/Documents/opt/my-daily-sprints/docs/artifacts/multi-source-tasks/screenshots/DEBUG-logging-20260116-080732.png",
+  "timestamp": "2026-01-16T08:08:08.903388",
+  "workflow": "multi-source-tasks",
   "awaiting_after": true
 }

@@ -15,13 +15,17 @@ struct BlockPlanningView: View {
     private let endHour = 22
 
     var body: some View {
+        let _ = print("🟢 BlockPlanningView.body rendered - isLoading: \(isLoading), errorMessage: \(errorMessage ?? "nil")")
+
         NavigationStack {
             VStack(spacing: 0) {
                 if isLoading {
+                    let _ = print("🟡 Showing: ProgressView (Loading)")
                     Spacer()
                     ProgressView("Lade Kalender...")
                     Spacer()
                 } else if let error = errorMessage {
+                    let _ = print("🔴 Showing: ContentUnavailableView (Error: \(error))")
                     Spacer()
                     ContentUnavailableView(
                         "Fehler",
@@ -30,6 +34,7 @@ struct BlockPlanningView: View {
                     )
                     Spacer()
                 } else {
+                    let _ = print("🟢 Showing: blockPlanningTimeline (\(calendarEvents.count) events, \(focusBlocks.count) blocks)")
                     blockPlanningTimeline
                 }
             }
@@ -57,9 +62,11 @@ struct BlockPlanningView: View {
             }
         }
         .task {
+            print("🟣 .task modifier triggered - calling loadData()")
             await loadData()
         }
         .onChange(of: selectedDate) {
+            print("🟣 selectedDate changed - calling loadData()")
             Task {
                 await loadData()
             }
@@ -120,24 +127,38 @@ struct BlockPlanningView: View {
     }
 
     private func loadData() async {
+        print("🔵 BlockPlanningView.loadData() START")
         isLoading = true
         errorMessage = nil
+        print("🔵   isLoading = true")
 
         do {
+            print("🔵   Calling eventKitRepo.requestAccess()...")
             let hasAccess = try await eventKitRepo.requestAccess()
+            print("🔵   requestAccess() returned: \(hasAccess)")
+
             guard hasAccess else {
                 errorMessage = "Zugriff auf Kalender verweigert."
                 isLoading = false
+                print("🔵   ❌ No access! errorMessage = \(errorMessage!), isLoading = false")
                 return
             }
 
+            print("🔵   Fetching calendar events for \(selectedDate)...")
             calendarEvents = try eventKitRepo.fetchCalendarEvents(for: selectedDate)
+            print("🔵   ✅ Fetched \(calendarEvents.count) calendar events")
+
+            print("🔵   Fetching focus blocks for \(selectedDate)...")
             focusBlocks = try eventKitRepo.fetchFocusBlocks(for: selectedDate)
+            print("🔵   ✅ Fetched \(focusBlocks.count) focus blocks")
         } catch {
             errorMessage = error.localizedDescription
+            print("🔵   ❌ ERROR: \(error.localizedDescription)")
         }
 
         isLoading = false
+        print("🔵 BlockPlanningView.loadData() END")
+        print("🔵   Final state: isLoading=\(isLoading), errorMessage=\(errorMessage ?? "nil"), events=\(calendarEvents.count), blocks=\(focusBlocks.count)")
     }
 
     private func createFocusBlock(startDate: Date, endDate: Date) {
