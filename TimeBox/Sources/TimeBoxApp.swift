@@ -8,15 +8,22 @@ struct TimeBoxApp: App {
             LocalTask.self,
             TaskMetadata.self
         ])
-        
+
+        // Disable CloudKit for UI testing to avoid simulator crashes
+        let isUITesting = ProcessInfo.processInfo.arguments.contains("-UITesting")
+
         let modelConfiguration = ModelConfiguration(
             schema: schema,
-            isStoredInMemoryOnly: false,
-            cloudKitDatabase: .private("iCloud.com.henning.timebox")
+            isStoredInMemoryOnly: isUITesting,
+            cloudKitDatabase: isUITesting ? .none : .private("iCloud.com.henning.timebox")
         )
 
         do {
-            return try ModelContainer(for: schema, configurations: [modelConfiguration])
+            let container = try ModelContainer(for: schema, configurations: [modelConfiguration])
+            if isUITesting {
+                print("🟠 TimeBoxApp: ModelContainer configured for UI testing (in-memory, no CloudKit)")
+            }
+            return container
         } catch {
             fatalError("Could not create ModelContainer: \(error)")
         }
@@ -24,17 +31,23 @@ struct TimeBoxApp: App {
 
     /// Repository based on launch mode (test vs production)
     private let eventKitRepository: any EventKitRepositoryProtocol = {
+        let logMessage: String
+        let repo: any EventKitRepositoryProtocol
+
         if ProcessInfo.processInfo.arguments.contains("-UITesting") {
-            print("🟠 TimeBoxApp: -UITesting flag detected, using MockEventKitRepository")
+            logMessage = "🟠 TimeBoxApp: -UITesting flag detected, using MockEventKitRepository\n🟠 TimeBoxApp: Mock configured with .fullAccess permissions"
             let mock = MockEventKitRepository()
             mock.mockCalendarAuthStatus = .fullAccess
             mock.mockReminderAuthStatus = .fullAccess
-            print("🟠 TimeBoxApp: Mock configured with .fullAccess permissions")
-            return mock
+            repo = mock
         } else {
-            print("🟠 TimeBoxApp: Production mode, using EventKitRepository")
-            return EventKitRepository()
+            logMessage = "🟠 TimeBoxApp: Production mode, using EventKitRepository"
+            repo = EventKitRepository()
         }
+
+        print(logMessage)
+        DebugLogger.log(logMessage)
+        return repo
     }()
 
     var body: some Scene {

@@ -15,17 +15,23 @@ struct BlockPlanningView: View {
     private let endHour = 22
 
     var body: some View {
-        let _ = print("🟢 BlockPlanningView.body rendered - isLoading: \(isLoading), errorMessage: \(errorMessage ?? "nil")")
+        let bodyMsg = "🟢 BlockPlanningView.body rendered - isLoading: \(isLoading), errorMessage: \(errorMessage ?? "nil")"
+        let _ = print(bodyMsg)
+        let _ = DebugLogger.log(bodyMsg)
 
         NavigationStack {
             VStack(spacing: 0) {
                 if isLoading {
-                    let _ = print("🟡 Showing: ProgressView (Loading)")
+                    let loadingMsg = "🟡 Showing: ProgressView (Loading)"
+                    let _ = print(loadingMsg)
+                    let _ = DebugLogger.log(loadingMsg)
                     Spacer()
                     ProgressView("Lade Kalender...")
                     Spacer()
                 } else if let error = errorMessage {
-                    let _ = print("🔴 Showing: ContentUnavailableView (Error: \(error))")
+                    let errorMsg = "🔴 Showing: ContentUnavailableView (Error: \(error))"
+                    let _ = print(errorMsg)
+                    let _ = DebugLogger.log(errorMsg)
                     Spacer()
                     ContentUnavailableView(
                         "Fehler",
@@ -34,7 +40,9 @@ struct BlockPlanningView: View {
                     )
                     Spacer()
                 } else {
-                    let _ = print("🟢 Showing: blockPlanningTimeline (\(calendarEvents.count) events, \(focusBlocks.count) blocks)")
+                    let timelineMsg = "🟢 Showing: blockPlanningTimeline (\(calendarEvents.count) events, \(focusBlocks.count) blocks)"
+                    let _ = print(timelineMsg)
+                    let _ = DebugLogger.log(timelineMsg)
                     blockPlanningTimeline
                 }
             }
@@ -127,38 +135,64 @@ struct BlockPlanningView: View {
     }
 
     private func loadData() async {
-        print("🔵 BlockPlanningView.loadData() START")
+        let msg1 = "🔵 BlockPlanningView.loadData() START"
+        print(msg1)
+        DebugLogger.log(msg1)
+
         isLoading = true
         errorMessage = nil
-        print("🔵   isLoading = true")
+
+        let msg2 = "🔵   isLoading = true"
+        print(msg2)
+        DebugLogger.log(msg2)
 
         do {
-            print("🔵   Calling eventKitRepo.requestAccess()...")
+            let msg3 = "🔵   Calling eventKitRepo.requestAccess()..."
+            print(msg3)
+            DebugLogger.log(msg3)
+
             let hasAccess = try await eventKitRepo.requestAccess()
-            print("🔵   requestAccess() returned: \(hasAccess)")
+
+            let msg4 = "🔵   requestAccess() returned: \(hasAccess)"
+            print(msg4)
+            DebugLogger.log(msg4)
 
             guard hasAccess else {
                 errorMessage = "Zugriff auf Kalender verweigert."
                 isLoading = false
-                print("🔵   ❌ No access! errorMessage = \(errorMessage!), isLoading = false")
+                let msg5 = "🔵   ❌ No access! errorMessage = \(errorMessage!), isLoading = false"
+                print(msg5)
+                DebugLogger.log(msg5)
                 return
             }
 
-            print("🔵   Fetching calendar events for \(selectedDate)...")
-            calendarEvents = try eventKitRepo.fetchCalendarEvents(for: selectedDate)
-            print("🔵   ✅ Fetched \(calendarEvents.count) calendar events")
+            let msg6 = "🔵   Fetching calendar events..."
+            print(msg6)
+            DebugLogger.log(msg6)
 
-            print("🔵   Fetching focus blocks for \(selectedDate)...")
+            calendarEvents = try eventKitRepo.fetchCalendarEvents(for: selectedDate)
+
+            let msg7 = "🔵   ✅ Fetched \(calendarEvents.count) calendar events"
+            print(msg7)
+            DebugLogger.log(msg7)
+
             focusBlocks = try eventKitRepo.fetchFocusBlocks(for: selectedDate)
-            print("🔵   ✅ Fetched \(focusBlocks.count) focus blocks")
+
+            let msg8 = "🔵   ✅ Fetched \(focusBlocks.count) focus blocks"
+            print(msg8)
+            DebugLogger.log(msg8)
         } catch {
             errorMessage = error.localizedDescription
-            print("🔵   ❌ ERROR: \(error.localizedDescription)")
+            let msg9 = "🔵   ❌ ERROR: \(error.localizedDescription)"
+            print(msg9)
+            DebugLogger.log(msg9)
         }
 
         isLoading = false
-        print("🔵 BlockPlanningView.loadData() END")
-        print("🔵   Final state: isLoading=\(isLoading), errorMessage=\(errorMessage ?? "nil"), events=\(calendarEvents.count), blocks=\(focusBlocks.count)")
+
+        let msgFinal = "🔵 BlockPlanningView.loadData() END - isLoading=\(isLoading), errorMessage=\(errorMessage ?? "nil"), events=\(calendarEvents.count), blocks=\(focusBlocks.count)"
+        print(msgFinal)
+        DebugLogger.log(msgFinal)
     }
 
     private func createFocusBlock(startDate: Date, endDate: Date) {

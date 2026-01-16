@@ -50,10 +50,12 @@
     "TimeBox/TimeBoxTests/Testing/MockEventKitRepository.swift",
     "TimeBox/Sources/Helpers/EventKitRepositoryEnvironment.swift",
     "TimeBox/TimeBoxUITests/BeforeScreenshotTest.swift",
-    "TimeBox/Sources/Testing/MockEventKitRepository.swift"
+    "TimeBox/Sources/Testing/MockEventKitRepository.swift",
+    "TimeBox/Sources/Helpers/DebugLogger.swift",
+    "TimeBox/TimeBoxUITests/DebugLogReaderTest.swift"
   ],
   "last_validation": "2026-01-15T16:25:00.000000",
-  "last_change": "2026-01-16T07:36:45.006657",
+  "last_change": "2026-01-16T08:35:57.456003",
   "validation_result": {
     "status": "passed",
     "build_status": "success",
