@@ -19,11 +19,7 @@ struct TimeBoxApp: App {
         )
 
         do {
-            let container = try ModelContainer(for: schema, configurations: [modelConfiguration])
-            if isUITesting {
-                print("🟠 TimeBoxApp: ModelContainer configured for UI testing (in-memory, no CloudKit)")
-            }
-            return container
+            return try ModelContainer(for: schema, configurations: [modelConfiguration])
         } catch {
             fatalError("Could not create ModelContainer: \(error)")
         }
@@ -31,23 +27,14 @@ struct TimeBoxApp: App {
 
     /// Repository based on launch mode (test vs production)
     private let eventKitRepository: any EventKitRepositoryProtocol = {
-        let logMessage: String
-        let repo: any EventKitRepositoryProtocol
-
         if ProcessInfo.processInfo.arguments.contains("-UITesting") {
-            logMessage = "🟠 TimeBoxApp: -UITesting flag detected, using MockEventKitRepository\n🟠 TimeBoxApp: Mock configured with .fullAccess permissions"
             let mock = MockEventKitRepository()
             mock.mockCalendarAuthStatus = .fullAccess
             mock.mockReminderAuthStatus = .fullAccess
-            repo = mock
+            return mock
         } else {
-            logMessage = "🟠 TimeBoxApp: Production mode, using EventKitRepository"
-            repo = EventKitRepository()
+            return EventKitRepository()
         }
-
-        print(logMessage)
-        DebugLogger.log(logMessage)
-        return repo
     }()
 
     var body: some Scene {
