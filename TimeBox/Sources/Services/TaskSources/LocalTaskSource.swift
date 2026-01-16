@@ -55,13 +55,15 @@ final class LocalTaskSource: @preconcurrency TaskSource, @preconcurrency TaskSou
 
     func createTask(
         title: String,
-        category: String?,
-        dueDate: Date?,
-        priority: Int,
+        tags: [String] = [],
+        dueDate: Date? = nil,
+        priority: Int = 1,
         duration: Int? = nil,
         urgency: String = "not_urgent",
         taskType: String = "maintenance",
-        isRecurring: Bool = false,
+        recurrencePattern: String = "none",
+        recurrenceWeekdays: [Int]? = nil,
+        recurrenceMonthDay: Int? = nil,
         description: String? = nil
     ) async throws -> LocalTask {
         let nextSortOrder = try await getNextSortOrder()
@@ -69,13 +71,15 @@ final class LocalTaskSource: @preconcurrency TaskSource, @preconcurrency TaskSou
         let task = LocalTask(
             title: title,
             priority: priority,
-            category: category,
+            tags: tags,
             dueDate: dueDate,
             sortOrder: nextSortOrder,
             manualDuration: duration,
             urgency: urgency,
             taskType: taskType,
-            isRecurring: isRecurring,
+            recurrencePattern: recurrencePattern,
+            recurrenceWeekdays: recurrenceWeekdays,
+            recurrenceMonthDay: recurrenceMonthDay,
             taskDescription: description,
             sourceSystem: "local"
         )
@@ -87,13 +91,15 @@ final class LocalTaskSource: @preconcurrency TaskSource, @preconcurrency TaskSou
     func updateTask(
         taskID: String,
         title: String? = nil,
-        category: String? = nil,
+        tags: [String]? = nil,
         dueDate: Date? = nil,
         priority: Int? = nil,
         duration: Int? = nil,
         urgency: String? = nil,
         taskType: String? = nil,
-        isRecurring: Bool? = nil,
+        recurrencePattern: String? = nil,
+        recurrenceWeekdays: [Int]? = nil,
+        recurrenceMonthDay: Int? = nil,
         description: String? = nil
     ) async throws {
         guard let task = try findTask(byID: taskID) else { return }
@@ -101,8 +107,8 @@ final class LocalTaskSource: @preconcurrency TaskSource, @preconcurrency TaskSou
         if let title = title {
             task.title = title
         }
-        if let category = category {
-            task.category = category
+        if let tags = tags {
+            task.tags = tags
         }
         if let dueDate = dueDate {
             task.dueDate = dueDate
@@ -119,8 +125,14 @@ final class LocalTaskSource: @preconcurrency TaskSource, @preconcurrency TaskSou
         if let taskType = taskType {
             task.taskType = taskType
         }
-        if let isRecurring = isRecurring {
-            task.isRecurring = isRecurring
+        if let recurrencePattern = recurrencePattern {
+            task.recurrencePattern = recurrencePattern
+        }
+        if let recurrenceWeekdays = recurrenceWeekdays {
+            task.recurrenceWeekdays = recurrenceWeekdays
+        }
+        if let recurrenceMonthDay = recurrenceMonthDay {
+            task.recurrenceMonthDay = recurrenceMonthDay
         }
         if let description = description {
             task.taskDescription = description

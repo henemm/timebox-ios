@@ -10,9 +10,8 @@ final class LocalTask {
     var uuid: UUID = UUID()
     var title: String = ""
     var isCompleted: Bool = false
-    var priority: Int = 0
-    var category: String?
-    var categoryColorHex: String?
+    var priority: Int = 1  // Default: Low priority (1=Low, 2=Medium, 3=High)
+    var tags: [String] = []  // Multi-select tags (e.g., ["Hausarbeit", "Recherche"])
     var dueDate: Date?
     var createdAt: Date = Date()
     var sortOrder: Int = 0
@@ -26,8 +25,14 @@ final class LocalTask {
     /// Task categorization type (income/maintenance/recharge)
     var taskType: String = "maintenance"
 
-    /// Flag for recurring tasks
-    var isRecurring: Bool = false
+    /// Recurrence pattern (none/daily/weekly/biweekly/monthly)
+    var recurrencePattern: String = "none"
+
+    /// Weekdays for weekly/biweekly recurrence (1=Mon, 2=Tue, ..., 7=Sun)
+    var recurrenceWeekdays: [Int]?
+
+    /// Day of month for monthly recurrence (1-31, or 32=last day)
+    var recurrenceMonthDay: Int?
 
     /// Long-form description/notes for the task
     var taskDescription: String?
@@ -44,17 +49,18 @@ final class LocalTask {
     init(
         uuid: UUID = UUID(),
         title: String,
-        priority: Int,
+        priority: Int = 1,
         isCompleted: Bool = false,
-        category: String? = nil,
-        categoryColorHex: String? = nil,
+        tags: [String] = [],
         dueDate: Date? = nil,
         createdAt: Date = Date(),
         sortOrder: Int = 0,
         manualDuration: Int? = nil,
         urgency: String = "not_urgent",
         taskType: String = "maintenance",
-        isRecurring: Bool = false,
+        recurrencePattern: String = "none",
+        recurrenceWeekdays: [Int]? = nil,
+        recurrenceMonthDay: Int? = nil,
         taskDescription: String? = nil,
         externalID: String? = nil,
         sourceSystem: String = "local"
@@ -63,15 +69,16 @@ final class LocalTask {
         self.title = title
         self.priority = priority
         self.isCompleted = isCompleted
-        self.category = category
-        self.categoryColorHex = categoryColorHex
+        self.tags = tags
         self.dueDate = dueDate
         self.createdAt = createdAt
         self.sortOrder = sortOrder
         self.manualDuration = manualDuration
         self.urgency = urgency
         self.taskType = taskType
-        self.isRecurring = isRecurring
+        self.recurrencePattern = recurrencePattern
+        self.recurrenceWeekdays = recurrenceWeekdays
+        self.recurrenceMonthDay = recurrenceMonthDay
         self.taskDescription = taskDescription
         self.externalID = externalID
         self.sourceSystem = sourceSystem
@@ -81,6 +88,6 @@ final class LocalTask {
 // MARK: - TaskSourceData Conformance
 
 extension LocalTask: TaskSourceData {
-    /// Map category to categoryTitle for TaskSourceData protocol
-    var categoryTitle: String? { category }
+    // All properties already match TaskSourceData protocol
+    // No additional computed properties needed
 }

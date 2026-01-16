@@ -9,8 +9,7 @@ protocol TaskSourceData {
     var title: String { get }
     var isCompleted: Bool { get }
     var priority: Int { get }
-    var categoryTitle: String? { get }
-    var categoryColorHex: String? { get }
+    var tags: [String] { get }
     var dueDate: Date? { get }
 
     // MARK: - Phase 1: Enhanced Task Fields
@@ -21,8 +20,14 @@ protocol TaskSourceData {
     /// Task categorization type (income/maintenance/recharge)
     var taskType: String { get }
 
-    /// Flag for recurring tasks
-    var isRecurring: Bool { get }
+    /// Recurrence pattern (none/daily/weekly/biweekly/monthly)
+    var recurrencePattern: String { get }
+
+    /// Weekdays for weekly/biweekly recurrence (1=Mon, 2=Tue, ..., 7=Sun)
+    var recurrenceWeekdays: [Int]? { get }
+
+    /// Day of month for monthly recurrence (1-31, or 32=last day)
+    var recurrenceMonthDay: Int? { get }
 
     /// Long-form description/notes for the task
     var taskDescription: String? { get }
@@ -70,13 +75,15 @@ protocol TaskSourceWritable: TaskSource {
     /// Create a new task
     func createTask(
         title: String,
-        category: String?,
+        tags: [String],
         dueDate: Date?,
         priority: Int,
         duration: Int?,
         urgency: String,
         taskType: String,
-        isRecurring: Bool,
+        recurrencePattern: String,
+        recurrenceWeekdays: [Int]?,
+        recurrenceMonthDay: Int?,
         description: String?
     ) async throws -> TaskData
 
@@ -84,13 +91,15 @@ protocol TaskSourceWritable: TaskSource {
     func updateTask(
         taskID: String,
         title: String?,
-        category: String?,
+        tags: [String]?,
         dueDate: Date?,
         priority: Int?,
         duration: Int?,
         urgency: String?,
         taskType: String?,
-        isRecurring: Bool?,
+        recurrencePattern: String?,
+        recurrenceWeekdays: [Int]?,
+        recurrenceMonthDay: Int?,
         description: String?
     ) async throws
 

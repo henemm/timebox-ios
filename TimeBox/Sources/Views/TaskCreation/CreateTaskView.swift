@@ -6,18 +6,21 @@ struct CreateTaskView: View {
     @Environment(\.dismiss) private var dismiss
 
     @State private var title = ""
-    @State private var category = ""
+    @State private var tags: [String] = []
+    @State private var newTag: String = ""
     @State private var hasDueDate = false
     @State private var dueDate = Date()
-    @State private var priority = 0
+    @State private var priority = 1  // Default: Low
     @State private var isSaving = false
 
-    // MARK: - Phase 1: Enhanced Task Fields
+    // MARK: - Refactored Task Fields
 
-    @State private var duration: Int = 15
+    @State private var duration: Int = 15  // Quick select: 5, 15, 30, 60
     @State private var urgency: String = "not_urgent"
     @State private var taskType: String = "maintenance"
-    @State private var isRecurring: Bool = false
+    @State private var recurrencePattern: RecurrencePattern = .none
+    @State private var selectedWeekdays: Set<Int> = []
+    @State private var monthDay: Int = 1
     @State private var taskDescription: String = ""
 
     var onSave: (() -> Void)?
@@ -25,33 +28,36 @@ struct CreateTaskView: View {
     var body: some View {
         NavigationStack {
             Form {
+                // MARK: - Title
+
                 Section {
                     TextField("Task-Titel", text: $title)
-                        .textInputAutocapitalization(.sentences)
                 }
 
-                // MARK: - Duration Section
+                // MARK: - Duration (Quick Select)
 
                 Section {
-                    Stepper("Dauer: \(duration) min", value: $duration, in: 5...240, step: 5)
+                    HStack(spacing: 12) {
+                        QuickDurationButton(minutes: 5, selectedMinutes: $duration)
+                        QuickDurationButton(minutes: 15, selectedMinutes: $duration)
+                        QuickDurationButton(minutes: 30, selectedMinutes: $duration)
+                        QuickDurationButton(minutes: 60, selectedMinutes: $duration)
+                    }
                 } header: {
-                    Text("Zeitbedarf")
-                } footer: {
-                    Text("Geschätzte Dauer für diese Aufgabe")
+                    Text("Dauer")
                 }
 
-                // MARK: - Priority Section
+                // MARK: - Priority (3 Levels)
 
                 Section {
                     Picker("Priorität", selection: $priority) {
-                        Text("Keine").tag(0)
-                        Text("Niedrig").tag(1)
-                        Text("Mittel").tag(2)
-                        Text("Hoch").tag(3)
+                        Text("🟦 Niedrig").tag(1)
+                        Text("🟨 Mittel").tag(2)
+                        Text("🔴 Hoch").tag(3)
                     }
                 }
 
-                // MARK: - Urgency Section
+                // MARK: - Urgency
 
                 Section {
                     Picker("Dringlichkeit", selection: $urgency) {
@@ -65,7 +71,7 @@ struct CreateTaskView: View {
                     Text("Dringend = Deadline oder zeitkritisch")
                 }
 
-                // MARK: - Task Type Section
+                // MARK: - Task Type
 
                 Section {
                     Picker("Aufgabentyp", selection: $taskType) {
@@ -74,19 +80,46 @@ struct CreateTaskView: View {
                         Label("Energie aufladen", systemImage: "battery.100").tag("recharge")
                     }
                 } header: {
-                    Text("Kategorie")
+                    Text("Typ")
                 }
 
-                // MARK: - Category Section
+                // MARK: - Tags (Multi-Select)
 
                 Section {
-                    TextField("Kategorie (optional)", text: $category)
-                        .textInputAutocapitalization(.words)
+                    if !tags.isEmpty {
+                        ForEach(tags, id: \.self) { tag in
+                            HStack {
+                                Text(tag)
+                                Spacer()
+                                Button {
+                                    tags.removeAll { $0 == tag }
+                                } label: {
+                                    Image(systemName: "xmark.circle.fill")
+                                        .foregroundStyle(.secondary)
+                                }
+                                .buttonStyle(.plain)
+                            }
+                        }
+                    }
+
+                    HStack {
+                        TextField("Neuer Tag", text: $newTag)
+                        Button("Hinzufügen") {
+                            let trimmed = newTag.trimmingCharacters(in: .whitespacesAndNewlines)
+                            if !trimmed.isEmpty && !tags.contains(trimmed) {
+                                tags.append(trimmed)
+                                newTag = ""
+                            }
+                        }
+                        .disabled(newTag.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                    }
+                } header: {
+                    Text("Tags")
                 } footer: {
                     Text("Z.B. 'Hausarbeit', 'Recherche', 'Besorgungen'")
                 }
 
-                // MARK: - Due Date Section
+                // MARK: - Due Date
 
                 Section {
                     Toggle("Fälligkeitsdatum", isOn: $hasDueDate)
@@ -99,15 +132,45 @@ struct CreateTaskView: View {
                     }
                 }
 
-                // MARK: - Recurring Section
+                // MARK: - Recurrence (Pattern with Inline Expansion)
 
                 Section {
-                    Toggle("Wiederkehrende Aufgabe", isOn: $isRecurring)
-                } footer: {
-                    Text("Aufgabe bleibt nach Abschluss im Backlog")
+                    Picker("Wiederholt sich", selection: $recurrencePattern) {
+                        ForEach(RecurrencePattern.allCases) { pattern in
+                            Text(pattern.displayName).tag(pattern)
+                        }
+                    }
+
+                    // Inline expansion: Weekdays for weekly/biweekly
+                    if recurrencePattern.requiresWeekdays {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("An folgenden Tagen:")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+
+                            HStack(spacing: 8) {
+                                ForEach(Weekday.all) { weekday in
+                                    WeekdayButton(weekday: weekday, selectedWeekdays: $selectedWeekdays)
+                                }
+                            }
+                        }
+                        .padding(.top, 4)
+                    }
+
+                    // Inline expansion: Month day for monthly
+                    if recurrencePattern.requiresMonthDay {
+                        Picker("Am Tag", selection: $monthDay) {
+                            ForEach(1...31, id: \.self) { day in
+                                Text("\(day).").tag(day)
+                            }
+                            Text("Letzter Tag").tag(32)
+                        }
+                    }
+                } header: {
+                    Text("Wiederholung")
                 }
 
-                // MARK: - Description Section
+                // MARK: - Description
 
                 Section {
                     TextEditor(text: $taskDescription)
@@ -151,15 +214,22 @@ struct CreateTaskView: View {
         Task {
             do {
                 let taskSource = LocalTaskSource(modelContext: modelContext)
+
+                // Prepare recurrence data
+                let weekdays: [Int]? = recurrencePattern.requiresWeekdays ? Array(selectedWeekdays).sorted() : nil
+                let monthDay: Int? = recurrencePattern.requiresMonthDay ? self.monthDay : nil
+
                 _ = try await taskSource.createTask(
                     title: title.trimmingCharacters(in: .whitespaces),
-                    category: category.isEmpty ? nil : category,
+                    tags: tags,
                     dueDate: hasDueDate ? dueDate : nil,
                     priority: priority,
                     duration: duration,
                     urgency: urgency,
                     taskType: taskType,
-                    isRecurring: isRecurring,
+                    recurrencePattern: recurrencePattern.rawValue,
+                    recurrenceWeekdays: weekdays,
+                    recurrenceMonthDay: monthDay,
                     description: taskDescription.isEmpty ? nil : taskDescription
                 )
 
@@ -177,4 +247,119 @@ struct CreateTaskView: View {
 #Preview {
     CreateTaskView()
         .modelContainer(for: LocalTask.self, inMemory: true)
+}
+
+// MARK: - Supporting Types (TODO: Extract to separate files when added to Xcode project)
+
+/// Recurrence pattern options for recurring tasks
+enum RecurrencePattern: String, CaseIterable, Identifiable {
+    case none = "none"
+    case daily = "daily"
+    case weekly = "weekly"
+    case biweekly = "biweekly"
+    case monthly = "monthly"
+
+    var id: String { rawValue }
+
+    var displayName: String {
+        switch self {
+        case .none:
+            return "Nie"
+        case .daily:
+            return "Täglich"
+        case .weekly:
+            return "Wöchentlich"
+        case .biweekly:
+            return "Zweiwöchentlich"
+        case .monthly:
+            return "Monatlich"
+        }
+    }
+
+    var requiresWeekdays: Bool {
+        self == .weekly || self == .biweekly
+    }
+
+    var requiresMonthDay: Bool {
+        self == .monthly
+    }
+}
+
+/// Quick duration selection button
+struct QuickDurationButton: View {
+    let minutes: Int
+    @Binding var selectedMinutes: Int
+
+    private var isSelected: Bool {
+        selectedMinutes == minutes
+    }
+
+    var body: some View {
+        Button {
+            selectedMinutes = minutes
+        } label: {
+            Text("\(minutes)m")
+                .font(.headline)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 12)
+                .background(
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(isSelected ? Color.accentColor : Color(.secondarySystemFill))
+                )
+                .foregroundStyle(isSelected ? .white : .primary)
+        }
+        .buttonStyle(.plain)
+    }
+}
+
+/// Weekday toggle button for recurrence selection
+struct WeekdayButton: View {
+    let weekday: Weekday
+    @Binding var selectedWeekdays: Set<Int>
+
+    private var isSelected: Bool {
+        selectedWeekdays.contains(weekday.value)
+    }
+
+    var body: some View {
+        Button {
+            if isSelected {
+                selectedWeekdays.remove(weekday.value)
+            } else {
+                selectedWeekdays.insert(weekday.value)
+            }
+        } label: {
+            Text(weekday.shortName)
+                .font(.caption)
+                .fontWeight(.medium)
+                .frame(width: 36, height: 36)
+                .background(
+                    Circle()
+                        .fill(isSelected ? Color.accentColor : Color(.tertiarySystemFill))
+                )
+                .foregroundStyle(isSelected ? .white : .secondary)
+        }
+        .buttonStyle(.plain)
+    }
+}
+
+/// Weekday representation for recurrence
+struct Weekday: Identifiable {
+    let value: Int  // 1=Mon, 2=Tue, ..., 7=Sun
+    let shortName: String
+    let fullName: String
+
+    var id: Int { value }
+
+    static let monday = Weekday(value: 1, shortName: "Mo", fullName: "Montag")
+    static let tuesday = Weekday(value: 2, shortName: "Di", fullName: "Dienstag")
+    static let wednesday = Weekday(value: 3, shortName: "Mi", fullName: "Mittwoch")
+    static let thursday = Weekday(value: 4, shortName: "Do", fullName: "Donnerstag")
+    static let friday = Weekday(value: 5, shortName: "Fr", fullName: "Freitag")
+    static let saturday = Weekday(value: 6, shortName: "Sa", fullName: "Samstag")
+    static let sunday = Weekday(value: 7, shortName: "So", fullName: "Sonntag")
+
+    static let all: [Weekday] = [
+        monday, tuesday, wednesday, thursday, friday, saturday, sunday
+    ]
 }
