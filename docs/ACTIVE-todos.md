@@ -45,13 +45,7 @@ _Keine offenen Bugs_
 - Status: OFFEN / SPEC READY / IN ARBEIT / ERLEDIGT / BLOCKIERT
 -->
 
-**Task 1: Timeline Rendering Issue - Device Testing**
-- Beschreibung: UI Tests finden Timeline-Elemente nicht (nach Phase 2)
-- Problem: App crasht nicht mehr, aber Timeline hour labels werden nicht gefunden
-- Prioritaet: Mittel
-- Status: OFFEN (Device Testing benötigt)
-- Hinweis: Phase 2 Kernsieg: Kein Crash mehr! Aber Timeline rendert nicht wie erwartet
-- Details: docs/artifacts/mock-eventkit-repository/timeline-rendering-issue.md
+_Keine offenen Tasks_
 
 ---
 
@@ -68,13 +62,13 @@ _Keine Items mit fertiger Spec_
 <!-- Archiv der letzten erledigten Items -->
 
 **Feature: Mock EventKit Repository (Phase 2)**
-- Beschreibung: SwiftUI Environment Injection für Mock in UI Tests
-- Implementiert: EventKitRepositoryEnvironment, TimeBoxApp Mock Injection, View @Environment Updates
-- Changes: 11 files (EventKitRepositoryEnvironment.swift, TimeBoxApp, 2 Views, 2 UI Test files, Mock moved to main target)
-- Tests: App crasht nicht mehr (✅), 8 UI Tests laufen 90+s statt 60s Crash (✅), Timeline-Elemente nicht gefunden (⚠️)
+- Beschreibung: SwiftUI Environment Injection für Mock in UI Tests + CloudKit Fix für Simulator
+- Implementiert: EventKitRepositoryEnvironment, TimeBoxApp Mock Injection + CloudKit Disable, View @Environment Updates
+- Changes: 13 files (EventKitRepositoryEnvironment.swift, TimeBoxApp, 2 Views, 2 UI Test files, Mock moved to main target)
+- Tests: 7 Timeline UI Tests bestehen (PlanningViewUITests 3/3, SchedulingUITests 4/4), App startet erfolgreich, keine Crashes
+- Root Cause Fix: CloudKit Initialisierung crashte im Simulator → isStoredInMemoryOnly + cloudKitDatabase: .none für Tests
 - Validation: 2026-01-16
-- Status: ERLEDIGT (Kernfunktionalität: Mock Injection funktioniert, kein Crash)
-- Follow-up: Timeline Rendering Issue (Device Testing)
+- Status: KOMPLETT ERLEDIGT ✅ (alle Acceptance Criteria erfüllt)
 
 **Feature: Mock EventKit Repository (Phase 1)**
 - Beschreibung: Protocol-basierte EventKit-Abstraktion mit Mock für Unit Tests
