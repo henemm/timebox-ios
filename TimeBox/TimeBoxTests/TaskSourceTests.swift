@@ -11,6 +11,15 @@ struct MockTaskData: TaskSourceData {
     let categoryTitle: String?
     let categoryColorHex: String?
     let dueDate: Date?
+
+    // MARK: - Phase 1: Enhanced Task Fields
+
+    let urgency: String
+    let taskType: String
+    let isRecurring: Bool
+    let taskDescription: String?
+    let externalID: String?
+    let sourceSystem: String
 }
 
 // MARK: - Mock Task Source
@@ -43,7 +52,13 @@ final class MockTaskSource: TaskSource, TaskSourceWritable {
                 priority: task.priority,
                 categoryTitle: task.categoryTitle,
                 categoryColorHex: task.categoryColorHex,
-                dueDate: task.dueDate
+                dueDate: task.dueDate,
+                urgency: task.urgency,
+                taskType: task.taskType,
+                isRecurring: task.isRecurring,
+                taskDescription: task.taskDescription,
+                externalID: task.externalID,
+                sourceSystem: task.sourceSystem
             )
         }
     }
@@ -58,12 +73,28 @@ final class MockTaskSource: TaskSource, TaskSourceWritable {
                 priority: task.priority,
                 categoryTitle: task.categoryTitle,
                 categoryColorHex: task.categoryColorHex,
-                dueDate: task.dueDate
+                dueDate: task.dueDate,
+                urgency: task.urgency,
+                taskType: task.taskType,
+                isRecurring: task.isRecurring,
+                taskDescription: task.taskDescription,
+                externalID: task.externalID,
+                sourceSystem: task.sourceSystem
             )
         }
     }
 
-    func createTask(title: String, category: String?, dueDate: Date?, priority: Int) async throws -> MockTaskData {
+    func createTask(
+        title: String,
+        category: String?,
+        dueDate: Date?,
+        priority: Int,
+        duration: Int?,
+        urgency: String,
+        taskType: String,
+        isRecurring: Bool,
+        description: String?
+    ) async throws -> MockTaskData {
         let task = MockTaskData(
             id: UUID().uuidString,
             title: title,
@@ -71,13 +102,30 @@ final class MockTaskSource: TaskSource, TaskSourceWritable {
             priority: priority,
             categoryTitle: category,
             categoryColorHex: nil,
-            dueDate: dueDate
+            dueDate: dueDate,
+            urgency: urgency,
+            taskType: taskType,
+            isRecurring: isRecurring,
+            taskDescription: description,
+            externalID: nil,
+            sourceSystem: "mock"
         )
         tasks.append(task)
         return task
     }
 
-    func updateTask(taskID: String, title: String?, category: String?, dueDate: Date?, priority: Int?) async throws {
+    func updateTask(
+        taskID: String,
+        title: String?,
+        category: String?,
+        dueDate: Date?,
+        priority: Int?,
+        duration: Int?,
+        urgency: String?,
+        taskType: String?,
+        isRecurring: Bool?,
+        description: String?
+    ) async throws {
         if let index = tasks.firstIndex(where: { $0.id == taskID }) {
             let task = tasks[index]
             tasks[index] = MockTaskData(
@@ -87,7 +135,13 @@ final class MockTaskSource: TaskSource, TaskSourceWritable {
                 priority: priority ?? task.priority,
                 categoryTitle: category ?? task.categoryTitle,
                 categoryColorHex: task.categoryColorHex,
-                dueDate: dueDate ?? task.dueDate
+                dueDate: dueDate ?? task.dueDate,
+                urgency: urgency ?? task.urgency,
+                taskType: taskType ?? task.taskType,
+                isRecurring: isRecurring ?? task.isRecurring,
+                taskDescription: description ?? task.taskDescription,
+                externalID: task.externalID,
+                sourceSystem: task.sourceSystem
             )
         }
     }
@@ -111,7 +165,13 @@ final class TaskSourceTests: XCTestCase {
             priority: 1,
             categoryTitle: "Work",
             categoryColorHex: "#FF0000",
-            dueDate: Date()
+            dueDate: Date(),
+            urgency: "urgent",
+            taskType: "income",
+            isRecurring: false,
+            taskDescription: "Test description",
+            externalID: nil,
+            sourceSystem: "mock"
         )
 
         XCTAssertEqual(task.id, "test-1")
@@ -121,6 +181,10 @@ final class TaskSourceTests: XCTestCase {
         XCTAssertEqual(task.categoryTitle, "Work")
         XCTAssertEqual(task.categoryColorHex, "#FF0000")
         XCTAssertNotNil(task.dueDate)
+        XCTAssertEqual(task.urgency, "urgent")
+        XCTAssertEqual(task.taskType, "income")
+        XCTAssertFalse(task.isRecurring)
+        XCTAssertEqual(task.taskDescription, "Test description")
     }
 
     func test_taskSourceData_optionalPropertiesCanBeNil() {
@@ -131,12 +195,20 @@ final class TaskSourceTests: XCTestCase {
             priority: 0,
             categoryTitle: nil,
             categoryColorHex: nil,
-            dueDate: nil
+            dueDate: nil,
+            urgency: "not_urgent",
+            taskType: "maintenance",
+            isRecurring: false,
+            taskDescription: nil,
+            externalID: nil,
+            sourceSystem: "mock"
         )
 
         XCTAssertNil(task.categoryTitle)
         XCTAssertNil(task.categoryColorHex)
         XCTAssertNil(task.dueDate)
+        XCTAssertNil(task.taskDescription)
+        XCTAssertNil(task.externalID)
     }
 
     // MARK: - TaskSource Tests
@@ -167,9 +239,9 @@ final class TaskSourceTests: XCTestCase {
     func test_taskSource_fetchIncompleteTasks_returnsOnlyIncomplete() async throws {
         let source = MockTaskSource()
         source.tasks = [
-            MockTaskData(id: "1", title: "Task 1", isCompleted: false, priority: 0, categoryTitle: nil, categoryColorHex: nil, dueDate: nil),
-            MockTaskData(id: "2", title: "Task 2", isCompleted: true, priority: 0, categoryTitle: nil, categoryColorHex: nil, dueDate: nil),
-            MockTaskData(id: "3", title: "Task 3", isCompleted: false, priority: 0, categoryTitle: nil, categoryColorHex: nil, dueDate: nil)
+            MockTaskData(id: "1", title: "Task 1", isCompleted: false, priority: 0, categoryTitle: nil, categoryColorHex: nil, dueDate: nil, urgency: "not_urgent", taskType: "maintenance", isRecurring: false, taskDescription: nil, externalID: nil, sourceSystem: "mock"),
+            MockTaskData(id: "2", title: "Task 2", isCompleted: true, priority: 0, categoryTitle: nil, categoryColorHex: nil, dueDate: nil, urgency: "not_urgent", taskType: "maintenance", isRecurring: false, taskDescription: nil, externalID: nil, sourceSystem: "mock"),
+            MockTaskData(id: "3", title: "Task 3", isCompleted: false, priority: 0, categoryTitle: nil, categoryColorHex: nil, dueDate: nil, urgency: "not_urgent", taskType: "maintenance", isRecurring: false, taskDescription: nil, externalID: nil, sourceSystem: "mock")
         ]
 
         let incomplete = try await source.fetchIncompleteTasks()
@@ -181,7 +253,7 @@ final class TaskSourceTests: XCTestCase {
     func test_taskSource_markComplete_updatesTask() async throws {
         let source = MockTaskSource()
         source.tasks = [
-            MockTaskData(id: "1", title: "Task 1", isCompleted: false, priority: 0, categoryTitle: nil, categoryColorHex: nil, dueDate: nil)
+            MockTaskData(id: "1", title: "Task 1", isCompleted: false, priority: 0, categoryTitle: nil, categoryColorHex: nil, dueDate: nil, urgency: "not_urgent", taskType: "maintenance", isRecurring: false, taskDescription: nil, externalID: nil, sourceSystem: "mock")
         ]
 
         try await source.markComplete(taskID: "1")
@@ -192,7 +264,7 @@ final class TaskSourceTests: XCTestCase {
     func test_taskSource_markIncomplete_updatesTask() async throws {
         let source = MockTaskSource()
         source.tasks = [
-            MockTaskData(id: "1", title: "Task 1", isCompleted: true, priority: 0, categoryTitle: nil, categoryColorHex: nil, dueDate: nil)
+            MockTaskData(id: "1", title: "Task 1", isCompleted: true, priority: 0, categoryTitle: nil, categoryColorHex: nil, dueDate: nil, urgency: "not_urgent", taskType: "maintenance", isRecurring: false, taskDescription: nil, externalID: nil, sourceSystem: "mock")
         ]
 
         try await source.markIncomplete(taskID: "1")
@@ -209,7 +281,12 @@ final class TaskSourceTests: XCTestCase {
             title: "New Task",
             category: "Work",
             dueDate: nil,
-            priority: 1
+            priority: 1,
+            duration: 30,
+            urgency: "urgent",
+            taskType: "income",
+            isRecurring: false,
+            description: nil
         )
 
         XCTAssertEqual(source.tasks.count, 1)
@@ -217,26 +294,32 @@ final class TaskSourceTests: XCTestCase {
         XCTAssertEqual(newTask.categoryTitle, "Work")
         XCTAssertEqual(newTask.priority, 1)
         XCTAssertFalse(newTask.isCompleted)
+        XCTAssertEqual(newTask.urgency, "urgent")
+        XCTAssertEqual(newTask.taskType, "income")
     }
 
     func test_taskSourceWritable_updateTask_modifiesExistingTask() async throws {
         let source = MockTaskSource()
         source.tasks = [
-            MockTaskData(id: "1", title: "Old Title", isCompleted: false, priority: 0, categoryTitle: nil, categoryColorHex: nil, dueDate: nil)
+            MockTaskData(id: "1", title: "Old Title", isCompleted: false, priority: 0, categoryTitle: nil, categoryColorHex: nil, dueDate: nil, urgency: "not_urgent", taskType: "maintenance", isRecurring: false, taskDescription: nil, externalID: nil, sourceSystem: "mock")
         ]
 
-        try await source.updateTask(taskID: "1", title: "New Title", category: "Work", dueDate: nil, priority: 2)
+        try await source.updateTask(taskID: "1", title: "New Title", category: "Work", dueDate: nil, priority: 2, duration: nil, urgency: "urgent", taskType: "income", isRecurring: true, description: "Updated")
 
         XCTAssertEqual(source.tasks[0].title, "New Title")
         XCTAssertEqual(source.tasks[0].categoryTitle, "Work")
         XCTAssertEqual(source.tasks[0].priority, 2)
+        XCTAssertEqual(source.tasks[0].urgency, "urgent")
+        XCTAssertEqual(source.tasks[0].taskType, "income")
+        XCTAssertTrue(source.tasks[0].isRecurring)
+        XCTAssertEqual(source.tasks[0].taskDescription, "Updated")
     }
 
     func test_taskSourceWritable_deleteTask_removesTask() async throws {
         let source = MockTaskSource()
         source.tasks = [
-            MockTaskData(id: "1", title: "Task 1", isCompleted: false, priority: 0, categoryTitle: nil, categoryColorHex: nil, dueDate: nil),
-            MockTaskData(id: "2", title: "Task 2", isCompleted: false, priority: 0, categoryTitle: nil, categoryColorHex: nil, dueDate: nil)
+            MockTaskData(id: "1", title: "Task 1", isCompleted: false, priority: 0, categoryTitle: nil, categoryColorHex: nil, dueDate: nil, urgency: "not_urgent", taskType: "maintenance", isRecurring: false, taskDescription: nil, externalID: nil, sourceSystem: "mock"),
+            MockTaskData(id: "2", title: "Task 2", isCompleted: false, priority: 0, categoryTitle: nil, categoryColorHex: nil, dueDate: nil, urgency: "not_urgent", taskType: "maintenance", isRecurring: false, taskDescription: nil, externalID: nil, sourceSystem: "mock")
         ]
 
         try await source.deleteTask(taskID: "1")

@@ -9,13 +9,20 @@ struct TimeBoxApp: App {
             TaskMetadata.self
         ])
 
-        // Disable CloudKit for UI testing to avoid simulator crashes
+        // Disable CloudKit for UI testing and Simulator to avoid crashes
         let isUITesting = ProcessInfo.processInfo.arguments.contains("-UITesting")
+        #if targetEnvironment(simulator)
+        let isSimulator = true
+        #else
+        let isSimulator = false
+        #endif
+
+        let shouldDisableCloudKit = isUITesting || isSimulator
 
         let modelConfiguration = ModelConfiguration(
             schema: schema,
             isStoredInMemoryOnly: isUITesting,
-            cloudKitDatabase: isUITesting ? .none : .private("iCloud.com.henning.timebox")
+            cloudKitDatabase: shouldDisableCloudKit ? .none : .private("iCloud.com.henning.timebox")
         )
 
         do {

@@ -205,4 +205,130 @@ final class LocalTaskTests: XCTestCase {
         XCTAssertEqual(sourceData.categoryColorHex, "#00FF00")
         XCTAssertFalse(sourceData.isCompleted)
     }
+
+    // MARK: - Phase 1: New Fields (Urgency, Task Type, Recurring, Description, Sync)
+
+    func test_localTask_defaultValues_phase1() throws {
+        let context = container.mainContext
+        let task = LocalTask(title: "Test Task", priority: 0)
+        context.insert(task)
+
+        XCTAssertEqual(task.urgency, "not_urgent")
+        XCTAssertEqual(task.taskType, "maintenance")
+        XCTAssertEqual(task.isRecurring, false)
+        XCTAssertNil(task.taskDescription)
+        XCTAssertNil(task.externalID)
+        XCTAssertEqual(task.sourceSystem, "local")
+    }
+
+    func test_localTask_urgencyCanBeSet() throws {
+        let context = container.mainContext
+        let task = LocalTask(
+            title: "Urgent Task",
+            priority: 3,
+            urgency: "urgent"
+        )
+        context.insert(task)
+
+        XCTAssertEqual(task.urgency, "urgent")
+    }
+
+    func test_localTask_taskTypeCanBeSet() throws {
+        let context = container.mainContext
+        let taskIncome = LocalTask(title: "Work", priority: 2, taskType: "income")
+        let taskMaintenance = LocalTask(title: "Fix", priority: 1, taskType: "maintenance")
+        let taskRecharge = LocalTask(title: "Rest", priority: 0, taskType: "recharge")
+
+        context.insert(taskIncome)
+        context.insert(taskMaintenance)
+        context.insert(taskRecharge)
+
+        XCTAssertEqual(taskIncome.taskType, "income")
+        XCTAssertEqual(taskMaintenance.taskType, "maintenance")
+        XCTAssertEqual(taskRecharge.taskType, "recharge")
+    }
+
+    func test_localTask_recurringFlagWorks() throws {
+        let context = container.mainContext
+        let recurringTask = LocalTask(
+            title: "Weekly Review",
+            priority: 2,
+            isRecurring: true
+        )
+        context.insert(recurringTask)
+
+        XCTAssertTrue(recurringTask.isRecurring)
+    }
+
+    func test_localTask_descriptionCanBeSet() throws {
+        let context = container.mainContext
+        let task = LocalTask(
+            title: "Research",
+            priority: 1,
+            taskDescription: "Investigate new frameworks for iOS development"
+        )
+        context.insert(task)
+
+        XCTAssertEqual(task.taskDescription, "Investigate new frameworks for iOS development")
+    }
+
+    func test_localTask_externalIDCanBeSet() throws {
+        let context = container.mainContext
+        let task = LocalTask(
+            title: "Synced Task",
+            priority: 2,
+            externalID: "notion-page-abc123"
+        )
+        context.insert(task)
+
+        XCTAssertEqual(task.externalID, "notion-page-abc123")
+    }
+
+    func test_localTask_sourceSystemCanBeSet() throws {
+        let context = container.mainContext
+        let localTask = LocalTask(title: "Local", priority: 0, sourceSystem: "local")
+        let notionTask = LocalTask(title: "Notion", priority: 1, sourceSystem: "notion")
+
+        context.insert(localTask)
+        context.insert(notionTask)
+
+        XCTAssertEqual(localTask.sourceSystem, "local")
+        XCTAssertEqual(notionTask.sourceSystem, "notion")
+    }
+
+    func test_localTask_allFieldsCanBeSet() throws {
+        let context = container.mainContext
+        let dueDate = Date()
+        let task = LocalTask(
+            title: "Complete Task",
+            priority: 3,
+            category: "Work",
+            categoryColorHex: "#FF0000",
+            dueDate: dueDate,
+            createdAt: Date(),
+            sortOrder: 5,
+            manualDuration: 30,
+            urgency: "urgent",
+            taskType: "income",
+            isRecurring: true,
+            taskDescription: "Important work task",
+            externalID: "notion-123",
+            sourceSystem: "notion"
+        )
+        context.insert(task)
+
+        XCTAssertEqual(task.title, "Complete Task")
+        XCTAssertEqual(task.priority, 3)
+        XCTAssertEqual(task.category, "Work")
+        XCTAssertEqual(task.categoryColorHex, "#FF0000")
+        XCTAssertEqual(task.dueDate, dueDate)
+        XCTAssertEqual(task.sortOrder, 5)
+        XCTAssertEqual(task.manualDuration, 30)
+        XCTAssertEqual(task.urgency, "urgent")
+        XCTAssertEqual(task.taskType, "income")
+        XCTAssertTrue(task.isRecurring)
+        XCTAssertEqual(task.taskDescription, "Important work task")
+        XCTAssertEqual(task.externalID, "notion-123")
+        XCTAssertEqual(task.sourceSystem, "notion")
+    }
 }

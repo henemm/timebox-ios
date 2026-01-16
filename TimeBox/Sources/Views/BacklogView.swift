@@ -54,6 +54,7 @@ struct BacklogView: View {
                     } label: {
                         Image(systemName: "plus")
                     }
+                    .accessibilityIdentifier("addTaskButton")
                 }
             }
             .withSettingsToolbar()

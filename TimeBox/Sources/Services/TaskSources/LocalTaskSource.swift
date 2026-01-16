@@ -57,7 +57,12 @@ final class LocalTaskSource: @preconcurrency TaskSource, @preconcurrency TaskSou
         title: String,
         category: String?,
         dueDate: Date?,
-        priority: Int
+        priority: Int,
+        duration: Int? = nil,
+        urgency: String = "not_urgent",
+        taskType: String = "maintenance",
+        isRecurring: Bool = false,
+        description: String? = nil
     ) async throws -> LocalTask {
         let nextSortOrder = try await getNextSortOrder()
 
@@ -66,7 +71,13 @@ final class LocalTaskSource: @preconcurrency TaskSource, @preconcurrency TaskSou
             priority: priority,
             category: category,
             dueDate: dueDate,
-            sortOrder: nextSortOrder
+            sortOrder: nextSortOrder,
+            manualDuration: duration,
+            urgency: urgency,
+            taskType: taskType,
+            isRecurring: isRecurring,
+            taskDescription: description,
+            sourceSystem: "local"
         )
         modelContext.insert(task)
         try modelContext.save()
@@ -75,10 +86,15 @@ final class LocalTaskSource: @preconcurrency TaskSource, @preconcurrency TaskSou
 
     func updateTask(
         taskID: String,
-        title: String?,
-        category: String?,
-        dueDate: Date?,
-        priority: Int?
+        title: String? = nil,
+        category: String? = nil,
+        dueDate: Date? = nil,
+        priority: Int? = nil,
+        duration: Int? = nil,
+        urgency: String? = nil,
+        taskType: String? = nil,
+        isRecurring: Bool? = nil,
+        description: String? = nil
     ) async throws {
         guard let task = try findTask(byID: taskID) else { return }
 
@@ -93,6 +109,21 @@ final class LocalTaskSource: @preconcurrency TaskSource, @preconcurrency TaskSou
         }
         if let priority = priority {
             task.priority = priority
+        }
+        if let duration = duration {
+            task.manualDuration = duration
+        }
+        if let urgency = urgency {
+            task.urgency = urgency
+        }
+        if let taskType = taskType {
+            task.taskType = taskType
+        }
+        if let isRecurring = isRecurring {
+            task.isRecurring = isRecurring
+        }
+        if let description = description {
+            task.taskDescription = description
         }
 
         try modelContext.save()

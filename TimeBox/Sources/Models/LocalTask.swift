@@ -18,6 +18,26 @@ final class LocalTask {
     var sortOrder: Int = 0
     var manualDuration: Int?
 
+    // MARK: - Phase 1: Enhanced Task Fields
+
+    /// Urgency level for Eisenhower Matrix (urgent/not_urgent)
+    var urgency: String = "not_urgent"
+
+    /// Task categorization type (income/maintenance/recharge)
+    var taskType: String = "maintenance"
+
+    /// Flag for recurring tasks
+    var isRecurring: Bool = false
+
+    /// Long-form description/notes for the task
+    var taskDescription: String?
+
+    /// External system identifier for sync (e.g., Notion page ID)
+    var externalID: String?
+
+    /// Source system identifier (local/notion/todoist)
+    var sourceSystem: String = "local"
+
     /// String id for TaskSourceData protocol conformance
     var id: String { uuid.uuidString }
 
@@ -30,7 +50,14 @@ final class LocalTask {
         categoryColorHex: String? = nil,
         dueDate: Date? = nil,
         createdAt: Date = Date(),
-        sortOrder: Int = 0
+        sortOrder: Int = 0,
+        manualDuration: Int? = nil,
+        urgency: String = "not_urgent",
+        taskType: String = "maintenance",
+        isRecurring: Bool = false,
+        taskDescription: String? = nil,
+        externalID: String? = nil,
+        sourceSystem: String = "local"
     ) {
         self.uuid = uuid
         self.title = title
@@ -41,6 +68,13 @@ final class LocalTask {
         self.dueDate = dueDate
         self.createdAt = createdAt
         self.sortOrder = sortOrder
+        self.manualDuration = manualDuration
+        self.urgency = urgency
+        self.taskType = taskType
+        self.isRecurring = isRecurring
+        self.taskDescription = taskDescription
+        self.externalID = externalID
+        self.sourceSystem = sourceSystem
     }
 }
 
