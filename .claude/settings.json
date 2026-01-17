@@ -15,6 +15,11 @@
         "hooks": [
           {
             "type": "command",
+            "command": "python3 /Users/hem/Documents/opt/my-daily-sprints/.claude/hooks/strict_code_gate.py",
+            "timeout": 5
+          },
+          {
+            "type": "command",
             "command": "python3 /Users/hem/Documents/opt/my-daily-sprints/.claude/hooks/claude_md_protection.py",
             "timeout": 5
           },
