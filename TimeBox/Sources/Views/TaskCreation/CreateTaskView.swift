@@ -50,11 +50,13 @@ struct CreateTaskView: View {
                 // MARK: - Priority (3 Levels)
 
                 Section {
-                    Picker("Priorität", selection: $priority) {
-                        Text("🟦 Niedrig").tag(1)
-                        Text("🟨 Mittel").tag(2)
-                        Text("🔴 Hoch").tag(3)
+                    HStack(spacing: 12) {
+                        QuickPriorityButton(priority: 1, selectedPriority: $priority)
+                        QuickPriorityButton(priority: 2, selectedPriority: $priority)
+                        QuickPriorityButton(priority: 3, selectedPriority: $priority)
                     }
+                } header: {
+                    Text("Priorität")
                 }
 
                 // MARK: - Urgency
@@ -299,6 +301,42 @@ struct QuickDurationButton: View {
             selectedMinutes = minutes
         } label: {
             Text("\(minutes)m")
+                .font(.headline)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 12)
+                .background(
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(isSelected ? Color.accentColor : Color(.secondarySystemFill))
+                )
+                .foregroundStyle(isSelected ? .white : .primary)
+        }
+        .buttonStyle(.plain)
+    }
+}
+
+/// Quick priority selection button
+struct QuickPriorityButton: View {
+    let priority: Int
+    @Binding var selectedPriority: Int
+
+    private var isSelected: Bool {
+        selectedPriority == priority
+    }
+
+    var displayName: String {
+        switch priority {
+        case 1: return "🟦 Niedrig"
+        case 2: return "🟨 Mittel"
+        case 3: return "🔴 Hoch"
+        default: return ""
+        }
+    }
+
+    var body: some View {
+        Button {
+            selectedPriority = priority
+        } label: {
+            Text(displayName)
                 .font(.headline)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 12)
