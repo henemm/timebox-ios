@@ -32,8 +32,7 @@ final class LocalTaskTests: XCTestCase {
         XCTAssertEqual(task.title, "Test Task")
         XCTAssertFalse(task.isCompleted)
         XCTAssertEqual(task.priority, 1)
-        XCTAssertNil(task.category)
-        XCTAssertNil(task.categoryColorHex)
+        XCTAssertTrue(task.tags.isEmpty)
         XCTAssertNil(task.dueDate)
         XCTAssertNotNil(task.createdAt)
         XCTAssertEqual(task.sortOrder, 0)
@@ -45,14 +44,12 @@ final class LocalTaskTests: XCTestCase {
         let task = LocalTask(
             title: "Task with extras",
             priority: 2,
-            category: "Work",
-            categoryColorHex: "#FF5733",
+            tags: ["Work"],
             dueDate: dueDate
         )
         context.insert(task)
 
-        XCTAssertEqual(task.category, "Work")
-        XCTAssertEqual(task.categoryColorHex, "#FF5733")
+        XCTAssertEqual(task.tags, ["Work"])
         XCTAssertEqual(task.dueDate, dueDate)
     }
 
@@ -191,8 +188,7 @@ final class LocalTaskTests: XCTestCase {
         let task = LocalTask(
             title: "Source Task",
             priority: 1,
-            category: "Personal",
-            categoryColorHex: "#00FF00",
+            tags: ["Personal"],
             dueDate: Date()
         )
         context.insert(task)
@@ -201,8 +197,7 @@ final class LocalTaskTests: XCTestCase {
         let sourceData: any TaskSourceData = task
         XCTAssertEqual(sourceData.title, "Source Task")
         XCTAssertEqual(sourceData.priority, 1)
-        XCTAssertEqual(sourceData.categoryTitle, "Personal")
-        XCTAssertEqual(sourceData.categoryColorHex, "#00FF00")
+        XCTAssertEqual(sourceData.tags, ["Personal"])
         XCTAssertFalse(sourceData.isCompleted)
     }
 
@@ -210,12 +205,12 @@ final class LocalTaskTests: XCTestCase {
 
     func test_localTask_defaultValues_phase1() throws {
         let context = container.mainContext
-        let task = LocalTask(title: "Test Task", priority: 0)
+        let task = LocalTask(title: "Test Task", priority: 1)
         context.insert(task)
 
         XCTAssertEqual(task.urgency, "not_urgent")
         XCTAssertEqual(task.taskType, "maintenance")
-        XCTAssertEqual(task.isRecurring, false)
+        XCTAssertEqual(task.recurrencePattern, "none")
         XCTAssertNil(task.taskDescription)
         XCTAssertNil(task.externalID)
         XCTAssertEqual(task.sourceSystem, "local")
@@ -253,11 +248,11 @@ final class LocalTaskTests: XCTestCase {
         let recurringTask = LocalTask(
             title: "Weekly Review",
             priority: 2,
-            isRecurring: true
+            recurrencePattern: "weekly"
         )
         context.insert(recurringTask)
 
-        XCTAssertTrue(recurringTask.isRecurring)
+        XCTAssertEqual(recurringTask.recurrencePattern, "weekly")
     }
 
     func test_localTask_descriptionCanBeSet() throws {
@@ -286,7 +281,7 @@ final class LocalTaskTests: XCTestCase {
 
     func test_localTask_sourceSystemCanBeSet() throws {
         let context = container.mainContext
-        let localTask = LocalTask(title: "Local", priority: 0, sourceSystem: "local")
+        let localTask = LocalTask(title: "Local", priority: 1, sourceSystem: "local")
         let notionTask = LocalTask(title: "Notion", priority: 1, sourceSystem: "notion")
 
         context.insert(localTask)
@@ -302,15 +297,16 @@ final class LocalTaskTests: XCTestCase {
         let task = LocalTask(
             title: "Complete Task",
             priority: 3,
-            category: "Work",
-            categoryColorHex: "#FF0000",
+            tags: ["Work"],
             dueDate: dueDate,
             createdAt: Date(),
             sortOrder: 5,
             manualDuration: 30,
             urgency: "urgent",
             taskType: "income",
-            isRecurring: true,
+            recurrencePattern: "weekly",
+            recurrenceWeekdays: [1, 3, 5],
+            recurrenceMonthDay: nil,
             taskDescription: "Important work task",
             externalID: "notion-123",
             sourceSystem: "notion"
@@ -319,14 +315,14 @@ final class LocalTaskTests: XCTestCase {
 
         XCTAssertEqual(task.title, "Complete Task")
         XCTAssertEqual(task.priority, 3)
-        XCTAssertEqual(task.category, "Work")
-        XCTAssertEqual(task.categoryColorHex, "#FF0000")
+        XCTAssertEqual(task.tags, ["Work"])
         XCTAssertEqual(task.dueDate, dueDate)
         XCTAssertEqual(task.sortOrder, 5)
         XCTAssertEqual(task.manualDuration, 30)
         XCTAssertEqual(task.urgency, "urgent")
         XCTAssertEqual(task.taskType, "income")
-        XCTAssertTrue(task.isRecurring)
+        XCTAssertEqual(task.recurrencePattern, "weekly")
+        XCTAssertEqual(task.recurrenceWeekdays, [1, 3, 5])
         XCTAssertEqual(task.taskDescription, "Important work task")
         XCTAssertEqual(task.externalID, "notion-123")
         XCTAssertEqual(task.sourceSystem, "notion")
