@@ -9,6 +9,13 @@ struct PlanItem: Identifiable, Sendable {
     var effectiveDuration: Int
     let durationSource: DurationSource
 
+    // Enhanced task fields (Phase 2)
+    let tags: [String]
+    let urgency: String
+    let taskType: String
+    let dueDate: Date?
+    let taskDescription: String?
+
     init(reminder: ReminderData, metadata: TaskMetadata) {
         self.id = reminder.id
         self.title = reminder.title
@@ -22,6 +29,13 @@ struct PlanItem: Identifiable, Sendable {
         )
         self.effectiveDuration = duration
         self.durationSource = source
+
+        // Enhanced fields (defaults for Reminders integration)
+        self.tags = []
+        self.urgency = "not_urgent"
+        self.taskType = "maintenance"
+        self.dueDate = nil
+        self.taskDescription = nil
     }
 
     init(localTask: LocalTask) {
@@ -37,6 +51,13 @@ struct PlanItem: Identifiable, Sendable {
         )
         self.effectiveDuration = duration
         self.durationSource = source
+
+        // Enhanced fields from LocalTask
+        self.tags = localTask.tags
+        self.urgency = localTask.urgency
+        self.taskType = localTask.taskType
+        self.dueDate = localTask.dueDate
+        self.taskDescription = localTask.taskDescription
     }
 
     private static func resolveDuration(manual: Int?, title: String?) -> (Int, DurationSource) {
