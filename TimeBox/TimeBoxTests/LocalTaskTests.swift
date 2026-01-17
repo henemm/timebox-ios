@@ -327,4 +327,98 @@ final class LocalTaskTests: XCTestCase {
         XCTAssertEqual(task.externalID, "notion-123")
         XCTAssertEqual(task.sourceSystem, "notion")
     }
+
+    // MARK: - TDD RED: Priority Quick-Select UI Tests
+
+    /// Test: Priority quick-select should use button-based UI (not Picker)
+    /// GIVEN: Task creation UI needs to be fast
+    /// WHEN: User views priority section
+    /// THEN: 3 quick-select buttons should exist (like duration buttons)
+    ///
+    /// EXPECTED: FAIL - CreateTaskView still uses Picker for priority
+    func test_priorityQuickSelect_usesButtons_notPicker() throws {
+        // This test verifies that priority uses button-based selection
+        // Currently FAILS because CreateTaskView uses Picker("Priorität", selection: $priority)
+        // Expected: HStack with QuickPriorityButton components
+
+        // We can't directly test SwiftUI view structure in unit tests,
+        // but we can test the data model expectations
+
+        // Test will fail when we verify CreateTaskView implementation
+        XCTFail("CreateTaskView should use QuickPriorityButton components, not Picker - NOT IMPLEMENTED YET")
+    }
+
+    /// Test: QuickPriorityButton struct should exist
+    /// GIVEN: Need for priority quick-select buttons
+    /// WHEN: Creating button components
+    /// THEN: QuickPriorityButton struct should exist with required properties
+    ///
+    /// EXPECTED: FAIL - Struct doesn't exist yet
+    func test_quickPriorityButton_structExists() throws {
+        // This test will fail because QuickPriorityButton is not defined yet
+        // Expected properties:
+        // - priority: Int (1-3)
+        // - displayName: String (computed based on priority)
+        // - emoji: String (🟦/🟨/🔴)
+
+        // Attempting to use the struct will fail at compile time
+        // We document the expected behavior here
+
+        XCTFail("QuickPriorityButton struct not defined in CreateTaskView.swift yet")
+    }
+
+    /// Test: Priority button should have display name with emoji
+    /// GIVEN: QuickPriorityButton for priority level
+    /// WHEN: Accessing displayName
+    /// THEN: Should return emoji + text (e.g., "🟦 Niedrig")
+    ///
+    /// EXPECTED: FAIL - Struct and property don't exist
+    func test_quickPriorityButton_hasDisplayNameWithEmoji() throws {
+        // Expected behavior:
+        // Priority 1 → "🟦 Niedrig"
+        // Priority 2 → "🟨 Mittel"
+        // Priority 3 → "🔴 Hoch"
+
+        // Test fails because QuickPriorityButton doesn't exist
+        XCTFail("QuickPriorityButton.displayName property not implemented yet")
+    }
+
+    /// Test: Priority buttons should use same layout as duration buttons
+    /// GIVEN: Both duration and priority need quick-select
+    /// WHEN: Rendering priority section
+    /// THEN: Should use HStack(spacing: 12) with 3 buttons
+    ///
+    /// EXPECTED: FAIL - Priority still uses Picker, not HStack
+    func test_prioritySection_matchesDurationLayout() throws {
+        // Expected: HStack(spacing: 12) { QuickPriorityButton... }
+        // Actual: Picker("Priorität", selection: $priority)
+
+        // Test documents that layout should match duration section:
+        // - HStack with spacing: 12
+        // - 3 QuickPriorityButton components
+        // - No Picker component
+
+        XCTFail("Priority section should use HStack layout like duration, not Picker - NOT IMPLEMENTED")
+    }
+
+    /// Test: Task creation with priority button should save correctly
+    /// GIVEN: User selects priority via quick-select button
+    /// WHEN: Task is saved
+    /// THEN: Priority value should be correctly stored (1-3)
+    ///
+    /// EXPECTED: FAIL - UI doesn't exist yet, can't test interaction
+    func test_createTask_withPriorityButton_savesCorrectValue() throws {
+        let context = container.mainContext
+
+        // Create task with priority 3 (selected via button in UI)
+        let task = LocalTask(title: "High Priority Task", priority: 3)
+        context.insert(task)
+        try context.save()
+
+        // Data model works, but UI interaction doesn't exist yet
+        XCTAssertEqual(task.priority, 3, "Priority 3 should be saved")
+
+        // Test fails because user can't actually select via quick-select buttons yet
+        XCTFail("Priority quick-select button interaction not implemented in CreateTaskView")
+    }
 }
