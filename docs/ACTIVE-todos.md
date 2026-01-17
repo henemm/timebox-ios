@@ -61,6 +61,21 @@ _Keine Items mit fertiger Spec_
 
 <!-- Archiv der letzten erledigten Items -->
 
+**Feature: Task System v2.0 - Phase 2: Backlog Enhancements**
+- Beschreibung: Visual Indicators + Eisenhower Matrix für besseres Task-Prioritization
+- Implementiert:
+  - BacklogRow mit Priority Icons, Tag Chips, Due Date Badges (f049830)
+  - EisenhowerMatrixView mit 4 Quadranten (Do First, Schedule, Delegate, Eliminate) (ed56d42)
+  - Retroaktive Tests: 10 Unit Tests + 12 UI Tests (4af9209)
+  - TDD-Enforcement: strict_code_gate.py Hook aktiviert (3843335)
+- Files Changed: BacklogView.swift, BacklogRow.swift, PlanItem.swift, MainTabView.swift
+- Tests: 22 Tests geschrieben (EisenhowerMatrixTests.swift, EisenhowerMatrixUITests.swift)
+- TDD-Status: ⚠️ Implementiert OHNE TDD (vor Hook-Aktivierung), Tests retroaktiv geschrieben
+- Hook-System: strict_code_gate.py verhindert zukünftige TDD-Bypasses
+- Validation: 2026-01-17
+- Status: ERLEDIGT ✅ (Tests geschrieben, Hook aktiv, Feature funktioniert)
+- Note: Filter/Sort UI blocked by Swift 6 Toolbar Bug (deferred)
+
 **Feature: Mock EventKit Repository (Phase 2)**
 - Beschreibung: SwiftUI Environment Injection für Mock in UI Tests + CloudKit Fix für Simulator
 - Implementiert: EventKitRepositoryEnvironment, TimeBoxApp Mock Injection + CloudKit Disable, View @Environment Updates
