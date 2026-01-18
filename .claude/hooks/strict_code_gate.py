@@ -111,18 +111,24 @@ def verify_file_in_workflow(workflow: dict, file_path: str) -> tuple[bool, str]:
     """
     affected_files = workflow.get("affected_files", [])
 
-    # If no affected_files declared yet, allow
-    # (workflow is in early phases, hasn't specified files yet)
+    # If no affected_files declared, BLOCK!
+    # Workflows MUST declare which files they will modify BEFORE implementation
     if len(affected_files) == 0:
-        return True, "Workflow hasn't declared affected_files yet"
+        return False, "Workflow has no affected_files declared - update spec first!"
 
     # Normalize paths for comparison
+    # Handle both absolute and relative paths
     normalized_file = file_path.replace("./", "")
     normalized_affected = [f.replace("./", "") for f in affected_files]
 
-    # Check if file is in affected_files
-    if normalized_file in normalized_affected:
-        return True, "File is in workflow's affected_files"
+    # Check if file is in affected_files (exact match or path ends with)
+    for affected in normalized_affected:
+        # Exact match
+        if normalized_file == affected:
+            return True, "File is in workflow's affected_files"
+        # Absolute path ends with relative affected_file
+        if normalized_file.endswith("/" + affected) or normalized_file.endswith(affected):
+            return True, "File is in workflow's affected_files"
 
     # Check if file matches any pattern in affected_files
     for pattern in normalized_affected:
@@ -130,6 +136,9 @@ def verify_file_in_workflow(workflow: dict, file_path: str) -> tuple[bool, str]:
             # Simple glob pattern matching
             regex_pattern = pattern.replace("*", ".*")
             if re.match(regex_pattern, normalized_file):
+                return True, f"File matches pattern: {pattern}"
+            # Also check if absolute path ends with pattern
+            if normalized_file.endswith("/" + pattern.replace("*", "")):
                 return True, f"File matches pattern: {pattern}"
 
     return False, f"File not in workflow's affected_files: {affected_files}"
@@ -266,34 +275,36 @@ def main():
     if not allowed:
         print(f"""
 ╔══════════════════════════════════════════════════════════════════╗
-║  ⚠️  WARNING: File Not in Workflow!                              ║
+║  🔴 BLOCKED: File Not in Workflow!                               ║
 ╠══════════════════════════════════════════════════════════════════╣
 ║  Workflow: {workflow_name:<54}║
 ║  File: {file_path[:58]:<58}║
 ║                                                                  ║
-║  This file is not registered in the workflow's affected_files.   ║
+║  This file is NOT registered in the workflow's affected_files.   ║
 ║                                                                  ║
 ║  Reason: {reason[:55]:<55}║
 ║                                                                  ║
-║  This might indicate:                                            ║
-║  - You're working on a different feature                         ║
+║  This indicates:                                                 ║
+║  - You're working on a DIFFERENT feature/bug than the workflow   ║
 ║  - Scope creep (changing unrelated files)                        ║
 ║  - Missing file in workflow planning                             ║
 ║                                                                  ║
-║  ACTION:                                                         ║
-║  1. If this file IS part of the feature:                         ║
-║     - Update docs/specs/[feature].md to include this file        ║
-║     - Re-run /analyse to update workflow state                   ║
+║  ACTION REQUIRED:                                                ║
+║  ┌─────────────────────────────────────────────────────────────┐ ║
+║  │ OPTION 1: File belongs to CURRENT workflow                  │ ║
+║  │   → Update spec to include this file in affected_files      │ ║
+║  │   → Re-run /analyse to update workflow state                │ ║
+║  │                                                             │ ║
+║  │ OPTION 2: This is a DIFFERENT task (bug/feature)            │ ║
+║  │   → First: /reset to clear current workflow                 │ ║
+║  │   → Then: /10-bug or /11-feature to start NEW workflow      │ ║
+║  └─────────────────────────────────────────────────────────────┘ ║
 ║                                                                  ║
-║  2. If this file is NOT part of the feature:                     ║
-║     - Start a separate workflow for this change                  ║
-║     - Use /11-feature to plan properly                           ║
-║                                                                  ║
-║  ALLOWING THIS CHANGE (with warning logged)                      ║
+║  NO SCOPE CREEP ALLOWED! Each task needs its own workflow.       ║
 ╚══════════════════════════════════════════════════════════════════╝
 """, file=sys.stderr)
-        # Allow but warn (not blocking, just informational)
-        sys.exit(0)
+        # BLOCK - do not allow files outside workflow scope
+        sys.exit(2)
 
     # All checks passed
     sys.exit(0)
