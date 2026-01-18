@@ -204,6 +204,11 @@ struct TaskAssignmentView: View {
                     completedTaskIDs: block.completedTaskIDs
                 )
 
+                // Restore to Next Up after removal from block
+                let taskSource = LocalTaskSource(modelContext: modelContext)
+                let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
+                try syncEngine.updateNextUp(itemID: taskID, isNextUp: true)
+
                 await loadData()
                 assignmentFeedback.toggle()
             } catch {

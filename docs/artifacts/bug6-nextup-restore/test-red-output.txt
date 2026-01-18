@@ -1,0 +1,36 @@
+TDD RED Phase - Bug 6: isNextUp restore beim Entfernen
+======================================================
+Date: 2026-01-18
+
+BUG VERIFICATION (Manual Test)
+------------------------------
+
+Test Steps:
+1. Open Backlog tab
+2. Add task to Next Up (tap arrow-up button)
+3. Switch to "Zuordnen" tab
+4. Drag task from Next Up into Focus Block
+5. Tap X button to remove task from Focus Block
+
+Expected Result:
+- Task should reappear in "Next Up" section
+
+Actual Result (FAILED):
+- Task disappears completely
+- Task is NOT in Focus Block
+- Task is NOT in Next Up section
+- Task is "lost" (only visible in Backlog if !isNextUp filter is removed)
+
+ROOT CAUSE IDENTIFIED:
+----------------------
+File: TimeBox/Sources/Views/TaskAssignmentView.swift
+Function: removeTaskFromBlock() (lines 195-213)
+
+The function removes the task from the block's taskIDs but does NOT
+restore isNextUp = true. Compare with assignTaskToBlock() which correctly
+sets isNextUp = false on assignment.
+
+Missing code in removeTaskFromBlock():
+  try syncEngine.updateNextUp(itemID: taskID, isNextUp: true)
+
+TEST RESULT: FAILED (as expected - functionality not implemented)

@@ -74,6 +74,27 @@
 - Test: Task zuordnen → erscheint im Block
 - Status: OFFEN
 
+**Bug 6: Task kehrt nicht zu Next Up zurueck nach Block-Entfernung**
+- Location: `TaskAssignmentView.swift:195-213`
+- Problem: Task aus Focus Block entfernt → verschwindet komplett (weder in Block noch Next Up)
+- Expected: Task sollte wieder in "Next Up" Section erscheinen
+- Root Cause:
+  - `removeTaskFromBlock()` (Zeile 195-213) entfernt Task aus EventKit-Block
+  - ABER: `isNextUp` wird NICHT zurueck auf `true` gesetzt
+  - Vergleich: `assignTaskToBlock()` (Zeile 185) setzt korrekt `isNextUp = false`
+  - Symmetrie fehlt: `removeTaskFromBlock()` muesste `isNextUp = true` setzen
+- Fix: In `removeTaskFromBlock()` nach EventKit-Update hinzufuegen:
+  ```swift
+  try syncEngine.updateNextUp(itemID: taskID, isNextUp: true)
+  ```
+- Test:
+  1. Task zu Block zuordnen (verschwindet aus Next Up - korrekt)
+  2. Task aus Block entfernen (X-Button)
+  3. Task erscheint wieder in Next Up
+- Aufwand: Klein (1 Zeile Code)
+- Status: OFFEN
+- Spec: `docs/specs/bugfixes/bug6-nextup-restore.md`
+
 ---
 
 ## Offene Tasks
