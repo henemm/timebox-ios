@@ -2,7 +2,45 @@ import SwiftUI
 import SwiftData
 
 struct BacklogView: View {
+    // MARK: - ViewMode Definition
+    enum ViewMode: String, CaseIterable, Identifiable {
+        case list = "Liste"
+        case eisenhowerMatrix = "Matrix"
+        case category = "Kategorie"
+        case duration = "Dauer"
+        case dueDate = "Fälligkeit"
+
+        var id: String { rawValue }
+
+        var icon: String {
+            switch self {
+            case .list: return "list.bullet"
+            case .eisenhowerMatrix: return "square.grid.2x2"
+            case .category: return "folder"
+            case .duration: return "clock"
+            case .dueDate: return "calendar"
+            }
+        }
+
+        var emptyStateMessage: (title: String, description: String) {
+            switch self {
+            case .list:
+                return ("Keine Tasks", "Tippe auf + um einen neuen Task zu erstellen.")
+            case .eisenhowerMatrix:
+                return ("Keine Tasks für Matrix", "Setze Priorität und Dringlichkeit für deine Tasks.")
+            case .category:
+                return ("Keine Tasks in Kategorien", "Erstelle Tasks und weise ihnen Kategorien zu.")
+            case .duration:
+                return ("Keine Tasks mit Dauer", "Setze geschätzte Dauern für deine Tasks.")
+            case .dueDate:
+                return ("Keine Tasks mit Fälligkeitsdatum", "Setze Fälligkeitsdaten für deine Tasks.")
+            }
+        }
+    }
+
+    // MARK: - Properties
     @Environment(\.modelContext) private var modelContext
+    @AppStorage("backlogViewMode") private var selectedMode: ViewMode = .list
     @State private var planItems: [PlanItem] = []
     @State private var errorMessage: String?
     @State private var isLoading = false
@@ -11,6 +49,90 @@ struct BacklogView: View {
     @State private var durationFeedback = false
     @State private var showCreateTask = false
 
+    // MARK: - Eisenhower Matrix Filters
+    private var doFirstTasks: [PlanItem] {
+        planItems.filter { $0.urgency == "urgent" && $0.priority == 3 && !$0.isCompleted }
+    }
+
+    private var scheduleTasks: [PlanItem] {
+        planItems.filter { $0.urgency == "not_urgent" && $0.priority == 3 && !$0.isCompleted }
+    }
+
+    private var delegateTasks: [PlanItem] {
+        planItems.filter { $0.urgency == "urgent" && $0.priority < 3 && !$0.isCompleted }
+    }
+
+    private var eliminateTasks: [PlanItem] {
+        planItems.filter { $0.urgency == "not_urgent" && $0.priority < 3 && !$0.isCompleted }
+    }
+
+    // MARK: - Category Grouping
+    private var tasksByCategory: [(category: String, tasks: [PlanItem])] {
+        let categories = ["deep_work", "shallow_work", "meetings", "maintenance", "creative", "strategic"]
+        return categories.compactMap { category in
+            let filtered = planItems.filter { $0.taskType == category && !$0.isCompleted }
+            guard !filtered.isEmpty else { return nil }
+            return (category: category.localizedCategory, tasks: filtered)
+        }
+    }
+
+    // MARK: - Duration Grouping
+    private var tasksByDuration: [(bucket: String, tasks: [PlanItem])] {
+        let buckets: [(String, ClosedRange<Int>)] = [
+            ("< 15 Min", 0...14),
+            ("15-30 Min", 15...29),
+            ("30-60 Min", 30...59),
+            ("> 60 Min", 60...999)
+        ]
+        return buckets.compactMap { (label, range) in
+            let filtered = planItems.filter {
+                !$0.isCompleted && range.contains($0.effectiveDuration)
+            }
+            guard !filtered.isEmpty else { return nil }
+            return (bucket: label, tasks: filtered)
+        }
+    }
+
+    // MARK: - Due Date Grouping
+    private var tasksByDueDate: [(section: String, tasks: [PlanItem])] {
+        let calendar = Calendar.current
+        let today = Date()
+
+        var grouped: [(String, [PlanItem])] = []
+
+        let todayTasks = planItems.filter {
+            guard let due = $0.dueDate, !$0.isCompleted else { return false }
+            return calendar.isDateInToday(due)
+        }
+        if !todayTasks.isEmpty { grouped.append(("Heute", todayTasks)) }
+
+        let tomorrowTasks = planItems.filter {
+            guard let due = $0.dueDate, !$0.isCompleted else { return false }
+            return calendar.isDateInTomorrow(due)
+        }
+        if !tomorrowTasks.isEmpty { grouped.append(("Morgen", tomorrowTasks)) }
+
+        let weekTasks = planItems.filter {
+            guard let due = $0.dueDate, !$0.isCompleted else { return false }
+            return calendar.isDate(due, equalTo: today, toGranularity: .weekOfYear) &&
+                   !calendar.isDateInToday(due) && !calendar.isDateInTomorrow(due)
+        }
+        if !weekTasks.isEmpty { grouped.append(("Diese Woche", weekTasks)) }
+
+        let laterTasks = planItems.filter {
+            guard let due = $0.dueDate, !$0.isCompleted else { return false }
+            guard let nextWeek = calendar.date(byAdding: .weekOfYear, value: 1, to: today) else { return false }
+            return due > nextWeek
+        }
+        if !laterTasks.isEmpty { grouped.append(("Später", laterTasks)) }
+
+        let noDueDateTasks = planItems.filter { $0.dueDate == nil && !$0.isCompleted }
+        if !noDueDateTasks.isEmpty { grouped.append(("Ohne Fälligkeitsdatum", noDueDateTasks)) }
+
+        return grouped
+    }
+
+    // MARK: - Body
     var body: some View {
         NavigationStack {
             Group {
@@ -23,32 +145,38 @@ struct BacklogView: View {
                         description: Text(error)
                     )
                 } else if planItems.isEmpty {
+                    let emptyState = selectedMode.emptyStateMessage
                     ContentUnavailableView(
-                        "Keine Tasks",
+                        emptyState.title,
                         systemImage: "checklist",
-                        description: Text("Tippe auf + um einen neuen Task zu erstellen.")
+                        description: Text(emptyState.description)
                     )
                 } else {
-                    List {
-                        ForEach(planItems) { item in
-                            BacklogRow(item: item) {
-                                selectedItemForDuration = item
-                            }
-                        }
-                        .onMove(perform: moveItems)
-                    }
-                    .listStyle(.plain)
-                    .refreshable {
-                        await loadTasks()
+                    switch selectedMode {
+                    case .list:
+                        listView
+                    case .eisenhowerMatrix:
+                        eisenhowerMatrixView
+                    case .category:
+                        categoryView
+                    case .duration:
+                        durationView
+                    case .dueDate:
+                        dueDateView
                     }
                 }
             }
             .navigationTitle("Backlog")
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    EditButton()
+                    if selectedMode == .list {
+                        EditButton()
+                    }
                 }
-                ToolbarItem(placement: .topBarTrailing) {
+
+                ToolbarItemGroup(placement: .topBarTrailing) {
+                    viewModeSwitcher
+
                     Button {
                         showCreateTask = true
                     } label: {
@@ -121,143 +249,173 @@ struct BacklogView: View {
             errorMessage = "Dauer konnte nicht gespeichert werden."
         }
     }
-}
 
-// MARK: - Eisenhower Matrix View
-
-struct EisenhowerMatrixView: View {
-    @Environment(\.modelContext) private var modelContext
-    @State private var planItems: [PlanItem] = []
-    @State private var errorMessage: String?
-    @State private var isLoading = false
-    @State private var selectedItemForDuration: PlanItem?
-
-    private var doFirstTasks: [PlanItem] {
-        planItems.filter { $0.urgency == "urgent" && $0.priority == 3 && !$0.isCompleted }
-    }
-
-    private var scheduleTasks: [PlanItem] {
-        planItems.filter { $0.urgency == "not_urgent" && $0.priority == 3 && !$0.isCompleted }
-    }
-
-    private var delegateTasks: [PlanItem] {
-        planItems.filter { $0.urgency == "urgent" && $0.priority < 3 && !$0.isCompleted }
-    }
-
-    private var eliminateTasks: [PlanItem] {
-        planItems.filter { $0.urgency == "not_urgent" && $0.priority < 3 && !$0.isCompleted }
-    }
-
-    var body: some View {
-        NavigationStack {
-            Group {
-                if isLoading {
-                    ProgressView("Lade Tasks...")
-                } else if let error = errorMessage {
-                    ContentUnavailableView(
-                        "Fehler",
-                        systemImage: "exclamationmark.triangle",
-                        description: Text(error)
-                    )
-                } else if planItems.isEmpty {
-                    ContentUnavailableView(
-                        "Keine Tasks",
-                        systemImage: "checklist",
-                        description: Text("Erstelle Tasks im Backlog.")
-                    )
-                } else {
-                    ScrollView {
-                        VStack(spacing: 16) {
-                            QuadrantCard(
-                                title: "Do First",
-                                subtitle: "Dringend + Wichtig",
-                                color: .red,
-                                icon: "exclamationmark.3",
-                                tasks: doFirstTasks,
-                                onDurationTap: { item in
-                                    selectedItemForDuration = item
-                                }
-                            )
-
-                            QuadrantCard(
-                                title: "Schedule",
-                                subtitle: "Nicht dringend + Wichtig",
-                                color: .yellow,
-                                icon: "calendar",
-                                tasks: scheduleTasks,
-                                onDurationTap: { item in
-                                    selectedItemForDuration = item
-                                }
-                            )
-
-                            QuadrantCard(
-                                title: "Delegate",
-                                subtitle: "Dringend + Weniger wichtig",
-                                color: .orange,
-                                icon: "person.2",
-                                tasks: delegateTasks,
-                                onDurationTap: { item in
-                                    selectedItemForDuration = item
-                                }
-                            )
-
-                            QuadrantCard(
-                                title: "Eliminate",
-                                subtitle: "Nicht dringend + Weniger wichtig",
-                                color: .green,
-                                icon: "trash",
-                                tasks: eliminateTasks,
-                                onDurationTap: { item in
-                                    selectedItemForDuration = item
-                                }
-                            )
-                        }
-                        .padding()
+    // MARK: - View Mode Switcher (Swift Liquid Glass)
+    private var viewModeSwitcher: some View {
+        Menu {
+            ForEach(ViewMode.allCases) { mode in
+                Button {
+                    withAnimation(.smooth) {
+                        selectedMode = mode
                     }
-                    .refreshable {
-                        await loadTasks()
-                    }
+                } label: {
+                    Label(mode.rawValue, systemImage: mode.icon)
                 }
             }
-            .navigationTitle("Eisenhower Matrix")
-            .sheet(item: $selectedItemForDuration) { item in
-                DurationPicker(currentDuration: item.effectiveDuration) { newDuration in
-                    updateDuration(for: item, minutes: newDuration)
-                    selectedItemForDuration = nil
-                }
+        } label: {
+            HStack(spacing: 4) {
+                Image(systemName: selectedMode.icon)
+                Text(selectedMode.rawValue)
+                    .font(.headline)
+                Image(systemName: "chevron.down")
+                    .font(.caption)
             }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 6)
+            .background(
+                Capsule()
+                    .fill(.ultraThinMaterial)
+            )
+            .overlay(
+                Capsule()
+                    .strokeBorder(Color.accentColor.opacity(0.3), lineWidth: 1)
+            )
         }
-        .task {
+        .accessibilityIdentifier("viewModeSwitcher")
+    }
+
+    // MARK: - List View
+    private var listView: some View {
+        List {
+            ForEach(planItems) { item in
+                BacklogRow(item: item) {
+                    selectedItemForDuration = item
+                }
+            }
+            .onMove(perform: moveItems)
+        }
+        .listStyle(.plain)
+        .refreshable {
             await loadTasks()
         }
     }
 
-    private func loadTasks() async {
-        isLoading = true
-        errorMessage = nil
+    // MARK: - Eisenhower Matrix View
+    private var eisenhowerMatrixView: some View {
+        ScrollView {
+            VStack(spacing: 16) {
+                QuadrantCard(
+                    title: "Do First",
+                    subtitle: "Dringend + Wichtig",
+                    color: .red,
+                    icon: "exclamationmark.3",
+                    tasks: doFirstTasks,
+                    onDurationTap: { item in selectedItemForDuration = item }
+                )
 
-        do {
-            let taskSource = LocalTaskSource(modelContext: modelContext)
-            let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
-            planItems = try await syncEngine.sync()
-        } catch {
-            errorMessage = error.localizedDescription
+                QuadrantCard(
+                    title: "Schedule",
+                    subtitle: "Nicht dringend + Wichtig",
+                    color: .yellow,
+                    icon: "calendar",
+                    tasks: scheduleTasks,
+                    onDurationTap: { item in selectedItemForDuration = item }
+                )
+
+                QuadrantCard(
+                    title: "Delegate",
+                    subtitle: "Dringend + Weniger wichtig",
+                    color: .orange,
+                    icon: "person.2",
+                    tasks: delegateTasks,
+                    onDurationTap: { item in selectedItemForDuration = item }
+                )
+
+                QuadrantCard(
+                    title: "Eliminate",
+                    subtitle: "Nicht dringend + Weniger wichtig",
+                    color: .green,
+                    icon: "trash",
+                    tasks: eliminateTasks,
+                    onDurationTap: { item in selectedItemForDuration = item }
+                )
+            }
+            .padding()
         }
-
-        isLoading = false
+        .refreshable {
+            await loadTasks()
+        }
     }
 
-    private func updateDuration(for item: PlanItem, minutes: Int?) {
-        do {
-            let taskSource = LocalTaskSource(modelContext: modelContext)
-            let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
-            try syncEngine.updateDuration(itemID: item.id, minutes: minutes)
-
-            Task {
-                await loadTasks()
+    // MARK: - Category View
+    private var categoryView: some View {
+        List {
+            ForEach(tasksByCategory, id: \.category) { group in
+                Section(header: Text(group.category)) {
+                    ForEach(group.tasks) { item in
+                        BacklogRow(item: item) {
+                            selectedItemForDuration = item
+                        }
+                    }
+                }
             }
-        } catch {
-            errorMessage = "Dauer konnte nicht gespeichert werden."
+        }
+        .listStyle(.insetGrouped)
+        .refreshable {
+            await loadTasks()
+        }
+    }
+
+    // MARK: - Duration View
+    private var durationView: some View {
+        List {
+            ForEach(tasksByDuration, id: \.bucket) { group in
+                Section(header: Text(group.bucket)) {
+                    ForEach(group.tasks) { item in
+                        BacklogRow(item: item) {
+                            selectedItemForDuration = item
+                        }
+                    }
+                }
+            }
+        }
+        .listStyle(.insetGrouped)
+        .refreshable {
+            await loadTasks()
+        }
+    }
+
+    // MARK: - Due Date View
+    private var dueDateView: some View {
+        List {
+            ForEach(tasksByDueDate, id: \.section) { group in
+                Section(header: Text(group.section)) {
+                    ForEach(group.tasks) { item in
+                        BacklogRow(item: item) {
+                            selectedItemForDuration = item
+                        }
+                    }
+                }
+            }
+        }
+        .listStyle(.insetGrouped)
+        .refreshable {
+            await loadTasks()
+        }
+    }
+}
+
+// MARK: - String Extension for Category Localization
+private extension String {
+    var localizedCategory: String {
+        switch self {
+        case "deep_work": return "Deep Work"
+        case "shallow_work": return "Shallow Work"
+        case "meetings": return "Meetings"
+        case "maintenance": return "Maintenance"
+        case "creative": return "Creative"
+        case "strategic": return "Strategic"
+        default: return self.capitalized
         }
     }
 }

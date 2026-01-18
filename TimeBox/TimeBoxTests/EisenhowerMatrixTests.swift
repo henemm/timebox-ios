@@ -28,13 +28,12 @@ final class EisenhowerMatrixTests: XCTestCase {
         let task = LocalTask(
             title: title,
             priority: priority,
-            category: "Test",
             tags: [],
+            dueDate: nil,
+            manualDuration: nil,
             urgency: urgency,
             taskType: "maintenance",
-            dueDate: nil,
-            taskDescription: nil,
-            manualDuration: nil
+            taskDescription: nil
         )
         task.isCompleted = isCompleted
         return task

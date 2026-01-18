@@ -8,11 +8,6 @@ struct MainTabView: View {
                     Label("Backlog", systemImage: "list.bullet")
                 }
 
-            EisenhowerMatrixView()
-                .tabItem {
-                    Label("Matrix", systemImage: "square.grid.2x2")
-                }
-
             BlockPlanningView()
                 .tabItem {
                     Label("Blöcke", systemImage: "rectangle.split.3x1")

@@ -53,13 +53,33 @@ _Keine offenen Tasks_
 
 <!-- Items mit fertiger Spec, aber noch nicht implementiert -->
 
-_Keine Items mit fertiger Spec_
+_Keine ausstehenden Specs_
 
 ---
 
 ## Zuletzt erledigt
 
 <!-- Archiv der letzten erledigten Items -->
+
+**Feature: Eisenhower Matrix als ViewMode in BacklogView**
+- Beschreibung: Eisenhower Matrix von separatem Tab zu ViewMode in BacklogView umgebaut
+- Type: AENDERUNG (Modification)
+- Implementiert:
+  - ViewMode enum mit 5 Modi (List, Matrix, Category, Duration, Due Date)
+  - Swift Liquid Glass Switcher im Toolbar (Menu Button)
+  - AppStorage Persistence mit Key "backlogViewMode"
+  - Matrix Tab aus MainTabView entfernt
+  - 5 View-Renderer in BacklogView integriert
+- Files Changed: MainTabView.swift (-4 lines), BacklogView.swift (+150 net), BacklogViewUITests.swift (+64)
+- Tests: 4 TDD UI Tests (alle grün)
+  - testViewModeSwitcherExists ✅
+  - testViewModeSwitcherShowsAllOptions ✅
+  - testSwitchToEisenhowerMatrixMode ✅
+  - testMatrixTabDoesNotExist ✅
+- TDD-Status: ✅ Vollständig TDD (RED → GREEN)
+- Spec: `TimeBox/docs/artifacts/eisenhower-view-mode/spec.md`
+- Validation: 2026-01-18
+- Status: ERLEDIGT ✅
 
 **Feature: Task System v2.0 - Phase 2: Backlog Enhancements**
 - Beschreibung: Visual Indicators + Eisenhower Matrix für besseres Task-Prioritization

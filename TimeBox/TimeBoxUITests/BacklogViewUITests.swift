@@ -267,4 +267,74 @@ final class BacklogViewUITests: XCTestCase {
         attachment.lifetime = .keepAlways
         add(attachment)
     }
+
+    // MARK: - ViewMode Switcher Tests (TDD RED Phase - Eisenhower View Mode Feature)
+
+    /// GIVEN: BacklogView is displayed
+    /// WHEN: Looking at the toolbar
+    /// THEN: ViewMode switcher should be visible
+    /// NOTE: This test MUST FAIL because ViewMode switcher doesn't exist yet (TDD RED)
+    func testViewModeSwitcherExists() throws {
+        let navBar = app.navigationBars["Backlog"]
+        XCTAssertTrue(navBar.waitForExistence(timeout: 5), "Backlog view should be displayed")
+
+        // Look for ViewMode switcher button
+        let switcher = app.buttons["viewModeSwitcher"]
+        XCTAssertTrue(switcher.waitForExistence(timeout: 5), "ViewMode switcher should be visible in toolbar")
+    }
+
+    /// GIVEN: BacklogView with ViewMode switcher
+    /// WHEN: User taps switcher
+    /// THEN: Should show all 5 view mode options
+    func testViewModeSwitcherShowsAllOptions() throws {
+        let switcher = app.buttons["viewModeSwitcher"]
+        XCTAssertTrue(switcher.waitForExistence(timeout: 5), "ViewMode switcher should exist")
+        switcher.tap()
+
+        sleep(1) // Wait for menu to appear
+
+        // SwiftUI Menu items appear as buttons when opened
+        let listeButton = app.buttons["Liste"]
+        let matrixButton = app.buttons["Matrix"]
+        let kategorieButton = app.buttons["Kategorie"]
+        let dauerButton = app.buttons["Dauer"]
+        let faelligkeitButton = app.buttons["Fälligkeit"]
+
+        XCTAssertTrue(listeButton.waitForExistence(timeout: 2), "List option should exist")
+        XCTAssertTrue(matrixButton.exists, "Matrix option should exist")
+        XCTAssertTrue(kategorieButton.exists, "Category option should exist")
+        XCTAssertTrue(dauerButton.exists, "Duration option should exist")
+        XCTAssertTrue(faelligkeitButton.exists, "Due Date option should exist")
+    }
+
+    /// GIVEN: BacklogView in List mode
+    /// WHEN: User selects "Matrix" from ViewMode switcher
+    /// THEN: Eisenhower Matrix view should be displayed
+    func testSwitchToEisenhowerMatrixMode() throws {
+        let switcher = app.buttons["viewModeSwitcher"]
+        XCTAssertTrue(switcher.waitForExistence(timeout: 5), "ViewMode switcher should exist")
+        switcher.tap()
+
+        sleep(1) // Wait for menu to appear
+
+        // SwiftUI Menu items appear as buttons
+        let matrixOption = app.buttons["Matrix"]
+        XCTAssertTrue(matrixOption.waitForExistence(timeout: 2), "Matrix option should exist")
+        matrixOption.tap()
+
+        sleep(1) // Wait for view transition
+
+        // Verify Matrix view is displayed (check for "Do First" quadrant)
+        let doFirstTitle = app.staticTexts["Do First"]
+        XCTAssertTrue(doFirstTitle.waitForExistence(timeout: 3), "Matrix view should display Do First quadrant")
+    }
+
+    /// GIVEN: App is launched
+    /// WHEN: Looking at tab bar
+    /// THEN: "Matrix" tab should NOT exist (removed in this feature)
+    /// NOTE: This test MUST FAIL because Matrix tab still exists (TDD RED)
+    func testMatrixTabDoesNotExist() throws {
+        let matrixTab = app.tabBars.buttons["Matrix"]
+        XCTAssertFalse(matrixTab.exists, "Matrix tab should be removed from TabView")
+    }
 }
