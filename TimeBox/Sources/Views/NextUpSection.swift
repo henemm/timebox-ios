@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Horizontale Staging Area für "Next Up" Tasks
+/// Vertikale Staging Area für "Next Up" Tasks
 /// Zeigt Tasks, die der User als nächstes erledigen will
 struct NextUpSection: View {
     let tasks: [PlanItem]
@@ -34,17 +34,15 @@ struct NextUpSection: View {
                     .frame(maxWidth: .infinity, alignment: .center)
                     .padding(.vertical, 12)
             } else {
-                // Task chips
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 8) {
-                        ForEach(tasks) { task in
-                            NextUpChip(task: task) {
-                                onRemoveFromNextUp(task.id)
-                            }
+                // Task list (vertical)
+                VStack(spacing: 6) {
+                    ForEach(tasks) { task in
+                        NextUpRow(task: task) {
+                            onRemoveFromNextUp(task.id)
                         }
                     }
-                    .padding(.horizontal)
                 }
+                .padding(.horizontal)
             }
         }
         .padding(.vertical, 12)
@@ -57,6 +55,48 @@ struct NextUpSection: View {
                 .stroke(.blue.opacity(0.2), lineWidth: 1)
         )
         .padding(.horizontal)
+    }
+}
+
+/// Einzelne Task-Zeile in der NextUpSection (vertikales Layout)
+struct NextUpRow: View {
+    let task: PlanItem
+    let onRemove: () -> Void
+
+    var body: some View {
+        HStack(spacing: 8) {
+            Circle()
+                .fill(.blue)
+                .frame(width: 6, height: 6)
+
+            Text(task.title)
+                .font(.subheadline)
+                .lineLimit(1)
+
+            Spacer()
+
+            Text("\(task.effectiveDuration) min")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+
+            Button {
+                onRemove()
+            } label: {
+                Image(systemName: "xmark.circle.fill")
+                    .foregroundStyle(.secondary)
+            }
+            .buttonStyle(.plain)
+        }
+        .padding(.vertical, 6)
+        .padding(.horizontal, 10)
+        .background(
+            RoundedRectangle(cornerRadius: 8)
+                .fill(.background)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 8)
+                .stroke(.blue.opacity(0.2), lineWidth: 1)
+        )
     }
 }
 

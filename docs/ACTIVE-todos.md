@@ -22,30 +22,69 @@
 
 ## Offene Bugs
 
-<!-- Beispiel-Format:
-**Bug 1: [Kurze Beschreibung]**
-- Location: [Datei(en)]
-- Problem: [Was passiert falsch]
-- Expected: [Was sollte passieren]
-- Root Cause: [Warum passiert es - Code-Stelle]
-- Test: [Wie Fix verifizieren]
-- Status: OFFEN / SPEC READY / IN ARBEIT / ERLEDIGT / BLOCKIERT
--->
+**Bug 1: Tasks bleiben in Quadranten sichtbar wenn in Next Up**
+- Location: `BacklogView.swift:58-77, 80-143`
+- Problem: Tasks erscheinen sowohl in Next Up Section ALS AUCH in Quadranten/Listen
+- Expected: Tasks mit `isNextUp=true` nur in Next Up Section
+- Root Cause: Filter-Properties filtern nur `!isCompleted`, nicht `!isNextUp`:
+  - `backlogTasks` (Zeile 58-60): `planItems.filter { !$0.isCompleted }`
+  - `doFirstTasks` (Zeile 63-65): fehlt `&& !$0.isNextUp`
+  - `scheduleTasks`, `delegateTasks`, `eliminateTasks` (Zeile 67-77): gleich
+  - `tasksByCategory` (Zeile 83): fehlt `&& !$0.isNextUp`
+  - `tasksByDuration` (Zeile 98-99): fehlt `&& !$0.isNextUp`
+  - `tasksByDueDate` (Zeile 113-139): fehlt `, !$0.isNextUp` in guards
+- Fix: `&& !$0.isNextUp` zu allen Filtern hinzufuegen
+- Test: Task zu Next Up → verschwindet aus Quadrant
+- Status: OFFEN
 
-_Keine offenen Bugs_
+**Bug 2: Next Up Section ist horizontal statt vertikal**
+- Location: `NextUpSection.swift:38`
+- Problem: `ScrollView(.horizontal, ...)` zeigt Tasks nebeneinander
+- Expected: Vertikale Liste mit dynamischer Hoehe
+- Root Cause: Zeile 38: `ScrollView(.horizontal, showsIndicators: false)`
+- Fix: VStack mit NextUpRow statt ScrollView mit NextUpChip
+- Test: Mehrere Tasks → untereinander angezeigt
+- Status: OFFEN
+
+**Bug 3: Kein Drag & Drop in Next Up** (DEFERRED)
+- Location: `NextUpSection.swift`
+- Problem: Keine Sortierung moeglich
+- Root Cause: Keine `.onMove()` implementiert, kein sortOrder Property
+- Fix: Benoetigt Datenmodell-Erweiterung (nextUpSortOrder)
+- Status: BLOCKIERT (groesserer Scope)
+
+**Bug 4: Zuordnen-Tab Next Up ist horizontal statt vertikal**
+- Location: `TaskAssignmentView.swift:108`
+- Problem: `ScrollView(.horizontal, ...)` zeigt Tasks nebeneinander
+- Expected: Vertikale Liste
+- Root Cause: Zeile 108: `ScrollView(.horizontal, showsIndicators: false)`
+- Fix: VStack mit DraggableTaskRow statt ScrollView
+- Test: Zuordnen-Tab → Tasks untereinander
+- Status: OFFEN
+
+**Bug 5: Tasks erscheinen nicht im Focus Block nach Zuordnung**
+- Location: `TaskAssignmentView.swift:141, 152-156, 175`
+- Problem: Nach Zuordnung ist Task weder in Next Up noch im Block sichtbar
+- Root Cause:
+  1. Zeile 141: `unscheduledTasks = allTasks.filter { $0.isNextUp && !$0.isCompleted }`
+  2. Zeile 152-156: `tasksForBlock()` sucht NUR in `unscheduledTasks`
+  3. Zeile 175: Nach Zuordnung `isNextUp=false` → Task verlässt `unscheduledTasks`
+  4. `tasksForBlock()` findet ihn nicht mehr!
+- Fix: Separate `allTasks` State-Variable fuer Block-Anzeige
+- Test: Task zuordnen → erscheint im Block
+- Status: OFFEN
 
 ---
 
 ## Offene Tasks
 
-<!-- Beispiel-Format:
-**Task 1: [Kurze Beschreibung]**
-- Beschreibung: [Was soll gemacht werden]
-- Prioritaet: Hoch / Mittel / Niedrig
-- Status: OFFEN / SPEC READY / IN ARBEIT / ERLEDIGT / BLOCKIERT
--->
-
-_Keine offenen Tasks_
+**Task 1: Drag & Drop Sortierung in Next Up Section**
+- Beschreibung: User soll Tasks in Next Up per Drag & Drop sortieren koennen
+- Voraussetzung: `nextUpSortOrder` Property in LocalTask Datenmodell
+- Scope: Datenmodell-Erweiterung + UI-Implementierung
+- Ursprung: Bug 3 aus Next Up Feature (2026-01-18)
+- Prioritaet: Mittel
+- Status: OFFEN
 
 ---
 

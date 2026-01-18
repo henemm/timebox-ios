@@ -56,31 +56,31 @@ struct BacklogView: View {
     }
 
     private var backlogTasks: [PlanItem] {
-        planItems.filter { !$0.isCompleted }
+        planItems.filter { !$0.isCompleted && !$0.isNextUp }
     }
 
     // MARK: - Eisenhower Matrix Filters
     private var doFirstTasks: [PlanItem] {
-        planItems.filter { $0.urgency == "urgent" && $0.priority == 3 && !$0.isCompleted }
+        planItems.filter { $0.urgency == "urgent" && $0.priority == 3 && !$0.isCompleted && !$0.isNextUp }
     }
 
     private var scheduleTasks: [PlanItem] {
-        planItems.filter { $0.urgency == "not_urgent" && $0.priority == 3 && !$0.isCompleted }
+        planItems.filter { $0.urgency == "not_urgent" && $0.priority == 3 && !$0.isCompleted && !$0.isNextUp }
     }
 
     private var delegateTasks: [PlanItem] {
-        planItems.filter { $0.urgency == "urgent" && $0.priority < 3 && !$0.isCompleted }
+        planItems.filter { $0.urgency == "urgent" && $0.priority < 3 && !$0.isCompleted && !$0.isNextUp }
     }
 
     private var eliminateTasks: [PlanItem] {
-        planItems.filter { $0.urgency == "not_urgent" && $0.priority < 3 && !$0.isCompleted }
+        planItems.filter { $0.urgency == "not_urgent" && $0.priority < 3 && !$0.isCompleted && !$0.isNextUp }
     }
 
     // MARK: - Category Grouping
     private var tasksByCategory: [(category: String, tasks: [PlanItem])] {
         let categories = ["deep_work", "shallow_work", "meetings", "maintenance", "creative", "strategic"]
         return categories.compactMap { category in
-            let filtered = planItems.filter { $0.taskType == category && !$0.isCompleted }
+            let filtered = planItems.filter { $0.taskType == category && !$0.isCompleted && !$0.isNextUp }
             guard !filtered.isEmpty else { return nil }
             return (category: category.localizedCategory, tasks: filtered)
         }
@@ -96,7 +96,7 @@ struct BacklogView: View {
         ]
         return buckets.compactMap { (label, range) in
             let filtered = planItems.filter {
-                !$0.isCompleted && range.contains($0.effectiveDuration)
+                !$0.isCompleted && !$0.isNextUp && range.contains($0.effectiveDuration)
             }
             guard !filtered.isEmpty else { return nil }
             return (bucket: label, tasks: filtered)
@@ -111,32 +111,32 @@ struct BacklogView: View {
         var grouped: [(String, [PlanItem])] = []
 
         let todayTasks = planItems.filter {
-            guard let due = $0.dueDate, !$0.isCompleted else { return false }
+            guard let due = $0.dueDate, !$0.isCompleted, !$0.isNextUp else { return false }
             return calendar.isDateInToday(due)
         }
         if !todayTasks.isEmpty { grouped.append(("Heute", todayTasks)) }
 
         let tomorrowTasks = planItems.filter {
-            guard let due = $0.dueDate, !$0.isCompleted else { return false }
+            guard let due = $0.dueDate, !$0.isCompleted, !$0.isNextUp else { return false }
             return calendar.isDateInTomorrow(due)
         }
         if !tomorrowTasks.isEmpty { grouped.append(("Morgen", tomorrowTasks)) }
 
         let weekTasks = planItems.filter {
-            guard let due = $0.dueDate, !$0.isCompleted else { return false }
+            guard let due = $0.dueDate, !$0.isCompleted, !$0.isNextUp else { return false }
             return calendar.isDate(due, equalTo: today, toGranularity: .weekOfYear) &&
                    !calendar.isDateInToday(due) && !calendar.isDateInTomorrow(due)
         }
         if !weekTasks.isEmpty { grouped.append(("Diese Woche", weekTasks)) }
 
         let laterTasks = planItems.filter {
-            guard let due = $0.dueDate, !$0.isCompleted else { return false }
+            guard let due = $0.dueDate, !$0.isCompleted, !$0.isNextUp else { return false }
             guard let nextWeek = calendar.date(byAdding: .weekOfYear, value: 1, to: today) else { return false }
             return due > nextWeek
         }
         if !laterTasks.isEmpty { grouped.append(("Später", laterTasks)) }
 
-        let noDueDateTasks = planItems.filter { $0.dueDate == nil && !$0.isCompleted }
+        let noDueDateTasks = planItems.filter { $0.dueDate == nil && !$0.isCompleted && !$0.isNextUp }
         if !noDueDateTasks.isEmpty { grouped.append(("Ohne Fälligkeitsdatum", noDueDateTasks)) }
 
         return grouped

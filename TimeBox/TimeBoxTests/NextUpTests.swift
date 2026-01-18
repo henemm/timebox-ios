@@ -194,4 +194,74 @@ final class NextUpTests: XCTestCase {
         XCTAssertEqual(nextUpTasks.count, 2, "Should only return tasks with isNextUp=true")
         XCTAssertTrue(nextUpTasks.allSatisfy { $0.isNextUp }, "All returned tasks should have isNextUp=true")
     }
+
+    // MARK: - Bugfix Tests: Filter Exclusion
+
+    /// Test: Backlog filter should EXCLUDE tasks with isNextUp=true
+    /// GIVEN: Tasks where some have isNextUp=true
+    /// WHEN: Filtering for backlog (like BacklogView.backlogTasks)
+    /// THEN: isNextUp tasks should NOT be included
+    ///
+    /// EXPECTED TO FAIL: Current filter doesn't exclude isNextUp
+    func test_backlogFilter_excludesNextUpTasks() throws {
+        let context = container.mainContext
+
+        let regularTask = LocalTask(title: "Regular Task", priority: 1)
+        regularTask.isNextUp = false
+        regularTask.isCompleted = false
+
+        let nextUpTask = LocalTask(title: "Next Up Task", priority: 2)
+        nextUpTask.isNextUp = true
+        nextUpTask.isCompleted = false
+
+        context.insert(regularTask)
+        context.insert(nextUpTask)
+        try context.save()
+
+        // Simulate BacklogView.backlogTasks filter: !isCompleted && !isNextUp
+        let descriptor = FetchDescriptor<LocalTask>()
+        let allTasks = try context.fetch(descriptor)
+        let backlogTasks = allTasks.filter { !$0.isCompleted && !$0.isNextUp }
+
+        XCTAssertEqual(backlogTasks.count, 1, "Backlog should only contain non-NextUp tasks")
+        XCTAssertEqual(backlogTasks.first?.title, "Regular Task")
+        XCTAssertFalse(backlogTasks.contains { $0.isNextUp }, "Backlog should NOT contain isNextUp tasks")
+    }
+
+    /// Test: Eisenhower "Do First" filter should EXCLUDE tasks with isNextUp=true
+    /// GIVEN: Urgent+Important tasks where some have isNextUp=true
+    /// WHEN: Filtering for doFirst quadrant
+    /// THEN: isNextUp tasks should NOT be included
+    ///
+    /// EXPECTED TO FAIL: Current filter doesn't exclude isNextUp
+    func test_doFirstFilter_excludesNextUpTasks() throws {
+        let context = container.mainContext
+
+        // Regular urgent+important task
+        let regularTask = LocalTask(title: "Regular Urgent", priority: 3)
+        regularTask.urgency = "urgent"
+        regularTask.isNextUp = false
+        regularTask.isCompleted = false
+
+        // Next Up urgent+important task (should be excluded from quadrant)
+        let nextUpTask = LocalTask(title: "Next Up Urgent", priority: 3)
+        nextUpTask.urgency = "urgent"
+        nextUpTask.isNextUp = true
+        nextUpTask.isCompleted = false
+
+        context.insert(regularTask)
+        context.insert(nextUpTask)
+        try context.save()
+
+        // Simulate BacklogView.doFirstTasks filter: urgent && priority==3 && !isCompleted && !isNextUp
+        let descriptor = FetchDescriptor<LocalTask>()
+        let allTasks = try context.fetch(descriptor)
+        let doFirstTasks = allTasks.filter {
+            $0.urgency == "urgent" && $0.priority == 3 && !$0.isCompleted && !$0.isNextUp
+        }
+
+        XCTAssertEqual(doFirstTasks.count, 1, "Do First should only contain non-NextUp tasks")
+        XCTAssertEqual(doFirstTasks.first?.title, "Regular Urgent")
+        XCTAssertFalse(doFirstTasks.contains { $0.isNextUp }, "Do First should NOT contain isNextUp tasks")
+    }
 }

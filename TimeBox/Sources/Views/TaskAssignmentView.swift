@@ -7,6 +7,7 @@ struct TaskAssignmentView: View {
     @State private var selectedDate = Date()
     @State private var focusBlocks: [FocusBlock] = []
     @State private var unscheduledTasks: [PlanItem] = []
+    @State private var allTasks: [PlanItem] = []  // All tasks for block display
     @State private var isLoading = false
     @State private var errorMessage: String?
     @State private var assignmentFeedback = false
@@ -101,19 +102,25 @@ struct TaskAssignmentView: View {
                     .foregroundStyle(.blue)
                 Text("Next Up")
                     .font(.headline)
+                Spacer()
+                Text("\(unscheduledTasks.count)")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 2)
+                    .background(Capsule().fill(.blue.opacity(0.15)))
             }
             .padding(.horizontal)
             .padding(.top, 8)
 
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 8) {
-                    ForEach(unscheduledTasks) { task in
-                        DraggableTaskChip(task: task)
-                    }
+            // Vertical list instead of horizontal scroll
+            VStack(spacing: 6) {
+                ForEach(unscheduledTasks) { task in
+                    DraggableTaskRow(task: task)
                 }
-                .padding(.horizontal)
-                .padding(.bottom, 12)
             }
+            .padding(.horizontal)
+            .padding(.bottom, 12)
         }
         .background(.ultraThinMaterial)
     }
@@ -136,9 +143,11 @@ struct TaskAssignmentView: View {
 
             let taskSource = LocalTaskSource(modelContext: modelContext)
             let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
-            let allTasks = try await syncEngine.sync()
-            // Only show Next Up tasks in the assignment view
-            unscheduledTasks = allTasks.filter { $0.isNextUp && !$0.isCompleted }
+            let syncedTasks = try await syncEngine.sync()
+            // Store all tasks for block display
+            allTasks = syncedTasks.filter { !$0.isCompleted }
+            // Only show Next Up tasks in the backlog section
+            unscheduledTasks = syncedTasks.filter { $0.isNextUp && !$0.isCompleted }
 
         } catch {
             errorMessage = error.localizedDescription
@@ -150,8 +159,9 @@ struct TaskAssignmentView: View {
     // MARK: - Task Assignment
 
     private func tasksForBlock(_ block: FocusBlock) -> [PlanItem] {
+        // Search in allTasks (not just unscheduledTasks) to find assigned tasks
         block.taskIDs.compactMap { taskID in
-            unscheduledTasks.first { $0.id == taskID }
+            allTasks.first { $0.id == taskID }
         }
     }
 
@@ -337,7 +347,42 @@ struct AssignedTaskRow: View {
     }
 }
 
-// MARK: - Draggable Task Chip
+// MARK: - Draggable Task Row (Vertical Layout)
+
+struct DraggableTaskRow: View {
+    let task: PlanItem
+
+    var body: some View {
+        HStack(spacing: 8) {
+            Circle()
+                .fill(.blue)
+                .frame(width: 6, height: 6)
+
+            Text(task.title)
+                .font(.subheadline)
+                .lineLimit(1)
+
+            Spacer()
+
+            Text("\(task.effectiveDuration) min")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+        .padding(.vertical, 8)
+        .padding(.horizontal, 12)
+        .background(
+            RoundedRectangle(cornerRadius: 8)
+                .fill(.background)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 8)
+                .strokeBorder(.blue.opacity(0.3), lineWidth: 1)
+        )
+        .draggable(PlanItemTransfer(from: task))
+    }
+}
+
+// MARK: - Draggable Task Chip (kept for compatibility)
 
 struct DraggableTaskChip: View {
     let task: PlanItem
