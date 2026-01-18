@@ -1,7 +1,7 @@
 {
-  "file": "/Users/hem/Documents/opt/my-daily-sprints/TimeBox/Sources/Views/BlockPlanningView.swift",
-  "before_screenshot": "/Users/hem/Documents/opt/my-daily-sprints/docs/artifacts/multi-source-tasks/screenshots/BEFORE-BlockPlanningView-20260116-073054.png",
-  "timestamp": "2026-01-16T09:37:28.463075",
-  "workflow": "multi-source-tasks",
+  "file": "/Users/hem/Documents/opt/my-daily-sprints/TimeBox/Sources/Views/TaskAssignmentView.swift",
+  "before_screenshot": "/Users/hem/Documents/opt/my-daily-sprints/docs/artifacts/next-up-bugfix/screenshots/before-bugfix.png",
+  "timestamp": "2026-01-18T16:37:39.022800",
+  "workflow": "next-up-bugfix",
   "awaiting_after": true
 }

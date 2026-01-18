@@ -1,0 +1,279 @@
+Command line invocation:
+    /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild test -project TimeBox.xcodeproj -scheme TimeBox -destination id=D9E26087-132A-44CB-9883-59073DD9CC54 "-only-testing:TimeBoxTests/NextUpTests"
+
+2026-01-18 14:55:25.540 xcodebuild[57578:22166153] [MT] IDERunDestination: Supported platforms for the buildables in the current scheme is empty.
+ComputePackagePrebuildTargetDependencyGraph
+
+Prepare packages
+
+CreateBuildRequest
+
+SendProjectDescription
+
+CreateBuildOperation
+
+ComputeTargetDependencyGraph
+note: Building targets in dependency order
+note: Target dependency graph (3 targets)
+    Target 'TimeBoxTests' in project 'TimeBox'
+        ➜ Explicit dependency on target 'TimeBox' in project 'TimeBox'
+    Target 'TimeBoxUITests' in project 'TimeBox'
+        ➜ Explicit dependency on target 'TimeBox' in project 'TimeBox'
+    Target 'TimeBox' in project 'TimeBox' (no dependencies)
+
+GatherProvisioningInputs
+
+CreateBuildDescription
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -v -E -dM -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk -x c -c /dev/null
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc --version
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld -version_details
+
+Build description signature: 4a4efdbe49ddf2e5cfb3ba53a2181388
+Build description path: /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/XCBuildData/4a4efdbe49ddf2e5cfb3ba53a2181388.xcbuilddata
+ClangStatCache /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk /Users/hem/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator26.2-23C53-7d00a8b37fbd7999ea79df8ebc024bf0.sdkstatcache
+    cd /Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBox.xcodeproj
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk -o /Users/hem/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator26.2-23C53-7d00a8b37fbd7999ea79df8ebc024bf0.sdkstatcache
+
+ProcessInfoPlistFile /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBox.app/Info.plist /Users/hem/Documents/opt/my-daily-sprints/TimeBox/Resources/Info.plist (in target 'TimeBox' from project 'TimeBox')
+    cd /Users/hem/Documents/opt/my-daily-sprints/TimeBox
+    builtin-infoPlistUtility /Users/hem/Documents/opt/my-daily-sprints/TimeBox/Resources/Info.plist -producttype com.apple.product-type.application -genpkginfo /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBox.app/PkgInfo -expandbuildsettings -format binary -platform iphonesimulator -o /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBox.app/Info.plist
+
+WriteAuxiliaryFile /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxTests.build/Objects-normal/arm64/TimeBoxTests.SwiftFileList (in target 'TimeBoxTests' from project 'TimeBox')
+    cd /Users/hem/Documents/opt/my-daily-sprints/TimeBox
+    write-file /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxTests.build/Objects-normal/arm64/TimeBoxTests.SwiftFileList
+
+WriteAuxiliaryFile /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxTests.build/Objects-normal/arm64/TimeBoxTests.SwiftConstValuesFileList (in target 'TimeBoxTests' from project 'TimeBox')
+    cd /Users/hem/Documents/opt/my-daily-sprints/TimeBox
+    write-file /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxTests.build/Objects-normal/arm64/TimeBoxTests.SwiftConstValuesFileList
+
+WriteAuxiliaryFile /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxTests.build/Objects-normal/arm64/TimeBoxTests.LinkFileList (in target 'TimeBoxTests' from project 'TimeBox')
+    cd /Users/hem/Documents/opt/my-daily-sprints/TimeBox
+    write-file /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxTests.build/Objects-normal/arm64/TimeBoxTests.LinkFileList
+
+WriteAuxiliaryFile /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxTests.build/Objects-normal/arm64/TimeBoxTests-OutputFileMap.json (in target 'TimeBoxTests' from project 'TimeBox')
+    cd /Users/hem/Documents/opt/my-daily-sprints/TimeBox
+    write-file /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxTests.build/Objects-normal/arm64/TimeBoxTests-OutputFileMap.json
+
+CopySwiftLibs /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBox.app (in target 'TimeBox' from project 'TimeBox')
+    cd /Users/hem/Documents/opt/my-daily-sprints/TimeBox
+    builtin-swiftStdLibTool --copy --verbose --sign - --scan-executable /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBox.app/TimeBox.debug.dylib --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBox.app/Frameworks --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBox.app/PlugIns --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBox.app/SystemExtensions --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBox.app/Extensions --platform iphonesimulator --toolchain /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain --destination /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBox.app/Frameworks --strip-bitcode --strip-bitcode-tool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/bitcode_strip --emit-dependency-info /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBox.build/SwiftStdLibToolInputDependencies.dep --filter-for-swift-os
+
+SwiftDriver TimeBoxTests normal arm64 com.apple.xcode.tools.swift.compiler (in target 'TimeBoxTests' from project 'TimeBox')
+    cd /Users/hem/Documents/opt/my-daily-sprints/TimeBox
+    builtin-SwiftDriver -- /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name TimeBoxTests -Onone -enforce-exclusivity\=checked @/Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxTests.build/Objects-normal/arm64/TimeBoxTests.SwiftFileList -DDEBUG -plugin-path /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk -target arm64-apple-ios17.0-simulator -g -module-cache-path /Users/hem/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -Xfrontend -serialize-debugging-options -profile-coverage-mapping -profile-generate -enable-testing -index-store-path /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Index.noindex/DataStore -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -swift-version 6 -I /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator -Isystem /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib -F /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator -F /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks -F /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk/Developer/Library/Frameworks -c -j10 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /Users/hem/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator26.2-23C53-7d00a8b37fbd7999ea79df8ebc024bf0.sdkstatcache -output-file-map /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxTests.build/Objects-normal/arm64/TimeBoxTests-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -explicit-module-build -module-cache-path /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -clang-scanner-module-cache-path /Users/hem/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -sdk-module-cache-path /Users/hem/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxTests.build/Objects-normal/arm64/TimeBoxTests.swiftmodule -validate-clang-modules-once -clang-build-session-file /Users/hem/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxTests.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxTests.build/Objects-normal/arm64/TimeBoxTests_const_extract_protocols.json -Xcc -iquote -Xcc /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxTests.build/TimeBoxTests-generated-files.hmap -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxTests.build/TimeBoxTests-own-target-headers.hmap -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxTests.build/TimeBoxTests-all-target-headers.hmap -Xcc -iquote -Xcc /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxTests.build/TimeBoxTests-project-headers.hmap -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/include -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxTests.build/DerivedSources-normal/arm64 -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxTests.build/DerivedSources/arm64 -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxTests.build/DerivedSources -Xcc -DDEBUG\=1 -emit-objc-header -emit-objc-header-path /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxTests.build/Objects-normal/arm64/TimeBoxTests-Swift.h -working-directory /Users/hem/Documents/opt/my-daily-sprints/TimeBox -experimental-emit-module-separately -disable-cmo
+
+ProcessInfoPlistFile /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBox.app/PlugIns/TimeBoxTests.xctest/Info.plist /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxTests.build/empty-TimeBoxTests.plist (in target 'TimeBoxTests' from project 'TimeBox')
+    cd /Users/hem/Documents/opt/my-daily-sprints/TimeBox
+    builtin-infoPlistUtility /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxTests.build/empty-TimeBoxTests.plist -producttype com.apple.product-type.bundle.unit-test -expandbuildsettings -format binary -platform iphonesimulator -o /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBox.app/PlugIns/TimeBoxTests.xctest/Info.plist
+
+SwiftCompile normal arm64 Compiling\ NextUpTests.swift /Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxTests/NextUpTests.swift (in target 'TimeBoxTests' from project 'TimeBox')
+
+SwiftCompile normal arm64 /Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxTests/NextUpTests.swift (in target 'TimeBoxTests' from project 'TimeBox')
+    cd /Users/hem/Documents/opt/my-daily-sprints/TimeBox
+    
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxTests/NextUpTests.swift:16:9: warning: main actor-isolated property 'container' can not be mutated from a nonisolated context
+        container = try ModelContainer(for: LocalTask.self, configurations: config)
+        ^
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxTests/NextUpTests.swift:10:9: note: mutation of this property is only permitted within the actor
+    var container: ModelContainer!
+        ^
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxTests/NextUpTests.swift:17:9: warning: main actor-isolated property 'source' can not be mutated from a nonisolated context
+        source = LocalTaskSource(modelContext: container.mainContext)
+        ^
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxTests/NextUpTests.swift:11:9: note: mutation of this property is only permitted within the actor
+    var source: LocalTaskSource!
+        ^
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxTests/NextUpTests.swift:17:18: warning: call to main actor-isolated initializer 'init(modelContext:)' in a synchronous nonisolated context
+        source = LocalTaskSource(modelContext: container.mainContext)
+                 ^
+TimeBox.LocalTaskSource.init:2:21: note: calls to initializer 'init(modelContext:)' from outside of its actor context are implicitly asynchronous
+@MainActor internal init(modelContext: ModelContext)}
+                    ^
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxTests/NextUpTests.swift:17:58: warning: main actor-isolated property 'mainContext' can not be referenced from a nonisolated context
+        source = LocalTaskSource(modelContext: container.mainContext)
+                                                         ^
+SwiftData.ModelContainer.mainContext:2:23: note: property declared here
+@MainActor public var mainContext: ModelContext { get }}
+                      ^
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxTests/NextUpTests.swift:17:48: warning: main actor-isolated property 'container' can not be referenced from a nonisolated context
+        source = LocalTaskSource(modelContext: container.mainContext)
+                                               ^
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxTests/NextUpTests.swift:10:9: note: property declared here
+    var container: ModelContainer!
+        ^
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxTests/NextUpTests.swift:18:9: warning: main actor-isolated property 'syncEngine' can not be mutated from a nonisolated context
+        syncEngine = SyncEngine(taskSource: source, modelContext: container.mainContext)
+        ^
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxTests/NextUpTests.swift:12:9: note: mutation of this property is only permitted within the actor
+    var syncEngine: SyncEngine!
+        ^
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxTests/NextUpTests.swift:18:22: warning: call to main actor-isolated initializer 'init(taskSource:modelContext:)' in a synchronous nonisolated context
+        syncEngine = SyncEngine(taskSource: source, modelContext: container.mainContext)
+                     ^
+TimeBox.SyncEngine.init:2:21: note: calls to initializer 'init(taskSource:modelContext:)' from outside of its actor context are implicitly asynchronous
+@MainActor internal init(taskSource: TimeBox.LocalTaskSource, modelContext: ModelContext)}
+                    ^
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxTests/NextUpTests.swift:18:45: warning: main actor-isolated property 'source' can not be referenced from a nonisolated context
+        syncEngine = SyncEngine(taskSource: source, modelContext: container.mainContext)
+                                            ^
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxTests/NextUpTests.swift:11:9: note: property declared here
+    var source: LocalTaskSource!
+        ^
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxTests/NextUpTests.swift:18:77: warning: main actor-isolated property 'mainContext' can not be referenced from a nonisolated context
+        syncEngine = SyncEngine(taskSource: source, modelContext: container.mainContext)
+                                                                            ^
+SwiftData.ModelContainer.mainContext:2:23: note: property declared here
+@MainActor public var mainContext: ModelContext { get }}
+                      ^
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxTests/NextUpTests.swift:18:67: warning: main actor-isolated property 'container' can not be referenced from a nonisolated context
+        syncEngine = SyncEngine(taskSource: source, modelContext: container.mainContext)
+                                                                  ^
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxTests/NextUpTests.swift:10:9: note: property declared here
+    var container: ModelContainer!
+        ^
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxTests/NextUpTests.swift:22:9: warning: main actor-isolated property 'container' can not be mutated from a nonisolated context
+        container = nil
+        ^
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxTests/NextUpTests.swift:10:9: note: mutation of this property is only permitted within the actor
+    var container: ModelContainer!
+        ^
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxTests/NextUpTests.swift:23:9: warning: main actor-isolated property 'source' can not be mutated from a nonisolated context
+        source = nil
+        ^
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxTests/NextUpTests.swift:11:9: note: mutation of this property is only permitted within the actor
+    var source: LocalTaskSource!
+        ^
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxTests/NextUpTests.swift:24:9: warning: main actor-isolated property 'syncEngine' can not be mutated from a nonisolated context
+        syncEngine = nil
+        ^
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxTests/NextUpTests.swift:12:9: note: mutation of this property is only permitted within the actor
+    var syncEngine: SyncEngine!
+        ^
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxTests/NextUpTests.swift:41:29: error: value of type 'LocalTask' has no member 'isNextUp'
+        XCTAssertFalse(task.isNextUp, "isNextUp should default to false")
+                       ~~~~ ^~~~~~~~
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxTests/NextUpTests.swift:55:14: error: value of type 'LocalTask' has no member 'isNextUp'
+        task.isNextUp = true
+        ~~~~ ^~~~~~~~
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxTests/NextUpTests.swift:58:28: error: value of type 'LocalTask' has no member 'isNextUp'
+        XCTAssertTrue(task.isNextUp, "isNextUp should be true after setting")
+                      ~~~~ ^~~~~~~~
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxTests/NextUpTests.swift:70:14: error: value of type 'LocalTask' has no member 'isNextUp'
+        task.isNextUp = true
+        ~~~~ ^~~~~~~~
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxTests/NextUpTests.swift:78:36: error: value of type 'LocalTask' has no member 'isNextUp'
+        XCTAssertTrue(tasks.first?.isNextUp ?? false, "isNextUp should persist")
+                      ~~~~~~~~~~~~ ^~~~~~~~
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxTests/NextUpTests.swift:92:14: error: value of type 'LocalTask' has no member 'isNextUp'
+        task.isNextUp = true
+        ~~~~ ^~~~~~~~
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxTests/NextUpTests.swift:97:32: error: value of type 'PlanItem' has no member 'isNextUp'
+        XCTAssertTrue(planItem.isNextUp, "PlanItem should preserve isNextUp=true from LocalTask")
+                      ~~~~~~~~ ^~~~~~~~
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxTests/NextUpTests.swift:113:33: error: value of type 'PlanItem' has no member 'isNextUp'
+        XCTAssertFalse(planItem.isNextUp, "PlanItem should preserve isNextUp=false from LocalTask")
+                       ~~~~~~~~ ^~~~~~~~
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxTests/NextUpTests.swift:131:24: error: value of type 'SyncEngine' has no member 'updateNextUp'
+        try syncEngine.updateNextUp(itemID: task.id, isNextUp: true)
+            ~~~~~~~~~~ ^~~~~~~~~~~~
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxTests/NextUpTests.swift:133:28: error: value of type 'LocalTask' has no member 'isNextUp'
+        XCTAssertTrue(task.isNextUp, "Task.isNextUp should be true after updateNextUp")
+                      ~~~~ ^~~~~~~~
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxTests/NextUpTests.swift:145:14: error: value of type 'LocalTask' has no member 'isNextUp'
+        task.isNextUp = true
+        ~~~~ ^~~~~~~~
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxTests/NextUpTests.swift:149:24: error: value of type 'SyncEngine' has no member 'updateNextUp'
+        try syncEngine.updateNextUp(itemID: task.id, isNextUp: false)
+            ~~~~~~~~~~ ^~~~~~~~~~~~
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxTests/NextUpTests.swift:151:29: error: value of type 'LocalTask' has no member 'isNextUp'
+        XCTAssertFalse(task.isNextUp, "Task.isNextUp should be false after updateNextUp")
+                       ~~~~ ^~~~~~~~
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxTests/NextUpTests.swift:162:24: error: value of type 'SyncEngine' has no member 'updateNextUp'
+        try syncEngine.updateNextUp(itemID: "invalid-uuid", isNextUp: true)
+            ~~~~~~~~~~ ^~~~~~~~~~~~
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxTests/NextUpTests.swift:178:15: error: value of type 'LocalTask' has no member 'isNextUp'
+        task1.isNextUp = true
+        ~~~~~ ^~~~~~~~
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxTests/NextUpTests.swift:180:15: error: value of type 'LocalTask' has no member 'isNextUp'
+        task2.isNextUp = false
+        ~~~~~ ^~~~~~~~
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxTests/NextUpTests.swift:182:15: error: value of type 'LocalTask' has no member 'isNextUp'
+        task3.isNextUp = true
+        ~~~~~ ^~~~~~~~
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxTests/NextUpTests.swift:190:40: error: value of type 'LocalTask' has no member 'isNextUp'
+            predicate: #Predicate { $0.isNextUp == true }
+                                    ~~ ^~~~~~~~
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxTests/NextUpTests.swift:192:39: error: generic parameter 'T' could not be inferred
+        let nextUpTasks = try context.fetch(descriptor)
+                                      ^
+SwiftData.ModelContext.fetch:2:13: note: in call to function 'fetch'
+public func fetch<T>(_ descriptor: FetchDescriptor<T>) throws -> [T] where T : PersistentModel}
+            ^
+
+Failed frontend command:
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swift-frontend -frontend -c /Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxTests/CalendarSelectionTests.swift /Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxTests/EventKitRepositoryTests.swift /Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxTests/FocusBlockTests.swift /Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxTests/LocalTaskSourceTests.swift /Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxTests/LocalTaskTests.swift /Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxTests/MockEventKitRepositoryTests.swift /Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxTests/PlanItemTests.swift /Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxTests/EisenhowerMatrixTests.swift -primary-file /Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxTests/NextUpTests.swift /Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxTests/SyncEngineTests.swift /Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxTests/TaskSourceTests.swift -emit-dependencies-path /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxTests.build/Objects-normal/arm64/NextUpTests.d -emit-const-values-path /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxTests.build/Objects-normal/arm64/NextUpTests.swiftconstvalues -emit-reference-dependencies-path /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxTests.build/Objects-normal/arm64/NextUpTests.swiftdeps -serialize-diagnostics-path /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxTests.build/Objects-normal/arm64/NextUpTests.dia -target arm64-apple-ios17.0-simulator -load-resolved-plugin /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/lib/swift/host/plugins/libFoundationMacros.dylib\#/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server\#FoundationMacros -load-resolved-plugin /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/lib/swift/host/plugins/libObservationMacros.dylib\#/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server\#ObservationMacros -load-resolved-plugin /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/lib/swift/host/plugins/libPreviewsMacros.dylib\#/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server\#PreviewsMacros -load-resolved-plugin /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/lib/swift/host/plugins/libSwiftDataMacros.dylib\#/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server\#SwiftDataMacros -load-resolved-plugin /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/lib/swift/host/plugins/libSwiftMacros.dylib\#/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server\#SwiftMacros -load-resolved-plugin /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/lib/swift/host/plugins/libSwiftUIMacros.dylib\#/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server\#SwiftUIMacros -disable-implicit-swift-modules -Xcc -fno-implicit-modules -Xcc -fno-implicit-module-maps -explicit-swift-module-map-file /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxTests.build/Objects-normal/arm64/TimeBoxTests-dependencies-1.json -Xllvm -aarch64-use-tbi -enable-objc-interop -sdk /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk -I /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator -Isystem /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib -F /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator -F /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks -F /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk/Developer/Library/Frameworks -no-color-diagnostics -Xcc -fno-color-diagnostics -enable-testing -g -debug-info-format\=dwarf -dwarf-version\=4 -module-cache-path /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -profile-generate -profile-coverage-mapping -swift-version 6 -enforce-exclusivity\=checked -Onone -D DEBUG -serialize-debugging-options -const-gather-protocols-file /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxTests.build/Objects-normal/arm64/TimeBoxTests_const_extract_protocols.json -enable-experimental-feature DebugDescriptionMacro -empty-abi-descriptor -validate-clang-modules-once -clang-build-session-file /Users/hem/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -working-directory -Xcc /Users/hem/Documents/opt/my-daily-sprints/TimeBox -enable-anonymous-context-mangled-names -file-compilation-dir /Users/hem/Documents/opt/my-daily-sprints/TimeBox -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -Xcc -ivfsstatcache -Xcc /Users/hem/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator26.2-23C53-7d00a8b37fbd7999ea79df8ebc024bf0.sdkstatcache -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxTests.build/swift-overrides.hmap -Xcc -iquote -Xcc /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxTests.build/TimeBoxTests-generated-files.hmap -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxTests.build/TimeBoxTests-own-target-headers.hmap -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxTests.build/TimeBoxTests-all-target-headers.hmap -Xcc -iquote -Xcc /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxTests.build/TimeBoxTests-project-headers.hmap -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/include -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxTests.build/DerivedSources-normal/arm64 -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxTests.build/DerivedSources/arm64 -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxTests.build/DerivedSources -Xcc -DDEBUG\=1 -no-auto-bridging-header-chaining -module-name TimeBoxTests -frontend-parseable-output -disable-clang-spi -target-sdk-version 26.2 -target-sdk-name iphonesimulator26.2 -clang-target arm64-apple-ios26.2-simulator -in-process-plugin-server-path /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/libSwiftInProcPluginServer.dylib -o /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxTests.build/Objects-normal/arm64/NextUpTests.o -index-unit-output-path /TimeBox.build/Debug-iphonesimulator/TimeBoxTests.build/Objects-normal/arm64/NextUpTests.o -index-store-path /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Index.noindex/DataStore -index-system-modules
+SwiftEmitModule normal arm64 Emitting\ module\ for\ TimeBoxTests (in target 'TimeBoxTests' from project 'TimeBox')
+
+EmitSwiftModule normal arm64 (in target 'TimeBoxTests' from project 'TimeBox')
+    cd /Users/hem/Documents/opt/my-daily-sprints/TimeBox
+    
+
+SwiftDriverJobDiscovery normal arm64 Emitting module for TimeBoxTests (in target 'TimeBoxTests' from project 'TimeBox')
+
+SwiftDriver\ Compilation\ Requirements TimeBoxTests normal arm64 com.apple.xcode.tools.swift.compiler (in target 'TimeBoxTests' from project 'TimeBox')
+    cd /Users/hem/Documents/opt/my-daily-sprints/TimeBox
+    builtin-Swift-Compilation-Requirements -- /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name TimeBoxTests -Onone -enforce-exclusivity\=checked @/Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxTests.build/Objects-normal/arm64/TimeBoxTests.SwiftFileList -DDEBUG -plugin-path /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk -target arm64-apple-ios17.0-simulator -g -module-cache-path /Users/hem/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -Xfrontend -serialize-debugging-options -profile-coverage-mapping -profile-generate -enable-testing -index-store-path /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Index.noindex/DataStore -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -swift-version 6 -I /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator -Isystem /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib -F /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator -F /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks -F /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk/Developer/Library/Frameworks -c -j10 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /Users/hem/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator26.2-23C53-7d00a8b37fbd7999ea79df8ebc024bf0.sdkstatcache -output-file-map /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxTests.build/Objects-normal/arm64/TimeBoxTests-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -explicit-module-build -module-cache-path /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -clang-scanner-module-cache-path /Users/hem/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -sdk-module-cache-path /Users/hem/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxTests.build/Objects-normal/arm64/TimeBoxTests.swiftmodule -validate-clang-modules-once -clang-build-session-file /Users/hem/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxTests.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxTests.build/Objects-normal/arm64/TimeBoxTests_const_extract_protocols.json -Xcc -iquote -Xcc /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxTests.build/TimeBoxTests-generated-files.hmap -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxTests.build/TimeBoxTests-own-target-headers.hmap -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxTests.build/TimeBoxTests-all-target-headers.hmap -Xcc -iquote -Xcc /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxTests.build/TimeBoxTests-project-headers.hmap -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/include -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxTests.build/DerivedSources-normal/arm64 -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxTests.build/DerivedSources/arm64 -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxTests.build/DerivedSources -Xcc -DDEBUG\=1 -emit-objc-header -emit-objc-header-path /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxTests.build/Objects-normal/arm64/TimeBoxTests-Swift.h -working-directory /Users/hem/Documents/opt/my-daily-sprints/TimeBox -experimental-emit-module-separately -disable-cmo
+
+Copy /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBoxTests.swiftmodule/arm64-apple-ios-simulator.swiftdoc /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxTests.build/Objects-normal/arm64/TimeBoxTests.swiftdoc (in target 'TimeBoxTests' from project 'TimeBox')
+    cd /Users/hem/Documents/opt/my-daily-sprints/TimeBox
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxTests.build/Objects-normal/arm64/TimeBoxTests.swiftdoc /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBoxTests.swiftmodule/arm64-apple-ios-simulator.swiftdoc
+
+Copy /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBoxTests.swiftmodule/arm64-apple-ios-simulator.abi.json /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxTests.build/Objects-normal/arm64/TimeBoxTests.abi.json (in target 'TimeBoxTests' from project 'TimeBox')
+    cd /Users/hem/Documents/opt/my-daily-sprints/TimeBox
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxTests.build/Objects-normal/arm64/TimeBoxTests.abi.json /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBoxTests.swiftmodule/arm64-apple-ios-simulator.abi.json
+
+Copy /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBoxTests.swiftmodule/Project/arm64-apple-ios-simulator.swiftsourceinfo /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxTests.build/Objects-normal/arm64/TimeBoxTests.swiftsourceinfo (in target 'TimeBoxTests' from project 'TimeBox')
+    cd /Users/hem/Documents/opt/my-daily-sprints/TimeBox
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxTests.build/Objects-normal/arm64/TimeBoxTests.swiftsourceinfo /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBoxTests.swiftmodule/Project/arm64-apple-ios-simulator.swiftsourceinfo
+
+Copy /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBoxTests.swiftmodule/arm64-apple-ios-simulator.swiftmodule /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxTests.build/Objects-normal/arm64/TimeBoxTests.swiftmodule (in target 'TimeBoxTests' from project 'TimeBox')
+    cd /Users/hem/Documents/opt/my-daily-sprints/TimeBox
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxTests.build/Objects-normal/arm64/TimeBoxTests.swiftmodule /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBoxTests.swiftmodule/arm64-apple-ios-simulator.swiftmodule
+
+
+Test session results, code coverage, and logs:
+	/Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Logs/Test/Test-TimeBox-2026.01.18_14-55-25-+0100.xcresult
+
+Testing failed:
+	Value of type 'LocalTask' has no member 'isNextUp'
+	Value of type 'LocalTask' has no member 'isNextUp'
+	Value of type 'LocalTask' has no member 'isNextUp'
+	Value of type 'LocalTask' has no member 'isNextUp'
+	Value of type 'LocalTask' has no member 'isNextUp'
+	Value of type 'LocalTask' has no member 'isNextUp'
+	Value of type 'PlanItem' has no member 'isNextUp'
+	Value of type 'PlanItem' has no member 'isNextUp'
+	Value of type 'SyncEngine' has no member 'updateNextUp'
+	Value of type 'LocalTask' has no member 'isNextUp'
+	Value of type 'LocalTask' has no member 'isNextUp'
+	Value of type 'SyncEngine' has no member 'updateNextUp'
+	Value of type 'LocalTask' has no member 'isNextUp'
+	Value of type 'SyncEngine' has no member 'updateNextUp'
+	Value of type 'LocalTask' has no member 'isNextUp'
+	Value of type 'LocalTask' has no member 'isNextUp'
+	Value of type 'LocalTask' has no member 'isNextUp'
+	Value of type 'LocalTask' has no member 'isNextUp'
+	Generic parameter 'T' could not be inferred
+	Testing cancelled because the build failed.
+
+** TEST FAILED **
+
+
+The following build commands failed:
+	SwiftCompile normal arm64 /Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxTests/NextUpTests.swift (in target 'TimeBoxTests' from project 'TimeBox')
+	SwiftCompile normal arm64 Compiling\ NextUpTests.swift /Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxTests/NextUpTests.swift (in target 'TimeBoxTests' from project 'TimeBox')
+	Testing project TimeBox with scheme TimeBox
+(3 failures)
