@@ -3,6 +3,7 @@ import SwiftUI
 struct BacklogRow: View {
     let item: PlanItem
     var onDurationTap: (() -> Void)?
+    var onAddToNextUp: (() -> Void)?
 
     private var priorityIcon: String {
         switch item.priority {
@@ -62,6 +63,19 @@ struct BacklogRow: View {
             }
 
             Spacer()
+
+            // Next Up Button (only show if not already in Next Up)
+            if let onAddToNextUp, !item.isNextUp {
+                Button {
+                    onAddToNextUp()
+                } label: {
+                    Image(systemName: "arrow.up.circle")
+                        .font(.title3)
+                        .foregroundStyle(.blue)
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Zu Next Up hinzufügen")
+            }
 
             // Duration Badge
             DurationBadge(

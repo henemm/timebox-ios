@@ -96,11 +96,14 @@ struct TaskAssignmentView: View {
 
     private var taskBacklog: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Backlog")
-                .font(.caption)
-                .foregroundStyle(.secondary)
-                .padding(.horizontal)
-                .padding(.top, 8)
+            HStack {
+                Image(systemName: "arrow.up.circle.fill")
+                    .foregroundStyle(.blue)
+                Text("Next Up")
+                    .font(.headline)
+            }
+            .padding(.horizontal)
+            .padding(.top, 8)
 
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 8) {
@@ -133,7 +136,9 @@ struct TaskAssignmentView: View {
 
             let taskSource = LocalTaskSource(modelContext: modelContext)
             let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
-            unscheduledTasks = try await syncEngine.sync()
+            let allTasks = try await syncEngine.sync()
+            // Only show Next Up tasks in the assignment view
+            unscheduledTasks = allTasks.filter { $0.isNextUp && !$0.isCompleted }
 
         } catch {
             errorMessage = error.localizedDescription
@@ -163,6 +168,11 @@ struct TaskAssignmentView: View {
                     taskIDs: updatedTaskIDs,
                     completedTaskIDs: block.completedTaskIDs
                 )
+
+                // Remove from Next Up after assignment
+                let taskSource = LocalTaskSource(modelContext: modelContext)
+                let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
+                try syncEngine.updateNextUp(itemID: taskID, isNextUp: false)
 
                 await loadData()
                 assignmentFeedback.toggle()

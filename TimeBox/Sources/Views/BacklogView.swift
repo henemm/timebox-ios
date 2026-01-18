@@ -48,6 +48,16 @@ struct BacklogView: View {
     @State private var selectedItemForDuration: PlanItem?
     @State private var durationFeedback = false
     @State private var showCreateTask = false
+    @State private var nextUpFeedback = false
+
+    // MARK: - Next Up Tasks
+    private var nextUpTasks: [PlanItem] {
+        planItems.filter { $0.isNextUp && !$0.isCompleted }
+    }
+
+    private var backlogTasks: [PlanItem] {
+        planItems.filter { !$0.isCompleted }
+    }
 
     // MARK: - Eisenhower Matrix Filters
     private var doFirstTasks: [PlanItem] {
@@ -152,17 +162,30 @@ struct BacklogView: View {
                         description: Text(emptyState.description)
                     )
                 } else {
-                    switch selectedMode {
-                    case .list:
-                        listView
-                    case .eisenhowerMatrix:
-                        eisenhowerMatrixView
-                    case .category:
-                        categoryView
-                    case .duration:
-                        durationView
-                    case .dueDate:
-                        dueDateView
+                    VStack(spacing: 16) {
+                        // Next Up Section
+                        NextUpSection(
+                            tasks: nextUpTasks,
+                            onRemoveFromNextUp: { taskID in
+                                if let item = planItems.first(where: { $0.id == taskID }) {
+                                    updateNextUp(for: item, isNextUp: false)
+                                }
+                            }
+                        )
+
+                        // Main content based on view mode
+                        switch selectedMode {
+                        case .list:
+                            listView
+                        case .eisenhowerMatrix:
+                            eisenhowerMatrixView
+                        case .category:
+                            categoryView
+                        case .duration:
+                            durationView
+                        case .dueDate:
+                            dueDateView
+                        }
                     }
                 }
             }
@@ -188,6 +211,7 @@ struct BacklogView: View {
             .withSettingsToolbar()
             .sensoryFeedback(.impact(weight: .medium), trigger: reorderTrigger)
             .sensoryFeedback(.success, trigger: durationFeedback)
+            .sensoryFeedback(.success, trigger: nextUpFeedback)
             .sheet(item: $selectedItemForDuration) { item in
                 DurationPicker(currentDuration: item.effectiveDuration) { newDuration in
                     updateDuration(for: item, minutes: newDuration)
@@ -250,6 +274,21 @@ struct BacklogView: View {
         }
     }
 
+    private func updateNextUp(for item: PlanItem, isNextUp: Bool) {
+        do {
+            let taskSource = LocalTaskSource(modelContext: modelContext)
+            let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
+            try syncEngine.updateNextUp(itemID: item.id, isNextUp: isNextUp)
+            nextUpFeedback.toggle()
+
+            Task {
+                await loadTasks()
+            }
+        } catch {
+            errorMessage = "Next Up Status konnte nicht geändert werden."
+        }
+    }
+
     // MARK: - View Mode Switcher (Swift Liquid Glass)
     private var viewModeSwitcher: some View {
         Menu {
@@ -287,10 +326,12 @@ struct BacklogView: View {
     // MARK: - List View
     private var listView: some View {
         List {
-            ForEach(planItems) { item in
-                BacklogRow(item: item) {
-                    selectedItemForDuration = item
-                }
+            ForEach(backlogTasks) { item in
+                BacklogRow(
+                    item: item,
+                    onDurationTap: { selectedItemForDuration = item },
+                    onAddToNextUp: { updateNextUp(for: item, isNextUp: true) }
+                )
             }
             .onMove(perform: moveItems)
         }
@@ -310,7 +351,8 @@ struct BacklogView: View {
                     color: .red,
                     icon: "exclamationmark.3",
                     tasks: doFirstTasks,
-                    onDurationTap: { item in selectedItemForDuration = item }
+                    onDurationTap: { item in selectedItemForDuration = item },
+                    onAddToNextUp: { item in updateNextUp(for: item, isNextUp: true) }
                 )
 
                 QuadrantCard(
@@ -319,7 +361,8 @@ struct BacklogView: View {
                     color: .yellow,
                     icon: "calendar",
                     tasks: scheduleTasks,
-                    onDurationTap: { item in selectedItemForDuration = item }
+                    onDurationTap: { item in selectedItemForDuration = item },
+                    onAddToNextUp: { item in updateNextUp(for: item, isNextUp: true) }
                 )
 
                 QuadrantCard(
@@ -328,7 +371,8 @@ struct BacklogView: View {
                     color: .orange,
                     icon: "person.2",
                     tasks: delegateTasks,
-                    onDurationTap: { item in selectedItemForDuration = item }
+                    onDurationTap: { item in selectedItemForDuration = item },
+                    onAddToNextUp: { item in updateNextUp(for: item, isNextUp: true) }
                 )
 
                 QuadrantCard(
@@ -337,7 +381,8 @@ struct BacklogView: View {
                     color: .green,
                     icon: "trash",
                     tasks: eliminateTasks,
-                    onDurationTap: { item in selectedItemForDuration = item }
+                    onDurationTap: { item in selectedItemForDuration = item },
+                    onAddToNextUp: { item in updateNextUp(for: item, isNextUp: true) }
                 )
             }
             .padding()
@@ -353,9 +398,11 @@ struct BacklogView: View {
             ForEach(tasksByCategory, id: \.category) { group in
                 Section(header: Text(group.category)) {
                     ForEach(group.tasks) { item in
-                        BacklogRow(item: item) {
-                            selectedItemForDuration = item
-                        }
+                        BacklogRow(
+                            item: item,
+                            onDurationTap: { selectedItemForDuration = item },
+                            onAddToNextUp: { updateNextUp(for: item, isNextUp: true) }
+                        )
                     }
                 }
             }
@@ -372,9 +419,11 @@ struct BacklogView: View {
             ForEach(tasksByDuration, id: \.bucket) { group in
                 Section(header: Text(group.bucket)) {
                     ForEach(group.tasks) { item in
-                        BacklogRow(item: item) {
-                            selectedItemForDuration = item
-                        }
+                        BacklogRow(
+                            item: item,
+                            onDurationTap: { selectedItemForDuration = item },
+                            onAddToNextUp: { updateNextUp(for: item, isNextUp: true) }
+                        )
                     }
                 }
             }
@@ -391,9 +440,11 @@ struct BacklogView: View {
             ForEach(tasksByDueDate, id: \.section) { group in
                 Section(header: Text(group.section)) {
                     ForEach(group.tasks) { item in
-                        BacklogRow(item: item) {
-                            selectedItemForDuration = item
-                        }
+                        BacklogRow(
+                            item: item,
+                            onDurationTap: { selectedItemForDuration = item },
+                            onAddToNextUp: { updateNextUp(for: item, isNextUp: true) }
+                        )
                     }
                 }
             }
@@ -429,6 +480,7 @@ struct QuadrantCard: View {
     let icon: String
     let tasks: [PlanItem]
     let onDurationTap: (PlanItem) -> Void
+    let onAddToNextUp: (PlanItem) -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -460,9 +512,11 @@ struct QuadrantCard: View {
                     .padding(.vertical, 20)
             } else {
                 ForEach(tasks.prefix(5)) { task in
-                    BacklogRow(item: task) {
-                        onDurationTap(task)
-                    }
+                    BacklogRow(
+                        item: task,
+                        onDurationTap: { onDurationTap(task) },
+                        onAddToNextUp: { onAddToNextUp(task) }
+                    )
                     .padding(.horizontal, 8)
                 }
 

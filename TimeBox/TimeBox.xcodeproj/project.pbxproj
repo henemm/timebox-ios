@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 77;
+	objectVersion = 63;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -39,6 +39,9 @@
 		B46449CB5D5E8C093E07C2D9 /* DurationPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = F91103B45CFB1388E6B12F3C /* DurationPicker.swift */; };
 		B5253CB93F49550930B0AF7C /* FocusBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0B1EE7295AF0AD91CA0027A /* FocusBlock.swift */; };
 		B59D2883B998A9D4A297ED2C /* LocalTaskSourceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64C281ADBE9DA2AC381CB747 /* LocalTaskSourceTests.swift */; };
+		B703FF51FE4B31A1D059A453 /* NextUpTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D81A830A7874C023E289830 /* NextUpTests.swift */; };
+		B7B87F202F1BCD900069B457 /* EisenhowerMatrixTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7B87F1F2F1BCD900069B457 /* EisenhowerMatrixTests.swift */; };
+		B7B87F222F1BCD9B0069B457 /* EisenhowerMatrixUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7B87F212F1BCD9B0069B457 /* EisenhowerMatrixUITests.swift */; };
 		B95825BFA85A0C001D1310A4 /* TaskSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 414BC475930C1DCDA3E9033B /* TaskSource.swift */; };
 		B9D12D9BF22325ADDE757862 /* CalendarEventTransfer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D1F03B35977548B59D7269F /* CalendarEventTransfer.swift */; };
 		BC2B829A833F87522CFFB6BC /* MockEventKitRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 993E45CA1F0174CC0345C92C /* MockEventKitRepository.swift */; };
@@ -55,6 +58,7 @@
 		D4EB0D97525927CB36D81D07 /* PlanItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9826FCF9A087183038C6ACED /* PlanItem.swift */; };
 		DE5811F4F48BE79B9EB7C818 /* PlanningViewUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C40AFBB545C0FA15517B9CE4 /* PlanningViewUITests.swift */; };
 		E6DF69A28B0DB868B330DADD /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5F22CE94E29A523114817BF /* ContentView.swift */; };
+		58649A426A8AF17A4944DBCF /* NextUpSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B35F02DA57C64E51F6EC483 /* NextUpSection.swift */; };
 		E907CB03C20C1B55A48C4B1B /* BacklogRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92133F2683BB9B90566D7646 /* BacklogRow.swift */; };
 		E98A667A603886CE7A68D968 /* EventBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B77251F3B87AF26FD6473763 /* EventBlock.swift */; };
 		EA6560340794C06D21D9CD85 /* PlanningView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8537E6312F33871F310A843F /* PlanningView.swift */; };
@@ -111,6 +115,7 @@
 		821E6E3E951900DF99190196 /* HourRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HourRow.swift; sourceTree = "<group>"; };
 		8537E6312F33871F310A843F /* PlanningView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanningView.swift; sourceTree = "<group>"; };
 		86453EFF3FD7231E39EC5E4D /* BacklogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BacklogView.swift; sourceTree = "<group>"; };
+		9B35F02DA57C64E51F6EC483 /* NextUpSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NextUpSection.swift; sourceTree = "<group>"; };
 		92133F2683BB9B90566D7646 /* BacklogRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BacklogRow.swift; sourceTree = "<group>"; };
 		9356580BE3C5699878A6B87D /* BeforeScreenshotTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BeforeScreenshotTest.swift; sourceTree = "<group>"; };
 		9826FCF9A087183038C6ACED /* PlanItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanItem.swift; sourceTree = "<group>"; };
@@ -120,6 +125,9 @@
 		A0B1EE7295AF0AD91CA0027A /* FocusBlock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusBlock.swift; sourceTree = "<group>"; };
 		B31CB18EF0C80E62953F34D6 /* SprintReviewSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SprintReviewSheet.swift; sourceTree = "<group>"; };
 		B77251F3B87AF26FD6473763 /* EventBlock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventBlock.swift; sourceTree = "<group>"; };
+		7D81A830A7874C023E289830 /* NextUpTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NextUpTests.swift; sourceTree = "<group>"; };
+		B7B87F1F2F1BCD900069B457 /* EisenhowerMatrixTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EisenhowerMatrixTests.swift; sourceTree = "<group>"; };
+		B7B87F212F1BCD9B0069B457 /* EisenhowerMatrixUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EisenhowerMatrixUITests.swift; sourceTree = "<group>"; };
 		BCFB47E31C1D91935DCB9374 /* DebugLogReaderTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugLogReaderTest.swift; sourceTree = "<group>"; };
 		C40AFBB545C0FA15517B9CE4 /* PlanningViewUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanningViewUITests.swift; sourceTree = "<group>"; };
 		C439255FDECD6C6CB2377237 /* MiniTaskCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MiniTaskCard.swift; sourceTree = "<group>"; };
@@ -140,6 +148,7 @@
 		05D90FB2A2CE48689EC309B4 /* TimeBoxUITests */ = {
 			isa = PBXGroup;
 			children = (
+				B7B87F212F1BCD9B0069B457 /* EisenhowerMatrixUITests.swift */,
 				339BBA1A3799CB0C6CF5897A /* BacklogViewUITests.swift */,
 				9356580BE3C5699878A6B87D /* BeforeScreenshotTest.swift */,
 				BCFB47E31C1D91935DCB9374 /* DebugLogReaderTest.swift */,
@@ -214,6 +223,7 @@
 			isa = PBXGroup;
 			children = (
 				92133F2683BB9B90566D7646 /* BacklogRow.swift */,
+				9B35F02DA57C64E51F6EC483 /* NextUpSection.swift */,
 				86453EFF3FD7231E39EC5E4D /* BacklogView.swift */,
 				20D808247CA55763ACF23BC5 /* BlockPlanningView.swift */,
 				D5F22CE94E29A523114817BF /* ContentView.swift */,
@@ -268,6 +278,8 @@
 		A6B3805EF19D1B131D346DDD /* TimeBoxTests */ = {
 			isa = PBXGroup;
 			children = (
+				B7B87F1F2F1BCD900069B457 /* EisenhowerMatrixTests.swift */,
+				7D81A830A7874C023E289830 /* NextUpTests.swift */,
 				F1CCA00FEA15FD7BA149CDDE /* CalendarSelectionTests.swift */,
 				9DC26C4D8FDC4B811001FD2C /* EventKitRepositoryTests.swift */,
 				1177F32AD2A8E3DE065A8945 /* FocusBlockTests.swift */,
@@ -382,7 +394,6 @@
 			);
 			mainGroup = F035EACA143AFEF72D3412E7;
 			minimizedProjectReferenceProxies = 1;
-			preferredProjectObjectVersion = 77;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -399,6 +410,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E907CB03C20C1B55A48C4B1B /* BacklogRow.swift in Sources */,
+				58649A426A8AF17A4944DBCF /* NextUpSection.swift in Sources */,
 				402B599EB1486BA1E69EF4FF /* BacklogView.swift in Sources */,
 				83C779D1EFB193A3B7A2E5AD /* BlockPlanningView.swift in Sources */,
 				D4D7EAC3019BD5B643DC70F8 /* CalendarEvent.swift in Sources */,
@@ -448,6 +460,7 @@
 				9F9185F5A9BD5A8CFF79DECA /* ErrorStateUITests.swift in Sources */,
 				DE5811F4F48BE79B9EB7C818 /* PlanningViewUITests.swift in Sources */,
 				A37B483E47D5F1A662D498CC /* SchedulingUITests.swift in Sources */,
+				B7B87F222F1BCD9B0069B457 /* EisenhowerMatrixUITests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -462,6 +475,8 @@
 				6B6843B1FA16372D73DF9402 /* LocalTaskTests.swift in Sources */,
 				2F7184DE552C8D322971EDED /* MockEventKitRepositoryTests.swift in Sources */,
 				94EC1D85A0F4B53160332751 /* PlanItemTests.swift in Sources */,
+				B7B87F202F1BCD900069B457 /* EisenhowerMatrixTests.swift in Sources */,
+				B703FF51FE4B31A1D059A453 /* NextUpTests.swift in Sources */,
 				3F9639915C12205F6DE53C7D /* SyncEngineTests.swift in Sources */,
 				CC3848FFA2D898F1A3FDFC27 /* TaskSourceTests.swift in Sources */,
 			);

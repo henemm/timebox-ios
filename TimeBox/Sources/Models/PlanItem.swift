@@ -16,6 +16,9 @@ struct PlanItem: Identifiable, Sendable {
     let dueDate: Date?
     let taskDescription: String?
 
+    // Next Up staging (Phase 3)
+    let isNextUp: Bool
+
     init(reminder: ReminderData, metadata: TaskMetadata) {
         self.id = reminder.id
         self.title = reminder.title
@@ -36,6 +39,7 @@ struct PlanItem: Identifiable, Sendable {
         self.taskType = "maintenance"
         self.dueDate = nil
         self.taskDescription = nil
+        self.isNextUp = false
     }
 
     init(localTask: LocalTask) {
@@ -58,6 +62,7 @@ struct PlanItem: Identifiable, Sendable {
         self.taskType = localTask.taskType
         self.dueDate = localTask.dueDate
         self.taskDescription = localTask.taskDescription
+        self.isNextUp = localTask.isNextUp
     }
 
     private static func resolveDuration(manual: Int?, title: String?) -> (Int, DurationSource) {

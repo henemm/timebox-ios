@@ -35,6 +35,14 @@ final class SyncEngine {
         try modelContext.save()
     }
 
+    func updateNextUp(itemID: String, isNextUp: Bool) throws {
+        guard let task = try findTask(byID: itemID) else {
+            return
+        }
+        task.isNextUp = isNextUp
+        try modelContext.save()
+    }
+
     private func findTask(byID id: String) throws -> LocalTask? {
         guard let uuid = UUID(uuidString: id) else { return nil }
         let descriptor = FetchDescriptor<LocalTask>(

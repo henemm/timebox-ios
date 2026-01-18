@@ -37,6 +37,9 @@ final class LocalTask {
     /// Long-form description/notes for the task
     var taskDescription: String?
 
+    /// Marks task as staged for "Next Up" (ready for assignment to Focus Blocks)
+    var isNextUp: Bool = false
+
     /// External system identifier for sync (e.g., Notion page ID)
     var externalID: String?
 
