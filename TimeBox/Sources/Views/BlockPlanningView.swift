@@ -30,7 +30,7 @@ struct BlockPlanningView: View {
                     )
                     Spacer()
                 } else {
-                    blockPlanningTimeline
+                    smartGapsContent
                 }
             }
             .navigationTitle("Blöcke")
@@ -117,6 +117,74 @@ struct BlockPlanningView: View {
         }
     }
 
+    // MARK: - Smart Gaps Content
+
+    private var smartGapsContent: some View {
+        ScrollView {
+            VStack(spacing: 16) {
+                // Smart Gaps Section
+                SmartGapsSection(
+                    slots: computedFreeSlots,
+                    isDayFree: isDayMostlyFree,
+                    onCreateBlock: { slot in
+                        createFocusBlock(startDate: slot.startDate, endDate: slot.endDate)
+                    }
+                )
+
+                // Existing Focus Blocks
+                if !focusBlocks.isEmpty {
+                    existingBlocksSection
+                }
+            }
+            .padding()
+        }
+        .refreshable {
+            await loadData()
+        }
+    }
+
+    private var computedFreeSlots: [TimeSlot] {
+        let finder = GapFinder(events: calendarEvents, focusBlocks: focusBlocks, date: selectedDate)
+        return finder.findFreeSlots(minMinutes: 30, maxMinutes: 60)
+    }
+
+    private var isDayMostlyFree: Bool {
+        let nonAllDayEvents = calendarEvents.filter { !$0.isAllDay && !$0.isFocusBlock }
+        let totalBusyMinutes = nonAllDayEvents.reduce(0) { $0 + $1.durationMinutes }
+        return totalBusyMinutes < 120 // Less than 2 hours of meetings
+    }
+
+    private var existingBlocksSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Image(systemName: "rectangle.split.3x1.fill")
+                    .foregroundStyle(.blue)
+                Text("Heutige Blöcke")
+                    .font(.headline)
+                Spacer()
+                Text("\(focusBlocks.count)")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 2)
+                    .background(Capsule().fill(.blue.opacity(0.15)))
+            }
+
+            ForEach(focusBlocks) { block in
+                ExistingBlockRow(block: block)
+            }
+        }
+        .padding()
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(.blue.opacity(0.05))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(.blue.opacity(0.2), lineWidth: 1)
+        )
+    }
+
     private var nonFocusBlockEvents: [CalendarEvent] {
         calendarEvents.filter { !$0.isAllDay && !$0.isFocusBlock }
     }
@@ -164,6 +232,126 @@ struct TimeSlot: Identifiable {
 
     var durationMinutes: Int {
         Int(endDate.timeIntervalSince(startDate) / 60)
+    }
+}
+
+// MARK: - Gap Finder
+
+/// Finds free time slots between calendar events for focus blocks
+struct GapFinder {
+    let events: [CalendarEvent]
+    let focusBlocks: [FocusBlock]
+    let date: Date
+
+    private let startHour = 6
+    private let endHour = 22
+    private let defaultSuggestionHours = [9, 11, 14, 16]
+
+    /// Find free slots within the min/max duration range
+    func findFreeSlots(minMinutes: Int = 30, maxMinutes: Int = 60) -> [TimeSlot] {
+        let calendar = Calendar.current
+
+        // Get day boundaries
+        var startComponents = calendar.dateComponents([.year, .month, .day], from: date)
+        startComponents.hour = startHour
+        startComponents.minute = 0
+        let dayStart = calendar.date(from: startComponents) ?? date
+
+        var endComponents = calendar.dateComponents([.year, .month, .day], from: date)
+        endComponents.hour = endHour
+        endComponents.minute = 0
+        let dayEnd = calendar.date(from: endComponents) ?? date
+
+        // Collect all busy periods
+        var busyPeriods: [(start: Date, end: Date)] = []
+
+        for event in events where !event.isAllDay && !event.isFocusBlock {
+            busyPeriods.append((event.startDate, event.endDate))
+        }
+
+        for block in focusBlocks {
+            busyPeriods.append((block.startDate, block.endDate))
+        }
+
+        // Sort by start time
+        busyPeriods.sort { $0.start < $1.start }
+
+        // Find gaps
+        var gaps: [TimeSlot] = []
+        var currentTime = dayStart
+
+        for period in busyPeriods {
+            // Skip periods outside our time range
+            if period.end <= dayStart || period.start >= dayEnd {
+                continue
+            }
+
+            // Clamp to day boundaries
+            let periodStart = max(period.start, dayStart)
+
+            // Found a gap before this period
+            if currentTime < periodStart {
+                let gapDuration = Int(periodStart.timeIntervalSince(currentTime) / 60)
+                if gapDuration >= minMinutes {
+                    // If gap is larger than max, create a slot at the start
+                    let slotEnd: Date
+                    if gapDuration > maxMinutes {
+                        slotEnd = currentTime.addingTimeInterval(Double(maxMinutes) * 60)
+                    } else {
+                        slotEnd = periodStart
+                    }
+                    gaps.append(TimeSlot(startDate: currentTime, endDate: slotEnd))
+                }
+            }
+
+            // Move current time to end of this period
+            currentTime = max(currentTime, min(period.end, dayEnd))
+        }
+
+        // Check for gap at the end of the day
+        if currentTime < dayEnd {
+            let gapDuration = Int(dayEnd.timeIntervalSince(currentTime) / 60)
+            if gapDuration >= minMinutes {
+                let slotEnd: Date
+                if gapDuration > maxMinutes {
+                    slotEnd = currentTime.addingTimeInterval(Double(maxMinutes) * 60)
+                } else {
+                    slotEnd = dayEnd
+                }
+                gaps.append(TimeSlot(startDate: currentTime, endDate: slotEnd))
+            }
+        }
+
+        // If day is mostly free (no gaps found or only huge gaps), show default suggestions
+        if gaps.isEmpty || isWholeDayFree(busyPeriods: busyPeriods, dayStart: dayStart, dayEnd: dayEnd) {
+            return createDefaultSuggestions(maxMinutes: maxMinutes)
+        }
+
+        return gaps
+    }
+
+    private func isWholeDayFree(busyPeriods: [(start: Date, end: Date)], dayStart: Date, dayEnd: Date) -> Bool {
+        // Day is considered "free" if total busy time is less than 2 hours
+        let totalBusyMinutes = busyPeriods
+            .filter { $0.end > dayStart && $0.start < dayEnd }
+            .reduce(0) { total, period in
+                let start = max(period.start, dayStart)
+                let end = min(period.end, dayEnd)
+                return total + Int(end.timeIntervalSince(start) / 60)
+            }
+        return totalBusyMinutes < 120
+    }
+
+    private func createDefaultSuggestions(maxMinutes: Int) -> [TimeSlot] {
+        let calendar = Calendar.current
+        return defaultSuggestionHours.compactMap { hour in
+            var components = calendar.dateComponents([.year, .month, .day], from: date)
+            components.hour = hour
+            components.minute = 0
+            guard let start = calendar.date(from: components) else { return nil }
+            let end = start.addingTimeInterval(Double(maxMinutes) * 60)
+            return TimeSlot(startDate: start, endDate: end)
+        }
     }
 }
 
@@ -401,5 +589,156 @@ struct CreateFocusBlockSheet: View {
                 return "\(hours) Std \(remainingMinutes) Min"
             }
         }
+    }
+}
+
+// MARK: - Smart Gaps Section
+
+struct SmartGapsSection: View {
+    let slots: [TimeSlot]
+    let isDayFree: Bool
+    let onCreateBlock: (TimeSlot) -> Void
+
+    private let timeFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.timeStyle = .short
+        return f
+    }()
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            // Header
+            HStack {
+                Image(systemName: isDayFree ? "sun.max.fill" : "clock.fill")
+                    .foregroundStyle(isDayFree ? .orange : .green)
+                Text(isDayFree ? "Tag ist frei!" : "Freie Slots")
+                    .font(.headline)
+                Spacer()
+                if !slots.isEmpty {
+                    Text("\(slots.count)")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 2)
+                        .background(Capsule().fill(.green.opacity(0.15)))
+                }
+            }
+
+            if isDayFree {
+                Text("Vorgeschlagene Zeiten:")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+
+            // Slots
+            if slots.isEmpty {
+                Text("Keine freien Slots (30-60 min) verfügbar")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    .padding(.vertical, 12)
+            } else {
+                VStack(spacing: 8) {
+                    ForEach(slots) { slot in
+                        GapRow(slot: slot, timeFormatter: timeFormatter) {
+                            onCreateBlock(slot)
+                        }
+                    }
+                }
+            }
+        }
+        .padding()
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(.green.opacity(0.05))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(.green.opacity(0.3), lineWidth: 1)
+        )
+    }
+}
+
+// MARK: - Gap Row
+
+struct GapRow: View {
+    let slot: TimeSlot
+    let timeFormatter: DateFormatter
+    let onCreate: () -> Void
+
+    var body: some View {
+        HStack {
+            Text("\(timeFormatter.string(from: slot.startDate)) - \(timeFormatter.string(from: slot.endDate))")
+                .font(.subheadline)
+
+            Spacer()
+
+            Text("\(slot.durationMinutes) min")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 4)
+                .background(Capsule().fill(.green.opacity(0.15)))
+
+            Button {
+                onCreate()
+            } label: {
+                Image(systemName: "plus.circle.fill")
+                    .font(.title2)
+                    .foregroundStyle(.green)
+            }
+            .buttonStyle(.plain)
+        }
+        .padding(.vertical, 8)
+        .padding(.horizontal, 12)
+        .background(
+            RoundedRectangle(cornerRadius: 8)
+                .fill(.background)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 8)
+                .stroke(.green.opacity(0.2), lineWidth: 1)
+        )
+    }
+}
+
+// MARK: - Existing Block Row
+
+struct ExistingBlockRow: View {
+    let block: FocusBlock
+
+    private let timeFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.timeStyle = .short
+        return f
+    }()
+
+    var body: some View {
+        HStack {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(block.title)
+                    .font(.subheadline.weight(.medium))
+                Text("\(timeFormatter.string(from: block.startDate)) - \(timeFormatter.string(from: block.endDate))")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
+            Spacer()
+
+            if !block.taskIDs.isEmpty {
+                Text("\(block.taskIDs.count) Tasks")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(Capsule().fill(.blue.opacity(0.15)))
+            }
+        }
+        .padding(.vertical, 8)
+        .padding(.horizontal, 12)
+        .background(
+            RoundedRectangle(cornerRadius: 8)
+                .fill(.blue.opacity(0.1))
+        )
     }
 }

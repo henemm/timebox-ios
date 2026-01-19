@@ -1,0 +1,30 @@
+TDD RED Phase - Smart Gaps Feature
+===================================
+Date: 2026-01-18
+
+COMPILE ERRORS (Tests FAIL as expected - GapFinder not implemented)
+-------------------------------------------------------------------
+
+SmartGapsTests.swift:20:22: error: cannot find 'GapFinder' in scope
+        let finder = GapFinder(events: events, focusBlocks: [], date: date)
+
+SmartGapsTests.swift:44:22: error: cannot find 'GapFinder' in scope
+        let finder = GapFinder(events: events, focusBlocks: [], date: date)
+
+SmartGapsTests.swift:67:22: error: cannot find 'GapFinder' in scope
+        let finder = GapFinder(events: events, focusBlocks: [], date: date)
+
+SmartGapsTests.swift:88:22: error: cannot find 'GapFinder' in scope
+        let finder = GapFinder(events: events, focusBlocks: [], date: date)
+
+ANALYSIS
+--------
+All 4 test methods fail to compile because GapFinder struct/class does not exist yet.
+
+Tests defined:
+1. testFindFreeSlotsFindsGaps - Find gaps between calendar events
+2. testFindFreeSlotsRespectsMinDuration - Exclude gaps < 30 min
+3. testFindFreeSlotsRespectsMaxDuration - Limit gaps to max 60 min
+4. testWholeDayFreeShowsSuggestions - Show 4 default suggestions when day is free
+
+TEST RESULT: FAILED (compile error - as expected for TDD RED)
