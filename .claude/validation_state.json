@@ -64,10 +64,12 @@
     "TimeBox/TimeBoxTests/EisenhowerMatrixTests.swift",
     "TimeBox/TimeBoxUITests/EisenhowerMatrixUITests.swift",
     "TimeBox/TimeBoxTests/NextUpTests.swift",
-    "TimeBox/Sources/Views/NextUpSection.swift"
+    "TimeBox/Sources/Views/NextUpSection.swift",
+    "TimeBox/TimeBoxTests/SmartGapsTests.swift",
+    "TimeBox/TimeBoxUITests/SmartGapsUITests.swift"
   ],
   "last_validation": "2026-01-15T16:25:00.000000",
-  "last_change": "2026-01-18T14:59:56.933427",
+  "last_change": "2026-01-19T07:58:08.051272",
   "validation_result": {
     "status": "passed",
     "build_status": "success",

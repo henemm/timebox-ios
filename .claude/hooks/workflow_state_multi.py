@@ -212,11 +212,16 @@ def create_workflow(name: str) -> dict:
         "context_file": None,
         "test_artifacts": [],
         "affected_files": [],
-        # Separate RED/GREEN tracking (v2.0)
+        # Separate RED/GREEN tracking for UNIT tests (v2.0)
         "red_test_done": False,
         "red_test_result": None,  # Description of the failing test
         "green_test_done": False,
         "green_test_result": None,  # Description of passing tests
+        # Separate RED/GREEN tracking for UI tests (v2.2)
+        "ui_test_red_done": False,
+        "ui_test_red_result": None,  # Description of failing UI test
+        "ui_test_green_done": False,
+        "ui_test_green_result": None,  # Description of passing UI tests
         # Analysis findings
         "analysis_findings": None,
         # Phases completed history
@@ -291,20 +296,53 @@ def advance_phase(workflow_name: str = None) -> Optional[str]:
     return None
 
 
-def set_phase(workflow_name: str, phase: str) -> bool:
-    """Set a specific phase for a workflow."""
+def set_phase(workflow_name: str, phase: str, force: bool = False) -> tuple[bool, str]:
+    """
+    Set a specific phase for a workflow.
+
+    Args:
+        workflow_name: Name of the workflow
+        phase: Target phase
+        force: If True, skip validation checks
+
+    Returns:
+        (success, message) tuple
+    """
     if phase not in PHASES:
-        return False
+        return False, f"Invalid phase: {phase}"
 
     state = load_state()
 
     if workflow_name not in state["workflows"]:
-        return False
+        return False, f"Workflow not found: {workflow_name}"
+
+    workflow = state["workflows"][workflow_name]
+
+    # Validation check for phase7_validate
+    if phase == "phase7_validate" and not force:
+        # Check if both unit and UI tests are complete
+        unit_red = workflow.get("red_test_done", False)
+        unit_green = workflow.get("green_test_done", False)
+        ui_red = workflow.get("ui_test_red_done", False)
+        ui_green = workflow.get("ui_test_green_done", False)
+
+        missing = []
+        if not unit_red:
+            missing.append("Unit RED")
+        if not unit_green:
+            missing.append("Unit GREEN")
+        if not ui_red:
+            missing.append("UI RED")
+        if not ui_green:
+            missing.append("UI GREEN")
+
+        if missing:
+            return False, f"Cannot enter validation phase. Missing: {', '.join(missing)}"
 
     state["workflows"][workflow_name]["current_phase"] = phase
     state["workflows"][workflow_name]["last_updated"] = datetime.now().isoformat()
     save_state(state)
-    return True
+    return True, f"Phase set to {phase}"
 
 
 def add_test_artifact(workflow_name: str, artifact: dict) -> bool:
@@ -499,10 +537,14 @@ def get_tdd_status(workflow_name: str = None) -> dict:
     Get TDD status for a workflow.
 
     Returns dict with:
-        red_done: bool
+        red_done: bool (unit tests)
         red_result: str or None
-        green_done: bool
+        green_done: bool (unit tests)
         green_result: str or None
+        ui_test_red_done: bool
+        ui_test_red_result: str or None
+        ui_test_green_done: bool
+        ui_test_green_result: str or None
         artifacts: list of test artifacts
     """
     workflow = get_active_workflow() if not workflow_name else None
@@ -517,6 +559,10 @@ def get_tdd_status(workflow_name: str = None) -> dict:
             "red_result": None,
             "green_done": False,
             "green_result": None,
+            "ui_test_red_done": False,
+            "ui_test_red_result": None,
+            "ui_test_green_done": False,
+            "ui_test_green_result": None,
             "artifacts": [],
         }
 
@@ -525,8 +571,87 @@ def get_tdd_status(workflow_name: str = None) -> dict:
         "red_result": workflow.get("red_test_result"),
         "green_done": workflow.get("green_test_done", False),
         "green_result": workflow.get("green_test_result"),
+        "ui_test_red_done": workflow.get("ui_test_red_done", False),
+        "ui_test_red_result": workflow.get("ui_test_red_result"),
+        "ui_test_green_done": workflow.get("ui_test_green_done", False),
+        "ui_test_green_result": workflow.get("ui_test_green_result"),
         "artifacts": workflow.get("test_artifacts", []),
     }
+
+
+def mark_ui_test_red_done(workflow_name: str = None, result: str = None) -> bool:
+    """
+    Mark UI test RED as done for a workflow.
+
+    Args:
+        workflow_name: Name of workflow (uses active if None)
+        result: Description of the failing UI test result
+    """
+    state = load_state()
+
+    name = workflow_name or state.get("active_workflow")
+    if not name or name not in state["workflows"]:
+        return False
+
+    workflow = state["workflows"][name]
+    workflow["ui_test_red_done"] = True
+    workflow["ui_test_red_result"] = result
+    workflow["last_updated"] = datetime.now().isoformat()
+
+    save_state(state)
+    return True
+
+
+def mark_ui_test_green_done(workflow_name: str = None, result: str = None) -> bool:
+    """
+    Mark UI test GREEN as done for a workflow.
+
+    Args:
+        workflow_name: Name of workflow (uses active if None)
+        result: Description of passing UI tests
+    """
+    state = load_state()
+
+    name = workflow_name or state.get("active_workflow")
+    if not name or name not in state["workflows"]:
+        return False
+
+    workflow = state["workflows"][name]
+    workflow["ui_test_green_done"] = True
+    workflow["ui_test_green_result"] = result
+    workflow["last_updated"] = datetime.now().isoformat()
+
+    save_state(state)
+    return True
+
+
+def are_all_tests_complete(workflow_name: str = None) -> tuple[bool, str]:
+    """
+    Check if all required tests (unit + UI) are complete for validation phase.
+
+    Returns (complete, reason).
+    """
+    state = load_state()
+
+    name = workflow_name or state.get("active_workflow")
+    if not name or name not in state["workflows"]:
+        return False, "No active workflow"
+
+    workflow = state["workflows"][name]
+
+    # Check unit tests
+    if not workflow.get("red_test_done", False):
+        return False, "Unit test RED phase not complete"
+    if not workflow.get("green_test_done", False):
+        return False, "Unit test GREEN phase not complete"
+
+    # Check UI tests
+    if not workflow.get("ui_test_red_done", False):
+        return False, "UI test RED phase not complete"
+    if not workflow.get("ui_test_green_done", False):
+        return False, "UI test GREEN phase not complete"
+
+    return True, "All tests complete"
 
 
 def derive_backlog_status(phase: str) -> str:
@@ -698,12 +823,18 @@ if __name__ == "__main__":
     elif cmd == "phase" and len(sys.argv) > 2:
         state = load_state()
         active = state.get("active_workflow")
-        if active and set_phase(active, sys.argv[2]):
-            # Sync backlog status when phase changes
-            sync_backlog_status_from_phase(active)
-            print(f"Set phase to: {sys.argv[2]}")
+        if active:
+            # Check for --force flag
+            force = "--force" in sys.argv
+            success, message = set_phase(active, sys.argv[2], force=force)
+            if success:
+                # Sync backlog status when phase changes
+                sync_backlog_status_from_phase(active)
+                print(f"Set phase to: {sys.argv[2]}")
+            else:
+                print(f"BLOCKED: {message}")
         else:
-            print(f"Failed to set phase: {sys.argv[2]}")
+            print(f"No active workflow")
     elif cmd == "backlog" and len(sys.argv) > 2:
         status = sys.argv[2]
         if set_backlog_status(status):

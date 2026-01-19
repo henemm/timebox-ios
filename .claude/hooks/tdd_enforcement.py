@@ -45,9 +45,9 @@ except ImportError:
 
 # Minimum requirements for TDD RED phase
 TDD_RED_REQUIREMENTS = {
-    "min_artifacts": 1,  # At least one test artifact
+    "min_unit_artifacts": 1,  # At least one unit test artifact
+    "min_ui_artifacts": 1,    # At least one UI test artifact
     "max_artifact_age_hours": 24,  # Artifacts must be recent
-    "required_types": [],  # No specific type required by default
 }
 
 # Valid artifact types
@@ -57,10 +57,17 @@ VALID_ARTIFACT_TYPES = [
     "api_response",
     "log",
     "file",
-    "test_output",
+    "test_output",      # Unit test output
+    "ui_test_output",   # UI test output (NEW!)
     "video",
     "audio",
 ]
+
+# Types that count as UNIT test artifacts
+UNIT_TEST_TYPES = ["test_output", "log", "api_response"]
+
+# Types that count as UI test artifacts
+UI_TEST_TYPES = ["ui_test_output", "screenshot", "video"]
 
 # File extensions that prove REAL artifacts
 REAL_ARTIFACT_EXTENSIONS = {
@@ -70,6 +77,7 @@ REAL_ARTIFACT_EXTENSIONS = {
     "log": [".log", ".txt"],
     "file": ["*"],  # Any extension
     "test_output": [".txt", ".log", ".json"],
+    "ui_test_output": [".txt", ".log", ".json"],  # UI test logs
     "video": [".mp4", ".mov", ".webm", ".gif"],
     "audio": [".mp3", ".wav", ".m4a"],
 }
@@ -82,6 +90,7 @@ MIN_FILE_SIZES = {
     "log": 10,
     "file": 1,
     "test_output": 10,
+    "ui_test_output": 10,  # UI test logs
     "video": 10000,
     "audio": 1000,
 }
@@ -153,6 +162,7 @@ def validate_artifact(artifact: dict) -> tuple[bool, str]:
 def validate_red_phase(workflow: dict) -> tuple[bool, str]:
     """
     Validate that TDD RED phase is properly completed.
+    Requires BOTH unit test AND UI test artifacts.
     Returns (valid, reason).
     """
     artifacts = workflow.get("test_artifacts", [])
@@ -160,22 +170,46 @@ def validate_red_phase(workflow: dict) -> tuple[bool, str]:
     # Filter to RED phase artifacts
     red_artifacts = [a for a in artifacts if a.get("phase") == "phase5_tdd_red"]
 
-    if len(red_artifacts) < TDD_RED_REQUIREMENTS["min_artifacts"]:
+    # Separate unit test and UI test artifacts
+    unit_artifacts = [a for a in red_artifacts if a.get("type") in UNIT_TEST_TYPES]
+    ui_artifacts = [a for a in red_artifacts if a.get("type") in UI_TEST_TYPES]
+
+    # Check minimum unit test artifacts
+    if len(unit_artifacts) < TDD_RED_REQUIREMENTS["min_unit_artifacts"]:
         return False, f"""
 +======================================================================+
-|  TDD RED PHASE INCOMPLETE!                                           |
+|  TDD RED PHASE INCOMPLETE: UNIT TESTS MISSING!                       |
 +======================================================================+
-|  You have {len(red_artifacts)} test artifact(s), need at least {TDD_RED_REQUIREMENTS["min_artifacts"]}.           |
+|  You have {len(unit_artifacts)} unit test artifact(s), need at least {TDD_RED_REQUIREMENTS["min_unit_artifacts"]}.        |
 |                                                                      |
 |  Before implementing, you MUST:                                      |
-|  1. Write tests that exercise the new/changed functionality          |
+|  1. Write UNIT tests for the business logic                          |
 |  2. Run the tests - they MUST FAIL (RED)                             |
-|  3. Capture REAL artifacts proving the test ran:                     |
-|     - Screenshots of failed test output                              |
-|     - Log files showing test execution                               |
-|     - API responses from test calls                                  |
+|  3. Register artifact with type: "test_output"                       |
 |                                                                      |
 |  Use /add-artifact to register test evidence.                        |
++======================================================================+
+"""
+
+    # Check minimum UI test artifacts
+    if len(ui_artifacts) < TDD_RED_REQUIREMENTS["min_ui_artifacts"]:
+        return False, f"""
++======================================================================+
+|  TDD RED PHASE INCOMPLETE: UI TESTS MISSING!                         |
++======================================================================+
+|  You have {len(ui_artifacts)} UI test artifact(s), need at least {TDD_RED_REQUIREMENTS["min_ui_artifacts"]}.          |
+|                                                                      |
+|  Before implementing, you MUST:                                      |
+|  1. Write UI tests (XCUITest) for the user interface                 |
+|  2. Run the tests - they MUST FAIL (RED)                             |
+|  3. Register artifact with type: "ui_test_output"                    |
+|                                                                      |
+|  UI tests verify:                                                    |
+|  - Components render correctly                                       |
+|  - User interactions work as expected                                |
+|  - Navigation flows are correct                                      |
+|                                                                      |
+|  Use /add-artifact to register UI test evidence.                     |
 +======================================================================+
 """
 
@@ -200,7 +234,7 @@ def validate_red_phase(workflow: dict) -> tuple[bool, str]:
 """
 
     # Check for test failure evidence (at least one artifact should show failure)
-    failure_indicators = ["fail", "error", "red", "not found", "exception", "assert"]
+    failure_indicators = ["fail", "error", "red", "not found", "exception", "assert", "cannot find"]
     has_failure_evidence = False
 
     for artifact in red_artifacts:
@@ -228,7 +262,7 @@ def validate_red_phase(workflow: dict) -> tuple[bool, str]:
 +======================================================================+
 """
 
-    return True, "TDD RED phase validated"
+    return True, "TDD RED phase validated (unit + UI tests)"
 
 
 def check_tdd_requirements(file_path: str) -> tuple[bool, str]:
@@ -280,6 +314,11 @@ def main():
     # Skip for test files (we want to allow writing tests!)
     test_patterns = ["test_", "_test.", ".test.", "tests/", "spec/", "_spec."]
     if any(pattern in file_path.lower() for pattern in test_patterns):
+        sys.exit(0)
+
+    # Skip for workflow infrastructure files (meta-files, not app code)
+    infrastructure_patterns = [".claude/hooks/", ".claude/config", "docs/specs/", "docs/artifacts/"]
+    if any(pattern in file_path for pattern in infrastructure_patterns):
         sys.exit(0)
 
     # Check TDD requirements
