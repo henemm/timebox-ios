@@ -1,0 +1,9 @@
+# Legacy entities that don't need separate specs
+# These are either:
+# 1. Part of a larger feature spec (e.g., AppSettings in end-gong-sound)
+# 2. Pre-existing entities from before the OpenSpec workflow
+# 3. Trivial helper classes
+
+# Sound Feature (Sprint 1) - covered by end-gong-sound.md spec
+appsettings
+soundservice

@@ -60,33 +60,81 @@ _Keine Features in Arbeit_
 
 ---
 
-## Geplant (Open)
+## User Story Roadmap (Priorität 1)
+
+> Basiert auf: `docs/project/stories/timebox-core.md`
+> Gap-Analyse: `docs/context/user-story-gap-analysis.md`
+
+### Sprint 1: End-Gong/Sound
+**Status:** Open
+**Prioritaet:** Hoch (User Story Core)
+**Bereich:** FocusLiveView
+
+**Kurzbeschreibung:**
+Akustisches Signal am Block-Ende. System-Sound, konfigurierbar (mit/ohne).
+
+---
+
+### Sprint 2: Vorwarnung vor Block-Ende
+**Status:** Open
+**Prioritaet:** Hoch (User Story Core)
+**Bereich:** FocusLiveView, Settings
+
+**Kurzbeschreibung:**
+Konfigurierbarer Hinweis ("noch 5 min") mit Sound + Haptic.
+
+---
+
+### Sprint 3: Kategorien erweitern (5 statt 3)
+**Status:** Open
+**Prioritaet:** Hoch (User Story Core)
+**Bereich:** LocalTask, TaskCreation, BacklogRow
+
+**Kurzbeschreibung:**
+2 neue Kategorien: `learning` (Lernen), `giving_back` (Weitergeben).
+Bestehend: `income`, `maintenance`, `recharge`.
+
+---
+
+### Sprint 4: Live Activity (Lockscreen/Dynamic Island)
+**Status:** Open
+**Prioritaet:** Hoch (User Story Core)
+**Bereich:** ActivityKit, Widgets
+
+**Kurzbeschreibung:**
+Fokus-Block auf Lockscreen und Dynamic Island anzeigen.
+
+---
+
+### Sprint 5: Tages-Rückblick
+**Status:** Open
+**Prioritaet:** Mittel (User Story)
+**Bereich:** Neues View, History-Model
+
+**Kurzbeschreibung:**
+"Was habe ich heute alles geschafft?" - Übersicht erledigter Tasks.
+
+---
+
+### Sprint 6: Wochen-Rückblick
+**Status:** Open
+**Prioritaet:** Mittel (User Story)
+**Bereich:** Neues View, History-Model
+
+**Kurzbeschreibung:**
+"Womit habe ich meine Woche verbracht?" - Zeit-Analyse nach Kategorie.
+
+---
+
+## Weitere Features (Priorität 2)
 
 ### Kategorien in Backlog-View sichtbar machen
 **Status:** Open
-**Prioritaet:** Hoch
+**Prioritaet:** Mittel
 **Bereich:** BacklogView, Erinnerungen-Integration
 
 **Kurzbeschreibung:**
 Kategorien/Listen aus Apple Erinnerungen anzeigen mit visueller Unterscheidung.
-
-**Offene Fragen:**
-- Wie visuell darstellen? (Farbige Chips, Sections, Icons?)
-- Gruppieren oder nur als Label?
-
----
-
-### Sortierung nach Kategorie oder Zeit
-**Status:** Open
-**Prioritaet:** Mittel
-**Bereich:** BacklogView
-
-**Kurzbeschreibung:**
-Sortier-Optionen fuer Backlog: nach Kategorie/Liste oder nach Zeit/Faelligkeit.
-
-**Offene Fragen:**
-- UI: Dropdown, Segmented Control, oder Menu?
-- Persistieren der Sortierung?
 
 ---
 
@@ -98,24 +146,6 @@ Sortier-Optionen fuer Backlog: nach Kategorie/Liste oder nach Zeit/Faelligkeit.
 **Kurzbeschreibung:**
 Tap auf Task oeffnet Detail-Ansicht mit Notes, Faelligkeit, Prioritaet, Kategorie.
 
-**Offene Fragen:**
-- Modal Sheet oder Navigation Push?
-- Editierbar oder nur Anzeige?
-
----
-
-### Zuordnen-View: Backlog-Bereich vergroessern
-**Status:** Open
-**Prioritaet:** Mittel
-**Bereich:** TaskAssignmentView
-
-**Kurzbeschreibung:**
-Zweistufiger Flow: Erst Focus Block auswaehlen, dann Tasks prominent anzeigen.
-
-**Offene Fragen:**
-- Zweistufiger Flow oder Split-View?
-- Full-Screen Task-Auswahl nach Block-Selection?
-
 ---
 
 ### Reihenfolge im Focus Block veraenderbar
@@ -125,8 +155,6 @@ Zweistufiger Flow: Erst Focus Block auswaehlen, dann Tasks prominent anzeigen.
 
 **Kurzbeschreibung:**
 Tasks innerhalb eines Focus Blocks per Drag & Drop umsortierbar.
-
-**Recherche-Frage:** Was ist ein sinnvoller Default? (Eat the Frog, Quick Wins, Prioritaet, Faelligkeit)
 
 ---
 

@@ -4,6 +4,7 @@ import SwiftUI
 struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
     @AppStorage("selectedCalendarID") private var selectedCalendarID: String = ""
+    @AppStorage("soundEnabled") private var soundEnabled: Bool = true
     @State private var visibleCalendarIDs: Set<String> = []
     @State private var eventKitRepo = EventKitRepository()
     @State private var allCalendars: [EKCalendar] = []
@@ -12,6 +13,16 @@ struct SettingsView: View {
     var body: some View {
         NavigationStack {
             Form {
+                // Section 0: Sound Settings
+                Section {
+                    Toggle(isOn: $soundEnabled) {
+                        Text("Sound bei Block-Ende")
+                    }
+                    .accessibilityIdentifier("soundToggle")
+                } header: {
+                    Text("Benachrichtigungen")
+                }
+
                 // Section 1: Target Calendar
                 Section {
                     Picker("Focus Blocks speichern in", selection: $selectedCalendarID) {

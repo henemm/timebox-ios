@@ -14,6 +14,7 @@ struct SettingsToolbarModifier: ViewModifier {
                     } label: {
                         Image(systemName: "gear")
                     }
+                    .accessibilityIdentifier("settingsButton")
                 }
             }
             .sheet(isPresented: $showSettings) {

@@ -13,6 +13,8 @@ struct FocusLiveView: View {
 
     // Timer for progress updates
     @State private var currentTime = Date()
+    @State private var taskStartTime: Date?
+    @State private var lastTaskID: String?
     private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
     var body: some View {
@@ -148,18 +150,54 @@ struct FocusLiveView: View {
     // MARK: - Current Task View
 
     private func currentTaskView(task: PlanItem, block: FocusBlock) -> some View {
-        VStack(spacing: 24) {
+        let taskProgress = calculateTaskProgress(task: task)
+        let remainingTaskMinutes = calculateRemainingTaskMinutes(task: task)
+
+        return VStack(spacing: 24) {
             Text("Aktueller Task")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
+
+            // Task progress ring
+            ZStack {
+                // Background circle
+                Circle()
+                    .stroke(.secondary.opacity(0.2), lineWidth: 8)
+                    .frame(width: 120, height: 120)
+
+                // Progress circle
+                Circle()
+                    .trim(from: 0, to: min(taskProgress, 1))
+                    .stroke(
+                        taskProgress >= 1 ? .orange : .blue,
+                        style: StrokeStyle(lineWidth: 8, lineCap: .round)
+                    )
+                    .frame(width: 120, height: 120)
+                    .rotationEffect(.degrees(-90))
+                    .animation(.smooth, value: taskProgress)
+
+                // Time display in center
+                VStack(spacing: 2) {
+                    if remainingTaskMinutes > 0 {
+                        Text("\(remainingTaskMinutes)")
+                            .font(.title.monospacedDigit().weight(.bold))
+                        Text("min")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    } else {
+                        Text("🔥")
+                            .font(.title)
+                    }
+                }
+            }
 
             Text(task.title)
                 .font(.title2.weight(.semibold))
                 .multilineTextAlignment(.center)
                 .padding(.horizontal)
 
-            Text("\(task.effectiveDuration) min")
-                .font(.title3)
+            Text("\(task.effectiveDuration) min geschätzt")
+                .font(.caption)
                 .foregroundStyle(.secondary)
 
             Button {
@@ -175,6 +213,12 @@ struct FocusLiveView: View {
             .buttonStyle(.plain)
         }
         .padding()
+        .onAppear {
+            trackTaskStart(taskID: task.id)
+        }
+        .onChange(of: task.id) { _, newID in
+            trackTaskStart(taskID: newID)
+        }
     }
 
     // MARK: - All Tasks Completed View
@@ -336,10 +380,35 @@ struct FocusLiveView: View {
     private func checkBlockEnd() {
         guard let block = activeBlock else { return }
 
-        // If block just ended, show sprint review
+        // If block just ended, play sound and show sprint review
         if block.isPast && !showSprintReview {
+            SoundService.playEndGong()
             showSprintReview = true
         }
+    }
+
+    // MARK: - Task Progress Tracking
+
+    private func trackTaskStart(taskID: String) {
+        if lastTaskID != taskID {
+            lastTaskID = taskID
+            taskStartTime = Date()
+        }
+    }
+
+    private func calculateTaskProgress(task: PlanItem) -> Double {
+        guard let startTime = taskStartTime else { return 0 }
+        let elapsed = currentTime.timeIntervalSince(startTime)
+        let estimated = Double(task.effectiveDuration * 60)
+        return elapsed / estimated
+    }
+
+    private func calculateRemainingTaskMinutes(task: PlanItem) -> Int {
+        guard let startTime = taskStartTime else { return task.effectiveDuration }
+        let elapsed = currentTime.timeIntervalSince(startTime)
+        let estimated = Double(task.effectiveDuration * 60)
+        let remaining = estimated - elapsed
+        return max(0, Int(remaining / 60))
     }
 }
 
