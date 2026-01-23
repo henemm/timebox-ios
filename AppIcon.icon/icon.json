@@ -1,0 +1,16 @@
+{
+  "info": {
+    "author": "FocusBlox",
+    "version": 1
+  },
+  "layers": [
+    {
+      "filename": "background.png",
+      "name": "Background"
+    },
+    {
+      "filename": "foreground.png",
+      "name": "Foreground"
+    }
+  ]
+}
