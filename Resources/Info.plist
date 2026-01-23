@@ -37,6 +37,8 @@
     <string>FocusBlox benoetigt Zugriff auf deine Erinnerungen, um sie als Tasks anzuzeigen und zu planen.</string>
     <key>NSCalendarsUsageDescription</key>
     <string>FocusBlox benoetigt Zugriff auf deinen Kalender, um Tasks in freie Zeitslots einzuplanen.</string>
+    <key>NSSupportsLiveActivities</key>
+    <true/>
     <key>CFBundleURLTypes</key>
     <array>
         <dict>

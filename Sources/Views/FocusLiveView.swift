@@ -7,34 +7,48 @@ struct FocusLiveView: View {
     @State private var activeBlock: FocusBlock?
 
     /// Creates the appropriate repository based on launch mode
+    /// Use -MockData launch argument to test Live Activity with mock data
     private static func createRepository() -> any EventKitRepositoryProtocol {
         let isUITesting = ProcessInfo.processInfo.arguments.contains("-UITesting")
-        print("🔧 [FocusLiveView] createRepository: isUITesting=\(isUITesting)")
+        let isMockData = ProcessInfo.processInfo.arguments.contains("-MockData")
+        let useMock = isUITesting || isMockData
 
-        if isUITesting {
-            let mock = MockEventKitRepository()
-            mock.mockCalendarAuthStatus = .fullAccess
-            mock.mockReminderAuthStatus = .fullAccess
+        print("🔧 [FocusLiveView] createRepository: isUITesting=\(isUITesting), isMockData=\(isMockData)")
 
-            // Create an always-active Focus Block for testing
-            let calendar = Calendar.current
-            let now = Date()
-            let activeBlockStart = calendar.date(byAdding: .minute, value: -30, to: now)!
-            let activeBlockEnd = calendar.date(byAdding: .minute, value: 30, to: now)!
-            let activeBlock = FocusBlock(
-                id: "mock-block-active",
-                title: "Active Test Block",
-                startDate: activeBlockStart,
-                endDate: activeBlockEnd,
-                taskIDs: ["00000000-0000-0000-0000-000000000001"],
-                completedTaskIDs: []
-            )
-            mock.mockFocusBlocks = [activeBlock]
-            print("🔧 [FocusLiveView] Using mock repository with active block: \(activeBlock.title)")
-            return mock
+        if useMock {
+            return createMockRepository()
         }
         print("🔧 [FocusLiveView] Using real EventKitRepository")
         return EventKitRepository()
+    }
+
+    /// Creates a mock repository with an active Focus Block for testing Live Activity
+    private static func createMockRepository() -> MockEventKitRepository {
+        let mock = MockEventKitRepository()
+        mock.mockCalendarAuthStatus = .fullAccess
+        mock.mockReminderAuthStatus = .fullAccess
+
+        // Create an always-active Focus Block for testing Live Activity
+        let calendar = Calendar.current
+        let now = Date()
+        let activeBlockStart = calendar.date(byAdding: .minute, value: -5, to: now)!
+        let activeBlockEnd = calendar.date(byAdding: .minute, value: 25, to: now)!
+        let activeBlock = FocusBlock(
+            id: "mock-block-live-activity-test",
+            title: "🎯 Focus Block Test",
+            startDate: activeBlockStart,
+            endDate: activeBlockEnd,
+            taskIDs: [
+                "mock-task-1",
+                "mock-task-2",
+                "mock-task-3"
+            ],
+            completedTaskIDs: []
+        )
+        mock.mockFocusBlocks = [activeBlock]
+        print("🔧 [FocusLiveView] Using MOCK repository with active block: \(activeBlock.title)")
+        print("🔧 [FocusLiveView] Block: \(activeBlockStart.formatted(date: .omitted, time: .shortened)) - \(activeBlockEnd.formatted(date: .omitted, time: .shortened))")
+        return mock
     }
     @State private var allTasks: [PlanItem] = []
     @State private var isLoading = false
