@@ -85,6 +85,9 @@
 		SNDSVC01BUILDFILE0001 /* SoundServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = SNDSVC01FILEREF00001 /* SoundServiceTests.swift */; };
 		SNDSVC02BUILDFILE0001 /* SoundService.swift in Sources */ = {isa = PBXBuildFile; fileRef = SNDSVC02FILEREF00001 /* SoundService.swift */; };
 		APPSET01BUILDFILE0001 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = APPSET01FILEREF00001 /* AppSettings.swift */; };
+		WARNTIM01BUILDFILE001 /* WarningTiming.swift in Sources */ = {isa = PBXBuildFile; fileRef = WARNTIM01FILEREF0001 /* WarningTiming.swift */; };
+		WARN001BUILDFILE00001 /* WarningTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = WARN001FILEREF000001 /* WarningTests.swift */; };
+		WARNUI01BUILDFILE0001 /* WarningSettingsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = WARNUI01FILEREF00001 /* WarningSettingsUITests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -261,6 +264,9 @@
 		SNDSVC01FILEREF00001 /* SoundServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundServiceTests.swift; sourceTree = "<group>"; };
 		SNDSVC02FILEREF00001 /* SoundService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundService.swift; sourceTree = "<group>"; };
 		APPSET01FILEREF00001 /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
+		WARNTIM01FILEREF0001 /* WarningTiming.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WarningTiming.swift; sourceTree = "<group>"; };
+		WARN001FILEREF000001 /* WarningTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WarningTests.swift; sourceTree = "<group>"; };
+		WARNUI01FILEREF00001 /* WarningSettingsUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WarningSettingsUITests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -334,6 +340,7 @@
 				B9C8001C9F5CBCA0AC28B19A /* UXImprovementsUITests.swift */,
 				SCROLL001FILEREF00001 /* ScrollingUITests.swift */,
 				SNDUI001FILEREF00001 /* SoundSettingsUITests.swift */,
+				WARNUI01FILEREF00001 /* WarningSettingsUITests.swift */,
 			);
 			path = TimeBoxUITests;
 			sourceTree = "<group>";
@@ -389,6 +396,7 @@
 			isa = PBXGroup;
 			children = (
 				APPSET01FILEREF00001 /* AppSettings.swift */,
+				WARNTIM01FILEREF0001 /* WarningTiming.swift */,
 				F7B0BE54BB8E4DC5B9F85C28 /* CalendarEvent.swift */,
 				5D1F03B35977548B59D7269F /* CalendarEventTransfer.swift */,
 				A0B1EE7295AF0AD91CA0027A /* FocusBlock.swift */,
@@ -476,6 +484,7 @@
 				14E16E8941781A7134CBEE3A /* SyncEngineTests.swift */,
 				76296762878DC5D17EA4E12A /* TaskSourceTests.swift */,
 				SNDSVC01FILEREF00001 /* SoundServiceTests.swift */,
+				WARN001FILEREF000001 /* WarningTests.swift */,
 				8326129AA8A1069F1C4589BE /* Testing */,
 			);
 			path = TimeBoxTests;
@@ -744,6 +753,7 @@
 				E98A667A603886CE7A68D968 /* EventBlock.swift in Sources */,
 				C3F49C8B0CD3C6552054BE7D /* EventKitRepository.swift in Sources */,
 				APPSET01BUILDFILE0001 /* AppSettings.swift in Sources */,
+				WARNTIM01BUILDFILE001 /* WarningTiming.swift in Sources */,
 				B2607FE51C4B30E5069AA807 /* EventKitRepositoryEnvironment.swift in Sources */,
 				858746851FD293D53D7583E7 /* EventKitRepositoryProtocol.swift in Sources */,
 				B5253CB93F49550930B0AF7C /* FocusBlock.swift in Sources */,
@@ -794,6 +804,7 @@
 				4BE1E3D56F11189BF6AA8459 /* UXImprovementsUITests.swift in Sources */,
 				SCROLL001BUILDFILE0001 /* ScrollingUITests.swift in Sources */,
 				SNDUI001BUILDFILE0001 /* SoundSettingsUITests.swift in Sources */,
+				WARNUI01BUILDFILE0001 /* WarningSettingsUITests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -814,6 +825,7 @@
 				3F9639915C12205F6DE53C7D /* SyncEngineTests.swift in Sources */,
 				CC3848FFA2D898F1A3FDFC27 /* TaskSourceTests.swift in Sources */,
 				SNDSVC01BUILDFILE0001 /* SoundServiceTests.swift in Sources */,
+				WARN001BUILDFILE00001 /* WarningTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

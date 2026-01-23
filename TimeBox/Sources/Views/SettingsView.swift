@@ -5,6 +5,8 @@ struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
     @AppStorage("selectedCalendarID") private var selectedCalendarID: String = ""
     @AppStorage("soundEnabled") private var soundEnabled: Bool = true
+    @AppStorage("warningEnabled") private var warningEnabled: Bool = true
+    @AppStorage("warningTiming") private var warningTimingRaw: Int = WarningTiming.standard.rawValue
     @State private var visibleCalendarIDs: Set<String> = []
     @State private var eventKitRepo = EventKitRepository()
     @State private var allCalendars: [EKCalendar] = []
@@ -21,6 +23,27 @@ struct SettingsView: View {
                     .accessibilityIdentifier("soundToggle")
                 } header: {
                     Text("Benachrichtigungen")
+                }
+
+                // Section 0.5: Warning Settings
+                Section {
+                    Toggle(isOn: $warningEnabled) {
+                        Text("Vorwarnung")
+                    }
+                    .accessibilityIdentifier("warningToggle")
+
+                    if warningEnabled {
+                        Picker("Zeitpunkt", selection: $warningTimingRaw) {
+                            ForEach(WarningTiming.allCases, id: \.rawValue) { timing in
+                                Text(timing.label).tag(timing.rawValue)
+                            }
+                        }
+                        .accessibilityIdentifier("warningTimingPicker")
+                    }
+                } header: {
+                    Text("Vorwarnung")
+                } footer: {
+                    Text("Sound und Vibration vor Block-Ende.")
                 }
 
                 // Section 1: Target Calendar

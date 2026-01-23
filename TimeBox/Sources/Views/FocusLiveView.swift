@@ -15,6 +15,7 @@ struct FocusLiveView: View {
     @State private var currentTime = Date()
     @State private var taskStartTime: Date?
     @State private var lastTaskID: String?
+    @State private var warningPlayed = false
     private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
     var body: some View {
@@ -380,10 +381,20 @@ struct FocusLiveView: View {
     private func checkBlockEnd() {
         guard let block = activeBlock else { return }
 
+        let progress = calculateProgress(block: block)
+        let warningThreshold = AppSettings.shared.warningTiming.percentComplete
+
+        // Check for warning (only once per block, when threshold reached)
+        if progress >= warningThreshold && !warningPlayed && !block.isPast {
+            SoundService.playWarning()
+            warningPlayed = true
+        }
+
         // If block just ended, play sound and show sprint review
         if block.isPast && !showSprintReview {
             SoundService.playEndGong()
             showSprintReview = true
+            warningPlayed = false  // Reset for next block
         }
     }
 
