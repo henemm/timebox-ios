@@ -88,6 +88,8 @@
 		WARNTIM01BUILDFILE001 /* WarningTiming.swift in Sources */ = {isa = PBXBuildFile; fileRef = WARNTIM01FILEREF0001 /* WarningTiming.swift */; };
 		WARN001BUILDFILE00001 /* WarningTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = WARN001FILEREF000001 /* WarningTests.swift */; };
 		WARNUI01BUILDFILE0001 /* WarningSettingsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = WARNUI01FILEREF00001 /* WarningSettingsUITests.swift */; };
+		CATEG001BUILDFILE0001 /* CategoriesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CATEG001FILEREF00001 /* CategoriesTests.swift */; };
+		CATUI001BUILDFILE0001 /* CategoriesUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CATUI001FILEREF00001 /* CategoriesUITests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -266,6 +268,8 @@
 		APPSET01FILEREF00001 /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
 		WARNTIM01FILEREF0001 /* WarningTiming.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WarningTiming.swift; sourceTree = "<group>"; };
 		WARN001FILEREF000001 /* WarningTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WarningTests.swift; sourceTree = "<group>"; };
+		CATEG001FILEREF00001 /* CategoriesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoriesTests.swift; sourceTree = "<group>"; };
+		CATUI001FILEREF00001 /* CategoriesUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoriesUITests.swift; sourceTree = "<group>"; };
 		WARNUI01FILEREF00001 /* WarningSettingsUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WarningSettingsUITests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -341,6 +345,7 @@
 				SCROLL001FILEREF00001 /* ScrollingUITests.swift */,
 				SNDUI001FILEREF00001 /* SoundSettingsUITests.swift */,
 				WARNUI01FILEREF00001 /* WarningSettingsUITests.swift */,
+				CATUI001FILEREF00001 /* CategoriesUITests.swift */,
 			);
 			path = TimeBoxUITests;
 			sourceTree = "<group>";
@@ -485,6 +490,7 @@
 				76296762878DC5D17EA4E12A /* TaskSourceTests.swift */,
 				SNDSVC01FILEREF00001 /* SoundServiceTests.swift */,
 				WARN001FILEREF000001 /* WarningTests.swift */,
+				CATEG001FILEREF00001 /* CategoriesTests.swift */,
 				8326129AA8A1069F1C4589BE /* Testing */,
 			);
 			path = TimeBoxTests;
@@ -805,6 +811,7 @@
 				SCROLL001BUILDFILE0001 /* ScrollingUITests.swift in Sources */,
 				SNDUI001BUILDFILE0001 /* SoundSettingsUITests.swift in Sources */,
 				WARNUI01BUILDFILE0001 /* WarningSettingsUITests.swift in Sources */,
+				CATUI001BUILDFILE0001 /* CategoriesUITests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -826,6 +833,7 @@
 				CC3848FFA2D898F1A3FDFC27 /* TaskSourceTests.swift in Sources */,
 				SNDSVC01BUILDFILE0001 /* SoundServiceTests.swift in Sources */,
 				WARN001BUILDFILE00001 /* WarningTests.swift in Sources */,
+				CATEG001BUILDFILE0001 /* CategoriesTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

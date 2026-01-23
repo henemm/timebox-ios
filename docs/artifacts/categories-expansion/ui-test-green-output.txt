@@ -1,0 +1,557 @@
+Command line invocation:
+    /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild test -project TimeBox.xcodeproj -scheme TimeBox -destination id=D9E26087-132A-44CB-9883-59073DD9CC54 "-only-testing:TimeBoxUITests/CategoriesUITests"
+
+2026-01-23 10:36:32.090 xcodebuild[55497:28945298] [MT] IDERunDestination: Supported platforms for the buildables in the current scheme is empty.
+ComputePackagePrebuildTargetDependencyGraph
+
+Prepare packages
+
+CreateBuildRequest
+
+SendProjectDescription
+
+CreateBuildOperation
+
+ComputeTargetDependencyGraph
+note: Building targets in dependency order
+note: Target dependency graph (6 targets)
+    Target 'TimeBoxTests' in project 'TimeBox'
+        ➜ Explicit dependency on target 'TimeBox' in project 'TimeBox'
+    Target 'TimeBoxCoreTests' in project 'TimeBox'
+        ➜ Explicit dependency on target 'TimeBoxCore' in project 'TimeBox'
+        ➜ Explicit dependency on target 'TimeBox' in project 'TimeBox'
+    Target 'TimeBoxUITests' in project 'TimeBox'
+        ➜ Explicit dependency on target 'TimeBox' in project 'TimeBox'
+    Target 'TimeBox' in project 'TimeBox'
+        ➜ Explicit dependency on target 'TimeBoxWidgetsExtension' in project 'TimeBox'
+        ➜ Explicit dependency on target 'TimeBoxCore' in project 'TimeBox'
+    Target 'TimeBoxWidgetsExtension' in project 'TimeBox'
+        ➜ Explicit dependency on target 'TimeBoxCore' in project 'TimeBox'
+    Target 'TimeBoxCore' in project 'TimeBox' (no dependencies)
+
+GatherProvisioningInputs
+
+CreateBuildDescription
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -v -E -dM -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk -x c -c /dev/null
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/usr/bin/actool --version --output-format xml1
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -v -E -dM -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk -x c -c /dev/null
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc --version
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld -version_details
+
+ReadFileContents /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/share/docc/features.json
+
+Build description signature: c86165beb1465943357b6e546faf3469
+Build description path: /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/XCBuildData/c86165beb1465943357b6e546faf3469.xcbuilddata
+ClangStatCache /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk /Users/hem/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator26.2-23C53-7d00a8b37fbd7999ea79df8ebc024bf0.sdkstatcache
+    cd /Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBox.xcodeproj
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk -o /Users/hem/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator26.2-23C53-7d00a8b37fbd7999ea79df8ebc024bf0.sdkstatcache
+
+ProcessInfoPlistFile /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBoxCore.framework/Info.plist /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxCore.build/empty-TimeBoxCore.plist (in target 'TimeBoxCore' from project 'TimeBox')
+    cd /Users/hem/Documents/opt/my-daily-sprints/TimeBox
+    builtin-infoPlistUtility /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxCore.build/empty-TimeBoxCore.plist -producttype com.apple.product-type.framework -expandbuildsettings -format binary -platform iphonesimulator -o /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBoxCore.framework/Info.plist
+
+SwiftDriver TimeBoxUITests normal arm64 com.apple.xcode.tools.swift.compiler (in target 'TimeBoxUITests' from project 'TimeBox')
+    cd /Users/hem/Documents/opt/my-daily-sprints/TimeBox
+    builtin-SwiftDriver -- /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name TimeBoxUITests -Onone -enforce-exclusivity\=checked @/Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxUITests.build/Objects-normal/arm64/TimeBoxUITests.SwiftFileList -DDEBUG -module-alias Testing\=_Testing_Unavailable -plugin-path /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk -target arm64-apple-ios17.0-simulator -g -module-cache-path /Users/hem/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -Xfrontend -serialize-debugging-options -profile-coverage-mapping -profile-generate -enable-testing -index-store-path /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Index.noindex/DataStore -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -swift-version 6 -I /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator -Isystem /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib -F /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator -F /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks -F /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk/Developer/Library/Frameworks -c -j10 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /Users/hem/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator26.2-23C53-7d00a8b37fbd7999ea79df8ebc024bf0.sdkstatcache -output-file-map /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxUITests.build/Objects-normal/arm64/TimeBoxUITests-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -explicit-module-build -module-cache-path /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -clang-scanner-module-cache-path /Users/hem/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -sdk-module-cache-path /Users/hem/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxUITests.build/Objects-normal/arm64/TimeBoxUITests.swiftmodule -validate-clang-modules-once -clang-build-session-file /Users/hem/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxUITests.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxUITests.build/Objects-normal/arm64/TimeBoxUITests_const_extract_protocols.json -Xcc -iquote -Xcc /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxUITests.build/TimeBoxUITests-generated-files.hmap -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxUITests.build/TimeBoxUITests-own-target-headers.hmap -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxUITests.build/TimeBoxUITests-all-target-headers.hmap -Xcc -iquote -Xcc /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxUITests.build/TimeBoxUITests-project-headers.hmap -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/include -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxUITests.build/DerivedSources-normal/arm64 -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxUITests.build/DerivedSources/arm64 -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxUITests.build/DerivedSources -Xcc -DDEBUG\=1 -emit-objc-header -emit-objc-header-path /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxUITests.build/Objects-normal/arm64/TimeBoxUITests-Swift.h -working-directory /Users/hem/Documents/opt/my-daily-sprints/TimeBox -experimental-emit-module-separately -disable-cmo
+
+ProcessInfoPlistFile /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBoxWidgetsExtension.appex/Info.plist /Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxWidgets/Info.plist (in target 'TimeBoxWidgetsExtension' from project 'TimeBox')
+    cd /Users/hem/Documents/opt/my-daily-sprints/TimeBox
+    builtin-infoPlistUtility /Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxWidgets/Info.plist -producttype com.apple.product-type.app-extension -expandbuildsettings -format binary -platform iphonesimulator -additionalcontentfile /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxWidgetsExtension.build/assetcatalog_generated_info.plist -o /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBoxWidgetsExtension.appex/Info.plist
+
+ProcessInfoPlistFile /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBox.app/Info.plist /Users/hem/Documents/opt/my-daily-sprints/TimeBox/Resources/Info.plist (in target 'TimeBox' from project 'TimeBox')
+    cd /Users/hem/Documents/opt/my-daily-sprints/TimeBox
+    builtin-infoPlistUtility /Users/hem/Documents/opt/my-daily-sprints/TimeBox/Resources/Info.plist -producttype com.apple.product-type.application -genpkginfo /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBox.app/PkgInfo -expandbuildsettings -format binary -platform iphonesimulator -scanforprivacyfile /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBox.app/Frameworks/TimeBoxCore.framework -scanforprivacyfile /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBox.app/PlugIns/TimeBoxWidgetsExtension.appex -o /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBox.app/Info.plist
+
+ProcessInfoPlistFile /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBox.app/PlugIns/TimeBoxCoreTests.xctest/Info.plist /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxCoreTests.build/empty-TimeBoxCoreTests.plist (in target 'TimeBoxCoreTests' from project 'TimeBox')
+    cd /Users/hem/Documents/opt/my-daily-sprints/TimeBox
+    builtin-infoPlistUtility /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxCoreTests.build/empty-TimeBoxCoreTests.plist -producttype com.apple.product-type.bundle.unit-test -expandbuildsettings -format binary -platform iphonesimulator -o /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBox.app/PlugIns/TimeBoxCoreTests.xctest/Info.plist
+
+ProcessInfoPlistFile /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBox.app/PlugIns/TimeBoxTests.xctest/Info.plist /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxTests.build/empty-TimeBoxTests.plist (in target 'TimeBoxTests' from project 'TimeBox')
+    cd /Users/hem/Documents/opt/my-daily-sprints/TimeBox
+    builtin-infoPlistUtility /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxTests.build/empty-TimeBoxTests.plist -producttype com.apple.product-type.bundle.unit-test -expandbuildsettings -format binary -platform iphonesimulator -o /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBox.app/PlugIns/TimeBoxTests.xctest/Info.plist
+
+CopySwiftLibs /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBox.app/PlugIns/TimeBoxCoreTests.xctest (in target 'TimeBoxCoreTests' from project 'TimeBox')
+    cd /Users/hem/Documents/opt/my-daily-sprints/TimeBox
+    builtin-swiftStdLibTool --copy --verbose --sign - --scan-executable /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBox.app/PlugIns/TimeBoxCoreTests.xctest/TimeBoxCoreTests --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBox.app/PlugIns/TimeBoxCoreTests.xctest/Frameworks --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBox.app/PlugIns/TimeBoxCoreTests.xctest/PlugIns --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBox.app/PlugIns/TimeBoxCoreTests.xctest/SystemExtensions --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBox.app/PlugIns/TimeBoxCoreTests.xctest/Extensions --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBoxCore.framework --platform iphonesimulator --toolchain /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain --destination /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBox.app/PlugIns/TimeBoxCoreTests.xctest/Frameworks --strip-bitcode --scan-executable /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib/libXCTestSwiftSupport.dylib --strip-bitcode-tool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/bitcode_strip --emit-dependency-info /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxCoreTests.build/SwiftStdLibToolInputDependencies.dep --filter-for-swift-os
+
+CopySwiftLibs /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBox.app/PlugIns/TimeBoxTests.xctest (in target 'TimeBoxTests' from project 'TimeBox')
+    cd /Users/hem/Documents/opt/my-daily-sprints/TimeBox
+    builtin-swiftStdLibTool --copy --verbose --sign - --scan-executable /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBox.app/PlugIns/TimeBoxTests.xctest/TimeBoxTests --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBox.app/PlugIns/TimeBoxTests.xctest/Frameworks --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBox.app/PlugIns/TimeBoxTests.xctest/PlugIns --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBox.app/PlugIns/TimeBoxTests.xctest/SystemExtensions --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBox.app/PlugIns/TimeBoxTests.xctest/Extensions --platform iphonesimulator --toolchain /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain --destination /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBox.app/PlugIns/TimeBoxTests.xctest/Frameworks --strip-bitcode --scan-executable /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib/libXCTestSwiftSupport.dylib --strip-bitcode-tool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/bitcode_strip --emit-dependency-info /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxTests.build/SwiftStdLibToolInputDependencies.dep --filter-for-swift-os
+
+ProcessInfoPlistFile /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBoxUITests-Runner.app/PlugIns/TimeBoxUITests.xctest/Info.plist /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxUITests.build/empty-TimeBoxUITests.plist (in target 'TimeBoxUITests' from project 'TimeBox')
+    cd /Users/hem/Documents/opt/my-daily-sprints/TimeBox
+    builtin-infoPlistUtility /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxUITests.build/empty-TimeBoxUITests.plist -producttype com.apple.product-type.bundle.ui-testing -expandbuildsettings -format binary -platform iphonesimulator -additionalcontentfile /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxUITests.build/ProductTypeInfoPlistAdditions.plist -o /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBoxUITests-Runner.app/PlugIns/TimeBoxUITests.xctest/Info.plist
+
+SwiftCompile normal arm64 Compiling\ CategoriesUITests.swift /Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxUITests/CategoriesUITests.swift (in target 'TimeBoxUITests' from project 'TimeBox')
+
+SwiftCompile normal arm64 /Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxUITests/CategoriesUITests.swift (in target 'TimeBoxUITests' from project 'TimeBox')
+    cd /Users/hem/Documents/opt/my-daily-sprints/TimeBox
+    
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxUITests/CategoriesUITests.swift:10:15: warning: call to main actor-isolated initializer 'init()' in a synchronous nonisolated context
+        app = XCUIApplication()
+              ^
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCUIAutomation.framework/Headers/XCUIApplication.h:29:1: note: calls to initializer 'init()' from outside of its actor context are implicitly asynchronous
+- (instancetype)init NS_DESIGNATED_INITIALIZER;
+^
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxUITests/CategoriesUITests.swift:11:13: warning: main actor-isolated property 'launchArguments' can not be mutated from a nonisolated context
+        app.launchArguments = ["-UITesting"]
+            ^
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCUIAutomation.framework/Headers/XCUIApplication.h:93:51: note: mutation of this property is only permitted within the actor
+@property (nonatomic, copy) NSArray <NSString *> *launchArguments;
+                                                  ^
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxUITests/CategoriesUITests.swift:12:13: warning: call to main actor-isolated instance method 'launch()' in a synchronous nonisolated context
+        app.launch()
+            ^
+XCUIAutomation.XCUIApplication.launch:2:22: note: calls to instance method 'launch()' from outside of its actor context are implicitly asynchronous
+@MainActor open func launch()}
+                     ^
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxUITests/CategoriesUITests.swift:23:45: warning: main actor-isolated subscript 'subscript(_:)' can not be referenced from a nonisolated context
+        let backlogTab = app.tabBars.buttons["Backlog"]
+                                            ^
+XCUIAutomation.XCUIElementQuery.subscript:2:17: note: subscript declared here
+@MainActor open subscript(key: String) -> XCUIElement { get }}
+                ^
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxUITests/CategoriesUITests.swift:21:18: note: add '@MainActor' to make instance method 'openCreateTaskView()' part of global actor 'MainActor'
+    private func openCreateTaskView() {
+                 ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxUITests/CategoriesUITests.swift:23:38: warning: main actor-isolated property 'buttons' can not be referenced from a nonisolated context
+        let backlogTab = app.tabBars.buttons["Backlog"]
+                                     ^
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCUIAutomation.framework/Headers/XCUIElementTypeQueryProvider.h:22:46: note: property declared here
+@property (readonly, copy) XCUIElementQuery *buttons;
+                                             ^
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxUITests/CategoriesUITests.swift:21:18: note: add '@MainActor' to make instance method 'openCreateTaskView()' part of global actor 'MainActor'
+    private func openCreateTaskView() {
+                 ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxUITests/CategoriesUITests.swift:23:30: warning: main actor-isolated property 'tabBars' can not be referenced from a nonisolated context
+        let backlogTab = app.tabBars.buttons["Backlog"]
+                             ^
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCUIAutomation.framework/Headers/XCUIElementTypeQueryProvider.h:35:46: note: property declared here
+@property (readonly, copy) XCUIElementQuery *tabBars;
+                                             ^
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxUITests/CategoriesUITests.swift:21:18: note: add '@MainActor' to make instance method 'openCreateTaskView()' part of global actor 'MainActor'
+    private func openCreateTaskView() {
+                 ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxUITests/CategoriesUITests.swift:24:23: warning: call to main actor-isolated instance method 'waitForExistence(timeout:)' in a synchronous nonisolated context
+        if backlogTab.waitForExistence(timeout: 5) {
+                      ^
+XCUIAutomation.XCUIElement.waitForExistence:2:22: note: calls to instance method 'waitForExistence(timeout:)' from outside of its actor context are implicitly asynchronous
+@MainActor open func waitForExistence(timeout: TimeInterval) -> Bool}
+                     ^
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxUITests/CategoriesUITests.swift:21:18: note: add '@MainActor' to make instance method 'openCreateTaskView()' part of global actor 'MainActor'
+    private func openCreateTaskView() {
+                 ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxUITests/CategoriesUITests.swift:25:24: warning: call to main actor-isolated instance method 'tap()' in a synchronous nonisolated context
+            backlogTab.tap()
+                       ^
+XCUIAutomation.XCUIElement.tap:2:22: note: calls to instance method 'tap()' from outside of its actor context are implicitly asynchronous
+@MainActor open func tap()}
+                     ^
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxUITests/CategoriesUITests.swift:21:18: note: add '@MainActor' to make instance method 'openCreateTaskView()' part of global actor 'MainActor'
+    private func openCreateTaskView() {
+                 ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxUITests/CategoriesUITests.swift:28:36: warning: main actor-isolated subscript 'subscript(_:)' can not be referenced from a nonisolated context
+        let addButton = app.buttons["addTaskButton"]
+                                   ^
+XCUIAutomation.XCUIElementQuery.subscript:2:17: note: subscript declared here
+@MainActor open subscript(key: String) -> XCUIElement { get }}
+                ^
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxUITests/CategoriesUITests.swift:21:18: note: add '@MainActor' to make instance method 'openCreateTaskView()' part of global actor 'MainActor'
+    private func openCreateTaskView() {
+                 ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxUITests/CategoriesUITests.swift:28:29: warning: main actor-isolated property 'buttons' can not be referenced from a nonisolated context
+        let addButton = app.buttons["addTaskButton"]
+                            ^
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCUIAutomation.framework/Headers/XCUIElementTypeQueryProvider.h:22:46: note: property declared here
+@property (readonly, copy) XCUIElementQuery *buttons;
+                                             ^
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxUITests/CategoriesUITests.swift:21:18: note: add '@MainActor' to make instance method 'openCreateTaskView()' part of global actor 'MainActor'
+    private func openCreateTaskView() {
+                 ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxUITests/CategoriesUITests.swift:29:22: warning: call to main actor-isolated instance method 'waitForExistence(timeout:)' in a synchronous nonisolated context
+        if addButton.waitForExistence(timeout: 3) {
+                     ^
+XCUIAutomation.XCUIElement.waitForExistence:2:22: note: calls to instance method 'waitForExistence(timeout:)' from outside of its actor context are implicitly asynchronous
+@MainActor open func waitForExistence(timeout: TimeInterval) -> Bool}
+                     ^
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxUITests/CategoriesUITests.swift:21:18: note: add '@MainActor' to make instance method 'openCreateTaskView()' part of global actor 'MainActor'
+    private func openCreateTaskView() {
+                 ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxUITests/CategoriesUITests.swift:30:23: warning: call to main actor-isolated instance method 'tap()' in a synchronous nonisolated context
+            addButton.tap()
+                      ^
+XCUIAutomation.XCUIElement.tap:2:22: note: calls to instance method 'tap()' from outside of its actor context are implicitly asynchronous
+@MainActor open func tap()}
+                     ^
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxUITests/CategoriesUITests.swift:21:18: note: add '@MainActor' to make instance method 'openCreateTaskView()' part of global actor 'MainActor'
+    private func openCreateTaskView() {
+                 ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxUITests/CategoriesUITests.swift:43:40: warning: main actor-isolated subscript 'subscript(_:)' can not be referenced from a nonisolated context
+        let navBar = app.navigationBars["Neuer Task"]
+                                       ^
+XCUIAutomation.XCUIElementQuery.subscript:2:17: note: subscript declared here
+@MainActor open subscript(key: String) -> XCUIElement { get }}
+                ^
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxUITests/CategoriesUITests.swift:39:10: note: add '@MainActor' to make instance method 'testTaskTypePickerExists()' part of global actor 'MainActor'
+    func testTaskTypePickerExists() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxUITests/CategoriesUITests.swift:43:26: warning: main actor-isolated property 'navigationBars' can not be referenced from a nonisolated context
+        let navBar = app.navigationBars["Neuer Task"]
+                         ^
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCUIAutomation.framework/Headers/XCUIElementTypeQueryProvider.h:34:46: note: property declared here
+@property (readonly, copy) XCUIElementQuery *navigationBars;
+                                             ^
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxUITests/CategoriesUITests.swift:39:10: note: add '@MainActor' to make instance method 'testTaskTypePickerExists()' part of global actor 'MainActor'
+    func testTaskTypePickerExists() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxUITests/CategoriesUITests.swift:44:30: warning: call to main actor-isolated instance method 'waitForExistence(timeout:)' in a synchronous nonisolated context
+        XCTAssertTrue(navBar.waitForExistence(timeout: 5), "Create Task view should open")
+                             ^
+XCUIAutomation.XCUIElement.waitForExistence:2:22: note: calls to instance method 'waitForExistence(timeout:)' from outside of its actor context are implicitly asynchronous
+@MainActor open func waitForExistence(timeout: TimeInterval) -> Bool}
+                     ^
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxUITests/CategoriesUITests.swift:47:40: warning: main actor-isolated subscript 'subscript(_:)' can not be referenced from a nonisolated context
+        let typHeader = app.staticTexts["Typ"]
+                                       ^
+XCUIAutomation.XCUIElementQuery.subscript:2:17: note: subscript declared here
+@MainActor open subscript(key: String) -> XCUIElement { get }}
+                ^
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxUITests/CategoriesUITests.swift:39:10: note: add '@MainActor' to make instance method 'testTaskTypePickerExists()' part of global actor 'MainActor'
+    func testTaskTypePickerExists() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxUITests/CategoriesUITests.swift:47:29: warning: main actor-isolated property 'staticTexts' can not be referenced from a nonisolated context
+        let typHeader = app.staticTexts["Typ"]
+                            ^
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCUIAutomation.framework/Headers/XCUIElementTypeQueryProvider.h:62:46: note: property declared here
+@property (readonly, copy) XCUIElementQuery *staticTexts;
+                                             ^
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxUITests/CategoriesUITests.swift:39:10: note: add '@MainActor' to make instance method 'testTaskTypePickerExists()' part of global actor 'MainActor'
+    func testTaskTypePickerExists() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxUITests/CategoriesUITests.swift:48:33: warning: call to main actor-isolated instance method 'waitForExistence(timeout:)' in a synchronous nonisolated context
+        XCTAssertTrue(typHeader.waitForExistence(timeout: 3), "Typ section header should exist")
+                                ^
+XCUIAutomation.XCUIElement.waitForExistence:2:22: note: calls to instance method 'waitForExistence(timeout:)' from outside of its actor context are implicitly asynchronous
+@MainActor open func waitForExistence(timeout: TimeInterval) -> Bool}
+                     ^
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxUITests/CategoriesUITests.swift:51:44: warning: main actor-isolated subscript 'subscript(_:)' can not be referenced from a nonisolated context
+        let aufgabentypPicker = app.buttons["Aufgabentyp"]
+                                           ^
+XCUIAutomation.XCUIElementQuery.subscript:2:17: note: subscript declared here
+@MainActor open subscript(key: String) -> XCUIElement { get }}
+                ^
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxUITests/CategoriesUITests.swift:39:10: note: add '@MainActor' to make instance method 'testTaskTypePickerExists()' part of global actor 'MainActor'
+    func testTaskTypePickerExists() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxUITests/CategoriesUITests.swift:51:37: warning: main actor-isolated property 'buttons' can not be referenced from a nonisolated context
+        let aufgabentypPicker = app.buttons["Aufgabentyp"]
+                                    ^
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCUIAutomation.framework/Headers/XCUIElementTypeQueryProvider.h:22:46: note: property declared here
+@property (readonly, copy) XCUIElementQuery *buttons;
+                                             ^
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxUITests/CategoriesUITests.swift:39:10: note: add '@MainActor' to make instance method 'testTaskTypePickerExists()' part of global actor 'MainActor'
+    func testTaskTypePickerExists() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxUITests/CategoriesUITests.swift:52:41: warning: call to main actor-isolated instance method 'waitForExistence(timeout:)' in a synchronous nonisolated context
+        XCTAssertTrue(aufgabentypPicker.waitForExistence(timeout: 3), "Aufgabentyp picker should exist")
+                                        ^
+XCUIAutomation.XCUIElement.waitForExistence:2:22: note: calls to instance method 'waitForExistence(timeout:)' from outside of its actor context are implicitly asynchronous
+@MainActor open func waitForExistence(timeout: TimeInterval) -> Bool}
+                     ^
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxUITests/CategoriesUITests.swift:62:40: warning: main actor-isolated subscript 'subscript(_:)' can not be referenced from a nonisolated context
+        let navBar = app.navigationBars["Neuer Task"]
+                                       ^
+XCUIAutomation.XCUIElementQuery.subscript:2:17: note: subscript declared here
+@MainActor open subscript(key: String) -> XCUIElement { get }}
+                ^
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxUITests/CategoriesUITests.swift:58:10: note: add '@MainActor' to make instance method 'testTaskCanBeCreatedWithDefaultCategory()' part of global actor 'MainActor'
+    func testTaskCanBeCreatedWithDefaultCategory() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxUITests/CategoriesUITests.swift:62:26: warning: main actor-isolated property 'navigationBars' can not be referenced from a nonisolated context
+        let navBar = app.navigationBars["Neuer Task"]
+                         ^
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCUIAutomation.framework/Headers/XCUIElementTypeQueryProvider.h:34:46: note: property declared here
+@property (readonly, copy) XCUIElementQuery *navigationBars;
+                                             ^
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxUITests/CategoriesUITests.swift:58:10: note: add '@MainActor' to make instance method 'testTaskCanBeCreatedWithDefaultCategory()' part of global actor 'MainActor'
+    func testTaskCanBeCreatedWithDefaultCategory() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxUITests/CategoriesUITests.swift:63:30: warning: call to main actor-isolated instance method 'waitForExistence(timeout:)' in a synchronous nonisolated context
+        XCTAssertTrue(navBar.waitForExistence(timeout: 5), "Create Task view should open")
+                             ^
+XCUIAutomation.XCUIElement.waitForExistence:2:22: note: calls to instance method 'waitForExistence(timeout:)' from outside of its actor context are implicitly asynchronous
+@MainActor open func waitForExistence(timeout: TimeInterval) -> Bool}
+                     ^
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxUITests/CategoriesUITests.swift:66:40: warning: main actor-isolated subscript 'subscript(_:)' can not be referenced from a nonisolated context
+        let titleField = app.textFields["Task-Titel"]
+                                       ^
+XCUIAutomation.XCUIElementQuery.subscript:2:17: note: subscript declared here
+@MainActor open subscript(key: String) -> XCUIElement { get }}
+                ^
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxUITests/CategoriesUITests.swift:58:10: note: add '@MainActor' to make instance method 'testTaskCanBeCreatedWithDefaultCategory()' part of global actor 'MainActor'
+    func testTaskCanBeCreatedWithDefaultCategory() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxUITests/CategoriesUITests.swift:66:30: warning: main actor-isolated property 'textFields' can not be referenced from a nonisolated context
+        let titleField = app.textFields["Task-Titel"]
+                             ^
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCUIAutomation.framework/Headers/XCUIElementTypeQueryProvider.h:63:46: note: property declared here
+@property (readonly, copy) XCUIElementQuery *textFields;
+                                             ^
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxUITests/CategoriesUITests.swift:58:10: note: add '@MainActor' to make instance method 'testTaskCanBeCreatedWithDefaultCategory()' part of global actor 'MainActor'
+    func testTaskCanBeCreatedWithDefaultCategory() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxUITests/CategoriesUITests.swift:67:34: warning: call to main actor-isolated instance method 'waitForExistence(timeout:)' in a synchronous nonisolated context
+        XCTAssertTrue(titleField.waitForExistence(timeout: 3), "Title field should exist")
+                                 ^
+XCUIAutomation.XCUIElement.waitForExistence:2:22: note: calls to instance method 'waitForExistence(timeout:)' from outside of its actor context are implicitly asynchronous
+@MainActor open func waitForExistence(timeout: TimeInterval) -> Bool}
+                     ^
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxUITests/CategoriesUITests.swift:68:20: warning: call to main actor-isolated instance method 'tap()' in a synchronous nonisolated context
+        titleField.tap()
+                   ^
+XCUIAutomation.XCUIElement.tap:2:22: note: calls to instance method 'tap()' from outside of its actor context are implicitly asynchronous
+@MainActor open func tap()}
+                     ^
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxUITests/CategoriesUITests.swift:58:10: note: add '@MainActor' to make instance method 'testTaskCanBeCreatedWithDefaultCategory()' part of global actor 'MainActor'
+    func testTaskCanBeCreatedWithDefaultCategory() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxUITests/CategoriesUITests.swift:69:20: warning: call to main actor-isolated instance method 'typeText' in a synchronous nonisolated context
+        titleField.typeText("Test Task")
+                   ^
+XCUIAutomation.XCUIElement.typeText:2:22: note: calls to instance method 'typeText' from outside of its actor context are implicitly asynchronous
+@MainActor open func typeText(_ text: String)}
+                     ^
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxUITests/CategoriesUITests.swift:58:10: note: add '@MainActor' to make instance method 'testTaskCanBeCreatedWithDefaultCategory()' part of global actor 'MainActor'
+    func testTaskCanBeCreatedWithDefaultCategory() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxUITests/CategoriesUITests.swift:72:37: warning: main actor-isolated subscript 'subscript(_:)' can not be referenced from a nonisolated context
+        let saveButton = app.buttons["Speichern"]
+                                    ^
+XCUIAutomation.XCUIElementQuery.subscript:2:17: note: subscript declared here
+@MainActor open subscript(key: String) -> XCUIElement { get }}
+                ^
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxUITests/CategoriesUITests.swift:58:10: note: add '@MainActor' to make instance method 'testTaskCanBeCreatedWithDefaultCategory()' part of global actor 'MainActor'
+    func testTaskCanBeCreatedWithDefaultCategory() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxUITests/CategoriesUITests.swift:72:30: warning: main actor-isolated property 'buttons' can not be referenced from a nonisolated context
+        let saveButton = app.buttons["Speichern"]
+                             ^
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCUIAutomation.framework/Headers/XCUIElementTypeQueryProvider.h:22:46: note: property declared here
+@property (readonly, copy) XCUIElementQuery *buttons;
+                                             ^
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxUITests/CategoriesUITests.swift:58:10: note: add '@MainActor' to make instance method 'testTaskCanBeCreatedWithDefaultCategory()' part of global actor 'MainActor'
+    func testTaskCanBeCreatedWithDefaultCategory() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxUITests/CategoriesUITests.swift:73:34: warning: call to main actor-isolated instance method 'waitForExistence(timeout:)' in a synchronous nonisolated context
+        XCTAssertTrue(saveButton.waitForExistence(timeout: 3), "Save button should exist")
+                                 ^
+XCUIAutomation.XCUIElement.waitForExistence:2:22: note: calls to instance method 'waitForExistence(timeout:)' from outside of its actor context are implicitly asynchronous
+@MainActor open func waitForExistence(timeout: TimeInterval) -> Bool}
+                     ^
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxUITests/CategoriesUITests.swift:74:34: warning: main actor-isolated property 'isEnabled' can not be referenced from a nonisolated autoclosure
+        XCTAssertTrue(saveButton.isEnabled, "Save button should be enabled after entering title")
+                                 ^
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCUIAutomation.framework/Headers/XCUIElementAttributes.h:53:47: note: property declared here
+@property (readonly, getter = isEnabled) BOOL enabled;
+                                              ^
+
+SwiftEmitModule normal arm64 Emitting\ module\ for\ TimeBoxUITests (in target 'TimeBoxUITests' from project 'TimeBox')
+
+EmitSwiftModule normal arm64 (in target 'TimeBoxUITests' from project 'TimeBox')
+    cd /Users/hem/Documents/opt/my-daily-sprints/TimeBox
+    
+
+SwiftDriverJobDiscovery normal arm64 Emitting module for TimeBoxUITests (in target 'TimeBoxUITests' from project 'TimeBox')
+
+SwiftDriver\ Compilation\ Requirements TimeBoxUITests normal arm64 com.apple.xcode.tools.swift.compiler (in target 'TimeBoxUITests' from project 'TimeBox')
+    cd /Users/hem/Documents/opt/my-daily-sprints/TimeBox
+    builtin-Swift-Compilation-Requirements -- /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name TimeBoxUITests -Onone -enforce-exclusivity\=checked @/Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxUITests.build/Objects-normal/arm64/TimeBoxUITests.SwiftFileList -DDEBUG -module-alias Testing\=_Testing_Unavailable -plugin-path /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk -target arm64-apple-ios17.0-simulator -g -module-cache-path /Users/hem/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -Xfrontend -serialize-debugging-options -profile-coverage-mapping -profile-generate -enable-testing -index-store-path /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Index.noindex/DataStore -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -swift-version 6 -I /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator -Isystem /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib -F /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator -F /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks -F /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk/Developer/Library/Frameworks -c -j10 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /Users/hem/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator26.2-23C53-7d00a8b37fbd7999ea79df8ebc024bf0.sdkstatcache -output-file-map /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxUITests.build/Objects-normal/arm64/TimeBoxUITests-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -explicit-module-build -module-cache-path /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -clang-scanner-module-cache-path /Users/hem/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -sdk-module-cache-path /Users/hem/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxUITests.build/Objects-normal/arm64/TimeBoxUITests.swiftmodule -validate-clang-modules-once -clang-build-session-file /Users/hem/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxUITests.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxUITests.build/Objects-normal/arm64/TimeBoxUITests_const_extract_protocols.json -Xcc -iquote -Xcc /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxUITests.build/TimeBoxUITests-generated-files.hmap -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxUITests.build/TimeBoxUITests-own-target-headers.hmap -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxUITests.build/TimeBoxUITests-all-target-headers.hmap -Xcc -iquote -Xcc /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxUITests.build/TimeBoxUITests-project-headers.hmap -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/include -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxUITests.build/DerivedSources-normal/arm64 -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxUITests.build/DerivedSources/arm64 -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxUITests.build/DerivedSources -Xcc -DDEBUG\=1 -emit-objc-header -emit-objc-header-path /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxUITests.build/Objects-normal/arm64/TimeBoxUITests-Swift.h -working-directory /Users/hem/Documents/opt/my-daily-sprints/TimeBox -experimental-emit-module-separately -disable-cmo
+
+Copy /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBoxUITests.swiftmodule/Project/arm64-apple-ios-simulator.swiftsourceinfo /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxUITests.build/Objects-normal/arm64/TimeBoxUITests.swiftsourceinfo (in target 'TimeBoxUITests' from project 'TimeBox')
+    cd /Users/hem/Documents/opt/my-daily-sprints/TimeBox
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxUITests.build/Objects-normal/arm64/TimeBoxUITests.swiftsourceinfo /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBoxUITests.swiftmodule/Project/arm64-apple-ios-simulator.swiftsourceinfo
+
+Copy /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBoxUITests.swiftmodule/arm64-apple-ios-simulator.swiftdoc /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxUITests.build/Objects-normal/arm64/TimeBoxUITests.swiftdoc (in target 'TimeBoxUITests' from project 'TimeBox')
+    cd /Users/hem/Documents/opt/my-daily-sprints/TimeBox
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxUITests.build/Objects-normal/arm64/TimeBoxUITests.swiftdoc /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBoxUITests.swiftmodule/arm64-apple-ios-simulator.swiftdoc
+
+Copy /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBoxUITests.swiftmodule/arm64-apple-ios-simulator.abi.json /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxUITests.build/Objects-normal/arm64/TimeBoxUITests.abi.json (in target 'TimeBoxUITests' from project 'TimeBox')
+    cd /Users/hem/Documents/opt/my-daily-sprints/TimeBox
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxUITests.build/Objects-normal/arm64/TimeBoxUITests.abi.json /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBoxUITests.swiftmodule/arm64-apple-ios-simulator.abi.json
+
+Copy /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBoxUITests.swiftmodule/arm64-apple-ios-simulator.swiftmodule /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxUITests.build/Objects-normal/arm64/TimeBoxUITests.swiftmodule (in target 'TimeBoxUITests' from project 'TimeBox')
+    cd /Users/hem/Documents/opt/my-daily-sprints/TimeBox
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxUITests.build/Objects-normal/arm64/TimeBoxUITests.swiftmodule /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBoxUITests.swiftmodule/arm64-apple-ios-simulator.swiftmodule
+
+SwiftDriverJobDiscovery normal arm64 Compiling CategoriesUITests.swift (in target 'TimeBoxUITests' from project 'TimeBox')
+
+SwiftDriver\ Compilation TimeBoxUITests normal arm64 com.apple.xcode.tools.swift.compiler (in target 'TimeBoxUITests' from project 'TimeBox')
+    cd /Users/hem/Documents/opt/my-daily-sprints/TimeBox
+    builtin-Swift-Compilation -- /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name TimeBoxUITests -Onone -enforce-exclusivity\=checked @/Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxUITests.build/Objects-normal/arm64/TimeBoxUITests.SwiftFileList -DDEBUG -module-alias Testing\=_Testing_Unavailable -plugin-path /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk -target arm64-apple-ios17.0-simulator -g -module-cache-path /Users/hem/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -Xfrontend -serialize-debugging-options -profile-coverage-mapping -profile-generate -enable-testing -index-store-path /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Index.noindex/DataStore -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -swift-version 6 -I /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator -Isystem /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib -F /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator -F /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks -F /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk/Developer/Library/Frameworks -c -j10 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /Users/hem/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator26.2-23C53-7d00a8b37fbd7999ea79df8ebc024bf0.sdkstatcache -output-file-map /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxUITests.build/Objects-normal/arm64/TimeBoxUITests-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -explicit-module-build -module-cache-path /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -clang-scanner-module-cache-path /Users/hem/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -sdk-module-cache-path /Users/hem/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxUITests.build/Objects-normal/arm64/TimeBoxUITests.swiftmodule -validate-clang-modules-once -clang-build-session-file /Users/hem/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxUITests.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxUITests.build/Objects-normal/arm64/TimeBoxUITests_const_extract_protocols.json -Xcc -iquote -Xcc /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxUITests.build/TimeBoxUITests-generated-files.hmap -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxUITests.build/TimeBoxUITests-own-target-headers.hmap -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxUITests.build/TimeBoxUITests-all-target-headers.hmap -Xcc -iquote -Xcc /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxUITests.build/TimeBoxUITests-project-headers.hmap -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/include -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxUITests.build/DerivedSources-normal/arm64 -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxUITests.build/DerivedSources/arm64 -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxUITests.build/DerivedSources -Xcc -DDEBUG\=1 -emit-objc-header -emit-objc-header-path /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxUITests.build/Objects-normal/arm64/TimeBoxUITests-Swift.h -working-directory /Users/hem/Documents/opt/my-daily-sprints/TimeBox -experimental-emit-module-separately -disable-cmo
+
+Ld /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBoxUITests-Runner.app/PlugIns/TimeBoxUITests.xctest/TimeBoxUITests normal (in target 'TimeBoxUITests' from project 'TimeBox')
+    cd /Users/hem/Documents/opt/my-daily-sprints/TimeBox
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -Xlinker -reproducible -target arm64-apple-ios17.0-simulator -bundle -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk -O0 -L/Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/EagerLinkingTBDs/Debug-iphonesimulator -L/Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator -L/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib -F/Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/EagerLinkingTBDs/Debug-iphonesimulator -F/Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator -iframework /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks -iframework /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk/Developer/Library/Frameworks -filelist /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxUITests.build/Objects-normal/arm64/TimeBoxUITests.LinkFileList -Xlinker -rpath -Xlinker /usr/lib/swift -Xlinker -rpath -Xlinker @loader_path/Frameworks -Xlinker -rpath -Xlinker @executable_path/Frameworks -dead_strip -Xlinker -object_path_lto -Xlinker /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxUITests.build/Objects-normal/arm64/TimeBoxUITests_lto.o -rdynamic -Xlinker -no_deduplicate -Xlinker -objc_abi_version -Xlinker 2 -Xlinker -debug_variant -Xlinker -dependency_info -Xlinker /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxUITests.build/Objects-normal/arm64/TimeBoxUITests_dependency_info.dat -fobjc-link-runtime -fprofile-instr-generate -L/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphonesimulator -L/usr/lib/swift -Xlinker -add_ast_path -Xlinker /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxUITests.build/Objects-normal/arm64/TimeBoxUITests.swiftmodule @/Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxUITests.build/Objects-normal/arm64/TimeBoxUITests-linker-args.resp -Xlinker -needed_framework -Xlinker XCTest -framework XCTest -Xlinker -needed-lXCTestSwiftSupport -lXCTestSwiftSupport -Xlinker -sectcreate -Xlinker __TEXT -Xlinker __entitlements -Xlinker /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxUITests.build/TimeBoxUITests.xctest-Simulated.xcent -Xlinker -sectcreate -Xlinker __TEXT -Xlinker __ents_der -Xlinker /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxUITests.build/TimeBoxUITests.xctest-Simulated.xcent.der -Xlinker -no_adhoc_codesign -o /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBoxUITests-Runner.app/PlugIns/TimeBoxUITests.xctest/TimeBoxUITests
+
+ExtractAppIntentsMetadata (in target 'TimeBoxUITests' from project 'TimeBox')
+    cd /Users/hem/Documents/opt/my-daily-sprints/TimeBox
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/appintentsmetadataprocessor --toolchain-dir /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain --module-name TimeBoxUITests --sdk-root /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk --xcode-version 17C52 --platform-family iOS --deployment-target 17.0 --bundle-identifier com.henning.timebox.uitests --output /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBoxUITests-Runner.app/PlugIns/TimeBoxUITests.xctest --target-triple arm64-apple-ios17.0-simulator --binary-file /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBoxUITests-Runner.app/PlugIns/TimeBoxUITests.xctest/TimeBoxUITests --dependency-file /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxUITests.build/Objects-normal/arm64/TimeBoxUITests_dependency_info.dat --stringsdata-file /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxUITests.build/Objects-normal/arm64/ExtractedAppShortcutsMetadata.stringsdata --source-file-list /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxUITests.build/Objects-normal/arm64/TimeBoxUITests.SwiftFileList --metadata-file-list /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxUITests.build/TimeBoxUITests.DependencyMetadataFileList --static-metadata-file-list /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxUITests.build/TimeBoxUITests.DependencyStaticMetadataFileList --swift-const-vals-list /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxUITests.build/Objects-normal/arm64/TimeBoxUITests.SwiftConstValuesFileList --compile-time-extraction --deployment-aware-processing --validate-assistant-intents --no-app-shortcuts-localization
+2026-01-23 10:36:35.123 appintentsmetadataprocessor[55529:28945552] Starting appintentsmetadataprocessor export
+2026-01-23 10:36:35.124 appintentsmetadataprocessor[55529:28945552] warning: Metadata extraction skipped. No AppIntents.framework dependency found.
+
+CopySwiftLibs /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBoxUITests-Runner.app/PlugIns/TimeBoxUITests.xctest (in target 'TimeBoxUITests' from project 'TimeBox')
+    cd /Users/hem/Documents/opt/my-daily-sprints/TimeBox
+    builtin-swiftStdLibTool --copy --verbose --sign - --scan-executable /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBoxUITests-Runner.app/PlugIns/TimeBoxUITests.xctest/TimeBoxUITests --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBoxUITests-Runner.app/PlugIns/TimeBoxUITests.xctest/Frameworks --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBoxUITests-Runner.app/PlugIns/TimeBoxUITests.xctest/PlugIns --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBoxUITests-Runner.app/PlugIns/TimeBoxUITests.xctest/SystemExtensions --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBoxUITests-Runner.app/PlugIns/TimeBoxUITests.xctest/Extensions --platform iphonesimulator --toolchain /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain --destination /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBoxUITests-Runner.app/PlugIns/TimeBoxUITests.xctest/Frameworks --strip-bitcode --scan-executable /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib/libXCTestSwiftSupport.dylib --strip-bitcode-tool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/bitcode_strip --emit-dependency-info /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxUITests.build/SwiftStdLibToolInputDependencies.dep --filter-for-swift-os
+
+CodeSign /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBoxUITests-Runner.app/PlugIns/TimeBoxUITests.xctest (in target 'TimeBoxUITests' from project 'TimeBox')
+    cd /Users/hem/Documents/opt/my-daily-sprints/TimeBox
+    
+    Signing Identity:     "Sign to Run Locally"
+    
+    /usr/bin/codesign --force --sign - --timestamp\=none --generate-entitlement-der /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBoxUITests-Runner.app/PlugIns/TimeBoxUITests.xctest
+
+CodeSign /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBoxUITests-Runner.app (in target 'TimeBoxUITests' from project 'TimeBox')
+    cd /Users/hem/Documents/opt/my-daily-sprints/TimeBox
+    
+    Signing Identity:     "Sign to Run Locally"
+    
+    /usr/bin/codesign --force --sign - --timestamp\=none --generate-entitlement-der /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBoxUITests-Runner.app
+/Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBoxUITests-Runner.app: replacing existing signature
+
+2026-01-23 10:36:58.995641+0100 TimeBoxUITests-Runner[55787:28948331] [Default] Running tests...
+2026-01-23 10:36:59.040575+0100 TimeBoxUITests-Runner[55787:28948447] [General] Failed to send CA Event for app launch measurements for ca_event_type: 0 event_name: com.apple.app_launch_measurement.FirstFramePresentationMetric
+2026-01-23 10:36:59.082683+0100 TimeBoxUITests-Runner[55787:28948447] [General] Failed to send CA Event for app launch measurements for ca_event_type: 1 event_name: com.apple.app_launch_measurement.ExtendedLaunchMetrics
+    t =      nans Interface orientation changed to Portrait
+Test Suite 'Selected tests' started at 2026-01-23 10:37:03.490.
+Test Suite 'TimeBoxUITests.xctest' started at 2026-01-23 10:37:03.490.
+Test Suite 'CategoriesUITests' started at 2026-01-23 10:37:03.491.
+Test Case '-[TimeBoxUITests.CategoriesUITests testTaskCanBeCreatedWithDefaultCategory]' started.
+    t =     0.00s Start Test at 2026-01-23 10:37:03.491
+    t =     0.33s Set Up
+    t =     0.33s     Open com.henning.timebox
+    t =     0.33s         Launch com.henning.timebox
+    t =     2.72s             Setting up automation session
+    t =     3.75s             Wait for com.henning.timebox to idle
+    t =     5.75s Waiting 5.0s for "Backlog" Button to exist
+    t =     6.79s     Checking `Expect predicate `existsNoRetry == 1` for object "Backlog" Button`
+    t =     6.79s         Checking existence of `"Backlog" Button`
+    t =     6.90s Tap "Backlog" Button
+    t =     6.91s     Wait for com.henning.timebox to idle
+    t =     6.91s     Find the "Backlog" Button
+    t =     6.94s     Check for interrupting elements affecting "Backlog" Button
+    t =     7.01s     Synthesize event
+    t =     7.41s     Wait for com.henning.timebox to idle
+    t =     8.16s Waiting 3.0s for "addTaskButton" Button to exist
+    t =     9.20s     Checking `Expect predicate `existsNoRetry == 1` for object "addTaskButton" Button`
+    t =     9.20s         Checking existence of `"addTaskButton" Button`
+    t =     9.25s Tap "addTaskButton" Button
+    t =     9.25s     Wait for com.henning.timebox to idle
+    t =     9.25s     Find the "addTaskButton" Button
+    t =     9.28s     Check for interrupting elements affecting "addTaskButton" Button
+    t =     9.32s     Synthesize event
+    t =     9.61s     Wait for com.henning.timebox to idle
+    t =    10.65s Waiting 5.0s for "Neuer Task" NavigationBar to exist
+    t =    11.68s     Checking `Expect predicate `existsNoRetry == 1` for object "Neuer Task" NavigationBar`
+    t =    11.68s         Checking existence of `"Neuer Task" NavigationBar`
+    t =    11.78s Waiting 3.0s for "Task-Titel" TextField to exist
+    t =    12.81s     Checking `Expect predicate `existsNoRetry == 1` for object "Task-Titel" TextField`
+    t =    12.81s         Checking existence of `"Task-Titel" TextField`
+    t =    12.86s Tap "Task-Titel" TextField
+    t =    12.86s     Wait for com.henning.timebox to idle
+    t =    12.87s     Find the "Task-Titel" TextField
+    t =    12.92s     Check for interrupting elements affecting "Task-Titel" TextField
+    t =    12.97s     Synthesize event
+    t =    13.26s     Wait for com.henning.timebox to idle
+    t =    13.64s Type 'Test Task' into "Task-Titel" TextField
+    t =    13.64s     Wait for com.henning.timebox to idle
+    t =    13.65s     Find the "Task-Titel" TextField
+    t =    13.73s     Check for interrupting elements affecting "Task-Titel" TextField
+    t =    13.80s     Synthesize event
+    t =    14.15s     Wait for com.henning.timebox to idle
+    t =    14.25s Waiting 3.0s for "Speichern" Button to exist
+    t =    15.28s     Checking `Expect predicate `existsNoRetry == 1` for object "Speichern" Button`
+    t =    15.28s         Checking existence of `"Speichern" Button`
+    t =    15.36s Find the "Speichern" Button
+    t =    15.44s Tear Down
+Test Case '-[TimeBoxUITests.CategoriesUITests testTaskCanBeCreatedWithDefaultCategory]' passed (15.981 seconds).
+Test Case '-[TimeBoxUITests.CategoriesUITests testTaskTypePickerExists]' started.
+    t =     0.00s Start Test at 2026-01-23 10:37:19.473
+    t =     0.04s Set Up
+    t =     0.04s     Open com.henning.timebox
+    t =     0.05s         Launch com.henning.timebox
+    t =     0.05s             Terminate com.henning.timebox:55843
+    t =     1.33s             Setting up automation session
+    t =     2.14s             Wait for com.henning.timebox to idle
+    t =     3.68s Waiting 5.0s for "Backlog" Button to exist
+    t =     4.71s     Checking `Expect predicate `existsNoRetry == 1` for object "Backlog" Button`
+    t =     4.71s         Checking existence of `"Backlog" Button`
+    t =     4.80s Tap "Backlog" Button
+    t =     4.80s     Wait for com.henning.timebox to idle
+    t =     4.80s     Find the "Backlog" Button
+    t =     4.83s     Check for interrupting elements affecting "Backlog" Button
+    t =     4.85s     Synthesize event
+    t =     5.14s     Wait for com.henning.timebox to idle
+    t =     5.90s Waiting 3.0s for "addTaskButton" Button to exist
+    t =     6.93s     Checking `Expect predicate `existsNoRetry == 1` for object "addTaskButton" Button`
+    t =     6.94s         Checking existence of `"addTaskButton" Button`
+    t =     6.98s Tap "addTaskButton" Button
+    t =     6.98s     Wait for com.henning.timebox to idle
+    t =     6.98s     Find the "addTaskButton" Button
+    t =     7.01s     Check for interrupting elements affecting "addTaskButton" Button
+    t =     7.04s     Synthesize event
+    t =     7.33s     Wait for com.henning.timebox to idle
+    t =     8.17s Waiting 5.0s for "Neuer Task" NavigationBar to exist
+    t =     9.19s     Checking `Expect predicate `existsNoRetry == 1` for object "Neuer Task" NavigationBar`
+    t =     9.19s         Checking existence of `"Neuer Task" NavigationBar`
+    t =     9.28s Waiting 3.0s for "Typ" StaticText to exist
+    t =    10.31s     Checking `Expect predicate `existsNoRetry == 1` for object "Typ" StaticText`
+    t =    10.31s         Checking existence of `"Typ" StaticText`
+    t =    10.38s Waiting 3.0s for "Aufgabentyp" Button to exist
+    t =    11.41s     Checking `Expect predicate `existsNoRetry == 1` for object "Aufgabentyp" Button`
+    t =    11.41s         Checking existence of `"Aufgabentyp" Button`
+    t =    11.48s Tear Down
+Test Case '-[TimeBoxUITests.CategoriesUITests testTaskTypePickerExists]' passed (11.721 seconds).
+Test Suite 'CategoriesUITests' passed at 2026-01-23 10:37:31.194.
+	 Executed 2 tests, with 0 failures (0 unexpected) in 27.702 (27.703) seconds
+Test Suite 'TimeBoxUITests.xctest' passed at 2026-01-23 10:37:31.194.
+	 Executed 2 tests, with 0 failures (0 unexpected) in 27.702 (27.704) seconds
+Test Suite 'Selected tests' passed at 2026-01-23 10:37:31.195.
+	 Executed 2 tests, with 0 failures (0 unexpected) in 27.702 (27.705) seconds
+2026-01-23 10:37:31.524 xcodebuild[55497:28945298] [MT] IDETestOperationsObserverDebug: 56.297 elapsed -- Testing started completed.
+2026-01-23 10:37:31.524 xcodebuild[55497:28945298] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2026-01-23 10:37:31.524 xcodebuild[55497:28945298] [MT] IDETestOperationsObserverDebug: 56.297 sec, +56.297 sec -- end
+
+Test session results, code coverage, and logs:
+	/Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Logs/Test/Test-TimeBox-2026.01.23_10-36-32-+0100.xcresult
+
+** TEST SUCCEEDED **
+
+Testing started

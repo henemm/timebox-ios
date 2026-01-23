@@ -22,7 +22,7 @@ final class LocalTask {
     /// Urgency level for Eisenhower Matrix (urgent/not_urgent)
     var urgency: String = "not_urgent"
 
-    /// Task categorization type (income/maintenance/recharge)
+    /// Task categorization type (income/maintenance/recharge/learning/giving_back)
     var taskType: String = "maintenance"
 
     /// Recurrence pattern (none/daily/weekly/biweekly/monthly)

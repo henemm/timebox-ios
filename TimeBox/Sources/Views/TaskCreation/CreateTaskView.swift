@@ -80,6 +80,8 @@ struct CreateTaskView: View {
                         Label("Geld verdienen", systemImage: "dollarsign.circle").tag("income")
                         Label("Schneeschaufeln", systemImage: "wrench.and.screwdriver").tag("maintenance")
                         Label("Energie aufladen", systemImage: "battery.100").tag("recharge")
+                        Label("Lernen", systemImage: "book").tag("learning")
+                        Label("Weitergeben", systemImage: "gift").tag("giving_back")
                     }
                 } header: {
                     Text("Typ")

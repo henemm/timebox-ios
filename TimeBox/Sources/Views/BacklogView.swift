@@ -49,6 +49,7 @@ struct BacklogView: View {
     @State private var durationFeedback = false
     @State private var showCreateTask = false
     @State private var nextUpFeedback = false
+    @State private var taskToEdit: PlanItem?
 
     // MARK: - Next Up Tasks
     private var nextUpTasks: [PlanItem] {
@@ -61,19 +62,19 @@ struct BacklogView: View {
 
     // MARK: - Eisenhower Matrix Filters
     private var doFirstTasks: [PlanItem] {
-        planItems.filter { $0.urgency == "urgent" && $0.priority == 3 && !$0.isCompleted && !$0.isNextUp }
+        planItems.filter { $0.urgency == "urgent" && $0.priorityValue == 3 && !$0.isCompleted && !$0.isNextUp }
     }
 
     private var scheduleTasks: [PlanItem] {
-        planItems.filter { $0.urgency == "not_urgent" && $0.priority == 3 && !$0.isCompleted && !$0.isNextUp }
+        planItems.filter { $0.urgency == "not_urgent" && $0.priorityValue == 3 && !$0.isCompleted && !$0.isNextUp }
     }
 
     private var delegateTasks: [PlanItem] {
-        planItems.filter { $0.urgency == "urgent" && $0.priority < 3 && !$0.isCompleted && !$0.isNextUp }
+        planItems.filter { $0.urgency == "urgent" && $0.priorityValue < 3 && !$0.isCompleted && !$0.isNextUp }
     }
 
     private var eliminateTasks: [PlanItem] {
-        planItems.filter { $0.urgency == "not_urgent" && $0.priority < 3 && !$0.isCompleted && !$0.isNextUp }
+        planItems.filter { $0.urgency == "not_urgent" && $0.priorityValue < 3 && !$0.isCompleted && !$0.isNextUp }
     }
 
     // MARK: - Category Grouping
@@ -225,6 +226,17 @@ struct BacklogView: View {
                     }
                 }
             }
+            .sheet(item: $taskToEdit) { task in
+                EditTaskSheet(
+                    task: task,
+                    onSave: { title, priority, duration in
+                        updateTask(task, title: title, priority: priority, duration: duration)
+                    },
+                    onDelete: {
+                        deleteTask(task)
+                    }
+                )
+            }
         }
         .task {
             await loadTasks()
@@ -289,6 +301,34 @@ struct BacklogView: View {
         }
     }
 
+    private func updateTask(_ task: PlanItem, title: String, priority: TaskPriority, duration: Int) {
+        do {
+            let taskSource = LocalTaskSource(modelContext: modelContext)
+            let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
+            try syncEngine.updateTask(itemID: task.id, title: title, priority: priority, duration: duration)
+
+            Task {
+                await loadTasks()
+            }
+        } catch {
+            errorMessage = "Task konnte nicht aktualisiert werden."
+        }
+    }
+
+    private func deleteTask(_ task: PlanItem) {
+        do {
+            let taskSource = LocalTaskSource(modelContext: modelContext)
+            let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
+            try syncEngine.deleteTask(itemID: task.id)
+
+            Task {
+                await loadTasks()
+            }
+        } catch {
+            errorMessage = "Task konnte nicht gelöscht werden."
+        }
+    }
+
     // MARK: - View Mode Switcher (Swift Liquid Glass)
     private var viewModeSwitcher: some View {
         Menu {
@@ -330,7 +370,8 @@ struct BacklogView: View {
                 BacklogRow(
                     item: item,
                     onDurationTap: { selectedItemForDuration = item },
-                    onAddToNextUp: { updateNextUp(for: item, isNextUp: true) }
+                    onAddToNextUp: { updateNextUp(for: item, isNextUp: true) },
+                    onTap: { taskToEdit = item }
                 )
             }
             .onMove(perform: moveItems)
@@ -466,6 +507,10 @@ private extension String {
         case "maintenance": return "Maintenance"
         case "creative": return "Creative"
         case "strategic": return "Strategic"
+        case "income": return "Geld verdienen"
+        case "recharge": return "Energie aufladen"
+        case "learning": return "Lernen"
+        case "giving_back": return "Weitergeben"
         default: return self.capitalized
         }
     }
