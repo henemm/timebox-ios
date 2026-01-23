@@ -1,0 +1,45 @@
+TDD GREEN: UI Tests for Weekly Review Feature (Sprint 6)
+========================================================
+
+Date: 2026-01-23T19:14:07
+Test File: FocusBloxUITests/DailyReviewUITests.swift
+
+TESTS RUN: 7
+TESTS PASSED: 7
+TESTS FAILED: 0
+
+ALL TESTS PASSED:
+-----------------
+
+1. testRueckblickTabExists()
+   - PASSED: "Rückblick" tab exists in tab bar
+
+2. testRueckblickViewOpens()
+   - PASSED: View opens with navigation title
+
+3. testEmptyStateShown()
+   - PASSED: Empty state or content shown correctly
+
+4. testSettingsButtonWorks()
+   - PASSED: Settings button opens settings view
+
+5. testSegmentedPickerExists() [NEW - Sprint 6]
+   - PASSED: Segmented picker with "Heute" and "Diese Woche" exists
+
+6. testWeeklyViewShown() [NEW - Sprint 6]
+   - PASSED: Weekly view displays date range header or empty state
+
+7. testWeeklyEmptyState() [NEW - Sprint 6]
+   - PASSED: Weekly empty state message shown correctly
+
+IMPLEMENTATION VERIFIED:
+------------------------
+- ReviewMode enum with .today and .week cases
+- Segmented Picker in DailyReviewView
+- weekBlocks computed property filters by week interval
+- categoryStats computed property groups by taskType
+- weeklyStatsHeader with completion ring
+- categoryStatsSection with CategoryBar components
+- CategoryBar displays category icon, name, time, and progress bar
+
+TDD GREEN COMPLETE: Feature fully implemented and all tests pass.

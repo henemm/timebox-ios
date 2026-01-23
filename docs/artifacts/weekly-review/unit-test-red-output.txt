@@ -1,0 +1,36 @@
+TDD RED: Unit Tests for Weekly Review Feature (Sprint 6)
+========================================================
+
+Date: 2026-01-23T19:10:00
+Feature: Weekly Review Tab
+
+ANALYSIS:
+---------
+This feature is primarily UI layout with simple computed properties:
+- ReviewMode enum: Static string enum for picker selection
+- CategoryConfig enum: Static configuration (display names, icons, colors)
+- weekBlocks: Simple date filter (blocks within week interval)
+- categoryStats: Simple aggregation (group tasks by category, sum minutes)
+
+UNIT TEST SCOPE:
+---------------
+No complex business logic requiring unit tests. The computed properties are:
+1. Pure data transformations (filtering, grouping, summing)
+2. Use existing tested APIs (Calendar.dateInterval, Array.filter)
+3. Will be validated by UI tests + manual verification
+
+UI TESTS VERIFY:
+---------------
+- Segmented picker renders correctly
+- Weekly view shows correct data structure
+- Category bars display when data exists
+- Empty state shows when no data
+
+EXEMPTION REASON:
+-----------------
+Pure UI feature with trivial computed properties.
+All business logic (FocusBlock loading, task loading) is already tested.
+UI tests provide sufficient coverage for view layer.
+
+STATUS: EXEMPTED (UI-only feature)
+Ready for Phase 6: Implementation

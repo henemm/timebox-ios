@@ -106,4 +106,97 @@ final class DailyReviewUITests: XCTestCase {
             "Settings view should open"
         )
     }
+
+    // MARK: - Weekly Review Tests (Sprint 6)
+
+    /// GIVEN: DailyReviewView is displayed
+    /// WHEN: User looks at view
+    /// THEN: Segmented picker with "Heute" and "Diese Woche" should exist
+    /// EXPECTED TO FAIL: Segmented picker doesn't exist yet
+    func testSegmentedPickerExists() throws {
+        navigateToRueckblick()
+
+        // Wait for view to load
+        let navTitle = app.navigationBars["Rückblick"]
+        XCTAssertTrue(navTitle.waitForExistence(timeout: 5), "View should open")
+
+        // Check for segmented picker buttons
+        let heuteButton = app.buttons["Heute"]
+        let dieseWocheButton = app.buttons["Diese Woche"]
+
+        XCTAssertTrue(
+            heuteButton.waitForExistence(timeout: 3),
+            "Segmented picker should have 'Heute' option"
+        )
+        XCTAssertTrue(
+            dieseWocheButton.exists,
+            "Segmented picker should have 'Diese Woche' option"
+        )
+    }
+
+    /// GIVEN: DailyReviewView is displayed
+    /// WHEN: User taps "Diese Woche" segment
+    /// THEN: Weekly view should be shown with week date range header
+    /// EXPECTED TO FAIL: Weekly view doesn't exist yet
+    func testWeeklyViewShown() throws {
+        navigateToRueckblick()
+
+        // Wait for view to load
+        let navTitle = app.navigationBars["Rückblick"]
+        XCTAssertTrue(navTitle.waitForExistence(timeout: 5), "View should open")
+
+        // Tap "Diese Woche" segment
+        let dieseWocheButton = app.buttons["Diese Woche"]
+        XCTAssertTrue(
+            dieseWocheButton.waitForExistence(timeout: 3),
+            "Diese Woche button should exist"
+        )
+        dieseWocheButton.tap()
+
+        // Weekly view should show date range (e.g., "20. - 26. Jan")
+        // We check for the pattern of week range or the "Diese Woche" text
+        let weekHeader = app.staticTexts.matching(
+            NSPredicate(format: "label CONTAINS[c] ' - '")
+        ).firstMatch
+
+        // Either we have blocks with a date range header, or empty state
+        let emptyState = app.staticTexts["Diese Woche noch keine Focus Blocks"]
+
+        XCTAssertTrue(
+            weekHeader.waitForExistence(timeout: 3) || emptyState.exists,
+            "Weekly view should show date range header or empty state"
+        )
+    }
+
+    /// GIVEN: DailyReviewView is in weekly mode
+    /// WHEN: No focus blocks exist this week
+    /// THEN: Should show weekly empty state message
+    /// EXPECTED TO FAIL: Weekly empty state doesn't exist yet
+    func testWeeklyEmptyState() throws {
+        navigateToRueckblick()
+
+        // Wait for view to load
+        let navTitle = app.navigationBars["Rückblick"]
+        XCTAssertTrue(navTitle.waitForExistence(timeout: 5), "View should open")
+
+        // Tap "Diese Woche" segment
+        let dieseWocheButton = app.buttons["Diese Woche"]
+        XCTAssertTrue(
+            dieseWocheButton.waitForExistence(timeout: 3),
+            "Diese Woche button should exist"
+        )
+        dieseWocheButton.tap()
+
+        // Check for empty state text OR actual content
+        // (We can't guarantee no blocks exist in test environment)
+        let emptyText = app.staticTexts["Diese Woche noch keine Focus Blocks"]
+        let hasContent = app.staticTexts.matching(
+            NSPredicate(format: "label CONTAINS[c] ' - '")
+        ).firstMatch.exists
+
+        XCTAssertTrue(
+            emptyText.waitForExistence(timeout: 3) || hasContent,
+            "Should show either empty state or weekly content"
+        )
+    }
 }

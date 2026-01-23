@@ -1,0 +1,38 @@
+TDD RED: UI Tests for Weekly Review Feature (Sprint 6)
+======================================================
+
+Date: 2026-01-23T19:04:24
+Test File: FocusBloxUITests/DailyReviewUITests.swift
+
+TESTS RUN: 3
+TESTS FAILED: 3 (as expected for TDD RED)
+TESTS PASSED: 0
+
+FAILED TESTS:
+-------------
+
+1. testSegmentedPickerExists()
+   - FAILED: Segmented picker does not exist
+   - Expected: "Heute" and "Diese Woche" buttons in picker
+   - Error: "Diese Woche" button not found within 3 seconds
+
+2. testWeeklyViewShown()
+   - FAILED: Weekly view not displayed
+   - Expected: Week date range header or weekly empty state
+   - Error: "Diese Woche" button not found - cannot tap to switch view
+
+3. testWeeklyEmptyState()
+   - FAILED: Weekly empty state not shown
+   - Expected: "Diese Woche noch keine Focus Blocks" or content with date range
+   - Error: "Diese Woche" button not found - cannot switch to weekly view
+
+ROOT CAUSE:
+-----------
+DailyReviewView does not yet have:
+- ReviewMode enum
+- Segmented Picker component
+- Weekly blocks computed property
+- Weekly content view
+
+TDD RED VERIFIED: All tests fail because feature doesn't exist yet.
+Ready for Phase 6: Implementation (TDD GREEN)
