@@ -35,6 +35,17 @@
     <string>TimeBox benoetigt Zugriff auf deine Erinnerungen, um sie als Tasks anzuzeigen und zu planen.</string>
     <key>NSCalendarsUsageDescription</key>
     <string>TimeBox benoetigt Zugriff auf deinen Kalender, um Tasks in freie Zeitslots einzuplanen.</string>
+    <key>CFBundleURLTypes</key>
+    <array>
+        <dict>
+            <key>CFBundleURLSchemes</key>
+            <array>
+                <string>timebox</string>
+            </array>
+            <key>CFBundleURLName</key>
+            <string>com.henning.timebox</string>
+        </dict>
+    </array>
     <key>UTExportedTypeDeclarations</key>
     <array>
         <dict>
