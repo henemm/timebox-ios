@@ -1,0 +1,14 @@
+Test Case '-[TimeBoxTests.SmartGapsTests testFindFreeSlotsFindsGaps]' started.
+Test Case '-[TimeBoxTests.SmartGapsTests testFindFreeSlotsFindsGaps]' passed (0.003 seconds).
+Test Case '-[TimeBoxTests.SmartGapsTests testFindFreeSlotsRespectsMaxDuration]' started.
+Test Case '-[TimeBoxTests.SmartGapsTests testFindFreeSlotsRespectsMaxDuration]' passed (0.000 seconds).
+Test Case '-[TimeBoxTests.SmartGapsTests testFindFreeSlotsRespectsMinDuration]' started.
+Test Case '-[TimeBoxTests.SmartGapsTests testFindFreeSlotsRespectsMinDuration]' passed (0.000 seconds).
+Test Case '-[TimeBoxTests.SmartGapsTests testWholeDayFreeShowsSuggestions]' started.
+Test Case '-[TimeBoxTests.SmartGapsTests testWholeDayFreeShowsSuggestions]' passed (0.000 seconds).
+Test Suite 'SmartGapsTests' passed at 2026-01-19 07:56:34.328.
+	 Executed 4 tests, with 0 failures (0 unexpected) in 0.004 (0.005) seconds
+Test Suite 'TimeBoxTests.xctest' passed at 2026-01-19 07:56:34.328.
+	 Executed 4 tests, with 0 failures (0 unexpected) in 0.004 (0.005) seconds
+Test Suite 'Selected tests' passed at 2026-01-19 07:56:34.332.
+	 Executed 4 tests, with 0 failures (0 unexpected) in 0.004 (0.010) seconds

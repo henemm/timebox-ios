@@ -1,0 +1,17 @@
+BEFORE Screenshot Description (SettingsView)
+=============================================
+
+Current State (before Sound Toggle implementation):
+- NavigationStack with title "Settings"
+- Form with 2 sections:
+  1. Section "Ziel-Kalender" with Picker for Focus Block calendar
+  2. Section "Sichtbare Kalender" with Toggle list for calendar visibility
+- Toolbar with "Fertig" button
+
+No sound settings exist yet.
+
+This file serves as documentation since simulator screenshot
+requires the app to be running interactively.
+
+Date: 2026-01-22
+Workflow: user-story-gap-analysis (End-Gong/Sound)

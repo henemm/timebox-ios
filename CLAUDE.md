@@ -140,7 +140,7 @@ All automated tests (Unit Tests, UI Tests) must run on this specific simulator.
 
 Example command:
 ```bash
-xcodebuild test -project FocusBlox/FocusBlox.xcodeproj -scheme FocusBlox \
+xcodebuild test -project FocusBlox.xcodeproj -scheme FocusBlox \
   -destination 'id=D9E26087-132A-44CB-9883-59073DD9CC54'
 ```
 

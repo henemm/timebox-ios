@@ -1,0 +1,10 @@
+BUILD TEST - TDD RED
+====================
+Date: 2026-01-20
+
+Test: Attempt to build TimeBoxWidgets scheme before widget extension exists
+
+Result: FAILED (as expected)
+xcodebuild: error: There are no schemes named "TimeBoxWidgets"
+
+This proves the widget extension does not exist yet - TDD RED criteria met.

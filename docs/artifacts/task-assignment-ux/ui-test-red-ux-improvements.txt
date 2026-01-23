@@ -1,0 +1,38 @@
+TDD RED Phase - UX Improvements
+================================
+
+Test Strategy for Pure UI Changes:
+
+1. Icon Consistency Test - WILL PASS (no UI change needed)
+   - Button functionality already tested in TaskAssignmentUITests
+   - Icon change is visual only, no testable behavior change
+
+2. Focus Block Delete Test - WILL FAIL (RED)
+   - Swipe action not implemented yet
+   - Test: Swipe left on block -> Delete button appears
+   - Current state: No swipe action exists
+
+3. Drag&Drop Reorder Test - WILL FAIL (RED)
+   - Drag handles not visible yet
+   - Test: Drag task up/down in block -> Order changes
+   - Current state: Uses chevron buttons instead
+
+4. Edit Focus Block Sheet Test - WILL FAIL (RED)
+   - Edit sheet not implemented yet
+   - Test: Tap on block -> Sheet opens with time pickers
+   - Current state: No tap action
+
+5. Edit Task Sheet Test - WILL FAIL (RED)
+   - Edit sheet not implemented yet
+   - Test: Tap on task -> Sheet opens with title/priority/duration
+   - Current state: No tap action
+
+6. Task Progress Bar Test - WILL FAIL (RED)
+   - Progress indicator not implemented yet
+   - Test: Running task shows progress ring
+   - Current state: No progress indicator
+
+RED Phase Verified: Features not implemented yet
+
+Date: 2026-01-19
+Phase: TDD RED

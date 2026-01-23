@@ -1,0 +1,14 @@
+Test Case '-[TimeBoxUITests.SmartGapsUITests testGapSlotsHavePlusButton]' started.
+Test Case '-[TimeBoxUITests.SmartGapsUITests testGapSlotsHavePlusButton]' passed (7.388 seconds).
+Test Case '-[TimeBoxUITests.SmartGapsUITests testShowsSuggestedTimesWhenDayFree]' started.
+Test Case '-[TimeBoxUITests.SmartGapsUITests testShowsSuggestedTimesWhenDayFree]' passed (10.565 seconds).
+Test Case '-[TimeBoxUITests.SmartGapsUITests testSmartGapsSectionExists]' started.
+Test Case '-[TimeBoxUITests.SmartGapsUITests testSmartGapsSectionExists]' passed (9.582 seconds).
+Test Case '-[TimeBoxUITests.SmartGapsUITests testSmartGapsSectionScreenshot]' started.
+Test Case '-[TimeBoxUITests.SmartGapsUITests testSmartGapsSectionScreenshot]' passed (7.853 seconds).
+Test Suite 'SmartGapsUITests' passed at 2026-01-19 08:02:32.919.
+	 Executed 4 tests, with 0 failures (0 unexpected) in 35.388 (35.392) seconds
+Test Suite 'TimeBoxUITests.xctest' passed at 2026-01-19 08:02:32.920.
+	 Executed 4 tests, with 0 failures (0 unexpected) in 35.388 (35.393) seconds
+Test Suite 'Selected tests' passed at 2026-01-19 08:02:32.920.
+	 Executed 4 tests, with 0 failures (0 unexpected) in 35.388 (35.394) seconds

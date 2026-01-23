@@ -1,0 +1,15 @@
+UI TEST EXEMPTION - Control Center Widget Prototype
+====================================================
+Date: 2026-01-20
+
+REASON FOR EXEMPTION:
+Control Center widgets are System UI - they cannot be tested via XCTest.
+- XCUIApplication cannot access Control Center
+- iOS Simulator does not support Control Center widgets
+- Only real device testing is possible
+
+ALTERNATIVE VERIFICATION:
+- Build test (fails before implementation)
+- Manual device testing required for this prototype
+
+This is a PROTOTYPE to verify Gemini's claim about requestValueDialog.

@@ -1,0 +1,202 @@
+Command line invocation:
+    /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild test -project TimeBox.xcodeproj -scheme TimeBox -destination "platform=iOS Simulator,id=D9E26087-132A-44CB-9883-59073DD9CC54" "-only-testing:TimeBoxUITests/SoundSettingsUITests" "-only-testing:TimeBoxTests/SoundServiceTests"
+
+2026-01-22 20:38:58.476 xcodebuild[89627:28181533] [MT] IDERunDestination: Supported platforms for the buildables in the current scheme is empty.
+ComputePackagePrebuildTargetDependencyGraph
+
+Prepare packages
+
+CreateBuildRequest
+
+SendProjectDescription
+
+CreateBuildOperation
+
+ComputeTargetDependencyGraph
+note: Building targets in dependency order
+note: Target dependency graph (6 targets)
+    Target 'TimeBoxUITests' in project 'TimeBox'
+        ➜ Explicit dependency on target 'TimeBox' in project 'TimeBox'
+    Target 'TimeBoxCoreTests' in project 'TimeBox'
+        ➜ Explicit dependency on target 'TimeBoxCore' in project 'TimeBox'
+        ➜ Explicit dependency on target 'TimeBox' in project 'TimeBox'
+    Target 'TimeBoxTests' in project 'TimeBox'
+        ➜ Explicit dependency on target 'TimeBox' in project 'TimeBox'
+    Target 'TimeBox' in project 'TimeBox'
+        ➜ Explicit dependency on target 'TimeBoxWidgetsExtension' in project 'TimeBox'
+        ➜ Explicit dependency on target 'TimeBoxCore' in project 'TimeBox'
+    Target 'TimeBoxWidgetsExtension' in project 'TimeBox'
+        ➜ Explicit dependency on target 'TimeBoxCore' in project 'TimeBox'
+    Target 'TimeBoxCore' in project 'TimeBox' (no dependencies)
+
+GatherProvisioningInputs
+
+CreateBuildDescription
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -v -E -dM -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk -x c -c /dev/null
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/usr/bin/actool --version --output-format xml1
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -v -E -dM -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk -x c -c /dev/null
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc --version
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld -version_details
+
+ReadFileContents /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/share/docc/features.json
+
+Build description signature: c4e7bf5a1069696739864e6847276515
+Build description path: /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/XCBuildData/c4e7bf5a1069696739864e6847276515.xcbuilddata
+ClangStatCache /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk /Users/hem/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator26.2-23C53-7d00a8b37fbd7999ea79df8ebc024bf0.sdkstatcache
+    cd /Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBox.xcodeproj
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk -o /Users/hem/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator26.2-23C53-7d00a8b37fbd7999ea79df8ebc024bf0.sdkstatcache
+
+ProcessInfoPlistFile /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBoxCore.framework/Info.plist /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxCore.build/empty-TimeBoxCore.plist (in target 'TimeBoxCore' from project 'TimeBox')
+    cd /Users/hem/Documents/opt/my-daily-sprints/TimeBox
+    builtin-infoPlistUtility /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxCore.build/empty-TimeBoxCore.plist -producttype com.apple.product-type.framework -expandbuildsettings -format binary -platform iphonesimulator -o /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBoxCore.framework/Info.plist
+
+ProcessInfoPlistFile /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBoxWidgetsExtension.appex/Info.plist /Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxWidgets/Info.plist (in target 'TimeBoxWidgetsExtension' from project 'TimeBox')
+    cd /Users/hem/Documents/opt/my-daily-sprints/TimeBox
+    builtin-infoPlistUtility /Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxWidgets/Info.plist -producttype com.apple.product-type.app-extension -expandbuildsettings -format binary -platform iphonesimulator -additionalcontentfile /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxWidgetsExtension.build/assetcatalog_generated_info.plist -o /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBoxWidgetsExtension.appex/Info.plist
+
+ProcessInfoPlistFile /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBox.app/Info.plist /Users/hem/Documents/opt/my-daily-sprints/TimeBox/Resources/Info.plist (in target 'TimeBox' from project 'TimeBox')
+    cd /Users/hem/Documents/opt/my-daily-sprints/TimeBox
+    builtin-infoPlistUtility /Users/hem/Documents/opt/my-daily-sprints/TimeBox/Resources/Info.plist -producttype com.apple.product-type.application -genpkginfo /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBox.app/PkgInfo -expandbuildsettings -format binary -platform iphonesimulator -scanforprivacyfile /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBox.app/Frameworks/TimeBoxCore.framework -scanforprivacyfile /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBox.app/PlugIns/TimeBoxWidgetsExtension.appex -o /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBox.app/Info.plist
+
+CopySwiftLibs /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBox.app (in target 'TimeBox' from project 'TimeBox')
+    cd /Users/hem/Documents/opt/my-daily-sprints/TimeBox
+    builtin-swiftStdLibTool --copy --verbose --sign - --scan-executable /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBox.app/TimeBox.debug.dylib --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBox.app/Frameworks --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBox.app/PlugIns --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBox.app/SystemExtensions --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBox.app/Extensions --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBoxCore.framework --platform iphonesimulator --toolchain /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain --destination /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBox.app/Frameworks --strip-bitcode --strip-bitcode-tool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/bitcode_strip --emit-dependency-info /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBox.build/SwiftStdLibToolInputDependencies.dep --filter-for-swift-os
+
+ProcessInfoPlistFile /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBox.app/PlugIns/TimeBoxTests.xctest/Info.plist /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxTests.build/empty-TimeBoxTests.plist (in target 'TimeBoxTests' from project 'TimeBox')
+    cd /Users/hem/Documents/opt/my-daily-sprints/TimeBox
+    builtin-infoPlistUtility /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxTests.build/empty-TimeBoxTests.plist -producttype com.apple.product-type.bundle.unit-test -expandbuildsettings -format binary -platform iphonesimulator -o /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBox.app/PlugIns/TimeBoxTests.xctest/Info.plist
+
+ProcessInfoPlistFile /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBox.app/PlugIns/TimeBoxCoreTests.xctest/Info.plist /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxCoreTests.build/empty-TimeBoxCoreTests.plist (in target 'TimeBoxCoreTests' from project 'TimeBox')
+    cd /Users/hem/Documents/opt/my-daily-sprints/TimeBox
+    builtin-infoPlistUtility /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxCoreTests.build/empty-TimeBoxCoreTests.plist -producttype com.apple.product-type.bundle.unit-test -expandbuildsettings -format binary -platform iphonesimulator -o /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBox.app/PlugIns/TimeBoxCoreTests.xctest/Info.plist
+
+CopySwiftLibs /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBox.app/PlugIns/TimeBoxTests.xctest (in target 'TimeBoxTests' from project 'TimeBox')
+    cd /Users/hem/Documents/opt/my-daily-sprints/TimeBox
+    builtin-swiftStdLibTool --copy --verbose --sign - --scan-executable /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBox.app/PlugIns/TimeBoxTests.xctest/TimeBoxTests --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBox.app/PlugIns/TimeBoxTests.xctest/Frameworks --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBox.app/PlugIns/TimeBoxTests.xctest/PlugIns --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBox.app/PlugIns/TimeBoxTests.xctest/SystemExtensions --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBox.app/PlugIns/TimeBoxTests.xctest/Extensions --platform iphonesimulator --toolchain /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain --destination /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBox.app/PlugIns/TimeBoxTests.xctest/Frameworks --strip-bitcode --scan-executable /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib/libXCTestSwiftSupport.dylib --strip-bitcode-tool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/bitcode_strip --emit-dependency-info /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxTests.build/SwiftStdLibToolInputDependencies.dep --filter-for-swift-os
+
+CopySwiftLibs /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBox.app/PlugIns/TimeBoxCoreTests.xctest (in target 'TimeBoxCoreTests' from project 'TimeBox')
+    cd /Users/hem/Documents/opt/my-daily-sprints/TimeBox
+    builtin-swiftStdLibTool --copy --verbose --sign - --scan-executable /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBox.app/PlugIns/TimeBoxCoreTests.xctest/TimeBoxCoreTests --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBox.app/PlugIns/TimeBoxCoreTests.xctest/Frameworks --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBox.app/PlugIns/TimeBoxCoreTests.xctest/PlugIns --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBox.app/PlugIns/TimeBoxCoreTests.xctest/SystemExtensions --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBox.app/PlugIns/TimeBoxCoreTests.xctest/Extensions --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBoxCore.framework --platform iphonesimulator --toolchain /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain --destination /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBox.app/PlugIns/TimeBoxCoreTests.xctest/Frameworks --strip-bitcode --scan-executable /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib/libXCTestSwiftSupport.dylib --strip-bitcode-tool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/bitcode_strip --emit-dependency-info /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxCoreTests.build/SwiftStdLibToolInputDependencies.dep --filter-for-swift-os
+
+ProcessInfoPlistFile /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBoxUITests-Runner.app/PlugIns/TimeBoxUITests.xctest/Info.plist /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxUITests.build/empty-TimeBoxUITests.plist (in target 'TimeBoxUITests' from project 'TimeBox')
+    cd /Users/hem/Documents/opt/my-daily-sprints/TimeBox
+    builtin-infoPlistUtility /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxUITests.build/empty-TimeBoxUITests.plist -producttype com.apple.product-type.bundle.ui-testing -expandbuildsettings -format binary -platform iphonesimulator -additionalcontentfile /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxUITests.build/ProductTypeInfoPlistAdditions.plist -o /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBoxUITests-Runner.app/PlugIns/TimeBoxUITests.xctest/Info.plist
+
+CopySwiftLibs /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBoxUITests-Runner.app/PlugIns/TimeBoxUITests.xctest (in target 'TimeBoxUITests' from project 'TimeBox')
+    cd /Users/hem/Documents/opt/my-daily-sprints/TimeBox
+    builtin-swiftStdLibTool --copy --verbose --sign - --scan-executable /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBoxUITests-Runner.app/PlugIns/TimeBoxUITests.xctest/TimeBoxUITests --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBoxUITests-Runner.app/PlugIns/TimeBoxUITests.xctest/Frameworks --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBoxUITests-Runner.app/PlugIns/TimeBoxUITests.xctest/PlugIns --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBoxUITests-Runner.app/PlugIns/TimeBoxUITests.xctest/SystemExtensions --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBoxUITests-Runner.app/PlugIns/TimeBoxUITests.xctest/Extensions --platform iphonesimulator --toolchain /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain --destination /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Products/Debug-iphonesimulator/TimeBoxUITests-Runner.app/PlugIns/TimeBoxUITests.xctest/Frameworks --strip-bitcode --scan-executable /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib/libXCTestSwiftSupport.dylib --strip-bitcode-tool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/bitcode_strip --emit-dependency-info /Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Build/Intermediates.noindex/TimeBox.build/Debug-iphonesimulator/TimeBoxUITests.build/SwiftStdLibToolInputDependencies.dep --filter-for-swift-os
+
+2026-01-22 20:39:20.961869+0100 TimeBox[89911:28184524] [General] Failed to send CA Event for app launch measurements for ca_event_type: 0 event_name: com.apple.app_launch_measurement.FirstFramePresentationMetric
+Test Suite 'Selected tests' started at 2026-01-22 20:39:21.343.
+Test Suite 'TimeBoxTests.xctest' started at 2026-01-22 20:39:21.344.
+Test Suite 'SoundServiceTests' started at 2026-01-22 20:39:21.344.
+Test Case '-[TimeBoxTests.SoundServiceTests test_playEndGong_exists]' started.
+Test Case '-[TimeBoxTests.SoundServiceTests test_playEndGong_exists]' passed (0.002 seconds).
+Test Case '-[TimeBoxTests.SoundServiceTests test_soundEnabled_defaultsToTrue]' started.
+Test Case '-[TimeBoxTests.SoundServiceTests test_soundEnabled_defaultsToTrue]' passed (0.001 seconds).
+Test Case '-[TimeBoxTests.SoundServiceTests test_soundEnabled_keyExists]' started.
+Test Case '-[TimeBoxTests.SoundServiceTests test_soundEnabled_keyExists]' passed (0.002 seconds).
+Test Case '-[TimeBoxTests.SoundServiceTests test_soundService_exists]' started.
+Test Case '-[TimeBoxTests.SoundServiceTests test_soundService_exists]' passed (0.000 seconds).
+Test Suite 'SoundServiceTests' passed at 2026-01-22 20:39:21.350.
+	 Executed 4 tests, with 0 failures (0 unexpected) in 0.005 (0.006) seconds
+Test Suite 'TimeBoxTests.xctest' passed at 2026-01-22 20:39:21.350.
+	 Executed 4 tests, with 0 failures (0 unexpected) in 0.005 (0.006) seconds
+Test Suite 'Selected tests' passed at 2026-01-22 20:39:21.350.
+	 Executed 4 tests, with 0 failures (0 unexpected) in 0.005 (0.007) seconds
+2026-01-22 20:39:22.313815+0100 TimeBoxUITests-Runner[89929:28184586] [Default] Running tests...
+    t =      nans Interface orientation changed to Portrait
+Test Suite 'Selected tests' started at 2026-01-22 20:39:25.055.
+Test Suite 'TimeBoxUITests.xctest' started at 2026-01-22 20:39:25.055.
+Test Suite 'SoundSettingsUITests' started at 2026-01-22 20:39:25.055.
+Test Case '-[TimeBoxUITests.SoundSettingsUITests testSoundSectionHasLabel]' started.
+    t =     0.00s Start Test at 2026-01-22 20:39:25.056
+    t =     0.21s Set Up
+    t =     0.21s     Open com.henning.timebox
+    t =     0.22s         Launch com.henning.timebox
+    t =     0.43s             Setting up automation session
+    t =     1.41s             Wait for com.henning.timebox to idle
+    t =     3.02s Waiting 5.0s for "settingsButton" Button to exist
+    t =     4.05s     Checking `Expect predicate `existsNoRetry == 1` for object "settingsButton" Button`
+    t =     4.05s         Checking existence of `"settingsButton" Button`
+    t =     4.15s Tap "settingsButton" Button
+    t =     4.15s     Wait for com.henning.timebox to idle
+    t =     4.15s     Find the "settingsButton" Button
+    t =     4.18s     Check for interrupting elements affecting "settingsButton" Button
+    t =     4.22s     Synthesize event
+    t =     4.63s     Wait for com.henning.timebox to idle
+    t =     5.92s Waiting 5.0s for "Sound bei Block-Ende" StaticText to exist
+    t =     6.95s     Checking `Expect predicate `existsNoRetry == 1` for object "Sound bei Block-Ende" StaticText`
+    t =     6.95s         Checking existence of `"Sound bei Block-Ende" StaticText`
+    t =     7.04s Tear Down
+Test Case '-[TimeBoxUITests.SoundSettingsUITests testSoundSectionHasLabel]' passed (7.283 seconds).
+Test Case '-[TimeBoxUITests.SoundSettingsUITests testSoundToggleCanBeToggled]' started.
+    t =     0.00s Start Test at 2026-01-22 20:39:32.339
+    t =     0.02s Set Up
+    t =     0.02s     Open com.henning.timebox
+    t =     0.02s         Launch com.henning.timebox
+    t =     0.02s             Terminate com.henning.timebox:89942
+    t =     1.29s             Setting up automation session
+    t =     2.01s             Wait for com.henning.timebox to idle
+    t =     3.49s Waiting 5.0s for "settingsButton" Button to exist
+    t =     4.52s     Checking `Expect predicate `existsNoRetry == 1` for object "settingsButton" Button`
+    t =     4.52s         Checking existence of `"settingsButton" Button`
+    t =     4.60s Tap "settingsButton" Button
+    t =     4.60s     Wait for com.henning.timebox to idle
+    t =     4.60s     Find the "settingsButton" Button
+    t =     4.63s     Check for interrupting elements affecting "settingsButton" Button
+    t =     4.66s     Synthesize event
+    t =     4.95s     Wait for com.henning.timebox to idle
+    t =     5.67s Waiting 5.0s for "soundToggle" Switch to exist
+    t =     6.69s     Checking `Expect predicate `existsNoRetry == 1` for object "soundToggle" Switch`
+    t =     6.69s         Checking existence of `"soundToggle" Switch`
+    t =     6.76s Find the "soundToggle" Switch
+    t =     6.82s Find the "soundToggle" Switch
+    t =     6.86s Tear Down
+Test Case '-[TimeBoxUITests.SoundSettingsUITests testSoundToggleCanBeToggled]' passed (7.089 seconds).
+Test Case '-[TimeBoxUITests.SoundSettingsUITests testSoundToggleExistsInSettings]' started.
+    t =     0.00s Start Test at 2026-01-22 20:39:39.429
+    t =     0.02s Set Up
+    t =     0.02s     Open com.henning.timebox
+    t =     0.02s         Launch com.henning.timebox
+    t =     0.02s             Terminate com.henning.timebox:89966
+    t =     1.29s             Setting up automation session
+    t =     2.00s             Wait for com.henning.timebox to idle
+    t =     3.48s Waiting 5.0s for "settingsButton" Button to exist
+    t =     4.51s     Checking `Expect predicate `existsNoRetry == 1` for object "settingsButton" Button`
+    t =     4.51s         Checking existence of `"settingsButton" Button`
+    t =     4.60s Tap "settingsButton" Button
+    t =     4.60s     Wait for com.henning.timebox to idle
+    t =     4.60s     Find the "settingsButton" Button
+    t =     4.63s     Check for interrupting elements affecting "settingsButton" Button
+    t =     4.66s     Synthesize event
+    t =     4.95s     Wait for com.henning.timebox to idle
+    t =     5.79s Waiting 5.0s for "Settings" NavigationBar to exist
+    t =     6.82s     Checking `Expect predicate `existsNoRetry == 1` for object "Settings" NavigationBar`
+    t =     6.82s         Checking existence of `"Settings" NavigationBar`
+    t =     6.90s Waiting 3.0s for "soundToggle" Switch to exist
+    t =     7.93s     Checking `Expect predicate `existsNoRetry == 1` for object "soundToggle" Switch`
+    t =     7.93s         Checking existence of `"soundToggle" Switch`
+    t =     7.98s Tear Down
+Test Case '-[TimeBoxUITests.SoundSettingsUITests testSoundToggleExistsInSettings]' passed (8.196 seconds).
+Test Suite 'SoundSettingsUITests' passed at 2026-01-22 20:39:47.624.
+	 Executed 3 tests, with 0 failures (0 unexpected) in 22.567 (22.569) seconds
+Test Suite 'TimeBoxUITests.xctest' passed at 2026-01-22 20:39:47.624.
+	 Executed 3 tests, with 0 failures (0 unexpected) in 22.567 (22.569) seconds
+Test Suite 'Selected tests' passed at 2026-01-22 20:39:47.625.
+	 Executed 3 tests, with 0 failures (0 unexpected) in 22.567 (22.570) seconds
+2026-01-22 20:39:47.927 xcodebuild[89627:28181533] [MT] IDETestOperationsObserverDebug: 47.224 elapsed -- Testing started completed.
+2026-01-22 20:39:47.927 xcodebuild[89627:28181533] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2026-01-22 20:39:47.927 xcodebuild[89627:28181533] [MT] IDETestOperationsObserverDebug: 47.224 sec, +47.224 sec -- end
+
+Test session results, code coverage, and logs:
+	/Users/hem/Library/Developer/Xcode/DerivedData/TimeBox-bsjmcdsflgpdivgxidgxnaahhzjo/Logs/Test/Test-TimeBox-2026.01.22_20-38-58-+0100.xcresult
+
+** TEST SUCCEEDED **
+
+Testing started

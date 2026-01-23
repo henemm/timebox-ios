@@ -95,6 +95,30 @@
 - Status: OFFEN
 - Spec: `docs/specs/bugfixes/bug6-nextup-restore.md`
 
+**Bug 7: Scrolling innerhalb Focus Block nicht moeglich bei vielen Tasks**
+- Location: `TaskAssignmentView.swift:313-331` (FocusBlockCard)
+- Problem: Bei 6+ Tasks im Focus Block kann nicht innerhalb des Blocks gescrollt werden
+- Expected: Tasks innerhalb eines Blocks sollten scrollbar sein
+- Root Cause:
+  - Zeile 331: `.scrollDisabled(true)` auf der inneren `List`
+  - Zeile 330: `frame(minHeight: CGFloat(tasks.count * 44))` berechnet Hoehe
+  - Bei vielen Tasks wird Block zu gross fuer sichtbaren Bereich
+  - `.scrollDisabled(true)` verhindert Scrollen zu unteren Tasks
+  - Pattern wurde verwendet um Scroll-Konflikte mit aeusserer ScrollView (Zeile 74) zu vermeiden
+- Gleiches Pattern auch in:
+  - `BlockPlanningView.swift:196-216` (existingBlocksSection)
+- Fix-Strategien:
+  1. Feste `.frame(maxHeight: 250)` mit `.scrollDisabled(false)` (empfohlen)
+  2. Expandable/Collapsible Section mit "Mehr anzeigen"
+  3. ScrollViewReader mit programmatischem Scroll-Control
+- Test:
+  1. Focus Block mit 6+ Tasks erstellen
+  2. Versuche innerhalb des Blocks zu scrollen
+  3. Untere Tasks muessen erreichbar sein
+  4. Edge Case: Scroll-Geste soll nicht versehentlich aeussere ScrollView aktivieren
+- Aufwand: Mittel (Layout-Logik + Scroll-Konflikt-Handling)
+- Status: OFFEN
+
 ---
 
 ## Offene Tasks

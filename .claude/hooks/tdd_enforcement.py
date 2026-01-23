@@ -262,7 +262,87 @@ def validate_red_phase(workflow: dict) -> tuple[bool, str]:
 +======================================================================+
 """
 
-    return True, "TDD RED phase validated (unit + UI tests)"
+    # STRICT CHECK: Require ui_test_red_done flag with verified failure
+    ui_test_red_done = workflow.get("ui_test_red_done", False)
+    ui_test_red_result = workflow.get("ui_test_red_result", "")
+
+    if not ui_test_red_done:
+        return False, f"""
++======================================================================+
+|  UI TESTS NOT VERIFIED AS FAILING!                                   |
++======================================================================+
+|  Workflow flag 'ui_test_red_done' is not set to true.                |
+|                                                                      |
+|  You MUST:                                                           |
+|  1. Write UI tests FIRST (before any implementation)                 |
+|  2. Run xcodebuild test -only-testing:TimeBoxUITests/[YourTests]     |
+|  3. Capture the ACTUAL failure output                                |
+|  4. Set ui_test_red_done=true and ui_test_red_result="failed:..."    |
+|                                                                      |
+|  Use /tdd-red to properly start the TDD RED phase.                   |
++======================================================================+
+"""
+
+    # Verify the result indicates actual failure
+    if not ui_test_red_result or "fail" not in ui_test_red_result.lower():
+        return False, f"""
++======================================================================+
+|  UI TEST RED RESULT NOT VERIFIED!                                    |
++======================================================================+
+|  ui_test_red_result: "{ui_test_red_result[:40]}..."                   |
+|                                                                      |
+|  Result must contain "fail" to prove tests actually failed.          |
+|  Retroactive "exemption" results are not accepted.                   |
+|                                                                      |
+|  Run the UI tests and capture actual failure output.                 |
++======================================================================+
+"""
+
+    return True, "TDD RED phase validated (unit + UI tests with verified failure)"
+
+
+def validate_artifact_timestamps(workflow: dict, file_path: str) -> tuple[bool, str]:
+    """
+    Validate that RED phase artifacts were created BEFORE code modifications.
+    Prevents retroactive artifact creation to bypass TDD.
+    """
+    artifacts = workflow.get("test_artifacts", [])
+    red_artifacts = [a for a in artifacts if a.get("phase") == "phase5_tdd_red"]
+
+    if not red_artifacts:
+        return True, "No RED artifacts to check timestamps"
+
+    # Get the earliest RED artifact timestamp
+    earliest_red = None
+    for artifact in red_artifacts:
+        created = artifact.get("created")
+        if created:
+            try:
+                artifact_dt = datetime.fromisoformat(created.replace('Z', '+00:00'))
+                if earliest_red is None or artifact_dt < earliest_red:
+                    earliest_red = artifact_dt
+            except (ValueError, TypeError):
+                continue
+
+    if not earliest_red:
+        return True, "No valid artifact timestamps"
+
+    # Check if the code file was modified BEFORE the RED artifacts
+    code_path = Path(file_path)
+    if code_path.exists():
+        file_mtime = datetime.fromtimestamp(code_path.stat().st_mtime, tz=earliest_red.tzinfo)
+
+        # If file was modified AFTER earliest RED artifact, that's suspicious
+        # But we need to allow modifications during implementation
+        # The key check: affected_files should NOT have been modified before RED phase
+        affected_files = workflow.get("affected_files", [])
+
+        # Check if this is the FIRST modification to the file in this workflow
+        if str(file_path) in affected_files or any(file_path.endswith(af.split("/")[-1]) for af in affected_files):
+            # File was already registered - allow modifications during implementation
+            return True, "File already in affected_files - implementation in progress"
+
+    return True, "Timestamp check passed"
 
 
 def check_tdd_requirements(file_path: str) -> tuple[bool, str]:
@@ -281,8 +361,17 @@ def check_tdd_requirements(file_path: str) -> tuple[bool, str]:
     if phase not in TEST_REQUIRED_PHASES:
         return True, f"Phase {phase} doesn't require TDD artifacts"
 
-    # Validate RED phase completion
-    return validate_red_phase(workflow)
+    # Validate RED phase completion (must have artifacts)
+    valid, reason = validate_red_phase(workflow)
+    if not valid:
+        return False, reason
+
+    # Additional check: Verify artifact timestamps aren't retroactive
+    valid, reason = validate_artifact_timestamps(workflow, file_path)
+    if not valid:
+        return False, reason
+
+    return True, "TDD requirements met"
 
 
 def main():

@@ -1,0 +1,24 @@
+ScrollingUITests TDD RED Phase - Di. 20 Jan. 2026 08:09:32 CET
+Test Case '-[TimeBoxUITests.ScrollingUITests testAllBlocksAreTappable]' started.
+Test Case '-[TimeBoxUITests.ScrollingUITests testAllBlocksAreTappable]' passed (9.151 seconds).
+Test Case '-[TimeBoxUITests.ScrollingUITests testBlockPlanningViewScrollingWithManyBlocks]' started.
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxUITests/ScrollingUITests.swift:124: -[TimeBoxUITests.ScrollingUITests testBlockPlanningViewScrollingWithManyBlocks] : Test skipped - Need 6+ blocks to test scrolling - found 2
+Test Case '-[TimeBoxUITests.ScrollingUITests testBlockPlanningViewScrollingWithManyBlocks]' skipped (9.725 seconds).
+Test Case '-[TimeBoxUITests.ScrollingUITests testFocusBlockCardScrollingWithManyTasks]' started.
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxUITests/ScrollingUITests.swift:60: -[TimeBoxUITests.ScrollingUITests testFocusBlockCardScrollingWithManyTasks] : Test skipped - Need 7+ tasks in a block to test scrolling - found 1
+Test Case '-[TimeBoxUITests.ScrollingUITests testFocusBlockCardScrollingWithManyTasks]' skipped (14.658 seconds).
+Test Case '-[TimeBoxUITests.ScrollingUITests testIndependentBlockScrolling]' started.
+Test Case '-[TimeBoxUITests.ScrollingUITests testIndependentBlockScrolling]' passed (11.806 seconds).
+Test Case '-[TimeBoxUITests.ScrollingUITests testScrollingAcrossAllTabs]' started.
+Test Case '-[TimeBoxUITests.ScrollingUITests testScrollingAcrossAllTabs]' passed (16.756 seconds).
+Test Case '-[TimeBoxUITests.ScrollingUITests testScrollingBehaviorScreenshots]' started.
+Test Case '-[TimeBoxUITests.ScrollingUITests testScrollingBehaviorScreenshots]' passed (13.656 seconds).
+Test Case '-[TimeBoxUITests.ScrollingUITests testTaskBacklogScrollingWithManyTasks]' started.
+/Users/hem/Documents/opt/my-daily-sprints/TimeBox/TimeBoxUITests/ScrollingUITests.swift:185: -[TimeBoxUITests.ScrollingUITests testTaskBacklogScrollingWithManyTasks] : Test skipped - Need 10+ Next Up tasks to test scrolling - found 3
+Test Case '-[TimeBoxUITests.ScrollingUITests testTaskBacklogScrollingWithManyTasks]' skipped (9.776 seconds).
+Test Suite 'ScrollingUITests' passed at 2026-01-20 08:11:06.096.
+	 Executed 7 tests, with 3 tests skipped and 0 failures (0 unexpected) in 85.528 (85.536) seconds
+Test Suite 'TimeBoxUITests.xctest' passed at 2026-01-20 08:11:06.097.
+	 Executed 7 tests, with 3 tests skipped and 0 failures (0 unexpected) in 85.528 (85.537) seconds
+Test Suite 'Selected tests' passed at 2026-01-20 08:11:06.097.
+	 Executed 7 tests, with 3 tests skipped and 0 failures (0 unexpected) in 85.528 (85.538) seconds

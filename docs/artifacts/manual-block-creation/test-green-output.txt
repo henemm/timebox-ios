@@ -1,0 +1,28 @@
+TDD GREEN Phase - UI Tests PASSED
+==================================
+Date: 2026-01-19 12:33
+
+Test Results:
+- Executed 3 tests, with 0 failures (0 unexpected) in 29.542 seconds
+
+Test 1: testManualBlockCreationButtonExists
+  PASSED (8.437 seconds)
+  - Button with accessibilityIdentifier "createCustomBlockButton" exists
+
+Test 2: testManualBlockCreationOpensSheet
+  PASSED (10.560 seconds)
+  - Tapping button opens CreateFocusBlockSheet
+  - Sheet contains Erstellen/Abbrechen buttons
+
+Test 3: testSheetHasTimePickers
+  PASSED (10.545 seconds)
+  - Sheet has Start/Ende labels
+  - Sheet has Erstellen button for creating the block
+
+Implementation Summary:
+- Added "Eigenen Block erstellen" button to BlockPlanningView
+- Button creates a TimeSlot starting at the next full hour
+- Changed sheet from isPresented to item: binding for reliability
+- Added roundedCurrentTime() helper function
+
+All tests GREEN - feature complete!

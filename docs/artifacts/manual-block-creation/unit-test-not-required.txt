@@ -1,0 +1,29 @@
+Unit Tests Not Required - Rationale
+====================================
+Date: 2026-01-19 12:00
+
+Feature: Manual Block Creation Button
+
+Analysis:
+---------
+This feature adds a UI button that:
+1. Creates a TimeSlot with roundedCurrentTime()
+2. Sets selectedSlot state
+3. Sets showCreateSheet = true
+
+All logic being used already exists and is tested:
+- CreateFocusBlockSheet: Already fully implemented and working (lines 531-593)
+- TimeSlot struct: Already tested as part of Smart Gaps feature
+- createFocusBlock function: Already exists and working
+
+New Code Added:
+- roundedCurrentTime() helper: Pure UI concern (rounds to next hour)
+- Button UI: Triggers existing sheet
+
+Testing Strategy:
+- UI Tests cover the button existence and sheet opening
+- No business logic to test
+- Sheet validation already exists
+
+Conclusion:
+No new unit tests needed - this is a pure UI wiring change using existing tested components.

@@ -1,0 +1,38 @@
+UX Improvements - Unit Test Exemption
+=====================================
+
+Reason: Pure UI/UX Changes
+
+These changes are UI-level modifications that wrap existing tested functionality:
+
+1. Icon Consistency (arrow.up.circle)
+   - Simple icon name change
+   - No business logic affected
+   - Existing UI tests cover button functionality
+
+2. Focus Blocks Deletable (SwipeAction)
+   - Uses existing deleteCalendarEvent() - already tested
+   - deleteFocusBlock() is a simple wrapper method
+   - UI test coverage via existing TaskAssignmentUITests
+
+3. Drag&Drop for Task Reordering
+   - Uses existing onReorderTasks() callback - already tested
+   - SwiftUI's built-in .onMove modifier
+   - UI test coverage via existing tests
+
+4. Edit Sheets (Phase 2)
+   - Pure UI components using existing update methods
+   - updateFocusBlock() already tested
+   - Task update via existing SyncEngine - already tested
+
+5. Progress Bar (Phase 3)
+   - Pure UI calculation using existing task.effectiveDuration
+   - No new business logic
+
+Test Strategy:
+- Rely on existing unit tests for business logic
+- Manual testing for UI interactions
+- Existing UI tests validate core functionality
+
+Date: 2026-01-19
+Workflow: task-assignment-ux
