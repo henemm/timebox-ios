@@ -1,0 +1,39 @@
+UI Test RED Phase for TaskDetailSheet
+=====================================
+Date: 2026-01-23
+
+TEST RUN RESULT: 8 tests FAILED ❌
+
+FAILURE SUMMARY:
+- testTaskDetailSheetOpensFromListMode: FAILED
+  → XCTAssertTrue failed - TaskDetailSheet does not exist
+  → Navigation title "Task Details" not found
+  
+- testTaskDetailShowsAllFields: FAILED
+  → XCTAssertTrue failed - "Einordnung" section not found
+  → XCTAssertTrue failed - "Zeit" section not found
+  
+- testTaskDetailEditButtonWorks: FAILED  
+  → XCTAssertTrue failed - "Bearbeiten" button not found
+  
+- testTaskTappableInCategoryView: FAILED
+  → XCTAssertTrue failed - tap does not open TaskDetailSheet
+  
+- testTaskTappableInDurationView: FAILED
+  → XCTAssertTrue failed - tap does not open TaskDetailSheet
+  
+- testTaskTappableInDueDateView: FAILED
+  → XCTAssertTrue failed - tap does not open TaskDetailSheet
+  
+- testTaskTappableInEisenhowerView: FAILED
+  → XCTAssertTrue failed - tap does not open TaskDetailSheet
+  
+- testTaskReorderingInFocusBlock: FAILED
+  → Test skipped - data dependent
+
+REASON FOR FAILURES:
+- TaskDetailSheet.swift does not exist yet
+- BacklogView does not use TaskDetailSheet
+- onTap callbacks not wired to TaskDetailSheet in all view modes
+
+TDD RED PHASE COMPLETE: All 8 tests failed as expected

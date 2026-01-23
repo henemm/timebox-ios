@@ -1,0 +1,277 @@
+import SwiftUI
+
+struct TaskDetailSheet: View {
+    let task: PlanItem
+    let onSave: (String, TaskPriority, Int) -> Void
+    let onDelete: () -> Void
+
+    @State private var showEditSheet = false
+    @Environment(\.dismiss) private var dismiss
+
+    private var priorityText: String {
+        switch task.priorityValue {
+        case 1: return "Niedrig"
+        case 2: return "Mittel"
+        case 3: return "Hoch"
+        default: return "Unbekannt"
+        }
+    }
+
+    private var priorityColor: Color {
+        switch task.priorityValue {
+        case 1: return .blue
+        case 2: return .yellow
+        case 3: return .red
+        default: return .gray
+        }
+    }
+
+    private var urgencyText: String {
+        task.urgency == "urgent" ? "Dringend" : "Nicht dringend"
+    }
+
+    private var categoryText: String {
+        switch task.taskType {
+        case "deep_work": return "Deep Work"
+        case "shallow_work": return "Shallow Work"
+        case "meetings": return "Meetings"
+        case "maintenance": return "Maintenance"
+        case "creative": return "Creative"
+        case "strategic": return "Strategic"
+        case "income": return "Geld verdienen"
+        case "recharge": return "Energie aufladen"
+        case "learning": return "Lernen"
+        case "giving_back": return "Weitergeben"
+        default: return task.taskType.capitalized
+        }
+    }
+
+    var body: some View {
+        NavigationStack {
+            List {
+                // Header with Title + Priority
+                Section {
+                    titleSection
+                }
+
+                // Category + Urgency
+                Section("Einordnung") {
+                    categorySection
+                }
+
+                // Tags
+                if !task.tags.isEmpty {
+                    Section("Tags") {
+                        tagsSection
+                    }
+                }
+
+                // Due Date + Duration
+                Section("Zeit") {
+                    timeSection
+                }
+
+                // Description
+                if let desc = task.taskDescription, !desc.isEmpty {
+                    Section("Notizen") {
+                        Text(desc)
+                            .font(.body)
+                            .foregroundStyle(.primary)
+                    }
+                }
+            }
+            .navigationTitle("Task Details")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Fertig") {
+                        dismiss()
+                    }
+                }
+                ToolbarItem(placement: .primaryAction) {
+                    Button("Bearbeiten") {
+                        showEditSheet = true
+                    }
+                }
+            }
+            .sheet(isPresented: $showEditSheet) {
+                EditTaskSheet(
+                    task: task,
+                    onSave: { title, priority, duration in
+                        onSave(title, priority, duration)
+                        dismiss()
+                    },
+                    onDelete: {
+                        onDelete()
+                        dismiss()
+                    }
+                )
+            }
+        }
+        .presentationDetents([.medium, .large])
+    }
+
+    // MARK: - Title Section
+
+    private var titleSection: some View {
+        HStack(spacing: 12) {
+            Circle()
+                .fill(priorityColor)
+                .frame(width: 12, height: 12)
+
+            Text(task.title)
+                .font(.headline)
+
+            Spacer()
+
+            Text(priorityText)
+                .font(.caption)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 4)
+                .background(priorityColor.opacity(0.15))
+                .foregroundStyle(priorityColor)
+                .clipShape(Capsule())
+        }
+    }
+
+    // MARK: - Category Section
+
+    private var categorySection: some View {
+        VStack(spacing: 0) {
+            HStack {
+                Label("Kategorie", systemImage: "folder")
+                    .foregroundStyle(.secondary)
+                Spacer()
+                Text(categoryText)
+            }
+
+            Divider()
+                .padding(.vertical, 8)
+
+            HStack {
+                Label("Dringlichkeit", systemImage: task.urgency == "urgent" ? "exclamationmark.circle" : "clock")
+                    .foregroundStyle(.secondary)
+                Spacer()
+                Text(urgencyText)
+                    .foregroundStyle(task.urgency == "urgent" ? .red : .primary)
+            }
+        }
+    }
+
+    // MARK: - Tags Section
+
+    private var tagsSection: some View {
+        FlowLayout(spacing: 8) {
+            ForEach(task.tags, id: \.self) { tag in
+                Text(tag)
+                    .font(.caption)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+                    .background(Color.accentColor.opacity(0.15))
+                    .foregroundStyle(Color.accentColor)
+                    .clipShape(Capsule())
+            }
+        }
+    }
+
+    // MARK: - Time Section
+
+    private var timeSection: some View {
+        VStack(spacing: 0) {
+            HStack {
+                Label("Dauer", systemImage: "clock")
+                    .foregroundStyle(.secondary)
+                Spacer()
+                Text("\(task.effectiveDuration) min")
+                    .foregroundStyle(task.durationSource == .default ? .secondary : .primary)
+            }
+
+            if let dueDate = task.dueDate {
+                Divider()
+                    .padding(.vertical, 8)
+
+                HStack {
+                    Label("Fällig", systemImage: "calendar")
+                        .foregroundStyle(.secondary)
+                    Spacer()
+                    Text(dueDateFormatted(dueDate))
+                        .foregroundStyle(isDueToday(dueDate) ? .red : .primary)
+                }
+            }
+        }
+    }
+
+    // MARK: - Helpers
+
+    private func dueDateFormatted(_ date: Date) -> String {
+        let calendar = Calendar.current
+        if calendar.isDateInToday(date) {
+            return "Heute"
+        } else if calendar.isDateInTomorrow(date) {
+            return "Morgen"
+        } else if calendar.isDate(date, equalTo: Date(), toGranularity: .weekOfYear) {
+            let formatter = DateFormatter()
+            formatter.dateFormat = "EEEE"
+            formatter.locale = Locale(identifier: "de_DE")
+            return formatter.string(from: date)
+        } else {
+            let formatter = DateFormatter()
+            formatter.dateStyle = .medium
+            formatter.timeStyle = .none
+            formatter.locale = Locale(identifier: "de_DE")
+            return formatter.string(from: date)
+        }
+    }
+
+    private func isDueToday(_ date: Date) -> Bool {
+        Calendar.current.isDateInToday(date)
+    }
+}
+
+// MARK: - Flow Layout for Tags
+
+private struct FlowLayout: Layout {
+    var spacing: CGFloat = 8
+
+    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
+        let result = flowLayout(proposal: proposal, subviews: subviews)
+        return result.size
+    }
+
+    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
+        let result = flowLayout(proposal: proposal, subviews: subviews)
+        for (index, position) in result.positions.enumerated() {
+            subviews[index].place(
+                at: CGPoint(x: bounds.minX + position.x, y: bounds.minY + position.y),
+                proposal: .unspecified
+            )
+        }
+    }
+
+    private func flowLayout(proposal: ProposedViewSize, subviews: Subviews) -> (size: CGSize, positions: [CGPoint]) {
+        let maxWidth = proposal.width ?? .infinity
+        var positions: [CGPoint] = []
+        var currentX: CGFloat = 0
+        var currentY: CGFloat = 0
+        var lineHeight: CGFloat = 0
+
+        for subview in subviews {
+            let size = subview.sizeThatFits(.unspecified)
+
+            if currentX + size.width > maxWidth && currentX > 0 {
+                currentX = 0
+                currentY += lineHeight + spacing
+                lineHeight = 0
+            }
+
+            positions.append(CGPoint(x: currentX, y: currentY))
+            lineHeight = max(lineHeight, size.height)
+            currentX += size.width + spacing
+        }
+
+        let totalHeight = currentY + lineHeight
+        let totalWidth = maxWidth == .infinity ? currentX : maxWidth
+
+        return (CGSize(width: totalWidth, height: totalHeight), positions)
+    }
+}

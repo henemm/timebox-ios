@@ -227,7 +227,7 @@ struct BacklogView: View {
                 }
             }
             .sheet(item: $taskToEdit) { task in
-                EditTaskSheet(
+                TaskDetailSheet(
                     task: task,
                     onSave: { title, priority, duration in
                         updateTask(task, title: title, priority: priority, duration: duration)
@@ -393,7 +393,8 @@ struct BacklogView: View {
                     icon: "exclamationmark.3",
                     tasks: doFirstTasks,
                     onDurationTap: { item in selectedItemForDuration = item },
-                    onAddToNextUp: { item in updateNextUp(for: item, isNextUp: true) }
+                    onAddToNextUp: { item in updateNextUp(for: item, isNextUp: true) },
+                    onTap: { item in taskToEdit = item }
                 )
 
                 QuadrantCard(
@@ -403,7 +404,8 @@ struct BacklogView: View {
                     icon: "calendar",
                     tasks: scheduleTasks,
                     onDurationTap: { item in selectedItemForDuration = item },
-                    onAddToNextUp: { item in updateNextUp(for: item, isNextUp: true) }
+                    onAddToNextUp: { item in updateNextUp(for: item, isNextUp: true) },
+                    onTap: { item in taskToEdit = item }
                 )
 
                 QuadrantCard(
@@ -413,7 +415,8 @@ struct BacklogView: View {
                     icon: "person.2",
                     tasks: delegateTasks,
                     onDurationTap: { item in selectedItemForDuration = item },
-                    onAddToNextUp: { item in updateNextUp(for: item, isNextUp: true) }
+                    onAddToNextUp: { item in updateNextUp(for: item, isNextUp: true) },
+                    onTap: { item in taskToEdit = item }
                 )
 
                 QuadrantCard(
@@ -423,7 +426,8 @@ struct BacklogView: View {
                     icon: "trash",
                     tasks: eliminateTasks,
                     onDurationTap: { item in selectedItemForDuration = item },
-                    onAddToNextUp: { item in updateNextUp(for: item, isNextUp: true) }
+                    onAddToNextUp: { item in updateNextUp(for: item, isNextUp: true) },
+                    onTap: { item in taskToEdit = item }
                 )
             }
             .padding()
@@ -442,7 +446,8 @@ struct BacklogView: View {
                         BacklogRow(
                             item: item,
                             onDurationTap: { selectedItemForDuration = item },
-                            onAddToNextUp: { updateNextUp(for: item, isNextUp: true) }
+                            onAddToNextUp: { updateNextUp(for: item, isNextUp: true) },
+                            onTap: { taskToEdit = item }
                         )
                     }
                 }
@@ -463,7 +468,8 @@ struct BacklogView: View {
                         BacklogRow(
                             item: item,
                             onDurationTap: { selectedItemForDuration = item },
-                            onAddToNextUp: { updateNextUp(for: item, isNextUp: true) }
+                            onAddToNextUp: { updateNextUp(for: item, isNextUp: true) },
+                            onTap: { taskToEdit = item }
                         )
                     }
                 }
@@ -484,7 +490,8 @@ struct BacklogView: View {
                         BacklogRow(
                             item: item,
                             onDurationTap: { selectedItemForDuration = item },
-                            onAddToNextUp: { updateNextUp(for: item, isNextUp: true) }
+                            onAddToNextUp: { updateNextUp(for: item, isNextUp: true) },
+                            onTap: { taskToEdit = item }
                         )
                     }
                 }
@@ -526,6 +533,7 @@ struct QuadrantCard: View {
     let tasks: [PlanItem]
     let onDurationTap: (PlanItem) -> Void
     let onAddToNextUp: (PlanItem) -> Void
+    let onTap: (PlanItem) -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -560,7 +568,8 @@ struct QuadrantCard: View {
                     BacklogRow(
                         item: task,
                         onDurationTap: { onDurationTap(task) },
-                        onAddToNextUp: { onAddToNextUp(task) }
+                        onAddToNextUp: { onAddToNextUp(task) },
+                        onTap: { onTap(task) }
                     )
                     .padding(.horizontal, 8)
                 }

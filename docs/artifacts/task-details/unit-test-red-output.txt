@@ -1,0 +1,31 @@
+Unit Test Exemption for TaskDetailSheet
+========================================
+
+Date: 2026-01-23
+Feature: Task Details Sheet (Sprint 7)
+
+EXEMPTION REASON:
+TaskDetailSheet is a PURE UI VIEW with NO business logic.
+
+- All data comes from PlanItem model (already tested)
+- All formatting/display logic is trivial (string switch statements)
+- No state mutations, no async operations, no complex calculations
+- Similar to existing EditTaskSheet which also has no unit tests
+
+What the view does:
+1. Display task.title - direct property access
+2. Display task.priorityValue - simple switch to string
+3. Display task.urgency - simple ternary
+4. Display task.taskType - simple switch to localized string
+5. Display task.tags - direct ForEach iteration
+6. Display task.dueDate - simple date formatting
+7. Display task.effectiveDuration - direct property access
+
+All of these are presentation-only, no business logic.
+
+UI TESTS:
+- TaskDetailUITests.swift created with 8 tests
+- Tests verify: sheet opening, all fields visible, edit button works
+- Tests cover all view modes: List, Category, Duration, DueDate, Matrix
+
+RESULT: Unit test RED phase EXEMPTED - pure UI feature
