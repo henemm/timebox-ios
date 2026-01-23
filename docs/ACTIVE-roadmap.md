@@ -65,34 +65,7 @@ _Keine Features in Arbeit_
 > Basiert auf: `docs/project/stories/timebox-core.md`
 > Gap-Analyse: `docs/context/user-story-gap-analysis.md`
 
-### Sprint 1: End-Gong/Sound
-**Status:** Open
-**Prioritaet:** Hoch (User Story Core)
-**Bereich:** FocusLiveView
-
-**Kurzbeschreibung:**
-Akustisches Signal am Block-Ende. System-Sound, konfigurierbar (mit/ohne).
-
----
-
-### Sprint 2: Vorwarnung vor Block-Ende
-**Status:** Open
-**Prioritaet:** Hoch (User Story Core)
-**Bereich:** FocusLiveView, Settings
-
-**Kurzbeschreibung:**
-Konfigurierbarer Hinweis ("noch 5 min") mit Sound + Haptic.
-
----
-
-### Sprint 3: Kategorien erweitern (5 statt 3)
-**Status:** Open
-**Prioritaet:** Hoch (User Story Core)
-**Bereich:** LocalTask, TaskCreation, BacklogRow
-
-**Kurzbeschreibung:**
-2 neue Kategorien: `learning` (Lernen), `giving_back` (Weitergeben).
-Bestehend: `income`, `maintenance`, `recharge`.
+### Sprint 4: Live Activity (Lockscreen/Dynamic Island)
 
 ---
 
@@ -159,6 +132,36 @@ Tasks innerhalb eines Focus Blocks per Drag & Drop umsortierbar.
 ---
 
 ## Abgeschlossen (Done)
+
+### Sprint 3: Kategorien erweitern (5 statt 3)
+**Status:** Done
+**Bereich:** LocalTask, CreateTaskView, BacklogView
+**Commit:** 5c054ef
+
+**Kurzbeschreibung:**
+2 neue Kategorien: `learning` (Lernen), `giving_back` (Weitergeben).
+
+---
+
+### Sprint 2: Vorwarnung vor Block-Ende
+**Status:** Done
+**Bereich:** FocusLiveView, SettingsView, SoundService
+**Commit:** 247dc76
+
+**Kurzbeschreibung:**
+Prozentbasierte Vorwarnung (10/20/30% vor Ende) mit Sound + Haptic.
+
+---
+
+### Sprint 1: End-Gong/Sound
+**Status:** Done
+**Bereich:** FocusLiveView, SettingsView, SoundService
+**Commit:** (Teil von Sound-System)
+
+**Kurzbeschreibung:**
+Akustisches Signal am Block-Ende. System-Sound, konfigurierbar.
+
+---
 
 ### Kalender auswaehlbar machen (Settings)
 **Status:** Done
