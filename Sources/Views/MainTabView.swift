@@ -22,6 +22,11 @@ struct MainTabView: View {
                 .tabItem {
                     Label("Fokus", systemImage: "target")
                 }
+
+            DailyReviewView()
+                .tabItem {
+                    Label("Rückblick", systemImage: "clock.arrow.circlepath")
+                }
         }
     }
 }
