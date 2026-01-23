@@ -65,23 +65,7 @@ _Keine Features in Arbeit_
 > Basiert auf: `docs/project/stories/timebox-core.md`
 > Gap-Analyse: `docs/context/user-story-gap-analysis.md`
 
-### Sprint 5: Tages-Rückblick
-**Status:** Open
-**Prioritaet:** Mittel (User Story)
-**Bereich:** Neues View, History-Model
-
-**Kurzbeschreibung:**
-"Was habe ich heute alles geschafft?" - Übersicht erledigter Tasks.
-
----
-
-### Sprint 6: Wochen-Rückblick
-**Status:** Open
-**Prioritaet:** Mittel (User Story)
-**Bereich:** Neues View, History-Model
-
-**Kurzbeschreibung:**
-"Womit habe ich meine Woche verbracht?" - Zeit-Analyse nach Kategorie.
+_Alle User Story Features abgeschlossen - siehe "Abgeschlossen" unten_
 
 ---
 
@@ -118,6 +102,26 @@ Tasks innerhalb eines Focus Blocks per Drag & Drop umsortierbar.
 ---
 
 ## Abgeschlossen (Done)
+
+### Sprint 6: Wochen-Rückblick
+**Status:** Done
+**Bereich:** DailyReviewView (erweitert)
+**Commit:** cc2d34a
+
+**Kurzbeschreibung:**
+"Womit habe ich meine Woche verbracht?" - Segmented Picker im Rückblick-Tab ermöglicht Wechsel zwischen Tages- und Wochen-Ansicht. Wochen-Ansicht zeigt Zeit pro Kategorie als horizontale Balken.
+
+---
+
+### Sprint 5: Tages-Rückblick
+**Status:** Done
+**Bereich:** DailyReviewView, MainTabView
+**Spec:** docs/specs/features/daily-review.md
+
+**Kurzbeschreibung:**
+"Was habe ich heute alles geschafft?" - Neuer Tab zeigt Übersicht aller erledigten Tasks des Tages, gruppiert nach Focus Blocks.
+
+---
 
 ### Sprint 4: Live Activity (Lockscreen/Dynamic Island)
 **Status:** Done
