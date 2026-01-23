@@ -293,7 +293,19 @@
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		RESRC001EXCEPTION00001 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+				FocusBlox.entitlements,
+			);
+			target = 16ED0EAB4D5DFBFFCCD4B1B6 /* FocusBlox */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		RESRC001SYNCGROUP00001 /* Resources */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (RESRC001EXCEPTION00001 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = Resources; sourceTree = "<group>"; };
 		B7A16CD62F1FE3BC00165284 /* FocusBloxWidgets */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (B7A16CEA2F1FE3BE00165284 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = FocusBloxWidgets; sourceTree = "<group>"; };
 		B7A16D0D2F20FDD400165284 /* FocusBloxCore */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = FocusBloxCore; sourceTree = "<group>"; };
 		B7A16D1C2F20FDD400165284 /* FocusBloxCoreTests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = FocusBloxCoreTests; sourceTree = "<group>"; };
@@ -534,6 +546,7 @@
 		F035EACA143AFEF72D3412E7 = {
 			isa = PBXGroup;
 			children = (
+				RESRC001SYNCGROUP00001 /* Resources */,
 				A4C4EBF78590D9165A0AA710 /* Sources */,
 				A6B3805EF19D1B131D346DDD /* FocusBloxTests */,
 				05D90FB2A2CE48689EC309B4 /* FocusBloxUITests */,
@@ -563,6 +576,7 @@
 			buildConfigurationList = 099289053D4F2939E705E22B /* Build configuration list for PBXNativeTarget "FocusBlox" */;
 			buildPhases = (
 				2F0E2791A1F8F8F4C7109EED /* Sources */,
+				RESRC001BUILDPHASE001 /* Resources */,
 				B7A16CE72F1FE3BE00165284 /* Embed Foundation Extensions */,
 				B7A16D262F20FDD400165284 /* Frameworks */,
 				B7A16D3A2F2144A100165284 /* Embed Frameworks */,
@@ -575,9 +589,14 @@
 				B7A16D312F21001300165284 /* PBXTargetDependency */,
 			);
 			name = FocusBlox;
+			packageProductDependencies = (
+			);
 			productName = FocusBlox;
 			productReference = 0A9FDDCD2C501D3A6679FA58 /* FocusBlox.app */;
 			productType = "com.apple.product-type.application";
+			fileSystemSynchronizedGroups = (
+				RESRC001SYNCGROUP00001 /* Resources */,
+			);
 		};
 		B7A16CCF2F1FE3BC00165284 /* FocusBloxWidgetsExtension */ = {
 			isa = PBXNativeTarget;
@@ -732,6 +751,13 @@
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		RESRC001BUILDPHASE001 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		B7A16CCE2F1FE3BC00165284 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
