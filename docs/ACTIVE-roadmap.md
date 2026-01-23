@@ -65,20 +65,6 @@ _Keine Features in Arbeit_
 > Basiert auf: `docs/project/stories/timebox-core.md`
 > Gap-Analyse: `docs/context/user-story-gap-analysis.md`
 
-### Sprint 4: Live Activity (Lockscreen/Dynamic Island)
-
----
-
-### Sprint 4: Live Activity (Lockscreen/Dynamic Island)
-**Status:** Open
-**Prioritaet:** Hoch (User Story Core)
-**Bereich:** ActivityKit, Widgets
-
-**Kurzbeschreibung:**
-Fokus-Block auf Lockscreen und Dynamic Island anzeigen.
-
----
-
 ### Sprint 5: Tages-Rückblick
 **Status:** Open
 **Prioritaet:** Mittel (User Story)
@@ -132,6 +118,16 @@ Tasks innerhalb eines Focus Blocks per Drag & Drop umsortierbar.
 ---
 
 ## Abgeschlossen (Done)
+
+### Sprint 4: Live Activity (Lockscreen/Dynamic Island)
+**Status:** Done
+**Bereich:** ActivityKit, FocusBloxWidgets, FocusLiveView
+**Spec:** docs/specs/features/live-activity.md
+
+**Kurzbeschreibung:**
+Focus Block Timer auf Lock Screen und Dynamic Island anzeigen mit Countdown und aktuellem Task.
+
+---
 
 ### Sprint 3: Kategorien erweitern (5 statt 3)
 **Status:** Done

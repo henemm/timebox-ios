@@ -18,6 +18,10 @@ struct FocusLiveView: View {
     @State private var warningPlayed = false
     private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
+    // Live Activity Manager
+    @State private var liveActivityManager = LiveActivityManager()
+    @State private var liveActivityStarted = false
+
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
@@ -64,6 +68,44 @@ struct FocusLiveView: View {
             currentTime = time
             checkBlockEnd()
         }
+        .onChange(of: activeBlock?.id) { _, _ in
+            // Start or end Live Activity when block changes
+            if let block = activeBlock, block.isActive {
+                startLiveActivity(for: block)
+            } else {
+                liveActivityManager.endActivity()
+                liveActivityStarted = false
+            }
+        }
+    }
+
+    // MARK: - Live Activity Management
+
+    private func startLiveActivity(for block: FocusBlock) {
+        let tasks = tasksForBlock(block)
+        let remainingTasks = tasks.filter { !block.completedTaskIDs.contains($0.id) }
+        let currentTask = remainingTasks.first?.title
+
+        Task {
+            do {
+                try await liveActivityManager.startActivity(for: block, currentTask: currentTask)
+                liveActivityStarted = true
+            } catch {
+                // Live Activity couldn't be started - not critical
+                liveActivityStarted = false
+            }
+        }
+    }
+
+    private func updateLiveActivity(for block: FocusBlock) {
+        let tasks = tasksForBlock(block)
+        let remainingTasks = tasks.filter { !block.completedTaskIDs.contains($0.id) }
+        let currentTask = remainingTasks.first?.title
+
+        liveActivityManager.updateActivity(
+            currentTask: currentTask,
+            completedCount: block.completedTaskIDs.count
+        )
     }
 
     // MARK: - Active Focus Content
@@ -107,7 +149,21 @@ struct FocusLiveView: View {
             HStack {
                 Text(block.title)
                     .font(.headline)
+
+                // Live Activity status indicator (show when block is active)
+                Image(systemName: "dot.radiowaves.left.and.right")
+                    .font(.caption)
+                    .foregroundStyle(liveActivityStarted ? .blue : .secondary)
+                    .accessibilityIdentifier("liveActivityBadge")
+
                 Spacer()
+
+                // Live Activity status text
+                Text(liveActivityStarted ? "Live" : "Aktiv")
+                    .font(.caption2)
+                    .foregroundStyle(liveActivityStarted ? .blue : .secondary)
+                    .accessibilityIdentifier("liveActivityStatus")
+
                 Text(timeRangeText(block: block))
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
@@ -355,6 +411,11 @@ struct FocusLiveView: View {
 
                 completionFeedback.toggle()
                 await loadData()
+
+                // Update Live Activity with new task
+                if let updatedBlock = activeBlock {
+                    updateLiveActivity(for: updatedBlock)
+                }
             } catch {
                 errorMessage = "Task konnte nicht als erledigt markiert werden."
             }
@@ -395,6 +456,10 @@ struct FocusLiveView: View {
             SoundService.playEndGong()
             showSprintReview = true
             warningPlayed = false  // Reset for next block
+
+            // End Live Activity
+            liveActivityManager.endActivity()
+            liveActivityStarted = false
         }
     }
 

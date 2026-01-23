@@ -65,7 +65,20 @@ struct FocusBloxApp: App {
                 completedTaskIDs: []
             )
 
-            mock.mockFocusBlocks = [focusBlock1, focusBlock2]
+            // Focus Block 3: ALWAYS ACTIVE (for Live Activity testing)
+            // Starts 30min ago, ends in 30min
+            let activeBlockStart = calendar.date(byAdding: .minute, value: -30, to: now)!
+            let activeBlockEnd = calendar.date(byAdding: .minute, value: 30, to: now)!
+            let activeBlock = FocusBlock(
+                id: "mock-block-active",
+                title: "Active Test Block",
+                startDate: activeBlockStart,
+                endDate: activeBlockEnd,
+                taskIDs: ["00000000-0000-0000-0000-000000000001"],
+                completedTaskIDs: []
+            )
+
+            mock.mockFocusBlocks = [focusBlock1, focusBlock2, activeBlock]
 
             // Add mock Calendar Events for timeline testing
             let meeting1Start = calendar.date(byAdding: .hour, value: 8, to: startOfDay)!
