@@ -3,8 +3,39 @@ import SwiftData
 
 struct FocusLiveView: View {
     @Environment(\.modelContext) private var modelContext
-    @State private var eventKitRepo = EventKitRepository()
+    @State private var eventKitRepo: any EventKitRepositoryProtocol = FocusLiveView.createRepository()
     @State private var activeBlock: FocusBlock?
+
+    /// Creates the appropriate repository based on launch mode
+    private static func createRepository() -> any EventKitRepositoryProtocol {
+        let isUITesting = ProcessInfo.processInfo.arguments.contains("-UITesting")
+        print("🔧 [FocusLiveView] createRepository: isUITesting=\(isUITesting)")
+
+        if isUITesting {
+            let mock = MockEventKitRepository()
+            mock.mockCalendarAuthStatus = .fullAccess
+            mock.mockReminderAuthStatus = .fullAccess
+
+            // Create an always-active Focus Block for testing
+            let calendar = Calendar.current
+            let now = Date()
+            let activeBlockStart = calendar.date(byAdding: .minute, value: -30, to: now)!
+            let activeBlockEnd = calendar.date(byAdding: .minute, value: 30, to: now)!
+            let activeBlock = FocusBlock(
+                id: "mock-block-active",
+                title: "Active Test Block",
+                startDate: activeBlockStart,
+                endDate: activeBlockEnd,
+                taskIDs: ["00000000-0000-0000-0000-000000000001"],
+                completedTaskIDs: []
+            )
+            mock.mockFocusBlocks = [activeBlock]
+            print("🔧 [FocusLiveView] Using mock repository with active block: \(activeBlock.title)")
+            return mock
+        }
+        print("🔧 [FocusLiveView] Using real EventKitRepository")
+        return EventKitRepository()
+    }
     @State private var allTasks: [PlanItem] = []
     @State private var isLoading = false
     @State private var errorMessage: String?
@@ -68,11 +99,14 @@ struct FocusLiveView: View {
             currentTime = time
             checkBlockEnd()
         }
-        .onChange(of: activeBlock?.id) { _, _ in
+        .onChange(of: activeBlock?.id) { oldValue, newValue in
             // Start or end Live Activity when block changes
+            print("🔔 [FocusLiveView] onChange activeBlock: old=\(oldValue ?? "nil") new=\(newValue ?? "nil")")
             if let block = activeBlock, block.isActive {
+                print("🔔 [FocusLiveView] Starting Live Activity for block: \(block.title)")
                 startLiveActivity(for: block)
             } else {
+                print("🔔 [FocusLiveView] Ending Live Activity (no active block)")
                 liveActivityManager.endActivity()
                 liveActivityStarted = false
             }
@@ -366,9 +400,11 @@ struct FocusLiveView: View {
     private func loadData() async {
         isLoading = true
         errorMessage = nil
+        print("📥 [FocusLiveView] loadData: starting...")
 
         do {
             let hasAccess = try await eventKitRepo.requestAccess()
+            print("📥 [FocusLiveView] loadData: hasAccess=\(hasAccess)")
             guard hasAccess else {
                 errorMessage = "Zugriff verweigert."
                 isLoading = false
@@ -376,7 +412,12 @@ struct FocusLiveView: View {
             }
 
             let blocks = try eventKitRepo.fetchFocusBlocks(for: Date())
+            print("📥 [FocusLiveView] loadData: found \(blocks.count) blocks")
+            for block in blocks {
+                print("📥 [FocusLiveView] block: \(block.title), isActive=\(block.isActive)")
+            }
             activeBlock = blocks.first { $0.isActive }
+            print("📥 [FocusLiveView] activeBlock=\(activeBlock?.title ?? "nil")")
 
             let taskSource = LocalTaskSource(modelContext: modelContext)
             let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)

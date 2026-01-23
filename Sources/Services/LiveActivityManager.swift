@@ -21,7 +21,12 @@ final class LiveActivityManager: Sendable {
         // End any existing activity first
         endActivity()
 
-        guard isSupported else { return }
+        print("🚀 [LiveActivity] START: areActivitiesEnabled=\(ActivityAuthorizationInfo().areActivitiesEnabled), block=\(block.title)")
+
+        guard isSupported else {
+            print("🚫 [LiveActivity] NOT SUPPORTED - areActivitiesEnabled is false")
+            return
+        }
 
         let attributes = FocusBlockActivityAttributes(
             blockTitle: block.title,
@@ -35,49 +40,74 @@ final class LiveActivityManager: Sendable {
             completedCount: block.completedTaskIDs.count
         )
 
-        do {
-            let activity = try Activity.request(
-                attributes: attributes,
-                content: .init(state: initialState, staleDate: block.endDate),
-                pushType: nil
-            )
-            currentActivity = activity
-        } catch {
-            // Activity couldn't be started (e.g., too many activities)
+        // Retry loop for transient errors (similar to Meditationstimer)
+        var lastError: Error?
+        for attempt in 1...2 {
+            do {
+                print("🚀 [LiveActivity] START attempt \(attempt): block='\(block.title)', task='\(currentTask ?? "nil")'")
+                let activity = try Activity.request(
+                    attributes: attributes,
+                    content: .init(state: initialState, staleDate: block.endDate),
+                    pushType: nil
+                )
+                currentActivity = activity
+                print("✅ [LiveActivity] START SUCCESS")
+                return
+            } catch {
+                lastError = error
+                print("❌ [LiveActivity] START attempt \(attempt) FAILED: \(error)")
+                if attempt < 2 {
+                    try? await Task.sleep(nanoseconds: 120_000_000) // 0.12s
+                }
+            }
+        }
+
+        if let error = lastError {
+            print("💥 [LiveActivity] START ULTIMATE FAILURE: \(error)")
             throw error
         }
     }
 
     /// Update the current activity with new task info
     func updateActivity(currentTask: String?, completedCount: Int) {
-        guard let activity = currentActivity else { return }
+        guard let activity = currentActivity else {
+            print("⚠️ [LiveActivity] UPDATE called but NO ACTIVE ACTIVITY (ignored)")
+            return
+        }
 
         let newState = FocusBlockActivityAttributes.ContentState(
             currentTaskTitle: currentTask,
             completedCount: completedCount
         )
 
+        print("🔄 [LiveActivity] UPDATE: task='\(currentTask ?? "nil")', completed=\(completedCount)")
         Task {
+            // Use staleDate for better background updates
+            let staleDate = Date().addingTimeInterval(15)
             await activity.update(
-                ActivityContent(state: newState, staleDate: nil)
+                ActivityContent(state: newState, staleDate: staleDate)
             )
         }
     }
 
     /// End the current activity
     func endActivity() {
-        guard let activity = currentActivity else { return }
+        guard let activity = currentActivity else {
+            print("⚠️ [LiveActivity] END called but NO ACTIVE ACTIVITY (ignored)")
+            return
+        }
 
-        let finalState = FocusBlockActivityAttributes.ContentState(
-            currentTaskTitle: nil,
-            completedCount: 0
-        )
+        print("🛑 [LiveActivity] END called")
 
         Task {
-            await activity.end(
-                ActivityContent(state: finalState, staleDate: nil),
-                dismissalPolicy: .immediate
-            )
+            // End with nil content using immediate dismissal
+            await activity.end(nil, dismissalPolicy: .immediate)
+
+            // Also end any orphaned activities
+            for orphan in Activity<FocusBlockActivityAttributes>.activities {
+                await orphan.end(nil, dismissalPolicy: .immediate)
+            }
+            print("✅ [LiveActivity] END COMPLETE")
         }
 
         currentActivity = nil
