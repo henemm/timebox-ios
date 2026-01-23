@@ -52,7 +52,7 @@ This project uses the **OpenSpec TDD Workflow** (9 Phasen):
 
 **THIS IS NON-NEGOTIABLE:**
 
-1. **EVERY feature** must have UI tests in `TimeBoxUITests/`
+1. **EVERY feature** must have UI tests in `FocusBloxUITests/`
 2. **EVERY bug fix** must have UI tests verifying the fix
 3. UI tests must be written **BEFORE** implementation (TDD RED)
 4. UI tests must **FAIL** when first run (proving feature doesn't exist)
@@ -134,13 +134,13 @@ All entities/components need specs before implementation:
 
 **Designated Test Simulator:**
 - Identifier: `D9E26087-132A-44CB-9883-59073DD9CC54`
-- Name: "Timebox"
+- Name: "FocusBlox"
 
 All automated tests (Unit Tests, UI Tests) must run on this specific simulator.
 
 Example command:
 ```bash
-xcodebuild test -project TimeBox.xcodeproj -scheme TimeBox \
+xcodebuild test -project FocusBlox/FocusBlox.xcodeproj -scheme FocusBlox \
   -destination 'id=D9E26087-132A-44CB-9883-59073DD9CC54'
 ```
 

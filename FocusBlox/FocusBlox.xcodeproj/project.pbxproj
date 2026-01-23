@@ -1,0 +1,1453 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 70;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		1B489799D0D38661913FCC34 /* TimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C945F5092F6FFB66C11FD4C2 /* TimelineView.swift */; };
+		22AA189C61A4045FE2B36B64 /* DurationBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDD319A3F7DEE05F6A8885FC /* DurationBadge.swift */; };
+		2F7184DE552C8D322971EDED /* MockEventKitRepositoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37586E91853A38D88E035A33 /* MockEventKitRepositoryTests.swift */; };
+		36C24ECAE1DAEC6AC61E16E8 /* EditFocusBlockSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 515D3A83205F8E00941BD4D0 /* EditFocusBlockSheet.swift */; };
+		3F9639915C12205F6DE53C7D /* SyncEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14E16E8941781A7134CBEE3A /* SyncEngineTests.swift */; };
+		402B599EB1486BA1E69EF4FF /* BacklogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86453EFF3FD7231E39EC5E4D /* BacklogView.swift */; };
+		437A93B5161BFF7E7E5E73DC /* PlanItemTransfer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 548F5CBBB14618043F38ACE6 /* PlanItemTransfer.swift */; };
+		46A4C7615027C65CC8412D37 /* MiniTaskCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = C439255FDECD6C6CB2377237 /* MiniTaskCard.swift */; };
+		4702F3D2CAF394E0AC9AAF96 /* BeforeScreenshotTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9356580BE3C5699878A6B87D /* BeforeScreenshotTest.swift */; };
+		480FAFAEB03560F38352900B /* FocusBlockTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1177F32AD2A8E3DE065A8945 /* FocusBlockTests.swift */; };
+		4BE1E3D56F11189BF6AA8459 /* UXImprovementsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9C8001C9F5CBCA0AC28B19A /* UXImprovementsUITests.swift */; };
+		53697A70444E5ECF3B760A1C /* SyncEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34D186C26C7135F80A5E3B0B /* SyncEngine.swift */; };
+		58649A426A8AF17A4944DBCF /* NextUpSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B35F02DA57C64E51F6EC483 /* NextUpSection.swift */; };
+		586B7D1F1588622970BCEED8 /* MiniBacklogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1430133DDF6FA76E9E129534 /* MiniBacklogView.swift */; };
+		60EF444FADDBAC17F14380E0 /* FocusLiveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 710817B02FE720EDA21132FA /* FocusLiveView.swift */; };
+		65B5E7020B61B9C1785BD378 /* SettingsToolbarModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26CD9467C8156E2C66B2DC9C /* SettingsToolbarModifier.swift */; };
+		6B6843B1FA16372D73DF9402 /* LocalTaskTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01F676CC7EA20C97ACDD9D18 /* LocalTaskTests.swift */; };
+		6C17452E66E837CD8225506C /* DebugLogReaderTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCFB47E31C1D91935DCB9374 /* DebugLogReaderTest.swift */; };
+		6E8284A6F06C79DBE93A383E /* TaskMetadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42790F5402B3E1F632874F5A /* TaskMetadata.swift */; };
+		83C779D1EFB193A3B7A2E5AD /* BlockPlanningView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20D808247CA55763ACF23BC5 /* BlockPlanningView.swift */; };
+		858746851FD293D53D7583E7 /* EventKitRepositoryProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6D939B402B46840351D9475 /* EventKitRepositoryProtocol.swift */; };
+		878D5818BD3563CCE351CEE8 /* ReminderData.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1F3228806B919AB0836326F /* ReminderData.swift */; };
+		88ED9B394FA2293A587D7952 /* LocalTaskSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 999C0690FA25D74051BA1C6F /* LocalTaskSource.swift */; };
+		88FB3AEEAE86741E5EA6AC42 /* FocusBloxApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 407BE145C7716D6B1A1BB67F /* FocusBloxApp.swift */; };
+		94EC1D85A0F4B53160332751 /* PlanItemTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32E6EA75FACA340867827895 /* PlanItemTests.swift */; };
+		968A3087301F055E331E560C /* EventKitRepositoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DC26C4D8FDC4B811001FD2C /* EventKitRepositoryTests.swift */; };
+		991544877FDF4CD72B4F2DE4 /* SprintReviewSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = B31CB18EF0C80E62953F34D6 /* SprintReviewSheet.swift */; };
+		9E4DE0DFDA16F42B8D28D6CD /* ManualBlockCreationUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41F2A36E471937592F06F0C9 /* ManualBlockCreationUITests.swift */; };
+		9F9185F5A9BD5A8CFF79DECA /* ErrorStateUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B596C16F99039490702E0B7 /* ErrorStateUITests.swift */; };
+		A37B483E47D5F1A662D498CC /* SchedulingUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7ED51F72D6039EFAC3D85A3 /* SchedulingUITests.swift */; };
+		AA657A3EBF3967B2DECE4314 /* CreateTaskView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04068491AA7CD2368A273C00 /* CreateTaskView.swift */; };
+		ADEEAB024BB9B2C40CD6313D /* DebugLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71582A64B51A62129A2409B7 /* DebugLogger.swift */; };
+		B09A2CF15546B73F96EE0797 /* EditTaskSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03C849D4340F5E92CA1D754E /* EditTaskSheet.swift */; };
+		B2607FE51C4B30E5069AA807 /* EventKitRepositoryEnvironment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F276F67582A827E523D8ED6 /* EventKitRepositoryEnvironment.swift */; };
+		B46449CB5D5E8C093E07C2D9 /* DurationPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = F91103B45CFB1388E6B12F3C /* DurationPicker.swift */; };
+		B5253CB93F49550930B0AF7C /* FocusBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0B1EE7295AF0AD91CA0027A /* FocusBlock.swift */; };
+		B59D2883B998A9D4A297ED2C /* LocalTaskSourceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64C281ADBE9DA2AC381CB747 /* LocalTaskSourceTests.swift */; };
+		B703FF51FE4B31A1D059A453 /* NextUpTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D81A830A7874C023E289830 /* NextUpTests.swift */; };
+		B7A16CD32F1FE3BC00165284 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B7A16CD22F1FE3BC00165284 /* WidgetKit.framework */; };
+		B7A16CD52F1FE3BC00165284 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B7A16CD42F1FE3BC00165284 /* SwiftUI.framework */; };
+		B7A16CE62F1FE3BE00165284 /* FocusBloxWidgetsExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = B7A16CD02F1FE3BC00165284 /* FocusBloxWidgetsExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		B7A16D172F20FDD400165284 /* FocusBloxCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B7A16D0C2F20FDD400165284 /* FocusBloxCore.framework */; };
+		B7A16D212F20FDD400165284 /* FocusBloxCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B7A16D0C2F20FDD400165284 /* FocusBloxCore.framework */; };
+		B7A16D322F21003100165284 /* FocusBloxCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B7A16D0C2F20FDD400165284 /* FocusBloxCore.framework */; };
+		B7A16D392F2144A100165284 /* FocusBloxCore.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = B7A16D0C2F20FDD400165284 /* FocusBloxCore.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		B7A16D3B2F21450000165284 /* FocusBloxCore.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = B7A16D0C2F20FDD400165284 /* FocusBloxCore.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		B7B87F202F1BCD900069B457 /* EisenhowerMatrixTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7B87F1F2F1BCD900069B457 /* EisenhowerMatrixTests.swift */; };
+		B7B87F222F1BCD9B0069B457 /* EisenhowerMatrixUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7B87F212F1BCD9B0069B457 /* EisenhowerMatrixUITests.swift */; };
+		B95825BFA85A0C001D1310A4 /* TaskSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 414BC475930C1DCDA3E9033B /* TaskSource.swift */; };
+		B9D12D9BF22325ADDE757862 /* CalendarEventTransfer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D1F03B35977548B59D7269F /* CalendarEventTransfer.swift */; };
+		BC2B829A833F87522CFFB6BC /* MockEventKitRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 993E45CA1F0174CC0345C92C /* MockEventKitRepository.swift */; };
+		BDEDB5DE393186FC2D0BFF58 /* DurationEditingUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF402517A33C6BA497EFE1AC /* DurationEditingUITests.swift */; };
+		BFEDE0F6D0C383A49101B8D2 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F364C9B1BB1D787792360427 /* SettingsView.swift */; };
+		QCVIEW001BUILDFILE00001 /* QuickCaptureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = QCVIEW001FILEREF00001 /* QuickCaptureView.swift */; };
+		C2A1677B81BC3C8D2C548495 /* HourRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 821E6E3E951900DF99190196 /* HourRow.swift */; };
+		C2ED3FE95B938EB35CB3C24C /* LocalTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A27D4BE199FA040FC61FFD6 /* LocalTask.swift */; };
+		C3F49C8B0CD3C6552054BE7D /* EventKitRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4451B46B76517090C636FA94 /* EventKitRepository.swift */; };
+		C89E9F957213671FF1B0DC91 /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4383C656C07E4B4F56335921 /* MainTabView.swift */; };
+		CC3848FFA2D898F1A3FDFC27 /* TaskSourceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76296762878DC5D17EA4E12A /* TaskSourceTests.swift */; };
+		CF2E7692295B675D8541312A /* BacklogViewUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 339BBA1A3799CB0C6CF5897A /* BacklogViewUITests.swift */; };
+		D23F767C76495B0CA789C0B4 /* TaskAssignmentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0461CA6D7F62F83512E8AD05 /* TaskAssignmentView.swift */; };
+		D4D7EAC3019BD5B643DC70F8 /* CalendarEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7B0BE54BB8E4DC5B9F85C28 /* CalendarEvent.swift */; };
+		D4EB0D97525927CB36D81D07 /* PlanItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9826FCF9A087183038C6ACED /* PlanItem.swift */; };
+		DE5811F4F48BE79B9EB7C818 /* PlanningViewUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C40AFBB545C0FA15517B9CE4 /* PlanningViewUITests.swift */; };
+		E6DF69A28B0DB868B330DADD /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5F22CE94E29A523114817BF /* ContentView.swift */; };
+		E907CB03C20C1B55A48C4B1B /* BacklogRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92133F2683BB9B90566D7646 /* BacklogRow.swift */; };
+		E98A667A603886CE7A68D968 /* EventBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B77251F3B87AF26FD6473763 /* EventBlock.swift */; };
+		EA6560340794C06D21D9CD85 /* PlanningView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8537E6312F33871F310A843F /* PlanningView.swift */; };
+		EDE19804EA6D5CB9BCCB6981 /* CalendarSelectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1CCA00FEA15FD7BA149CDDE /* CalendarSelectionTests.swift */; };
+		SCROLL001BUILDFILE0001 /* ScrollingUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = SCROLL001FILEREF00001 /* ScrollingUITests.swift */; };
+		SGAP001F48BE79B9EB7C818 /* SmartGapsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = SGAP002545C0FA15517B9CE4 /* SmartGapsUITests.swift */; };
+		SMARTGAPS001BUILDFILE00001 /* SmartGapsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = SMARTGAPS001FILEREF000001 /* SmartGapsTests.swift */; };
+		TAUX001BUILDFILE00001 /* TaskAssignmentUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = TAUX001FILEREF000001 /* TaskAssignmentUITests.swift */; };
+		QCAP001BUILDFILE00001 /* QuickCaptureUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = QCAP001FILEREF000001 /* QuickCaptureUITests.swift */; };
+		SNDUI001BUILDFILE0001 /* SoundSettingsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = SNDUI001FILEREF00001 /* SoundSettingsUITests.swift */; };
+		SNDSVC01BUILDFILE0001 /* SoundServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = SNDSVC01FILEREF00001 /* SoundServiceTests.swift */; };
+		SNDSVC02BUILDFILE0001 /* SoundService.swift in Sources */ = {isa = PBXBuildFile; fileRef = SNDSVC02FILEREF00001 /* SoundService.swift */; };
+		APPSET01BUILDFILE0001 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = APPSET01FILEREF00001 /* AppSettings.swift */; };
+		WARNTIM01BUILDFILE001 /* WarningTiming.swift in Sources */ = {isa = PBXBuildFile; fileRef = WARNTIM01FILEREF0001 /* WarningTiming.swift */; };
+		WARN001BUILDFILE00001 /* WarningTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = WARN001FILEREF000001 /* WarningTests.swift */; };
+		WARNUI01BUILDFILE0001 /* WarningSettingsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = WARNUI01FILEREF00001 /* WarningSettingsUITests.swift */; };
+		CATEG001BUILDFILE0001 /* CategoriesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CATEG001FILEREF00001 /* CategoriesTests.swift */; };
+		CATUI001BUILDFILE0001 /* CategoriesUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CATUI001FILEREF00001 /* CategoriesUITests.swift */; };
+		FBRND001BUILDFILE0001 /* FocusBloxRebrandUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBRND001FILEREF00001 /* FocusBloxRebrandUITests.swift */; };
+		FBRND002BUILDFILE0001 /* FocusBloxRebrandTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBRND002FILEREF00001 /* FocusBloxRebrandTests.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		0E44D0566335240D9ABE97EC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C836E08D5A70572AE8F0B7F0 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 16ED0EAB4D5DFBFFCCD4B1B6;
+			remoteInfo = FocusBlox;
+		};
+		A15DA74A7958F6CEEDEE875F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C836E08D5A70572AE8F0B7F0 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 16ED0EAB4D5DFBFFCCD4B1B6;
+			remoteInfo = FocusBlox;
+		};
+		B7A16CE42F1FE3BE00165284 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C836E08D5A70572AE8F0B7F0 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B7A16CCF2F1FE3BC00165284;
+			remoteInfo = FocusBloxWidgetsExtension;
+		};
+		B7A16D182F20FDD400165284 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C836E08D5A70572AE8F0B7F0 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B7A16D0B2F20FDD400165284;
+			remoteInfo = FocusBloxCore;
+		};
+		B7A16D1A2F20FDD400165284 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C836E08D5A70572AE8F0B7F0 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 16ED0EAB4D5DFBFFCCD4B1B6;
+			remoteInfo = FocusBlox;
+		};
+		B7A16D1F2F20FDD400165284 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C836E08D5A70572AE8F0B7F0 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B7A16D0B2F20FDD400165284;
+			remoteInfo = FocusBloxCore;
+		};
+		B7A16D302F21001300165284 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C836E08D5A70572AE8F0B7F0 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B7A16D0B2F20FDD400165284;
+			remoteInfo = FocusBloxCore;
+		};
+		B7A16D342F21003100165284 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C836E08D5A70572AE8F0B7F0 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B7A16D0B2F20FDD400165284;
+			remoteInfo = FocusBloxCore;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		B7A16CE72F1FE3BE00165284 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				B7A16CE62F1FE3BE00165284 /* FocusBloxWidgetsExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B7A16D3A2F2144A100165284 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				B7A16D392F2144A100165284 /* FocusBloxCore.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B7A16D3C2F21450000165284 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				B7A16D3B2F21450000165284 /* FocusBloxCore.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		01F676CC7EA20C97ACDD9D18 /* LocalTaskTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalTaskTests.swift; sourceTree = "<group>"; };
+		03C849D4340F5E92CA1D754E /* EditTaskSheet.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = EditTaskSheet.swift; sourceTree = "<group>"; };
+		04068491AA7CD2368A273C00 /* CreateTaskView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateTaskView.swift; sourceTree = "<group>"; };
+		0461CA6D7F62F83512E8AD05 /* TaskAssignmentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskAssignmentView.swift; sourceTree = "<group>"; };
+		0A9FDDCD2C501D3A6679FA58 /* FocusBlox.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FocusBlox.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		1177F32AD2A8E3DE065A8945 /* FocusBlockTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusBlockTests.swift; sourceTree = "<group>"; };
+		1430133DDF6FA76E9E129534 /* MiniBacklogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MiniBacklogView.swift; sourceTree = "<group>"; };
+		14E16E8941781A7134CBEE3A /* SyncEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncEngineTests.swift; sourceTree = "<group>"; };
+		1A27D4BE199FA040FC61FFD6 /* LocalTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalTask.swift; sourceTree = "<group>"; };
+		20D808247CA55763ACF23BC5 /* BlockPlanningView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockPlanningView.swift; sourceTree = "<group>"; };
+		26CD9467C8156E2C66B2DC9C /* SettingsToolbarModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsToolbarModifier.swift; sourceTree = "<group>"; };
+		31904CA661DB113E1D4F523F /* FocusBloxUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FocusBloxUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		32E6EA75FACA340867827895 /* PlanItemTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanItemTests.swift; sourceTree = "<group>"; };
+		339BBA1A3799CB0C6CF5897A /* BacklogViewUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BacklogViewUITests.swift; sourceTree = "<group>"; };
+		34D186C26C7135F80A5E3B0B /* SyncEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncEngine.swift; sourceTree = "<group>"; };
+		37586E91853A38D88E035A33 /* MockEventKitRepositoryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockEventKitRepositoryTests.swift; sourceTree = "<group>"; };
+		3B596C16F99039490702E0B7 /* ErrorStateUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorStateUITests.swift; sourceTree = "<group>"; };
+		3F276F67582A827E523D8ED6 /* EventKitRepositoryEnvironment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventKitRepositoryEnvironment.swift; sourceTree = "<group>"; };
+		407BE145C7716D6B1A1BB67F /* FocusBloxApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusBloxApp.swift; sourceTree = "<group>"; };
+		414BC475930C1DCDA3E9033B /* TaskSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskSource.swift; sourceTree = "<group>"; };
+		41F2A36E471937592F06F0C9 /* ManualBlockCreationUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ManualBlockCreationUITests.swift; sourceTree = "<group>"; };
+		42790F5402B3E1F632874F5A /* TaskMetadata.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskMetadata.swift; sourceTree = "<group>"; };
+		4383C656C07E4B4F56335921 /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
+		4451B46B76517090C636FA94 /* EventKitRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventKitRepository.swift; sourceTree = "<group>"; };
+		4AEE1F0855953868BEB42045 /* FocusBloxTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FocusBloxTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		515D3A83205F8E00941BD4D0 /* EditFocusBlockSheet.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = EditFocusBlockSheet.swift; sourceTree = "<group>"; };
+		548F5CBBB14618043F38ACE6 /* PlanItemTransfer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanItemTransfer.swift; sourceTree = "<group>"; };
+		5D1F03B35977548B59D7269F /* CalendarEventTransfer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarEventTransfer.swift; sourceTree = "<group>"; };
+		64C281ADBE9DA2AC381CB747 /* LocalTaskSourceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalTaskSourceTests.swift; sourceTree = "<group>"; };
+		710817B02FE720EDA21132FA /* FocusLiveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusLiveView.swift; sourceTree = "<group>"; };
+		71582A64B51A62129A2409B7 /* DebugLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugLogger.swift; sourceTree = "<group>"; };
+		76296762878DC5D17EA4E12A /* TaskSourceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskSourceTests.swift; sourceTree = "<group>"; };
+		7D81A830A7874C023E289830 /* NextUpTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NextUpTests.swift; sourceTree = "<group>"; };
+		821E6E3E951900DF99190196 /* HourRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HourRow.swift; sourceTree = "<group>"; };
+		8537E6312F33871F310A843F /* PlanningView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanningView.swift; sourceTree = "<group>"; };
+		86453EFF3FD7231E39EC5E4D /* BacklogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BacklogView.swift; sourceTree = "<group>"; };
+		92133F2683BB9B90566D7646 /* BacklogRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BacklogRow.swift; sourceTree = "<group>"; };
+		9356580BE3C5699878A6B87D /* BeforeScreenshotTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BeforeScreenshotTest.swift; sourceTree = "<group>"; };
+		9826FCF9A087183038C6ACED /* PlanItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanItem.swift; sourceTree = "<group>"; };
+		993E45CA1F0174CC0345C92C /* MockEventKitRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockEventKitRepository.swift; sourceTree = "<group>"; };
+		999C0690FA25D74051BA1C6F /* LocalTaskSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalTaskSource.swift; sourceTree = "<group>"; };
+		9B35F02DA57C64E51F6EC483 /* NextUpSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NextUpSection.swift; sourceTree = "<group>"; };
+		9DC26C4D8FDC4B811001FD2C /* EventKitRepositoryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventKitRepositoryTests.swift; sourceTree = "<group>"; };
+		A0B1EE7295AF0AD91CA0027A /* FocusBlock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusBlock.swift; sourceTree = "<group>"; };
+		B31CB18EF0C80E62953F34D6 /* SprintReviewSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SprintReviewSheet.swift; sourceTree = "<group>"; };
+		B77251F3B87AF26FD6473763 /* EventBlock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventBlock.swift; sourceTree = "<group>"; };
+		B7A16CD02F1FE3BC00165284 /* FocusBloxWidgetsExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = FocusBloxWidgetsExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		B7A16CD22F1FE3BC00165284 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		B7A16CD42F1FE3BC00165284 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
+		B7A16D0C2F20FDD400165284 /* FocusBloxCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = FocusBloxCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		B7A16D162F20FDD400165284 /* FocusBloxCoreTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FocusBloxCoreTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		B7B87F1F2F1BCD900069B457 /* EisenhowerMatrixTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EisenhowerMatrixTests.swift; sourceTree = "<group>"; };
+		B7B87F212F1BCD9B0069B457 /* EisenhowerMatrixUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EisenhowerMatrixUITests.swift; sourceTree = "<group>"; };
+		B9C8001C9F5CBCA0AC28B19A /* UXImprovementsUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = UXImprovementsUITests.swift; sourceTree = "<group>"; };
+		BCFB47E31C1D91935DCB9374 /* DebugLogReaderTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugLogReaderTest.swift; sourceTree = "<group>"; };
+		C40AFBB545C0FA15517B9CE4 /* PlanningViewUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanningViewUITests.swift; sourceTree = "<group>"; };
+		C439255FDECD6C6CB2377237 /* MiniTaskCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MiniTaskCard.swift; sourceTree = "<group>"; };
+		C945F5092F6FFB66C11FD4C2 /* TimelineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineView.swift; sourceTree = "<group>"; };
+		D5F22CE94E29A523114817BF /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		D7ED51F72D6039EFAC3D85A3 /* SchedulingUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchedulingUITests.swift; sourceTree = "<group>"; };
+		DF402517A33C6BA497EFE1AC /* DurationEditingUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DurationEditingUITests.swift; sourceTree = "<group>"; };
+		E1F3228806B919AB0836326F /* ReminderData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReminderData.swift; sourceTree = "<group>"; };
+		E6D939B402B46840351D9475 /* EventKitRepositoryProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventKitRepositoryProtocol.swift; sourceTree = "<group>"; };
+		F1CCA00FEA15FD7BA149CDDE /* CalendarSelectionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarSelectionTests.swift; sourceTree = "<group>"; };
+		F364C9B1BB1D787792360427 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		QCVIEW001FILEREF00001 /* QuickCaptureView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickCaptureView.swift; sourceTree = "<group>"; };
+		F7B0BE54BB8E4DC5B9F85C28 /* CalendarEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarEvent.swift; sourceTree = "<group>"; };
+		F91103B45CFB1388E6B12F3C /* DurationPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DurationPicker.swift; sourceTree = "<group>"; };
+		FDD319A3F7DEE05F6A8885FC /* DurationBadge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DurationBadge.swift; sourceTree = "<group>"; };
+		SCROLL001FILEREF00001 /* ScrollingUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollingUITests.swift; sourceTree = "<group>"; };
+		SGAP002545C0FA15517B9CE4 /* SmartGapsUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartGapsUITests.swift; sourceTree = "<group>"; };
+		SMARTGAPS001FILEREF000001 /* SmartGapsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartGapsTests.swift; sourceTree = "<group>"; };
+		TAUX001FILEREF000001 /* TaskAssignmentUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskAssignmentUITests.swift; sourceTree = "<group>"; };
+		QCAP001FILEREF000001 /* QuickCaptureUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickCaptureUITests.swift; sourceTree = "<group>"; };
+		SNDUI001FILEREF00001 /* SoundSettingsUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundSettingsUITests.swift; sourceTree = "<group>"; };
+		SNDSVC01FILEREF00001 /* SoundServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundServiceTests.swift; sourceTree = "<group>"; };
+		SNDSVC02FILEREF00001 /* SoundService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundService.swift; sourceTree = "<group>"; };
+		APPSET01FILEREF00001 /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
+		WARNTIM01FILEREF0001 /* WarningTiming.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WarningTiming.swift; sourceTree = "<group>"; };
+		WARN001FILEREF000001 /* WarningTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WarningTests.swift; sourceTree = "<group>"; };
+		CATEG001FILEREF00001 /* CategoriesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoriesTests.swift; sourceTree = "<group>"; };
+		CATUI001FILEREF00001 /* CategoriesUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoriesUITests.swift; sourceTree = "<group>"; };
+		WARNUI01FILEREF00001 /* WarningSettingsUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WarningSettingsUITests.swift; sourceTree = "<group>"; };
+		FBRND001FILEREF00001 /* FocusBloxRebrandUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusBloxRebrandUITests.swift; sourceTree = "<group>"; };
+		FBRND002FILEREF00001 /* FocusBloxRebrandTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusBloxRebrandTests.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		B7A16CEA2F1FE3BE00165284 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = B7A16CCF2F1FE3BC00165284 /* FocusBloxWidgetsExtension */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		B7A16CD62F1FE3BC00165284 /* FocusBloxWidgets */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (B7A16CEA2F1FE3BE00165284 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = FocusBloxWidgets; sourceTree = "<group>"; };
+		B7A16D0D2F20FDD400165284 /* FocusBloxCore */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = FocusBloxCore; sourceTree = "<group>"; };
+		B7A16D1C2F20FDD400165284 /* FocusBloxCoreTests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = FocusBloxCoreTests; sourceTree = "<group>"; };
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		B7A16CCD2F1FE3BC00165284 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B7A16CD52F1FE3BC00165284 /* SwiftUI.framework in Frameworks */,
+				B7A16D322F21003100165284 /* FocusBloxCore.framework in Frameworks */,
+				B7A16CD32F1FE3BC00165284 /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B7A16D092F20FDD400165284 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B7A16D132F20FDD400165284 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B7A16D172F20FDD400165284 /* FocusBloxCore.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B7A16D262F20FDD400165284 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B7A16D212F20FDD400165284 /* FocusBloxCore.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		05D90FB2A2CE48689EC309B4 /* FocusBloxUITests */ = {
+			isa = PBXGroup;
+			children = (
+				B7B87F212F1BCD9B0069B457 /* EisenhowerMatrixUITests.swift */,
+				339BBA1A3799CB0C6CF5897A /* BacklogViewUITests.swift */,
+				9356580BE3C5699878A6B87D /* BeforeScreenshotTest.swift */,
+				BCFB47E31C1D91935DCB9374 /* DebugLogReaderTest.swift */,
+				DF402517A33C6BA497EFE1AC /* DurationEditingUITests.swift */,
+				3B596C16F99039490702E0B7 /* ErrorStateUITests.swift */,
+				C40AFBB545C0FA15517B9CE4 /* PlanningViewUITests.swift */,
+				D7ED51F72D6039EFAC3D85A3 /* SchedulingUITests.swift */,
+				SGAP002545C0FA15517B9CE4 /* SmartGapsUITests.swift */,
+				41F2A36E471937592F06F0C9 /* ManualBlockCreationUITests.swift */,
+				TAUX001FILEREF000001 /* TaskAssignmentUITests.swift */,
+				QCAP001FILEREF000001 /* QuickCaptureUITests.swift */,
+				B9C8001C9F5CBCA0AC28B19A /* UXImprovementsUITests.swift */,
+				SCROLL001FILEREF00001 /* ScrollingUITests.swift */,
+				SNDUI001FILEREF00001 /* SoundSettingsUITests.swift */,
+				WARNUI01FILEREF00001 /* WarningSettingsUITests.swift */,
+				CATUI001FILEREF00001 /* CategoriesUITests.swift */,
+				FBRND001FILEREF00001 /* FocusBloxRebrandUITests.swift */,
+			);
+			path = FocusBloxUITests;
+			sourceTree = "<group>";
+		};
+		1544E675DCE060D409E484D8 /* TaskCreation */ = {
+			isa = PBXGroup;
+			children = (
+				04068491AA7CD2368A273C00 /* CreateTaskView.swift */,
+			);
+			path = TaskCreation;
+			sourceTree = "<group>";
+		};
+		2FB93EDD424437965784E8F2 /* Testing */ = {
+			isa = PBXGroup;
+			children = (
+				993E45CA1F0174CC0345C92C /* MockEventKitRepository.swift */,
+			);
+			path = Testing;
+			sourceTree = "<group>";
+		};
+		33F9E5347869F6F66DB9DD76 /* Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				71582A64B51A62129A2409B7 /* DebugLogger.swift */,
+				3F276F67582A827E523D8ED6 /* EventKitRepositoryEnvironment.swift */,
+			);
+			path = Helpers;
+			sourceTree = "<group>";
+		};
+		43FA5B6630027E2670A055BB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				0A9FDDCD2C501D3A6679FA58 /* FocusBlox.app */,
+				4AEE1F0855953868BEB42045 /* FocusBloxTests.xctest */,
+				31904CA661DB113E1D4F523F /* FocusBloxUITests.xctest */,
+				B7A16CD02F1FE3BC00165284 /* FocusBloxWidgetsExtension.appex */,
+				B7A16D0C2F20FDD400165284 /* FocusBloxCore.framework */,
+				B7A16D162F20FDD400165284 /* FocusBloxCoreTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		72FD978B8372B20FAF9E6C5C /* Protocols */ = {
+			isa = PBXGroup;
+			children = (
+				E6D939B402B46840351D9475 /* EventKitRepositoryProtocol.swift */,
+				414BC475930C1DCDA3E9033B /* TaskSource.swift */,
+			);
+			path = Protocols;
+			sourceTree = "<group>";
+		};
+		73F58232703F62346B160001 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				APPSET01FILEREF00001 /* AppSettings.swift */,
+				WARNTIM01FILEREF0001 /* WarningTiming.swift */,
+				F7B0BE54BB8E4DC5B9F85C28 /* CalendarEvent.swift */,
+				5D1F03B35977548B59D7269F /* CalendarEventTransfer.swift */,
+				A0B1EE7295AF0AD91CA0027A /* FocusBlock.swift */,
+				1A27D4BE199FA040FC61FFD6 /* LocalTask.swift */,
+				9826FCF9A087183038C6ACED /* PlanItem.swift */,
+				548F5CBBB14618043F38ACE6 /* PlanItemTransfer.swift */,
+				E1F3228806B919AB0836326F /* ReminderData.swift */,
+				42790F5402B3E1F632874F5A /* TaskMetadata.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		7613DF2BEF00711C6BDA68E3 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				92133F2683BB9B90566D7646 /* BacklogRow.swift */,
+				9B35F02DA57C64E51F6EC483 /* NextUpSection.swift */,
+				86453EFF3FD7231E39EC5E4D /* BacklogView.swift */,
+				20D808247CA55763ACF23BC5 /* BlockPlanningView.swift */,
+				D5F22CE94E29A523114817BF /* ContentView.swift */,
+				FDD319A3F7DEE05F6A8885FC /* DurationBadge.swift */,
+				F91103B45CFB1388E6B12F3C /* DurationPicker.swift */,
+				B77251F3B87AF26FD6473763 /* EventBlock.swift */,
+				710817B02FE720EDA21132FA /* FocusLiveView.swift */,
+				821E6E3E951900DF99190196 /* HourRow.swift */,
+				4383C656C07E4B4F56335921 /* MainTabView.swift */,
+				1430133DDF6FA76E9E129534 /* MiniBacklogView.swift */,
+				C439255FDECD6C6CB2377237 /* MiniTaskCard.swift */,
+				8537E6312F33871F310A843F /* PlanningView.swift */,
+				26CD9467C8156E2C66B2DC9C /* SettingsToolbarModifier.swift */,
+				F364C9B1BB1D787792360427 /* SettingsView.swift */,
+				QCVIEW001FILEREF00001 /* QuickCaptureView.swift */,
+				B31CB18EF0C80E62953F34D6 /* SprintReviewSheet.swift */,
+				0461CA6D7F62F83512E8AD05 /* TaskAssignmentView.swift */,
+				C945F5092F6FFB66C11FD4C2 /* TimelineView.swift */,
+				1544E675DCE060D409E484D8 /* TaskCreation */,
+				515D3A83205F8E00941BD4D0 /* EditFocusBlockSheet.swift */,
+				03C849D4340F5E92CA1D754E /* EditTaskSheet.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		76D00C9F307A1EC64537A9C7 /* TaskSources */ = {
+			isa = PBXGroup;
+			children = (
+				999C0690FA25D74051BA1C6F /* LocalTaskSource.swift */,
+			);
+			path = TaskSources;
+			sourceTree = "<group>";
+		};
+		8326129AA8A1069F1C4589BE /* Testing */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Testing;
+			sourceTree = "<group>";
+		};
+		A4C4EBF78590D9165A0AA710 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				407BE145C7716D6B1A1BB67F /* FocusBloxApp.swift */,
+				33F9E5347869F6F66DB9DD76 /* Helpers */,
+				73F58232703F62346B160001 /* Models */,
+				72FD978B8372B20FAF9E6C5C /* Protocols */,
+				E8F581D4C161751425D7F776 /* Services */,
+				2FB93EDD424437965784E8F2 /* Testing */,
+				7613DF2BEF00711C6BDA68E3 /* Views */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		A6B3805EF19D1B131D346DDD /* FocusBloxTests */ = {
+			isa = PBXGroup;
+			children = (
+				B7B87F1F2F1BCD900069B457 /* EisenhowerMatrixTests.swift */,
+				7D81A830A7874C023E289830 /* NextUpTests.swift */,
+				SMARTGAPS001FILEREF000001 /* SmartGapsTests.swift */,
+				F1CCA00FEA15FD7BA149CDDE /* CalendarSelectionTests.swift */,
+				9DC26C4D8FDC4B811001FD2C /* EventKitRepositoryTests.swift */,
+				1177F32AD2A8E3DE065A8945 /* FocusBlockTests.swift */,
+				64C281ADBE9DA2AC381CB747 /* LocalTaskSourceTests.swift */,
+				01F676CC7EA20C97ACDD9D18 /* LocalTaskTests.swift */,
+				37586E91853A38D88E035A33 /* MockEventKitRepositoryTests.swift */,
+				32E6EA75FACA340867827895 /* PlanItemTests.swift */,
+				14E16E8941781A7134CBEE3A /* SyncEngineTests.swift */,
+				76296762878DC5D17EA4E12A /* TaskSourceTests.swift */,
+				SNDSVC01FILEREF00001 /* SoundServiceTests.swift */,
+				WARN001FILEREF000001 /* WarningTests.swift */,
+				CATEG001FILEREF00001 /* CategoriesTests.swift */,
+				FBRND002FILEREF00001 /* FocusBloxRebrandTests.swift */,
+				8326129AA8A1069F1C4589BE /* Testing */,
+			);
+			path = FocusBloxTests;
+			sourceTree = "<group>";
+		};
+		B7A16CD12F1FE3BC00165284 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				B7A16CD22F1FE3BC00165284 /* WidgetKit.framework */,
+				B7A16CD42F1FE3BC00165284 /* SwiftUI.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		E8F581D4C161751425D7F776 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				4451B46B76517090C636FA94 /* EventKitRepository.swift */,
+				SNDSVC02FILEREF00001 /* SoundService.swift */,
+				34D186C26C7135F80A5E3B0B /* SyncEngine.swift */,
+				76D00C9F307A1EC64537A9C7 /* TaskSources */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		F035EACA143AFEF72D3412E7 = {
+			isa = PBXGroup;
+			children = (
+				A4C4EBF78590D9165A0AA710 /* Sources */,
+				A6B3805EF19D1B131D346DDD /* FocusBloxTests */,
+				05D90FB2A2CE48689EC309B4 /* FocusBloxUITests */,
+				B7A16CD62F1FE3BC00165284 /* FocusBloxWidgets */,
+				B7A16D0D2F20FDD400165284 /* FocusBloxCore */,
+				B7A16D1C2F20FDD400165284 /* FocusBloxCoreTests */,
+				B7A16CD12F1FE3BC00165284 /* Frameworks */,
+				43FA5B6630027E2670A055BB /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		B7A16D072F20FDD400165284 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		16ED0EAB4D5DFBFFCCD4B1B6 /* FocusBlox */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 099289053D4F2939E705E22B /* Build configuration list for PBXNativeTarget "FocusBlox" */;
+			buildPhases = (
+				2F0E2791A1F8F8F4C7109EED /* Sources */,
+				B7A16CE72F1FE3BE00165284 /* Embed Foundation Extensions */,
+				B7A16D262F20FDD400165284 /* Frameworks */,
+				B7A16D3A2F2144A100165284 /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				B7A16CE52F1FE3BE00165284 /* PBXTargetDependency */,
+				B7A16D202F20FDD400165284 /* PBXTargetDependency */,
+				B7A16D312F21001300165284 /* PBXTargetDependency */,
+			);
+			name = FocusBlox;
+			productName = FocusBlox;
+			productReference = 0A9FDDCD2C501D3A6679FA58 /* FocusBlox.app */;
+			productType = "com.apple.product-type.application";
+		};
+		B7A16CCF2F1FE3BC00165284 /* FocusBloxWidgetsExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B7A16CEB2F1FE3BE00165284 /* Build configuration list for PBXNativeTarget "FocusBloxWidgetsExtension" */;
+			buildPhases = (
+				B7A16CCC2F1FE3BC00165284 /* Sources */,
+				B7A16CCD2F1FE3BC00165284 /* Frameworks */,
+				B7A16CCE2F1FE3BC00165284 /* Resources */,
+				B7A16D3C2F21450000165284 /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				B7A16D352F21003100165284 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				B7A16CD62F1FE3BC00165284 /* FocusBloxWidgets */,
+			);
+			name = FocusBloxWidgetsExtension;
+			packageProductDependencies = (
+			);
+			productName = FocusBloxWidgetsExtension;
+			productReference = B7A16CD02F1FE3BC00165284 /* FocusBloxWidgetsExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		B7A16D0B2F20FDD400165284 /* FocusBloxCore */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B7A16D232F20FDD400165284 /* Build configuration list for PBXNativeTarget "FocusBloxCore" */;
+			buildPhases = (
+				B7A16D072F20FDD400165284 /* Headers */,
+				B7A16D082F20FDD400165284 /* Sources */,
+				B7A16D092F20FDD400165284 /* Frameworks */,
+				B7A16D0A2F20FDD400165284 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				B7A16D0D2F20FDD400165284 /* FocusBloxCore */,
+			);
+			name = FocusBloxCore;
+			packageProductDependencies = (
+			);
+			productName = FocusBloxCore;
+			productReference = B7A16D0C2F20FDD400165284 /* FocusBloxCore.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		B7A16D152F20FDD400165284 /* FocusBloxCoreTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B7A16D282F20FDD400165284 /* Build configuration list for PBXNativeTarget "FocusBloxCoreTests" */;
+			buildPhases = (
+				B7A16D122F20FDD400165284 /* Sources */,
+				B7A16D132F20FDD400165284 /* Frameworks */,
+				B7A16D142F20FDD400165284 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				B7A16D192F20FDD400165284 /* PBXTargetDependency */,
+				B7A16D1B2F20FDD400165284 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				B7A16D1C2F20FDD400165284 /* FocusBloxCoreTests */,
+			);
+			name = FocusBloxCoreTests;
+			packageProductDependencies = (
+			);
+			productName = FocusBloxCoreTests;
+			productReference = B7A16D162F20FDD400165284 /* FocusBloxCoreTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		DAEC9B105433BD37870D132A /* FocusBloxUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CC698DD0116E164D812AE71A /* Build configuration list for PBXNativeTarget "FocusBloxUITests" */;
+			buildPhases = (
+				8FA0CF4C10B9AFD1392EB1C2 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				346EDD6ABA03165F935829C4 /* PBXTargetDependency */,
+			);
+			name = FocusBloxUITests;
+			productName = FocusBloxUITests;
+			productReference = 31904CA661DB113E1D4F523F /* FocusBloxUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+		E50D6503572ED3DF16758A6C /* FocusBloxTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C655C505F841EA669E9B805F /* Build configuration list for PBXNativeTarget "FocusBloxTests" */;
+			buildPhases = (
+				A1737C952E1F43597069B507 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				AFAFC8639BF106190362A379 /* PBXTargetDependency */,
+			);
+			name = FocusBloxTests;
+			productName = FocusBloxTests;
+			productReference = 4AEE1F0855953868BEB42045 /* FocusBloxTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		C836E08D5A70572AE8F0B7F0 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastSwiftUpdateCheck = 2620;
+				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+					B7A16CCF2F1FE3BC00165284 = {
+						CreatedOnToolsVersion = 26.2;
+					};
+					B7A16D0B2F20FDD400165284 = {
+						CreatedOnToolsVersion = 26.2;
+					};
+					B7A16D152F20FDD400165284 = {
+						CreatedOnToolsVersion = 26.2;
+						TestTargetID = 16ED0EAB4D5DFBFFCCD4B1B6;
+					};
+					DAEC9B105433BD37870D132A = {
+						TestTargetID = 16ED0EAB4D5DFBFFCCD4B1B6;
+					};
+				};
+			};
+			buildConfigurationList = 88A7955348FAB0004FF9573E /* Build configuration list for PBXProject "FocusBlox" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = F035EACA143AFEF72D3412E7;
+			minimizedProjectReferenceProxies = 1;
+			productRefGroup = 43FA5B6630027E2670A055BB /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				16ED0EAB4D5DFBFFCCD4B1B6 /* FocusBlox */,
+				E50D6503572ED3DF16758A6C /* FocusBloxTests */,
+				DAEC9B105433BD37870D132A /* FocusBloxUITests */,
+				B7A16CCF2F1FE3BC00165284 /* FocusBloxWidgetsExtension */,
+				B7A16D0B2F20FDD400165284 /* FocusBloxCore */,
+				B7A16D152F20FDD400165284 /* FocusBloxCoreTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		B7A16CCE2F1FE3BC00165284 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B7A16D0A2F20FDD400165284 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B7A16D142F20FDD400165284 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		2F0E2791A1F8F8F4C7109EED /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E907CB03C20C1B55A48C4B1B /* BacklogRow.swift in Sources */,
+				58649A426A8AF17A4944DBCF /* NextUpSection.swift in Sources */,
+				402B599EB1486BA1E69EF4FF /* BacklogView.swift in Sources */,
+				83C779D1EFB193A3B7A2E5AD /* BlockPlanningView.swift in Sources */,
+				D4D7EAC3019BD5B643DC70F8 /* CalendarEvent.swift in Sources */,
+				B9D12D9BF22325ADDE757862 /* CalendarEventTransfer.swift in Sources */,
+				E6DF69A28B0DB868B330DADD /* ContentView.swift in Sources */,
+				AA657A3EBF3967B2DECE4314 /* CreateTaskView.swift in Sources */,
+				ADEEAB024BB9B2C40CD6313D /* DebugLogger.swift in Sources */,
+				22AA189C61A4045FE2B36B64 /* DurationBadge.swift in Sources */,
+				B46449CB5D5E8C093E07C2D9 /* DurationPicker.swift in Sources */,
+				E98A667A603886CE7A68D968 /* EventBlock.swift in Sources */,
+				C3F49C8B0CD3C6552054BE7D /* EventKitRepository.swift in Sources */,
+				APPSET01BUILDFILE0001 /* AppSettings.swift in Sources */,
+				WARNTIM01BUILDFILE001 /* WarningTiming.swift in Sources */,
+				B2607FE51C4B30E5069AA807 /* EventKitRepositoryEnvironment.swift in Sources */,
+				858746851FD293D53D7583E7 /* EventKitRepositoryProtocol.swift in Sources */,
+				B5253CB93F49550930B0AF7C /* FocusBlock.swift in Sources */,
+				60EF444FADDBAC17F14380E0 /* FocusLiveView.swift in Sources */,
+				C2A1677B81BC3C8D2C548495 /* HourRow.swift in Sources */,
+				C2ED3FE95B938EB35CB3C24C /* LocalTask.swift in Sources */,
+				88ED9B394FA2293A587D7952 /* LocalTaskSource.swift in Sources */,
+				C89E9F957213671FF1B0DC91 /* MainTabView.swift in Sources */,
+				586B7D1F1588622970BCEED8 /* MiniBacklogView.swift in Sources */,
+				46A4C7615027C65CC8412D37 /* MiniTaskCard.swift in Sources */,
+				BC2B829A833F87522CFFB6BC /* MockEventKitRepository.swift in Sources */,
+				D4EB0D97525927CB36D81D07 /* PlanItem.swift in Sources */,
+				437A93B5161BFF7E7E5E73DC /* PlanItemTransfer.swift in Sources */,
+				EA6560340794C06D21D9CD85 /* PlanningView.swift in Sources */,
+				878D5818BD3563CCE351CEE8 /* ReminderData.swift in Sources */,
+				65B5E7020B61B9C1785BD378 /* SettingsToolbarModifier.swift in Sources */,
+				BFEDE0F6D0C383A49101B8D2 /* SettingsView.swift in Sources */,
+				QCVIEW001BUILDFILE00001 /* QuickCaptureView.swift in Sources */,
+				991544877FDF4CD72B4F2DE4 /* SprintReviewSheet.swift in Sources */,
+				SNDSVC02BUILDFILE0001 /* SoundService.swift in Sources */,
+				53697A70444E5ECF3B760A1C /* SyncEngine.swift in Sources */,
+				D23F767C76495B0CA789C0B4 /* TaskAssignmentView.swift in Sources */,
+				6E8284A6F06C79DBE93A383E /* TaskMetadata.swift in Sources */,
+				B95825BFA85A0C001D1310A4 /* TaskSource.swift in Sources */,
+				88FB3AEEAE86741E5EA6AC42 /* FocusBloxApp.swift in Sources */,
+				1B489799D0D38661913FCC34 /* TimelineView.swift in Sources */,
+				36C24ECAE1DAEC6AC61E16E8 /* EditFocusBlockSheet.swift in Sources */,
+				B09A2CF15546B73F96EE0797 /* EditTaskSheet.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8FA0CF4C10B9AFD1392EB1C2 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CF2E7692295B675D8541312A /* BacklogViewUITests.swift in Sources */,
+				4702F3D2CAF394E0AC9AAF96 /* BeforeScreenshotTest.swift in Sources */,
+				6C17452E66E837CD8225506C /* DebugLogReaderTest.swift in Sources */,
+				BDEDB5DE393186FC2D0BFF58 /* DurationEditingUITests.swift in Sources */,
+				9F9185F5A9BD5A8CFF79DECA /* ErrorStateUITests.swift in Sources */,
+				DE5811F4F48BE79B9EB7C818 /* PlanningViewUITests.swift in Sources */,
+				A37B483E47D5F1A662D498CC /* SchedulingUITests.swift in Sources */,
+				B7B87F222F1BCD9B0069B457 /* EisenhowerMatrixUITests.swift in Sources */,
+				SGAP001F48BE79B9EB7C818 /* SmartGapsUITests.swift in Sources */,
+				9E4DE0DFDA16F42B8D28D6CD /* ManualBlockCreationUITests.swift in Sources */,
+				TAUX001BUILDFILE00001 /* TaskAssignmentUITests.swift in Sources */,
+				QCAP001BUILDFILE00001 /* QuickCaptureUITests.swift in Sources */,
+				4BE1E3D56F11189BF6AA8459 /* UXImprovementsUITests.swift in Sources */,
+				SCROLL001BUILDFILE0001 /* ScrollingUITests.swift in Sources */,
+				SNDUI001BUILDFILE0001 /* SoundSettingsUITests.swift in Sources */,
+				WARNUI01BUILDFILE0001 /* WarningSettingsUITests.swift in Sources */,
+				CATUI001BUILDFILE0001 /* CategoriesUITests.swift in Sources */,
+				FBRND001BUILDFILE0001 /* FocusBloxRebrandUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A1737C952E1F43597069B507 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EDE19804EA6D5CB9BCCB6981 /* CalendarSelectionTests.swift in Sources */,
+				968A3087301F055E331E560C /* EventKitRepositoryTests.swift in Sources */,
+				480FAFAEB03560F38352900B /* FocusBlockTests.swift in Sources */,
+				B59D2883B998A9D4A297ED2C /* LocalTaskSourceTests.swift in Sources */,
+				6B6843B1FA16372D73DF9402 /* LocalTaskTests.swift in Sources */,
+				2F7184DE552C8D322971EDED /* MockEventKitRepositoryTests.swift in Sources */,
+				94EC1D85A0F4B53160332751 /* PlanItemTests.swift in Sources */,
+				B7B87F202F1BCD900069B457 /* EisenhowerMatrixTests.swift in Sources */,
+				B703FF51FE4B31A1D059A453 /* NextUpTests.swift in Sources */,
+				SMARTGAPS001BUILDFILE00001 /* SmartGapsTests.swift in Sources */,
+				3F9639915C12205F6DE53C7D /* SyncEngineTests.swift in Sources */,
+				CC3848FFA2D898F1A3FDFC27 /* TaskSourceTests.swift in Sources */,
+				SNDSVC01BUILDFILE0001 /* SoundServiceTests.swift in Sources */,
+				WARN001BUILDFILE00001 /* WarningTests.swift in Sources */,
+				CATEG001BUILDFILE0001 /* CategoriesTests.swift in Sources */,
+				FBRND002BUILDFILE0001 /* FocusBloxRebrandTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B7A16CCC2F1FE3BC00165284 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B7A16D082F20FDD400165284 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B7A16D122F20FDD400165284 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		346EDD6ABA03165F935829C4 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 16ED0EAB4D5DFBFFCCD4B1B6 /* FocusBlox */;
+			targetProxy = 0E44D0566335240D9ABE97EC /* PBXContainerItemProxy */;
+		};
+		AFAFC8639BF106190362A379 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 16ED0EAB4D5DFBFFCCD4B1B6 /* FocusBlox */;
+			targetProxy = A15DA74A7958F6CEEDEE875F /* PBXContainerItemProxy */;
+		};
+		B7A16CE52F1FE3BE00165284 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B7A16CCF2F1FE3BC00165284 /* FocusBloxWidgetsExtension */;
+			targetProxy = B7A16CE42F1FE3BE00165284 /* PBXContainerItemProxy */;
+		};
+		B7A16D192F20FDD400165284 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B7A16D0B2F20FDD400165284 /* FocusBloxCore */;
+			targetProxy = B7A16D182F20FDD400165284 /* PBXContainerItemProxy */;
+		};
+		B7A16D1B2F20FDD400165284 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 16ED0EAB4D5DFBFFCCD4B1B6 /* FocusBlox */;
+			targetProxy = B7A16D1A2F20FDD400165284 /* PBXContainerItemProxy */;
+		};
+		B7A16D202F20FDD400165284 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B7A16D0B2F20FDD400165284 /* FocusBloxCore */;
+			targetProxy = B7A16D1F2F20FDD400165284 /* PBXContainerItemProxy */;
+		};
+		B7A16D312F21001300165284 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B7A16D0B2F20FDD400165284 /* FocusBloxCore */;
+			targetProxy = B7A16D302F21001300165284 /* PBXContainerItemProxy */;
+		};
+		B7A16D352F21003100165284 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B7A16D0B2F20FDD400165284 /* FocusBloxCore */;
+			targetProxy = B7A16D342F21003100165284 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		1820B95D3155D5BA31DBA625 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				DEVELOPMENT_TEAM = XK87E2B3VR;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.henning.timebox.tests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/FocusBlox.app/FocusBlox";
+			};
+			name = Debug;
+		};
+		27BB400362B686AEAEAB998A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Resources/FocusBlox.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = XK87E2B3VR;
+				INFOPLIST_FILE = Resources/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.henning.timebox;
+				SDKROOT = iphoneos;
+				SWIFT_STRICT_CONCURRENCY = complete;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		4274B3C338A868F54D573031 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				DEVELOPMENT_TEAM = XK87E2B3VR;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.henning.timebox.uitests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = FocusBlox;
+			};
+			name = Debug;
+		};
+		604CBB52FCE6598C5FA37C29 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 6.0;
+			};
+			name = Release;
+		};
+		771D686D08FA61CE954D5EA1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+		8221D63952A7D7A6660EA39C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Resources/FocusBlox.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = XK87E2B3VR;
+				INFOPLIST_FILE = Resources/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.henning.timebox;
+				SDKROOT = iphoneos;
+				SWIFT_STRICT_CONCURRENCY = complete;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		9764BF7E04C7EC696C3FF29C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				DEVELOPMENT_TEAM = XK87E2B3VR;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.henning.timebox.tests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/FocusBlox.app/FocusBlox";
+			};
+			name = Release;
+		};
+		B7A16CE82F1FE3BE00165284 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = XK87E2B3VR;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = FocusBloxWidgets/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = FocusBloxWidgets;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.henning.timebox.FocusBloxWidgets;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		B7A16CE92F1FE3BE00165284 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = XK87E2B3VR;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = FocusBloxWidgets/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = FocusBloxWidgets;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.henning.timebox.FocusBloxWidgets;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		B7A16D242F20FDD400165284 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = XK87E2B3VR;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
+				PRODUCT_BUNDLE_IDENTIFIER = com.henning.timebox.FocusBloxCore;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_INSTALL_MODULE = YES;
+				SWIFT_INSTALL_OBJC_HEADER = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		B7A16D252F20FDD400165284 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = XK87E2B3VR;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
+				PRODUCT_BUNDLE_IDENTIFIER = com.henning.timebox.FocusBloxCore;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_INSTALL_MODULE = YES;
+				SWIFT_INSTALL_OBJC_HEADER = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		B7A16D292F20FDD400165284 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = XK87E2B3VR;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.henning.timebox.FocusBloxCoreTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/FocusBlox.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/FocusBlox";
+			};
+			name = Debug;
+		};
+		B7A16D2A2F20FDD400165284 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = XK87E2B3VR;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.henning.timebox.FocusBloxCoreTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/FocusBlox.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/FocusBlox";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		E707FEBFC18F99948FF9509D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				DEVELOPMENT_TEAM = XK87E2B3VR;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.henning.timebox.uitests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = FocusBlox;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		099289053D4F2939E705E22B /* Build configuration list for PBXNativeTarget "FocusBlox" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8221D63952A7D7A6660EA39C /* Debug */,
+				27BB400362B686AEAEAB998A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		88A7955348FAB0004FF9573E /* Build configuration list for PBXProject "FocusBlox" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				771D686D08FA61CE954D5EA1 /* Debug */,
+				604CBB52FCE6598C5FA37C29 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		B7A16CEB2F1FE3BE00165284 /* Build configuration list for PBXNativeTarget "FocusBloxWidgetsExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B7A16CE82F1FE3BE00165284 /* Debug */,
+				B7A16CE92F1FE3BE00165284 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		B7A16D232F20FDD400165284 /* Build configuration list for PBXNativeTarget "FocusBloxCore" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B7A16D242F20FDD400165284 /* Debug */,
+				B7A16D252F20FDD400165284 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		B7A16D282F20FDD400165284 /* Build configuration list for PBXNativeTarget "FocusBloxCoreTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B7A16D292F20FDD400165284 /* Debug */,
+				B7A16D2A2F20FDD400165284 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		C655C505F841EA669E9B805F /* Build configuration list for PBXNativeTarget "FocusBloxTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1820B95D3155D5BA31DBA625 /* Debug */,
+				9764BF7E04C7EC696C3FF29C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		CC698DD0116E164D812AE71A /* Build configuration list for PBXNativeTarget "FocusBloxUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4274B3C338A868F54D573031 /* Debug */,
+				E707FEBFC18F99948FF9509D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = C836E08D5A70572AE8F0B7F0 /* Project object */;
+}
