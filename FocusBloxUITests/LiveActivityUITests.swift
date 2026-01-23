@@ -57,7 +57,7 @@ final class LiveActivityUITests: XCTestCase {
         // Since there's no real calendar access in tests, we expect the "no block" state
         // OR an active block if mock data works
         let noBlockText = app.staticTexts["Kein aktiver Focus Block"]
-        let blockTitle = app.staticTexts["Active Test Block"]
+        let blockTitle = app.staticTexts["🎯 Focus Block Test"]
 
         // One of these should exist
         let hasNoBlock = noBlockText.waitForExistence(timeout: 5)
