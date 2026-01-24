@@ -191,10 +191,37 @@ Section("Apple Erinnerungen") {
 - [ ] UI Tests: Alle 4 UI Tests grün
 - [ ] Unit Tests: Alle 5 Unit Tests grün
 
+## Reminder-Listen Konfiguration
+
+### Funktionalitaet
+
+User kann in Settings auswaehlen, welche Reminder-Listen synchronisiert werden sollen:
+- Alle verfuegbaren Listen werden als Toggles angezeigt
+- Standardmaessig sind alle Listen aktiv
+- Auswahl wird in UserDefaults gespeichert (`visibleReminderListIDs`)
+
+### API
+
+```swift
+// EventKitRepositoryProtocol
+func getAllReminderLists() -> [EKCalendar]
+
+// EventKitRepository - fetchIncompleteReminders() filtert nach visibleReminderListIDs
+```
+
+### UI (SettingsView)
+
+```swift
+Section("Sichtbare Erinnerungslisten") {
+    ForEach(allReminderLists) { list in
+        Toggle(list.title, isOn: binding(for: list.calendarIdentifier))
+    }
+}
+```
+
 ## Known Limitations
 
 - Nur Sync von incompleten Reminders (completed werden ignoriert)
-- Keine Reminder-Listen Auswahl (alle Listen werden synchronisiert)
 - Keine Push-Notifications bei Änderungen in Apple (nur Pull bei App-Start/Refresh)
 - Recurrence wird nicht synchronisiert (zu komplex)
 
