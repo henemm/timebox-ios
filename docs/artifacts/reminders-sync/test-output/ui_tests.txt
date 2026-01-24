@@ -1,0 +1,24 @@
+RemindersSyncUITests - UI Test Output (FINAL)
+=====================================================
+
+Test Run: 2026-01-24 08:55:00
+
+Test Suite: RemindersSyncUITests
+
+--- All Tests PASSED ---
+- testAppleRemindersSectionExists: PASSED (10.2s)
+- testDisabledSyncDoesNotImport: PASSED (14.6s)
+- testImportedReminderAppearsInBacklog: PASSED (24.3s)
+- testRemindersSyncToggleCanBeEnabled: PASSED (7.7s)
+- testRemindersSyncToggleDisabledByDefault: PASSED (7.3s)
+- testRemindersSyncToggleExistsInSettings: PASSED (8.3s)
+
+Result: 6/6 tests passed
+
+Feature Status: COMPLETE
+
+Issues Fixed During TDD GREEN:
+1. @AppStorage not updating when view inactive → Read UserDefaults.standard directly
+2. Toggle tap hitting label instead of switch → Tap at dx:0.95 (right side)
+3. Toggle below fold → swipeUp() before tap
+4. Test isolation → -ResetUserDefaults launch argument

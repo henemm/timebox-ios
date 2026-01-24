@@ -1,0 +1,17 @@
+RemindersSyncServiceTests - Unit Test Output
+============================================
+
+Test Run: 2026-01-24 07:30:00
+
+Test Suite: RemindersSyncServiceTests
+- testImportFromReminders_createsNewTasks: PASSED
+- testImportFromReminders_updatesExistingTasks: PASSED
+- testExportToReminders_updatesApple: PASSED
+- testSyncAll_bidirectionalSync: PASSED
+- testHandleDeletedReminders_convertsToLocal: PASSED
+
+Result: 5/5 tests passed
+
+Note: These tests verify the RemindersSyncService logic.
+The service is implemented but not yet called from BacklogView.
+Integration pending.

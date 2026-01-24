@@ -18,6 +18,7 @@ import Foundation
     func fetchIncompleteReminders() async throws -> [ReminderData]
     func markReminderComplete(reminderID: String) throws
     func markReminderIncomplete(reminderID: String) throws
+    func updateReminder(id: String, title: String?, priority: Int?, dueDate: Date?, notes: String?, isCompleted: Bool?) throws
 
     // MARK: - Calendar Events
 

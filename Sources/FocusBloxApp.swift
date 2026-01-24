@@ -119,6 +119,25 @@ struct FocusBloxApp: App {
 
             mock.mockEvents = [meeting1, meeting2, meeting3]
 
+            // Add mock Reminders for testing Reminders Sync
+            let reminder1 = ReminderData(
+                id: "mock-reminder-1",
+                title: "Design Review #30min",
+                isCompleted: false,
+                priority: 1,
+                dueDate: calendar.date(byAdding: .day, value: 1, to: now),
+                notes: "Review UI mockups"
+            )
+            let reminder2 = ReminderData(
+                id: "mock-reminder-2",
+                title: "Team Retro #45min",
+                isCompleted: false,
+                priority: 0,
+                dueDate: nil,
+                notes: nil
+            )
+            mock.mockReminders = [reminder1, reminder2]
+
             return mock
         } else {
             return EventKitRepository()
@@ -130,6 +149,7 @@ struct FocusBloxApp: App {
             ContentView()
                 .environment(\.eventKitRepository, eventKitRepository)
                 .onAppear {
+                    resetUserDefaultsIfNeeded()
                     seedUITestDataIfNeeded()
                     // Auto-open Quick Capture for UI testing
                     if ProcessInfo.processInfo.arguments.contains("-QuickCaptureTest") {
@@ -146,6 +166,13 @@ struct FocusBloxApp: App {
                 }
         }
         .modelContainer(sharedModelContainer)
+    }
+
+    /// Reset UserDefaults for UI test isolation
+    private func resetUserDefaultsIfNeeded() {
+        guard ProcessInfo.processInfo.arguments.contains("-ResetUserDefaults") else { return }
+        UserDefaults.standard.set(false, forKey: "remindersSyncEnabled")
+        UserDefaults.standard.synchronize()
     }
 
     /// Seed mock data for UI testing

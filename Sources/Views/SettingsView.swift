@@ -7,6 +7,7 @@ struct SettingsView: View {
     @AppStorage("soundEnabled") private var soundEnabled: Bool = true
     @AppStorage("warningEnabled") private var warningEnabled: Bool = true
     @AppStorage("warningTiming") private var warningTimingRaw: Int = WarningTiming.standard.rawValue
+    @AppStorage("remindersSyncEnabled") private var remindersSyncEnabled: Bool = false
     @State private var visibleCalendarIDs: Set<String> = []
     @State private var eventKitRepo = EventKitRepository()
     @State private var allCalendars: [EKCalendar] = []
@@ -72,6 +73,18 @@ struct SettingsView: View {
                     Text("Sichtbare Kalender")
                 } footer: {
                     Text("Nur ausgewählte Kalender werden in der Timeline angezeigt.")
+                }
+
+                // Section 3: Apple Reminders Sync
+                Section {
+                    Toggle(isOn: $remindersSyncEnabled) {
+                        Text("Mit Erinnerungen synchronisieren")
+                    }
+                    .accessibilityIdentifier("remindersSyncToggle")
+                } header: {
+                    Text("Apple Erinnerungen")
+                } footer: {
+                    Text("Tasks aus Apple Erinnerungen werden in den Backlog importiert.")
                 }
             }
             .navigationTitle("Settings")

@@ -159,6 +159,34 @@ final class EventKitRepository: EventKitRepositoryProtocol, @unchecked Sendable 
         try eventStore.save(reminder, commit: true)
     }
 
+    func updateReminder(id: String, title: String?, priority: Int?, dueDate: Date?, notes: String?, isCompleted: Bool?) throws {
+        guard reminderAuthStatus == .fullAccess else {
+            throw EventKitError.notAuthorized
+        }
+        guard let reminder = eventStore.calendarItem(withIdentifier: id) as? EKReminder else {
+            return
+        }
+
+        if let title = title {
+            reminder.title = title
+        }
+        if let priority = priority {
+            reminder.priority = priority
+        }
+        if let dueDate = dueDate {
+            reminder.dueDateComponents = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: dueDate)
+        }
+        if let notes = notes {
+            reminder.notes = notes
+        }
+        if let isCompleted = isCompleted {
+            reminder.isCompleted = isCompleted
+            reminder.completionDate = isCompleted ? Date() : nil
+        }
+
+        try eventStore.save(reminder, commit: true)
+    }
+
     func moveCalendarEvent(eventID: String, to newStartDate: Date, duration: Int) throws {
         guard calendarAuthStatus == .fullAccess else {
             throw EventKitError.notAuthorized

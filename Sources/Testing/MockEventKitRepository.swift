@@ -77,6 +77,19 @@ final class MockEventKitRepository: EventKitRepositoryProtocol, @unchecked Senda
         lastIncompletedReminderID = reminderID
     }
 
+    var updateReminderCalled = false
+    var lastUpdatedReminderID: String?
+    var lastUpdatedTitle: String?
+
+    func updateReminder(id: String, title: String?, priority: Int?, dueDate: Date?, notes: String?, isCompleted: Bool?) throws {
+        guard mockReminderAuthStatus == .fullAccess else {
+            throw EventKitError.notAuthorized
+        }
+        updateReminderCalled = true
+        lastUpdatedReminderID = id
+        lastUpdatedTitle = title
+    }
+
     // MARK: - Protocol Implementation - Calendar Events
 
     func fetchCalendarEvents(for date: Date) throws -> [CalendarEvent] {

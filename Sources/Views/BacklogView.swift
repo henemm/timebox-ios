@@ -40,7 +40,9 @@ struct BacklogView: View {
 
     // MARK: - Properties
     @Environment(\.modelContext) private var modelContext
+    @Environment(\.eventKitRepository) private var eventKitRepo
     @AppStorage("backlogViewMode") private var selectedMode: ViewMode = .list
+    @AppStorage("remindersSyncEnabled") private var remindersSyncEnabled: Bool = false
     @State private var planItems: [PlanItem] = []
     @State private var errorMessage: String?
     @State private var isLoading = false
@@ -238,7 +240,10 @@ struct BacklogView: View {
                 )
             }
         }
-        .task {
+        .task(id: remindersSyncEnabled) {
+            await loadTasks()
+        }
+        .refreshable {
             await loadTasks()
         }
     }
@@ -247,7 +252,21 @@ struct BacklogView: View {
         isLoading = true
         errorMessage = nil
 
+        // Read directly from UserDefaults to ensure we get the latest value
+        // (@AppStorage may not update when view is not active in tab/modal scenarios)
+        let syncEnabled = UserDefaults.standard.bool(forKey: "remindersSyncEnabled")
+
         do {
+            // 1. Wenn Sync aktiviert: Reminders importieren
+            if syncEnabled {
+                let syncService = RemindersSyncService(
+                    eventKitRepo: eventKitRepo,
+                    modelContext: modelContext
+                )
+                _ = try await syncService.importFromReminders()
+            }
+
+            // 2. Alle lokalen Tasks laden (inkl. importierter Reminders)
             let taskSource = LocalTaskSource(modelContext: modelContext)
             let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
             planItems = try await syncEngine.sync()
