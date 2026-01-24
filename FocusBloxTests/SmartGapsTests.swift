@@ -98,6 +98,68 @@ final class SmartGapsTests: XCTestCase {
         XCTAssertTrue(hours.contains(16), "Should suggest 16:00")
     }
 
+    // MARK: - Test 5: Bug 9 - No Past Time Slots
+
+    /// Bug 9: GapFinder should NOT return slots that are in the past
+    /// Current time should be the lower bound, not 06:00
+    /// EXPECTED TO FAIL: GapFinder currently starts at 06:00
+    func testNoSlotsBeforeCurrentTime() {
+        // GIVEN: Today's date with events, current time is e.g. 14:00
+        let now = Date()
+        let calendar = Calendar.current
+        let currentHour = calendar.component(.hour, from: now)
+
+        // Skip test if it's before 10:00 (not enough past hours to test)
+        guard currentHour >= 10 else {
+            // Can't test past slots if current hour is too early
+            return
+        }
+
+        // Create an event later today (e.g., at 20:00)
+        var eventComponents = calendar.dateComponents([.year, .month, .day], from: now)
+        eventComponents.hour = 20
+        eventComponents.minute = 0
+        let eventStart = calendar.date(from: eventComponents)!
+        eventComponents.hour = 21
+        let eventEnd = calendar.date(from: eventComponents)!
+
+        let events = [
+            CalendarEvent(
+                id: "test-event",
+                title: "Evening Event",
+                startDate: eventStart,
+                endDate: eventEnd,
+                isAllDay: false,
+                calendarColor: nil,
+                notes: nil
+            )
+        ]
+
+        // WHEN: findFreeSlots is called
+        let finder = GapFinder(events: events, focusBlocks: [], date: now)
+        let slots = finder.findFreeSlots(minMinutes: 30, maxMinutes: 60)
+
+        // THEN: No slot should start before the current time
+        for slot in slots {
+            let slotHour = calendar.component(.hour, from: slot.startDate)
+            let slotMinute = calendar.component(.minute, from: slot.startDate)
+
+            // Create a comparable time for the slot
+            var slotTimeComponents = calendar.dateComponents([.year, .month, .day], from: now)
+            slotTimeComponents.hour = slotHour
+            slotTimeComponents.minute = slotMinute
+            let slotTime = calendar.date(from: slotTimeComponents)!
+
+            // Slot start time should be >= current time (with some tolerance for test execution time)
+            let tolerance: TimeInterval = 60 // 1 minute tolerance
+            XCTAssertGreaterThanOrEqual(
+                slotTime.timeIntervalSince1970,
+                now.timeIntervalSince1970 - tolerance,
+                "Slot at \(slotHour):\(String(format: "%02d", slotMinute)) should not be in the past (current hour: \(currentHour))"
+            )
+        }
+    }
+
     // MARK: - Helpers
 
     private func createDate(year: Int, month: Int, day: Int) -> Date {

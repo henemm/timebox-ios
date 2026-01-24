@@ -81,7 +81,52 @@ final class SmartGapsUITests: XCTestCase {
         XCTAssertTrue(hasCreateButton, "Gap rows should have plus button to create block")
     }
 
-    // MARK: - Test 4: Screenshot of Smart Gaps Section
+    // MARK: - Test 4: No Past Time Slots Shown (Bug 9)
+
+    /// Test: Blöcke tab should NOT show time slots from the past
+    /// BUG 9: Past timeslots were being displayed (e.g., 09:00 when it's 14:00)
+    /// EXPECTED TO FAIL: GapFinder currently starts at 06:00 instead of current time
+    func testNoPastTimeSlotsShown() throws {
+        // Navigate to Blöcke tab
+        app.tabBars.buttons["Blöcke"].tap()
+        sleep(2)
+
+        // Get current hour
+        let currentHour = Calendar.current.component(.hour, from: Date())
+
+        // Collect all time slot texts (format: "HH:mm - HH:mm")
+        let timeFormatter = DateFormatter()
+        timeFormatter.timeStyle = .short
+
+        // Check for slots that start before current time
+        // Look for typical past hour patterns like "06:00", "07:00", "08:00", etc.
+        var foundPastSlot = false
+        var pastSlotDetails = ""
+
+        // Check hours from 6 to current hour - these should NOT appear as start times
+        for hour in 6..<currentHour {
+            let hourString = String(format: "%02d:", hour)
+            let pastSlotTexts = app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", hourString))
+
+            if pastSlotTexts.count > 0 {
+                foundPastSlot = true
+                pastSlotDetails += "Found past slot starting at \(hourString)xx; "
+            }
+        }
+
+        // Take screenshot for evidence
+        let screenshot = app.screenshot()
+        let attachment = XCTAttachment(screenshot: screenshot)
+        attachment.name = "Bug9-PastTimeslots-\(currentHour)h"
+        attachment.lifetime = .keepAlways
+        add(attachment)
+
+        // ASSERTION: No past slots should be shown
+        // This WILL FAIL until Bug 9 is fixed
+        XCTAssertFalse(foundPastSlot, "Past time slots should NOT be displayed. Current hour: \(currentHour). \(pastSlotDetails)")
+    }
+
+    // MARK: - Test 5: Screenshot of Smart Gaps Section
 
     func testSmartGapsSectionScreenshot() throws {
         // Navigate to Blöcke tab

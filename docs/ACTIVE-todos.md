@@ -16,190 +16,191 @@
 | **ERLEDIGT** | Fertig (nur nach Phase 8 / vollstaendiger Validierung) |
 | **BLOCKIERT** | Kann nicht fortgesetzt werden |
 
-**WICHTIG:** "SPEC READY" ≠ "ERLEDIGT"! Eine fertige Spec bedeutet NICHT, dass das Feature fertig ist.
+---
+
+## Themengruppe A: Next Up Layout (Horizontal → Vertikal)
+
+> **3 Stellen mit gleichem Bug:** ScrollView horizontal statt VStack vertikal
+
+| ID | Location | Status |
+|----|----------|--------|
+| Bug 2 | `NextUpSection.swift:38` | OFFEN |
+| Bug 4 | `TaskAssignmentView.swift:108` | OFFEN |
+| Task 5 | `FocusLiveView.swift` (nextUpSection) | OFFEN |
+
+**Gemeinsamer Fix:** `ScrollView(.horizontal)` → `VStack` mit Task-Rows
+**Scope:** Klein (3x gleiche Aenderung)
 
 ---
 
-## Offene Bugs
+## Themengruppe B: Next Up State Management
+
+> **Tasks erscheinen/verschwinden falsch**
 
 **Bug 1: Tasks bleiben in Quadranten sichtbar wenn in Next Up**
 - Location: `BacklogView.swift:58-77, 80-143`
-- Problem: Tasks erscheinen sowohl in Next Up Section ALS AUCH in Quadranten/Listen
-- Expected: Tasks mit `isNextUp=true` nur in Next Up Section
-- Root Cause: Filter-Properties filtern nur `!isCompleted`, nicht `!isNextUp`:
-  - `backlogTasks` (Zeile 58-60): `planItems.filter { !$0.isCompleted }`
-  - `doFirstTasks` (Zeile 63-65): fehlt `&& !$0.isNextUp`
-  - `scheduleTasks`, `delegateTasks`, `eliminateTasks` (Zeile 67-77): gleich
-  - `tasksByCategory` (Zeile 83): fehlt `&& !$0.isNextUp`
-  - `tasksByDuration` (Zeile 98-99): fehlt `&& !$0.isNextUp`
-  - `tasksByDueDate` (Zeile 113-139): fehlt `, !$0.isNextUp` in guards
+- Problem: Filter pruefen nur `!isCompleted`, nicht `!isNextUp`
 - Fix: `&& !$0.isNextUp` zu allen Filtern hinzufuegen
-- Test: Task zu Next Up → verschwindet aus Quadrant
-- Status: OFFEN
-
-**Bug 2: Next Up Section ist horizontal statt vertikal**
-- Location: `NextUpSection.swift:38`
-- Problem: `ScrollView(.horizontal, ...)` zeigt Tasks nebeneinander
-- Expected: Vertikale Liste mit dynamischer Hoehe
-- Root Cause: Zeile 38: `ScrollView(.horizontal, showsIndicators: false)`
-- Fix: VStack mit NextUpRow statt ScrollView mit NextUpChip
-- Test: Mehrere Tasks → untereinander angezeigt
-- Status: OFFEN
-
-**Bug 3: Kein Drag & Drop in Next Up** (DEFERRED)
-- Location: `NextUpSection.swift`
-- Problem: Keine Sortierung moeglich
-- Root Cause: Keine `.onMove()` implementiert, kein sortOrder Property
-- Fix: Benoetigt Datenmodell-Erweiterung (nextUpSortOrder)
-- Status: BLOCKIERT (groesserer Scope)
-
-**Bug 4: Zuordnen-Tab Next Up ist horizontal statt vertikal**
-- Location: `TaskAssignmentView.swift:108`
-- Problem: `ScrollView(.horizontal, ...)` zeigt Tasks nebeneinander
-- Expected: Vertikale Liste
-- Root Cause: Zeile 108: `ScrollView(.horizontal, showsIndicators: false)`
-- Fix: VStack mit DraggableTaskRow statt ScrollView
-- Test: Zuordnen-Tab → Tasks untereinander
+- Scope: Klein
 - Status: OFFEN
 
 **Bug 5: Tasks erscheinen nicht im Focus Block nach Zuordnung**
 - Location: `TaskAssignmentView.swift:141, 152-156, 175`
-- Problem: Nach Zuordnung ist Task weder in Next Up noch im Block sichtbar
-- Root Cause:
-  1. Zeile 141: `unscheduledTasks = allTasks.filter { $0.isNextUp && !$0.isCompleted }`
-  2. Zeile 152-156: `tasksForBlock()` sucht NUR in `unscheduledTasks`
-  3. Zeile 175: Nach Zuordnung `isNextUp=false` → Task verlässt `unscheduledTasks`
-  4. `tasksForBlock()` findet ihn nicht mehr!
+- Problem: Nach Zuordnung `isNextUp=false` → Task aus `unscheduledTasks` raus → `tasksForBlock()` findet ihn nicht
 - Fix: Separate `allTasks` State-Variable fuer Block-Anzeige
-- Test: Task zuordnen → erscheint im Block
 - Status: OFFEN
 
-**Bug 6: Task kehrt nicht zu Next Up zurueck nach Block-Entfernung**
-- Location: `TaskAssignmentView.swift:195-213`
-- Problem: Task aus Focus Block entfernt → verschwindet komplett (weder in Block noch Next Up)
-- Expected: Task sollte wieder in "Next Up" Section erscheinen
-- Root Cause:
-  - `removeTaskFromBlock()` (Zeile 195-213) entfernt Task aus EventKit-Block
-  - ABER: `isNextUp` wird NICHT zurueck auf `true` gesetzt
-  - Vergleich: `assignTaskToBlock()` (Zeile 185) setzt korrekt `isNextUp = false`
-  - Symmetrie fehlt: `removeTaskFromBlock()` muesste `isNextUp = true` setzen
-- Fix: In `removeTaskFromBlock()` nach EventKit-Update hinzufuegen:
-  ```swift
-  try syncEngine.updateNextUp(itemID: taskID, isNextUp: true)
-  ```
-- Test:
-  1. Task zu Block zuordnen (verschwindet aus Next Up - korrekt)
-  2. Task aus Block entfernen (X-Button)
-  3. Task erscheint wieder in Next Up
-- Aufwand: Klein (1 Zeile Code)
-- Status: OFFEN
-- Spec: `docs/specs/bugfixes/bug6-nextup-restore.md`
-
-**Bug 7: Scrolling innerhalb Focus Block nicht moeglich bei vielen Tasks**
-- Location: `TaskAssignmentView.swift:313-331` (FocusBlockCard)
-- Problem: Bei 6+ Tasks im Focus Block kann nicht innerhalb des Blocks gescrollt werden
-- Expected: Tasks innerhalb eines Blocks sollten scrollbar sein
-- Root Cause:
-  - Zeile 331: `.scrollDisabled(true)` auf der inneren `List`
-  - Zeile 330: `frame(minHeight: CGFloat(tasks.count * 44))` berechnet Hoehe
-  - Bei vielen Tasks wird Block zu gross fuer sichtbaren Bereich
-  - `.scrollDisabled(true)` verhindert Scrollen zu unteren Tasks
-  - Pattern wurde verwendet um Scroll-Konflikte mit aeusserer ScrollView (Zeile 74) zu vermeiden
-- Gleiches Pattern auch in:
-  - `BlockPlanningView.swift:196-216` (existingBlocksSection)
-- Fix-Strategien:
-  1. Feste `.frame(maxHeight: 250)` mit `.scrollDisabled(false)` (empfohlen)
-  2. Expandable/Collapsible Section mit "Mehr anzeigen"
-  3. ScrollViewReader mit programmatischem Scroll-Control
-- Test:
-  1. Focus Block mit 6+ Tasks erstellen
-  2. Versuche innerhalb des Blocks zu scrollen
-  3. Untere Tasks muessen erreichbar sein
-  4. Edge Case: Scroll-Geste soll nicht versehentlich aeussere ScrollView aktivieren
-- Aufwand: Mittel (Layout-Logik + Scroll-Konflikt-Handling)
-- Status: OFFEN
-
----
-
-## Offene Tasks
-
-**Task 1: Drag & Drop Sortierung in Next Up Section**
-- Beschreibung: User soll Tasks in Next Up per Drag & Drop sortieren koennen
-- Voraussetzung: `nextUpSortOrder` Property in LocalTask Datenmodell
-- Scope: Datenmodell-Erweiterung + UI-Implementierung
-- Ursprung: Bug 3 aus Next Up Feature (2026-01-18)
-- Prioritaet: Mittel
-- Status: OFFEN
-
----
-
-## Spec Ready (Implementation ausstehend)
-
-<!-- Items mit fertiger Spec, aber noch nicht implementiert -->
-
-_Keine ausstehenden Specs_
-
----
-
-## Zuletzt erledigt
-
-<!-- Archiv der letzten erledigten Items -->
-
-**Feature: Eisenhower Matrix als ViewMode in BacklogView**
-- Beschreibung: Eisenhower Matrix von separatem Tab zu ViewMode in BacklogView umgebaut
-- Type: AENDERUNG (Modification)
-- Implementiert:
-  - ViewMode enum mit 5 Modi (List, Matrix, Category, Duration, Due Date)
-  - Swift Liquid Glass Switcher im Toolbar (Menu Button)
-  - AppStorage Persistence mit Key "backlogViewMode"
-  - Matrix Tab aus MainTabView entfernt
-  - 5 View-Renderer in BacklogView integriert
-- Files Changed: MainTabView.swift (-4 lines), BacklogView.swift (+150 net), BacklogViewUITests.swift (+64)
-- Tests: 4 TDD UI Tests (alle grün)
-  - testViewModeSwitcherExists ✅
-  - testViewModeSwitcherShowsAllOptions ✅
-  - testSwitchToEisenhowerMatrixMode ✅
-  - testMatrixTabDoesNotExist ✅
-- TDD-Status: ✅ Vollständig TDD (RED → GREEN)
-- Spec: `TimeBox/docs/artifacts/eisenhower-view-mode/spec.md`
-- Validation: 2026-01-18
-- Status: ERLEDIGT ✅
-
-**Feature: Task System v2.0 - Phase 2: Backlog Enhancements**
-- Beschreibung: Visual Indicators + Eisenhower Matrix für besseres Task-Prioritization
-- Implementiert:
-  - BacklogRow mit Priority Icons, Tag Chips, Due Date Badges (f049830)
-  - EisenhowerMatrixView mit 4 Quadranten (Do First, Schedule, Delegate, Eliminate) (ed56d42)
-  - Retroaktive Tests: 10 Unit Tests + 12 UI Tests (4af9209)
-  - TDD-Enforcement: strict_code_gate.py Hook aktiviert (3843335)
-- Files Changed: BacklogView.swift, BacklogRow.swift, PlanItem.swift, MainTabView.swift
-- Tests: 22 Tests geschrieben (EisenhowerMatrixTests.swift, EisenhowerMatrixUITests.swift)
-- TDD-Status: ⚠️ Implementiert OHNE TDD (vor Hook-Aktivierung), Tests retroaktiv geschrieben
-- Hook-System: strict_code_gate.py verhindert zukünftige TDD-Bypasses
-- Validation: 2026-01-17
-- Status: ERLEDIGT ✅ (Tests geschrieben, Hook aktiv, Feature funktioniert)
-- Note: Filter/Sort UI blocked by Swift 6 Toolbar Bug (deferred)
-
-**Feature: Mock EventKit Repository (Phase 2)**
-- Beschreibung: SwiftUI Environment Injection für Mock in UI Tests + CloudKit Fix für Simulator
-- Implementiert: EventKitRepositoryEnvironment, TimeBoxApp Mock Injection + CloudKit Disable, View @Environment Updates
-- Changes: 13 files (EventKitRepositoryEnvironment.swift, TimeBoxApp, 2 Views, 2 UI Test files, Mock moved to main target)
-- Tests: 7 Timeline UI Tests bestehen (PlanningViewUITests 3/3, SchedulingUITests 4/4), App startet erfolgreich, keine Crashes
-- Root Cause Fix: CloudKit Initialisierung crashte im Simulator → isStoredInMemoryOnly + cloudKitDatabase: .none für Tests
-- Validation: 2026-01-16
-- Status: KOMPLETT ERLEDIGT ✅ (alle Acceptance Criteria erfüllt)
-
-**Feature: Mock EventKit Repository (Phase 1)**
-- Beschreibung: Protocol-basierte EventKit-Abstraktion mit Mock für Unit Tests
-- Implementiert: EventKitRepositoryProtocol, MockEventKitRepository, Test Refactoring
-- Tests: Build erfolgreich, 5 neue Mock Tests, 1 Fix (Device-Validation ausstehend)
-- Validation: 2026-01-15 (Build Success + Code Review)
-- Status: ERLEDIGT (Phase 1 - Unit Test Foundation)
-- Phase 2: View Injection + UI Tests (Future)
-
-**Feature: Multi-Source Task System**
-- Beschreibung: Task-Source Protocol System mit lokaler SwiftData Storage und CloudKit Sync
-- Implementiert: LocalTask Model, TaskSource Protocol, LocalTaskSource Implementation
-- Tests: Alle neuen Tests grün (TaskSourceTests, LocalTaskTests, LocalTaskSourceTests, PlanItemTests)
-- Validation: 2026-01-15
+**Bug 6: Task kehrt nicht zu Next Up zurueck nach Block-Entfernung** (ERLEDIGT)
+- Location: `TaskAssignmentView.swift:216-219`
+- Problem: `removeTaskFromBlock()` setzte `isNextUp` nicht zurueck auf `true`
+- Fix: `try syncEngine.updateNextUp(itemID: taskID, isNextUp: true)` hinzugefuegt
+- Commit: `d0fdcf1` (2026-01-18)
 - Status: ERLEDIGT
+
+---
+
+## Themengruppe C: Drag & Drop Sortierung
+
+> **Voraussetzung:** Datenmodell-Erweiterung (`nextUpSortOrder` Property)
+
+**Task 1: Drag & Drop in Next Up Section**
+- User soll Tasks in Next Up per Drag & Drop sortieren
+- Status: BLOCKIERT (benoetigt Datenmodell)
+
+**Task 2: Task-Sortierung in Focus Block**
+- User soll Tasks innerhalb eines Focus Blocks sortieren
+- `taskIDs` Array existiert bereits → Reihenfolge = Array-Index
+- Scope: ~50 LoC
+- Status: OFFEN
+
+---
+
+## Themengruppe D: Quick Task Capture
+
+> **4 Wege zur schnellen Task-Erfassung**
+
+| ID | Feature | Status | Prioritaet |
+|----|---------|--------|------------|
+| Task 7 | Control Center Fix (OpenURLIntent kaputt) | OFFEN | **HOCH** |
+| Task 8 | Home Screen Widget | OFFEN | Mittel |
+| Task 9 | Control Center Inline-Eingabe (iOS 18+) | OFFEN | Niedrig |
+| Task 10 | Siri Shortcut funktionsfaehig | OFFEN | Mittel |
+
+**Task 7 (Control Center Fix)** - MUSS ZUERST
+- Root Cause: `OpenURLIntent` blockiert custom URL schemes
+- Fix: `openAppWhenRun = true` statt `OpenURLIntent`
+- Location: `FocusBloxWidgets/QuickAddTaskControl.swift:11-14`
+- Scope: Klein (~5 LoC)
+
+**Task 8 (Home Screen Widget)**
+- Neues `StaticConfiguration` Widget
+- Tap → App mit QuickCaptureView
+- Scope: Mittel (~100 LoC)
+
+**Task 9 (Control Center Inline)**
+- Voraussetzung: Task 7 gefixt
+- iOS 18+ interaktives Control mit Textfeld
+- Scope: Gross + Research
+
+**Task 10 (Siri Shortcut)**
+- Intent erstellt aktuell keinen Task (nur Logging)
+- Benoetigt: App Group fuer shared ModelContainer
+- Scope: Mittel (~80 LoC)
+
+---
+
+## Themengruppe E: Focus Block Ausfuehrung
+
+> **Live Activity, Timer, Notifications waehrend Focus Block**
+
+**Bug 10: Dynamic Island Layout falsch**
+- Problem: Zu breit, falsches Layout-Pattern
+- Fix: Layout 1:1 von Meditationstimer uebernehmen (explizite frame sizes, padding, overlay-trick)
+- Location: `FocusBloxWidgets/FocusBlockLiveActivity.swift`
+- Referenz: `Meditationstimer/.../MeditationstimerWidgetLiveActivity.swift`
+- Scope: Mittel (~80 LoC)
+- Status: OFFEN
+
+**Task 4: Live Activity zeigt Task-Restzeit statt Block-Restzeit**
+- Aktuell: Countdown fuer gesamten Block
+- Expected: Countdown fuer aktuellen Task
+- Scope: Mittel
+- Status: OFFEN
+
+**Task 3: Push-Notification bei Focus Block Start**
+- X Minuten vor Start oder bei Start
+- `UNUserNotificationCenter` fuer lokale Notifications
+- Scope: Mittel (~100 LoC)
+- Status: OFFEN
+
+**Task 11: Task-Timer Ablauf - Overdue Handling**
+- Aktuelle Probleme:
+  1. Keine Push-Notification bei Task-Zeitablauf
+  2. Nur "erledigt" Button - "nicht erledigt" fehlt
+  3. Kein Overdue-Zustand
+- Expected:
+  1. Push: "Zeit fuer [Task] abgelaufen"
+  2. Buttons: "Erledigt" / "Nicht erledigt"
+  3. Overdue: Timer rot, regelmaessige Erinnerung
+- Scope: Gross (~200 LoC)
+- Prioritaet: **HOCH**
+- Status: OFFEN
+
+---
+
+## Themengruppe F: Sprint Review
+
+**Task 12: Sprint Review komplett ueberarbeiten**
+- Aktuelle Probleme:
+  1. Zeigt nicht: geplante Zeit vs. tatsaechliche Zeit
+  2. Keine Editiermoeglichkeit fuer Task-Status
+  3. Keine Anpassung der Restzeit fuer unerledigte Tasks
+- Expected:
+  1. Pro Task: geplant X min, gebraucht Y min
+  2. Tasks als erledigt/unerledigt markierbar
+  3. Bei "unerledigt": Restzeit anpassen
+- Voraussetzung: Task-Tracking mit Start/Ende-Zeiten (neues Datenmodell)
+- Scope: Gross (~300 LoC + Datenmodell)
+- Prioritaet: **HOCH**
+- Status: OFFEN
+
+---
+
+## Einzelne Bugs
+
+**Bug 7: Scrolling innerhalb Focus Block nicht moeglich**
+- Location: `TaskAssignmentView.swift:313-331`
+- Problem: `.scrollDisabled(true)` bei 6+ Tasks
+- Fix: Feste `.frame(maxHeight: 250)` mit `.scrollDisabled(false)`
+- Scope: Mittel
+- Status: OFFEN
+
+**Bug 9: Bloecke-Tab zeigt vergangene Zeitslots** ✅
+- Location: `BlockPlanningView.swift` (GapFinder)
+- Fix: `findFreeSlots()` und `createDefaultSuggestions()` filtern jetzt nach aktueller Zeit
+- Status: ERLEDIGT (2026-01-24)
+
+---
+
+## Erledigt
+
+**Task 6: Volle Editierbarkeit fuer importierte Reminders** ✅
+- Problem: Importierte Tasks aus Apple Erinnerungen hatten eingeschraenkte Editieroptionen
+- Loesung: EditTaskSheet um alle Felder erweitert (Tags, Dringlichkeit, Typ, Faelligkeitsdatum, Beschreibung)
+- Files: EditTaskSheet.swift, TaskDetailSheet.swift, BacklogView.swift, SyncEngine.swift, FocusBloxApp.swift
+- Status: ERLEDIGT (2026-01-24)
+
+**Bug 8: Kalender-/Erinnerungen-Berechtigung wird nicht abgefragt** ✅
+- Fix: `requestPermissionsOnLaunch()` in `FocusBloxApp.onAppear`
+- Status: ERLEDIGT (2026-01-24)
+
+---
+
+## Priorisierung Empfehlung
+
+| Prioritaet | Items |
+|------------|-------|
+| **1. Quick Wins** | ~~Bug 9 (Zeitslots)~~ ✅, Task 7 (Control Center) |
+| **2. Next Up Fixes** | Gruppe A (Layout), Gruppe B (State) |
+| **3. Core UX** | Task 11 (Overdue), Task 12 (Sprint Review) |
+| **4. Nice to Have** | Gruppe D (Quick Capture), Gruppe E (Live Activity) |

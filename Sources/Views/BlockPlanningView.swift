@@ -9,6 +9,7 @@ struct BlockPlanningView: View {
     @State private var errorMessage: String?
     @State private var selectedSlot: TimeSlot?
     @State private var blockToEdit: FocusBlock?
+    @State private var eventToCategories: CalendarEvent?
 
     private let hourHeight: CGFloat = 60
     private let startHour = 6
@@ -64,6 +65,14 @@ struct BlockPlanningView: View {
                     }
                 )
             }
+            .sheet(item: $eventToCategories) { event in
+                EventCategorySheet(
+                    event: event,
+                    onSelect: { category in
+                        updateEventCategory(event: event, category: category)
+                    }
+                )
+            }
         }
         .task {
             print("🟣 .task modifier triggered - calling loadData()")
@@ -97,12 +106,15 @@ struct BlockPlanningView: View {
                         }
                     }
 
-                    // Existing events overlay (grayed out)
+                    // Existing events overlay (grayed out, tappable for categorization)
                     ForEach(nonFocusBlockEvents) { event in
                         ExistingEventBlock(
                             event: event,
                             hourHeight: hourHeight,
-                            startHour: startHour
+                            startHour: startHour,
+                            onTap: {
+                                eventToCategories = event
+                            }
                         )
                     }
 
@@ -158,12 +170,54 @@ struct BlockPlanningView: View {
                 if !focusBlocks.isEmpty {
                     existingBlocksSection
                 }
+
+                // Calendar Events (tappable for categorization)
+                if !nonFocusBlockEvents.isEmpty {
+                    calendarEventsSection
+                }
             }
             .padding()
         }
         .refreshable {
             await loadData()
         }
+    }
+
+    // MARK: - Calendar Events Section
+
+    private var calendarEventsSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Image(systemName: "calendar")
+                    .foregroundStyle(.gray)
+                Text("Heutige Termine")
+                    .font(.headline)
+                Spacer()
+                Text("\(nonFocusBlockEvents.count)")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 2)
+                    .background(Capsule().fill(.gray.opacity(0.15)))
+            }
+
+            VStack(spacing: 8) {
+                ForEach(nonFocusBlockEvents) { event in
+                    CalendarEventRow(event: event) {
+                        eventToCategories = event
+                    }
+                }
+            }
+        }
+        .padding()
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(.gray.opacity(0.05))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(.gray.opacity(0.2), lineWidth: 1)
+        )
     }
 
     private var computedFreeSlots: [TimeSlot] {
@@ -243,6 +297,17 @@ struct BlockPlanningView: View {
                 await loadData()
             } catch {
                 errorMessage = "Block konnte nicht aktualisiert werden."
+            }
+        }
+    }
+
+    private func updateEventCategory(event: CalendarEvent, category: String?) {
+        Task {
+            do {
+                try eventKitRepo.updateEventCategory(eventID: event.id, category: category)
+                await loadData()
+            } catch {
+                errorMessage = "Kategorie konnte nicht gespeichert werden."
             }
         }
     }
@@ -353,7 +418,10 @@ struct GapFinder {
 
         // Find gaps
         var gaps: [TimeSlot] = []
-        var currentTime = dayStart
+        // Bug 9 Fix: Start from current time, not day start (06:00)
+        // This prevents showing past time slots
+        let now = Date()
+        var currentTime = Calendar.current.isDate(now, inSameDayAs: date) ? max(dayStart, now) : dayStart
 
         for period in busyPeriods {
             // Skip periods outside our time range
@@ -419,11 +487,20 @@ struct GapFinder {
 
     private func createDefaultSuggestions(maxMinutes: Int) -> [TimeSlot] {
         let calendar = Calendar.current
+        let now = Date()
+        let isToday = calendar.isDate(now, inSameDayAs: date)
+
         return defaultSuggestionHours.compactMap { hour in
             var components = calendar.dateComponents([.year, .month, .day], from: date)
             components.hour = hour
             components.minute = 0
             guard let start = calendar.date(from: components) else { return nil }
+
+            // Bug 9 Fix: Filter out past suggestions for today
+            if isToday && start < now {
+                return nil
+            }
+
             let end = start.addingTimeInterval(Double(maxMinutes) * 60)
             return TimeSlot(startDate: start, endDate: end)
         }
@@ -502,12 +579,22 @@ struct BlockPlanningHourRow: View {
     }
 }
 
-// MARK: - Existing Event Block (grayed out)
+// MARK: - Existing Event Block (grayed out, tappable for categorization)
 
 struct ExistingEventBlock: View {
     let event: CalendarEvent
     let hourHeight: CGFloat
     let startHour: Int
+    var onTap: (() -> Void)? = nil
+
+    /// Get category color if event has a category
+    private var categoryColor: Color? {
+        guard let categoryString = event.category,
+              let category = CategoryConfig(rawValue: categoryString) else {
+            return nil
+        }
+        return category.color
+    }
 
     var body: some View {
         let yOffset = calculateYOffset()
@@ -516,19 +603,36 @@ struct ExistingEventBlock: View {
         RoundedRectangle(cornerRadius: 6)
             .fill(.gray.opacity(0.3))
             .overlay(
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(event.title)
-                        .font(.caption.weight(.medium))
-                        .foregroundStyle(.secondary)
-                        .lineLimit(1)
+                HStack(spacing: 4) {
+                    // Category indicator (left edge)
+                    if let color = categoryColor {
+                        RoundedRectangle(cornerRadius: 2)
+                            .fill(color)
+                            .frame(width: 4)
+                            .accessibilityIdentifier("eventCategory_\(event.title)")
+                    }
+
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(event.title)
+                            .font(.caption.weight(.medium))
+                            .foregroundStyle(.secondary)
+                            .lineLimit(1)
+                    }
+                    .padding(.vertical, 6)
+                    .padding(.trailing, 6)
+                    .padding(.leading, categoryColor == nil ? 6 : 2)
+
+                    Spacer()
                 }
-                .padding(6),
-                alignment: .topLeading
             )
             .frame(height: max(height, 25))
             .padding(.leading, 55)
             .padding(.trailing, 8)
             .offset(y: yOffset)
+            .contentShape(Rectangle())
+            .onTapGesture {
+                onTap?()
+            }
     }
 
     private func calculateYOffset() -> CGFloat {
@@ -815,5 +919,133 @@ struct ExistingBlockRow: View {
             RoundedRectangle(cornerRadius: 8)
                 .fill(.blue.opacity(0.1))
         )
+    }
+}
+
+// MARK: - Event Category Sheet
+
+/// Sheet for selecting a category for a calendar event
+struct EventCategorySheet: View {
+    let event: CalendarEvent
+    let onSelect: (String?) -> Void
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        NavigationStack {
+            List {
+                ForEach(CategoryConfig.allCases, id: \.self) { category in
+                    Button {
+                        onSelect(category.rawValue)
+                        dismiss()
+                    } label: {
+                        HStack {
+                            Image(systemName: category.icon)
+                                .foregroundStyle(category.color)
+                                .frame(width: 30)
+
+                            Text(category.displayName)
+                                .foregroundStyle(.primary)
+
+                            Spacer()
+
+                            if event.category == category.rawValue {
+                                Image(systemName: "checkmark")
+                                    .foregroundStyle(.blue)
+                            }
+                        }
+                    }
+                    .accessibilityIdentifier("categoryOption_\(category.rawValue)")
+                }
+
+                // Option to clear category
+                if event.category != nil {
+                    Button(role: .destructive) {
+                        onSelect(nil)
+                        dismiss()
+                    } label: {
+                        HStack {
+                            Image(systemName: "xmark.circle")
+                                .foregroundStyle(.red)
+                                .frame(width: 30)
+
+                            Text("Kategorie entfernen")
+                                .foregroundStyle(.red)
+                        }
+                    }
+                }
+            }
+            .navigationTitle("Kategorie wählen")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Abbrechen") {
+                        dismiss()
+                    }
+                }
+            }
+        }
+        .presentationDetents([.medium])
+    }
+}
+
+// MARK: - Calendar Event Row
+
+/// Row for displaying a calendar event with tap-to-categorize
+struct CalendarEventRow: View {
+    let event: CalendarEvent
+    let onTap: () -> Void
+
+    private let timeFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.timeStyle = .short
+        return f
+    }()
+
+    /// Get category color if event has a category
+    private var categoryColor: Color? {
+        guard let categoryString = event.category,
+              let category = CategoryConfig(rawValue: categoryString) else {
+            return nil
+        }
+        return category.color
+    }
+
+    var body: some View {
+        Button(action: onTap) {
+            HStack(spacing: 8) {
+                // Category indicator (left edge)
+                if let color = categoryColor {
+                    RoundedRectangle(cornerRadius: 2)
+                        .fill(color)
+                        .frame(width: 4, height: 40)
+                        .accessibilityIdentifier("eventCategory_\(event.title)")
+                }
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(event.title)
+                        .font(.subheadline.weight(.medium))
+                        .foregroundStyle(.primary)
+                        .lineLimit(1)
+
+                    Text("\(timeFormatter.string(from: event.startDate)) - \(timeFormatter.string(from: event.endDate))")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+
+                Spacer()
+
+                // Tap hint
+                Image(systemName: "tag")
+                    .foregroundStyle(.secondary)
+                    .font(.caption)
+            }
+            .padding(.vertical, 8)
+            .padding(.horizontal, 12)
+            .background(
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(.gray.opacity(0.1))
+            )
+        }
+        .buttonStyle(.plain)
     }
 }
