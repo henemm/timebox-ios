@@ -14,10 +14,28 @@ final class RemindersSyncService {
         self.modelContext = modelContext
     }
 
-    /// Import all incomplete reminders from Apple Reminders.
+    /// Import incomplete reminders from visible Apple Reminders lists.
     /// Creates new LocalTask for new reminders, updates existing ones.
+    /// Reminders from hidden lists are removed from backlog.
     func importFromReminders() async throws -> [LocalTask] {
-        let reminders = try await eventKitRepo.fetchIncompleteReminders()
+        let allReminders = try await eventKitRepo.fetchIncompleteReminders()
+
+        // Get visible reminder list IDs from UserDefaults
+        let visibleListIDs: Set<String>
+        if let savedListIDs = UserDefaults.standard.array(forKey: "visibleReminderListIDs") as? [String] {
+            visibleListIDs = Set(savedListIDs)
+        } else {
+            // Default: all lists visible
+            let allLists = eventKitRepo.getAllReminderLists()
+            visibleListIDs = Set(allLists.map(\.id))
+        }
+
+        // Filter reminders by visible lists
+        let reminders = allReminders.filter { reminder in
+            guard let listID = reminder.calendarIdentifier else { return true }
+            return visibleListIDs.contains(listID)
+        }
+
         var importedTasks: [LocalTask] = []
 
         for reminder in reminders {
@@ -33,7 +51,7 @@ final class RemindersSyncService {
             }
         }
 
-        // Handle deleted reminders: set sourceSystem to "local"
+        // Handle deleted/hidden reminders: set sourceSystem to "local"
         try handleDeletedReminders(currentReminderIDs: Set(reminders.map(\.id)))
 
         try modelContext.save()
@@ -112,9 +130,9 @@ final class RemindersSyncService {
             guard let externalID = task.externalID else { continue }
 
             if !currentReminderIDs.contains(externalID) {
-                // Reminder was deleted in Apple - convert to local task
-                task.sourceSystem = "local"
-                // Keep externalID for potential reconnection
+                // Reminder was deleted or hidden - remove from backlog
+                // Will be re-imported if list is re-enabled
+                modelContext.delete(task)
             }
         }
     }

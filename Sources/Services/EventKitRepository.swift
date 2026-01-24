@@ -303,6 +303,13 @@ final class EventKitRepository: EventKitRepositoryProtocol, @unchecked Sendable 
             .filter { $0.allowsContentModifications }
     }
 
+    // MARK: - Reminder Lists
+
+    /// Returns all available reminder lists as ReminderListInfo
+    func getAllReminderLists() -> [ReminderListInfo] {
+        eventStore.calendars(for: .reminder).map { ReminderListInfo(from: $0) }
+    }
+
     /// Returns the selected calendar for creating events, with fallback to default
     func calendarForEvents() -> EKCalendar? {
         if let id = UserDefaults.standard.string(forKey: "selectedCalendarID"),

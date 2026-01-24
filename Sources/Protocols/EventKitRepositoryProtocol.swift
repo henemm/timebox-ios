@@ -41,4 +41,8 @@ import Foundation
 
     func getWritableCalendars() -> [EKCalendar]
     func getAllCalendars() -> [EKCalendar]
+
+    // MARK: - Reminder Lists
+
+    func getAllReminderLists() -> [ReminderListInfo]
 }

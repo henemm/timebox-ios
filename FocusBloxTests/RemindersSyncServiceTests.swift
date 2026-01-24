@@ -88,9 +88,9 @@ final class RemindersSyncServiceTests: XCTestCase {
     }
 
     /// GIVEN: LocalTask with sourceSystem="reminders"
-    /// WHEN: Reminder not found in Apple
-    /// THEN: sourceSystem changes to "local", externalID preserved
-    func testDeletedReminderBecomesLocal() async throws {
+    /// WHEN: Reminder not found in Apple (deleted or hidden list)
+    /// THEN: Task is deleted from SwiftData (will be re-imported if list is re-enabled)
+    func testDeletedReminderIsRemoved() async throws {
         // Create existing LocalTask linked to a reminder
         let existingTask = LocalTask(
             title: "Orphaned Task",
@@ -106,8 +106,41 @@ final class RemindersSyncServiceTests: XCTestCase {
 
         _ = try await syncService.importFromReminders()
 
-        XCTAssertEqual(existingTask.sourceSystem, "local")
-        XCTAssertEqual(existingTask.externalID, "deleted-reminder-id")
+        // The task should have been deleted
+        let descriptor = FetchDescriptor<LocalTask>(
+            predicate: #Predicate { $0.externalID == "deleted-reminder-id" }
+        )
+        let remainingTasks = try modelContext.fetch(descriptor)
+        XCTAssertEqual(remainingTasks.count, 0, "Task should be deleted when reminder is hidden/deleted")
+    }
+
+    /// GIVEN: Reminders in visible and hidden lists
+    /// WHEN: importFromReminders() is called with visibleReminderListIDs set
+    /// THEN: Only reminders from visible lists are imported
+    func testImportFiltersHiddenLists() async throws {
+        // Setup: Save only "list-arbeit" as visible
+        UserDefaults.standard.set(["list-arbeit"], forKey: "visibleReminderListIDs")
+
+        let mockRepo = MockEventKitRepository()
+        mockRepo.mockReminders = [
+            ReminderData(id: "r1", title: "Work Task", calendarIdentifier: "list-arbeit"),
+            ReminderData(id: "r2", title: "Private Task", calendarIdentifier: "list-privat")
+        ]
+        mockRepo.mockReminderLists = [
+            ReminderListInfo(id: "list-arbeit", title: "Arbeit"),
+            ReminderListInfo(id: "list-privat", title: "Privat")
+        ]
+
+        let syncService = RemindersSyncService(eventKitRepo: mockRepo, modelContext: modelContext)
+
+        let imported = try await syncService.importFromReminders()
+
+        // Only the reminder from "list-arbeit" should be imported
+        XCTAssertEqual(imported.count, 1, "Should only import from visible lists")
+        XCTAssertEqual(imported.first?.title, "Work Task", "Should import 'Work Task' from visible Arbeit list")
+
+        // Cleanup
+        UserDefaults.standard.removeObject(forKey: "visibleReminderListIDs")
     }
 
     /// GIVEN: LocalTask with sourceSystem="reminders", changed title

@@ -196,4 +196,12 @@ final class MockEventKitRepository: EventKitRepositoryProtocol, @unchecked Senda
     func getAllCalendars() -> [EKCalendar] {
         return mockCalendars
     }
+
+    // MARK: - Protocol Implementation - Reminder Lists
+
+    var mockReminderLists: [ReminderListInfo] = []
+
+    func getAllReminderLists() -> [ReminderListInfo] {
+        return mockReminderLists
+    }
 }

@@ -120,13 +120,18 @@ struct FocusBloxApp: App {
             mock.mockEvents = [meeting1, meeting2, meeting3]
 
             // Add mock Reminders for testing Reminders Sync
+            // List IDs for filtering
+            let arbeitListID = "mock-list-arbeit"
+            let privatListID = "mock-list-privat"
+
             let reminder1 = ReminderData(
                 id: "mock-reminder-1",
                 title: "Design Review #30min",
                 isCompleted: false,
                 priority: 1,
                 dueDate: calendar.date(byAdding: .day, value: 1, to: now),
-                notes: "Review UI mockups"
+                notes: "Review UI mockups",
+                calendarIdentifier: arbeitListID  // In "Arbeit" list
             )
             let reminder2 = ReminderData(
                 id: "mock-reminder-2",
@@ -134,9 +139,24 @@ struct FocusBloxApp: App {
                 isCompleted: false,
                 priority: 0,
                 dueDate: nil,
-                notes: nil
+                notes: nil,
+                calendarIdentifier: arbeitListID  // In "Arbeit" list
             )
-            mock.mockReminders = [reminder1, reminder2]
+            let reminder3 = ReminderData(
+                id: "mock-reminder-3",
+                title: "Einkaufen gehen",
+                isCompleted: false,
+                priority: 0,
+                dueDate: nil,
+                notes: nil,
+                calendarIdentifier: privatListID  // In "Privat" list
+            )
+            mock.mockReminders = [reminder1, reminder2, reminder3]
+
+            // Add mock Reminder Lists for Settings UI
+            let arbeitList = ReminderListInfo(id: arbeitListID, title: "Arbeit", colorHex: "#FF0000")
+            let privatList = ReminderListInfo(id: privatListID, title: "Privat", colorHex: "#00FF00")
+            mock.mockReminderLists = [arbeitList, privatList]
 
             return mock
         } else {
@@ -172,6 +192,7 @@ struct FocusBloxApp: App {
     private func resetUserDefaultsIfNeeded() {
         guard ProcessInfo.processInfo.arguments.contains("-ResetUserDefaults") else { return }
         UserDefaults.standard.set(false, forKey: "remindersSyncEnabled")
+        UserDefaults.standard.removeObject(forKey: "visibleReminderListIDs")
         UserDefaults.standard.synchronize()
     }
 

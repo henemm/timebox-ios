@@ -8,10 +8,12 @@ struct SettingsView: View {
     @AppStorage("warningEnabled") private var warningEnabled: Bool = true
     @AppStorage("warningTiming") private var warningTimingRaw: Int = WarningTiming.standard.rawValue
     @AppStorage("remindersSyncEnabled") private var remindersSyncEnabled: Bool = false
+    @Environment(\.eventKitRepository) private var eventKitRepo
     @State private var visibleCalendarIDs: Set<String> = []
-    @State private var eventKitRepo = EventKitRepository()
+    @State private var visibleReminderListIDs: Set<String> = []
     @State private var allCalendars: [EKCalendar] = []
     @State private var writableCalendars: [EKCalendar] = []
+    @State private var allReminderLists: [ReminderListInfo] = []
 
     var body: some View {
         NavigationStack {
@@ -86,6 +88,22 @@ struct SettingsView: View {
                 } footer: {
                     Text("Tasks aus Apple Erinnerungen werden in den Backlog importiert.")
                 }
+
+                // Section 4: Visible Reminder Lists (only shown when sync enabled)
+                if remindersSyncEnabled && !allReminderLists.isEmpty {
+                    Section {
+                        ForEach(allReminderLists) { list in
+                            Toggle(isOn: reminderListBinding(for: list.id)) {
+                                ReminderListRow(list: list)
+                            }
+                            .accessibilityIdentifier("reminderList_\(list.title)")
+                        }
+                    } header: {
+                        Text("Sichtbare Erinnerungslisten")
+                    } footer: {
+                        Text("Nur ausgewählte Listen werden in den Backlog importiert.")
+                    }
+                }
             }
             .navigationTitle("Settings")
             .toolbar {
@@ -115,20 +133,43 @@ struct SettingsView: View {
         )
     }
 
+    private func reminderListBinding(for listID: String) -> Binding<Bool> {
+        Binding(
+            get: { visibleReminderListIDs.contains(listID) },
+            set: { isVisible in
+                if isVisible {
+                    visibleReminderListIDs.insert(listID)
+                } else {
+                    visibleReminderListIDs.remove(listID)
+                }
+            }
+        )
+    }
+
     private func loadCalendars() {
         allCalendars = eventKitRepo.getAllCalendars()
         writableCalendars = eventKitRepo.getWritableCalendars()
+        allReminderLists = eventKitRepo.getAllReminderLists()
 
         // Load saved visible calendars or default to all
-        if let saved = eventKitRepo.visibleCalendarIDs() {
+        if let saved = UserDefaults.standard.array(forKey: "visibleCalendarIDs") as? [String] {
             visibleCalendarIDs = Set(saved)
         } else {
             visibleCalendarIDs = Set(allCalendars.map(\.calendarIdentifier))
+        }
+
+        // Load saved visible reminder lists or default to all
+        if let savedReminders = UserDefaults.standard.array(forKey: "visibleReminderListIDs") as? [String] {
+            visibleReminderListIDs = Set(savedReminders)
+        } else {
+            visibleReminderListIDs = Set(allReminderLists.map(\.id))
         }
     }
 
     private func saveVisibleCalendars() {
         UserDefaults.standard.set(Array(visibleCalendarIDs), forKey: "visibleCalendarIDs")
+        UserDefaults.standard.set(Array(visibleReminderListIDs), forKey: "visibleReminderListIDs")
+        UserDefaults.standard.synchronize()
     }
 }
 
@@ -144,5 +185,48 @@ struct CalendarRow: View {
                 .frame(width: 12, height: 12)
             Text(calendar.title)
         }
+    }
+}
+
+// MARK: - Reminder List Row
+
+struct ReminderListRow: View {
+    let list: ReminderListInfo
+
+    var body: some View {
+        HStack(spacing: 8) {
+            if let hex = list.colorHex {
+                Circle()
+                    .fill(Color(hex: hex))
+                    .frame(width: 12, height: 12)
+            } else {
+                Circle()
+                    .fill(Color.gray)
+                    .frame(width: 12, height: 12)
+            }
+            Text(list.title)
+        }
+    }
+}
+
+// MARK: - Color Extension for Hex
+
+extension Color {
+    init(hex: String) {
+        let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
+        var int: UInt64 = 0
+        Scanner(string: hex).scanHexInt64(&int)
+        let r, g, b: UInt64
+        switch hex.count {
+        case 6:
+            (r, g, b) = ((int >> 16) & 0xFF, (int >> 8) & 0xFF, int & 0xFF)
+        default:
+            (r, g, b) = (128, 128, 128)
+        }
+        self.init(
+            red: Double(r) / 255,
+            green: Double(g) / 255,
+            blue: Double(b) / 255
+        )
     }
 }
