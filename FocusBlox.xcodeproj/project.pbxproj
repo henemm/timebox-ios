@@ -20,6 +20,7 @@
 		480FAFAEB03560F38352900B /* FocusBlockTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1177F32AD2A8E3DE065A8945 /* FocusBlockTests.swift */; };
 		4BE1E3D56F11189BF6AA8459 /* UXImprovementsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9C8001C9F5CBCA0AC28B19A /* UXImprovementsUITests.swift */; };
 		53697A70444E5ECF3B760A1C /* SyncEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34D186C26C7135F80A5E3B0B /* SyncEngine.swift */; };
+		REMSYNC3BUILDFILE001 /* RemindersSyncService.swift in Sources */ = {isa = PBXBuildFile; fileRef = REMSYNC3FILEREF0001 /* RemindersSyncService.swift */; };
 		58649A426A8AF17A4944DBCF /* NextUpSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B35F02DA57C64E51F6EC483 /* NextUpSection.swift */; };
 		586B7D1F1588622970BCEED8 /* MiniBacklogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1430133DDF6FA76E9E129534 /* MiniBacklogView.swift */; };
 		60EF444FADDBAC17F14380E0 /* FocusLiveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 710817B02FE720EDA21132FA /* FocusLiveView.swift */; };
@@ -47,6 +48,7 @@
 		B46449CB5D5E8C093E07C2D9 /* DurationPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = F91103B45CFB1388E6B12F3C /* DurationPicker.swift */; };
 		B5253CB93F49550930B0AF7C /* FocusBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0B1EE7295AF0AD91CA0027A /* FocusBlock.swift */; };
 		B59D2883B998A9D4A297ED2C /* LocalTaskSourceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64C281ADBE9DA2AC381CB747 /* LocalTaskSourceTests.swift */; };
+		REMSYNC2BUILDFILE001 /* RemindersSyncServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = REMSYNC2FILEREF0001 /* RemindersSyncServiceTests.swift */; };
 		B703FF51FE4B31A1D059A453 /* NextUpTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D81A830A7874C023E289830 /* NextUpTests.swift */; };
 		B7A16CD32F1FE3BC00165284 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B7A16CD22F1FE3BC00165284 /* WidgetKit.framework */; };
 		B7A16CD52F1FE3BC00165284 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B7A16CD42F1FE3BC00165284 /* SwiftUI.framework */; };
@@ -96,6 +98,8 @@
 		SNDUI001BUILDFILE0001 /* SoundSettingsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = SNDUI001FILEREF00001 /* SoundSettingsUITests.swift */; };
 		TAUX001BUILDFILE00001 /* TaskAssignmentUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = TAUX001FILEREF000001 /* TaskAssignmentUITests.swift */; };
 		TSKDTUI1BUILDFILE001 /* TaskDetailUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = TSKDTUI1FILEREF0001 /* TaskDetailUITests.swift */; };
+		REMSYNC1BUILDFILE001 /* RemindersSyncUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = REMSYNC1FILEREF0001 /* RemindersSyncUITests.swift */; };
+		REMSYNC4BUILDFILE001 /* RemindersSyncE2ETests.swift in Sources */ = {isa = PBXBuildFile; fileRef = REMSYNC4FILEREF0001 /* RemindersSyncE2ETests.swift */; };
 		WARN001BUILDFILE00001 /* WarningTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = WARN001FILEREF000001 /* WarningTests.swift */; };
 		WARNTIM01BUILDFILE001 /* WarningTiming.swift in Sources */ = {isa = PBXBuildFile; fileRef = WARNTIM01FILEREF0001 /* WarningTiming.swift */; };
 		WARNUI01BUILDFILE0001 /* WarningSettingsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = WARNUI01FILEREF00001 /* WarningSettingsUITests.swift */; };
@@ -213,6 +217,7 @@
 		32E6EA75FACA340867827895 /* PlanItemTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanItemTests.swift; sourceTree = "<group>"; };
 		339BBA1A3799CB0C6CF5897A /* BacklogViewUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BacklogViewUITests.swift; sourceTree = "<group>"; };
 		34D186C26C7135F80A5E3B0B /* SyncEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncEngine.swift; sourceTree = "<group>"; };
+		REMSYNC3FILEREF0001 /* RemindersSyncService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemindersSyncService.swift; sourceTree = "<group>"; };
 		37586E91853A38D88E035A33 /* MockEventKitRepositoryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockEventKitRepositoryTests.swift; sourceTree = "<group>"; };
 		3B596C16F99039490702E0B7 /* ErrorStateUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorStateUITests.swift; sourceTree = "<group>"; };
 		3F276F67582A827E523D8ED6 /* EventKitRepositoryEnvironment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventKitRepositoryEnvironment.swift; sourceTree = "<group>"; };
@@ -227,6 +232,7 @@
 		548F5CBBB14618043F38ACE6 /* PlanItemTransfer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanItemTransfer.swift; sourceTree = "<group>"; };
 		5D1F03B35977548B59D7269F /* CalendarEventTransfer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarEventTransfer.swift; sourceTree = "<group>"; };
 		64C281ADBE9DA2AC381CB747 /* LocalTaskSourceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalTaskSourceTests.swift; sourceTree = "<group>"; };
+		REMSYNC2FILEREF0001 /* RemindersSyncServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemindersSyncServiceTests.swift; sourceTree = "<group>"; };
 		710817B02FE720EDA21132FA /* FocusLiveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusLiveView.swift; sourceTree = "<group>"; };
 		71582A64B51A62129A2409B7 /* DebugLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugLogger.swift; sourceTree = "<group>"; };
 		76296762878DC5D17EA4E12A /* TaskSourceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskSourceTests.swift; sourceTree = "<group>"; };
@@ -286,6 +292,8 @@
 		SNDUI001FILEREF00001 /* SoundSettingsUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundSettingsUITests.swift; sourceTree = "<group>"; };
 		TAUX001FILEREF000001 /* TaskAssignmentUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskAssignmentUITests.swift; sourceTree = "<group>"; };
 		TSKDTUI1FILEREF0001 /* TaskDetailUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskDetailUITests.swift; sourceTree = "<group>"; };
+		REMSYNC1FILEREF0001 /* RemindersSyncUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemindersSyncUITests.swift; sourceTree = "<group>"; };
+		REMSYNC4FILEREF0001 /* RemindersSyncE2ETests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemindersSyncE2ETests.swift; sourceTree = "<group>"; };
 		WARN001FILEREF000001 /* WarningTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WarningTests.swift; sourceTree = "<group>"; };
 		WARNTIM01FILEREF0001 /* WarningTiming.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WarningTiming.swift; sourceTree = "<group>"; };
 		WARNUI01FILEREF00001 /* WarningSettingsUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WarningSettingsUITests.swift; sourceTree = "<group>"; };
@@ -419,6 +427,8 @@
 				LIVACT01FILEREF00001 /* LiveActivityUITests.swift */,
 				DAILYR01FILEREF00001 /* DailyReviewUITests.swift */,
 				TSKDTUI1FILEREF0001 /* TaskDetailUITests.swift */,
+				REMSYNC1FILEREF0001 /* RemindersSyncUITests.swift */,
+				REMSYNC4FILEREF0001 /* RemindersSyncE2ETests.swift */,
 			);
 			path = FocusBloxUITests;
 			sourceTree = "<group>";
@@ -559,6 +569,7 @@
 				1177F32AD2A8E3DE065A8945 /* FocusBlockTests.swift */,
 				64C281ADBE9DA2AC381CB747 /* LocalTaskSourceTests.swift */,
 				01F676CC7EA20C97ACDD9D18 /* LocalTaskTests.swift */,
+				REMSYNC2FILEREF0001 /* RemindersSyncServiceTests.swift */,
 				37586E91853A38D88E035A33 /* MockEventKitRepositoryTests.swift */,
 				32E6EA75FACA340867827895 /* PlanItemTests.swift */,
 				14E16E8941781A7134CBEE3A /* SyncEngineTests.swift */,
@@ -587,6 +598,7 @@
 			children = (
 				4451B46B76517090C636FA94 /* EventKitRepository.swift */,
 				LIVACT03FILEREF00001 /* LiveActivityManager.swift */,
+				REMSYNC3FILEREF0001 /* RemindersSyncService.swift */,
 				SNDSVC02FILEREF00001 /* SoundService.swift */,
 				34D186C26C7135F80A5E3B0B /* SyncEngine.swift */,
 				76D00C9F307A1EC64537A9C7 /* TaskSources */,
@@ -866,6 +878,7 @@
 				SNDSVC02BUILDFILE0001 /* SoundService.swift in Sources */,
 				LIVACT03BUILDFILE0001 /* LiveActivityManager.swift in Sources */,
 				53697A70444E5ECF3B760A1C /* SyncEngine.swift in Sources */,
+				REMSYNC3BUILDFILE001 /* RemindersSyncService.swift in Sources */,
 				D23F767C76495B0CA789C0B4 /* TaskAssignmentView.swift in Sources */,
 				6E8284A6F06C79DBE93A383E /* TaskMetadata.swift in Sources */,
 				B95825BFA85A0C001D1310A4 /* TaskSource.swift in Sources */,
@@ -903,6 +916,8 @@
 				LIVACT01BUILDFILE0001 /* LiveActivityUITests.swift in Sources */,
 				DAILYR01BUILDFILE0001 /* DailyReviewUITests.swift in Sources */,
 				TSKDTUI1BUILDFILE001 /* TaskDetailUITests.swift in Sources */,
+				REMSYNC1BUILDFILE001 /* RemindersSyncUITests.swift in Sources */,
+				REMSYNC4BUILDFILE001 /* RemindersSyncE2ETests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -915,6 +930,7 @@
 				480FAFAEB03560F38352900B /* FocusBlockTests.swift in Sources */,
 				B59D2883B998A9D4A297ED2C /* LocalTaskSourceTests.swift in Sources */,
 				6B6843B1FA16372D73DF9402 /* LocalTaskTests.swift in Sources */,
+				REMSYNC2BUILDFILE001 /* RemindersSyncServiceTests.swift in Sources */,
 				2F7184DE552C8D322971EDED /* MockEventKitRepositoryTests.swift in Sources */,
 				94EC1D85A0F4B53160332751 /* PlanItemTests.swift in Sources */,
 				B7B87F202F1BCD900069B457 /* EisenhowerMatrixTests.swift in Sources */,

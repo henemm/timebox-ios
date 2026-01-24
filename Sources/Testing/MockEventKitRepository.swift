@@ -58,7 +58,34 @@ final class MockEventKitRepository: EventKitRepositoryProtocol, @unchecked Senda
         guard mockReminderAuthStatus == .fullAccess else {
             throw EventKitError.notAuthorized
         }
-        return mockReminders
+        return mockReminders.filter { !$0.isCompleted }
+    }
+
+    var createReminderCalled = false
+    var lastCreatedReminderTitle: String?
+
+    func createReminder(title: String, priority: Int = 0, dueDate: Date? = nil, notes: String? = nil) throws -> String {
+        guard mockReminderAuthStatus == .fullAccess else {
+            throw EventKitError.notAuthorized
+        }
+        createReminderCalled = true
+        lastCreatedReminderTitle = title
+        let newID = "mock-created-\(UUID().uuidString)"
+        let newReminder = ReminderData(id: newID, title: title, isCompleted: false, priority: priority, dueDate: dueDate, notes: notes)
+        mockReminders.append(newReminder)
+        return newID
+    }
+
+    var deleteReminderCalled = false
+    var lastDeletedReminderID: String?
+
+    func deleteReminder(id: String) throws {
+        guard mockReminderAuthStatus == .fullAccess else {
+            throw EventKitError.notAuthorized
+        }
+        deleteReminderCalled = true
+        lastDeletedReminderID = id
+        mockReminders.removeAll { $0.id == id }
     }
 
     func markReminderComplete(reminderID: String) throws {
