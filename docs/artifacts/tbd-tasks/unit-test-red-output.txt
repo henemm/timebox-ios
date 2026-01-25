@@ -1,0 +1,33 @@
+# TDD RED - Unit Tests für TBD Tasks
+# Datum: 2026-01-25
+# Status: FEHLGESCHLAGEN (wie erwartet)
+
+## Zusammenfassung
+
+Die Unit Tests kompilieren nicht, weil die folgenden Features noch nicht implementiert sind:
+
+- LocalTask.importance (optional Int)
+- LocalTask.estimatedDuration (optional Int)
+- LocalTask.isTbd (computed property)
+
+## Compiler-Fehler (Auszug)
+
+/FocusBloxTests/TbdTasksTests.swift:38:27: error: value of type 'LocalTask' has no member 'importance'
+/FocusBloxTests/TbdTasksTests.swift:40:27: error: value of type 'LocalTask' has no member 'estimatedDuration'
+/FocusBloxTests/TbdTasksTests.swift:95:28: error: value of type 'LocalTask' has no member 'isTbd'
+/FocusBloxTests/TbdTasksTests.swift:104:14: error: value of type 'LocalTask' has no member 'importance'
+/FocusBloxTests/TbdTasksTests.swift:107:28: error: value of type 'LocalTask' has no member 'isTbd'
+
+## Test-Dateien
+
+- FocusBloxTests/TbdTasksTests.swift (Unit Tests)
+- FocusBloxUITests/TbdTasksUITests.swift (UI Tests)
+
+## Nächster Schritt
+
+Implementation der Features in:
+- Sources/Models/LocalTask.swift
+- Sources/Models/PlanItem.swift
+- Sources/Views/BacklogView.swift
+- Sources/Views/BacklogRow.swift
+- Sources/Views/EditTaskSheet.swift

@@ -6,8 +6,9 @@ struct BacklogRow: View {
     var onAddToNextUp: (() -> Void)?
     var onTap: (() -> Void)?
 
-    private var priorityIcon: String {
-        switch item.priorityValue {
+    private var importanceIcon: String {
+        guard let importance = item.importance else { return "" }
+        switch importance {
         case 1: return "🟦"
         case 2: return "🟨"
         case 3: return "🔴"
@@ -21,18 +22,30 @@ struct BacklogRow: View {
 
     var body: some View {
         HStack(spacing: 8) {
-            // Priority Icon
-            Text(priorityIcon)
+            // Importance Icon
+            Text(importanceIcon)
                 .font(.caption)
 
             VStack(alignment: .leading, spacing: 4) {
-                // Title
+                // Title (kursiv bei unvollständigen Tasks)
                 Text(item.title)
                     .font(.body)
+                    .italic(item.isTbd)
                     .lineLimit(2)
 
                 // Tags + Due Date
                 HStack(spacing: 6) {
+                    // TBD Tag (als erstes, wenn Task unvollständig)
+                    if item.isTbd {
+                        Text("tbd")
+                            .font(.caption2)
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 2)
+                            .background(Color.secondary.opacity(0.2))
+                            .foregroundStyle(.secondary)
+                            .cornerRadius(4)
+                    }
+
                     // Tags as chips
                     if !item.tags.isEmpty {
                         ForEach(item.tags.prefix(2), id: \.self) { tag in

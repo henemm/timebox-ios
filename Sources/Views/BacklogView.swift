@@ -9,6 +9,7 @@ struct BacklogView: View {
         case category = "Kategorie"
         case duration = "Dauer"
         case dueDate = "Fälligkeit"
+        case tbd = "TBD"
 
         var id: String { rawValue }
 
@@ -19,6 +20,7 @@ struct BacklogView: View {
             case .category: return "folder"
             case .duration: return "clock"
             case .dueDate: return "calendar"
+            case .tbd: return "questionmark.circle"
             }
         }
 
@@ -27,13 +29,15 @@ struct BacklogView: View {
             case .list:
                 return ("Keine Tasks", "Tippe auf + um einen neuen Task zu erstellen.")
             case .eisenhowerMatrix:
-                return ("Keine Tasks für Matrix", "Setze Priorität und Dringlichkeit für deine Tasks.")
+                return ("Keine Tasks für Matrix", "Setze Wichtigkeit und Dringlichkeit für deine Tasks.")
             case .category:
                 return ("Keine Tasks in Kategorien", "Erstelle Tasks und weise ihnen Kategorien zu.")
             case .duration:
                 return ("Keine Tasks mit Dauer", "Setze geschätzte Dauern für deine Tasks.")
             case .dueDate:
                 return ("Keine Tasks mit Fälligkeitsdatum", "Setze Fälligkeitsdaten für deine Tasks.")
+            case .tbd:
+                return ("Keine unvollständigen Tasks", "Alle Tasks haben Wichtigkeit, Dringlichkeit und Dauer.")
             }
         }
     }
@@ -62,21 +66,30 @@ struct BacklogView: View {
         planItems.filter { !$0.isCompleted && !$0.isNextUp }
     }
 
-    // MARK: - Eisenhower Matrix Filters
+    // MARK: - Eisenhower Matrix Filters (nur vollständige Tasks, keine TBDs)
     private var doFirstTasks: [PlanItem] {
-        planItems.filter { $0.urgency == "urgent" && $0.priorityValue == 3 && !$0.isCompleted && !$0.isNextUp }
+        planItems.filter { $0.urgency == "urgent" && $0.importance == 3 && !$0.isTbd && !$0.isCompleted && !$0.isNextUp }
     }
 
     private var scheduleTasks: [PlanItem] {
-        planItems.filter { $0.urgency == "not_urgent" && $0.priorityValue == 3 && !$0.isCompleted && !$0.isNextUp }
+        planItems.filter { $0.urgency == "not_urgent" && $0.importance == 3 && !$0.isTbd && !$0.isCompleted && !$0.isNextUp }
     }
 
     private var delegateTasks: [PlanItem] {
-        planItems.filter { $0.urgency == "urgent" && $0.priorityValue < 3 && !$0.isCompleted && !$0.isNextUp }
+        planItems.filter { $0.urgency == "urgent" && ($0.importance ?? 0) < 3 && !$0.isTbd && !$0.isCompleted && !$0.isNextUp }
     }
 
     private var eliminateTasks: [PlanItem] {
-        planItems.filter { $0.urgency == "not_urgent" && $0.priorityValue < 3 && !$0.isCompleted && !$0.isNextUp }
+        planItems.filter { $0.urgency == "not_urgent" && ($0.importance ?? 0) < 3 && !$0.isTbd && !$0.isCompleted && !$0.isNextUp }
+    }
+
+    // MARK: - TBD Tasks (unvollständig)
+    private var tbdTasks: [PlanItem] {
+        planItems.filter { $0.isTbd && !$0.isCompleted && !$0.isNextUp }
+    }
+
+    private var tbdCount: Int {
+        tbdTasks.count
     }
 
     // MARK: - Category Grouping
@@ -188,6 +201,8 @@ struct BacklogView: View {
                             durationView
                         case .dueDate:
                             dueDateView
+                        case .tbd:
+                            tbdView
                         }
                     }
                 }
@@ -231,8 +246,8 @@ struct BacklogView: View {
             .sheet(item: $taskToEdit) { task in
                 TaskDetailSheet(
                     task: task,
-                    onSave: { title, priority, duration in
-                        updateTask(task, title: title, priority: priority, duration: duration)
+                    onSave: { title, priority, duration, tags, urgency, taskType, dueDate, description in
+                        updateTask(task, title: title, priority: priority, duration: duration, tags: tags, urgency: urgency, taskType: taskType, dueDate: dueDate, description: description)
                     },
                     onDelete: {
                         deleteTask(task)
@@ -320,11 +335,11 @@ struct BacklogView: View {
         }
     }
 
-    private func updateTask(_ task: PlanItem, title: String, priority: TaskPriority, duration: Int) {
+    private func updateTask(_ task: PlanItem, title: String, priority: TaskPriority, duration: Int, tags: [String], urgency: String, taskType: String, dueDate: Date?, description: String?) {
         do {
             let taskSource = LocalTaskSource(modelContext: modelContext)
             let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
-            try syncEngine.updateTask(itemID: task.id, title: title, priority: priority, duration: duration)
+            try syncEngine.updateTask(itemID: task.id, title: title, importance: priority.rawValue, duration: duration, tags: tags, urgency: urgency, taskType: taskType, dueDate: dueDate, description: description)
 
             Task {
                 await loadTasks()
@@ -357,14 +372,25 @@ struct BacklogView: View {
                         selectedMode = mode
                     }
                 } label: {
-                    Label(mode.rawValue, systemImage: mode.icon)
+                    // TBD zeigt Badge mit Anzahl
+                    if mode == .tbd && tbdCount > 0 {
+                        Label("\(mode.rawValue) (\(tbdCount))", systemImage: mode.icon)
+                    } else {
+                        Label(mode.rawValue, systemImage: mode.icon)
+                    }
                 }
             }
         } label: {
             HStack(spacing: 4) {
                 Image(systemName: selectedMode.icon)
-                Text(selectedMode.rawValue)
-                    .font(.headline)
+                // TBD im Toggle zeigt Badge
+                if selectedMode == .tbd && tbdCount > 0 {
+                    Text("\(selectedMode.rawValue) (\(tbdCount))")
+                        .font(.headline)
+                } else {
+                    Text(selectedMode.rawValue)
+                        .font(.headline)
+                }
                 Image(systemName: "chevron.down")
                     .font(.caption)
             }
@@ -517,6 +543,24 @@ struct BacklogView: View {
             }
         }
         .listStyle(.insetGrouped)
+        .refreshable {
+            await loadTasks()
+        }
+    }
+
+    // MARK: - TBD View (unvollständige Tasks)
+    private var tbdView: some View {
+        List {
+            ForEach(tbdTasks) { item in
+                BacklogRow(
+                    item: item,
+                    onDurationTap: { selectedItemForDuration = item },
+                    onAddToNextUp: { updateNextUp(for: item, isNextUp: true) },
+                    onTap: { taskToEdit = item }
+                )
+            }
+        }
+        .listStyle(.plain)
         .refreshable {
             await loadTasks()
         }

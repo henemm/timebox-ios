@@ -1,0 +1,31 @@
+# TDD RED - UI Tests für TBD Tasks
+# Datum: 2026-01-25
+# Status: FEHLGESCHLAGEN (wie erwartet)
+
+## Zusammenfassung
+
+Die UI Tests kompilieren nicht, weil die folgenden Features noch nicht implementiert sind:
+
+- LocalTask.isTbd (computed property)
+- BacklogRow zeigt keinen "tbd" Tag
+- BacklogView hat keinen TBD ViewMode
+- EditTaskSheet zeigt noch "Priorität" statt "Wichtigkeit"
+
+## Compiler-Fehler (Auszug)
+
+/FocusBloxUITests/TbdTasksUITests.swift:45:27: error: value of type 'LocalTask' has no member 'isTbd'
+/FocusBloxUITests/TbdTasksUITests.swift:68:38: error: cannot find 'TbdTaskRow' in scope
+/FocusBloxUITests/TbdTasksUITests.swift:82:42: error: type 'ViewMode' has no member 'tbd'
+
+## Test-Dateien
+
+- FocusBloxUITests/TbdTasksUITests.swift (UI Tests)
+
+## Nächster Schritt
+
+Implementation der Features in:
+- Sources/Models/LocalTask.swift
+- Sources/Models/PlanItem.swift
+- Sources/Views/BacklogView.swift
+- Sources/Views/BacklogRow.swift
+- Sources/Views/EditTaskSheet.swift

@@ -2,40 +2,115 @@ import SwiftUI
 
 struct EditTaskSheet: View {
     let task: PlanItem
-    let onSave: (String, TaskPriority, Int) -> Void
+    let onSave: (String, TaskPriority, Int, [String], String, String, Date?, String?) -> Void
     let onDelete: () -> Void
 
     @State private var title: String
     @State private var priority: TaskPriority
     @State private var duration: Int
+    @State private var tags: String
+    @State private var urgency: String
+    @State private var taskType: String
+    @State private var hasDueDate: Bool
+    @State private var dueDate: Date
+    @State private var taskDescription: String
     @Environment(\.dismiss) private var dismiss
 
-    init(task: PlanItem, onSave: @escaping (String, TaskPriority, Int) -> Void, onDelete: @escaping () -> Void) {
+    private let urgencyOptions = [
+        ("normal", "Normal"),
+        ("urgent", "Dringend"),
+        ("not_urgent", "Kann warten")
+    ]
+
+    private let taskTypeOptions = [
+        ("deep_work", "Deep Work"),
+        ("shallow_work", "Shallow Work"),
+        ("meetings", "Meetings"),
+        ("maintenance", "Maintenance"),
+        ("creative", "Creative"),
+        ("strategic", "Strategic"),
+        ("income", "Geld verdienen"),
+        ("recharge", "Energie aufladen"),
+        ("learning", "Lernen"),
+        ("giving_back", "Weitergeben")
+    ]
+
+    init(task: PlanItem, onSave: @escaping (String, TaskPriority, Int, [String], String, String, Date?, String?) -> Void, onDelete: @escaping () -> Void) {
         self.task = task
         self.onSave = onSave
         self.onDelete = onDelete
         _title = State(initialValue: task.title)
         _priority = State(initialValue: task.priority)
         _duration = State(initialValue: task.effectiveDuration)
+        _tags = State(initialValue: task.tags.joined(separator: ", "))
+        _urgency = State(initialValue: task.urgency ?? "not_urgent")
+        _taskType = State(initialValue: task.taskType)
+        _hasDueDate = State(initialValue: task.dueDate != nil)
+        _dueDate = State(initialValue: task.dueDate ?? Date())
+        _taskDescription = State(initialValue: task.taskDescription ?? "")
     }
 
     var body: some View {
         NavigationStack {
             Form {
+                // MARK: - Basis
                 Section("Task") {
                     TextField("Titel", text: $title)
                 }
 
                 Section("Details") {
-                    Picker("Priorität", selection: $priority) {
+                    Picker("Wichtigkeit", selection: $priority) {
                         Text("Niedrig").tag(TaskPriority.low)
                         Text("Mittel").tag(TaskPriority.medium)
                         Text("Hoch").tag(TaskPriority.high)
                     }
+                    .accessibilityIdentifier("Wichtigkeit")
 
                     Stepper("Dauer: \(duration) min", value: $duration, in: 5...180, step: 5)
                 }
 
+                // MARK: - Kategorisierung
+                Section("Kategorisierung") {
+                    TextField("Tags", text: $tags)
+                        .accessibilityIdentifier("Tags")
+
+                    Picker("Dringlichkeit", selection: $urgency) {
+                        ForEach(urgencyOptions, id: \.0) { value, label in
+                            Text(label).tag(value)
+                        }
+                    }
+                    .accessibilityIdentifier("Dringlichkeit")
+
+                    Picker("Typ", selection: $taskType) {
+                        ForEach(taskTypeOptions, id: \.0) { value, label in
+                            Text(label).tag(value)
+                        }
+                    }
+                    .accessibilityIdentifier("Typ")
+                }
+
+                // MARK: - Zeitplanung
+                Section("Zeitplanung") {
+                    Toggle("Fälligkeitsdatum", isOn: $hasDueDate)
+                        .accessibilityIdentifier("Fälligkeitsdatum")
+
+                    if hasDueDate {
+                        DatePicker(
+                            "Datum",
+                            selection: $dueDate,
+                            displayedComponents: [.date]
+                        )
+                    }
+                }
+
+                // MARK: - Beschreibung
+                Section("Beschreibung") {
+                    TextEditor(text: $taskDescription)
+                        .frame(minHeight: 80)
+                        .accessibilityIdentifier("Beschreibung")
+                }
+
+                // MARK: - Löschen
                 Section {
                     Button(role: .destructive) {
                         onDelete()
@@ -55,13 +130,34 @@ struct EditTaskSheet: View {
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Speichern") {
-                        onSave(title, priority, duration)
+                        saveTask()
                         dismiss()
                     }
                     .disabled(title.isEmpty)
                 }
             }
         }
-        .presentationDetents([.medium])
+        .presentationDetents([.large])
+    }
+
+    private func saveTask() {
+        let parsedTags = tags
+            .split(separator: ",")
+            .map { $0.trimmingCharacters(in: .whitespaces) }
+            .filter { !$0.isEmpty }
+
+        let finalDueDate: Date? = hasDueDate ? dueDate : nil
+        let finalDescription: String? = taskDescription.isEmpty ? nil : taskDescription
+
+        onSave(
+            title,
+            priority,
+            duration,
+            parsedTags,
+            urgency,
+            taskType,
+            finalDueDate,
+            finalDescription
+        )
     }
 }
