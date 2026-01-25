@@ -2,16 +2,22 @@ import WidgetKit
 import SwiftUI
 import AppIntents
 
-/// Intent that opens the app with Quick Capture view via deep link
+// MARK: - Notification Name Extension
+extension Notification.Name {
+    static let quickCaptureRequested = Notification.Name("QuickCaptureRequested")
+}
+
+/// Intent that opens the app and triggers Quick Capture
 struct QuickAddLaunchIntent: AppIntent {
     static var title: LocalizedStringResource = "Quick Add Task"
+    static var openAppWhenRun: Bool = true
 
-    func perform() async throws -> some IntentResult & OpensIntent {
-        // Open app via deep link - TimeBoxApp.onOpenURL handles this
-        guard let url = URL(string: "timebox://create-task") else {
-            return .result()
-        }
-        return .result(opensIntent: OpenURLIntent(url))
+    @MainActor
+    func perform() async throws -> some IntentResult {
+        // App is already open due to openAppWhenRun = true
+        // Post notification to trigger QuickCaptureView
+        NotificationCenter.default.post(name: .quickCaptureRequested, object: nil)
+        return .result()
     }
 }
 

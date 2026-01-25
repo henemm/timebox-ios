@@ -374,6 +374,18 @@ def check_tdd_requirements(file_path: str) -> tuple[bool, str]:
     return True, "TDD requirements met"
 
 
+def check_user_override() -> bool:
+    """Check if user has granted manual override in workflow state."""
+    workflow = get_active_workflow()
+    if not workflow:
+        return False
+    if workflow.get("user_override", False):
+        return True
+    if workflow.get("spec_approved", False):
+        return True
+    return False
+
+
 def main():
     """Main hook entry point."""
     # Get tool input
@@ -393,6 +405,10 @@ def main():
         file_path = ""
 
     if not file_path:
+        sys.exit(0)
+
+    # Check for user override FIRST (allows bypassing TDD for edge cases)
+    if check_user_override():
         sys.exit(0)
 
     # Skip for non-code files

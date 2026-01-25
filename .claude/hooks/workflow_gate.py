@@ -11,6 +11,10 @@ Enforces the 4-phase workflow for protected files:
 
 Blocks Edit/Write on protected files unless workflow phase allows it.
 
+MANUAL OVERRIDE:
+Set "user_override": true in workflow_state.json to bypass all checks.
+This allows the user to grant explicit permission for edge cases.
+
 Exit Codes:
 - 0: Allowed
 - 2: Blocked (stderr shown to Claude)
@@ -55,6 +59,33 @@ def load_state() -> dict:
         return json.load(f)
 
 
+def get_active_workflow(state: dict) -> dict | None:
+    """Get the active workflow from v2 state structure."""
+    if "workflows" in state and "active_workflow" in state:
+        active_name = state.get("active_workflow")
+        if active_name and active_name in state["workflows"]:
+            return state["workflows"][active_name]
+    return None
+
+
+def check_user_override(state: dict) -> bool:
+    """Check if user has granted manual override."""
+    # Global override
+    if state.get("user_override", False):
+        return True
+
+    # Check active workflow for override
+    workflow = get_active_workflow(state)
+    if workflow and workflow.get("user_override", False):
+        return True
+
+    # Check if spec_approved is set in active workflow (v2)
+    if workflow and workflow.get("spec_approved", False):
+        return True
+
+    return False
+
+
 def is_always_allowed(file_path: str) -> bool:
     """Check if file is always allowed without workflow."""
     patterns = get_always_allowed()
@@ -74,9 +105,20 @@ def requires_workflow(file_path: str) -> bool:
     return False
 
 
+def get_current_phase(state: dict) -> str:
+    """Get current phase from v1 or v2 state structure."""
+    # Try v2 structure first
+    workflow = get_active_workflow(state)
+    if workflow:
+        return workflow.get("current_phase", "idle")
+
+    # Fall back to v1
+    return state.get("current_phase", "idle")
+
+
 def get_phase_error(state: dict, file_path: str) -> str | None:
     """Generate error message based on current state."""
-    phase = state.get("current_phase", "idle")
+    phase = get_current_phase(state)
 
     # Support both old (v1) and new (v2) phase names
     if phase in ["idle", "phase0_idle"]:
@@ -98,6 +140,8 @@ def get_phase_error(state: dict, file_path: str) -> str | None:
 ║  └─────────────────────────────────────────────────────────────┘ ║
 ║                                                                  ║
 ║  START WITH: /context or /analyse                                ║
+║                                                                  ║
+║  MANUAL OVERRIDE: User can say "ich genehmige das" to bypass.    ║
 ╚══════════════════════════════════════════════════════════════════╝
 """
 
@@ -146,7 +190,10 @@ def get_phase_error(state: dict, file_path: str) -> str | None:
 """
 
     if phase in ["spec_approved", "phase4_approved"]:
+        workflow = get_active_workflow(state)
         red_done = state.get("red_test_done", False)
+        if workflow:
+            red_done = workflow.get("red_test_done", False) or workflow.get("ui_test_red_done", False)
         if not red_done:
             return """
 ╔══════════════════════════════════════════════════════════════════╗
@@ -164,11 +211,18 @@ def get_phase_error(state: dict, file_path: str) -> str | None:
 ║  NEXT: /tdd-red                                                  ║
 ║                                                                  ║
 ║  Write tests, run them, capture the FAILURE as artifact!         ║
+║                                                                  ║
+║  MANUAL OVERRIDE: User can say "ich genehmige das" to bypass.    ║
 ╚══════════════════════════════════════════════════════════════════╝
 """
 
     if phase in ["phase5_tdd_red"]:
-        return """
+        workflow = get_active_workflow(state)
+        red_done = False
+        if workflow:
+            red_done = workflow.get("red_test_done", False) or workflow.get("ui_test_red_done", False)
+        if not red_done:
+            return """
 ╔══════════════════════════════════════════════════════════════════╗
 ║  TDD RED PHASE - Capture Failure First!                          ║
 ╠══════════════════════════════════════════════════════════════════╣
@@ -180,6 +234,8 @@ def get_phase_error(state: dict, file_path: str) -> str | None:
 ║  3. Capture failure: /add-artifact                               ║
 ║                                                                  ║
 ║  Only after capturing RED failure can you implement!             ║
+║                                                                  ║
+║  MANUAL OVERRIDE: User can say "ich genehmige das" to bypass.    ║
 ╚══════════════════════════════════════════════════════════════════╝
 """
 
@@ -228,15 +284,33 @@ def main():
     if not requires_workflow(file_path):
         sys.exit(0)
 
-    # Load state and check phase
+    # Load state
     state = load_state()
-    phase = state.get("current_phase", "idle")
 
-    # Allowed phases for implementation
-    allowed_phases = ["spec_approved", "implemented", "validated"]
+    # Check for user override FIRST
+    if check_user_override(state):
+        sys.exit(0)  # User has granted override, allow through
+
+    phase = get_current_phase(state)
+
+    # Allowed phases for implementation (v1 and v2 names)
+    allowed_phases = [
+        "spec_approved", "implemented", "validated",
+        "phase4_approved", "phase5_tdd_red", "phase6_implement",
+        "phase7_validate", "phase8_complete"
+    ]
 
     if phase in allowed_phases:
-        sys.exit(0)  # Workflow correct, allow through
+        # Additional check: in phase5/phase6, need red_test_done or user_override
+        if phase in ["phase5_tdd_red"]:
+            workflow = get_active_workflow(state)
+            if workflow:
+                red_done = workflow.get("red_test_done", False) or workflow.get("ui_test_red_done", False)
+                if red_done:
+                    sys.exit(0)
+            # Fall through to error
+        else:
+            sys.exit(0)  # Workflow correct, allow through
 
     # Block with appropriate error message
     error = get_phase_error(state, file_path)

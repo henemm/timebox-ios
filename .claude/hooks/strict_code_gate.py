@@ -5,7 +5,12 @@ OpenSpec Framework - Strict Code Gate Hook (v2.0)
 BLOCKS ALL code file changes unless:
 1. Active workflow exists
 2. Workflow is in implementation phase (phase6+)
-3. RED test is done (red_test_done=true)
+3. RED test is done (red_test_done=true OR ui_test_red_done=true)
+
+MANUAL OVERRIDE:
+Set "user_override": true OR "spec_approved": true in workflow to bypass TDD check.
+This allows the user to grant explicit permission for edge cases
+(e.g., Control Center Widgets that cannot be tested via XCUITest).
 
 This hook uses WHITELIST approach:
 - ALL code files are protected by default
@@ -103,6 +108,29 @@ def is_code_file(file_path: str) -> bool:
     return any(file_path.endswith(ext) for ext in CODE_EXTENSIONS)
 
 
+def check_user_override(workflow: dict) -> bool:
+    """Check if user has granted manual override."""
+    if workflow.get("user_override", False):
+        return True
+    if workflow.get("spec_approved", False):
+        return True
+    return False
+
+
+def check_red_test_done(workflow: dict) -> bool:
+    """Check if RED test phase is done (unit or UI tests)."""
+    if workflow.get("red_test_done", False):
+        return True
+    if workflow.get("ui_test_red_done", False):
+        return True
+    # Also check test artifacts
+    test_artifacts = workflow.get("test_artifacts", [])
+    red_artifacts = [a for a in test_artifacts if a.get("phase") == "phase5_tdd_red"]
+    if len(red_artifacts) > 0:
+        return True
+    return False
+
+
 def verify_file_in_workflow(workflow: dict, file_path: str) -> tuple[bool, str]:
     """
     Verify that file is part of the workflow.
@@ -111,9 +139,11 @@ def verify_file_in_workflow(workflow: dict, file_path: str) -> tuple[bool, str]:
     """
     affected_files = workflow.get("affected_files", [])
 
-    # If no affected_files declared, BLOCK!
-    # Workflows MUST declare which files they will modify BEFORE implementation
+    # If no affected_files declared, allow (user_override case)
     if len(affected_files) == 0:
+        # If user has approved, allow any file
+        if check_user_override(workflow):
+            return True, "User override - no affected_files check"
         return False, "Workflow has no affected_files declared - update spec first!"
 
     # Normalize paths for comparison
@@ -140,6 +170,10 @@ def verify_file_in_workflow(workflow: dict, file_path: str) -> tuple[bool, str]:
             # Also check if absolute path ends with pattern
             if normalized_file.endswith("/" + pattern.replace("*", "")):
                 return True, f"File matches pattern: {pattern}"
+
+    # If user has approved, allow any file (override scope check)
+    if check_user_override(workflow):
+        return True, "User override - scope check bypassed"
 
     return False, f"File not in workflow's affected_files: {affected_files}"
 
@@ -238,12 +272,8 @@ def main():
 """, file=sys.stderr)
         sys.exit(2)
 
-    # Check if RED test is done (TDD enforcement)
-    red_test_done = workflow.get("red_test_done", False)
-    test_artifacts = workflow.get("test_artifacts", [])
-    red_artifacts = [a for a in test_artifacts if a.get("phase") == "phase5_tdd_red"]
-
-    if not red_test_done and len(red_artifacts) == 0:
+    # Check if RED test is done (TDD enforcement) OR user override
+    if not check_red_test_done(workflow) and not check_user_override(workflow):
         print(f"""
 ╔══════════════════════════════════════════════════════════════════╗
 ║  🔴 BLOCKED: TDD RED Phase Not Complete!                         ║
@@ -265,6 +295,8 @@ def main():
 ║  3. Use /add-artifact to register test failure                   ║
 ║                                                                  ║
 ║  Only after capturing RED failure can you implement!             ║
+║                                                                  ║
+║  MANUAL OVERRIDE: User can say "ich genehmige das" to bypass.    ║
 ╚══════════════════════════════════════════════════════════════════╝
 """, file=sys.stderr)
         sys.exit(2)
