@@ -127,13 +127,15 @@
 
 > **Live Activity, Timer, Notifications waehrend Focus Block**
 
-**Bug 10: Dynamic Island Layout falsch**
+**Bug 10: Dynamic Island Layout falsch** ✅
 - Problem: Zu breit, falsches Layout-Pattern
-- Fix: Layout 1:1 von Meditationstimer uebernehmen (explizite frame sizes, padding, overlay-trick)
+- Fix implementiert:
+  1. **Overlay-Trick** in compactTrailing (hidden "00:00" placeholder)
+  2. Explizite frame sizes für Icons (20x20 compact, 18x18 minimal, 52x52 expanded)
+  3. ZStack mit Circle-Background für konsistentes Icon-Styling
+  4. Proper padding (.leading, .trailing, .vertical)
 - Location: `FocusBloxWidgets/FocusBlockLiveActivity.swift`
-- Referenz: `Meditationstimer/.../MeditationstimerWidgetLiveActivity.swift`
-- Scope: Mittel (~80 LoC)
-- Status: OFFEN
+- Status: **ERLEDIGT** (2026-01-26) - Manueller Test auf Device empfohlen
 
 **Task 4: Live Activity zeigt Task-Restzeit statt Block-Restzeit**
 - Aktuell: Countdown fuer gesamten Block

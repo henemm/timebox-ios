@@ -36,3 +36,27 @@ public struct FocusBlockActivityAttributes: ActivityAttributes {
         self.totalTaskCount = totalTaskCount
     }
 }
+
+// MARK: - Preview Helpers
+
+#if DEBUG
+public extension FocusBlockActivityAttributes {
+    static var preview: FocusBlockActivityAttributes {
+        FocusBlockActivityAttributes(
+            blockTitle: "Focus Block",
+            startDate: Date(),
+            endDate: Date().addingTimeInterval(25 * 60),
+            totalTaskCount: 3
+        )
+    }
+}
+
+public extension FocusBlockActivityAttributes.ContentState {
+    static var sample: FocusBlockActivityAttributes.ContentState {
+        FocusBlockActivityAttributes.ContentState(
+            currentTaskTitle: "Code Review",
+            completedCount: 1
+        )
+    }
+}
+#endif
