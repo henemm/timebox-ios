@@ -8,6 +8,7 @@ struct FocusBlock: Identifiable, Sendable {
     let endDate: Date
     var taskIDs: [String]       // Ordered list of assigned task IDs
     var completedTaskIDs: [String]
+    var taskTimes: [String: Int] // Task ID -> seconds spent (actual time tracking)
 
     /// Check if block is currently active
     var isActive: Bool {
@@ -40,16 +41,18 @@ struct FocusBlock: Identifiable, Sendable {
         self.endDate = event.endDate
         self.taskIDs = event.focusBlockTaskIDs
         self.completedTaskIDs = event.focusBlockCompletedIDs
+        self.taskTimes = event.focusBlockTaskTimes
     }
 
     /// Create a new focus block
-    init(id: String, title: String, startDate: Date, endDate: Date, taskIDs: [String] = [], completedTaskIDs: [String] = []) {
+    init(id: String, title: String, startDate: Date, endDate: Date, taskIDs: [String] = [], completedTaskIDs: [String] = [], taskTimes: [String: Int] = [:]) {
         self.id = id
         self.title = title
         self.startDate = startDate
         self.endDate = endDate
         self.taskIDs = taskIDs
         self.completedTaskIDs = completedTaskIDs
+        self.taskTimes = taskTimes
     }
 }
 
@@ -61,7 +64,8 @@ extension FocusBlock {
     /// focusBlock:true
     /// tasks:id1|id2|id3
     /// completed:id1
-    static func serializeToNotes(taskIDs: [String], completedTaskIDs: [String]) -> String {
+    /// times:id1=120|id2=90
+    static func serializeToNotes(taskIDs: [String], completedTaskIDs: [String], taskTimes: [String: Int] = [:]) -> String {
         var lines = ["focusBlock:true"]
 
         if !taskIDs.isEmpty {
@@ -72,11 +76,16 @@ extension FocusBlock {
             lines.append("completed:\(completedTaskIDs.joined(separator: "|"))")
         }
 
+        if !taskTimes.isEmpty {
+            let timesString = taskTimes.map { "\($0.key)=\($0.value)" }.joined(separator: "|")
+            lines.append("times:\(timesString)")
+        }
+
         return lines.joined(separator: "\n")
     }
 
     /// Generate notes string for this block
     var notesString: String {
-        Self.serializeToNotes(taskIDs: taskIDs, completedTaskIDs: completedTaskIDs)
+        Self.serializeToNotes(taskIDs: taskIDs, completedTaskIDs: completedTaskIDs, taskTimes: taskTimes)
     }
 }

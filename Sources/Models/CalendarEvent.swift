@@ -41,6 +41,24 @@ struct CalendarEvent: Identifiable, Sendable {
         return String(notes.dropFirst("reminderID:".count))
     }
 
+    // MARK: - Category Support
+
+    /// Returns the category if stored in notes (format: "category:xxx")
+    var category: String? {
+        guard let notes else { return nil }
+        return parseNotesValue(prefix: "category:", from: notes)
+    }
+
+    /// Parse a single value from notes with format "prefix:value"
+    private func parseNotesValue(prefix: String, from notes: String) -> String? {
+        let lines = notes.components(separatedBy: "\n")
+        guard let line = lines.first(where: { $0.hasPrefix(prefix) }) else {
+            return nil
+        }
+        let value = String(line.dropFirst(prefix.count))
+        return value.isEmpty ? nil : value
+    }
+
     // MARK: - Focus Block Support
 
     /// Check if this event is a Focus Block
@@ -59,6 +77,28 @@ struct CalendarEvent: Identifiable, Sendable {
     var focusBlockCompletedIDs: [String] {
         guard let notes else { return [] }
         return parseNotesLine(prefix: "completed:", from: notes)
+    }
+
+    /// Get task times for this focus block (seconds spent per task)
+    /// Format in notes: "times:id1=120|id2=90"
+    var focusBlockTaskTimes: [String: Int] {
+        guard let notes else { return [:] }
+        let lines = notes.components(separatedBy: "\n")
+        guard let line = lines.first(where: { $0.hasPrefix("times:") }) else {
+            return [:]
+        }
+        let value = String(line.dropFirst("times:".count))
+        guard !value.isEmpty else { return [:] }
+
+        var result: [String: Int] = [:]
+        let pairs = value.components(separatedBy: "|")
+        for pair in pairs {
+            let parts = pair.components(separatedBy: "=")
+            if parts.count == 2, let seconds = Int(parts[1]) {
+                result[parts[0]] = seconds
+            }
+        }
+        return result
     }
 
     /// Parse a line from notes with format "prefix:id1|id2|id3"

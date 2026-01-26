@@ -16,6 +16,7 @@ final class MockEventKitRepository: EventKitRepositoryProtocol, @unchecked Senda
 
     // MARK: - Method Call Tracking
 
+    var requestAccessCalled = false
     var deleteCalendarEventCalled = false
     var lastDeletedEventID: String?
 
@@ -47,6 +48,7 @@ final class MockEventKitRepository: EventKitRepositoryProtocol, @unchecked Senda
     }
 
     func requestAccess() async throws -> Bool {
+        requestAccessCalled = true
         let reminders = try await requestReminderAccess()
         let calendar = try await requestCalendarAccess()
         return reminders && calendar
@@ -150,6 +152,49 @@ final class MockEventKitRepository: EventKitRepositoryProtocol, @unchecked Senda
         // Silent implementation for now
     }
 
+    var updateEventCategoryCalled = false
+    var lastUpdatedEventID: String?
+    var lastUpdatedCategory: String?
+
+    func updateEventCategory(eventID: String, category: String?) throws {
+        guard mockCalendarAuthStatus == .fullAccess else {
+            throw EventKitError.notAuthorized
+        }
+        updateEventCategoryCalled = true
+        lastUpdatedEventID = eventID
+        lastUpdatedCategory = category
+
+        // Actually update the mock event's notes so the category change is visible
+        if let index = mockEvents.firstIndex(where: { $0.id == eventID }) {
+            let oldEvent = mockEvents[index]
+            var notes = oldEvent.notes ?? ""
+
+            // Remove existing category line
+            var lines = notes.components(separatedBy: "\n")
+            lines.removeAll { $0.hasPrefix("category:") }
+
+            // Add new category if provided
+            if let category = category, !category.isEmpty {
+                lines.append("category:\(category)")
+            }
+
+            // Rebuild notes
+            notes = lines.filter { !$0.isEmpty }.joined(separator: "\n")
+
+            // Create new event with updated notes
+            let updatedEvent = CalendarEvent(
+                id: oldEvent.id,
+                title: oldEvent.title,
+                startDate: oldEvent.startDate,
+                endDate: oldEvent.endDate,
+                isAllDay: oldEvent.isAllDay,
+                calendarColor: oldEvent.calendarColor,
+                notes: notes.isEmpty ? nil : notes
+            )
+            mockEvents[index] = updatedEvent
+        }
+    }
+
     // MARK: - Protocol Implementation - Focus Blocks
 
     func fetchFocusBlocks(for date: Date) throws -> [FocusBlock] {
@@ -166,11 +211,22 @@ final class MockEventKitRepository: EventKitRepositoryProtocol, @unchecked Senda
         return UUID().uuidString
     }
 
-    func updateFocusBlock(eventID: String, taskIDs: [String], completedTaskIDs: [String]) throws {
+    func updateFocusBlock(eventID: String, taskIDs: [String], completedTaskIDs: [String], taskTimes: [String: Int] = [:]) throws {
         guard mockCalendarAuthStatus == .fullAccess else {
             throw EventKitError.notAuthorized
         }
-        // Silent implementation for now
+        // Update mock focus block if exists
+        if let index = mockFocusBlocks.firstIndex(where: { $0.id == eventID }) {
+            mockFocusBlocks[index] = FocusBlock(
+                id: eventID,
+                title: mockFocusBlocks[index].title,
+                startDate: mockFocusBlocks[index].startDate,
+                endDate: mockFocusBlocks[index].endDate,
+                taskIDs: taskIDs,
+                completedTaskIDs: completedTaskIDs,
+                taskTimes: taskTimes
+            )
+        }
     }
 
     func deleteFocusBlock(eventID: String) throws {

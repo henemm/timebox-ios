@@ -56,7 +56,7 @@ struct CreateTaskView: View {
                         QuickPriorityButton(priority: 3, selectedPriority: $priority)
                     }
                 } header: {
-                    Text("Priorität")
+                    Text("Wichtigkeit")
                 }
 
                 // MARK: - Urgency
@@ -227,8 +227,8 @@ struct CreateTaskView: View {
                     title: title.trimmingCharacters(in: .whitespaces),
                     tags: tags,
                     dueDate: hasDueDate ? dueDate : nil,
-                    priority: priority,
-                    duration: duration,
+                    importance: priority,
+                    estimatedDuration: duration,
                     urgency: urgency,
                     taskType: taskType,
                     recurrencePattern: recurrencePattern.rawValue,

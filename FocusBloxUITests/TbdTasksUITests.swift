@@ -288,10 +288,7 @@ final class TbdTasksUITests: XCTestCase {
 
     /// GIVEN: CreateTaskView wird geöffnet
     /// WHEN: Felder angezeigt werden
-    /// THEN: "Priorität" Section Header sollte existieren
-    ///
-    /// HINWEIS: Die aktuelle Implementierung verwendet noch "Priorität".
-    /// Eine Umbenennung zu "Wichtigkeit" wäre ein separates Feature.
+    /// THEN: "Wichtigkeit" Section Header sollte existieren
     func testImportanceLabelInsteadOfPriority() throws {
         navigateToBacklog()
 
@@ -303,17 +300,17 @@ final class TbdTasksUITests: XCTestCase {
         let titleField = app.textFields["Task-Titel"]
         XCTAssertTrue(titleField.waitForExistence(timeout: 3), "CreateTask sollte geöffnet sein")
 
-        // Aktuelle Implementierung: "Priorität" (noch nicht umbenannt zu "Wichtigkeit")
-        let priorityLabel = app.staticTexts["Priorität"]
-        XCTAssertTrue(priorityLabel.exists, "Priorität Section sollte existieren")
+        // "Wichtigkeit" Section Header (umbenannt von "Priorität")
+        let importanceLabel = app.staticTexts["Wichtigkeit"]
+        XCTAssertTrue(importanceLabel.exists, "Wichtigkeit Section sollte existieren")
 
         // Abbrechen
         app.buttons["Abbrechen"].tap()
     }
 
     /// GIVEN: CreateTaskView wird geöffnet
-    /// WHEN: Priorität-Section angezeigt wird
-    /// THEN: Section Header "Priorität" sollte existieren
+    /// WHEN: Wichtigkeit-Section angezeigt wird
+    /// THEN: Section Header "Wichtigkeit" sollte existieren
     func testImportanceLabelInCreateTask() throws {
         navigateToBacklog()
 
@@ -325,9 +322,9 @@ final class TbdTasksUITests: XCTestCase {
         let titleField = app.textFields["Task-Titel"]
         XCTAssertTrue(titleField.waitForExistence(timeout: 3), "CreateTask sollte geöffnet sein")
 
-        // "Priorität" Section Header prüfen
-        let priorityLabel = app.staticTexts["Priorität"]
-        XCTAssertTrue(priorityLabel.exists, "CreateTask sollte 'Priorität' Section haben")
+        // "Wichtigkeit" Section Header prüfen
+        let importanceLabel = app.staticTexts["Wichtigkeit"]
+        XCTAssertTrue(importanceLabel.exists, "CreateTask sollte 'Wichtigkeit' Section haben")
 
         // Abbrechen
         app.buttons["Abbrechen"].tap()

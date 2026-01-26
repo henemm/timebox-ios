@@ -61,7 +61,10 @@ struct FocusLiveView: View {
     @State private var taskStartTime: Date?
     @State private var lastTaskID: String?
     @State private var warningPlayed = false
+    @State private var lastOverdueReminderTime: Date?
+    @State private var skipFeedback = false
     private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+    private let overdueReminderInterval: TimeInterval = 120 // 2 Minuten
 
     // Live Activity Manager
     @State private var liveActivityManager = LiveActivityManager()
@@ -112,6 +115,7 @@ struct FocusLiveView: View {
         .onReceive(timer) { time in
             currentTime = time
             checkBlockEnd()
+            checkTaskOverdue()
         }
         .onChange(of: activeBlock?.id) { oldValue, newValue in
             // Start or end Live Activity when block changes
@@ -257,11 +261,12 @@ struct FocusLiveView: View {
     private func currentTaskView(task: PlanItem, block: FocusBlock) -> some View {
         let taskProgress = calculateTaskProgress(task: task)
         let remainingTaskMinutes = calculateRemainingTaskMinutes(task: task)
+        let isOverdue = remainingTaskMinutes <= 0
 
         return VStack(spacing: 24) {
-            Text("Aktueller Task")
+            Text(isOverdue ? "⏰ Zeit abgelaufen" : "Aktueller Task")
                 .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(isOverdue ? .red : .secondary)
 
             // Task progress ring
             ZStack {
@@ -270,11 +275,11 @@ struct FocusLiveView: View {
                     .stroke(.secondary.opacity(0.2), lineWidth: 8)
                     .frame(width: 120, height: 120)
 
-                // Progress circle
+                // Progress circle - red when overdue
                 Circle()
                     .trim(from: 0, to: min(taskProgress, 1))
                     .stroke(
-                        taskProgress >= 1 ? .orange : .blue,
+                        isOverdue ? .red : (taskProgress >= 1 ? .orange : .blue),
                         style: StrokeStyle(lineWidth: 8, lineCap: .round)
                     )
                     .frame(width: 120, height: 120)
@@ -292,6 +297,9 @@ struct FocusLiveView: View {
                     } else {
                         Text("🔥")
                             .font(.title)
+                        Text("Overdue")
+                            .font(.caption)
+                            .foregroundStyle(.red)
                     }
                 }
             }
@@ -305,19 +313,37 @@ struct FocusLiveView: View {
                 .font(.caption)
                 .foregroundStyle(.secondary)
 
-            Button {
-                markTaskComplete(taskID: task.id, block: block)
-            } label: {
-                Label("Erledigt", systemImage: "checkmark.circle.fill")
-                    .font(.title3.weight(.semibold))
-                    .foregroundStyle(.white)
-                    .padding(.horizontal, 32)
-                    .padding(.vertical, 16)
-                    .background(.green, in: Capsule())
+            // Action buttons
+            HStack(spacing: 16) {
+                // Skip button (Nicht erledigt)
+                Button {
+                    skipTask(taskID: task.id, block: block)
+                } label: {
+                    Label("Überspringen", systemImage: "forward.fill")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 14)
+                        .background(.orange, in: Capsule())
+                }
+                .buttonStyle(.plain)
+
+                // Complete button (Erledigt)
+                Button {
+                    markTaskComplete(taskID: task.id, block: block)
+                } label: {
+                    Label("Erledigt", systemImage: "checkmark.circle.fill")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 14)
+                        .background(.green, in: Capsule())
+                }
+                .buttonStyle(.plain)
             }
-            .buttonStyle(.plain)
         }
         .padding()
+        .sensoryFeedback(.warning, trigger: skipFeedback)
         .onAppear {
             trackTaskStart(taskID: task.id)
         }
@@ -367,14 +393,12 @@ struct FocusLiveView: View {
                 .foregroundStyle(.secondary)
                 .padding(.horizontal)
 
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 8) {
-                    ForEach(tasks) { task in
-                        UpcomingTaskChip(task: task)
-                    }
+            VStack(spacing: 6) {
+                ForEach(tasks) { task in
+                    UpcomingTaskChip(task: task)
                 }
-                .padding(.horizontal)
             }
+            .padding(.horizontal)
         }
         .padding(.vertical, 12)
         .background(.ultraThinMaterial)
@@ -451,6 +475,9 @@ struct FocusLiveView: View {
     }
 
     private func markTaskComplete(taskID: String, block: FocusBlock) {
+        // Cancel notification for completed task
+        NotificationService.cancelTaskNotification(taskID: taskID)
+
         Task {
             do {
                 var updatedCompletedIDs = block.completedTaskIDs
@@ -458,13 +485,23 @@ struct FocusLiveView: View {
                     updatedCompletedIDs.append(taskID)
                 }
 
+                // Calculate time spent on this task
+                var updatedTaskTimes = block.taskTimes
+                if let startTime = taskStartTime {
+                    let secondsSpent = Int(Date().timeIntervalSince(startTime))
+                    updatedTaskTimes[taskID] = (updatedTaskTimes[taskID] ?? 0) + secondsSpent
+                }
+
                 try eventKitRepo.updateFocusBlock(
                     eventID: block.id,
                     taskIDs: block.taskIDs,
-                    completedTaskIDs: updatedCompletedIDs
+                    completedTaskIDs: updatedCompletedIDs,
+                    taskTimes: updatedTaskTimes
                 )
 
+                taskStartTime = nil  // Reset for next task
                 completionFeedback.toggle()
+                lastOverdueReminderTime = nil  // Reset overdue reminder
                 await loadData()
 
                 // Update Live Activity with new task
@@ -473,6 +510,50 @@ struct FocusLiveView: View {
                 }
             } catch {
                 errorMessage = "Task konnte nicht als erledigt markiert werden."
+            }
+        }
+    }
+
+    /// Skip task without marking as complete - moves to next task in queue
+    private func skipTask(taskID: String, block: FocusBlock) {
+        // Cancel notification for skipped task
+        NotificationService.cancelTaskNotification(taskID: taskID)
+
+        Task {
+            do {
+                // Move task to end of queue by reordering taskIDs
+                var updatedTaskIDs = block.taskIDs
+                if let index = updatedTaskIDs.firstIndex(of: taskID) {
+                    updatedTaskIDs.remove(at: index)
+                    updatedTaskIDs.append(taskID)  // Move to end
+                }
+
+                // Preserve partial time spent on skipped task
+                var updatedTaskTimes = block.taskTimes
+                if let startTime = taskStartTime {
+                    let secondsSpent = Int(Date().timeIntervalSince(startTime))
+                    updatedTaskTimes[taskID] = (updatedTaskTimes[taskID] ?? 0) + secondsSpent
+                }
+
+                try eventKitRepo.updateFocusBlock(
+                    eventID: block.id,
+                    taskIDs: updatedTaskIDs,
+                    completedTaskIDs: block.completedTaskIDs,
+                    taskTimes: updatedTaskTimes
+                )
+
+                skipFeedback.toggle()
+                lastOverdueReminderTime = nil  // Reset overdue reminder
+                taskStartTime = nil  // Reset task timer for next task
+                lastTaskID = nil
+                await loadData()
+
+                // Update Live Activity with new task
+                if let updatedBlock = activeBlock {
+                    updateLiveActivity(for: updatedBlock)
+                }
+            } catch {
+                errorMessage = "Task konnte nicht übersprungen werden."
             }
         }
     }
@@ -518,12 +599,60 @@ struct FocusLiveView: View {
         }
     }
 
+    /// Check if current task is overdue and play reminder every 2 minutes
+    private func checkTaskOverdue() {
+        guard let block = activeBlock else { return }
+        guard !block.isPast else { return }  // Don't remind if block is over
+
+        // Get current task
+        let tasks = tasksForBlock(block)
+        let remainingTasks = tasks.filter { !block.completedTaskIDs.contains($0.id) }
+        guard let currentTask = remainingTasks.first else { return }
+
+        // Check if task is overdue
+        let remainingMinutes = calculateRemainingTaskMinutes(task: currentTask)
+        guard remainingMinutes <= 0 else {
+            lastOverdueReminderTime = nil  // Reset if not overdue anymore
+            return
+        }
+
+        // Play reminder every 2 minutes
+        let now = Date()
+        if let lastReminder = lastOverdueReminderTime {
+            if now.timeIntervalSince(lastReminder) >= overdueReminderInterval {
+                SoundService.playWarning()
+                lastOverdueReminderTime = now
+            }
+        } else {
+            // First overdue - play immediately
+            SoundService.playWarning()
+            lastOverdueReminderTime = now
+        }
+    }
+
     // MARK: - Task Progress Tracking
 
     private func trackTaskStart(taskID: String) {
         if lastTaskID != taskID {
+            // Cancel previous task notification
+            if let previousTaskID = lastTaskID {
+                NotificationService.cancelTaskNotification(taskID: previousTaskID)
+            }
+
             lastTaskID = taskID
             taskStartTime = Date()
+
+            // Schedule notification for new task
+            if let block = activeBlock {
+                let tasks = tasksForBlock(block)
+                if let task = tasks.first(where: { $0.id == taskID }) {
+                    NotificationService.scheduleTaskOverdueNotification(
+                        taskID: taskID,
+                        taskTitle: task.title,
+                        durationMinutes: task.effectiveDuration
+                    )
+                }
+            }
         }
     }
 

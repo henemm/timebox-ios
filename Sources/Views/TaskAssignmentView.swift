@@ -185,7 +185,8 @@ struct TaskAssignmentView: View {
                 try eventKitRepo.updateFocusBlock(
                     eventID: block.id,
                     taskIDs: updatedTaskIDs,
-                    completedTaskIDs: block.completedTaskIDs
+                    completedTaskIDs: block.completedTaskIDs,
+                    taskTimes: block.taskTimes
                 )
 
                 // Remove from Next Up after assignment
@@ -210,7 +211,8 @@ struct TaskAssignmentView: View {
                 try eventKitRepo.updateFocusBlock(
                     eventID: block.id,
                     taskIDs: updatedTaskIDs,
-                    completedTaskIDs: block.completedTaskIDs
+                    completedTaskIDs: block.completedTaskIDs,
+                    taskTimes: block.taskTimes
                 )
 
                 // Restore to Next Up after removal from block
@@ -232,7 +234,8 @@ struct TaskAssignmentView: View {
                 try eventKitRepo.updateFocusBlock(
                     eventID: block.id,
                     taskIDs: newTaskIDs,
-                    completedTaskIDs: block.completedTaskIDs
+                    completedTaskIDs: block.completedTaskIDs,
+                    taskTimes: block.taskTimes
                 )
 
                 await loadData()

@@ -56,7 +56,16 @@ _Keine Features mit fertiger Spec_
 - [System 2]
 -->
 
-_Keine Features in Arbeit_
+### Task 12b: Sprint Review UI
+**Status:** Done ✅
+**Phase:** Complete (2026-01-26)
+**Priorität:** Hoch
+**Bereich:** SprintReviewSheet
+
+**Implementiert:**
+- Zeit-Anzeige: "X min geplant" + "Y min gebraucht" mit Differenz
+- Task-Status umschaltbar (Tap auf Checkbox)
+- Stats Header mit "gebraucht" Spalte
 
 ---
 
@@ -66,6 +75,56 @@ _Keine Features in Arbeit_
 > Gap-Analyse: `docs/context/user-story-gap-analysis.md`
 
 _Alle User Story Features abgeschlossen - siehe "Abgeschlossen" unten_
+
+---
+
+## Quick Capture (User Story)
+
+> Story: `docs/project/stories/quick-capture.md`
+> JTBD: "Gedanken festhalten, bevor sie weg sind"
+
+### TBD Tasks (Unvollständige Tasks)
+**Status:** Done ✅
+**Phase:** Validation complete (2026-01-26)
+**Priorität:** Must
+**Bereich:** App (alle Plattformen)
+**Spec:** `docs/specs/features/tbd-tasks.md`
+**Artifacts:** `docs/artifacts/tbd-tasks/`
+
+**Kurzbeschreibung:**
+Tasks ohne Wichtigkeit/Dringlichkeit/Dauer werden mit `tbd` Tag markiert (kursiver Titel). Keine Fake-Defaults mehr. TBD ViewMode für fokussierte Vervollständigung. Inkl. Umbenennung "Priorität" → "Wichtigkeit".
+
+**Tests:** 14 Unit Tests + 11 UI Tests = 25 Tests GRÜN
+
+---
+
+### Watch Voice Capture
+**Status:** Open
+**Priorität:** Must
+**Bereich:** watchOS App
+
+**Kurzbeschreibung:**
+Button-Tap → Spracheingabe → Task landet im Backlog (als tbd).
+
+---
+
+### Quick Add Widget (iOS)
+**Status:** Open
+**Priorität:** Must
+**Bereich:** iOS WidgetKit
+
+**Kurzbeschreibung:**
+Home/Lock Screen Widget für schnelle Task-Eingabe (1-2 Taps). Task landet als tbd.
+
+---
+
+### Spotlight Integration (Mac)
+**Status:** Open
+**Priorität:** Should
+**Bereich:** macOS
+
+**Kurzbeschreibung:**
+CMD+Leertaste → Syntax-Eingabe → Task im Backlog (als tbd).
 
 ---
 
@@ -98,6 +157,29 @@ Tap auf Task oeffnet Detail-Ansicht mit Notes, Faelligkeit, Prioritaet, Kategori
 
 **Kurzbeschreibung:**
 Tasks innerhalb eines Focus Blocks per Drag & Drop umsortierbar.
+
+---
+
+### Tasks im Backlog als erledigt markieren
+**Status:** Open
+**Prioritaet:** Mittel
+**Bereich:** BacklogView, BacklogRow
+
+**Kurzbeschreibung:**
+Tasks direkt in der Backlog-View auf "erledigt" setzen (Checkbox/Swipe-Action).
+
+---
+
+### Backlog Row Redesign
+**Status:** Open (Konzept erstellt)
+**Prioritaet:** Mittel
+**Bereich:** BacklogView, BacklogRow, DurationBadge
+**Konzept:** docs/concepts/backlog-row-redesign.md
+
+**Kurzbeschreibung:**
+Klarere Darstellung der Task-Informationen: Checkbox links (iOS-Standard), verstaendliche Prioritaets-Anzeige, Swipe-Actions statt versteckter Buttons, bessere visuelle Hierarchie.
+
+**Abhaengigkeit:** "Tasks als erledigt markieren" sollte zuerst/zusammen umgesetzt werden.
 
 ---
 

@@ -28,12 +28,13 @@ import Foundation
     func createCalendarEvent(title: String, startDate: Date, endDate: Date, reminderID: String?) throws
     func deleteCalendarEvent(eventID: String) throws
     func moveCalendarEvent(eventID: String, to newStartDate: Date, duration: Int) throws
+    func updateEventCategory(eventID: String, category: String?) throws
 
     // MARK: - Focus Blocks
 
     func fetchFocusBlocks(for date: Date) throws -> [FocusBlock]
     func createFocusBlock(startDate: Date, endDate: Date) throws -> String
-    func updateFocusBlock(eventID: String, taskIDs: [String], completedTaskIDs: [String]) throws
+    func updateFocusBlock(eventID: String, taskIDs: [String], completedTaskIDs: [String], taskTimes: [String: Int]) throws
     func deleteFocusBlock(eventID: String) throws
     func updateFocusBlockTime(eventID: String, startDate: Date, endDate: Date) throws
 

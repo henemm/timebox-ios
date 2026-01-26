@@ -3,23 +3,50 @@ import SwiftUI
 struct SprintReviewSheet: View {
     let block: FocusBlock
     let tasks: [PlanItem]
-    let completedTaskIDs: [String]
+    let initialCompletedTaskIDs: [String]
     let onDismiss: () -> Void
 
     @Environment(\.dismiss) private var dismiss
     @State private var eventKitRepo = EventKitRepository()
 
+    // Local state for editing
+    @State private var localCompletedIDs: Set<String> = []
+    @State private var hasChanges = false
+
+    init(block: FocusBlock, tasks: [PlanItem], completedTaskIDs: [String], onDismiss: @escaping () -> Void) {
+        self.block = block
+        self.tasks = tasks
+        self.initialCompletedTaskIDs = completedTaskIDs
+        self.onDismiss = onDismiss
+        self._localCompletedIDs = State(initialValue: Set(completedTaskIDs))
+    }
+
     private var completedTasks: [PlanItem] {
-        tasks.filter { completedTaskIDs.contains($0.id) }
+        tasks.filter { localCompletedIDs.contains($0.id) }
     }
 
     private var incompleteTasks: [PlanItem] {
-        tasks.filter { !completedTaskIDs.contains($0.id) }
+        tasks.filter { !localCompletedIDs.contains($0.id) }
     }
 
     private var completionPercentage: Int {
         guard !tasks.isEmpty else { return 100 }
         return Int((Double(completedTasks.count) / Double(tasks.count)) * 100)
+    }
+
+    /// Get actual time spent on a task (in seconds), or nil if not tracked
+    private func actualTime(for taskID: String) -> Int? {
+        block.taskTimes[taskID]
+    }
+
+    /// Format seconds as "X min" or "X:SS" for display
+    private func formatTime(seconds: Int) -> String {
+        let minutes = seconds / 60
+        let secs = seconds % 60
+        if secs == 0 {
+            return "\(minutes) min"
+        }
+        return "\(minutes):\(String(format: "%02d", secs))"
     }
 
     var body: some View {
@@ -95,7 +122,7 @@ struct SprintReviewSheet: View {
             }
 
             // Stats row
-            HStack(spacing: 32) {
+            HStack(spacing: 24) {
                 StatItem(
                     value: "\(completedTasks.count)",
                     label: "Erledigt",
@@ -110,8 +137,14 @@ struct SprintReviewSheet: View {
 
                 StatItem(
                     value: "\(totalDuration)m",
-                    label: "Geplant",
+                    label: "geplant",
                     color: .blue
+                )
+
+                StatItem(
+                    value: "\(totalActualMinutes)m",
+                    label: "gebraucht",
+                    color: .purple
                 )
             }
         }
@@ -120,6 +153,12 @@ struct SprintReviewSheet: View {
             RoundedRectangle(cornerRadius: 16)
                 .fill(.ultraThinMaterial)
         )
+    }
+
+    /// Total actual time spent (in minutes)
+    private var totalActualMinutes: Int {
+        let totalSeconds = block.taskTimes.values.reduce(0, +)
+        return totalSeconds / 60
     }
 
     // MARK: - Completed Tasks Section
@@ -132,7 +171,13 @@ struct SprintReviewSheet: View {
 
             VStack(spacing: 8) {
                 ForEach(completedTasks) { task in
-                    ReviewTaskRow(task: task, isCompleted: true)
+                    InteractiveReviewTaskRow(
+                        task: task,
+                        isCompleted: true,
+                        plannedMinutes: task.effectiveDuration,
+                        actualSeconds: actualTime(for: task.id),
+                        onToggle: { toggleTaskCompletion(task.id) }
+                    )
                 }
             }
         }
@@ -146,15 +191,34 @@ struct SprintReviewSheet: View {
                 .font(.headline)
                 .foregroundStyle(.orange)
 
-            Text("Diese Tasks werden zurück ins Backlog gelegt")
+            Text("Tippe auf ○ um Status zu ändern")
                 .font(.caption)
                 .foregroundStyle(.secondary)
 
             VStack(spacing: 8) {
                 ForEach(incompleteTasks) { task in
-                    ReviewTaskRow(task: task, isCompleted: false)
+                    InteractiveReviewTaskRow(
+                        task: task,
+                        isCompleted: false,
+                        plannedMinutes: task.effectiveDuration,
+                        actualSeconds: actualTime(for: task.id),
+                        onToggle: { toggleTaskCompletion(task.id) }
+                    )
                 }
             }
+        }
+    }
+
+    // MARK: - Toggle Task Completion
+
+    private func toggleTaskCompletion(_ taskID: String) {
+        withAnimation(.spring(duration: 0.3)) {
+            if localCompletedIDs.contains(taskID) {
+                localCompletedIDs.remove(taskID)
+            } else {
+                localCompletedIDs.insert(taskID)
+            }
+            hasChanges = true
         }
     }
 
@@ -162,6 +226,21 @@ struct SprintReviewSheet: View {
 
     private var actionButtons: some View {
         VStack(spacing: 12) {
+            // Save changes button (only if changes were made)
+            if hasChanges {
+                Button {
+                    saveChanges()
+                } label: {
+                    Label("Änderungen speichern", systemImage: "checkmark.circle")
+                        .font(.headline)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(.green, in: RoundedRectangle(cornerRadius: 12))
+                        .foregroundStyle(.white)
+                }
+                .buttonStyle(.plain)
+            }
+
             if !incompleteTasks.isEmpty {
                 Button {
                     moveIncompleteTasks()
@@ -177,6 +256,9 @@ struct SprintReviewSheet: View {
             }
 
             Button {
+                if hasChanges {
+                    saveChanges()
+                }
                 dismiss()
                 onDismiss()
             } label: {
@@ -190,6 +272,24 @@ struct SprintReviewSheet: View {
             .buttonStyle(.plain)
         }
         .padding(.top)
+    }
+
+    // MARK: - Save Changes
+
+    private func saveChanges() {
+        Task {
+            do {
+                try eventKitRepo.updateFocusBlock(
+                    eventID: block.id,
+                    taskIDs: block.taskIDs,
+                    completedTaskIDs: Array(localCompletedIDs),
+                    taskTimes: block.taskTimes
+                )
+                hasChanges = false
+            } catch {
+                // Silently fail - user can retry
+            }
+        }
     }
 
     // MARK: - Helper Functions
@@ -209,13 +309,14 @@ struct SprintReviewSheet: View {
         Task {
             do {
                 let remainingTaskIDs = block.taskIDs.filter { taskID in
-                    completedTaskIDs.contains(taskID)
+                    localCompletedIDs.contains(taskID)
                 }
 
                 try eventKitRepo.updateFocusBlock(
                     eventID: block.id,
                     taskIDs: remainingTaskIDs,
-                    completedTaskIDs: completedTaskIDs
+                    completedTaskIDs: Array(localCompletedIDs),
+                    taskTimes: block.taskTimes
                 )
 
                 dismiss()
@@ -246,7 +347,7 @@ struct StatItem: View {
     }
 }
 
-// MARK: - Review Task Row
+// MARK: - Review Task Row (Legacy)
 
 struct ReviewTaskRow: View {
     let task: PlanItem
@@ -278,5 +379,96 @@ struct ReviewTaskRow: View {
             RoundedRectangle(cornerRadius: 8)
                 .strokeBorder(.secondary.opacity(0.2), lineWidth: 1)
         )
+    }
+}
+
+// MARK: - Interactive Review Task Row
+
+struct InteractiveReviewTaskRow: View {
+    let task: PlanItem
+    let isCompleted: Bool
+    let plannedMinutes: Int
+    let actualSeconds: Int?
+    let onToggle: () -> Void
+
+    private var actualMinutes: Int? {
+        guard let seconds = actualSeconds else { return nil }
+        return seconds / 60
+    }
+
+    private var timeDifference: Int? {
+        guard let actual = actualMinutes else { return nil }
+        return actual - plannedMinutes
+    }
+
+    private var timeDifferenceColor: Color {
+        guard let diff = timeDifference else { return .secondary }
+        if diff <= 0 { return .green }
+        if diff <= 5 { return .orange }
+        return .red
+    }
+
+    var body: some View {
+        HStack(spacing: 12) {
+            // Toggle button
+            Button {
+                onToggle()
+            } label: {
+                Image(systemName: isCompleted ? "checkmark.circle.fill" : "circle")
+                    .font(.title3)
+                    .foregroundStyle(isCompleted ? .green : .secondary)
+            }
+            .buttonStyle(.plain)
+            .accessibilityIdentifier("taskStatusToggle")
+            .accessibilityLabel(isCompleted ? "Als unerledigt markieren" : "Als erledigt markieren")
+
+            // Task title
+            VStack(alignment: .leading, spacing: 2) {
+                Text(task.title)
+                    .font(.subheadline)
+                    .strikethrough(isCompleted, color: .secondary)
+                    .foregroundStyle(isCompleted ? .secondary : .primary)
+                    .lineLimit(2)
+
+                // Time info
+                HStack(spacing: 8) {
+                    // Planned time
+                    Text("\(plannedMinutes) min geplant")
+                        .font(.caption2)
+                        .foregroundStyle(.blue)
+
+                    if let actual = actualMinutes {
+                        Text("•")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+
+                        // Actual time
+                        Text("\(actual) min gebraucht")
+                            .font(.caption2)
+                            .foregroundStyle(.purple)
+
+                        // Difference indicator
+                        if let diff = timeDifference, diff != 0 {
+                            Text(diff > 0 ? "+\(diff)" : "\(diff)")
+                                .font(.caption2.weight(.medium))
+                                .foregroundStyle(timeDifferenceColor)
+                        }
+                    }
+                }
+            }
+
+            Spacer()
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 10)
+        .background(
+            RoundedRectangle(cornerRadius: 8)
+                .fill(.background)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 8)
+                .strokeBorder(isCompleted ? Color.green.opacity(0.3) : Color.secondary.opacity(0.2), lineWidth: 1)
+        )
+        .accessibilityIdentifier("reviewTaskRow_\(task.id)")
     }
 }

@@ -185,4 +185,133 @@ final class FocusBlockTests: XCTestCase {
 
         XCTAssertNil(focusBlock)
     }
+
+    // MARK: - Task Times (Zeit-Tracking) Tests
+
+    /// GIVEN: A CalendarEvent with notes containing "times:id1=120|id2=90"
+    /// WHEN: focusBlockTaskTimes is accessed
+    /// THEN: Returns ["id1": 120, "id2": 90]
+    func testFocusBlockTaskTimesParsesPipeSeparatedTimes() {
+        let event = CalendarEvent(
+            id: "test-times-1",
+            title: "Focus Block with Times",
+            startDate: Date(),
+            endDate: Date().addingTimeInterval(3600),
+            isAllDay: false,
+            calendarColor: nil,
+            notes: "focusBlock:true\ntasks:id1|id2\ncompleted:id1|id2\ntimes:id1=120|id2=90"
+        )
+
+        let times = event.focusBlockTaskTimes
+        XCTAssertEqual(times["id1"], 120)
+        XCTAssertEqual(times["id2"], 90)
+    }
+
+    /// GIVEN: A CalendarEvent with no times line
+    /// WHEN: focusBlockTaskTimes is accessed
+    /// THEN: Returns empty dictionary
+    func testFocusBlockTaskTimesReturnsEmptyForNoTimesLine() {
+        let event = CalendarEvent(
+            id: "test-times-2",
+            title: "Focus Block no Times",
+            startDate: Date(),
+            endDate: Date().addingTimeInterval(3600),
+            isAllDay: false,
+            calendarColor: nil,
+            notes: "focusBlock:true\ntasks:id1|id2"
+        )
+
+        let times = event.focusBlockTaskTimes
+        XCTAssertTrue(times.isEmpty)
+    }
+
+    /// GIVEN: taskIDs, completedTaskIDs, and taskTimes
+    /// WHEN: serializeToNotes is called
+    /// THEN: Returns notes string including times line
+    func testSerializeToNotesIncludesTaskTimes() {
+        let taskIDs = ["task-1", "task-2"]
+        let completedIDs = ["task-1"]
+        let taskTimes = ["task-1": 180, "task-2": 90]
+
+        let notes = FocusBlock.serializeToNotes(
+            taskIDs: taskIDs,
+            completedTaskIDs: completedIDs,
+            taskTimes: taskTimes
+        )
+
+        XCTAssertTrue(notes.contains("focusBlock:true"))
+        XCTAssertTrue(notes.contains("tasks:task-1|task-2"))
+        XCTAssertTrue(notes.contains("completed:task-1"))
+        XCTAssertTrue(notes.contains("times:"))
+        XCTAssertTrue(notes.contains("task-1=180"))
+        XCTAssertTrue(notes.contains("task-2=90"))
+    }
+
+    /// GIVEN: taskIDs, completedTaskIDs, and empty taskTimes
+    /// WHEN: serializeToNotes is called
+    /// THEN: Returns notes string without times line
+    func testSerializeToNotesOmitsEmptyTaskTimes() {
+        let notes = FocusBlock.serializeToNotes(
+            taskIDs: ["task-1"],
+            completedTaskIDs: [],
+            taskTimes: [:]
+        )
+
+        XCTAssertFalse(notes.contains("times:"))
+    }
+
+    /// GIVEN: A FocusBlock with taskTimes
+    /// WHEN: notesString is accessed
+    /// THEN: Returns correctly formatted notes including times
+    func testFocusBlockNotesStringIncludesTimes() {
+        let block = FocusBlock(
+            id: "fb-times",
+            title: "Focus Block",
+            startDate: Date(),
+            endDate: Date().addingTimeInterval(3600),
+            taskIDs: ["t1", "t2"],
+            completedTaskIDs: ["t1"],
+            taskTimes: ["t1": 300]
+        )
+
+        let notes = block.notesString
+        XCTAssertTrue(notes.contains("times:t1=300"))
+    }
+
+    /// GIVEN: A CalendarEvent with times data
+    /// WHEN: FocusBlock(from:) is called
+    /// THEN: FocusBlock has correct taskTimes
+    func testFocusBlockCreationParsesTaskTimes() {
+        let event = CalendarEvent(
+            id: "fb-times-2",
+            title: "Focus Block",
+            startDate: Date(),
+            endDate: Date().addingTimeInterval(3600),
+            isAllDay: false,
+            calendarColor: nil,
+            notes: "focusBlock:true\ntasks:t1|t2\ncompleted:t1\ntimes:t1=240|t2=60"
+        )
+
+        let block = FocusBlock(from: event)
+
+        XCTAssertNotNil(block)
+        XCTAssertEqual(block?.taskTimes["t1"], 240)
+        XCTAssertEqual(block?.taskTimes["t2"], 60)
+    }
+
+    /// GIVEN: A FocusBlock with no taskTimes
+    /// WHEN: taskTimes is accessed
+    /// THEN: Returns empty dictionary
+    func testFocusBlockDefaultsToEmptyTaskTimes() {
+        let block = FocusBlock(
+            id: "fb-no-times",
+            title: "Focus Block",
+            startDate: Date(),
+            endDate: Date().addingTimeInterval(3600),
+            taskIDs: ["t1"],
+            completedTaskIDs: []
+        )
+
+        XCTAssertTrue(block.taskTimes.isEmpty)
+    }
 }

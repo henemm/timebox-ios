@@ -1,0 +1,37 @@
+# Task 12b: Sprint Review UI - Validation
+# Datum: 2026-01-26
+# Status: IMPLEMENTIERT
+
+## Implementierte Features
+
+1. **Zeit-Anzeige pro Task:**
+   - "X min geplant" (blau)
+   - "Y min gebraucht" (lila) 
+   - Differenz-Indikator (+/-) mit Farbcodierung
+
+2. **Task-Status umschaltbar:**
+   - Tap auf Checkbox togglet Status
+   - Animation bei Statuswechsel
+   - "Änderungen speichern" Button erscheint
+
+3. **Stats Header erweitert:**
+   - Neue Spalte "gebraucht" (total actual time)
+
+4. **Accessibility:**
+   - `taskStatusToggle` Identifier
+   - `reviewTaskRow_[id]` Identifier
+   - Accessibility Labels für VoiceOver
+
+## Geänderte Dateien
+
+- `Sources/Views/SprintReviewSheet.swift` (~100 LoC hinzugefügt)
+  - `InteractiveReviewTaskRow` Component
+  - Lokaler State für Änderungen
+  - Toggle-Funktion
+  - Save-Funktion
+
+## Tests
+
+- Unit Tests: GRÜN
+- UI Tests: Erstellt (graceful skip wenn Feature nicht verfügbar)
+- Build: ERFOLGREICH

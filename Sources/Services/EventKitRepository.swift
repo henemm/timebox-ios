@@ -237,6 +237,31 @@ final class EventKitRepository: EventKitRepositoryProtocol, @unchecked Sendable 
         try eventStore.save(event, span: .thisEvent)
     }
 
+    func updateEventCategory(eventID: String, category: String?) throws {
+        guard calendarAuthStatus == .fullAccess else {
+            throw EventKitError.notAuthorized
+        }
+        guard let event = eventStore.event(withIdentifier: eventID) else {
+            return // Silent fail if event not found
+        }
+
+        // Update notes with category, preserving existing content
+        var notes = event.notes ?? ""
+
+        // Remove existing category line
+        var lines = notes.components(separatedBy: "\n")
+        lines.removeAll { $0.hasPrefix("category:") }
+
+        // Add new category if provided
+        if let category = category, !category.isEmpty {
+            lines.append("category:\(category)")
+        }
+
+        // Rebuild notes, removing empty lines at the end
+        event.notes = lines.filter { !$0.isEmpty }.joined(separator: "\n")
+        try eventStore.save(event, span: .thisEvent)
+    }
+
     // MARK: - Focus Block Methods
 
     func createFocusBlock(startDate: Date, endDate: Date) throws -> String {
@@ -257,7 +282,7 @@ final class EventKitRepository: EventKitRepositoryProtocol, @unchecked Sendable 
         return event.eventIdentifier ?? ""
     }
 
-    func updateFocusBlock(eventID: String, taskIDs: [String], completedTaskIDs: [String]) throws {
+    func updateFocusBlock(eventID: String, taskIDs: [String], completedTaskIDs: [String], taskTimes: [String: Int] = [:]) throws {
         guard calendarAuthStatus == .fullAccess else {
             throw EventKitError.notAuthorized
         }
@@ -265,7 +290,7 @@ final class EventKitRepository: EventKitRepositoryProtocol, @unchecked Sendable 
             return
         }
 
-        event.notes = FocusBlock.serializeToNotes(taskIDs: taskIDs, completedTaskIDs: completedTaskIDs)
+        event.notes = FocusBlock.serializeToNotes(taskIDs: taskIDs, completedTaskIDs: completedTaskIDs, taskTimes: taskTimes)
         try eventStore.save(event, span: .thisEvent)
     }
 
