@@ -1,0 +1,31 @@
+TDD RED Phase - App Group SwiftData Tests
+==========================================
+Date: 2026-01-28 17:19:56
+
+Tests FAILED as expected (compile errors - types do not exist):
+
+Errors:
+- Cannot find 'SharedModelContainer' in scope (7x)
+- Cannot find 'AppGroupMigration' in scope (3x)
+
+Test Classes:
+1. AppGroupSwiftDataTests (4 tests)
+   - testSharedContainerAccessible
+   - testSharedContainerUsesAppGroup
+   - testMigrationCopiesAllTasks
+   - testMigrationOnlyRunsOnce
+   - testMigrationSetsCompletionFlag
+
+2. IntentSwiftDataTests (3 tests)
+   - testCreateTaskIntentSavesTask
+   - testGetNextUpQueryReturnsTasks
+   - testCompleteTaskUpdatesTask
+
+Total: 7 tests, all FAILED (compile error)
+
+Missing Types (to be implemented):
+- SharedModelContainer.create() -> ModelContainer
+- AppGroupMigration.needsMigration() -> Bool
+- AppGroupMigration.migrateIfNeeded() throws
+
+This is the expected TDD RED state - tests fail because implementation doesn't exist.

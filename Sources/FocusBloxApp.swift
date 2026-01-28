@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import FocusBloxCore
 
 // MARK: - Notification Name for Control Center Widget
 extension Notification.Name {
@@ -8,6 +9,7 @@ extension Notification.Name {
 
 @main
 struct FocusBloxApp: App {
+    @Environment(\.scenePhase) private var scenePhase
     @State private var showQuickCapture = false
     @State private var permissionRequested = false
 
@@ -17,19 +19,33 @@ struct FocusBloxApp: App {
             TaskMetadata.self
         ])
 
-        // Disable CloudKit everywhere until entitlements are properly configured
-        // CloudKit requires com.apple.developer.icloud-services entitlement
         let isUITesting = ProcessInfo.processInfo.arguments.contains("-UITesting")
-        let shouldDisableCloudKit = true
-
-        let modelConfiguration = ModelConfiguration(
-            schema: schema,
-            isStoredInMemoryOnly: isUITesting,
-            cloudKitDatabase: shouldDisableCloudKit ? .none : .private("iCloud.com.henning.timebox")
-        )
 
         do {
-            return try ModelContainer(for: schema, configurations: [modelConfiguration])
+            let container: ModelContainer
+
+            if isUITesting {
+                // UI tests use in-memory storage for isolation
+                let inMemoryConfig = ModelConfiguration(
+                    schema: schema,
+                    isStoredInMemoryOnly: true,
+                    cloudKitDatabase: .none
+                )
+                container = try ModelContainer(for: schema, configurations: [inMemoryConfig])
+            } else {
+                // Production: Migrate from default to App Group, then use App Group
+                try AppGroupMigration.migrateIfNeeded()
+                container = try SharedModelContainer.create()
+            }
+
+            // Seed mock data BEFORE any view loads
+            // Fixes race condition: child .task fires before parent .onAppear,
+            // so FocusLiveView.loadData() would find empty store if seeded in .onAppear
+            if isUITesting {
+                FocusBloxApp.seedUITestData(into: container.mainContext)
+            }
+
+            return container
         } catch {
             fatalError("Could not create ModelContainer: \(error)")
         }
@@ -186,12 +202,19 @@ struct FocusBloxApp: App {
             }
             .onAppear {
                 resetUserDefaultsIfNeeded()
-                seedUITestDataIfNeeded()
                 // Request calendar/reminders permission on app launch (Bug 8 fix)
                 requestPermissionsOnLaunch()
+                // Check for CC trigger (App Group flag)
+                checkCCQuickCaptureTrigger()
                 // Auto-open Quick Capture for UI testing
-                if ProcessInfo.processInfo.arguments.contains("-QuickCaptureTest") {
+                if ProcessInfo.processInfo.arguments.contains("-QuickCaptureTest")
+                    || ProcessInfo.processInfo.arguments.contains("-SimulateCCTrigger") {
                     showQuickCapture = true
+                }
+            }
+            .onChange(of: scenePhase) { _, newPhase in
+                if newPhase == .active {
+                    checkCCQuickCaptureTrigger()
                 }
             }
             .onOpenURL { url in
@@ -202,22 +225,37 @@ struct FocusBloxApp: App {
             .onReceive(NotificationCenter.default.publisher(for: .quickCaptureRequested)) { _ in
                 showQuickCapture = true
             }
-            .fullScreenCover(isPresented: $showQuickCapture) {
+            .sheet(isPresented: $showQuickCapture) {
                 QuickCaptureView()
             }
         }
         .modelContainer(sharedModelContainer)
     }
 
-    /// Request calendar and reminders permissions on app launch
+    /// Request calendar, reminders, and notification permissions on app launch
     /// This ensures the app appears in iOS Settings and prompts for access
+    /// Skips during UI testing to avoid blocking dialogs
     private func requestPermissionsOnLaunch() {
+        let isUITesting = ProcessInfo.processInfo.arguments.contains("-UITesting")
         Task {
             _ = try? await eventKitRepository.requestAccess()
+            // Skip notification permission during UI testing to avoid blocking dialogs
+            if !isUITesting {
+                _ = await NotificationService.requestPermission()
+            }
             await MainActor.run {
                 permissionRequested = true
             }
         }
+    }
+
+    /// Check if Control Center triggered Quick Capture (via App Group flag)
+    private func checkCCQuickCaptureTrigger() {
+        guard let defaults = UserDefaults(suiteName: "group.com.henning.focusblox") else { return }
+        guard defaults.bool(forKey: "quickCaptureFromCC") else { return }
+        // Clear flag and show QuickCapture
+        defaults.removeObject(forKey: "quickCaptureFromCC")
+        showQuickCapture = true
     }
 
     /// Reset UserDefaults for UI test isolation
@@ -229,11 +267,8 @@ struct FocusBloxApp: App {
     }
 
     /// Seed mock data for UI testing
-    private func seedUITestDataIfNeeded() {
-        guard ProcessInfo.processInfo.arguments.contains("-UITesting") else { return }
-
-        let context = sharedModelContainer.mainContext
-
+    /// Static so it can be called from the model container initializer (before views load)
+    private static func seedUITestData(into context: ModelContext) {
         // Check if already seeded (avoid duplicates on re-render)
         let descriptor = FetchDescriptor<LocalTask>(predicate: #Predicate { $0.title == "Mock Task 1 #30min" })
         let existingTasks = (try? context.fetch(descriptor)) ?? []
@@ -276,6 +311,39 @@ struct FocusBloxApp: App {
         context.insert(assignedTask)
         context.insert(backlogTask1)
         context.insert(backlogTask2)
+
+        // Create Focus Block mock tasks with known UUIDs
+        // These match the taskIDs in FocusLiveView.createMockRepository()
+        let fbTask1 = LocalTask(
+            uuid: UUID(uuidString: "AAAAAAAA-0000-0000-0000-000000000001")!,
+            title: "Focus Task 1",
+            importance: 3,
+            estimatedDuration: 10,
+            urgency: "urgent"
+        )
+        fbTask1.isNextUp = false
+
+        let fbTask2 = LocalTask(
+            uuid: UUID(uuidString: "AAAAAAAA-0000-0000-0000-000000000002")!,
+            title: "Focus Task 2",
+            importance: 2,
+            estimatedDuration: 10,
+            urgency: "not_urgent"
+        )
+        fbTask2.isNextUp = false
+
+        let fbTask3 = LocalTask(
+            uuid: UUID(uuidString: "AAAAAAAA-0000-0000-0000-000000000003")!,
+            title: "Focus Task 3",
+            importance: 1,
+            estimatedDuration: 10,
+            urgency: "not_urgent"
+        )
+        fbTask3.isNextUp = false
+
+        context.insert(fbTask1)
+        context.insert(fbTask2)
+        context.insert(fbTask3)
 
         try? context.save()
     }
