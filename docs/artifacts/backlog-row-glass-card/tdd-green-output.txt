@@ -1,0 +1,26 @@
+=== TDD GREEN Test Results ===
+Date: 2026-01-29 07:45:42
+
+Test Suite: BacklogRowGlassCardUITests
+Result: ** TEST SUCCEEDED **
+
+All 10 tests passed:
+- testImportanceButtonExists
+- testCategoryBadgeWithIconExists
+- testActionsMenuExists
+- testActionsMenuOptions
+- testDurationBadgeExists
+- testTbdBadgeInMetadataRow
+- testTaskTitleExists
+- testBacklogRowContainerExists
+- testRowTapExpandsInlineEdit
+- testInlineEditDurationQuickSelect
+- testInlineEditCancelSaveButtons
+
+Implementation verified:
+- Importance: SF Symbol (square.fill/circle.fill) with color (blue/yellow/red)
+- Category Badge: Icon + Label (horizontal)
+- Actions Menu: Ellipsis with Bearbeiten/Zu Next Up/Loeschen
+- Glass Card: .ultraThinMaterial background
+- Inline Edit: Expands on tap with title field and duration quick-select
+- Title: Italic for TBD tasks (feature preserved)

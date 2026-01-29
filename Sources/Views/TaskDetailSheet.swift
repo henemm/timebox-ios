@@ -2,14 +2,14 @@ import SwiftUI
 
 struct TaskDetailSheet: View {
     let task: PlanItem
-    let onSave: (String, TaskPriority, Int) -> Void
+    let onSave: (String, TaskPriority, Int, [String], String, String, Date?, String?) -> Void
     let onDelete: () -> Void
 
     @State private var showEditSheet = false
     @Environment(\.dismiss) private var dismiss
 
     private var priorityText: String {
-        switch task.priorityValue {
+        switch task.importance {
         case 1: return "Niedrig"
         case 2: return "Mittel"
         case 3: return "Hoch"
@@ -18,7 +18,7 @@ struct TaskDetailSheet: View {
     }
 
     private var priorityColor: Color {
-        switch task.priorityValue {
+        switch task.importance {
         case 1: return .blue
         case 2: return .yellow
         case 3: return .red
@@ -97,8 +97,8 @@ struct TaskDetailSheet: View {
             .sheet(isPresented: $showEditSheet) {
                 EditTaskSheet(
                     task: task,
-                    onSave: { title, priority, duration in
-                        onSave(title, priority, duration)
+                    onSave: { title, priority, duration, tags, urgency, taskType, dueDate, description in
+                        onSave(title, priority, duration, tags, urgency, taskType, dueDate, description)
                         dismiss()
                     },
                     onDelete: {
