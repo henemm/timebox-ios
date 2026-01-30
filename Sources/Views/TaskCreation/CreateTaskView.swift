@@ -10,7 +10,7 @@ struct CreateTaskView: View {
     @State private var newTag: String = ""
     @State private var hasDueDate = false
     @State private var dueDate = Date()
-    @State private var priority = 1  // Default: Low
+    @State private var priority: Int? = nil  // Bug 15: Default to TBD (nil)
     @State private var isSaving = false
 
     // MARK: - Refactored Task Fields
@@ -47,10 +47,11 @@ struct CreateTaskView: View {
                     Text("Dauer")
                 }
 
-                // MARK: - Priority (3 Levels)
+                // MARK: - Priority (3 Levels + TBD)
 
                 Section {
-                    HStack(spacing: 12) {
+                    HStack(spacing: 8) {
+                        QuickPriorityButton(priority: nil, selectedPriority: $priority)
                         QuickPriorityButton(priority: 1, selectedPriority: $priority)
                         QuickPriorityButton(priority: 2, selectedPriority: $priority)
                         QuickPriorityButton(priority: 3, selectedPriority: $priority)
@@ -316,21 +317,39 @@ struct QuickDurationButton: View {
     }
 }
 
-/// Quick priority selection button
+/// Quick priority selection button with SF Symbols (Bug 16 fix)
 struct QuickPriorityButton: View {
-    let priority: Int
-    @Binding var selectedPriority: Int
+    let priority: Int?
+    @Binding var selectedPriority: Int?
 
     private var isSelected: Bool {
         selectedPriority == priority
     }
 
-    var displayName: String {
+    private var sfSymbol: String {
         switch priority {
-        case 1: return "🟦 Niedrig"
-        case 2: return "🟨 Mittel"
-        case 3: return "🔴 Hoch"
-        default: return ""
+        case 1: return "exclamationmark"
+        case 2: return "exclamationmark.2"
+        case 3: return "exclamationmark.3"
+        default: return "questionmark"
+        }
+    }
+
+    private var symbolColor: Color {
+        switch priority {
+        case 1: return .blue
+        case 2: return .yellow
+        case 3: return .red
+        default: return .gray
+        }
+    }
+
+    private var displayName: String {
+        switch priority {
+        case 1: return "Niedrig"
+        case 2: return "Mittel"
+        case 3: return "Hoch"
+        default: return "TBD"
         }
     }
 
@@ -338,17 +357,23 @@ struct QuickPriorityButton: View {
         Button {
             selectedPriority = priority
         } label: {
-            Text(displayName)
-                .font(.headline)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 12)
-                .background(
-                    RoundedRectangle(cornerRadius: 12)
-                        .fill(isSelected ? Color.accentColor : Color(.secondarySystemFill))
-                )
-                .foregroundStyle(isSelected ? .white : .primary)
+            HStack(spacing: 6) {
+                Image(systemName: sfSymbol)
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(isSelected ? .white : symbolColor)
+                Text(displayName)
+                    .font(.subheadline.weight(.medium))
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 10)
+            .background(
+                RoundedRectangle(cornerRadius: 10)
+                    .fill(isSelected ? symbolColor : Color(.secondarySystemFill))
+            )
+            .foregroundStyle(isSelected ? .white : .primary)
         }
         .buttonStyle(.plain)
+        .accessibilityIdentifier("importance_\(priority ?? 0)")
     }
 }
 

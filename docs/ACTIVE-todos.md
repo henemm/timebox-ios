@@ -387,16 +387,17 @@
 - Status: **OFFEN**
 
 **Bug 15: Neue Task-Erstellung nutzt Default-Werte**
-- Location: `TaskFormSheet.swift` oder `QuickCaptureView.swift`
-- Problem: Neue Tasks werden mit Default-Importance/Urgency erstellt statt nil (TBD)
-- Expected: Neue Tasks sollten TBD sein (alle Werte nil)
-- Status: **OFFEN**
+- Location: `TaskFormSheet.swift`, `CreateTaskView.swift`
+- Problem: Neue Tasks wurden mit Default-Importance erstellt statt nil (TBD)
+- Fix (2026-01-30): `priority: Int? = nil` als Default, TBD-Button hinzugefügt
+- UI Tests: `TaskFormTbdUITests.swift` (4 Tests bestanden)
+- Status: ✅ **ERLEDIGT**
 
 **Bug 16: Task-Erstellung nutzt Emoji statt SF Symbols**
-- Location: `TaskFormSheet.swift`
-- Problem: Importance-Auswahl zeigt Emoji (🟦, 🟨, 🔴) statt SF Symbols
-- Fix: Wie BacklogRow SF Symbols verwenden (exclamationmark.1/2/3)
-- Status: **OFFEN**
+- Location: `CreateTaskView.swift` (QuickPriorityButton)
+- Problem: Importance-Auswahl zeigte Emoji (🟦, 🟨, 🔴) statt SF Symbols
+- Fix (2026-01-30): QuickPriorityButton mit SF Symbols (exclamationmark, .2, .3) + Farben
+- Status: ✅ **ERLEDIGT**
 
 **Bug 17: Task-Erstellung Design nicht aktualisiert**
 - Location: `TaskFormSheet.swift`

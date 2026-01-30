@@ -27,8 +27,6 @@
 		60EF444FADDBAC17F14380E0 /* FocusLiveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 710817B02FE720EDA21132FA /* FocusLiveView.swift */; };
 		65B5E7020B61B9C1785BD378 /* SettingsToolbarModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26CD9467C8156E2C66B2DC9C /* SettingsToolbarModifier.swift */; };
 		669DD290B3AF43A2A2F726A1 /* TbdTasksUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76E1CD1DD36A7476E82D9003 /* TbdTasksUITests.swift */; };
-		TBDITAL01BUILD0001 /* TbdItalicUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = TBDITAL01FILE00001 /* TbdItalicUITests.swift */; };
-		SKIPLOOP01BUILD001 /* SkipTaskLoopUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = SKIPLOOP01FILE0001 /* SkipTaskLoopUITests.swift */; };
 		6B6843B1FA16372D73DF9402 /* LocalTaskTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01F676CC7EA20C97ACDD9D18 /* LocalTaskTests.swift */; };
 		6C17452E66E837CD8225506C /* DebugLogReaderTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCFB47E31C1D91935DCB9374 /* DebugLogReaderTest.swift */; };
 		6E8284A6F06C79DBE93A383E /* TaskMetadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42790F5402B3E1F632874F5A /* TaskMetadata.swift */; };
@@ -40,6 +38,7 @@
 		88FB3AEEAE86741E5EA6AC42 /* FocusBloxApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 407BE145C7716D6B1A1BB67F /* FocusBloxApp.swift */; };
 		94EC1D85A0F4B53160332751 /* PlanItemTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32E6EA75FACA340867827895 /* PlanItemTests.swift */; };
 		968A3087301F055E331E560C /* EventKitRepositoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DC26C4D8FDC4B811001FD2C /* EventKitRepositoryTests.swift */; };
+		96DD4A471C3F159FE2C19462 /* TaskFormTbdUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFD460F955B924EB6F6C5B94 /* TaskFormTbdUITests.swift */; };
 		991544877FDF4CD72B4F2DE4 /* SprintReviewSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = B31CB18EF0C80E62953F34D6 /* SprintReviewSheet.swift */; };
 		9E4DE0DFDA16F42B8D28D6CD /* ManualBlockCreationUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41F2A36E471937592F06F0C9 /* ManualBlockCreationUITests.swift */; };
 		9F9185F5A9BD5A8CFF79DECA /* ErrorStateUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B596C16F99039490702E0B7 /* ErrorStateUITests.swift */; };
@@ -128,6 +127,7 @@
 		REVCATUI01BUILD0001 /* ReviewCategoryUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = REVCATUI01FILE0001 /* ReviewCategoryUITests.swift */; };
 		SCROLL001BUILDFILE0001 /* ScrollingUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = SCROLL001FILEREF00001 /* ScrollingUITests.swift */; };
 		SGAP001F48BE79B9EB7C818 /* SmartGapsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = SGAP002545C0FA15517B9CE4 /* SmartGapsUITests.swift */; };
+		SKIPLOOP01BUILD001 /* SkipTaskLoopUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = SKIPLOOP01FILE0001 /* SkipTaskLoopUITests.swift */; };
 		SMARTGAPS001BUILDFILE00001 /* SmartGapsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = SMARTGAPS001FILEREF000001 /* SmartGapsTests.swift */; };
 		SNDSVC01BUILDFILE0001 /* SoundServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = SNDSVC01FILEREF00001 /* SoundServiceTests.swift */; };
 		SNDSVC02BUILDFILE0001 /* SoundService.swift in Sources */ = {isa = PBXBuildFile; fileRef = SNDSVC02FILEREF00001 /* SoundService.swift */; };
@@ -135,6 +135,7 @@
 		SPRNTRV01BUILD0001 /* SprintReviewUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = SPRNTRV01FILE00001 /* SprintReviewUITests.swift */; };
 		TASKFORM01BUILD0001 /* TaskFormSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = TASKFORM01FILEREF01 /* TaskFormSheet.swift */; };
 		TAUX001BUILDFILE00001 /* TaskAssignmentUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = TAUX001FILEREF000001 /* TaskAssignmentUITests.swift */; };
+		TBDITAL01BUILD0001 /* TbdItalicUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = TBDITAL01FILE00001 /* TbdItalicUITests.swift */; };
 		TSKDTL01BUILDFILE0001 /* TaskDetailSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = TSKDTL01FILEREF00001 /* TaskDetailSheet.swift */; };
 		TSKDTUI1BUILDFILE001 /* TaskDetailUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = TSKDTUI1FILEREF0001 /* TaskDetailUITests.swift */; };
 		WARN001BUILDFILE00001 /* WarningTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = WARN001FILEREF000001 /* WarningTests.swift */; };
@@ -274,8 +275,6 @@
 		71582A64B51A62129A2409B7 /* DebugLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugLogger.swift; sourceTree = "<group>"; };
 		76296762878DC5D17EA4E12A /* TaskSourceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskSourceTests.swift; sourceTree = "<group>"; };
 		76E1CD1DD36A7476E82D9003 /* TbdTasksUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TbdTasksUITests.swift; sourceTree = "<group>"; };
-		TBDITAL01FILE00001 /* TbdItalicUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TbdItalicUITests.swift; sourceTree = "<group>"; };
-		SKIPLOOP01FILE0001 /* SkipTaskLoopUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkipTaskLoopUITests.swift; sourceTree = "<group>"; };
 		7D81A830A7874C023E289830 /* NextUpTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NextUpTests.swift; sourceTree = "<group>"; };
 		821E6E3E951900DF99190196 /* HourRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HourRow.swift; sourceTree = "<group>"; };
 		8537E6312F33871F310A843F /* PlanningView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanningView.swift; sourceTree = "<group>"; };
@@ -315,6 +314,7 @@
 		D7ED51F72D6039EFAC3D85A3 /* SchedulingUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchedulingUITests.swift; sourceTree = "<group>"; };
 		DAILYR01FILEREF00001 /* DailyReviewUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyReviewUITests.swift; sourceTree = "<group>"; };
 		DF402517A33C6BA497EFE1AC /* DurationEditingUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DurationEditingUITests.swift; sourceTree = "<group>"; };
+		DFD460F955B924EB6F6C5B94 /* TaskFormTbdUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = TaskFormTbdUITests.swift; path = TaskFormTbdUITests.swift; sourceTree = "<group>"; };
 		DSGNSYS01FILE00001 /* DesignSystemTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignSystemTests.swift; sourceTree = "<group>"; };
 		DSGNSYS02FILE00001 /* DesignSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignSystem.swift; sourceTree = "<group>"; };
 		DYNISLD01FILE00001 /* DynamicIslandUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DynamicIslandUITests.swift; sourceTree = "<group>"; };
@@ -359,6 +359,7 @@
 		REVCATUI01FILE0001 /* ReviewCategoryUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewCategoryUITests.swift; sourceTree = "<group>"; };
 		SCROLL001FILEREF00001 /* ScrollingUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollingUITests.swift; sourceTree = "<group>"; };
 		SGAP002545C0FA15517B9CE4 /* SmartGapsUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartGapsUITests.swift; sourceTree = "<group>"; };
+		SKIPLOOP01FILE0001 /* SkipTaskLoopUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkipTaskLoopUITests.swift; sourceTree = "<group>"; };
 		SMARTGAPS001FILEREF000001 /* SmartGapsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartGapsTests.swift; sourceTree = "<group>"; };
 		SNDSVC01FILEREF00001 /* SoundServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundServiceTests.swift; sourceTree = "<group>"; };
 		SNDSVC02FILEREF00001 /* SoundService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundService.swift; sourceTree = "<group>"; };
@@ -366,6 +367,7 @@
 		SPRNTRV01FILE00001 /* SprintReviewUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SprintReviewUITests.swift; sourceTree = "<group>"; };
 		TASKFORM01FILEREF01 /* TaskFormSheet.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TaskFormSheet.swift; sourceTree = "<group>"; };
 		TAUX001FILEREF000001 /* TaskAssignmentUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskAssignmentUITests.swift; sourceTree = "<group>"; };
+		TBDITAL01FILE00001 /* TbdItalicUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TbdItalicUITests.swift; sourceTree = "<group>"; };
 		TSKDTL01FILEREF00001 /* TaskDetailSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskDetailSheet.swift; sourceTree = "<group>"; };
 		TSKDTUI1FILEREF0001 /* TaskDetailUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskDetailUITests.swift; sourceTree = "<group>"; };
 		WARN001FILEREF000001 /* WarningTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WarningTests.swift; sourceTree = "<group>"; };
@@ -518,6 +520,7 @@
 				QKEDIT01FILE00001 /* QuickEditBacklogUITests.swift */,
 				54C8A326C1D84FA7A3BD27A8 /* BacklogRowRedesignUITests.swift */,
 				10F0B986805B8F703DB62935 /* DebugHierarchyTest.swift */,
+				DFD460F955B924EB6F6C5B94 /* TaskFormTbdUITests.swift */,
 			);
 			path = FocusBloxUITests;
 			sourceTree = "<group>";
@@ -1065,6 +1068,7 @@
 				QKEDIT01BUILD0001 /* QuickEditBacklogUITests.swift in Sources */,
 				03A94D15FBA2530D8C629546 /* BacklogRowRedesignUITests.swift in Sources */,
 				5696B45863B3DACF0773DF6C /* DebugHierarchyTest.swift in Sources */,
+				96DD4A471C3F159FE2C19462 /* TaskFormTbdUITests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

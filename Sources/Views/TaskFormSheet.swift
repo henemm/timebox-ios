@@ -29,7 +29,7 @@ struct TaskFormSheet: View {
     // MARK: - State
 
     @State private var title = ""
-    @State private var priority = 2  // Default: Medium
+    @State private var priority: Int? = nil  // Bug 15: Default to TBD (nil)
     @State private var duration: Int = 15
     @State private var tags: [String] = []
     @State private var newTag: String = ""
@@ -61,7 +61,7 @@ struct TaskFormSheet: View {
 
         // Initialize state from task
         _title = State(initialValue: task.title)
-        _priority = State(initialValue: task.importance ?? 2)
+        _priority = State(initialValue: task.importance)  // Keep nil if task is TBD
         _duration = State(initialValue: task.effectiveDuration)
         _tags = State(initialValue: task.tags)
         _urgency = State(initialValue: task.urgency ?? "not_urgent")
@@ -73,17 +73,13 @@ struct TaskFormSheet: View {
 
     // MARK: - Task Type Options
 
+    // 5 Lebensarbeit-Kategorien (Bug 12 fix)
     private let taskTypeOptions = [
         ("income", "Geld verdienen", "dollarsign.circle"),
         ("maintenance", "Schneeschaufeln", "wrench.and.screwdriver"),
         ("recharge", "Energie aufladen", "battery.100"),
         ("learning", "Lernen", "book"),
-        ("giving_back", "Weitergeben", "gift"),
-        ("deep_work", "Deep Work", "brain"),
-        ("shallow_work", "Shallow Work", "tray"),
-        ("meetings", "Meetings", "person.2"),
-        ("creative", "Kreativ", "paintbrush"),
-        ("strategic", "Strategisch", "map")
+        ("giving_back", "Weitergeben", "gift")
     ]
 
     // MARK: - Body
@@ -94,6 +90,7 @@ struct TaskFormSheet: View {
                 // MARK: - Title
                 Section {
                     TextField("Task-Titel", text: $title)
+                        .accessibilityIdentifier("taskTitle")
                 }
 
                 // MARK: - Duration (Quick Select)
@@ -108,9 +105,10 @@ struct TaskFormSheet: View {
                     Text("Dauer")
                 }
 
-                // MARK: - Importance (3 Levels)
+                // MARK: - Importance (3 Levels + TBD)
                 Section {
-                    HStack(spacing: 12) {
+                    HStack(spacing: 8) {
+                        QuickPriorityButton(priority: nil, selectedPriority: $priority)
                         QuickPriorityButton(priority: 1, selectedPriority: $priority)
                         QuickPriorityButton(priority: 2, selectedPriority: $priority)
                         QuickPriorityButton(priority: 3, selectedPriority: $priority)
@@ -251,7 +249,7 @@ struct TaskFormSheet: View {
 
         let finalDueDate: Date? = hasDueDate ? dueDate : nil
         let finalDescription: String? = taskDescription.isEmpty ? nil : taskDescription
-        let taskPriority = TaskPriority(rawValue: priority) ?? .medium
+        let taskPriority: TaskPriority = priority.flatMap { TaskPriority(rawValue: $0) } ?? .medium
 
         switch mode {
         case .create:
