@@ -18,6 +18,112 @@
 
 ---
 
+## 🔴 OFFEN - Neue Bugs/Features
+
+### Bug 17: BacklogRow - Touchbare Elemente nicht als Chips (Spec-Abweichung)
+**Status:** OFFEN
+**Gemeldet:** 2026-01-29
+**Location:** `BacklogRow.swift`
+**Spec:** `docs/specs/features/backlog-row-redesign.md`
+
+**Problem:**
+- Spec definiert Badges in Metadaten-Zeile für: Wichtigkeit, Dringlichkeit, Kategorie, Tags, Duration, Due
+- "Dauer" ist als Chip mit klarer Touch-Zone implementiert
+- Andere touchbare Elemente (Wichtigkeit, Dringlichkeit, Kategorie) sind NICHT als Chips
+- Inkonsistentes UI, Touch-Zonen unklar
+
+**Expected (gemäß Spec):**
+- Alle touchbaren Badges einheitlich als Chips
+- Klare visuelle Affordance für Touch-Interaktion
+
+**Priorität:** MITTEL
+
+---
+
+### Bug 16: Focus Tab - Weitere Tasks nicht sichtbar / kein "keine weiteren Tasks" Hinweis
+**Status:** OFFEN
+**Gemeldet:** 2026-01-29
+**Location:** `FocusLiveView.swift`
+
+**Problem:**
+- Während Focus Modus: Weitere Tasks im Block nicht sichtbar
+- Oder: Kein Hinweis wenn keine weiteren Tasks vorhanden sind
+
+**Expected:**
+- Liste der kommenden Tasks sichtbar (z.B. "Nächste: Task A, Task B")
+- Oder: "Keine weiteren Tasks" Hinweis wenn Block leer/fertig
+
+**Priorität:** MITTEL
+
+---
+
+### Bug 15: Focus Tab - "Überspringen" startet gleichen Task erneut
+**Status:** ✅ ERLEDIGT (2026-01-30)
+**Gemeldet:** 2026-01-29
+**Location:** `FocusLiveView.swift` - `skipTask()` Funktion
+
+**Problem:**
+- Focus Blox mit nur 1 verbleibendem Task
+- "Überspringen" tappen → gleicher Task startet erneut (Endlosschleife)
+
+**Root Cause:**
+- `skipTask()` verschiebt Task ans Array-Ende
+- Bei nur 1 verbleibendem Task: Array bleibt identisch → Loop
+
+**Fix (2026-01-30):**
+- Prüfung auf `remainingTaskIDs.count == 1`
+- Wenn letzter Task: Als "completed" markieren statt verschieben
+- → "Alle Tasks erledigt!" erscheint korrekt
+
+**UI Tests:** `SkipTaskLoopUITests.swift` (2 Tests bestanden)
+
+**Priorität:** HOCH (Core Feature - GEFIXT)
+
+---
+
+### Bug 14: Assign Tab - Next Up nicht sichtbar bei mehreren Blox
+**Status:** OFFEN
+**Gemeldet:** 2026-01-29
+**Location:** `TaskAssignmentView.swift`
+**Screenshot:** Downloads/Bildschirmfoto 2026-01-29 um 23.03.21.png
+
+**Problem:**
+- Bei mehreren Focus Blox füllen die Karten den ganzen Screen
+- "Next Up" Section ist kaum/nicht sichtbar (abgeschnitten)
+- Screen ist nicht scrollbar
+
+**Expected:**
+- Gesamter Screen scrollbar ODER
+- Focus Blox Karten sind expandierbar/collapsible (besser)
+
+**Zusätzlich:** "Focus Block" → "Focus Blox" umbenennen (Branding)
+
+**Priorität:** HOCH
+
+---
+
+### Bug 13: Blox Tab zeigt keine Block-Details
+**Status:** ✅ ERLEDIGT (2026-01-29)
+**Gemeldet:** 2026-01-29
+**Location:** `BlockPlanningView.swift` - `existingBlocksSection`
+
+**Problem:**
+- "Today's Blox" zeigt nur Header + Zähler (z.B. "3")
+- Die einzelnen Focus Blocks werden NICHT angezeigt
+
+**Root Cause:**
+- `List` innerhalb eines `ScrollView` funktioniert nicht in SwiftUI - die List-Items werden nicht gerendert
+
+**Fix:**
+- `List` → `LazyVStack(spacing: 8)` ersetzt
+- `swipeActions` → `contextMenu` ersetzt (LazyVStack unterstützt keine Swipe Actions)
+
+**Verifikation:** Visuell auf Device bestätigen
+
+**Priorität:** HOCH (Core Feature kaputt)
+
+---
+
 ## Themengruppe A: Next Up Layout (Horizontal → Vertikal)
 
 > **3 Stellen mit gleichem Bug:** ScrollView horizontal statt VStack vertikal
@@ -62,17 +168,21 @@
 
 ## Themengruppe C: Drag & Drop Sortierung
 
-> **Voraussetzung:** Datenmodell-Erweiterung (`nextUpSortOrder` Property)
+> **Voraussetzung:** ✅ Datenmodell-Erweiterung (`nextUpSortOrder` Property) - ERLEDIGT (2026-01-26)
 
-**Task 1: Drag & Drop in Next Up Section**
+**Task 1: Drag & Drop in Next Up Section** ✅
 - User soll Tasks in Next Up per Drag & Drop sortieren
-- Status: BLOCKIERT (benoetigt Datenmodell)
+- Datenmodell: `LocalTask.nextUpSortOrder: Int?` + `PlanItem.nextUpSortOrder`
+- SyncEngine: `updateNextUpSortOrder(for:)` Methode hinzugefuegt
+- UI: `NextUpSection` mit `.draggable()` + `.dropDestination()` erweitert
+- Drag Handle Icon hinzugefuegt, visuelles Feedback bei Drag
+- Status: **ERLEDIGT** (2026-01-26)
 
-**Task 2: Task-Sortierung in Focus Block**
+**Task 2: Task-Sortierung in Focus Block** ✅
 - User soll Tasks innerhalb eines Focus Blocks sortieren
 - `taskIDs` Array existiert bereits → Reihenfolge = Array-Index
-- Scope: ~50 LoC
-- Status: OFFEN
+- Implementation: `FocusBlockCard` nutzt `List` + `.onMove` + `.editMode(.active)`
+- Status: **BEREITS IMPLEMENTIERT** (Code existiert in TaskAssignmentView.swift)
 
 ---
 
@@ -106,20 +216,22 @@
 - Tests: 10 UI Tests bestanden
 - Status: ERLEDIGT
 
-**Task 8 (Home Screen Widget)**
-- Neues `StaticConfiguration` Widget
-- Tap → App mit QuickCaptureView
-- Scope: Mittel (~100 LoC)
+**Task 8 (Home Screen Widget)** ✅ ERLEDIGT (2026-01-26)
+- Neues `StaticConfiguration` Widget erstellt
+- Tap → App mit QuickCaptureView via `focusblox://create-task`
+- Unterstützte Größen: systemSmall, systemMedium
+- Neue Datei: `FocusBloxWidgets/QuickCaptureWidget.swift`
 
 **Task 9 (Control Center Inline)**
 - Voraussetzung: Task 7 gefixt
 - iOS 18+ interaktives Control mit Textfeld
 - Scope: Gross + Research
 
-**Task 10 (Siri Shortcut)**
-- Intent erstellt aktuell keinen Task (nur Logging)
-- Benoetigt: App Group fuer shared ModelContainer
-- Scope: Mittel (~80 LoC)
+**Task 10 (Siri Shortcut)** ✅ ERLEDIGT (2026-01-26)
+- Intent oeffnet jetzt App + zeigt QuickCaptureView
+- `openAppWhenRun = true` + NotificationCenter (wie Control Center Widget)
+- Siri Phrases: "Erstelle einen Task in FocusBlox", "Neuer Task in FocusBlox"
+- Geaenderte Datei: `FocusBloxCore/QuickAddTaskIntent.swift`
 
 ---
 
@@ -135,19 +247,25 @@
   3. ZStack mit Circle-Background für konsistentes Icon-Styling
   4. Proper padding (.leading, .trailing, .vertical)
 - Location: `FocusBloxWidgets/FocusBlockLiveActivity.swift`
-- Status: **ERLEDIGT** (2026-01-26) - Manueller Test auf Device empfohlen
+- Status: **ERLEDIGT** (2026-01-26) - Visuell im Simulator verifiziert ✅
 
-**Task 4: Live Activity zeigt Task-Restzeit statt Block-Restzeit**
+**Task 4: Live Activity zeigt Task-Restzeit statt Block-Restzeit** ✅
 - Aktuell: Countdown fuer gesamten Block
 - Expected: Countdown fuer aktuellen Task
-- Scope: Mittel
-- Status: OFFEN
+- Implementation (2026-01-26):
+  - `FocusBlockActivityAttributes.ContentState.taskEndDate: Date?` hinzugefuegt
+  - `LiveActivityManager` berechnet und uebergibt taskEndDate
+  - `FocusBlockLiveActivity` nutzt taskEndDate wenn verfuegbar (Fallback: Block-Ende)
+  - Timer zeigt jetzt Restzeit fuer aktuellen Task
+- Betroffene Dateien: FocusBloxCore/FocusBlockActivityAttributes.swift, LiveActivityManager.swift, FocusLiveView.swift, FocusBlockLiveActivity.swift
+- Status: **ERLEDIGT**
 
-**Task 3: Push-Notification bei Focus Block Start**
-- X Minuten vor Start oder bei Start
-- `UNUserNotificationCenter` fuer lokale Notifications
-- Scope: Mittel (~100 LoC)
-- Status: OFFEN
+**Task 3: Push-Notification bei Focus Block Start** ✅ ERLEDIGT (2026-01-27)
+- Notification 5 Min vor Block-Start (oder bei Start wenn < 5 Min)
+- `NotificationService.scheduleFocusBlockStartNotification()` + `cancelFocusBlockNotification()`
+- Integration: BlockPlanningView (Erstellung, Aenderung, Loeschung)
+- Testbar via `buildFocusBlockNotificationRequest()` (5 Unit Tests)
+- Status: **ERLEDIGT**
 
 **Task 11: Task-Timer Ablauf - Overdue Handling** ✅ ERLEDIGT (2026-01-25)
 - Implementiert:
@@ -185,36 +303,37 @@
 
 ## Einzelne Bugs
 
-**Bug 12: Kategorie-System inkonsistent** 🔧
+**Bug 12: Kategorie-System inkonsistent** ✅
 - Location: `TaskFormSheet.swift:76-87`, `EditTaskSheet.swift:25-36`, `BacklogView.swift:83-89`, `TaskDetailSheet.swift:42-56`
 - Problem: UI zeigt 10 Kategorien, Spec definiert 5+1, BacklogView Gruppierung nutzt nur 6 Work-Types
 - Root Cause: Zwei Konzepte vermischt (Lebensarbeit vs Work-Type)
 - Entscheidung: **Option A - Spec folgen** (nur 5+1 Lebensarbeit-Kategorien)
-- Fix:
-  1. `TaskFormSheet.swift` - taskTypeOptions auf 5 reduzieren
-  2. `EditTaskSheet.swift` - taskTypeOptions auf 5 reduzieren + Icons hinzufuegen
-  3. `BacklogView.swift` - categories Array und Lokalisierung anpassen
-  4. `TaskDetailSheet.swift` - categoryText anpassen
+- Fix (2026-01-26):
+  1. `TaskFormSheet.swift` - taskTypeOptions auf 5 reduziert
+  2. `EditTaskSheet.swift` - taskTypeOptions auf 5 reduziert + Icons hinzugefuegt
+  3. `BacklogView.swift` - categories Array und Lokalisierung angepasst
+  4. `TaskDetailSheet.swift` - categoryText angepasst
 - Scope: 4 Dateien, ~-50 LoC
-- Status: OFFEN
+- Status: **ERLEDIGT**
 
-**Bug 11: Pull-to-Refresh bewegt nicht den kompletten Inhalt (nur Backlog)**
-- Location: `BacklogView.swift:168-192`
-- Problem: NextUpSection und ggf. Section-Header bleiben beim Pull-to-Refresh stehen, nur der Listen-Inhalt bewegt sich
-- Expected: Beim Pull-to-Refresh soll sich der KOMPLETTE Fensterinhalt nach unten bewegen (normales iOS-Verhalten)
-- Root Cause: Die `NextUpSection` ist in einem aeusseren `VStack` platziert (Zeile 168), waehrend die scrollenden Container (`List`, `ScrollView`) nur den restlichen Inhalt enthalten. Die `NextUpSection` gehoert nicht zum scrollenden Container.
-- Zusaetzliches Problem: Doppelte `.refreshable` Modifier (Zeile 246-248 auf Group + nochmal auf jedem View-Mode)
-- Fix-Ansatz: Den gesamten Inhalt (NextUpSection + Content) in EINEN scrollenden Container packen, z.B. als Sections einer `List` oder als Content in einer gemeinsamen `ScrollView`
-- Test: Pull-to-Refresh im Backlog-Tab ausfuehren → Gesamter Inhalt inkl. blauer Next-Up-Box muss sich nach unten bewegen
-- Scope: Mittel (~50-80 LoC) - Umstrukturierung der View-Hierarchie
-- Status: OFFEN
+**Bug 11: Pull-to-Refresh bewegt nicht den kompletten Inhalt (nur Backlog)** ✅
+- Location: `BacklogView.swift` (alle View-Modes)
+- Problem: NextUpSection war ausserhalb des scrollbaren Containers
+- Fix (2026-01-26):
+  1. `NextUpSection` aus aeusserem VStack entfernt
+  2. `NextUpSection` IN jeden View-Mode verschoben (List-Section bzw. ScrollView-Content)
+  3. Redundanten `.refreshable` Modifier entfernt
+- Betroffene Views: listView, eisenhowerMatrixView, categoryView, durationView, dueDateView, tbdView
+- UI Tests: PullToRefreshUITests.swift erstellt
+- Status: **ERLEDIGT**
 
-**Bug 7: Scrolling innerhalb Focus Block nicht moeglich**
-- Location: `TaskAssignmentView.swift:313-331`
+**Bug 7: Scrolling innerhalb Focus Block nicht moeglich** ✅
+- Location: `TaskAssignmentView.swift:316-333`
 - Problem: `.scrollDisabled(true)` bei 6+ Tasks
-- Fix: Feste `.frame(maxHeight: 250)` mit `.scrollDisabled(false)`
-- Scope: Mittel
-- Status: OFFEN
+- Fix: `.scrollDisabled(true)` wurde entfernt, Code verwendet jetzt `maxHeight: 264`
+- Analyse (2026-01-26): Der Bug scheint bereits gefixt - `.scrollDisabled(true)` existiert nicht mehr im Code
+- ScrollingUITests bestehen (Tests mit 7+ Tasks werden wegen fehlender Mock-Daten uebersprungen)
+- Status: WAHRSCHEINLICH ERLEDIGT - Verifikation auf Device empfohlen
 
 **Bug 9: Bloecke-Tab zeigt vergangene Zeitslots** ✅
 - Location: `BlockPlanningView.swift` (GapFinder)
@@ -237,11 +356,82 @@
 
 ---
 
+## Themengruppe G: BacklogRow Redesign (29.01.2026)
+
+> **Glass Card Layout mit neuen Badges und Inline-Edit**
+
+### Erledigte Fixes
+
+| Fix | Beschreibung | Status |
+|-----|--------------|--------|
+| Dividers entfernen | List → ScrollView+LazyVStack für alle Views | ✅ ERLEDIGT |
+| TBD Italic | @ViewBuilder für korrekte Italic-Darstellung | ✅ ERLEDIGT |
+| Duration Badge Farben | Grau = nicht gesetzt, Blau = manuell gesetzt | ✅ ERLEDIGT |
+| Importance Badge | Immer sichtbar, grauer "?" wenn nil | ✅ ERLEDIGT |
+| Navigation Header | Pull-to-Refresh zieht Header nicht mehr mit | ✅ ERLEDIGT |
+| Tags ohne Chips | Plain Text mit # statt Chip-Design | ✅ ERLEDIGT |
+| Kategorie lesbar | `.primary` statt `.secondary` Farbe | ✅ ERLEDIGT |
+
+### Offene Bugs
+
+**Bug 13: Kategorie-Badge ohne Chip-Hintergrund**
+- Location: `BacklogRow.swift:221-237`
+- Problem: Kategorie-Badge hat keinen Chip-Hintergrund wie andere Badges
+- Fix: `.background(RoundedRectangle.fill(.ultraThinMaterial))` hinzufügen
+- Status: **OFFEN**
+
+**Bug 14: Focus Block Zeiteinstellung zeigt "25 Std" statt Minuten**
+- Location: Vermutlich `BlockPlanningView.swift` oder `FocusBlockCard.swift`
+- Problem: Dauer-Anzeige zeigt "25 Std" statt "25 min"
+- Root Cause: Formatierung oder falsche Zeiteinheit
+- Status: **OFFEN**
+
+**Bug 15: Neue Task-Erstellung nutzt Default-Werte**
+- Location: `TaskFormSheet.swift` oder `QuickCaptureView.swift`
+- Problem: Neue Tasks werden mit Default-Importance/Urgency erstellt statt nil (TBD)
+- Expected: Neue Tasks sollten TBD sein (alle Werte nil)
+- Status: **OFFEN**
+
+**Bug 16: Task-Erstellung nutzt Emoji statt SF Symbols**
+- Location: `TaskFormSheet.swift`
+- Problem: Importance-Auswahl zeigt Emoji (🟦, 🟨, 🔴) statt SF Symbols
+- Fix: Wie BacklogRow SF Symbols verwenden (exclamationmark.1/2/3)
+- Status: **OFFEN**
+
+**Bug 17: Task-Erstellung Design nicht aktualisiert**
+- Location: `TaskFormSheet.swift`
+- Problem: Neues Glass Card Design nicht übernommen
+- Scope: TaskFormSheet komplett redesignen wie BacklogRow
+- Status: **OFFEN**
+
+### UI Test Failures (29.01.2026)
+
+| Test | Fehler | Status |
+|------|--------|--------|
+| `testActionsMenuOpens()` | Menu öffnet nicht oder Optionen nicht gefunden | ⚠️ UNTERSUCHEN |
+| `testBacklogRowShowsTasks()` | 0.000 sec - Crash oder Setup-Problem | ⚠️ UNTERSUCHEN |
+
+### Neue Features
+
+**Feature: Focus Blocks bearbeiten**
+- Location: `BlockPlanningView.swift`
+- Problem: Erstellte Focus Blocks können nicht bearbeitet werden
+- Expected: Tap auf Block → Edit Sheet
+- Status: **OFFEN** (Feature Request)
+
+**Feature: Shake to Undo → Zurück zu Backlog**
+- Problem: Versehentlich zu Next Up hinzugefügt → Shake soll rückgängig machen
+- Implementation: UIResponder.motionEnded + UndoManager
+- Status: **OFFEN** (Feature Request)
+
+---
+
 ## Priorisierung Empfehlung
 
 | Prioritaet | Items |
 |------------|-------|
 | ~~**1. Quick Wins**~~ | ~~Bug 9 (Zeitslots)~~ ✅, ~~Task 7 (Control Center)~~ ✅ |
 | ~~**2. Next Up Fixes**~~ | ~~Gruppe A (Layout)~~ ✅, ~~Gruppe B (State)~~ ✅ |
-| **3. Core UX** | Task 11 (Overdue), Task 12 (Sprint Review) |
-| **4. Nice to Have** | ~~Task 7b (Compact QuickCapture)~~ ✅, Task 8-10 (Widgets/Siri), Gruppe E (Live Activity) |
+| ~~**3. Core UX**~~ | ~~Task 11 (Overdue)~~ ✅, ~~Task 12 (Sprint Review)~~ ✅ |
+| **4. BacklogRow Redesign** | Bug 13-17 (Gruppe G), UI Test Fixes |
+| **5. Nice to Have** | ~~Task 7b (Compact QuickCapture)~~ ✅, Task 8-10 (Widgets/Siri), ~~Gruppe E (Live Activity)~~ ✅ |
