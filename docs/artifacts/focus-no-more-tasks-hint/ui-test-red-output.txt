@@ -1,0 +1,11 @@
+TDD RED - Bug 16: No More Tasks Hint
+
+VISUAL TEST FAILED:
+- Expected: 'Keine weiteren Tasks' hint when no upcoming tasks
+- Actual: Nothing shown when last task is active
+
+Test Case 'NoMoreTasksHintUITests.testNoMoreTasksHintIdentifierExists()' - needs implementation
+  → noMoreTasksHint identifier doesn't exist yet
+
+The current code only shows 'Als Nächstes' when upcomingTasks.isEmpty == false
+When only 1 task remains, no indication is given to the user.

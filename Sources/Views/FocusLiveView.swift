@@ -203,11 +203,30 @@ struct FocusLiveView: View {
 
             Spacer()
 
-            // Upcoming tasks queue
+            // Upcoming tasks queue OR "No more tasks" hint
             if !upcomingTasks.isEmpty {
                 upcomingTasksView(tasks: upcomingTasks)
+            } else if currentTask != nil {
+                // Bug 16 Fix: Show hint when no upcoming tasks
+                noMoreTasksHint
             }
         }
+    }
+
+    // MARK: - No More Tasks Hint (Bug 16)
+
+    private var noMoreTasksHint: some View {
+        HStack(spacing: 8) {
+            Image(systemName: "checkmark.circle")
+                .foregroundStyle(.green)
+            Text("Keine weiteren Tasks")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 10)
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 8))
+        .accessibilityIdentifier("noMoreTasksHint")
     }
 
     // MARK: - Progress Header
