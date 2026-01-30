@@ -34,7 +34,7 @@ struct BlockPlanningView: View {
                     smartGapsContent
                 }
             }
-            .navigationTitle("Blöcke")
+            .navigationTitle("Blox")
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     DatePicker(
@@ -236,7 +236,7 @@ struct BlockPlanningView: View {
             HStack {
                 Image(systemName: "rectangle.split.3x1.fill")
                     .foregroundStyle(.blue)
-                Text("Heutige Blöcke")
+                Text("Today's Blox")
                     .font(.headline)
                 Spacer()
                 Text("\(focusBlocks.count)")
@@ -247,16 +247,14 @@ struct BlockPlanningView: View {
                     .background(Capsule().fill(.blue.opacity(0.15)))
             }
 
-            List {
+            LazyVStack(spacing: 8) {
                 ForEach(focusBlocks) { block in
                     ExistingBlockRow(block: block)
-                        .listRowInsets(EdgeInsets())
-                        .listRowBackground(Color.clear)
                         .contentShape(Rectangle())
                         .onTapGesture {
                             blockToEdit = block
                         }
-                        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                        .contextMenu {
                             Button(role: .destructive) {
                                 deleteBlock(block)
                             } label: {
@@ -265,8 +263,6 @@ struct BlockPlanningView: View {
                         }
                 }
             }
-            .listStyle(.plain)
-            .frame(maxHeight: min(CGFloat(focusBlocks.count * 60), 300))  // Max ~5 blocks visible, then scroll
         }
         .padding()
         .background(
@@ -283,6 +279,7 @@ struct BlockPlanningView: View {
         Task {
             do {
                 try eventKitRepo.deleteFocusBlock(eventID: block.id)
+                NotificationService.cancelFocusBlockNotification(blockID: block.id)
                 await loadData()
             } catch {
                 errorMessage = "Block konnte nicht gelöscht werden."
@@ -294,6 +291,15 @@ struct BlockPlanningView: View {
         Task {
             do {
                 try eventKitRepo.updateFocusBlockTime(eventID: block.id, startDate: startDate, endDate: endDate)
+
+                // Reschedule notification with new start time
+                NotificationService.cancelFocusBlockNotification(blockID: block.id)
+                NotificationService.scheduleFocusBlockStartNotification(
+                    blockID: block.id,
+                    blockTitle: block.title,
+                    startDate: startDate
+                )
+
                 await loadData()
             } catch {
                 errorMessage = "Block konnte nicht aktualisiert werden."
@@ -341,7 +347,17 @@ struct BlockPlanningView: View {
     private func createFocusBlock(startDate: Date, endDate: Date) {
         Task {
             do {
-                _ = try eventKitRepo.createFocusBlock(startDate: startDate, endDate: endDate)
+                let blockID = try eventKitRepo.createFocusBlock(startDate: startDate, endDate: endDate)
+
+                let formatter = DateFormatter()
+                formatter.timeStyle = .short
+                let title = "Focus Block \(formatter.string(from: startDate))"
+                NotificationService.scheduleFocusBlockStartNotification(
+                    blockID: blockID,
+                    blockTitle: title,
+                    startDate: startDate
+                )
+
                 await loadData()
             } catch {
                 errorMessage = "Focus Block konnte nicht erstellt werden."
@@ -919,6 +935,7 @@ struct ExistingBlockRow: View {
             RoundedRectangle(cornerRadius: 8)
                 .fill(.blue.opacity(0.1))
         )
+        .accessibilityIdentifier("existingBlock_\(block.id)")
     }
 }
 
