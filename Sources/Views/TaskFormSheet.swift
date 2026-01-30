@@ -86,141 +86,176 @@ struct TaskFormSheet: View {
 
     var body: some View {
         NavigationStack {
-            Form {
-                // MARK: - Title
-                Section {
-                    TextField("Task-Titel", text: $title)
-                        .accessibilityIdentifier("taskTitle")
-                }
-
-                // MARK: - Duration (Quick Select)
-                Section {
-                    HStack(spacing: 12) {
-                        QuickDurationButton(minutes: 5, selectedMinutes: $duration)
-                        QuickDurationButton(minutes: 15, selectedMinutes: $duration)
-                        QuickDurationButton(minutes: 30, selectedMinutes: $duration)
-                        QuickDurationButton(minutes: 60, selectedMinutes: $duration)
+            ScrollView {
+                VStack(spacing: 16) {
+                    // MARK: - Title
+                    glassCardSection(id: "title") {
+                        TextField("Task-Titel", text: $title)
+                            .font(.title3.weight(.medium))
+                            .accessibilityIdentifier("taskTitle")
                     }
-                } header: {
-                    Text("Dauer")
-                }
 
-                // MARK: - Importance (3 Levels + TBD)
-                Section {
-                    HStack(spacing: 8) {
-                        QuickPriorityButton(priority: nil, selectedPriority: $priority)
-                        QuickPriorityButton(priority: 1, selectedPriority: $priority)
-                        QuickPriorityButton(priority: 2, selectedPriority: $priority)
-                        QuickPriorityButton(priority: 3, selectedPriority: $priority)
-                    }
-                    .accessibilityIdentifier("Wichtigkeit")
-                } header: {
-                    Text("Wichtigkeit")
-                }
-
-                // MARK: - Urgency
-                Section {
-                    Picker("Dringlichkeit", selection: $urgency) {
-                        Text("Nicht dringend").tag("not_urgent")
-                        Text("Dringend").tag("urgent")
-                    }
-                    .pickerStyle(.segmented)
-                    .accessibilityIdentifier("Dringlichkeit")
-                } header: {
-                    Text("Dringlichkeit")
-                } footer: {
-                    Text("Dringend = Deadline oder zeitkritisch")
-                }
-
-                // MARK: - Task Type
-                Section {
-                    Picker("Aufgabentyp", selection: $taskType) {
-                        ForEach(taskTypeOptions, id: \.0) { value, label, icon in
-                            Label(label, systemImage: icon).tag(value)
+                    // MARK: - Duration (Quick Select)
+                    glassCardSection(id: "duration", header: "Dauer") {
+                        HStack(spacing: 8) {
+                            QuickDurationButton(minutes: 5, selectedMinutes: $duration)
+                            QuickDurationButton(minutes: 15, selectedMinutes: $duration)
+                            QuickDurationButton(minutes: 30, selectedMinutes: $duration)
+                            QuickDurationButton(minutes: 60, selectedMinutes: $duration)
                         }
                     }
-                    .accessibilityIdentifier("Typ")
-                } header: {
-                    Text("Typ")
-                }
 
-                // MARK: - Tags
-                Section {
-                    if !tags.isEmpty {
-                        ForEach(tags, id: \.self) { tag in
-                            HStack {
-                                Text(tag)
-                                Spacer()
+                    // MARK: - Importance (3 Levels + TBD)
+                    glassCardSection(id: "importance", header: "Wichtigkeit") {
+                        HStack(spacing: 6) {
+                            QuickPriorityButton(priority: nil, selectedPriority: $priority)
+                            QuickPriorityButton(priority: 1, selectedPriority: $priority)
+                            QuickPriorityButton(priority: 2, selectedPriority: $priority)
+                            QuickPriorityButton(priority: 3, selectedPriority: $priority)
+                        }
+                        .accessibilityIdentifier("Wichtigkeit")
+                    }
+
+                    // MARK: - Urgency
+                    glassCardSection(id: "urgency", header: "Dringlichkeit") {
+                        Picker("Dringlichkeit", selection: $urgency) {
+                            Text("Nicht dringend").tag("not_urgent")
+                            Text("Dringend").tag("urgent")
+                        }
+                        .pickerStyle(.segmented)
+                        .accessibilityIdentifier("Dringlichkeit")
+
+                        Text("Dringend = Deadline oder zeitkritisch")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+
+                    // MARK: - Task Type
+                    glassCardSection(id: "type", header: "Typ") {
+                        LazyVGrid(columns: [
+                            GridItem(.flexible()),
+                            GridItem(.flexible())
+                        ], spacing: 8) {
+                            ForEach(taskTypeOptions, id: \.0) { value, label, icon in
                                 Button {
-                                    tags.removeAll { $0 == tag }
+                                    taskType = value
                                 } label: {
-                                    Image(systemName: "xmark.circle.fill")
-                                        .foregroundStyle(.secondary)
+                                    HStack(spacing: 6) {
+                                        Image(systemName: icon)
+                                            .font(.system(size: 14))
+                                        Text(label)
+                                            .font(.caption)
+                                            .lineLimit(1)
+                                    }
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 10)
+                                    .background(
+                                        RoundedRectangle(cornerRadius: 10)
+                                            .fill(taskType == value ? Color.accentColor : Color(.secondarySystemFill))
+                                    )
+                                    .foregroundStyle(taskType == value ? .white : .primary)
                                 }
                                 .buttonStyle(.plain)
                             }
                         }
+                        .accessibilityIdentifier("Typ")
                     }
 
-                    HStack {
-                        TextField("Neuer Tag", text: $newTag)
-                            .accessibilityIdentifier("Tags")
-                        Button("Hinzufügen") {
-                            let trimmed = newTag.trimmingCharacters(in: .whitespacesAndNewlines)
-                            if !trimmed.isEmpty && !tags.contains(trimmed) {
-                                tags.append(trimmed)
-                                newTag = ""
+                    // MARK: - Tags
+                    glassCardSection(id: "tags", header: "Tags") {
+                        if !tags.isEmpty {
+                            ScrollView(.horizontal, showsIndicators: false) {
+                                HStack(spacing: 8) {
+                                    ForEach(tags, id: \.self) { tag in
+                                        HStack(spacing: 4) {
+                                            Text("#\(tag)")
+                                                .font(.caption)
+                                            Button {
+                                                tags.removeAll { $0 == tag }
+                                            } label: {
+                                                Image(systemName: "xmark.circle.fill")
+                                                    .font(.caption)
+                                            }
+                                            .buttonStyle(.plain)
+                                        }
+                                        .padding(.horizontal, 10)
+                                        .padding(.vertical, 6)
+                                        .background(
+                                            Capsule().fill(Color(.secondarySystemFill))
+                                        )
+                                    }
+                                }
                             }
                         }
-                        .disabled(newTag.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                    }
-                } header: {
-                    Text("Tags")
-                }
 
-                // MARK: - Due Date
-                Section {
-                    Toggle("Fälligkeitsdatum", isOn: $hasDueDate)
-                        .accessibilityIdentifier("Fälligkeitsdatum")
-                    if hasDueDate {
-                        DatePicker(
-                            "Datum",
-                            selection: $dueDate,
-                            displayedComponents: [.date, .hourAndMinute]
-                        )
-                    }
-                }
-
-                // MARK: - Description
-                Section {
-                    TextEditor(text: $taskDescription)
-                        .frame(minHeight: 80)
-                        .accessibilityIdentifier("Beschreibung")
-                        .overlay(alignment: .topLeading) {
-                            if taskDescription.isEmpty {
-                                Text("Notizen zur Aufgabe...")
-                                    .foregroundStyle(.secondary)
-                                    .padding(.top, 8)
-                                    .padding(.leading, 5)
-                                    .allowsHitTesting(false)
+                        HStack {
+                            TextField("Neuer Tag", text: $newTag)
+                                .textFieldStyle(.plain)
+                                .accessibilityIdentifier("Tags")
+                            Button {
+                                let trimmed = newTag.trimmingCharacters(in: .whitespacesAndNewlines)
+                                if !trimmed.isEmpty && !tags.contains(trimmed) {
+                                    tags.append(trimmed)
+                                    newTag = ""
+                                }
+                            } label: {
+                                Image(systemName: "plus.circle.fill")
+                                    .foregroundColor(.accentColor)
                             }
+                            .disabled(newTag.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                         }
-                } header: {
-                    Text("Beschreibung (optional)")
-                }
+                    }
 
-                // MARK: - Delete (Edit mode only)
-                if case .edit = mode, let onDelete {
-                    Section {
+                    // MARK: - Due Date
+                    glassCardSection(id: "dueDate", header: "Fälligkeit") {
+                        Toggle("Fälligkeitsdatum", isOn: $hasDueDate)
+                            .accessibilityIdentifier("Fälligkeitsdatum")
+                        if hasDueDate {
+                            DatePicker(
+                                "Datum",
+                                selection: $dueDate,
+                                displayedComponents: [.date, .hourAndMinute]
+                            )
+                        }
+                    }
+
+                    // MARK: - Description
+                    glassCardSection(id: "description", header: "Beschreibung (optional)") {
+                        TextEditor(text: $taskDescription)
+                            .frame(minHeight: 80)
+                            .scrollContentBackground(.hidden)
+                            .accessibilityIdentifier("Beschreibung")
+                            .overlay(alignment: .topLeading) {
+                                if taskDescription.isEmpty {
+                                    Text("Notizen zur Aufgabe...")
+                                        .foregroundStyle(.secondary)
+                                        .padding(.top, 8)
+                                        .padding(.leading, 5)
+                                        .allowsHitTesting(false)
+                                }
+                            }
+                    }
+
+                    // MARK: - Delete (Edit mode only)
+                    if case .edit = mode, let onDelete {
                         Button(role: .destructive) {
                             onDelete()
                             dismiss()
                         } label: {
                             Label("Task löschen", systemImage: "trash")
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 12)
                         }
+                        .background(
+                            RoundedRectangle(cornerRadius: 16)
+                                .fill(Color.red.opacity(0.1))
+                        )
                     }
                 }
+                .padding()
             }
+            .accessibilityIdentifier("taskFormScrollView")
+            .background(Color(.systemGroupedBackground))
             .navigationTitle(mode.title)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -238,6 +273,34 @@ struct TaskFormSheet: View {
             }
         }
         .presentationDetents([.large])
+    }
+
+    // MARK: - Glass Card Section Helper
+
+    @ViewBuilder
+    private func glassCardSection<Content: View>(
+        id: String,
+        header: String? = nil,
+        @ViewBuilder content: () -> Content
+    ) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            if let header {
+                Text(header)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .padding(.leading, 4)
+            }
+            VStack(alignment: .leading, spacing: 12) {
+                content()
+            }
+            .padding(16)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(.ultraThinMaterial)
+            )
+        }
+        .accessibilityIdentifier("taskFormSection_\(id)")
     }
 
     // MARK: - Save

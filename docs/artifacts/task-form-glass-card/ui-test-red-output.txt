@@ -1,0 +1,639 @@
+Command line invocation:
+    /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild test -project FocusBlox.xcodeproj -scheme FocusBlox -destination "platform=iOS Simulator,id=548B4A2F-FDFF-4F9E-8335-1A7A7B98E492" "-only-testing:FocusBloxUITests/TaskFormGlassCardUITests" -parallel-testing-enabled NO
+
+ComputePackagePrebuildTargetDependencyGraph
+
+Prepare packages
+
+CreateBuildRequest
+
+SendProjectDescription
+
+CreateBuildOperation
+
+ComputeTargetDependencyGraph
+note: Building targets in dependency order
+note: Target dependency graph (5 targets)
+    Target 'FocusBloxUITests' in project 'FocusBlox'
+        ➜ Explicit dependency on target 'FocusBlox' in project 'FocusBlox'
+    Target 'FocusBloxTests' in project 'FocusBlox'
+        ➜ Explicit dependency on target 'FocusBlox' in project 'FocusBlox'
+    Target 'FocusBlox' in project 'FocusBlox'
+        ➜ Explicit dependency on target 'FocusBloxWidgetsExtension' in project 'FocusBlox'
+        ➜ Explicit dependency on target 'FocusBloxCore' in project 'FocusBlox'
+    Target 'FocusBloxWidgetsExtension' in project 'FocusBlox'
+        ➜ Explicit dependency on target 'FocusBloxCore' in project 'FocusBlox'
+    Target 'FocusBloxCore' in project 'FocusBlox' (no dependencies)
+
+GatherProvisioningInputs
+
+CreateBuildDescription
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -v -E -dM -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk -x c -c /dev/null
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/usr/bin/actool --version --output-format xml1
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -v -E -dM -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk -x c -c /dev/null
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc --version
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/usr/bin/actool --print-asset-tag-combinations --output-format xml1 /Users/hem/Documents/opt/my-daily-sprints/Resources/Assets.xcassets
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld -version_details
+
+ReadFileContents /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/share/docc/features.json
+
+Build description signature: a280f1df60865368d146feb3c408bfae
+Build description path: /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/XCBuildData/a280f1df60865368d146feb3c408bfae.xcbuilddata
+ClangStatCache /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk /Users/hem/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator26.2-23C53-7d00a8b37fbd7999ea79df8ebc024bf0.sdkstatcache
+    cd /Users/hem/Documents/opt/my-daily-sprints/FocusBlox.xcodeproj
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk -o /Users/hem/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator26.2-23C53-7d00a8b37fbd7999ea79df8ebc024bf0.sdkstatcache
+
+ProcessInfoPlistFile /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBloxCore.framework/Info.plist /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxCore.build/empty-FocusBloxCore.plist (in target 'FocusBloxCore' from project 'FocusBlox')
+    cd /Users/hem/Documents/opt/my-daily-sprints
+    builtin-infoPlistUtility /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxCore.build/empty-FocusBloxCore.plist -producttype com.apple.product-type.framework -expandbuildsettings -format binary -platform iphonesimulator -o /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBloxCore.framework/Info.plist
+
+WriteAuxiliaryFile /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/Objects-normal/arm64/FocusBloxUITests.SwiftConstValuesFileList (in target 'FocusBloxUITests' from project 'FocusBlox')
+    cd /Users/hem/Documents/opt/my-daily-sprints
+    write-file /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/Objects-normal/arm64/FocusBloxUITests.SwiftConstValuesFileList
+
+WriteAuxiliaryFile /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/Objects-normal/arm64/FocusBloxUITests-OutputFileMap.json (in target 'FocusBloxUITests' from project 'FocusBlox')
+    cd /Users/hem/Documents/opt/my-daily-sprints
+    write-file /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/Objects-normal/arm64/FocusBloxUITests-OutputFileMap.json
+
+WriteAuxiliaryFile /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/Objects-normal/arm64/FocusBloxUITests.LinkFileList (in target 'FocusBloxUITests' from project 'FocusBlox')
+    cd /Users/hem/Documents/opt/my-daily-sprints
+    write-file /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/Objects-normal/arm64/FocusBloxUITests.LinkFileList
+
+WriteAuxiliaryFile /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/Objects-normal/arm64/FocusBloxUITests.SwiftFileList (in target 'FocusBloxUITests' from project 'FocusBlox')
+    cd /Users/hem/Documents/opt/my-daily-sprints
+    write-file /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/Objects-normal/arm64/FocusBloxUITests.SwiftFileList
+
+SwiftDriver FocusBloxUITests normal arm64 com.apple.xcode.tools.swift.compiler (in target 'FocusBloxUITests' from project 'FocusBlox')
+    cd /Users/hem/Documents/opt/my-daily-sprints
+    builtin-SwiftDriver -- /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name FocusBloxUITests -Onone -enforce-exclusivity\=checked @/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/Objects-normal/arm64/FocusBloxUITests.SwiftFileList -DDEBUG -module-alias Testing\=_Testing_Unavailable -plugin-path /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk -target arm64-apple-ios26.2-simulator -g -module-cache-path /Users/hem/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -Xfrontend -serialize-debugging-options -profile-coverage-mapping -profile-generate -enable-testing -index-store-path /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Index.noindex/DataStore -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -swift-version 6 -I /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator -Isystem /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib -F /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator -F /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks -F /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk/Developer/Library/Frameworks -c -j10 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /Users/hem/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator26.2-23C53-7d00a8b37fbd7999ea79df8ebc024bf0.sdkstatcache -output-file-map /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/Objects-normal/arm64/FocusBloxUITests-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -explicit-module-build -module-cache-path /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -clang-scanner-module-cache-path /Users/hem/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -sdk-module-cache-path /Users/hem/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/Objects-normal/arm64/FocusBloxUITests.swiftmodule -validate-clang-modules-once -clang-build-session-file /Users/hem/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/Objects-normal/arm64/FocusBloxUITests_const_extract_protocols.json -Xcc -iquote -Xcc /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/FocusBloxUITests-generated-files.hmap -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/FocusBloxUITests-own-target-headers.hmap -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/FocusBloxUITests-all-target-headers.hmap -Xcc -iquote -Xcc /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/FocusBloxUITests-project-headers.hmap -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/include -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/DerivedSources-normal/arm64 -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/DerivedSources/arm64 -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/DerivedSources -Xcc -DDEBUG\=1 -emit-objc-header -emit-objc-header-path /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/Objects-normal/arm64/FocusBloxUITests-Swift.h -working-directory /Users/hem/Documents/opt/my-daily-sprints -experimental-emit-module-separately -disable-cmo
+
+ProcessInfoPlistFile /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBloxWidgetsExtension.appex/Info.plist /Users/hem/Documents/opt/my-daily-sprints/FocusBloxWidgets/Info.plist (in target 'FocusBloxWidgetsExtension' from project 'FocusBlox')
+    cd /Users/hem/Documents/opt/my-daily-sprints
+    builtin-infoPlistUtility /Users/hem/Documents/opt/my-daily-sprints/FocusBloxWidgets/Info.plist -producttype com.apple.product-type.app-extension -expandbuildsettings -format binary -platform iphonesimulator -additionalcontentfile /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxWidgetsExtension.build/assetcatalog_generated_info.plist -o /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBloxWidgetsExtension.appex/Info.plist
+
+Copy /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBlox.app/PlugIns/FocusBloxWidgetsExtension.appex /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBloxWidgetsExtension.appex (in target 'FocusBlox' from project 'FocusBlox')
+    cd /Users/hem/Documents/opt/my-daily-sprints
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -exclude Headers -exclude PrivateHeaders -exclude Modules -exclude \*.tbd -resolve-src-symlinks -remove-static-executable /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBloxWidgetsExtension.appex /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBlox.app/PlugIns
+
+CopySwiftLibs /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBlox.app (in target 'FocusBlox' from project 'FocusBlox')
+    cd /Users/hem/Documents/opt/my-daily-sprints
+    builtin-swiftStdLibTool --copy --verbose --sign - --scan-executable /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBlox.app/FocusBlox.debug.dylib --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBlox.app/Frameworks --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBlox.app/PlugIns --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBlox.app/SystemExtensions --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBlox.app/Extensions --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBloxCore.framework --platform iphonesimulator --toolchain /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain --destination /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBlox.app/Frameworks --strip-bitcode --strip-bitcode-tool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/bitcode_strip --emit-dependency-info /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBlox.build/SwiftStdLibToolInputDependencies.dep --filter-for-swift-os
+
+ProcessInfoPlistFile /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBlox.app/Info.plist /Users/hem/Documents/opt/my-daily-sprints/Resources/Info.plist (in target 'FocusBlox' from project 'FocusBlox')
+    cd /Users/hem/Documents/opt/my-daily-sprints
+    builtin-infoPlistUtility /Users/hem/Documents/opt/my-daily-sprints/Resources/Info.plist -producttype com.apple.product-type.application -genpkginfo /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBlox.app/PkgInfo -expandbuildsettings -format binary -platform iphonesimulator -additionalcontentfile /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBlox.build/assetcatalog_generated_info.plist -scanforprivacyfile /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBlox.app/Frameworks/FocusBloxCore.framework -scanforprivacyfile /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBlox.app/PlugIns/FocusBloxWidgetsExtension.appex -o /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBlox.app/Info.plist
+warning: 'UIRequiresFullScreen' has been deprecated starting in iOS 26.0 and will be ignored in a future release. See the UIRequiresFullScreen documentation for more details. (in target 'FocusBlox' from project 'FocusBlox')
+
+ProcessInfoPlistFile /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBlox.app/PlugIns/FocusBloxTests.xctest/Info.plist /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxTests.build/empty-FocusBloxTests.plist (in target 'FocusBloxTests' from project 'FocusBlox')
+    cd /Users/hem/Documents/opt/my-daily-sprints
+    builtin-infoPlistUtility /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxTests.build/empty-FocusBloxTests.plist -producttype com.apple.product-type.bundle.unit-test -expandbuildsettings -format binary -platform iphonesimulator -o /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBlox.app/PlugIns/FocusBloxTests.xctest/Info.plist
+
+CopySwiftLibs /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBlox.app/PlugIns/FocusBloxTests.xctest (in target 'FocusBloxTests' from project 'FocusBlox')
+    cd /Users/hem/Documents/opt/my-daily-sprints
+    builtin-swiftStdLibTool --copy --verbose --sign - --scan-executable /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBlox.app/PlugIns/FocusBloxTests.xctest/FocusBloxTests --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBlox.app/PlugIns/FocusBloxTests.xctest/Frameworks --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBlox.app/PlugIns/FocusBloxTests.xctest/PlugIns --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBlox.app/PlugIns/FocusBloxTests.xctest/SystemExtensions --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBlox.app/PlugIns/FocusBloxTests.xctest/Extensions --platform iphonesimulator --toolchain /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain --destination /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBlox.app/PlugIns/FocusBloxTests.xctest/Frameworks --strip-bitcode --scan-executable /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib/libXCTestSwiftSupport.dylib --strip-bitcode-tool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/bitcode_strip --emit-dependency-info /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxTests.build/SwiftStdLibToolInputDependencies.dep --filter-for-swift-os
+
+CodeSign /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBlox.app/FocusBlox.debug.dylib (in target 'FocusBlox' from project 'FocusBlox')
+    cd /Users/hem/Documents/opt/my-daily-sprints
+    
+    Signing Identity:     "Sign to Run Locally"
+    
+    /usr/bin/codesign --force --sign - --timestamp\=none --generate-entitlement-der /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBlox.app/FocusBlox.debug.dylib
+/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBlox.app/FocusBlox.debug.dylib: replacing existing signature
+
+CodeSign /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBlox.app/__preview.dylib (in target 'FocusBlox' from project 'FocusBlox')
+    cd /Users/hem/Documents/opt/my-daily-sprints
+    
+    Signing Identity:     "Sign to Run Locally"
+    
+    /usr/bin/codesign --force --sign - --timestamp\=none --generate-entitlement-der /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBlox.app/__preview.dylib
+/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBlox.app/__preview.dylib: replacing existing signature
+
+CodeSign /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBlox.app (in target 'FocusBlox' from project 'FocusBlox')
+    cd /Users/hem/Documents/opt/my-daily-sprints
+    
+    Signing Identity:     "Sign to Run Locally"
+    
+    /usr/bin/codesign --force --sign - --entitlements /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBlox.build/FocusBlox.app.xcent --timestamp\=none --generate-entitlement-der /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBlox.app
+/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBlox.app: replacing existing signature
+
+Validate /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBlox.app (in target 'FocusBlox' from project 'FocusBlox')
+    cd /Users/hem/Documents/opt/my-daily-sprints
+    builtin-validationUtility /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBlox.app -shallow-bundle -infoplist-subpath Info.plist
+
+ValidateEmbeddedBinary /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBlox.app/PlugIns/FocusBloxWidgetsExtension.appex (in target 'FocusBlox' from project 'FocusBlox')
+    cd /Users/hem/Documents/opt/my-daily-sprints
+    /Applications/Xcode.app/Contents/Developer/usr/bin/embeddedBinaryValidationUtility /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBlox.app/PlugIns/FocusBloxWidgetsExtension.appex -signing-cert - -info-plist-path /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBlox.app/Info.plist
+
+SwiftEmitModule normal arm64 Emitting\ module\ for\ FocusBloxUITests (in target 'FocusBloxUITests' from project 'FocusBlox')
+
+EmitSwiftModule normal arm64 (in target 'FocusBloxUITests' from project 'FocusBlox')
+    cd /Users/hem/Documents/opt/my-daily-sprints
+    
+
+SwiftCompile normal arm64 Compiling\ TaskFormGlassCardUITests.swift /Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/TaskFormGlassCardUITests.swift (in target 'FocusBloxUITests' from project 'FocusBlox')
+SwiftCompile normal arm64 /Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/TaskFormGlassCardUITests.swift (in target 'FocusBloxUITests' from project 'FocusBlox')
+    cd /Users/hem/Documents/opt/my-daily-sprints
+    
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/TaskFormGlassCardUITests.swift:15:15: warning: call to main actor-isolated initializer 'init()' in a synchronous nonisolated context
+        app = XCUIApplication()
+              ^
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCUIAutomation.framework/Headers/XCUIApplication.h:29:1: note: calls to initializer 'init()' from outside of its actor context are implicitly asynchronous
+- (instancetype)init NS_DESIGNATED_INITIALIZER;
+^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/TaskFormGlassCardUITests.swift:16:13: warning: main actor-isolated property 'launchArguments' can not be mutated from a nonisolated context
+        app.launchArguments = ["-UITesting"]
+            ^
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCUIAutomation.framework/Headers/XCUIApplication.h:93:51: note: mutation of this property is only permitted within the actor
+@property (nonatomic, copy) NSArray <NSString *> *launchArguments;
+                                                  ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/TaskFormGlassCardUITests.swift:17:13: warning: call to main actor-isolated instance method 'launch()' in a synchronous nonisolated context
+        app.launch()
+            ^
+XCUIAutomation.XCUIApplication.launch:2:22: note: calls to instance method 'launch()' from outside of its actor context are implicitly asynchronous
+@MainActor open func launch()}
+                     ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/TaskFormGlassCardUITests.swift:27:37: warning: main actor-isolated subscript 'subscript(_:)' can not be referenced from a nonisolated context
+        let backlogTab = app.buttons["tab-backlog"]
+                                    ^
+XCUIAutomation.XCUIElementQuery.subscript:2:17: note: subscript declared here
+@MainActor open subscript(key: String) -> XCUIElement { get }}
+                ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/TaskFormGlassCardUITests.swift:26:18: note: add '@MainActor' to make instance method 'navigateToBacklog()' part of global actor 'MainActor'
+    private func navigateToBacklog() {
+                 ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/TaskFormGlassCardUITests.swift:27:30: warning: main actor-isolated property 'buttons' can not be referenced from a nonisolated context
+        let backlogTab = app.buttons["tab-backlog"]
+                             ^
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCUIAutomation.framework/Headers/XCUIElementTypeQueryProvider.h:22:46: note: property declared here
+@property (readonly, copy) XCUIElementQuery *buttons;
+                                             ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/TaskFormGlassCardUITests.swift:26:18: note: add '@MainActor' to make instance method 'navigateToBacklog()' part of global actor 'MainActor'
+    private func navigateToBacklog() {
+                 ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/TaskFormGlassCardUITests.swift:28:34: warning: call to main actor-isolated instance method 'waitForExistence(timeout:)' in a synchronous nonisolated context
+        XCTAssertTrue(backlogTab.waitForExistence(timeout: 5), "Backlog tab should exist")
+                                 ^
+XCUIAutomation.XCUIElement.waitForExistence:2:22: note: calls to instance method 'waitForExistence(timeout:)' from outside of its actor context are implicitly asynchronous
+@MainActor open func waitForExistence(timeout: TimeInterval) -> Bool}
+                     ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/TaskFormGlassCardUITests.swift:29:20: warning: call to main actor-isolated instance method 'tap()' in a synchronous nonisolated context
+        backlogTab.tap()
+                   ^
+XCUIAutomation.XCUIElement.tap:2:22: note: calls to instance method 'tap()' from outside of its actor context are implicitly asynchronous
+@MainActor open func tap()}
+                     ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/TaskFormGlassCardUITests.swift:26:18: note: add '@MainActor' to make instance method 'navigateToBacklog()' part of global actor 'MainActor'
+    private func navigateToBacklog() {
+                 ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/TaskFormGlassCardUITests.swift:34:36: warning: main actor-isolated subscript 'subscript(_:)' can not be referenced from a nonisolated context
+        let addButton = app.buttons["addTaskButton"]
+                                   ^
+XCUIAutomation.XCUIElementQuery.subscript:2:17: note: subscript declared here
+@MainActor open subscript(key: String) -> XCUIElement { get }}
+                ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/TaskFormGlassCardUITests.swift:33:18: note: add '@MainActor' to make instance method 'openCreateTaskSheet()' part of global actor 'MainActor'
+    private func openCreateTaskSheet() {
+                 ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/TaskFormGlassCardUITests.swift:34:29: warning: main actor-isolated property 'buttons' can not be referenced from a nonisolated context
+        let addButton = app.buttons["addTaskButton"]
+                            ^
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCUIAutomation.framework/Headers/XCUIElementTypeQueryProvider.h:22:46: note: property declared here
+@property (readonly, copy) XCUIElementQuery *buttons;
+                                             ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/TaskFormGlassCardUITests.swift:33:18: note: add '@MainActor' to make instance method 'openCreateTaskSheet()' part of global actor 'MainActor'
+    private func openCreateTaskSheet() {
+                 ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/TaskFormGlassCardUITests.swift:35:22: warning: call to main actor-isolated instance method 'waitForExistence(timeout:)' in a synchronous nonisolated context
+        if addButton.waitForExistence(timeout: 3) {
+                     ^
+XCUIAutomation.XCUIElement.waitForExistence:2:22: note: calls to instance method 'waitForExistence(timeout:)' from outside of its actor context are implicitly asynchronous
+@MainActor open func waitForExistence(timeout: TimeInterval) -> Bool}
+                     ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/TaskFormGlassCardUITests.swift:33:18: note: add '@MainActor' to make instance method 'openCreateTaskSheet()' part of global actor 'MainActor'
+    private func openCreateTaskSheet() {
+                 ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/TaskFormGlassCardUITests.swift:36:23: warning: call to main actor-isolated instance method 'tap()' in a synchronous nonisolated context
+            addButton.tap()
+                      ^
+XCUIAutomation.XCUIElement.tap:2:22: note: calls to instance method 'tap()' from outside of its actor context are implicitly asynchronous
+@MainActor open func tap()}
+                     ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/TaskFormGlassCardUITests.swift:33:18: note: add '@MainActor' to make instance method 'openCreateTaskSheet()' part of global actor 'MainActor'
+    private func openCreateTaskSheet() {
+                 ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/TaskFormGlassCardUITests.swift:40:15: warning: main actor-isolated property 'firstMatch' can not be referenced from a nonisolated context
+            ).firstMatch
+              ^
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCUIAutomation.framework/Headers/XCUIElementTypeQueryProvider.h:105:35: note: property declared here
+@property (readonly) XCUIElement *firstMatch;
+                                  ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/TaskFormGlassCardUITests.swift:33:18: note: add '@MainActor' to make instance method 'openCreateTaskSheet()' part of global actor 'MainActor'
+    private func openCreateTaskSheet() {
+                 ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/TaskFormGlassCardUITests.swift:38:59: warning: call to main actor-isolated instance method 'matching' in a synchronous nonisolated context
+            let navAddButton = app.navigationBars.buttons.matching(
+                                                          ^
+XCUIAutomation.XCUIElementQuery.matching:2:22: note: calls to instance method 'matching' from outside of its actor context are implicitly asynchronous
+@MainActor open func matching(_ predicate: NSPredicate) -> XCUIElementQuery}
+                     ^
+XCUIAutomation.XCUIElementQuery.matching:2:22: note: main actor isolation inferred from conformance to protocol 'XCUIElementTypeQueryProvider'
+@MainActor open func matching(_ predicate: NSPredicate) -> XCUIElementQuery}
+                     ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/TaskFormGlassCardUITests.swift:33:18: note: add '@MainActor' to make instance method 'openCreateTaskSheet()' part of global actor 'MainActor'
+    private func openCreateTaskSheet() {
+                 ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/TaskFormGlassCardUITests.swift:38:51: warning: main actor-isolated property 'buttons' can not be referenced from a nonisolated context
+            let navAddButton = app.navigationBars.buttons.matching(
+                                                  ^
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCUIAutomation.framework/Headers/XCUIElementTypeQueryProvider.h:22:46: note: property declared here
+@property (readonly, copy) XCUIElementQuery *buttons;
+                                             ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/TaskFormGlassCardUITests.swift:33:18: note: add '@MainActor' to make instance method 'openCreateTaskSheet()' part of global actor 'MainActor'
+    private func openCreateTaskSheet() {
+                 ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/TaskFormGlassCardUITests.swift:38:36: warning: main actor-isolated property 'navigationBars' can not be referenced from a nonisolated context
+            let navAddButton = app.navigationBars.buttons.matching(
+                                   ^
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCUIAutomation.framework/Headers/XCUIElementTypeQueryProvider.h:34:46: note: property declared here
+@property (readonly, copy) XCUIElementQuery *navigationBars;
+                                             ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/TaskFormGlassCardUITests.swift:33:18: note: add '@MainActor' to make instance method 'openCreateTaskSheet()' part of global actor 'MainActor'
+    private func openCreateTaskSheet() {
+                 ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/TaskFormGlassCardUITests.swift:41:29: warning: call to main actor-isolated instance method 'waitForExistence(timeout:)' in a synchronous nonisolated context
+            if navAddButton.waitForExistence(timeout: 3) {
+                            ^
+XCUIAutomation.XCUIElement.waitForExistence:2:22: note: calls to instance method 'waitForExistence(timeout:)' from outside of its actor context are implicitly asynchronous
+@MainActor open func waitForExistence(timeout: TimeInterval) -> Bool}
+                     ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/TaskFormGlassCardUITests.swift:33:18: note: add '@MainActor' to make instance method 'openCreateTaskSheet()' part of global actor 'MainActor'
+    private func openCreateTaskSheet() {
+                 ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/TaskFormGlassCardUITests.swift:42:30: warning: call to main actor-isolated instance method 'tap()' in a synchronous nonisolated context
+                navAddButton.tap()
+                             ^
+XCUIAutomation.XCUIElement.tap:2:22: note: calls to instance method 'tap()' from outside of its actor context are implicitly asynchronous
+@MainActor open func tap()}
+                     ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/TaskFormGlassCardUITests.swift:33:18: note: add '@MainActor' to make instance method 'openCreateTaskSheet()' part of global actor 'MainActor'
+    private func openCreateTaskSheet() {
+                 ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/TaskFormGlassCardUITests.swift:56:56: warning: call to main actor-isolated instance method 'screenshot()' in a synchronous nonisolated context
+        let screenshot = XCTAttachment(screenshot: app.screenshot())
+                                                       ^
+XCUIAutomation.XCUIElement.screenshot:2:22: note: calls to instance method 'screenshot()' from outside of its actor context are implicitly asynchronous
+@MainActor open func screenshot() -> XCUIScreenshot}
+                     ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/TaskFormGlassCardUITests.swift:51:10: note: add '@MainActor' to make instance method 'testFormHasGlassCardSections()' part of global actor 'MainActor'
+    func testFormHasGlassCardSections() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/TaskFormGlassCardUITests.swift:62:45: warning: main actor-isolated subscript 'subscript(_:)' can not be referenced from a nonisolated context
+        let titleSection = app.otherElements["taskFormSection_title"]
+                                            ^
+XCUIAutomation.XCUIElementQuery.subscript:2:17: note: subscript declared here
+@MainActor open subscript(key: String) -> XCUIElement { get }}
+                ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/TaskFormGlassCardUITests.swift:51:10: note: add '@MainActor' to make instance method 'testFormHasGlassCardSections()' part of global actor 'MainActor'
+    func testFormHasGlassCardSections() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/TaskFormGlassCardUITests.swift:62:32: warning: main actor-isolated property 'otherElements' can not be referenced from a nonisolated context
+        let titleSection = app.otherElements["taskFormSection_title"]
+                               ^
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCUIAutomation.framework/Headers/XCUIElementTypeQueryProvider.h:95:46: note: property declared here
+@property (readonly, copy) XCUIElementQuery *otherElements;
+                                             ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/TaskFormGlassCardUITests.swift:51:10: note: add '@MainActor' to make instance method 'testFormHasGlassCardSections()' part of global actor 'MainActor'
+    func testFormHasGlassCardSections() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/TaskFormGlassCardUITests.swift:63:48: warning: main actor-isolated subscript 'subscript(_:)' can not be referenced from a nonisolated context
+        let durationSection = app.otherElements["taskFormSection_duration"]
+                                               ^
+XCUIAutomation.XCUIElementQuery.subscript:2:17: note: subscript declared here
+@MainActor open subscript(key: String) -> XCUIElement { get }}
+                ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/TaskFormGlassCardUITests.swift:51:10: note: add '@MainActor' to make instance method 'testFormHasGlassCardSections()' part of global actor 'MainActor'
+    func testFormHasGlassCardSections() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/TaskFormGlassCardUITests.swift:63:35: warning: main actor-isolated property 'otherElements' can not be referenced from a nonisolated context
+        let durationSection = app.otherElements["taskFormSection_duration"]
+                                  ^
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCUIAutomation.framework/Headers/XCUIElementTypeQueryProvider.h:95:46: note: property declared here
+@property (readonly, copy) XCUIElementQuery *otherElements;
+                                             ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/TaskFormGlassCardUITests.swift:51:10: note: add '@MainActor' to make instance method 'testFormHasGlassCardSections()' part of global actor 'MainActor'
+    func testFormHasGlassCardSections() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/TaskFormGlassCardUITests.swift:64:50: warning: main actor-isolated subscript 'subscript(_:)' can not be referenced from a nonisolated context
+        let importanceSection = app.otherElements["taskFormSection_importance"]
+                                                 ^
+XCUIAutomation.XCUIElementQuery.subscript:2:17: note: subscript declared here
+@MainActor open subscript(key: String) -> XCUIElement { get }}
+                ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/TaskFormGlassCardUITests.swift:51:10: note: add '@MainActor' to make instance method 'testFormHasGlassCardSections()' part of global actor 'MainActor'
+    func testFormHasGlassCardSections() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/TaskFormGlassCardUITests.swift:64:37: warning: main actor-isolated property 'otherElements' can not be referenced from a nonisolated context
+        let importanceSection = app.otherElements["taskFormSection_importance"]
+                                    ^
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCUIAutomation.framework/Headers/XCUIElementTypeQueryProvider.h:95:46: note: property declared here
+@property (readonly, copy) XCUIElementQuery *otherElements;
+                                             ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/TaskFormGlassCardUITests.swift:51:10: note: add '@MainActor' to make instance method 'testFormHasGlassCardSections()' part of global actor 'MainActor'
+    func testFormHasGlassCardSections() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/TaskFormGlassCardUITests.swift:67:49: warning: main actor-isolated property 'exists' can not be referenced from a nonisolated context
+        let hasGlassCardSections = titleSection.exists || durationSection.exists || importanceSection.exists
+                                                ^
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCUIAutomation.framework/Headers/XCUIElement.h:54:27: note: property declared here
+@property (readonly) BOOL exists;
+                          ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/TaskFormGlassCardUITests.swift:51:10: note: add '@MainActor' to make instance method 'testFormHasGlassCardSections()' part of global actor 'MainActor'
+    func testFormHasGlassCardSections() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/TaskFormGlassCardUITests.swift:67:75: warning: main actor-isolated property 'exists' can not be referenced from a nonisolated autoclosure
+        let hasGlassCardSections = titleSection.exists || durationSection.exists || importanceSection.exists
+                                                                          ^
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCUIAutomation.framework/Headers/XCUIElement.h:54:27: note: property declared here
+@property (readonly) BOOL exists;
+                          ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/TaskFormGlassCardUITests.swift:67:103: warning: main actor-isolated property 'exists' can not be referenced from a nonisolated autoclosure
+        let hasGlassCardSections = titleSection.exists || durationSection.exists || importanceSection.exists
+                                                                                                      ^
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCUIAutomation.framework/Headers/XCUIElement.h:54:27: note: property declared here
+@property (readonly) BOOL exists;
+                          ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/TaskFormGlassCardUITests.swift:83:46: warning: main actor-isolated subscript 'subscript(_:)' can not be referenced from a nonisolated context
+        let customContainer = app.scrollViews["taskFormScrollView"]
+                                             ^
+XCUIAutomation.XCUIElementQuery.subscript:2:17: note: subscript declared here
+@MainActor open subscript(key: String) -> XCUIElement { get }}
+                ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/TaskFormGlassCardUITests.swift:78:10: note: add '@MainActor' to make instance method 'testFormDoesNotUseDefaultListStyle()' part of global actor 'MainActor'
+    func testFormDoesNotUseDefaultListStyle() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/TaskFormGlassCardUITests.swift:83:35: warning: main actor-isolated property 'scrollViews' can not be referenced from a nonisolated context
+        let customContainer = app.scrollViews["taskFormScrollView"]
+                                  ^
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCUIAutomation.framework/Headers/XCUIElementTypeQueryProvider.h:60:46: note: property declared here
+@property (readonly, copy) XCUIElementQuery *scrollViews;
+                                             ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/TaskFormGlassCardUITests.swift:78:10: note: add '@MainActor' to make instance method 'testFormDoesNotUseDefaultListStyle()' part of global actor 'MainActor'
+    func testFormDoesNotUseDefaultListStyle() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/TaskFormGlassCardUITests.swift:86:29: warning: call to main actor-isolated instance method 'waitForExistence(timeout:)' in a synchronous nonisolated context
+            customContainer.waitForExistence(timeout: 3),
+                            ^
+XCUIAutomation.XCUIElement.waitForExistence:2:22: note: calls to instance method 'waitForExistence(timeout:)' from outside of its actor context are implicitly asynchronous
+@MainActor open func waitForExistence(timeout: TimeInterval) -> Bool}
+                     ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/TaskFormGlassCardUITests.swift:108:45: warning: main actor-isolated property 'exists' can not be referenced from a nonisolated context
+            if app.otherElements[sectionId].exists {
+                                            ^
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCUIAutomation.framework/Headers/XCUIElement.h:54:27: note: property declared here
+@property (readonly) BOOL exists;
+                          ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/TaskFormGlassCardUITests.swift:93:10: note: add '@MainActor' to make instance method 'testAllSectionsHaveProperStructure()' part of global actor 'MainActor'
+    func testAllSectionsHaveProperStructure() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/TaskFormGlassCardUITests.swift:108:33: warning: main actor-isolated subscript 'subscript(_:)' can not be referenced from a nonisolated context
+            if app.otherElements[sectionId].exists {
+                                ^
+XCUIAutomation.XCUIElementQuery.subscript:2:17: note: subscript declared here
+@MainActor open subscript(key: String) -> XCUIElement { get }}
+                ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/TaskFormGlassCardUITests.swift:93:10: note: add '@MainActor' to make instance method 'testAllSectionsHaveProperStructure()' part of global actor 'MainActor'
+    func testAllSectionsHaveProperStructure() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/TaskFormGlassCardUITests.swift:108:20: warning: main actor-isolated property 'otherElements' can not be referenced from a nonisolated context
+            if app.otherElements[sectionId].exists {
+                   ^
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCUIAutomation.framework/Headers/XCUIElementTypeQueryProvider.h:95:46: note: property declared here
+@property (readonly, copy) XCUIElementQuery *otherElements;
+                                             ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/TaskFormGlassCardUITests.swift:93:10: note: add '@MainActor' to make instance method 'testAllSectionsHaveProperStructure()' part of global actor 'MainActor'
+    func testAllSectionsHaveProperStructure() throws {
+         ^
+    @MainActor 
+
+SwiftDriverJobDiscovery normal arm64 Emitting module for FocusBloxUITests (in target 'FocusBloxUITests' from project 'FocusBlox')
+
+SwiftDriver\ Compilation\ Requirements FocusBloxUITests normal arm64 com.apple.xcode.tools.swift.compiler (in target 'FocusBloxUITests' from project 'FocusBlox')
+    cd /Users/hem/Documents/opt/my-daily-sprints
+    builtin-Swift-Compilation-Requirements -- /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name FocusBloxUITests -Onone -enforce-exclusivity\=checked @/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/Objects-normal/arm64/FocusBloxUITests.SwiftFileList -DDEBUG -module-alias Testing\=_Testing_Unavailable -plugin-path /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk -target arm64-apple-ios26.2-simulator -g -module-cache-path /Users/hem/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -Xfrontend -serialize-debugging-options -profile-coverage-mapping -profile-generate -enable-testing -index-store-path /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Index.noindex/DataStore -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -swift-version 6 -I /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator -Isystem /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib -F /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator -F /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks -F /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk/Developer/Library/Frameworks -c -j10 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /Users/hem/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator26.2-23C53-7d00a8b37fbd7999ea79df8ebc024bf0.sdkstatcache -output-file-map /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/Objects-normal/arm64/FocusBloxUITests-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -explicit-module-build -module-cache-path /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -clang-scanner-module-cache-path /Users/hem/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -sdk-module-cache-path /Users/hem/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/Objects-normal/arm64/FocusBloxUITests.swiftmodule -validate-clang-modules-once -clang-build-session-file /Users/hem/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/Objects-normal/arm64/FocusBloxUITests_const_extract_protocols.json -Xcc -iquote -Xcc /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/FocusBloxUITests-generated-files.hmap -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/FocusBloxUITests-own-target-headers.hmap -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/FocusBloxUITests-all-target-headers.hmap -Xcc -iquote -Xcc /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/FocusBloxUITests-project-headers.hmap -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/include -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/DerivedSources-normal/arm64 -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/DerivedSources/arm64 -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/DerivedSources -Xcc -DDEBUG\=1 -emit-objc-header -emit-objc-header-path /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/Objects-normal/arm64/FocusBloxUITests-Swift.h -working-directory /Users/hem/Documents/opt/my-daily-sprints -experimental-emit-module-separately -disable-cmo
+
+Copy /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBloxUITests.swiftmodule/arm64-apple-ios-simulator.swiftdoc /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/Objects-normal/arm64/FocusBloxUITests.swiftdoc (in target 'FocusBloxUITests' from project 'FocusBlox')
+    cd /Users/hem/Documents/opt/my-daily-sprints
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/Objects-normal/arm64/FocusBloxUITests.swiftdoc /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBloxUITests.swiftmodule/arm64-apple-ios-simulator.swiftdoc
+
+Copy /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBloxUITests.swiftmodule/arm64-apple-ios-simulator.swiftmodule /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/Objects-normal/arm64/FocusBloxUITests.swiftmodule (in target 'FocusBloxUITests' from project 'FocusBlox')
+    cd /Users/hem/Documents/opt/my-daily-sprints
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/Objects-normal/arm64/FocusBloxUITests.swiftmodule /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBloxUITests.swiftmodule/arm64-apple-ios-simulator.swiftmodule
+
+Copy /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBloxUITests.swiftmodule/arm64-apple-ios-simulator.abi.json /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/Objects-normal/arm64/FocusBloxUITests.abi.json (in target 'FocusBloxUITests' from project 'FocusBlox')
+    cd /Users/hem/Documents/opt/my-daily-sprints
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/Objects-normal/arm64/FocusBloxUITests.abi.json /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBloxUITests.swiftmodule/arm64-apple-ios-simulator.abi.json
+
+Copy /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBloxUITests.swiftmodule/Project/arm64-apple-ios-simulator.swiftsourceinfo /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/Objects-normal/arm64/FocusBloxUITests.swiftsourceinfo (in target 'FocusBloxUITests' from project 'FocusBlox')
+    cd /Users/hem/Documents/opt/my-daily-sprints
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/Objects-normal/arm64/FocusBloxUITests.swiftsourceinfo /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBloxUITests.swiftmodule/Project/arm64-apple-ios-simulator.swiftsourceinfo
+
+ProcessInfoPlistFile /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBloxUITests-Runner.app/PlugIns/FocusBloxUITests.xctest/Info.plist /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/empty-FocusBloxUITests.plist (in target 'FocusBloxUITests' from project 'FocusBlox')
+    cd /Users/hem/Documents/opt/my-daily-sprints
+    builtin-infoPlistUtility /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/empty-FocusBloxUITests.plist -producttype com.apple.product-type.bundle.ui-testing -expandbuildsettings -format binary -platform iphonesimulator -additionalcontentfile /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/ProductTypeInfoPlistAdditions.plist -o /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBloxUITests-Runner.app/PlugIns/FocusBloxUITests.xctest/Info.plist
+
+SwiftDriverJobDiscovery normal arm64 Compiling TaskFormGlassCardUITests.swift (in target 'FocusBloxUITests' from project 'FocusBlox')
+
+SwiftDriver\ Compilation FocusBloxUITests normal arm64 com.apple.xcode.tools.swift.compiler (in target 'FocusBloxUITests' from project 'FocusBlox')
+    cd /Users/hem/Documents/opt/my-daily-sprints
+    builtin-Swift-Compilation -- /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name FocusBloxUITests -Onone -enforce-exclusivity\=checked @/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/Objects-normal/arm64/FocusBloxUITests.SwiftFileList -DDEBUG -module-alias Testing\=_Testing_Unavailable -plugin-path /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk -target arm64-apple-ios26.2-simulator -g -module-cache-path /Users/hem/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -Xfrontend -serialize-debugging-options -profile-coverage-mapping -profile-generate -enable-testing -index-store-path /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Index.noindex/DataStore -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -swift-version 6 -I /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator -Isystem /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib -F /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator -F /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks -F /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk/Developer/Library/Frameworks -c -j10 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /Users/hem/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator26.2-23C53-7d00a8b37fbd7999ea79df8ebc024bf0.sdkstatcache -output-file-map /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/Objects-normal/arm64/FocusBloxUITests-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -explicit-module-build -module-cache-path /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -clang-scanner-module-cache-path /Users/hem/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -sdk-module-cache-path /Users/hem/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/Objects-normal/arm64/FocusBloxUITests.swiftmodule -validate-clang-modules-once -clang-build-session-file /Users/hem/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/Objects-normal/arm64/FocusBloxUITests_const_extract_protocols.json -Xcc -iquote -Xcc /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/FocusBloxUITests-generated-files.hmap -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/FocusBloxUITests-own-target-headers.hmap -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/FocusBloxUITests-all-target-headers.hmap -Xcc -iquote -Xcc /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/FocusBloxUITests-project-headers.hmap -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/include -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/DerivedSources-normal/arm64 -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/DerivedSources/arm64 -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/DerivedSources -Xcc -DDEBUG\=1 -emit-objc-header -emit-objc-header-path /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/Objects-normal/arm64/FocusBloxUITests-Swift.h -working-directory /Users/hem/Documents/opt/my-daily-sprints -experimental-emit-module-separately -disable-cmo
+
+Ld /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBloxUITests-Runner.app/PlugIns/FocusBloxUITests.xctest/FocusBloxUITests normal (in target 'FocusBloxUITests' from project 'FocusBlox')
+    cd /Users/hem/Documents/opt/my-daily-sprints
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -Xlinker -reproducible -target arm64-apple-ios26.2-simulator -bundle -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk -O0 -L/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/EagerLinkingTBDs/Debug-iphonesimulator -L/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator -L/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib -F/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/EagerLinkingTBDs/Debug-iphonesimulator -F/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator -iframework /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks -iframework /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk/Developer/Library/Frameworks -filelist /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/Objects-normal/arm64/FocusBloxUITests.LinkFileList -Xlinker -rpath -Xlinker @loader_path/Frameworks -Xlinker -rpath -Xlinker @executable_path/Frameworks -dead_strip -Xlinker -object_path_lto -Xlinker /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/Objects-normal/arm64/FocusBloxUITests_lto.o -rdynamic -Xlinker -no_deduplicate -Xlinker -objc_abi_version -Xlinker 2 -Xlinker -debug_variant -Xlinker -dependency_info -Xlinker /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/Objects-normal/arm64/FocusBloxUITests_dependency_info.dat -fobjc-link-runtime -fprofile-instr-generate -L/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphonesimulator -L/usr/lib/swift -Xlinker -add_ast_path -Xlinker /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/Objects-normal/arm64/FocusBloxUITests.swiftmodule @/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/Objects-normal/arm64/FocusBloxUITests-linker-args.resp -Xlinker -needed_framework -Xlinker XCTest -framework XCTest -Xlinker -needed-lXCTestSwiftSupport -lXCTestSwiftSupport -Xlinker -sectcreate -Xlinker __TEXT -Xlinker __entitlements -Xlinker /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/FocusBloxUITests.xctest-Simulated.xcent -Xlinker -sectcreate -Xlinker __TEXT -Xlinker __ents_der -Xlinker /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/FocusBloxUITests.xctest-Simulated.xcent.der -Xlinker -no_adhoc_codesign -o /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBloxUITests-Runner.app/PlugIns/FocusBloxUITests.xctest/FocusBloxUITests
+
+CopySwiftLibs /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBloxUITests-Runner.app/PlugIns/FocusBloxUITests.xctest (in target 'FocusBloxUITests' from project 'FocusBlox')
+    cd /Users/hem/Documents/opt/my-daily-sprints
+    builtin-swiftStdLibTool --copy --verbose --sign - --scan-executable /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBloxUITests-Runner.app/PlugIns/FocusBloxUITests.xctest/FocusBloxUITests --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBloxUITests-Runner.app/PlugIns/FocusBloxUITests.xctest/Frameworks --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBloxUITests-Runner.app/PlugIns/FocusBloxUITests.xctest/PlugIns --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBloxUITests-Runner.app/PlugIns/FocusBloxUITests.xctest/SystemExtensions --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBloxUITests-Runner.app/PlugIns/FocusBloxUITests.xctest/Extensions --platform iphonesimulator --toolchain /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain --destination /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBloxUITests-Runner.app/PlugIns/FocusBloxUITests.xctest/Frameworks --strip-bitcode --scan-executable /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib/libXCTestSwiftSupport.dylib --strip-bitcode-tool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/bitcode_strip --emit-dependency-info /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/SwiftStdLibToolInputDependencies.dep --filter-for-swift-os
+
+ExtractAppIntentsMetadata (in target 'FocusBloxUITests' from project 'FocusBlox')
+    cd /Users/hem/Documents/opt/my-daily-sprints
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/appintentsmetadataprocessor --toolchain-dir /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain --module-name FocusBloxUITests --sdk-root /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk --xcode-version 17C52 --platform-family iOS --deployment-target 26.2 --bundle-identifier com.henning.timebox.uitests --output /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBloxUITests-Runner.app/PlugIns/FocusBloxUITests.xctest --target-triple arm64-apple-ios26.2-simulator --binary-file /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBloxUITests-Runner.app/PlugIns/FocusBloxUITests.xctest/FocusBloxUITests --dependency-file /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/Objects-normal/arm64/FocusBloxUITests_dependency_info.dat --stringsdata-file /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/Objects-normal/arm64/ExtractedAppShortcutsMetadata.stringsdata --source-file-list /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/Objects-normal/arm64/FocusBloxUITests.SwiftFileList --metadata-file-list /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/FocusBloxUITests.DependencyMetadataFileList --static-metadata-file-list /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/FocusBloxUITests.DependencyStaticMetadataFileList --swift-const-vals-list /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/Objects-normal/arm64/FocusBloxUITests.SwiftConstValuesFileList --compile-time-extraction --deployment-aware-processing --validate-assistant-intents --no-app-shortcuts-localization
+2026-01-30 08:03:52.613 appintentsmetadataprocessor[16360:42395827] Starting appintentsmetadataprocessor export
+2026-01-30 08:03:52.614 appintentsmetadataprocessor[16360:42395827] warning: Metadata extraction skipped. No AppIntents.framework dependency found.
+
+CodeSign /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBloxUITests-Runner.app/PlugIns/FocusBloxUITests.xctest (in target 'FocusBloxUITests' from project 'FocusBlox')
+    cd /Users/hem/Documents/opt/my-daily-sprints
+    
+    Signing Identity:     "Sign to Run Locally"
+    
+    /usr/bin/codesign --force --sign - --timestamp\=none --generate-entitlement-der /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBloxUITests-Runner.app/PlugIns/FocusBloxUITests.xctest
+
+CodeSign /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBloxUITests-Runner.app (in target 'FocusBloxUITests' from project 'FocusBlox')
+    cd /Users/hem/Documents/opt/my-daily-sprints
+    
+    Signing Identity:     "Sign to Run Locally"
+    
+    /usr/bin/codesign --force --sign - --timestamp\=none --generate-entitlement-der /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBloxUITests-Runner.app
+/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBloxUITests-Runner.app: replacing existing signature
+
+2026-01-30 08:03:55.221092+0100 FocusBloxUITests-Runner[16376:42396181] [Default] Running tests...
+    t =      nans Interface orientation changed to Portrait
+Test Suite 'Selected tests' started at 2026-01-30 08:03:56.968.
+Test Suite 'FocusBloxUITests.xctest' started at 2026-01-30 08:03:56.969.
+Test Suite 'TaskFormGlassCardUITests' started at 2026-01-30 08:03:56.969.
+Test Case '-[FocusBloxUITests.TaskFormGlassCardUITests testAllSectionsHaveProperStructure]' started.
+    t =     0.00s Start Test at 2026-01-30 08:03:56.970
+    t =     0.07s Set Up
+    t =     0.07s     Open com.henning.timebox
+    t =     0.07s         Launch com.henning.timebox
+    t =     0.89s             Setting up automation session
+    t =     1.72s             Wait for com.henning.timebox to idle
+    t =     3.62s Waiting 5.0s for "tab-backlog" Button to exist
+    t =     4.66s     Checking `Expect predicate `existsNoRetry == 1` for object "tab-backlog" Button`
+    t =     4.66s         Checking existence of `"tab-backlog" Button`
+    t =     4.73s Tap "tab-backlog" Button
+    t =     4.73s     Wait for com.henning.timebox to idle
+    t =     4.73s     Find the "tab-backlog" Button
+    t =     4.75s     Check for interrupting elements affecting "tab-backlog" Button
+    t =     4.78s     Synthesize event
+    t =     5.08s     Wait for com.henning.timebox to idle
+    t =     6.09s Waiting 3.0s for "addTaskButton" Button to exist
+    t =     7.11s     Checking `Expect predicate `existsNoRetry == 1` for object "addTaskButton" Button`
+    t =     7.11s         Checking existence of `"addTaskButton" Button`
+    t =     7.13s Tap "addTaskButton" Button
+    t =     7.13s     Wait for com.henning.timebox to idle
+    t =     7.14s     Find the "addTaskButton" Button
+    t =     7.17s     Check for interrupting elements affecting "addTaskButton" Button
+    t =     7.19s     Synthesize event
+    t =     7.48s     Wait for com.henning.timebox to idle
+    t =     9.48s Checking existence of `"taskFormSection_title" Other`
+    t =     9.58s Checking existence of `"taskFormSection_duration" Other`
+    t =     9.62s Checking existence of `"taskFormSection_importance" Other`
+    t =     9.67s Checking existence of `"taskFormSection_urgency" Other`
+    t =     9.71s Checking existence of `"taskFormSection_type" Other`
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/TaskFormGlassCardUITests.swift:113: error: -[FocusBloxUITests.TaskFormGlassCardUITests testAllSectionsHaveProperStructure] : XCTAssertGreaterThanOrEqual failed: ("0") is less than ("3") - Bug 17: At least 3 glass card sections should exist. Found 0.
+    t =    10.08s Tear Down
+Test Case '-[FocusBloxUITests.TaskFormGlassCardUITests testAllSectionsHaveProperStructure]' failed (10.323 seconds).
+Test Case '-[FocusBloxUITests.TaskFormGlassCardUITests testFormDoesNotUseDefaultListStyle]' started.
+    t =     0.00s Start Test at 2026-01-30 08:04:07.294
+    t =     0.02s Set Up
+    t =     0.02s     Open com.henning.timebox
+    t =     0.02s         Launch com.henning.timebox
+    t =     0.03s             Terminate com.henning.timebox:16385
+    t =     1.29s             Setting up automation session
+    t =     1.98s             Wait for com.henning.timebox to idle
+    t =     3.38s Waiting 5.0s for "tab-backlog" Button to exist
+    t =     4.40s     Checking `Expect predicate `existsNoRetry == 1` for object "tab-backlog" Button`
+    t =     4.40s         Checking existence of `"tab-backlog" Button`
+    t =     4.47s Tap "tab-backlog" Button
+    t =     4.47s     Wait for com.henning.timebox to idle
+    t =     4.47s     Find the "tab-backlog" Button
+    t =     4.50s     Check for interrupting elements affecting "tab-backlog" Button
+    t =     4.51s     Synthesize event
+    t =     4.80s     Wait for com.henning.timebox to idle
+    t =     5.81s Waiting 3.0s for "addTaskButton" Button to exist
+    t =     6.84s     Checking `Expect predicate `existsNoRetry == 1` for object "addTaskButton" Button`
+    t =     6.84s         Checking existence of `"addTaskButton" Button`
+    t =     6.87s Tap "addTaskButton" Button
+    t =     6.87s     Wait for com.henning.timebox to idle
+    t =     6.87s     Find the "addTaskButton" Button
+    t =     6.90s     Check for interrupting elements affecting "addTaskButton" Button
+    t =     6.92s     Synthesize event
+    t =     7.21s     Wait for com.henning.timebox to idle
+    t =     9.15s Waiting 3.0s for "taskFormScrollView" ScrollView to exist
+    t =    10.17s     Checking `Expect predicate `existsNoRetry == 1` for object "taskFormScrollView" ScrollView`
+    t =    10.17s         Checking existence of `"taskFormScrollView" ScrollView`
+    t =    10.26s         Capturing element debug description
+    t =    11.19s     Checking `Expect predicate `existsNoRetry == 1` for object "taskFormScrollView" ScrollView`
+    t =    11.19s         Checking existence of `"taskFormScrollView" ScrollView`
+    t =    11.25s         Capturing element debug description
+    t =    12.16s     Checking `Expect predicate `existsNoRetry == 1` for object "taskFormScrollView" ScrollView`
+    t =    12.16s         Checking existence of `"taskFormScrollView" ScrollView`
+    t =    12.22s         Capturing element debug description
+    t =    12.22s     Checking existence of `"taskFormScrollView" ScrollView`
+    t =    12.26s Collecting debug information to assist test failure triage
+    t =    12.26s     Requesting snapshot of accessibility hierarchy for app with pid 16417
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/TaskFormGlassCardUITests.swift:85: error: -[FocusBloxUITests.TaskFormGlassCardUITests testFormDoesNotUseDefaultListStyle] : XCTAssertTrue failed - Bug 17: TaskFormSheet should use custom ScrollView container, not default Form. Looking for 'taskFormScrollView' identifier.
+    t =    12.35s Tear Down
+Test Case '-[FocusBloxUITests.TaskFormGlassCardUITests testFormDoesNotUseDefaultListStyle]' failed (12.561 seconds).
+Test Case '-[FocusBloxUITests.TaskFormGlassCardUITests testFormHasGlassCardSections]' started.
+    t =     0.00s Start Test at 2026-01-30 08:04:19.855
+    t =     0.02s Set Up
+    t =     0.02s     Open com.henning.timebox
+    t =     0.02s         Launch com.henning.timebox
+    t =     0.02s             Terminate com.henning.timebox:16417
+    t =     1.27s             Setting up automation session
+    t =     1.93s             Wait for com.henning.timebox to idle
+    t =     3.35s Waiting 5.0s for "tab-backlog" Button to exist
+    t =     4.39s     Checking `Expect predicate `existsNoRetry == 1` for object "tab-backlog" Button`
+    t =     4.39s         Checking existence of `"tab-backlog" Button`
+    t =     4.46s Tap "tab-backlog" Button
+    t =     4.46s     Wait for com.henning.timebox to idle
+    t =     4.46s     Find the "tab-backlog" Button
+    t =     4.48s     Check for interrupting elements affecting "tab-backlog" Button
+    t =     4.50s     Synthesize event
+    t =     4.79s     Wait for com.henning.timebox to idle
+    t =     5.80s Waiting 3.0s for "addTaskButton" Button to exist
+    t =     6.83s     Checking `Expect predicate `existsNoRetry == 1` for object "addTaskButton" Button`
+    t =     6.83s         Checking existence of `"addTaskButton" Button`
+    t =     6.87s Tap "addTaskButton" Button
+    t =     6.87s     Wait for com.henning.timebox to idle
+    t =     6.87s     Find the "addTaskButton" Button
+    t =     6.89s     Check for interrupting elements affecting "addTaskButton" Button
+    t =     6.91s     Synthesize event
+    t =     7.20s     Wait for com.henning.timebox to idle
+    t =     9.09s Find the Target Application 'com.henning.timebox'
+    t =     9.24s Added attachment named 'Bug17-TaskForm-GlassCard'
+    t =     9.24s Checking existence of `"taskFormSection_title" Other`
+    t =     9.29s Checking existence of `"taskFormSection_duration" Other`
+    t =     9.34s Checking existence of `"taskFormSection_importance" Other`
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/TaskFormGlassCardUITests.swift:69: error: -[FocusBloxUITests.TaskFormGlassCardUITests testFormHasGlassCardSections] : XCTAssertTrue failed - Bug 17: TaskFormSheet should have glass card sections with identifiers. Currently uses default Form styling.
+    t =     9.38s Tear Down
+Test Case '-[FocusBloxUITests.TaskFormGlassCardUITests testFormHasGlassCardSections]' failed (9.596 seconds).
+Test Suite 'TaskFormGlassCardUITests' failed at 2026-01-30 08:04:29.452.
+	 Executed 3 tests, with 3 failures (0 unexpected) in 32.481 (32.483) seconds
+Test Suite 'FocusBloxUITests.xctest' failed at 2026-01-30 08:04:29.452.
+	 Executed 3 tests, with 3 failures (0 unexpected) in 32.481 (32.483) seconds
+Test Suite 'Selected tests' failed at 2026-01-30 08:04:29.452.
+	 Executed 3 tests, with 3 failures (0 unexpected) in 32.481 (32.485) seconds
+2026-01-30 08:04:47.562 xcodebuild[16324:42395536] [MT] IDETestOperationsObserverDebug: 54.839 elapsed -- Testing started completed.
+2026-01-30 08:04:47.562 xcodebuild[16324:42395536] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2026-01-30 08:04:47.562 xcodebuild[16324:42395536] [MT] IDETestOperationsObserverDebug: 54.839 sec, +54.839 sec -- end
+
+Test session results, code coverage, and logs:
+	/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Logs/Test/Test-FocusBlox-2026.01.30_08-03-48-+0100.xcresult
+
+** TEST FAILED **
+
+Testing started

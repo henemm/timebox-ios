@@ -400,10 +400,15 @@
 - Status: ✅ **ERLEDIGT**
 
 **Bug 17: Task-Erstellung Design nicht aktualisiert**
-- Location: `TaskFormSheet.swift`
-- Problem: Neues Glass Card Design nicht übernommen
-- Scope: TaskFormSheet komplett redesignen wie BacklogRow
-- Status: **OFFEN**
+- Location: `TaskFormSheet.swift`, `BacklogView.swift`
+- Problem: Altes Form Design statt Glass Card
+- Fix (2026-01-30):
+  - Form → ScrollView + VStack mit Glass Card Sections
+  - `.ultraThinMaterial` Hintergründe
+  - Kompakteres Layout mit Task Type Grid
+  - BacklogView nutzt jetzt TaskFormSheet statt CreateTaskView
+- UI Tests: `TaskFormGlassCardUITests.swift` (3 Tests bestanden)
+- Status: ✅ **ERLEDIGT**
 
 ### UI Test Failures (29.01.2026)
 

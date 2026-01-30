@@ -52,6 +52,9 @@ struct BacklogView: View {
     @State private var isLoading = false
     @State private var reorderTrigger = false
     @State private var selectedItemForDuration: PlanItem?
+    @State private var selectedItemForImportance: PlanItem?
+    @State private var selectedItemForCategory: PlanItem?
+    @State private var taskToEditDirectly: PlanItem?
     @State private var durationFeedback = false
     @State private var showCreateTask = false
     @State private var nextUpFeedback = false
@@ -207,7 +210,7 @@ struct BacklogView: View {
                     }
                 }
             }
-            .navigationTitle("FocusBlox")
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     if selectedMode == .list {
@@ -236,8 +239,31 @@ struct BacklogView: View {
                     selectedItemForDuration = nil
                 }
             }
+            .sheet(item: $selectedItemForImportance) { item in
+                ImportancePicker(currentImportance: item.importance) { newImportance in
+                    updateImportance(for: item, importance: newImportance)
+                    selectedItemForImportance = nil
+                }
+            }
+            .sheet(item: $selectedItemForCategory) { item in
+                CategoryPicker(currentCategory: item.taskType) { newCategory in
+                    updateCategory(for: item, category: newCategory)
+                    selectedItemForCategory = nil
+                }
+            }
+            .sheet(item: $taskToEditDirectly) { task in
+                TaskFormSheet(
+                    task: task,
+                    onSave: { title, priority, duration, tags, urgency, taskType, dueDate, description in
+                        updateTask(task, title: title, priority: priority, duration: duration, tags: tags, urgency: urgency, taskType: taskType, dueDate: dueDate, description: description)
+                    },
+                    onDelete: {
+                        deleteTask(task)
+                    }
+                )
+            }
             .sheet(isPresented: $showCreateTask) {
-                CreateTaskView {
+                TaskFormSheet {
                     Task {
                         await loadTasks()
                     }
@@ -349,6 +375,39 @@ struct BacklogView: View {
         }
     }
 
+    private func updateImportance(for item: PlanItem, importance: Int?) {
+        do {
+            let taskSource = LocalTaskSource(modelContext: modelContext)
+            let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
+            try syncEngine.updateTask(itemID: item.id, title: item.title, importance: importance, duration: item.estimatedDuration, tags: item.tags, urgency: item.urgency, taskType: item.taskType, dueDate: item.dueDate, description: item.taskDescription)
+            Task { await loadTasks() }
+        } catch {
+            errorMessage = "Wichtigkeit konnte nicht aktualisiert werden."
+        }
+    }
+
+    private func updateUrgency(for item: PlanItem, urgency: String) {
+        do {
+            let taskSource = LocalTaskSource(modelContext: modelContext)
+            let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
+            try syncEngine.updateTask(itemID: item.id, title: item.title, importance: item.importance, duration: item.estimatedDuration, tags: item.tags, urgency: urgency, taskType: item.taskType, dueDate: item.dueDate, description: item.taskDescription)
+            Task { await loadTasks() }
+        } catch {
+            errorMessage = "Dringlichkeit konnte nicht aktualisiert werden."
+        }
+    }
+
+    private func updateCategory(for item: PlanItem, category: String) {
+        do {
+            let taskSource = LocalTaskSource(modelContext: modelContext)
+            let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
+            try syncEngine.updateTask(itemID: item.id, title: item.title, importance: item.importance, duration: item.estimatedDuration, tags: item.tags, urgency: item.urgency, taskType: category, dueDate: item.dueDate, description: item.taskDescription)
+            Task { await loadTasks() }
+        } catch {
+            errorMessage = "Kategorie konnte nicht aktualisiert werden."
+        }
+    }
+
     private func deleteTask(_ task: PlanItem) {
         do {
             let taskSource = LocalTaskSource(modelContext: modelContext)
@@ -360,6 +419,30 @@ struct BacklogView: View {
             }
         } catch {
             errorMessage = "Task konnte nicht gelöscht werden."
+        }
+    }
+
+    private func saveInlineEdit(for task: PlanItem, title: String, duration: Int) {
+        do {
+            let taskSource = LocalTaskSource(modelContext: modelContext)
+            let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
+            try syncEngine.updateTask(
+                itemID: task.id,
+                title: title,
+                importance: task.importance,
+                duration: duration,
+                tags: task.tags,
+                urgency: task.urgency,
+                taskType: task.taskType,
+                dueDate: task.dueDate,
+                description: task.taskDescription
+            )
+
+            Task {
+                await loadTasks()
+            }
+        } catch {
+            errorMessage = "Änderungen konnten nicht gespeichert werden."
         }
     }
 
@@ -409,19 +492,28 @@ struct BacklogView: View {
     }
 
     // MARK: - List View
+    // Using ScrollView + LazyVStack instead of List for proper accessibility identifier exposure
     private var listView: some View {
-        List {
-            ForEach(backlogTasks) { item in
-                BacklogRow(
-                    item: item,
-                    onDurationTap: { selectedItemForDuration = item },
-                    onAddToNextUp: { updateNextUp(for: item, isNextUp: true) },
-                    onTap: { taskToEdit = item }
-                )
+        ScrollView {
+            LazyVStack(spacing: 8) {
+                ForEach(backlogTasks) { item in
+                    BacklogRow(
+                        item: item,
+                        onDurationTap: { selectedItemForDuration = item },
+                        onAddToNextUp: { updateNextUp(for: item, isNextUp: true) },
+                        onImportanceCycle: { newImportance in updateImportance(for: item, importance: newImportance) },
+                        onUrgencyToggle: { newUrgency in updateUrgency(for: item, urgency: newUrgency) },
+                        onCategoryTap: { selectedItemForCategory = item },
+                        onEditTap: { taskToEditDirectly = item },
+                        onDeleteTap: { deleteTask(item) },
+                        onSaveInline: { title, duration in
+                            saveInlineEdit(for: item, title: title, duration: duration)
+                        }
+                    )
+                }
             }
-            .onMove(perform: moveItems)
+            .padding(.horizontal, 16)
         }
-        .listStyle(.plain)
         .refreshable {
             await loadTasks()
         }
@@ -439,7 +531,12 @@ struct BacklogView: View {
                     tasks: doFirstTasks,
                     onDurationTap: { item in selectedItemForDuration = item },
                     onAddToNextUp: { item in updateNextUp(for: item, isNextUp: true) },
-                    onTap: { item in taskToEdit = item }
+                    onImportanceCycle: { item, newImportance in updateImportance(for: item, importance: newImportance) },
+                    onUrgencyToggle: { item, newUrgency in updateUrgency(for: item, urgency: newUrgency) },
+                    onCategoryTap: { item in selectedItemForCategory = item },
+                    onEditTap: { item in taskToEditDirectly = item },
+                    onDeleteTap: { item in deleteTask(item) },
+                    onSaveInline: { item, title, duration in saveInlineEdit(for: item, title: title, duration: duration) }
                 )
 
                 QuadrantCard(
@@ -450,7 +547,12 @@ struct BacklogView: View {
                     tasks: scheduleTasks,
                     onDurationTap: { item in selectedItemForDuration = item },
                     onAddToNextUp: { item in updateNextUp(for: item, isNextUp: true) },
-                    onTap: { item in taskToEdit = item }
+                    onImportanceCycle: { item, newImportance in updateImportance(for: item, importance: newImportance) },
+                    onUrgencyToggle: { item, newUrgency in updateUrgency(for: item, urgency: newUrgency) },
+                    onCategoryTap: { item in selectedItemForCategory = item },
+                    onEditTap: { item in taskToEditDirectly = item },
+                    onDeleteTap: { item in deleteTask(item) },
+                    onSaveInline: { item, title, duration in saveInlineEdit(for: item, title: title, duration: duration) }
                 )
 
                 QuadrantCard(
@@ -461,7 +563,12 @@ struct BacklogView: View {
                     tasks: delegateTasks,
                     onDurationTap: { item in selectedItemForDuration = item },
                     onAddToNextUp: { item in updateNextUp(for: item, isNextUp: true) },
-                    onTap: { item in taskToEdit = item }
+                    onImportanceCycle: { item, newImportance in updateImportance(for: item, importance: newImportance) },
+                    onUrgencyToggle: { item, newUrgency in updateUrgency(for: item, urgency: newUrgency) },
+                    onCategoryTap: { item in selectedItemForCategory = item },
+                    onEditTap: { item in taskToEditDirectly = item },
+                    onDeleteTap: { item in deleteTask(item) },
+                    onSaveInline: { item, title, duration in saveInlineEdit(for: item, title: title, duration: duration) }
                 )
 
                 QuadrantCard(
@@ -472,7 +579,12 @@ struct BacklogView: View {
                     tasks: eliminateTasks,
                     onDurationTap: { item in selectedItemForDuration = item },
                     onAddToNextUp: { item in updateNextUp(for: item, isNextUp: true) },
-                    onTap: { item in taskToEdit = item }
+                    onImportanceCycle: { item, newImportance in updateImportance(for: item, importance: newImportance) },
+                    onUrgencyToggle: { item, newUrgency in updateUrgency(for: item, urgency: newUrgency) },
+                    onCategoryTap: { item in selectedItemForCategory = item },
+                    onEditTap: { item in taskToEditDirectly = item },
+                    onDeleteTap: { item in deleteTask(item) },
+                    onSaveInline: { item, title, duration in saveInlineEdit(for: item, title: title, duration: duration) }
                 )
             }
             .padding()
@@ -484,21 +596,35 @@ struct BacklogView: View {
 
     // MARK: - Category View
     private var categoryView: some View {
-        List {
-            ForEach(tasksByCategory, id: \.category) { group in
-                Section(header: Text(group.category)) {
-                    ForEach(group.tasks) { item in
-                        BacklogRow(
-                            item: item,
-                            onDurationTap: { selectedItemForDuration = item },
-                            onAddToNextUp: { updateNextUp(for: item, isNextUp: true) },
-                            onTap: { taskToEdit = item }
-                        )
+        ScrollView {
+            LazyVStack(spacing: 16) {
+                ForEach(tasksByCategory, id: \.category) { group in
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text(group.category)
+                            .font(.headline)
+                            .foregroundStyle(.secondary)
+                            .padding(.horizontal, 16)
+
+                        LazyVStack(spacing: 8) {
+                            ForEach(group.tasks) { item in
+                                BacklogRow(
+                                    item: item,
+                                    onDurationTap: { selectedItemForDuration = item },
+                                    onAddToNextUp: { updateNextUp(for: item, isNextUp: true) },
+                                    onTap: { taskToEdit = item },
+                                    onImportanceCycle: { newImportance in updateImportance(for: item, importance: newImportance) },
+                                    onUrgencyToggle: { newUrgency in updateUrgency(for: item, urgency: newUrgency) },
+                                    onCategoryTap: { selectedItemForCategory = item },
+                                    onEditTap: { taskToEditDirectly = item },
+                                    onDeleteTap: { deleteTask(item) }
+                                )
+                            }
+                        }
+                        .padding(.horizontal, 16)
                     }
                 }
             }
         }
-        .listStyle(.insetGrouped)
         .refreshable {
             await loadTasks()
         }
@@ -506,21 +632,35 @@ struct BacklogView: View {
 
     // MARK: - Duration View
     private var durationView: some View {
-        List {
-            ForEach(tasksByDuration, id: \.bucket) { group in
-                Section(header: Text(group.bucket)) {
-                    ForEach(group.tasks) { item in
-                        BacklogRow(
-                            item: item,
-                            onDurationTap: { selectedItemForDuration = item },
-                            onAddToNextUp: { updateNextUp(for: item, isNextUp: true) },
-                            onTap: { taskToEdit = item }
-                        )
+        ScrollView {
+            LazyVStack(spacing: 16) {
+                ForEach(tasksByDuration, id: \.bucket) { group in
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text(group.bucket)
+                            .font(.headline)
+                            .foregroundStyle(.secondary)
+                            .padding(.horizontal, 16)
+
+                        LazyVStack(spacing: 8) {
+                            ForEach(group.tasks) { item in
+                                BacklogRow(
+                                    item: item,
+                                    onDurationTap: { selectedItemForDuration = item },
+                                    onAddToNextUp: { updateNextUp(for: item, isNextUp: true) },
+                                    onTap: { taskToEdit = item },
+                                    onImportanceCycle: { newImportance in updateImportance(for: item, importance: newImportance) },
+                                    onUrgencyToggle: { newUrgency in updateUrgency(for: item, urgency: newUrgency) },
+                                    onCategoryTap: { selectedItemForCategory = item },
+                                    onEditTap: { taskToEditDirectly = item },
+                                    onDeleteTap: { deleteTask(item) }
+                                )
+                            }
+                        }
+                        .padding(.horizontal, 16)
                     }
                 }
             }
         }
-        .listStyle(.insetGrouped)
         .refreshable {
             await loadTasks()
         }
@@ -528,21 +668,35 @@ struct BacklogView: View {
 
     // MARK: - Due Date View
     private var dueDateView: some View {
-        List {
-            ForEach(tasksByDueDate, id: \.section) { group in
-                Section(header: Text(group.section)) {
-                    ForEach(group.tasks) { item in
-                        BacklogRow(
-                            item: item,
-                            onDurationTap: { selectedItemForDuration = item },
-                            onAddToNextUp: { updateNextUp(for: item, isNextUp: true) },
-                            onTap: { taskToEdit = item }
-                        )
+        ScrollView {
+            LazyVStack(spacing: 16) {
+                ForEach(tasksByDueDate, id: \.section) { group in
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text(group.section)
+                            .font(.headline)
+                            .foregroundStyle(.secondary)
+                            .padding(.horizontal, 16)
+
+                        LazyVStack(spacing: 8) {
+                            ForEach(group.tasks) { item in
+                                BacklogRow(
+                                    item: item,
+                                    onDurationTap: { selectedItemForDuration = item },
+                                    onAddToNextUp: { updateNextUp(for: item, isNextUp: true) },
+                                    onTap: { taskToEdit = item },
+                                    onImportanceCycle: { newImportance in updateImportance(for: item, importance: newImportance) },
+                                    onUrgencyToggle: { newUrgency in updateUrgency(for: item, urgency: newUrgency) },
+                                    onCategoryTap: { selectedItemForCategory = item },
+                                    onEditTap: { taskToEditDirectly = item },
+                                    onDeleteTap: { deleteTask(item) }
+                                )
+                            }
+                        }
+                        .padding(.horizontal, 16)
                     }
                 }
             }
         }
-        .listStyle(.insetGrouped)
         .refreshable {
             await loadTasks()
         }
@@ -550,17 +704,24 @@ struct BacklogView: View {
 
     // MARK: - TBD View (unvollständige Tasks)
     private var tbdView: some View {
-        List {
-            ForEach(tbdTasks) { item in
-                BacklogRow(
-                    item: item,
-                    onDurationTap: { selectedItemForDuration = item },
-                    onAddToNextUp: { updateNextUp(for: item, isNextUp: true) },
-                    onTap: { taskToEdit = item }
-                )
+        ScrollView {
+            LazyVStack(spacing: 8) {
+                ForEach(tbdTasks) { item in
+                    BacklogRow(
+                        item: item,
+                        onDurationTap: { selectedItemForDuration = item },
+                        onAddToNextUp: { updateNextUp(for: item, isNextUp: true) },
+                        onTap: { taskToEdit = item },
+                        onImportanceCycle: { newImportance in updateImportance(for: item, importance: newImportance) },
+                        onUrgencyToggle: { newUrgency in updateUrgency(for: item, urgency: newUrgency) },
+                        onCategoryTap: { selectedItemForCategory = item },
+                        onEditTap: { taskToEditDirectly = item },
+                        onDeleteTap: { deleteTask(item) }
+                    )
+                }
             }
+            .padding(.horizontal, 16)
         }
-        .listStyle(.plain)
         .refreshable {
             await loadTasks()
         }
@@ -596,7 +757,12 @@ struct QuadrantCard: View {
     let tasks: [PlanItem]
     let onDurationTap: (PlanItem) -> Void
     let onAddToNextUp: (PlanItem) -> Void
-    let onTap: (PlanItem) -> Void
+    var onImportanceCycle: ((PlanItem, Int) -> Void)?
+    var onUrgencyToggle: ((PlanItem, String) -> Void)?
+    var onCategoryTap: ((PlanItem) -> Void)?
+    var onEditTap: ((PlanItem) -> Void)?
+    var onDeleteTap: ((PlanItem) -> Void)?
+    var onSaveInline: ((PlanItem, String, Int) -> Void)?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -632,7 +798,12 @@ struct QuadrantCard: View {
                         item: task,
                         onDurationTap: { onDurationTap(task) },
                         onAddToNextUp: { onAddToNextUp(task) },
-                        onTap: { onTap(task) }
+                        onImportanceCycle: onImportanceCycle.map { callback in { newImportance in callback(task, newImportance) } },
+                        onUrgencyToggle: onUrgencyToggle.map { callback in { newUrgency in callback(task, newUrgency) } },
+                        onCategoryTap: onCategoryTap.map { callback in { callback(task) } },
+                        onEditTap: onEditTap.map { callback in { callback(task) } },
+                        onDeleteTap: onDeleteTap.map { callback in { callback(task) } },
+                        onSaveInline: onSaveInline.map { callback in { title, duration in callback(task, title, duration) } }
                     )
                     .padding(.horizontal, 8)
                 }

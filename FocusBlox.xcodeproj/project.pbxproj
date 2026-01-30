@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		03A94D15FBA2530D8C629546 /* BacklogRowRedesignUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54C8A326C1D84FA7A3BD27A8 /* BacklogRowRedesignUITests.swift */; };
+		170C6E63339A92E86F659F7E /* TaskFormGlassCardUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDB06B85B45AB03356A14914 /* TaskFormGlassCardUITests.swift */; };
 		1800BB7020E3D6044A62475A /* DailyReviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A36E40124EBA31D7428EAA80 /* DailyReviewView.swift */; };
 		1B489799D0D38661913FCC34 /* TimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C945F5092F6FFB66C11FD4C2 /* TimelineView.swift */; };
 		22AA189C61A4045FE2B36B64 /* DurationBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDD319A3F7DEE05F6A8885FC /* DurationBadge.swift */; };
@@ -320,6 +321,7 @@
 		DYNISLD01FILE00001 /* DynamicIslandUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DynamicIslandUITests.swift; sourceTree = "<group>"; };
 		E1F3228806B919AB0836326F /* ReminderData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReminderData.swift; sourceTree = "<group>"; };
 		E6D939B402B46840351D9475 /* EventKitRepositoryProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventKitRepositoryProtocol.swift; sourceTree = "<group>"; };
+		EDB06B85B45AB03356A14914 /* TaskFormGlassCardUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TaskFormGlassCardUITests.swift; sourceTree = "<group>"; };
 		EDITTSK01FILE0001 /* EditTaskSheetUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditTaskSheetUITests.swift; sourceTree = "<group>"; };
 		F1CCA00FEA15FD7BA149CDDE /* CalendarSelectionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarSelectionTests.swift; sourceTree = "<group>"; };
 		F364C9B1BB1D787792360427 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
@@ -521,6 +523,7 @@
 				54C8A326C1D84FA7A3BD27A8 /* BacklogRowRedesignUITests.swift */,
 				10F0B986805B8F703DB62935 /* DebugHierarchyTest.swift */,
 				DFD460F955B924EB6F6C5B94 /* TaskFormTbdUITests.swift */,
+				EDB06B85B45AB03356A14914 /* TaskFormGlassCardUITests.swift */,
 			);
 			path = FocusBloxUITests;
 			sourceTree = "<group>";
@@ -1069,6 +1072,7 @@
 				03A94D15FBA2530D8C629546 /* BacklogRowRedesignUITests.swift in Sources */,
 				5696B45863B3DACF0773DF6C /* DebugHierarchyTest.swift in Sources */,
 				96DD4A471C3F159FE2C19462 /* TaskFormTbdUITests.swift in Sources */,
+				170C6E63339A92E86F659F7E /* TaskFormGlassCardUITests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
