@@ -1,0 +1,14 @@
+TDD RED - Badge Chip Styling Visual Test
+
+VISUAL ASSERTION ERROR:
+- Expected: All tappable badges have chip backgrounds
+- Actual: Category and Urgency (when not urgent) have NO background
+
+Test Case 'BadgeChipUITests.testCategoryBadgeHasChipBackground()' - VISUAL FAIL
+  → Category badge renders without background, expected RoundedRectangle.fill
+
+Test Case 'BadgeChipUITests.testUrgencyBadgeHasChipBackground()' - VISUAL FAIL  
+  → Urgency badge (not urgent state) has .clear background, expected .gray.opacity(0.2)
+
+Functional tests passed (badges exist, are tappable).
+Visual consistency test FAILED - requires implementation fix.

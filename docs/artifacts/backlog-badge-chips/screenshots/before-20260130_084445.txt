@@ -1,0 +1,31 @@
+BEFORE Screenshot - Bug 17 Badge Chip Styling
+
+Current state (2026-01-30_08:44):
+
+BADGES IN BACKLOG ROW:
+======================
+
+1. Importance Badge:
+   - Icon: exclamationmark / exclamationmark.2 / exclamationmark.3 / questionmark
+   - Color: blue / yellow / red / gray
+   - Background: RoundedRectangle with color.opacity(0.2) ✅ HAS CHIP
+
+2. Urgency Badge:
+   - Icon: flame.fill (urgent) or flame (not urgent)
+   - Color: orange (urgent) or gray.opacity(0.5) (not urgent)
+   - Background: .orange.opacity(0.2) when urgent, .clear when NOT urgent
+   - ❌ NO CHIP when not urgent
+
+3. Category Badge:
+   - Icon: varies by category (dollarsign.circle, wrench, battery, book, gift, etc.)
+   - Color: .primary
+   - Background: NONE
+   - ❌ NO CHIP
+
+4. Duration Badge:
+   - Icon: timer
+   - Color: gray (default) or blue (set)
+   - Background: Capsule with color.opacity(0.2) ✅ HAS CHIP
+
+PROBLEM: Inconsistent visual appearance - some badges have chip backgrounds, others don't.
+

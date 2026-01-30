@@ -5,10 +5,12 @@ struct BacklogRow: View {
     var onDurationTap: (() -> Void)?
     var onAddToNextUp: (() -> Void)?
     var onTap: (() -> Void)?
-    var onImportanceTap: (() -> Void)?
+    var onImportanceCycle: ((Int) -> Void)?  // Cycles: 1 → 2 → 3 → 1
+    var onUrgencyToggle: ((String) -> Void)?  // Toggles: "urgent" ↔ "not_urgent"
     var onCategoryTap: (() -> Void)?
     var onEditTap: (() -> Void)?
     var onDeleteTap: (() -> Void)?
+    var onSaveInline: ((String, Int) -> Void)?  // title, duration
 
     @State private var isExpanded = false
     @State private var editableTitle: String = ""
@@ -20,16 +22,13 @@ struct BacklogRow: View {
         VStack(spacing: 0) {
             // Main Row
             HStack(spacing: 12) {
-                // Column 1: Importance Button
-                importanceButton
-
-                // Column 2: Content
+                // Left Column: Content (Title + Metadata)
                 contentSection
 
                 Spacer(minLength: 8)
 
-                // Column 3: Actions
-                actionsMenu
+                // Right Column: 2 Buttons (Next Up + Menu)
+                rightColumnButtons
             }
 
             // Inline Edit Section (when expanded)
@@ -50,40 +49,132 @@ struct BacklogRow: View {
                 isExpanded.toggle()
             }
         }
-        .accessibilityIdentifier("backlogRow_\(item.id)")
+        // NOTE: No accessibilityIdentifier on parent - children have their own identifiers
+        // Parent identifier would override all child identifiers in SwiftUI
     }
 
-    // MARK: - Importance Button
+    // MARK: - Content Section (Left Column)
 
-    private var importanceButton: some View {
+    private var contentSection: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            // Title (bold, max 2 lines, italic + gray if TBD)
+            titleView
+                .accessibilityIdentifier("taskTitle_\(item.id)")
+
+            // Metadata Row
+            metadataRow
+        }
+    }
+
+    // MARK: - Title View (italic if TBD)
+
+    @ViewBuilder
+    private var titleView: some View {
+        if item.isTbd {
+            Text(item.title)
+                .font(.system(.body).weight(.semibold))
+                .foregroundStyle(.secondary)
+                .lineLimit(2)
+                .truncationMode(.tail)
+                .italic()
+        } else {
+            Text(item.title)
+                .font(.system(.body).weight(.semibold))
+                .foregroundStyle(.primary)
+                .lineLimit(2)
+                .truncationMode(.tail)
+        }
+    }
+
+    // MARK: - Metadata Row (Scrollable, fixed size badges)
+
+    private var metadataRow: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 6) {
+                // 1. Importance Badge (always visible, gray "?" if not set)
+                importanceBadge
+
+                // 2. Urgency Badge
+                urgencyBadge
+
+                // 3. Category Badge
+                categoryBadge
+
+                // 4. Tags (max 2, dann "+N") - plain text, no chips
+                if !item.tags.isEmpty {
+                    ForEach(item.tags.prefix(2), id: \.self) { tag in
+                        Text("#\(tag)")
+                            .font(.caption2)
+                            .lineLimit(1)
+                            .foregroundStyle(.secondary)
+                            .fixedSize()
+                    }
+
+                    if item.tags.count > 2 {
+                        Text("+\(item.tags.count - 2)")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                            .fixedSize()
+                    }
+                }
+
+                // 5. Duration Badge
+                durationBadge
+
+                // 6. Due Date Badge
+                if let dueDate = item.dueDate {
+                    HStack(spacing: 2) {
+                        Image(systemName: "calendar")
+                        Text(dueDateText(dueDate))
+                    }
+                    .font(.caption2)
+                    .foregroundStyle(isDueToday(dueDate) ? .red : .secondary)
+                    .fixedSize()
+                }
+            }
+        }
+    }
+
+    // MARK: - Importance Badge (tappable, cycles 1 → 2 → 3 → 1)
+    // Always visible: shows gray "?" when not set
+
+    private var importanceBadge: some View {
         Button {
-            onImportanceTap?()
+            let current = item.importance ?? 0
+            let next = current >= 3 ? 1 : current + 1
+            onImportanceCycle?(next)
         } label: {
             Image(systemName: importanceSFSymbol)
-                .font(.system(size: 22))
+                .font(.system(size: 14))
                 .foregroundStyle(importanceColor)
-                .symbolRenderingMode(.hierarchical)
+                .padding(.horizontal, 6)
+                .padding(.vertical, 4)
+                .background(
+                    RoundedRectangle(cornerRadius: 6)
+                        .fill(importanceColor.opacity(0.2))
+                )
         }
-        .frame(width: 44, height: 44)
-        .contentShape(Rectangle())
-        .accessibilityIdentifier("importanceButton_\(item.id)")
-        .accessibilityLabel("Wichtigkeit: \(importanceLabel)")
+        .buttonStyle(.plain)
+        .fixedSize()
+        .sensoryFeedback(.impact(weight: .light), trigger: item.importance)
+        .accessibilityIdentifier("importanceBadge_\(item.id)")
+        .accessibilityLabel("Wichtigkeit: \(importanceLabel). Tippen zum Ändern.")
     }
 
     private var importanceSFSymbol: String {
         switch item.importance {
-        case 1: return "square.fill"
-        case 2: return "square.fill"
-        case 3: return "circle.fill"
-        default: return "questionmark.square"
+        case 3: return "exclamationmark.3"
+        case 2: return "exclamationmark.2"
+        case 1: return "exclamationmark"
+        default: return "questionmark"
         }
     }
 
     private var importanceColor: Color {
         switch item.importance {
-        case 1: return .blue
-        case 2: return .yellow
         case 3: return .red
+        case 2: return .yellow
+        case 1: return .blue
         default: return .gray
         }
     }
@@ -97,76 +188,32 @@ struct BacklogRow: View {
         }
     }
 
-    // MARK: - Content Section
+    // MARK: - Urgency Badge (tappable, toggles urgent ↔ not_urgent)
 
-    private var contentSection: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            // Title
-            Text(item.title)
-                .font(.system(.body, design: .rounded).weight(.semibold))
-                .foregroundStyle(.primary)
-                .lineLimit(2)
-                .truncationMode(.tail)
-                .italic(item.isTbd)
-                .accessibilityIdentifier("taskTitle_\(item.id)")
-
-            // Metadata Row
-            metadataRow
-        }
+    private var isUrgent: Bool {
+        item.urgency == "urgent"
     }
 
-    private var metadataRow: some View {
-        HStack(spacing: 8) {
-            // 1. Category Badge (always visible)
-            categoryBadge
-
-            // 2. TBD Badge (if incomplete task)
-            if item.isTbd {
-                Text("tbd")
-                    .font(.caption2)
-                    .padding(.horizontal, 6)
-                    .padding(.vertical, 2)
-                    .background(Color.secondary.opacity(0.2))
-                    .foregroundStyle(.secondary)
-                    .cornerRadius(4)
-                    .accessibilityIdentifier("tbdBadge_\(item.id)")
-            }
-
-            // 3. Tags (max 2, no icons - just text)
-            if !item.tags.isEmpty {
-                ForEach(item.tags.prefix(2), id: \.self) { tag in
-                    Text(tag)
-                        .font(.caption2)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
-                        .background(Capsule().fill(.white.opacity(0.1)))
-                        .foregroundStyle(.secondary)
-                }
-
-                // Overflow counter
-                if item.tags.count > 2 {
-                    Text("+\(item.tags.count - 2)")
-                        .font(.caption2)
-                        .padding(.horizontal, 6)
-                        .padding(.vertical, 2)
-                        .background(Capsule().fill(.white.opacity(0.1)))
-                        .foregroundStyle(.secondary)
-                }
-            }
-
-            // 4. Due Date Badge
-            if let dueDate = item.dueDate {
-                HStack(spacing: 2) {
-                    Image(systemName: "calendar")
-                    Text(dueDateText(dueDate))
-                }
-                .font(.caption2)
-                .foregroundStyle(isDueToday(dueDate) ? .red : .secondary)
-            }
-
-            // 5. Duration Badge
-            durationBadge
+    private var urgencyBadge: some View {
+        Button {
+            let newUrgency = isUrgent ? "not_urgent" : "urgent"
+            onUrgencyToggle?(newUrgency)
+        } label: {
+            Image(systemName: isUrgent ? "flame.fill" : "flame")
+                .font(.system(size: 14))
+                .foregroundStyle(isUrgent ? .orange : .gray)
+                .padding(.horizontal, 6)
+                .padding(.vertical, 4)
+                .background(
+                    RoundedRectangle(cornerRadius: 6)
+                        .fill(isUrgent ? .orange.opacity(0.2) : .gray.opacity(0.2))
+                )
         }
+        .buttonStyle(.plain)
+        .fixedSize()
+        .sensoryFeedback(.impact(weight: .medium), trigger: item.urgency)
+        .accessibilityIdentifier("urgencyBadge_\(item.id)")
+        .accessibilityLabel(isUrgent ? "Dringend. Tippen zum Entfernen." : "Nicht dringend. Tippen für Dringend.")
     }
 
     // MARK: - Category Badge
@@ -178,13 +225,32 @@ struct BacklogRow: View {
             HStack(spacing: 4) {
                 Image(systemName: categoryIcon)
                 Text(categoryLabel)
+                    .lineLimit(1)
             }
             .font(.caption2)
-            .foregroundStyle(.white.opacity(0.7))
+            .foregroundStyle(categoryColor)
+            .padding(.horizontal, 6)
+            .padding(.vertical, 4)
+            .background(
+                RoundedRectangle(cornerRadius: 6)
+                    .fill(categoryColor.opacity(0.2))
+            )
         }
         .buttonStyle(.plain)
+        .fixedSize()
         .accessibilityIdentifier("categoryBadge_\(item.id)")
         .accessibilityLabel("Kategorie: \(categoryLabel)")
+    }
+
+    private var categoryColor: Color {
+        switch item.taskType {
+        case "income": return .green
+        case "maintenance": return .orange
+        case "recharge": return .cyan
+        case "learning": return .purple
+        case "giving_back": return .pink
+        default: return .gray
+        }
     }
 
     private var categoryIcon: String {
@@ -220,13 +286,14 @@ struct BacklogRow: View {
     }
 
     // MARK: - Duration Badge
+    // Gray = duration NOT set (TBD), Blue = duration IS set
 
     private var durationBadgeColor: Color {
-        item.durationSource == .default ? .yellow : .blue
+        item.durationSource == .default ? .gray : .blue
     }
 
     private var durationBadgeBackground: Color {
-        item.durationSource == .default ? .yellow.opacity(0.2) : .blue.opacity(0.2)
+        item.durationSource == .default ? .gray.opacity(0.2) : .blue.opacity(0.2)
     }
 
     private var durationBadge: some View {
@@ -236,22 +303,55 @@ struct BacklogRow: View {
             HStack(spacing: 4) {
                 Image(systemName: "timer")
                 Text("\(item.effectiveDuration)m")
+                    .lineLimit(1)
             }
             .font(.caption2)
             .foregroundStyle(durationBadgeColor)
-            .padding(.horizontal, 8)
-            .padding(.vertical, 4)
+            .padding(.horizontal, 6)
+            .padding(.vertical, 3)
             .background(
                 Capsule()
                     .fill(durationBadgeBackground)
             )
         }
         .buttonStyle(.plain)
+        .fixedSize()
         .accessibilityIdentifier("durationBadge_\(item.id)")
         .accessibilityLabel("Dauer: \(item.effectiveDuration) Minuten")
     }
 
-    // MARK: - Actions Menu
+    // MARK: - Right Column (2 Buttons Vertical)
+
+    private var rightColumnButtons: some View {
+        VStack(spacing: 0) {
+            // Next Up Button (hidden if already in Next Up)
+            if !item.isNextUp {
+                nextUpButton
+            }
+
+            // Actions Menu
+            actionsMenu
+        }
+        .frame(width: 44)
+    }
+
+    // MARK: - Next Up Button
+
+    private var nextUpButton: some View {
+        Button {
+            onAddToNextUp?()
+        } label: {
+            Image(systemName: "arrow.up.circle")
+                .font(.system(size: 20))
+                .foregroundStyle(.blue)
+                .frame(width: 44, height: 44)
+                .contentShape(Rectangle())
+        }
+        .accessibilityIdentifier("nextUpButton_\(item.id)")
+        .accessibilityLabel("Zu Next Up hinzufuegen")
+    }
+
+    // MARK: - Actions Menu (only Edit + Delete)
 
     private var actionsMenu: some View {
         Menu {
@@ -259,14 +359,6 @@ struct BacklogRow: View {
                 onEditTap?()
             } label: {
                 Label("Bearbeiten", systemImage: "pencil")
-            }
-
-            if !item.isNextUp {
-                Button {
-                    onAddToNextUp?()
-                } label: {
-                    Label("Zu Next Up", systemImage: "arrow.up.circle")
-                }
             }
 
             Divider()
@@ -327,12 +419,10 @@ struct BacklogRow: View {
                 Spacer()
 
                 Button("Speichern") {
-                    // Save will be handled via onEditTap for now
-                    // In future: direct save via callback
                     withAnimation(.spring(duration: 0.3)) {
                         isExpanded = false
                     }
-                    onEditTap?()
+                    onSaveInline?(editableTitle, editableDuration)
                 }
                 .buttonStyle(.borderedProminent)
                 .accessibilityIdentifier("saveEditButton_\(item.id)")
