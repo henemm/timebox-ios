@@ -32,19 +32,28 @@ struct TaskAssignmentView: View {
                     ContentUnavailableView(
                         "Keine Focus Blocks",
                         systemImage: "rectangle.split.3x1",
-                        description: Text("Erstelle zuerst Focus Blocks im \"Blöcke\" Tab")
+                        description: Text("Create Focus Blocks in the Blox tab first")
                     )
                     Spacer()
                 } else {
-                    focusBlocksList
+                    // Bug 14 Fix: Unified ScrollView for Focus Blocks + Next Up
+                    ScrollView {
+                        VStack(spacing: 16) {
+                            focusBlocksSection
 
-                    if !unscheduledTasks.isEmpty {
-                        Divider()
-                        taskBacklog
+                            if !unscheduledTasks.isEmpty {
+                                taskBacklogSection
+                            }
+                        }
+                        .padding(.bottom, 20)
+                    }
+                    .accessibilityIdentifier("assignTabScrollView")
+                    .refreshable {
+                        await loadData()
                     }
                 }
             }
-            .navigationTitle("Zuordnen")
+            .navigationTitle("Assign")
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     DatePicker(
@@ -68,37 +77,33 @@ struct TaskAssignmentView: View {
         }
     }
 
-    // MARK: - Focus Blocks List
+    // MARK: - Focus Blocks Section (unified in parent ScrollView)
 
-    private var focusBlocksList: some View {
-        ScrollView {
-            LazyVStack(spacing: 12) {
-                ForEach(focusBlocks) { block in
-                    FocusBlockCard(
-                        block: block,
-                        tasks: tasksForBlock(block),
-                        onDropTask: { taskID in
-                            assignTaskToBlock(taskID: taskID, block: block)
-                        },
-                        onRemoveTask: { taskID in
-                            removeTaskFromBlock(taskID: taskID, block: block)
-                        },
-                        onReorderTasks: { newTaskIDs in
-                            reorderTasksInBlock(block: block, newTaskIDs: newTaskIDs)
-                        }
-                    )
-                }
+    private var focusBlocksSection: some View {
+        LazyVStack(spacing: 12) {
+            ForEach(focusBlocks) { block in
+                FocusBlockCard(
+                    block: block,
+                    tasks: tasksForBlock(block),
+                    onDropTask: { taskID in
+                        assignTaskToBlock(taskID: taskID, block: block)
+                    },
+                    onRemoveTask: { taskID in
+                        removeTaskFromBlock(taskID: taskID, block: block)
+                    },
+                    onReorderTasks: { newTaskIDs in
+                        reorderTasksInBlock(block: block, newTaskIDs: newTaskIDs)
+                    }
+                )
             }
-            .padding()
         }
-        .refreshable {
-            await loadData()
-        }
+        .padding(.horizontal)
+        .padding(.top)
     }
 
-    // MARK: - Task Backlog
+    // MARK: - Task Backlog Section (unified in parent ScrollView)
 
-    private var taskBacklog: some View {
+    private var taskBacklogSection: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
                 Image(systemName: "arrow.up.circle.fill")
