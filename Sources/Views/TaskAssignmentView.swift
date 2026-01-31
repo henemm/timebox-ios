@@ -375,24 +375,16 @@ struct FocusBlockCard: View {
                 }
                 .padding(.vertical, 20)
             } else {
-                List {
+                // Use VStack instead of List to preserve accessibility identifiers
+                // (List with editMode absorbs cell accessibility)
+                VStack(spacing: 6) {
                     ForEach(tasks) { task in
                         TaskRowInBlock(task: task) {
                             onRemoveTask(task.id)
                         }
-                        .listRowInsets(EdgeInsets(top: 3, leading: 0, bottom: 3, trailing: 0))
-                        .listRowBackground(Color.clear)
-                        .listRowSeparator(.hidden)
-                    }
-                    .onMove { indices, destination in
-                        var taskIDs = tasks.map { $0.id }
-                        taskIDs.move(fromOffsets: indices, toOffset: destination)
-                        onReorderTasks(taskIDs)
                     }
                 }
-                .listStyle(.plain)
-                .environment(\.editMode, .constant(.active))
-                .frame(maxHeight: min(CGFloat(tasks.count * 44), 264))  // Max ~6 tasks visible, then scroll
+                .frame(maxHeight: min(CGFloat(tasks.count * 50), 300))
             }
         }
         .padding()
@@ -424,33 +416,40 @@ struct TaskRowInBlock: View {
     let onRemove: () -> Void
 
     var body: some View {
-        HStack(spacing: 8) {
-            Circle()
-                .fill(.blue)
-                .frame(width: 6, height: 6)
+        // Outer container for accessibility identifier
+        VStack(spacing: 0) {
+            HStack(spacing: 8) {
+                Circle()
+                    .fill(.blue)
+                    .frame(width: 6, height: 6)
 
-            Text(task.title)
-                .font(.subheadline)
-                .lineLimit(1)
+                Text(task.title)
+                    .font(.subheadline)
+                    .lineLimit(1)
+                    .accessibilityIdentifier("taskTitle_\(task.id)")
 
-            Spacer()
+                Spacer()
 
-            Text("\(task.effectiveDuration) min")
-                .font(.caption)
-                .foregroundStyle(.secondary)
-
-            Button { onRemove() } label: {
-                Image(systemName: "xmark.circle.fill")
+                Text("\(task.effectiveDuration) min")
+                    .font(.caption)
                     .foregroundStyle(.secondary)
+
+                Button { onRemove() } label: {
+                    Image(systemName: "xmark.circle.fill")
+                        .foregroundStyle(.secondary)
+                }
+                .buttonStyle(.plain)
+                .accessibilityIdentifier("removeTaskButton_\(task.id)")
             }
-            .buttonStyle(.plain)
+            .padding(.vertical, 6)
+            .padding(.horizontal, 8)
         }
-        .padding(.vertical, 6)
-        .padding(.horizontal, 8)
         .background(
             RoundedRectangle(cornerRadius: 6)
                 .fill(.background)
         )
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("taskInBlock_\(task.id)")
     }
 }
 
