@@ -7,6 +7,7 @@
 
 import SwiftUI
 import SwiftData
+import CoreSpotlight
 
 @main
 struct FocusBloxMacApp: App {
@@ -20,8 +21,31 @@ struct FocusBloxMacApp: App {
             container = try MacModelContainer.create()
             // Setup global hotkey for Quick Capture
             QuickCaptureController.shared.setup(with: container)
+            // Index Quick Capture action for Spotlight
+            indexQuickCaptureAction()
         } catch {
             fatalError("Failed to create ModelContainer: \(error)")
+        }
+    }
+
+    // MARK: - Spotlight Indexing
+
+    private func indexQuickCaptureAction() {
+        let attributeSet = CSSearchableItemAttributeSet(contentType: .item)
+        attributeSet.title = "Neue Task erstellen"
+        attributeSet.contentDescription = "Task schnell in FocusBlox erfassen"
+        attributeSet.keywords = ["task", "todo", "aufgabe", "focusblox", "new task", "neue aufgabe"]
+
+        let item = CSSearchableItem(
+            uniqueIdentifier: "com.focusblox.quickcapture",
+            domainIdentifier: "actions",
+            attributeSet: attributeSet
+        )
+
+        CSSearchableIndex.default().indexSearchableItems([item]) { error in
+            if let error {
+                print("Failed to index Quick Capture action: \(error)")
+            }
         }
     }
 
@@ -29,6 +53,12 @@ struct FocusBloxMacApp: App {
         // Main Window
         WindowGroup {
             MainWindowView(showShortcuts: $showShortcuts)
+                .onOpenURL { url in
+                    handleURL(url)
+                }
+                .onContinueUserActivity(CSSearchableItemActionType) { activity in
+                    handleSpotlightActivity(activity)
+                }
         }
         .modelContainer(container)
         .commands {
@@ -85,6 +115,30 @@ struct FocusBloxMacApp: App {
             Label("FocusBlox", systemImage: "cube.fill")
         }
         .menuBarExtraStyle(.window)
+    }
+
+    // MARK: - URL Handling
+
+    private func handleURL(_ url: URL) {
+        guard url.scheme == "focusblox" else { return }
+
+        if url.host == "add" {
+            // Optional: Extract title from query parameter
+            // focusblox://add?title=My%20Task
+            quickCapture.showPanel()
+        }
+    }
+
+    // MARK: - Spotlight Activity Handling
+
+    private func handleSpotlightActivity(_ activity: NSUserActivity) {
+        guard let identifier = activity.userInfo?[CSSearchableItemActivityIdentifier] as? String else {
+            return
+        }
+
+        if identifier == "com.focusblox.quickcapture" {
+            quickCapture.showPanel()
+        }
     }
 }
 
