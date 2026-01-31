@@ -36,6 +36,9 @@ struct FocusBloxApp: App {
                 // Production: Migrate from default to App Group, then use App Group
                 try AppGroupMigration.migrateIfNeeded()
                 container = try SharedModelContainer.create()
+
+                // Fix: Deduplicate tasks that may have been duplicated during migration
+                FocusBloxApp.deduplicateTasksIfNeeded(in: container.mainContext)
             }
 
             // Seed mock data BEFORE any view loads
@@ -266,6 +269,51 @@ struct FocusBloxApp: App {
         UserDefaults.standard.synchronize()
     }
 
+    /// Deduplicate tasks that may have been duplicated during migration
+    /// This fixes the "ForEach: the ID occurs multiple times" issue
+    /// Only runs once per device (uses UserDefaults flag)
+    private static func deduplicateTasksIfNeeded(in context: ModelContext) {
+        let deduplicationKey = "tasksDeduplicatedV1"
+
+        // Only run once
+        guard !UserDefaults.standard.bool(forKey: deduplicationKey) else { return }
+
+        do {
+            // Fetch all tasks
+            let descriptor = FetchDescriptor<LocalTask>()
+            let allTasks = try context.fetch(descriptor)
+
+            // Group by UUID
+            var tasksByUUID: [UUID: [LocalTask]] = [:]
+            for task in allTasks {
+                tasksByUUID[task.uuid, default: []].append(task)
+            }
+
+            // Find duplicates and delete older ones
+            var deletedCount = 0
+            for (_, tasks) in tasksByUUID where tasks.count > 1 {
+                // Sort by createdAt descending (newest first)
+                let sorted = tasks.sorted { $0.createdAt > $1.createdAt }
+
+                // Keep the newest, delete the rest
+                for task in sorted.dropFirst() {
+                    context.delete(task)
+                    deletedCount += 1
+                }
+            }
+
+            if deletedCount > 0 {
+                try context.save()
+                print("FocusBloxApp: Deduplicated \(deletedCount) duplicate tasks")
+            }
+
+            // Mark as done
+            UserDefaults.standard.set(true, forKey: deduplicationKey)
+        } catch {
+            print("FocusBloxApp: Deduplication failed: \(error)")
+        }
+    }
+
     /// Seed mock data for UI testing
     /// Static so it can be called from the model container initializer (before views load)
     private static func seedUITestData(into context: ModelContext) {
@@ -305,12 +353,20 @@ struct FocusBloxApp: App {
         backlogTask2.tags = []
         backlogTask2.taskType = "shallow_work"
 
+        // TBD Task (missing importance, urgency, duration) - should show italic title
+        // sortOrder = -1 to appear at top of backlog list
+        let tbdTask = LocalTask(title: "TBD Task - Unvollständig", importance: nil, estimatedDuration: nil, urgency: nil)
+        tbdTask.isNextUp = false
+        tbdTask.taskType = "maintenance"
+        tbdTask.sortOrder = -1  // Appear first in backlog
+
         context.insert(task1)
         context.insert(task2)
         context.insert(task3)
         context.insert(assignedTask)
         context.insert(backlogTask1)
         context.insert(backlogTask2)
+        context.insert(tbdTask)
 
         // Create Focus Block mock tasks with known UUIDs
         // These match the taskIDs in FocusLiveView.createMockRepository()
