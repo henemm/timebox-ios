@@ -11,6 +11,7 @@ struct TaskAssignmentView: View {
     @State private var isLoading = false
     @State private var errorMessage: String?
     @State private var assignmentFeedback = false
+    @State private var blockToEdit: FocusBlock?
 
     var body: some View {
         NavigationStack {
@@ -66,6 +67,17 @@ struct TaskAssignmentView: View {
             }
             .withSettingsToolbar()
             .sensoryFeedback(.success, trigger: assignmentFeedback)
+            .sheet(item: $blockToEdit) { block in
+                EditFocusBlockSheet(
+                    block: block,
+                    onSave: { start, end in
+                        updateBlock(block, startDate: start, endDate: end)
+                    },
+                    onDelete: {
+                        deleteBlock(block)
+                    }
+                )
+            }
         }
         .task {
             await loadData()
@@ -93,6 +105,9 @@ struct TaskAssignmentView: View {
                     },
                     onReorderTasks: { newTaskIDs in
                         reorderTasksInBlock(block: block, newTaskIDs: newTaskIDs)
+                    },
+                    onEditBlock: {
+                        blockToEdit = block
                     }
                 )
             }
@@ -250,6 +265,38 @@ struct TaskAssignmentView: View {
             }
         }
     }
+
+    private func updateBlock(_ block: FocusBlock, startDate: Date, endDate: Date) {
+        Task {
+            do {
+                try eventKitRepo.updateFocusBlockTime(eventID: block.id, startDate: startDate, endDate: endDate)
+
+                // Reschedule notification with new start time
+                NotificationService.cancelFocusBlockNotification(blockID: block.id)
+                NotificationService.scheduleFocusBlockStartNotification(
+                    blockID: block.id,
+                    blockTitle: block.title,
+                    startDate: startDate
+                )
+
+                await loadData()
+            } catch {
+                errorMessage = "Block konnte nicht aktualisiert werden."
+            }
+        }
+    }
+
+    private func deleteBlock(_ block: FocusBlock) {
+        Task {
+            do {
+                try eventKitRepo.deleteFocusBlock(eventID: block.id)
+                NotificationService.cancelFocusBlockNotification(blockID: block.id)
+                await loadData()
+            } catch {
+                errorMessage = "Block konnte nicht gelöscht werden."
+            }
+        }
+    }
 }
 
 // MARK: - Focus Block Card
@@ -260,6 +307,7 @@ struct FocusBlockCard: View {
     let onDropTask: (String) -> Void
     let onRemoveTask: (String) -> Void
     let onReorderTasks: ([String]) -> Void
+    let onEditBlock: () -> Void
 
     @State private var isTargeted = false
 
@@ -279,7 +327,7 @@ struct FocusBlockCard: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            // Header
+            // Header - tappable to edit block
             HStack {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(block.title)
@@ -305,6 +353,15 @@ struct FocusBlockCard: View {
                             .foregroundStyle(.red)
                     }
                 }
+
+                // Edit button
+                Image(systemName: "pencil.circle")
+                    .font(.title2)
+                    .foregroundStyle(.blue)
+            }
+            .contentShape(Rectangle())
+            .onTapGesture {
+                onEditBlock()
             }
 
             // Tasks in block
@@ -356,6 +413,7 @@ struct FocusBlockCard: View {
                 isTargeted = targeted
             }
         }
+        .accessibilityIdentifier("focusBlockCard_\(block.id)")
     }
 }
 
