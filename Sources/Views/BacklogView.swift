@@ -422,7 +422,7 @@ struct BacklogView: View {
         }
     }
 
-    private func saveInlineEdit(for task: PlanItem, title: String, duration: Int) {
+    private func saveTitleEdit(for task: PlanItem, title: String) {
         do {
             let taskSource = LocalTaskSource(modelContext: modelContext)
             let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
@@ -430,7 +430,7 @@ struct BacklogView: View {
                 itemID: task.id,
                 title: title,
                 importance: task.importance,
-                duration: duration,
+                duration: task.estimatedDuration,
                 tags: task.tags,
                 urgency: task.urgency,
                 taskType: task.taskType,
@@ -442,7 +442,7 @@ struct BacklogView: View {
                 await loadTasks()
             }
         } catch {
-            errorMessage = "Änderungen konnten nicht gespeichert werden."
+            errorMessage = "Titel konnte nicht gespeichert werden."
         }
     }
 
@@ -506,8 +506,8 @@ struct BacklogView: View {
                         onCategoryTap: { selectedItemForCategory = item },
                         onEditTap: { taskToEditDirectly = item },
                         onDeleteTap: { deleteTask(item) },
-                        onSaveInline: { title, duration in
-                            saveInlineEdit(for: item, title: title, duration: duration)
+                        onTitleSave: { newTitle in
+                            saveTitleEdit(for: item, title: newTitle)
                         }
                     )
                 }
@@ -536,7 +536,7 @@ struct BacklogView: View {
                     onCategoryTap: { item in selectedItemForCategory = item },
                     onEditTap: { item in taskToEditDirectly = item },
                     onDeleteTap: { item in deleteTask(item) },
-                    onSaveInline: { item, title, duration in saveInlineEdit(for: item, title: title, duration: duration) }
+                    onTitleSave: { item, newTitle in saveTitleEdit(for: item, title: newTitle) }
                 )
 
                 QuadrantCard(
@@ -552,7 +552,7 @@ struct BacklogView: View {
                     onCategoryTap: { item in selectedItemForCategory = item },
                     onEditTap: { item in taskToEditDirectly = item },
                     onDeleteTap: { item in deleteTask(item) },
-                    onSaveInline: { item, title, duration in saveInlineEdit(for: item, title: title, duration: duration) }
+                    onTitleSave: { item, newTitle in saveTitleEdit(for: item, title: newTitle) }
                 )
 
                 QuadrantCard(
@@ -568,7 +568,7 @@ struct BacklogView: View {
                     onCategoryTap: { item in selectedItemForCategory = item },
                     onEditTap: { item in taskToEditDirectly = item },
                     onDeleteTap: { item in deleteTask(item) },
-                    onSaveInline: { item, title, duration in saveInlineEdit(for: item, title: title, duration: duration) }
+                    onTitleSave: { item, newTitle in saveTitleEdit(for: item, title: newTitle) }
                 )
 
                 QuadrantCard(
@@ -584,7 +584,7 @@ struct BacklogView: View {
                     onCategoryTap: { item in selectedItemForCategory = item },
                     onEditTap: { item in taskToEditDirectly = item },
                     onDeleteTap: { item in deleteTask(item) },
-                    onSaveInline: { item, title, duration in saveInlineEdit(for: item, title: title, duration: duration) }
+                    onTitleSave: { item, newTitle in saveTitleEdit(for: item, title: newTitle) }
                 )
             }
             .padding()
@@ -762,7 +762,7 @@ struct QuadrantCard: View {
     var onCategoryTap: ((PlanItem) -> Void)?
     var onEditTap: ((PlanItem) -> Void)?
     var onDeleteTap: ((PlanItem) -> Void)?
-    var onSaveInline: ((PlanItem, String, Int) -> Void)?
+    var onTitleSave: ((PlanItem, String) -> Void)?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -803,7 +803,7 @@ struct QuadrantCard: View {
                         onCategoryTap: onCategoryTap.map { callback in { callback(task) } },
                         onEditTap: onEditTap.map { callback in { callback(task) } },
                         onDeleteTap: onDeleteTap.map { callback in { callback(task) } },
-                        onSaveInline: onSaveInline.map { callback in { title, duration in callback(task, title, duration) } }
+                        onTitleSave: onTitleSave.map { callback in { newTitle in callback(task, newTitle) } }
                     )
                     .padding(.horizontal, 8)
                 }

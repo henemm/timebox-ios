@@ -115,48 +115,73 @@ struct TaskFormSheet: View {
                         .accessibilityIdentifier("Wichtigkeit")
                     }
 
-                    // MARK: - Urgency - all unselected by default
+                    // MARK: - Urgency - Flame Toggle (like BacklogRow badge)
                     glassCardSection(id: "urgency", header: "Dringlichkeit") {
-                        HStack(spacing: 12) {
-                            OptionalUrgencyButton(value: "not_urgent", label: "Nicht dringend", selectedUrgency: $urgency)
-                            OptionalUrgencyButton(value: "urgent", label: "Dringend", selectedUrgency: $urgency)
+                        Button {
+                            // Cycle: nil → not_urgent → urgent → nil
+                            switch urgency {
+                            case nil: urgency = "not_urgent"
+                            case "not_urgent": urgency = "urgent"
+                            case "urgent": urgency = nil
+                            default: urgency = nil
+                            }
+                        } label: {
+                            HStack(spacing: 8) {
+                                Image(systemName: urgencyIcon)
+                                    .font(.system(size: 20))
+                                    .foregroundStyle(urgencyColor)
+                                Text(urgencyLabel)
+                                    .foregroundStyle(urgencyColor)
+                            }
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 12)
+                            .background(
+                                RoundedRectangle(cornerRadius: 10)
+                                    .fill(urgencyColor.opacity(0.2))
+                            )
                         }
-                        .accessibilityIdentifier("Dringlichkeit")
+                        .buttonStyle(.plain)
+                        .sensoryFeedback(.impact(weight: .medium), trigger: urgency)
+                        .accessibilityIdentifier("urgencyFlameToggle")
 
                         Text("Dringend = Deadline oder zeitkritisch")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
 
-                    // MARK: - Task Type
+                    // MARK: - Task Type - Horizontal Chip Row (like BacklogRow categoryBadge)
                     glassCardSection(id: "type", header: "Typ") {
-                        LazyVGrid(columns: [
-                            GridItem(.flexible()),
-                            GridItem(.flexible())
-                        ], spacing: 8) {
-                            ForEach(taskTypeOptions, id: \.0) { value, label, icon in
-                                Button {
-                                    taskType = value
-                                } label: {
-                                    HStack(spacing: 6) {
-                                        Image(systemName: icon)
-                                            .font(.system(size: 14))
-                                        Text(label)
-                                            .font(.caption)
-                                            .lineLimit(1)
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: 8) {
+                                ForEach(taskTypeOptions, id: \.0) { value, label, icon in
+                                    Button {
+                                        taskType = value
+                                    } label: {
+                                        HStack(spacing: 4) {
+                                            Image(systemName: icon)
+                                                .font(.system(size: 14))
+                                            Text(label)
+                                                .font(.caption)
+                                                .lineLimit(1)
+                                        }
+                                        .foregroundStyle(categoryColor(for: value))
+                                        .padding(.horizontal, 10)
+                                        .padding(.vertical, 8)
+                                        .background(
+                                            RoundedRectangle(cornerRadius: 8)
+                                                .fill(categoryColor(for: value).opacity(taskType == value ? 0.3 : 0.15))
+                                        )
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: 8)
+                                                .stroke(taskType == value ? categoryColor(for: value) : .clear, lineWidth: 2)
+                                        )
                                     }
-                                    .frame(maxWidth: .infinity)
-                                    .padding(.vertical, 10)
-                                    .background(
-                                        RoundedRectangle(cornerRadius: 10)
-                                            .fill(taskType == value ? Color.accentColor : Color(.secondarySystemFill))
-                                    )
-                                    .foregroundStyle(taskType == value ? .white : .primary)
+                                    .buttonStyle(.plain)
+                                    .accessibilityIdentifier("taskTypeChip_\(value)")
                                 }
-                                .buttonStyle(.plain)
                             }
                         }
-                        .accessibilityIdentifier("Typ")
+                        .accessibilityIdentifier("taskTypeChipRow")
                     }
 
                     // MARK: - Tags
@@ -271,6 +296,45 @@ struct TaskFormSheet: View {
             }
         }
         .presentationDetents([.large])
+    }
+
+    // MARK: - Urgency Helper Properties
+
+    private var urgencyIcon: String {
+        switch urgency {
+        case "urgent": return "flame.fill"
+        case "not_urgent": return "flame"
+        default: return "questionmark"  // TBD
+        }
+    }
+
+    private var urgencyColor: Color {
+        switch urgency {
+        case "urgent": return .orange
+        case "not_urgent": return .gray
+        default: return .gray  // TBD
+        }
+    }
+
+    private var urgencyLabel: String {
+        switch urgency {
+        case "urgent": return "Dringend"
+        case "not_urgent": return "Nicht dringend"
+        default: return "Nicht gesetzt"  // TBD
+        }
+    }
+
+    // MARK: - Category Color Helper
+
+    private func categoryColor(for type: String) -> Color {
+        switch type {
+        case "income": return .green
+        case "maintenance": return .orange
+        case "recharge": return .cyan
+        case "learning": return .purple
+        case "giving_back": return .pink
+        default: return .gray
+        }
     }
 
     // MARK: - Glass Card Section Helper

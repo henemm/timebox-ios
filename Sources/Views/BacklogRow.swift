@@ -10,31 +10,24 @@ struct BacklogRow: View {
     var onCategoryTap: (() -> Void)?
     var onEditTap: (() -> Void)?
     var onDeleteTap: (() -> Void)?
-    var onSaveInline: ((String, Int) -> Void)?  // title, duration
+    var onTitleSave: ((String) -> Void)?  // Inline title edit callback
 
-    @State private var isExpanded = false
+    // State for inline title editing (double-tap)
+    @State private var isEditingTitle = false
     @State private var editableTitle: String = ""
-    @State private var editableDuration: Int = 15
+    @FocusState private var titleFieldFocused: Bool
 
     // MARK: - Body
 
     var body: some View {
-        VStack(spacing: 0) {
-            // Main Row
-            HStack(spacing: 12) {
-                // Left Column: Content (Title + Metadata)
-                contentSection
+        HStack(spacing: 12) {
+            // Left Column: Content (Title + Metadata)
+            contentSection
 
-                Spacer(minLength: 8)
+            Spacer(minLength: 8)
 
-                // Right Column: 2 Buttons (Next Up + Menu)
-                rightColumnButtons
-            }
-
-            // Inline Edit Section (when expanded)
-            if isExpanded {
-                inlineEditSection
-            }
+            // Right Column: 2 Buttons (Next Up + Menu)
+            rightColumnButtons
         }
         .padding(12)
         .background(
@@ -42,13 +35,6 @@ struct BacklogRow: View {
                 .fill(.ultraThinMaterial)
         )
         .contentShape(Rectangle())
-        .onTapGesture {
-            editableTitle = item.title
-            editableDuration = item.effectiveDuration
-            withAnimation(.spring(duration: 0.3)) {
-                isExpanded.toggle()
-            }
-        }
         // NOTE: No accessibilityIdentifier on parent - children have their own identifiers
         // Parent identifier would override all child identifiers in SwiftUI
     }
@@ -66,24 +52,61 @@ struct BacklogRow: View {
         }
     }
 
-    // MARK: - Title View (italic if TBD)
+    // MARK: - Title View (italic if TBD, double-tap to edit)
 
     @ViewBuilder
     private var titleView: some View {
-        if item.isTbd {
+        if isEditingTitle {
+            // Inline title editing mode
+            TextField("Titel", text: $editableTitle)
+                .font(.system(.body).weight(.semibold))
+                .foregroundStyle(.primary)
+                .focused($titleFieldFocused)
+                .onSubmit {
+                    saveTitle()
+                }
+                .onChange(of: titleFieldFocused) { _, focused in
+                    if !focused {
+                        saveTitle()
+                    }
+                }
+                .accessibilityIdentifier("inlineTitleField_\(item.id)")
+        } else if item.isTbd {
             Text(item.title)
                 .font(.system(.body).weight(.semibold))
                 .foregroundStyle(.secondary)
                 .lineLimit(2)
                 .truncationMode(.tail)
                 .italic()
+                .onTapGesture(count: 2) {
+                    startTitleEdit()
+                }
         } else {
             Text(item.title)
                 .font(.system(.body).weight(.semibold))
                 .foregroundStyle(.primary)
                 .lineLimit(2)
                 .truncationMode(.tail)
+                .onTapGesture(count: 2) {
+                    startTitleEdit()
+                }
         }
+    }
+
+    // MARK: - Title Edit Helpers
+
+    private func startTitleEdit() {
+        editableTitle = item.title
+        isEditingTitle = true
+        titleFieldFocused = true
+    }
+
+    private func saveTitle() {
+        let trimmed = editableTitle.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !trimmed.isEmpty && trimmed != item.title {
+            onTitleSave?(trimmed)
+        }
+        isEditingTitle = false
     }
 
     // MARK: - Metadata Row (Scrollable, fixed size badges)
@@ -418,59 +441,6 @@ struct BacklogRow: View {
         .accessibilityIdentifier("actionsMenu_\(item.id)")
     }
 
-    // MARK: - Inline Edit Section
-
-    private var inlineEditSection: some View {
-        VStack(spacing: 12) {
-            Divider()
-                .padding(.top, 8)
-
-            // Title Edit Field
-            TextField("Titel", text: $editableTitle)
-                .textFieldStyle(.plain)
-                .font(.body)
-                .padding(8)
-                .background(
-                    RoundedRectangle(cornerRadius: 8)
-                        .fill(.white.opacity(0.1))
-                )
-                .accessibilityIdentifier("editTitleField_\(item.id)")
-
-            // Duration Quick-Select Buttons
-            HStack(spacing: 8) {
-                ForEach([5, 15, 30, 60], id: \.self) { minutes in
-                    Button("\(minutes)m") {
-                        editableDuration = minutes
-                    }
-                    .buttonStyle(.bordered)
-                    .tint(editableDuration == minutes ? .yellow : .gray)
-                    .accessibilityIdentifier("durationQuickSelect_\(minutes)_\(item.id)")
-                }
-            }
-
-            // Cancel / Save Buttons
-            HStack {
-                Button("Abbrechen") {
-                    withAnimation(.spring(duration: 0.3)) {
-                        isExpanded = false
-                    }
-                }
-                .accessibilityIdentifier("cancelEditButton_\(item.id)")
-
-                Spacer()
-
-                Button("Speichern") {
-                    withAnimation(.spring(duration: 0.3)) {
-                        isExpanded = false
-                    }
-                    onSaveInline?(editableTitle, editableDuration)
-                }
-                .buttonStyle(.borderedProminent)
-                .accessibilityIdentifier("saveEditButton_\(item.id)")
-            }
-        }
-        .padding(.top, 8)
-    }
 
     // MARK: - Helper Functions
 
