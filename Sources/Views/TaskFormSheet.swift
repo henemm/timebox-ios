@@ -22,18 +22,18 @@ struct TaskFormSheet: View {
     }
 
     let mode: Mode
-    let onSave: ((String, TaskPriority, Int, [String], String, String, Date?, String?) -> Void)?
+    let onSave: ((String, TaskPriority, Int?, [String], String?, String, Date?, String?) -> Void)?
     let onDelete: (() -> Void)?
     var onCreateComplete: (() -> Void)?
 
     // MARK: - State
 
     @State private var title = ""
-    @State private var priority: Int? = nil  // Bug 15: Default to TBD (nil)
-    @State private var duration: Int = 15
+    @State private var priority: Int? = nil  // nil = TBD (not set)
+    @State private var duration: Int? = nil  // nil = TBD (not set)
     @State private var tags: [String] = []
     @State private var newTag: String = ""
-    @State private var urgency: String = "not_urgent"
+    @State private var urgency: String? = nil  // nil = TBD (not set)
     @State private var taskType: String = "maintenance"
     @State private var hasDueDate = false
     @State private var dueDate = Date()
@@ -52,19 +52,19 @@ struct TaskFormSheet: View {
 
     /// Edit mode initializer
     init(task: PlanItem,
-         onSave: @escaping (String, TaskPriority, Int, [String], String, String, Date?, String?) -> Void,
+         onSave: @escaping (String, TaskPriority, Int?, [String], String?, String, Date?, String?) -> Void,
          onDelete: @escaping () -> Void) {
         self.mode = .edit(task)
         self.onSave = onSave
         self.onDelete = onDelete
         self.onCreateComplete = nil
 
-        // Initialize state from task
+        // Initialize state from task - preserve nil for TBD fields
         _title = State(initialValue: task.title)
         _priority = State(initialValue: task.importance)  // Keep nil if task is TBD
-        _duration = State(initialValue: task.effectiveDuration)
+        _duration = State(initialValue: task.estimatedDuration)  // Keep nil if task is TBD
         _tags = State(initialValue: task.tags)
-        _urgency = State(initialValue: task.urgency ?? "not_urgent")
+        _urgency = State(initialValue: task.urgency)  // Keep nil if task is TBD
         _taskType = State(initialValue: task.taskType)
         _hasDueDate = State(initialValue: task.dueDate != nil)
         _dueDate = State(initialValue: task.dueDate ?? Date())
@@ -95,34 +95,32 @@ struct TaskFormSheet: View {
                             .accessibilityIdentifier("taskTitle")
                     }
 
-                    // MARK: - Duration (Quick Select)
+                    // MARK: - Duration (Quick Select) - all unselected by default
                     glassCardSection(id: "duration", header: "Dauer") {
                         HStack(spacing: 8) {
-                            QuickDurationButton(minutes: 5, selectedMinutes: $duration)
-                            QuickDurationButton(minutes: 15, selectedMinutes: $duration)
-                            QuickDurationButton(minutes: 30, selectedMinutes: $duration)
-                            QuickDurationButton(minutes: 60, selectedMinutes: $duration)
+                            OptionalDurationButton(minutes: 5, selectedMinutes: $duration)
+                            OptionalDurationButton(minutes: 15, selectedMinutes: $duration)
+                            OptionalDurationButton(minutes: 30, selectedMinutes: $duration)
+                            OptionalDurationButton(minutes: 60, selectedMinutes: $duration)
                         }
                     }
 
-                    // MARK: - Importance (3 Levels + TBD)
+                    // MARK: - Importance (3 Levels) - all unselected by default
                     glassCardSection(id: "importance", header: "Wichtigkeit") {
                         HStack(spacing: 6) {
-                            QuickPriorityButton(priority: nil, selectedPriority: $priority)
-                            QuickPriorityButton(priority: 1, selectedPriority: $priority)
-                            QuickPriorityButton(priority: 2, selectedPriority: $priority)
-                            QuickPriorityButton(priority: 3, selectedPriority: $priority)
+                            OptionalPriorityButton(priority: 1, selectedPriority: $priority)
+                            OptionalPriorityButton(priority: 2, selectedPriority: $priority)
+                            OptionalPriorityButton(priority: 3, selectedPriority: $priority)
                         }
                         .accessibilityIdentifier("Wichtigkeit")
                     }
 
-                    // MARK: - Urgency
+                    // MARK: - Urgency - all unselected by default
                     glassCardSection(id: "urgency", header: "Dringlichkeit") {
-                        Picker("Dringlichkeit", selection: $urgency) {
-                            Text("Nicht dringend").tag("not_urgent")
-                            Text("Dringend").tag("urgent")
+                        HStack(spacing: 12) {
+                            OptionalUrgencyButton(value: "not_urgent", label: "Nicht dringend", selectedUrgency: $urgency)
+                            OptionalUrgencyButton(value: "urgent", label: "Dringend", selectedUrgency: $urgency)
                         }
-                        .pickerStyle(.segmented)
                         .accessibilityIdentifier("Dringlichkeit")
 
                         Text("Dringend = Deadline oder zeitkritisch")

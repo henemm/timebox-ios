@@ -188,32 +188,67 @@ struct BacklogRow: View {
         }
     }
 
-    // MARK: - Urgency Badge (tappable, toggles urgent ↔ not_urgent)
+    // MARK: - Urgency Badge (tappable, cycles: nil → not_urgent → urgent → nil)
 
     private var isUrgent: Bool {
         item.urgency == "urgent"
     }
 
+    private var isUrgencySet: Bool {
+        item.urgency != nil
+    }
+
     private var urgencyBadge: some View {
         Button {
-            let newUrgency = isUrgent ? "not_urgent" : "urgent"
-            onUrgencyToggle?(newUrgency)
+            // Cycle: nil → not_urgent → urgent → nil
+            let newUrgency: String?
+            switch item.urgency {
+            case nil: newUrgency = "not_urgent"
+            case "not_urgent": newUrgency = "urgent"
+            case "urgent": newUrgency = nil
+            default: newUrgency = nil
+            }
+            onUrgencyToggle?(newUrgency ?? "")
         } label: {
-            Image(systemName: isUrgent ? "flame.fill" : "flame")
+            Image(systemName: urgencyIcon)
                 .font(.system(size: 14))
-                .foregroundStyle(isUrgent ? .orange : .gray)
+                .foregroundStyle(urgencyColor)
                 .padding(.horizontal, 6)
                 .padding(.vertical, 4)
                 .background(
                     RoundedRectangle(cornerRadius: 6)
-                        .fill(isUrgent ? .orange.opacity(0.2) : .gray.opacity(0.2))
+                        .fill(urgencyColor.opacity(0.2))
                 )
         }
         .buttonStyle(.plain)
         .fixedSize()
         .sensoryFeedback(.impact(weight: .medium), trigger: item.urgency)
         .accessibilityIdentifier("urgencyBadge_\(item.id)")
-        .accessibilityLabel(isUrgent ? "Dringend. Tippen zum Entfernen." : "Nicht dringend. Tippen für Dringend.")
+        .accessibilityLabel(urgencyAccessibilityLabel)
+    }
+
+    private var urgencyIcon: String {
+        switch item.urgency {
+        case "urgent": return "flame.fill"
+        case "not_urgent": return "flame"
+        default: return "questionmark"  // TBD
+        }
+    }
+
+    private var urgencyColor: Color {
+        switch item.urgency {
+        case "urgent": return .orange
+        case "not_urgent": return .gray
+        default: return .gray  // TBD
+        }
+    }
+
+    private var urgencyAccessibilityLabel: String {
+        switch item.urgency {
+        case "urgent": return "Dringend. Tippen zum Entfernen."
+        case "not_urgent": return "Nicht dringend. Tippen für Dringend."
+        default: return "Dringlichkeit nicht gesetzt. Tippen zum Setzen."
+        }
     }
 
     // MARK: - Category Badge
@@ -286,14 +321,18 @@ struct BacklogRow: View {
     }
 
     // MARK: - Duration Badge
-    // Gray = duration NOT set (TBD), Blue = duration IS set
+    // Gray "?" = duration NOT set (TBD), Blue = duration IS set
+
+    private var isDurationSet: Bool {
+        item.estimatedDuration != nil
+    }
 
     private var durationBadgeColor: Color {
-        item.durationSource == .default ? .gray : .blue
+        isDurationSet ? .blue : .gray
     }
 
     private var durationBadgeBackground: Color {
-        item.durationSource == .default ? .gray.opacity(0.2) : .blue.opacity(0.2)
+        isDurationSet ? .blue.opacity(0.2) : .gray.opacity(0.2)
     }
 
     private var durationBadge: some View {
@@ -301,9 +340,11 @@ struct BacklogRow: View {
             onDurationTap?()
         } label: {
             HStack(spacing: 4) {
-                Image(systemName: "timer")
-                Text("\(item.effectiveDuration)m")
-                    .lineLimit(1)
+                Image(systemName: isDurationSet ? "timer" : "questionmark")
+                if isDurationSet {
+                    Text("\(item.effectiveDuration)m")
+                        .lineLimit(1)
+                }
             }
             .font(.caption2)
             .foregroundStyle(durationBadgeColor)
@@ -317,7 +358,7 @@ struct BacklogRow: View {
         .buttonStyle(.plain)
         .fixedSize()
         .accessibilityIdentifier("durationBadge_\(item.id)")
-        .accessibilityLabel("Dauer: \(item.effectiveDuration) Minuten")
+        .accessibilityLabel(isDurationSet ? "Dauer: \(item.effectiveDuration) Minuten" : "Dauer nicht gesetzt")
     }
 
     // MARK: - Right Column (2 Buttons Vertical)

@@ -361,7 +361,7 @@ struct BacklogView: View {
         }
     }
 
-    private func updateTask(_ task: PlanItem, title: String, priority: TaskPriority, duration: Int, tags: [String], urgency: String, taskType: String, dueDate: Date?, description: String?) {
+    private func updateTask(_ task: PlanItem, title: String, priority: TaskPriority, duration: Int?, tags: [String], urgency: String?, taskType: String, dueDate: Date?, description: String?) {
         do {
             let taskSource = LocalTaskSource(modelContext: modelContext)
             let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)

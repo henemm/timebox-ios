@@ -10,13 +10,13 @@ struct CreateTaskView: View {
     @State private var newTag: String = ""
     @State private var hasDueDate = false
     @State private var dueDate = Date()
-    @State private var priority: Int? = nil  // Bug 15: Default to TBD (nil)
+    @State private var priority: Int? = nil  // nil = TBD (not set)
     @State private var isSaving = false
 
     // MARK: - Refactored Task Fields
 
-    @State private var duration: Int = 15  // Quick select: 5, 15, 30, 60
-    @State private var urgency: String = "not_urgent"
+    @State private var duration: Int? = nil  // nil = TBD (not set)
+    @State private var urgency: String? = nil  // nil = TBD (not set)
     @State private var taskType: String = "maintenance"
     @State private var recurrencePattern: RecurrencePattern = .none
     @State private var selectedWeekdays: Set<Int> = []
@@ -34,40 +34,38 @@ struct CreateTaskView: View {
                     TextField("Task-Titel", text: $title)
                 }
 
-                // MARK: - Duration (Quick Select)
+                // MARK: - Duration (Quick Select) - all unselected by default
 
                 Section {
                     HStack(spacing: 12) {
-                        QuickDurationButton(minutes: 5, selectedMinutes: $duration)
-                        QuickDurationButton(minutes: 15, selectedMinutes: $duration)
-                        QuickDurationButton(minutes: 30, selectedMinutes: $duration)
-                        QuickDurationButton(minutes: 60, selectedMinutes: $duration)
+                        OptionalDurationButton(minutes: 5, selectedMinutes: $duration)
+                        OptionalDurationButton(minutes: 15, selectedMinutes: $duration)
+                        OptionalDurationButton(minutes: 30, selectedMinutes: $duration)
+                        OptionalDurationButton(minutes: 60, selectedMinutes: $duration)
                     }
                 } header: {
                     Text("Dauer")
                 }
 
-                // MARK: - Priority (3 Levels + TBD)
+                // MARK: - Priority (3 Levels) - all unselected by default
 
                 Section {
                     HStack(spacing: 8) {
-                        QuickPriorityButton(priority: nil, selectedPriority: $priority)
-                        QuickPriorityButton(priority: 1, selectedPriority: $priority)
-                        QuickPriorityButton(priority: 2, selectedPriority: $priority)
-                        QuickPriorityButton(priority: 3, selectedPriority: $priority)
+                        OptionalPriorityButton(priority: 1, selectedPriority: $priority)
+                        OptionalPriorityButton(priority: 2, selectedPriority: $priority)
+                        OptionalPriorityButton(priority: 3, selectedPriority: $priority)
                     }
                 } header: {
                     Text("Wichtigkeit")
                 }
 
-                // MARK: - Urgency
+                // MARK: - Urgency - all unselected by default
 
                 Section {
-                    Picker("Dringlichkeit", selection: $urgency) {
-                        Text("Nicht dringend").tag("not_urgent")
-                        Text("Dringend").tag("urgent")
+                    HStack(spacing: 12) {
+                        OptionalUrgencyButton(value: "not_urgent", label: "Nicht dringend", selectedUrgency: $urgency)
+                        OptionalUrgencyButton(value: "urgent", label: "Dringend", selectedUrgency: $urgency)
                     }
-                    .pickerStyle(.segmented)
                 } header: {
                     Text("Dringlichkeit")
                 } footer: {
@@ -254,7 +252,7 @@ struct CreateTaskView: View {
         .modelContainer(for: LocalTask.self, inMemory: true)
 }
 
-// MARK: - Supporting Types (TODO: Extract to separate files when added to Xcode project)
+// MARK: - Supporting Types
 
 /// Recurrence pattern options for recurring tasks
 enum RecurrencePattern: String, CaseIterable, Identifiable {
@@ -290,10 +288,10 @@ enum RecurrencePattern: String, CaseIterable, Identifiable {
     }
 }
 
-/// Quick duration selection button
-struct QuickDurationButton: View {
+/// Duration button with optional binding - tap again to deselect
+struct OptionalDurationButton: View {
     let minutes: Int
-    @Binding var selectedMinutes: Int
+    @Binding var selectedMinutes: Int?
 
     private var isSelected: Bool {
         selectedMinutes == minutes
@@ -301,7 +299,11 @@ struct QuickDurationButton: View {
 
     var body: some View {
         Button {
-            selectedMinutes = minutes
+            if isSelected {
+                selectedMinutes = nil  // Deselect
+            } else {
+                selectedMinutes = minutes
+            }
         } label: {
             Text("\(minutes)m")
                 .font(.headline)
@@ -317,9 +319,9 @@ struct QuickDurationButton: View {
     }
 }
 
-/// Quick priority selection button with SF Symbols (Bug 16 fix)
-struct QuickPriorityButton: View {
-    let priority: Int?
+/// Priority button with optional binding - tap again to deselect
+struct OptionalPriorityButton: View {
+    let priority: Int
     @Binding var selectedPriority: Int?
 
     private var isSelected: Bool {
@@ -349,13 +351,17 @@ struct QuickPriorityButton: View {
         case 1: return "Niedrig"
         case 2: return "Mittel"
         case 3: return "Hoch"
-        default: return "TBD"
+        default: return "?"
         }
     }
 
     var body: some View {
         Button {
-            selectedPriority = priority
+            if isSelected {
+                selectedPriority = nil  // Deselect
+            } else {
+                selectedPriority = priority
+            }
         } label: {
             HStack(spacing: 6) {
                 Image(systemName: sfSymbol)
@@ -373,7 +379,39 @@ struct QuickPriorityButton: View {
             .foregroundStyle(isSelected ? .white : .primary)
         }
         .buttonStyle(.plain)
-        .accessibilityIdentifier("importance_\(priority ?? 0)")
+        .accessibilityIdentifier("importance_\(priority)")
+    }
+}
+
+/// Urgency button with optional binding - tap again to deselect
+struct OptionalUrgencyButton: View {
+    let value: String
+    let label: String
+    @Binding var selectedUrgency: String?
+
+    private var isSelected: Bool {
+        selectedUrgency == value
+    }
+
+    var body: some View {
+        Button {
+            if isSelected {
+                selectedUrgency = nil  // Deselect
+            } else {
+                selectedUrgency = value
+            }
+        } label: {
+            Text(label)
+                .font(.subheadline.weight(.medium))
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 12)
+                .background(
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(isSelected ? Color.orange : Color(.secondarySystemFill))
+                )
+                .foregroundStyle(isSelected ? .white : .primary)
+        }
+        .buttonStyle(.plain)
     }
 }
 
