@@ -1,0 +1,1455 @@
+============================================
+  FocusBlox Resilient Test Runner
+============================================
+
+[0;34m[INFO][0m Phase 1: Simulator vorbereiten...
+[0;34m[INFO][0m Beende haengende Simulator-Prozesse...
+[1;33m[WARN][0m Simulator mit UUID 877731AF-6250-4E23-A07E-80270C69D827 nicht gefunden!
+[0;34m[INFO][0m Gefunden: FocusBlox mit UUID 6364A54B-5048-4346-899E-FFB67E630D53
+[0;34m[INFO][0m Boote Simulator 6364A54B-5048-4346-899E-FFB67E630D53...
+[0;34m[INFO][0m Warte auf Simulator-Bereitschaft...
+Monitoring boot status for FocusBlox (6364A54B-5048-4346-899E-FFB67E630D53).
+[2026-01-31 12:45:38 +0000] Status=2, isTerminal=NO, Elapsed=00:01.
+	Waiting on Data Migration
+		Reason:(null)
+		Migration Elapsed:00:00 seconds
+
+[2026-01-31 12:45:39 +0000] Status=4, isTerminal=NO, Elapsed=00:03.
+	Waiting on System App
+
+[2026-01-31 12:45:40 +0000] Status=4, isTerminal=NO, Elapsed=00:04.
+	Waiting on System App
+
+[2026-01-31 12:45:42 +0000] Status=4, isTerminal=NO, Elapsed=00:06.
+	Waiting on System App
+
+[2026-01-31 12:45:44 +0000] Status=4294967295, isTerminal=YES, Elapsed=00:08.
+	Finished
+
+[0;32m[SUCCESS][0m Simulator bereit.
+[0;34m[INFO][0m Phase 2: Tests ausfuehren (Versuch 1/2)...
+[0;34m[INFO][0m Teste nur: FocusBlockReorderUITests
+Command line invocation:
+    /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild test -project FocusBlox.xcodeproj -scheme FocusBlox -destination id=6364A54B-5048-4346-899E-FFB67E630D53 "-only-testing:FocusBloxUITests/FocusBlockReorderUITests" -parallel-testing-enabled NO -disable-concurrent-destination-testing -retry-tests-on-failure -resultBundlePath TestResults_1769863544.xcresult CODE_SIGNING_ALLOWED=NO
+
+Build settings from command line:
+    CODE_SIGNING_ALLOWED = NO
+
+Retrying tests on failure. Running tests repeatedly up to 3 times. Pass -test-iterations also to override the default of running up to 3 times.
+
+Writing result bundle at path:
+	/Users/hem/Documents/opt/my-daily-sprints/TestResults_1769863544.xcresult
+
+ComputePackagePrebuildTargetDependencyGraph
+
+Prepare packages
+
+CreateBuildRequest
+
+SendProjectDescription
+
+CreateBuildOperation
+
+ComputeTargetDependencyGraph
+note: Building targets in dependency order
+note: Target dependency graph (5 targets)
+    Target 'FocusBloxUITests' in project 'FocusBlox'
+        ➜ Explicit dependency on target 'FocusBlox' in project 'FocusBlox'
+    Target 'FocusBloxTests' in project 'FocusBlox'
+        ➜ Explicit dependency on target 'FocusBlox' in project 'FocusBlox'
+    Target 'FocusBlox' in project 'FocusBlox'
+        ➜ Explicit dependency on target 'FocusBloxWidgetsExtension' in project 'FocusBlox'
+        ➜ Explicit dependency on target 'FocusBloxCore' in project 'FocusBlox'
+    Target 'FocusBloxWidgetsExtension' in project 'FocusBlox'
+        ➜ Explicit dependency on target 'FocusBloxCore' in project 'FocusBlox'
+    Target 'FocusBloxCore' in project 'FocusBlox' (no dependencies)
+
+GatherProvisioningInputs
+
+CreateBuildDescription
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -v -E -dM -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk -x c -c /dev/null
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -v -E -dM -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk -x c -c /dev/null
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/usr/bin/actool --version --output-format xml1
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/usr/bin/actool --print-asset-tag-combinations --output-format xml1 /Users/hem/Documents/opt/my-daily-sprints/Resources/Assets.xcassets
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc --version
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld -version_details
+
+ReadFileContents /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/share/docc/features.json
+
+Build description signature: 1816a654a79dfa0b016572dd2da9520d
+Build description path: /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/XCBuildData/1816a654a79dfa0b016572dd2da9520d.xcbuilddata
+ClangStatCache /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk /Users/hem/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator26.2-23C53-7d00a8b37fbd7999ea79df8ebc024bf0.sdkstatcache
+    cd /Users/hem/Documents/opt/my-daily-sprints/FocusBlox.xcodeproj
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk -o /Users/hem/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator26.2-23C53-7d00a8b37fbd7999ea79df8ebc024bf0.sdkstatcache
+
+ProcessInfoPlistFile /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBloxCore.framework/Info.plist /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxCore.build/empty-FocusBloxCore.plist (in target 'FocusBloxCore' from project 'FocusBlox')
+    cd /Users/hem/Documents/opt/my-daily-sprints
+    builtin-infoPlistUtility /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxCore.build/empty-FocusBloxCore.plist -producttype com.apple.product-type.framework -expandbuildsettings -format binary -platform iphonesimulator -o /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBloxCore.framework/Info.plist
+
+SwiftDriver FocusBloxUITests normal arm64 com.apple.xcode.tools.swift.compiler (in target 'FocusBloxUITests' from project 'FocusBlox')
+    cd /Users/hem/Documents/opt/my-daily-sprints
+    builtin-SwiftDriver -- /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name FocusBloxUITests -Onone -enforce-exclusivity\=checked @/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/Objects-normal/arm64/FocusBloxUITests.SwiftFileList -DDEBUG -module-alias Testing\=_Testing_Unavailable -plugin-path /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk -target arm64-apple-ios26.2-simulator -g -module-cache-path /Users/hem/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -Xfrontend -serialize-debugging-options -profile-coverage-mapping -profile-generate -enable-testing -index-store-path /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Index.noindex/DataStore -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -swift-version 6 -I /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator -Isystem /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib -F /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator -F /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks -F /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk/Developer/Library/Frameworks -c -j10 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /Users/hem/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator26.2-23C53-7d00a8b37fbd7999ea79df8ebc024bf0.sdkstatcache -output-file-map /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/Objects-normal/arm64/FocusBloxUITests-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -explicit-module-build -module-cache-path /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -clang-scanner-module-cache-path /Users/hem/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -sdk-module-cache-path /Users/hem/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/Objects-normal/arm64/FocusBloxUITests.swiftmodule -validate-clang-modules-once -clang-build-session-file /Users/hem/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/Objects-normal/arm64/FocusBloxUITests_const_extract_protocols.json -Xcc -iquote -Xcc /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/FocusBloxUITests-generated-files.hmap -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/FocusBloxUITests-own-target-headers.hmap -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/FocusBloxUITests-all-target-headers.hmap -Xcc -iquote -Xcc /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/FocusBloxUITests-project-headers.hmap -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/include -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/DerivedSources-normal/arm64 -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/DerivedSources/arm64 -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/DerivedSources -Xcc -DDEBUG\=1 -emit-objc-header -emit-objc-header-path /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/Objects-normal/arm64/FocusBloxUITests-Swift.h -working-directory /Users/hem/Documents/opt/my-daily-sprints -experimental-emit-module-separately -disable-cmo
+
+ProcessInfoPlistFile /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBloxWidgetsExtension.appex/Info.plist /Users/hem/Documents/opt/my-daily-sprints/FocusBloxWidgets/Info.plist (in target 'FocusBloxWidgetsExtension' from project 'FocusBlox')
+    cd /Users/hem/Documents/opt/my-daily-sprints
+    builtin-infoPlistUtility /Users/hem/Documents/opt/my-daily-sprints/FocusBloxWidgets/Info.plist -producttype com.apple.product-type.app-extension -expandbuildsettings -format binary -platform iphonesimulator -additionalcontentfile /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxWidgetsExtension.build/assetcatalog_generated_info.plist -o /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBloxWidgetsExtension.appex/Info.plist
+
+ProcessInfoPlistFile /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBlox.app/Info.plist /Users/hem/Documents/opt/my-daily-sprints/Resources/Info.plist (in target 'FocusBlox' from project 'FocusBlox')
+    cd /Users/hem/Documents/opt/my-daily-sprints
+    builtin-infoPlistUtility /Users/hem/Documents/opt/my-daily-sprints/Resources/Info.plist -producttype com.apple.product-type.application -genpkginfo /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBlox.app/PkgInfo -expandbuildsettings -format binary -platform iphonesimulator -additionalcontentfile /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBlox.build/assetcatalog_generated_info.plist -scanforprivacyfile /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBlox.app/Frameworks/FocusBloxCore.framework -scanforprivacyfile /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBlox.app/PlugIns/FocusBloxWidgetsExtension.appex -o /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBlox.app/Info.plist
+warning: 'UIRequiresFullScreen' has been deprecated starting in iOS 26.0 and will be ignored in a future release. See the UIRequiresFullScreen documentation for more details. (in target 'FocusBlox' from project 'FocusBlox')
+
+CopySwiftLibs /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBlox.app (in target 'FocusBlox' from project 'FocusBlox')
+    cd /Users/hem/Documents/opt/my-daily-sprints
+    builtin-swiftStdLibTool --copy --verbose --scan-executable /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBlox.app/FocusBlox.debug.dylib --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBlox.app/Frameworks --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBlox.app/PlugIns --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBlox.app/SystemExtensions --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBlox.app/Extensions --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBloxCore.framework --platform iphonesimulator --toolchain /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain --destination /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBlox.app/Frameworks --strip-bitcode --strip-bitcode-tool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/bitcode_strip --emit-dependency-info /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBlox.build/SwiftStdLibToolInputDependencies.dep --filter-for-swift-os
+Ignoring --strip-bitcode because --sign was not passed
+
+ProcessInfoPlistFile /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBlox.app/PlugIns/FocusBloxTests.xctest/Info.plist /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxTests.build/empty-FocusBloxTests.plist (in target 'FocusBloxTests' from project 'FocusBlox')
+    cd /Users/hem/Documents/opt/my-daily-sprints
+    builtin-infoPlistUtility /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxTests.build/empty-FocusBloxTests.plist -producttype com.apple.product-type.bundle.unit-test -expandbuildsettings -format binary -platform iphonesimulator -o /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBlox.app/PlugIns/FocusBloxTests.xctest/Info.plist
+
+CopySwiftLibs /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBlox.app/PlugIns/FocusBloxTests.xctest (in target 'FocusBloxTests' from project 'FocusBlox')
+    cd /Users/hem/Documents/opt/my-daily-sprints
+    builtin-swiftStdLibTool --copy --verbose --scan-executable /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBlox.app/PlugIns/FocusBloxTests.xctest/FocusBloxTests --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBlox.app/PlugIns/FocusBloxTests.xctest/Frameworks --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBlox.app/PlugIns/FocusBloxTests.xctest/PlugIns --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBlox.app/PlugIns/FocusBloxTests.xctest/SystemExtensions --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBlox.app/PlugIns/FocusBloxTests.xctest/Extensions --platform iphonesimulator --toolchain /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain --destination /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBlox.app/PlugIns/FocusBloxTests.xctest/Frameworks --strip-bitcode --scan-executable /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib/libXCTestSwiftSupport.dylib --strip-bitcode-tool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/bitcode_strip --emit-dependency-info /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxTests.build/SwiftStdLibToolInputDependencies.dep --filter-for-swift-os
+Ignoring --strip-bitcode because --sign was not passed
+
+ProcessInfoPlistFile /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBloxUITests-Runner.app/PlugIns/FocusBloxUITests.xctest/Info.plist /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/empty-FocusBloxUITests.plist (in target 'FocusBloxUITests' from project 'FocusBlox')
+    cd /Users/hem/Documents/opt/my-daily-sprints
+    builtin-infoPlistUtility /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/empty-FocusBloxUITests.plist -producttype com.apple.product-type.bundle.ui-testing -expandbuildsettings -format binary -platform iphonesimulator -additionalcontentfile /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/ProductTypeInfoPlistAdditions.plist -o /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBloxUITests-Runner.app/PlugIns/FocusBloxUITests.xctest/Info.plist
+
+SwiftCompile normal arm64 Compiling\ FocusBlockReorderUITests.swift /Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift (in target 'FocusBloxUITests' from project 'FocusBlox')
+
+SwiftCompile normal arm64 /Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift (in target 'FocusBloxUITests' from project 'FocusBlox')
+    cd /Users/hem/Documents/opt/my-daily-sprints
+    
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:10:15: warning: call to main actor-isolated initializer 'init()' in a synchronous nonisolated context
+        app = XCUIApplication()
+              ^
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCUIAutomation.framework/Headers/XCUIApplication.h:29:1: note: calls to initializer 'init()' from outside of its actor context are implicitly asynchronous
+- (instancetype)init NS_DESIGNATED_INITIALIZER;
+^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:11:13: warning: main actor-isolated property 'launchArguments' can not be mutated from a nonisolated context
+        app.launchArguments = ["-UITesting"]
+            ^
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCUIAutomation.framework/Headers/XCUIApplication.h:93:51: note: mutation of this property is only permitted within the actor
+@property (nonatomic, copy) NSArray <NSString *> *launchArguments;
+                                                  ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:12:13: warning: call to main actor-isolated instance method 'launch()' in a synchronous nonisolated context
+        app.launch()
+            ^
+XCUIAutomation.XCUIApplication.launch:2:22: note: calls to instance method 'launch()' from outside of its actor context are implicitly asynchronous
+@MainActor open func launch()}
+                     ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:18:36: warning: main actor-isolated subscript 'subscript(_:)' can not be referenced from a nonisolated context
+        let assignTab = app.buttons["tab-assign"]
+                                   ^
+XCUIAutomation.XCUIElementQuery.subscript:2:17: note: subscript declared here
+@MainActor open subscript(key: String) -> XCUIElement { get }}
+                ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:17:18: note: add '@MainActor' to make instance method 'navigateToAssignTab()' part of global actor 'MainActor'
+    private func navigateToAssignTab() {
+                 ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:18:29: warning: main actor-isolated property 'buttons' can not be referenced from a nonisolated context
+        let assignTab = app.buttons["tab-assign"]
+                            ^
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCUIAutomation.framework/Headers/XCUIElementTypeQueryProvider.h:22:46: note: property declared here
+@property (readonly, copy) XCUIElementQuery *buttons;
+                                             ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:17:18: note: add '@MainActor' to make instance method 'navigateToAssignTab()' part of global actor 'MainActor'
+    private func navigateToAssignTab() {
+                 ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:19:33: warning: call to main actor-isolated instance method 'waitForExistence(timeout:)' in a synchronous nonisolated context
+        XCTAssertTrue(assignTab.waitForExistence(timeout: 5), "Assign tab should exist")
+                                ^
+XCUIAutomation.XCUIElement.waitForExistence:2:22: note: calls to instance method 'waitForExistence(timeout:)' from outside of its actor context are implicitly asynchronous
+@MainActor open func waitForExistence(timeout: TimeInterval) -> Bool}
+                     ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:20:19: warning: call to main actor-isolated instance method 'tap()' in a synchronous nonisolated context
+        assignTab.tap()
+                  ^
+XCUIAutomation.XCUIElement.tap:2:22: note: calls to instance method 'tap()' from outside of its actor context are implicitly asynchronous
+@MainActor open func tap()}
+                     ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:17:18: note: add '@MainActor' to make instance method 'navigateToAssignTab()' part of global actor 'MainActor'
+    private func navigateToAssignTab() {
+                 ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:25:37: warning: main actor-isolated subscript 'subscript(_:)' can not be referenced from a nonisolated context
+        let backlogTab = app.buttons["tab-backlog"]
+                                    ^
+XCUIAutomation.XCUIElementQuery.subscript:2:17: note: subscript declared here
+@MainActor open subscript(key: String) -> XCUIElement { get }}
+                ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:23:18: note: add '@MainActor' to make instance method 'createTestTasksAndBlock()' part of global actor 'MainActor'
+    private func createTestTasksAndBlock() {
+                 ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:25:30: warning: main actor-isolated property 'buttons' can not be referenced from a nonisolated context
+        let backlogTab = app.buttons["tab-backlog"]
+                             ^
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCUIAutomation.framework/Headers/XCUIElementTypeQueryProvider.h:22:46: note: property declared here
+@property (readonly, copy) XCUIElementQuery *buttons;
+                                             ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:23:18: note: add '@MainActor' to make instance method 'createTestTasksAndBlock()' part of global actor 'MainActor'
+    private func createTestTasksAndBlock() {
+                 ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:26:34: warning: call to main actor-isolated instance method 'waitForExistence(timeout:)' in a synchronous nonisolated context
+        XCTAssertTrue(backlogTab.waitForExistence(timeout: 5), "Backlog tab should exist")
+                                 ^
+XCUIAutomation.XCUIElement.waitForExistence:2:22: note: calls to instance method 'waitForExistence(timeout:)' from outside of its actor context are implicitly asynchronous
+@MainActor open func waitForExistence(timeout: TimeInterval) -> Bool}
+                     ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:27:20: warning: call to main actor-isolated instance method 'tap()' in a synchronous nonisolated context
+        backlogTab.tap()
+                   ^
+XCUIAutomation.XCUIElement.tap:2:22: note: calls to instance method 'tap()' from outside of its actor context are implicitly asynchronous
+@MainActor open func tap()}
+                     ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:23:18: note: add '@MainActor' to make instance method 'createTestTasksAndBlock()' part of global actor 'MainActor'
+    private func createTestTasksAndBlock() {
+                 ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:30:47: warning: main actor-isolated subscript 'subscript(_:)' can not be referenced from a nonisolated context
+        let quickCaptureField = app.textFields["quickCaptureField"]
+                                              ^
+XCUIAutomation.XCUIElementQuery.subscript:2:17: note: subscript declared here
+@MainActor open subscript(key: String) -> XCUIElement { get }}
+                ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:23:18: note: add '@MainActor' to make instance method 'createTestTasksAndBlock()' part of global actor 'MainActor'
+    private func createTestTasksAndBlock() {
+                 ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:30:37: warning: main actor-isolated property 'textFields' can not be referenced from a nonisolated context
+        let quickCaptureField = app.textFields["quickCaptureField"]
+                                    ^
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCUIAutomation.framework/Headers/XCUIElementTypeQueryProvider.h:63:46: note: property declared here
+@property (readonly, copy) XCUIElementQuery *textFields;
+                                             ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:23:18: note: add '@MainActor' to make instance method 'createTestTasksAndBlock()' part of global actor 'MainActor'
+    private func createTestTasksAndBlock() {
+                 ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:31:30: warning: call to main actor-isolated instance method 'waitForExistence(timeout:)' in a synchronous nonisolated context
+        if quickCaptureField.waitForExistence(timeout: 3) {
+                             ^
+XCUIAutomation.XCUIElement.waitForExistence:2:22: note: calls to instance method 'waitForExistence(timeout:)' from outside of its actor context are implicitly asynchronous
+@MainActor open func waitForExistence(timeout: TimeInterval) -> Bool}
+                     ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:23:18: note: add '@MainActor' to make instance method 'createTestTasksAndBlock()' part of global actor 'MainActor'
+    private func createTestTasksAndBlock() {
+                 ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:32:31: warning: call to main actor-isolated instance method 'tap()' in a synchronous nonisolated context
+            quickCaptureField.tap()
+                              ^
+XCUIAutomation.XCUIElement.tap:2:22: note: calls to instance method 'tap()' from outside of its actor context are implicitly asynchronous
+@MainActor open func tap()}
+                     ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:23:18: note: add '@MainActor' to make instance method 'createTestTasksAndBlock()' part of global actor 'MainActor'
+    private func createTestTasksAndBlock() {
+                 ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:33:31: warning: call to main actor-isolated instance method 'typeText' in a synchronous nonisolated context
+            quickCaptureField.typeText("Reorder Task A")
+                              ^
+XCUIAutomation.XCUIElement.typeText:2:22: note: calls to instance method 'typeText' from outside of its actor context are implicitly asynchronous
+@MainActor open func typeText(_ text: String)}
+                     ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:23:18: note: add '@MainActor' to make instance method 'createTestTasksAndBlock()' part of global actor 'MainActor'
+    private func createTestTasksAndBlock() {
+                 ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:34:47: warning: call to main actor-isolated instance method 'tap()' in a synchronous nonisolated context
+            app.buttons["quickCaptureSubmit"].tap()
+                                              ^
+XCUIAutomation.XCUIElement.tap:2:22: note: calls to instance method 'tap()' from outside of its actor context are implicitly asynchronous
+@MainActor open func tap()}
+                     ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:23:18: note: add '@MainActor' to make instance method 'createTestTasksAndBlock()' part of global actor 'MainActor'
+    private func createTestTasksAndBlock() {
+                 ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:34:24: warning: main actor-isolated subscript 'subscript(_:)' can not be referenced from a nonisolated context
+            app.buttons["quickCaptureSubmit"].tap()
+                       ^
+XCUIAutomation.XCUIElementQuery.subscript:2:17: note: subscript declared here
+@MainActor open subscript(key: String) -> XCUIElement { get }}
+                ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:23:18: note: add '@MainActor' to make instance method 'createTestTasksAndBlock()' part of global actor 'MainActor'
+    private func createTestTasksAndBlock() {
+                 ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:34:17: warning: main actor-isolated property 'buttons' can not be referenced from a nonisolated context
+            app.buttons["quickCaptureSubmit"].tap()
+                ^
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCUIAutomation.framework/Headers/XCUIElementTypeQueryProvider.h:22:46: note: property declared here
+@property (readonly, copy) XCUIElementQuery *buttons;
+                                             ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:23:18: note: add '@MainActor' to make instance method 'createTestTasksAndBlock()' part of global actor 'MainActor'
+    private func createTestTasksAndBlock() {
+                 ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:38:30: warning: call to main actor-isolated instance method 'waitForExistence(timeout:)' in a synchronous nonisolated context
+        if quickCaptureField.waitForExistence(timeout: 3) {
+                             ^
+XCUIAutomation.XCUIElement.waitForExistence:2:22: note: calls to instance method 'waitForExistence(timeout:)' from outside of its actor context are implicitly asynchronous
+@MainActor open func waitForExistence(timeout: TimeInterval) -> Bool}
+                     ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:23:18: note: add '@MainActor' to make instance method 'createTestTasksAndBlock()' part of global actor 'MainActor'
+    private func createTestTasksAndBlock() {
+                 ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:39:31: warning: call to main actor-isolated instance method 'tap()' in a synchronous nonisolated context
+            quickCaptureField.tap()
+                              ^
+XCUIAutomation.XCUIElement.tap:2:22: note: calls to instance method 'tap()' from outside of its actor context are implicitly asynchronous
+@MainActor open func tap()}
+                     ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:23:18: note: add '@MainActor' to make instance method 'createTestTasksAndBlock()' part of global actor 'MainActor'
+    private func createTestTasksAndBlock() {
+                 ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:40:31: warning: call to main actor-isolated instance method 'typeText' in a synchronous nonisolated context
+            quickCaptureField.typeText("Reorder Task B")
+                              ^
+XCUIAutomation.XCUIElement.typeText:2:22: note: calls to instance method 'typeText' from outside of its actor context are implicitly asynchronous
+@MainActor open func typeText(_ text: String)}
+                     ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:23:18: note: add '@MainActor' to make instance method 'createTestTasksAndBlock()' part of global actor 'MainActor'
+    private func createTestTasksAndBlock() {
+                 ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:41:47: warning: call to main actor-isolated instance method 'tap()' in a synchronous nonisolated context
+            app.buttons["quickCaptureSubmit"].tap()
+                                              ^
+XCUIAutomation.XCUIElement.tap:2:22: note: calls to instance method 'tap()' from outside of its actor context are implicitly asynchronous
+@MainActor open func tap()}
+                     ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:23:18: note: add '@MainActor' to make instance method 'createTestTasksAndBlock()' part of global actor 'MainActor'
+    private func createTestTasksAndBlock() {
+                 ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:41:24: warning: main actor-isolated subscript 'subscript(_:)' can not be referenced from a nonisolated context
+            app.buttons["quickCaptureSubmit"].tap()
+                       ^
+XCUIAutomation.XCUIElementQuery.subscript:2:17: note: subscript declared here
+@MainActor open subscript(key: String) -> XCUIElement { get }}
+                ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:23:18: note: add '@MainActor' to make instance method 'createTestTasksAndBlock()' part of global actor 'MainActor'
+    private func createTestTasksAndBlock() {
+                 ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:41:17: warning: main actor-isolated property 'buttons' can not be referenced from a nonisolated context
+            app.buttons["quickCaptureSubmit"].tap()
+                ^
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCUIAutomation.framework/Headers/XCUIElementTypeQueryProvider.h:22:46: note: property declared here
+@property (readonly, copy) XCUIElementQuery *buttons;
+                                             ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:23:18: note: add '@MainActor' to make instance method 'createTestTasksAndBlock()' part of global actor 'MainActor'
+    private func createTestTasksAndBlock() {
+                 ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:45:30: warning: call to main actor-isolated instance method 'waitForExistence(timeout:)' in a synchronous nonisolated context
+        if quickCaptureField.waitForExistence(timeout: 3) {
+                             ^
+XCUIAutomation.XCUIElement.waitForExistence:2:22: note: calls to instance method 'waitForExistence(timeout:)' from outside of its actor context are implicitly asynchronous
+@MainActor open func waitForExistence(timeout: TimeInterval) -> Bool}
+                     ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:23:18: note: add '@MainActor' to make instance method 'createTestTasksAndBlock()' part of global actor 'MainActor'
+    private func createTestTasksAndBlock() {
+                 ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:46:31: warning: call to main actor-isolated instance method 'tap()' in a synchronous nonisolated context
+            quickCaptureField.tap()
+                              ^
+XCUIAutomation.XCUIElement.tap:2:22: note: calls to instance method 'tap()' from outside of its actor context are implicitly asynchronous
+@MainActor open func tap()}
+                     ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:23:18: note: add '@MainActor' to make instance method 'createTestTasksAndBlock()' part of global actor 'MainActor'
+    private func createTestTasksAndBlock() {
+                 ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:47:31: warning: call to main actor-isolated instance method 'typeText' in a synchronous nonisolated context
+            quickCaptureField.typeText("Reorder Task C")
+                              ^
+XCUIAutomation.XCUIElement.typeText:2:22: note: calls to instance method 'typeText' from outside of its actor context are implicitly asynchronous
+@MainActor open func typeText(_ text: String)}
+                     ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:23:18: note: add '@MainActor' to make instance method 'createTestTasksAndBlock()' part of global actor 'MainActor'
+    private func createTestTasksAndBlock() {
+                 ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:48:47: warning: call to main actor-isolated instance method 'tap()' in a synchronous nonisolated context
+            app.buttons["quickCaptureSubmit"].tap()
+                                              ^
+XCUIAutomation.XCUIElement.tap:2:22: note: calls to instance method 'tap()' from outside of its actor context are implicitly asynchronous
+@MainActor open func tap()}
+                     ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:23:18: note: add '@MainActor' to make instance method 'createTestTasksAndBlock()' part of global actor 'MainActor'
+    private func createTestTasksAndBlock() {
+                 ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:48:24: warning: main actor-isolated subscript 'subscript(_:)' can not be referenced from a nonisolated context
+            app.buttons["quickCaptureSubmit"].tap()
+                       ^
+XCUIAutomation.XCUIElementQuery.subscript:2:17: note: subscript declared here
+@MainActor open subscript(key: String) -> XCUIElement { get }}
+                ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:23:18: note: add '@MainActor' to make instance method 'createTestTasksAndBlock()' part of global actor 'MainActor'
+    private func createTestTasksAndBlock() {
+                 ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:48:17: warning: main actor-isolated property 'buttons' can not be referenced from a nonisolated context
+            app.buttons["quickCaptureSubmit"].tap()
+                ^
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCUIAutomation.framework/Headers/XCUIElementTypeQueryProvider.h:22:46: note: property declared here
+@property (readonly, copy) XCUIElementQuery *buttons;
+                                             ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:23:18: note: add '@MainActor' to make instance method 'createTestTasksAndBlock()' part of global actor 'MainActor'
+    private func createTestTasksAndBlock() {
+                 ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:60:41: warning: main actor-isolated subscript 'subscript(_:)' can not be referenced from a nonisolated context
+        let scrollView = app.scrollViews["assignTabScrollView"]
+                                        ^
+XCUIAutomation.XCUIElementQuery.subscript:2:17: note: subscript declared here
+@MainActor open subscript(key: String) -> XCUIElement { get }}
+                ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:56:10: note: add '@MainActor' to make instance method 'testDragHandleExistsForTasksInBlock()' part of global actor 'MainActor'
+    func testDragHandleExistsForTasksInBlock() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:60:30: warning: main actor-isolated property 'scrollViews' can not be referenced from a nonisolated context
+        let scrollView = app.scrollViews["assignTabScrollView"]
+                             ^
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCUIAutomation.framework/Headers/XCUIElementTypeQueryProvider.h:60:46: note: property declared here
+@property (readonly, copy) XCUIElementQuery *scrollViews;
+                                             ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:56:10: note: add '@MainActor' to make instance method 'testDragHandleExistsForTasksInBlock()' part of global actor 'MainActor'
+    func testDragHandleExistsForTasksInBlock() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:61:34: warning: call to main actor-isolated instance method 'waitForExistence(timeout:)' in a synchronous nonisolated context
+        XCTAssertTrue(scrollView.waitForExistence(timeout: 5), "Assign scroll view should exist")
+                                 ^
+XCUIAutomation.XCUIElement.waitForExistence:2:22: note: calls to instance method 'waitForExistence(timeout:)' from outside of its actor context are implicitly asynchronous
+@MainActor open func waitForExistence(timeout: TimeInterval) -> Bool}
+                     ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:66:11: warning: main actor-isolated property 'firstMatch' can not be referenced from a nonisolated context
+        ).firstMatch
+          ^
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCUIAutomation.framework/Headers/XCUIElementTypeQueryProvider.h:105:35: note: property declared here
+@property (readonly) XCUIElement *firstMatch;
+                                  ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:56:10: note: add '@MainActor' to make instance method 'testDragHandleExistsForTasksInBlock()' part of global actor 'MainActor'
+    func testDragHandleExistsForTasksInBlock() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:64:48: warning: call to main actor-isolated instance method 'matching' in a synchronous nonisolated context
+        let focusBlockCard = app.otherElements.matching(
+                                               ^
+XCUIAutomation.XCUIElementQuery.matching:2:22: note: calls to instance method 'matching' from outside of its actor context are implicitly asynchronous
+@MainActor open func matching(_ predicate: NSPredicate) -> XCUIElementQuery}
+                     ^
+XCUIAutomation.XCUIElementQuery.matching:2:22: note: main actor isolation inferred from conformance to protocol 'XCUIElementTypeQueryProvider'
+@MainActor open func matching(_ predicate: NSPredicate) -> XCUIElementQuery}
+                     ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:56:10: note: add '@MainActor' to make instance method 'testDragHandleExistsForTasksInBlock()' part of global actor 'MainActor'
+    func testDragHandleExistsForTasksInBlock() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:64:34: warning: main actor-isolated property 'otherElements' can not be referenced from a nonisolated context
+        let focusBlockCard = app.otherElements.matching(
+                                 ^
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCUIAutomation.framework/Headers/XCUIElementTypeQueryProvider.h:95:46: note: property declared here
+@property (readonly, copy) XCUIElementQuery *otherElements;
+                                             ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:56:10: note: add '@MainActor' to make instance method 'testDragHandleExistsForTasksInBlock()' part of global actor 'MainActor'
+    func testDragHandleExistsForTasksInBlock() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:68:27: warning: call to main actor-isolated instance method 'waitForExistence(timeout:)' in a synchronous nonisolated context
+        if focusBlockCard.waitForExistence(timeout: 3) {
+                          ^
+XCUIAutomation.XCUIElement.waitForExistence:2:22: note: calls to instance method 'waitForExistence(timeout:)' from outside of its actor context are implicitly asynchronous
+@MainActor open func waitForExistence(timeout: TimeInterval) -> Bool}
+                     ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:56:10: note: add '@MainActor' to make instance method 'testDragHandleExistsForTasksInBlock()' part of global actor 'MainActor'
+    func testDragHandleExistsForTasksInBlock() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:73:15: warning: main actor-isolated property 'firstMatch' can not be referenced from a nonisolated context
+            ).firstMatch
+              ^
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCUIAutomation.framework/Headers/XCUIElementTypeQueryProvider.h:105:35: note: property declared here
+@property (readonly) XCUIElement *firstMatch;
+                                  ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:56:10: note: add '@MainActor' to make instance method 'testDragHandleExistsForTasksInBlock()' part of global actor 'MainActor'
+    func testDragHandleExistsForTasksInBlock() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:71:52: warning: call to main actor-isolated instance method 'matching' in a synchronous nonisolated context
+            let dragHandle = focusBlockCard.images.matching(
+                                                   ^
+XCUIAutomation.XCUIElementQuery.matching:2:22: note: calls to instance method 'matching' from outside of its actor context are implicitly asynchronous
+@MainActor open func matching(_ predicate: NSPredicate) -> XCUIElementQuery}
+                     ^
+XCUIAutomation.XCUIElementQuery.matching:2:22: note: main actor isolation inferred from conformance to protocol 'XCUIElementTypeQueryProvider'
+@MainActor open func matching(_ predicate: NSPredicate) -> XCUIElementQuery}
+                     ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:56:10: note: add '@MainActor' to make instance method 'testDragHandleExistsForTasksInBlock()' part of global actor 'MainActor'
+    func testDragHandleExistsForTasksInBlock() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:71:45: warning: main actor-isolated property 'images' can not be referenced from a nonisolated context
+            let dragHandle = focusBlockCard.images.matching(
+                                            ^
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCUIAutomation.framework/Headers/XCUIElementTypeQueryProvider.h:57:46: note: property declared here
+@property (readonly, copy) XCUIElementQuery *images;
+                                             ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:56:10: note: add '@MainActor' to make instance method 'testDragHandleExistsForTasksInBlock()' part of global actor 'MainActor'
+    func testDragHandleExistsForTasksInBlock() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:76:28: warning: call to main actor-isolated instance method 'waitForExistence(timeout:)' in a synchronous nonisolated context
+                dragHandle.waitForExistence(timeout: 3),
+                           ^
+XCUIAutomation.XCUIElement.waitForExistence:2:22: note: calls to instance method 'waitForExistence(timeout:)' from outside of its actor context are implicitly asynchronous
+@MainActor open func waitForExistence(timeout: TimeInterval) -> Bool}
+                     ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:91:41: warning: main actor-isolated subscript 'subscript(_:)' can not be referenced from a nonisolated context
+        let scrollView = app.scrollViews["assignTabScrollView"]
+                                        ^
+XCUIAutomation.XCUIElementQuery.subscript:2:17: note: subscript declared here
+@MainActor open subscript(key: String) -> XCUIElement { get }}
+                ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:88:10: note: add '@MainActor' to make instance method 'testDragHandleAccessibilityIdentifier()' part of global actor 'MainActor'
+    func testDragHandleAccessibilityIdentifier() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:91:30: warning: main actor-isolated property 'scrollViews' can not be referenced from a nonisolated context
+        let scrollView = app.scrollViews["assignTabScrollView"]
+                             ^
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCUIAutomation.framework/Headers/XCUIElementTypeQueryProvider.h:60:46: note: property declared here
+@property (readonly, copy) XCUIElementQuery *scrollViews;
+                                             ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:88:10: note: add '@MainActor' to make instance method 'testDragHandleAccessibilityIdentifier()' part of global actor 'MainActor'
+    func testDragHandleAccessibilityIdentifier() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:92:34: warning: call to main actor-isolated instance method 'waitForExistence(timeout:)' in a synchronous nonisolated context
+        XCTAssertTrue(scrollView.waitForExistence(timeout: 5), "Assign scroll view should exist")
+                                 ^
+XCUIAutomation.XCUIElement.waitForExistence:2:22: note: calls to instance method 'waitForExistence(timeout:)' from outside of its actor context are implicitly asynchronous
+@MainActor open func waitForExistence(timeout: TimeInterval) -> Bool}
+                     ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:97:11: warning: main actor-isolated property 'firstMatch' can not be referenced from a nonisolated context
+        ).firstMatch
+          ^
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCUIAutomation.framework/Headers/XCUIElementTypeQueryProvider.h:105:35: note: property declared here
+@property (readonly) XCUIElement *firstMatch;
+                                  ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:88:10: note: add '@MainActor' to make instance method 'testDragHandleAccessibilityIdentifier()' part of global actor 'MainActor'
+    func testDragHandleAccessibilityIdentifier() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:95:40: warning: call to main actor-isolated instance method 'matching' in a synchronous nonisolated context
+        let anyDragHandle = app.images.matching(
+                                       ^
+XCUIAutomation.XCUIElementQuery.matching:2:22: note: calls to instance method 'matching' from outside of its actor context are implicitly asynchronous
+@MainActor open func matching(_ predicate: NSPredicate) -> XCUIElementQuery}
+                     ^
+XCUIAutomation.XCUIElementQuery.matching:2:22: note: main actor isolation inferred from conformance to protocol 'XCUIElementTypeQueryProvider'
+@MainActor open func matching(_ predicate: NSPredicate) -> XCUIElementQuery}
+                     ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:88:10: note: add '@MainActor' to make instance method 'testDragHandleAccessibilityIdentifier()' part of global actor 'MainActor'
+    func testDragHandleAccessibilityIdentifier() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:95:33: warning: main actor-isolated property 'images' can not be referenced from a nonisolated context
+        let anyDragHandle = app.images.matching(
+                                ^
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCUIAutomation.framework/Headers/XCUIElementTypeQueryProvider.h:57:46: note: property declared here
+@property (readonly, copy) XCUIElementQuery *images;
+                                             ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:88:10: note: add '@MainActor' to make instance method 'testDragHandleAccessibilityIdentifier()' part of global actor 'MainActor'
+    func testDragHandleAccessibilityIdentifier() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:101:27: warning: main actor-isolated property 'exists' can not be referenced from a nonisolated autoclosure
+            anyDragHandle.exists,
+                          ^
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCUIAutomation.framework/Headers/XCUIElement.h:54:27: note: property declared here
+@property (readonly) BOOL exists;
+                          ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:141:13: warning: initialization of immutable value 'secondTaskFrame' was never used; consider replacing with assignment to '_' or removing it
+        let secondTaskFrame = secondTask.frame
+        ~~~~^~~~~~~~~~~~~~~
+        _
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:159:13: warning: initialization of immutable value 'updatedSecondTask' was never used; consider replacing with assignment to '_' or removing it
+        let updatedSecondTask = tasksInBlock.element(boundBy: 1)
+        ~~~~^~~~~~~~~~~~~~~~~
+        _
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:113:41: warning: main actor-isolated subscript 'subscript(_:)' can not be referenced from a nonisolated context
+        let scrollView = app.scrollViews["assignTabScrollView"]
+                                        ^
+XCUIAutomation.XCUIElementQuery.subscript:2:17: note: subscript declared here
+@MainActor open subscript(key: String) -> XCUIElement { get }}
+                ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:110:10: note: add '@MainActor' to make instance method 'testReorderTaskByDrag()' part of global actor 'MainActor'
+    func testReorderTaskByDrag() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:113:30: warning: main actor-isolated property 'scrollViews' can not be referenced from a nonisolated context
+        let scrollView = app.scrollViews["assignTabScrollView"]
+                             ^
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCUIAutomation.framework/Headers/XCUIElementTypeQueryProvider.h:60:46: note: property declared here
+@property (readonly, copy) XCUIElementQuery *scrollViews;
+                                             ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:110:10: note: add '@MainActor' to make instance method 'testReorderTaskByDrag()' part of global actor 'MainActor'
+    func testReorderTaskByDrag() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:114:34: warning: call to main actor-isolated instance method 'waitForExistence(timeout:)' in a synchronous nonisolated context
+        XCTAssertTrue(scrollView.waitForExistence(timeout: 5), "Assign scroll view should exist")
+                                 ^
+XCUIAutomation.XCUIElement.waitForExistence:2:22: note: calls to instance method 'waitForExistence(timeout:)' from outside of its actor context are implicitly asynchronous
+@MainActor open func waitForExistence(timeout: TimeInterval) -> Bool}
+                     ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:119:11: warning: main actor-isolated property 'firstMatch' can not be referenced from a nonisolated context
+        ).firstMatch
+          ^
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCUIAutomation.framework/Headers/XCUIElementTypeQueryProvider.h:105:35: note: property declared here
+@property (readonly) XCUIElement *firstMatch;
+                                  ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:110:10: note: add '@MainActor' to make instance method 'testReorderTaskByDrag()' part of global actor 'MainActor'
+    func testReorderTaskByDrag() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:117:48: warning: call to main actor-isolated instance method 'matching' in a synchronous nonisolated context
+        let focusBlockCard = app.otherElements.matching(
+                                               ^
+XCUIAutomation.XCUIElementQuery.matching:2:22: note: calls to instance method 'matching' from outside of its actor context are implicitly asynchronous
+@MainActor open func matching(_ predicate: NSPredicate) -> XCUIElementQuery}
+                     ^
+XCUIAutomation.XCUIElementQuery.matching:2:22: note: main actor isolation inferred from conformance to protocol 'XCUIElementTypeQueryProvider'
+@MainActor open func matching(_ predicate: NSPredicate) -> XCUIElementQuery}
+                     ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:110:10: note: add '@MainActor' to make instance method 'testReorderTaskByDrag()' part of global actor 'MainActor'
+    func testReorderTaskByDrag() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:117:34: warning: main actor-isolated property 'otherElements' can not be referenced from a nonisolated context
+        let focusBlockCard = app.otherElements.matching(
+                                 ^
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCUIAutomation.framework/Headers/XCUIElementTypeQueryProvider.h:95:46: note: property declared here
+@property (readonly, copy) XCUIElementQuery *otherElements;
+                                             ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:110:10: note: add '@MainActor' to make instance method 'testReorderTaskByDrag()' part of global actor 'MainActor'
+    func testReorderTaskByDrag() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:121:30: warning: call to main actor-isolated instance method 'waitForExistence(timeout:)' in a synchronous nonisolated context
+        guard focusBlockCard.waitForExistence(timeout: 3) else {
+                             ^
+XCUIAutomation.XCUIElement.waitForExistence:2:22: note: calls to instance method 'waitForExistence(timeout:)' from outside of its actor context are implicitly asynchronous
+@MainActor open func waitForExistence(timeout: TimeInterval) -> Bool}
+                     ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:110:10: note: add '@MainActor' to make instance method 'testReorderTaskByDrag()' part of global actor 'MainActor'
+    func testReorderTaskByDrag() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:127:57: warning: call to main actor-isolated instance method 'matching' in a synchronous nonisolated context
+        let tasksInBlock = focusBlockCard.otherElements.matching(
+                                                        ^
+XCUIAutomation.XCUIElementQuery.matching:2:22: note: calls to instance method 'matching' from outside of its actor context are implicitly asynchronous
+@MainActor open func matching(_ predicate: NSPredicate) -> XCUIElementQuery}
+                     ^
+XCUIAutomation.XCUIElementQuery.matching:2:22: note: main actor isolation inferred from conformance to protocol 'XCUIElementTypeQueryProvider'
+@MainActor open func matching(_ predicate: NSPredicate) -> XCUIElementQuery}
+                     ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:110:10: note: add '@MainActor' to make instance method 'testReorderTaskByDrag()' part of global actor 'MainActor'
+    func testReorderTaskByDrag() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:127:43: warning: main actor-isolated property 'otherElements' can not be referenced from a nonisolated context
+        let tasksInBlock = focusBlockCard.otherElements.matching(
+                                          ^
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCUIAutomation.framework/Headers/XCUIElementTypeQueryProvider.h:95:46: note: property declared here
+@property (readonly, copy) XCUIElementQuery *otherElements;
+                                             ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:110:10: note: add '@MainActor' to make instance method 'testReorderTaskByDrag()' part of global actor 'MainActor'
+    func testReorderTaskByDrag() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:131:28: warning: main actor-isolated property 'count' can not be referenced from a nonisolated context
+        guard tasksInBlock.count >= 2 else {
+                           ^
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCUIAutomation.framework/Headers/XCUIElementQuery.h:29:33: note: property declared here
+@property (readonly) NSUInteger count;
+                                ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:110:10: note: add '@MainActor' to make instance method 'testReorderTaskByDrag()' part of global actor 'MainActor'
+    func testReorderTaskByDrag() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:136:38: warning: call to main actor-isolated instance method 'element(boundBy:)' in a synchronous nonisolated context
+        let firstTask = tasksInBlock.element(boundBy: 0)
+                                     ^
+XCUIAutomation.XCUIElementQuery.element:2:22: note: calls to instance method 'element(boundBy:)' from outside of its actor context are implicitly asynchronous
+@MainActor open func element(boundBy index: Int) -> XCUIElement}
+                     ^
+XCUIAutomation.XCUIElementQuery.element:2:22: note: main actor isolation inferred from conformance to protocol 'XCUIElementTypeQueryProvider'
+@MainActor open func element(boundBy index: Int) -> XCUIElement}
+                     ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:110:10: note: add '@MainActor' to make instance method 'testReorderTaskByDrag()' part of global actor 'MainActor'
+    func testReorderTaskByDrag() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:137:39: warning: call to main actor-isolated instance method 'element(boundBy:)' in a synchronous nonisolated context
+        let secondTask = tasksInBlock.element(boundBy: 1)
+                                      ^
+XCUIAutomation.XCUIElementQuery.element:2:22: note: calls to instance method 'element(boundBy:)' from outside of its actor context are implicitly asynchronous
+@MainActor open func element(boundBy index: Int) -> XCUIElement}
+                     ^
+XCUIAutomation.XCUIElementQuery.element:2:22: note: main actor isolation inferred from conformance to protocol 'XCUIElementTypeQueryProvider'
+@MainActor open func element(boundBy index: Int) -> XCUIElement}
+                     ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:110:10: note: add '@MainActor' to make instance method 'testReorderTaskByDrag()' part of global actor 'MainActor'
+    func testReorderTaskByDrag() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:140:40: warning: main actor-isolated property 'frame' can not be referenced from a nonisolated context
+        let firstTaskFrame = firstTask.frame
+                                       ^
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCUIAutomation.framework/Headers/XCUIElementAttributes.h:38:29: note: property declared here
+@property (readonly) CGRect frame;
+                            ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:110:10: note: add '@MainActor' to make instance method 'testReorderTaskByDrag()' part of global actor 'MainActor'
+    func testReorderTaskByDrag() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:141:42: warning: main actor-isolated property 'frame' can not be referenced from a nonisolated context
+        let secondTaskFrame = secondTask.frame
+                                         ^
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCUIAutomation.framework/Headers/XCUIElementAttributes.h:38:29: note: property declared here
+@property (readonly) CGRect frame;
+                            ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:110:10: note: add '@MainActor' to make instance method 'testReorderTaskByDrag()' part of global actor 'MainActor'
+    func testReorderTaskByDrag() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:146:11: warning: main actor-isolated property 'firstMatch' can not be referenced from a nonisolated context
+        ).firstMatch
+          ^
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCUIAutomation.framework/Headers/XCUIElementTypeQueryProvider.h:105:35: note: property declared here
+@property (readonly) XCUIElement *firstMatch;
+                                  ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:110:10: note: add '@MainActor' to make instance method 'testReorderTaskByDrag()' part of global actor 'MainActor'
+    func testReorderTaskByDrag() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:144:48: warning: call to main actor-isolated instance method 'matching' in a synchronous nonisolated context
+        let firstDragHandle = firstTask.images.matching(
+                                               ^
+XCUIAutomation.XCUIElementQuery.matching:2:22: note: calls to instance method 'matching' from outside of its actor context are implicitly asynchronous
+@MainActor open func matching(_ predicate: NSPredicate) -> XCUIElementQuery}
+                     ^
+XCUIAutomation.XCUIElementQuery.matching:2:22: note: main actor isolation inferred from conformance to protocol 'XCUIElementTypeQueryProvider'
+@MainActor open func matching(_ predicate: NSPredicate) -> XCUIElementQuery}
+                     ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:110:10: note: add '@MainActor' to make instance method 'testReorderTaskByDrag()' part of global actor 'MainActor'
+    func testReorderTaskByDrag() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:144:41: warning: main actor-isolated property 'images' can not be referenced from a nonisolated context
+        let firstDragHandle = firstTask.images.matching(
+                                        ^
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCUIAutomation.framework/Headers/XCUIElementTypeQueryProvider.h:57:46: note: property declared here
+@property (readonly, copy) XCUIElementQuery *images;
+                                             ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:110:10: note: add '@MainActor' to make instance method 'testReorderTaskByDrag()' part of global actor 'MainActor'
+    func testReorderTaskByDrag() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:149:29: warning: call to main actor-isolated instance method 'waitForExistence(timeout:)' in a synchronous nonisolated context
+            firstDragHandle.waitForExistence(timeout: 3),
+                            ^
+XCUIAutomation.XCUIElement.waitForExistence:2:22: note: calls to instance method 'waitForExistence(timeout:)' from outside of its actor context are implicitly asynchronous
+@MainActor open func waitForExistence(timeout: TimeInterval) -> Bool}
+                     ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:154:25: warning: call to main actor-isolated instance method 'press(forDuration:thenDragTo:)' in a synchronous nonisolated context
+        firstDragHandle.press(forDuration: 0.5, thenDragTo: secondTask)
+                        ^
+XCUIAutomation.XCUIElement.press:2:22: note: calls to instance method 'press(forDuration:thenDragTo:)' from outside of its actor context are implicitly asynchronous
+@MainActor open func press(forDuration duration: TimeInterval, thenDragTo otherElement: XCUIElement)}
+                     ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:110:10: note: add '@MainActor' to make instance method 'testReorderTaskByDrag()' part of global actor 'MainActor'
+    func testReorderTaskByDrag() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:158:45: warning: call to main actor-isolated instance method 'element(boundBy:)' in a synchronous nonisolated context
+        let updatedFirstTask = tasksInBlock.element(boundBy: 0)
+                                            ^
+XCUIAutomation.XCUIElementQuery.element:2:22: note: calls to instance method 'element(boundBy:)' from outside of its actor context are implicitly asynchronous
+@MainActor open func element(boundBy index: Int) -> XCUIElement}
+                     ^
+XCUIAutomation.XCUIElementQuery.element:2:22: note: main actor isolation inferred from conformance to protocol 'XCUIElementTypeQueryProvider'
+@MainActor open func element(boundBy index: Int) -> XCUIElement}
+                     ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:110:10: note: add '@MainActor' to make instance method 'testReorderTaskByDrag()' part of global actor 'MainActor'
+    func testReorderTaskByDrag() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:159:46: warning: call to main actor-isolated instance method 'element(boundBy:)' in a synchronous nonisolated context
+        let updatedSecondTask = tasksInBlock.element(boundBy: 1)
+                                             ^
+XCUIAutomation.XCUIElementQuery.element:2:22: note: calls to instance method 'element(boundBy:)' from outside of its actor context are implicitly asynchronous
+@MainActor open func element(boundBy index: Int) -> XCUIElement}
+                     ^
+XCUIAutomation.XCUIElementQuery.element:2:22: note: main actor isolation inferred from conformance to protocol 'XCUIElementTypeQueryProvider'
+@MainActor open func element(boundBy index: Int) -> XCUIElement}
+                     ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:110:10: note: add '@MainActor' to make instance method 'testReorderTaskByDrag()' part of global actor 'MainActor'
+    func testReorderTaskByDrag() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:164:30: warning: main actor-isolated property 'frame' can not be referenced from a nonisolated autoclosure
+            updatedFirstTask.frame.minY,
+                             ^
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCUIAutomation.framework/Headers/XCUIElementAttributes.h:38:29: note: property declared here
+@property (readonly) CGRect frame;
+                            ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:176:41: warning: main actor-isolated subscript 'subscript(_:)' can not be referenced from a nonisolated context
+        let scrollView = app.scrollViews["assignTabScrollView"]
+                                        ^
+XCUIAutomation.XCUIElementQuery.subscript:2:17: note: subscript declared here
+@MainActor open subscript(key: String) -> XCUIElement { get }}
+                ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:173:10: note: add '@MainActor' to make instance method 'testReorderPersistsAfterNavigation()' part of global actor 'MainActor'
+    func testReorderPersistsAfterNavigation() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:176:30: warning: main actor-isolated property 'scrollViews' can not be referenced from a nonisolated context
+        let scrollView = app.scrollViews["assignTabScrollView"]
+                             ^
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCUIAutomation.framework/Headers/XCUIElementTypeQueryProvider.h:60:46: note: property declared here
+@property (readonly, copy) XCUIElementQuery *scrollViews;
+                                             ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:173:10: note: add '@MainActor' to make instance method 'testReorderPersistsAfterNavigation()' part of global actor 'MainActor'
+    func testReorderPersistsAfterNavigation() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:177:34: warning: call to main actor-isolated instance method 'waitForExistence(timeout:)' in a synchronous nonisolated context
+        XCTAssertTrue(scrollView.waitForExistence(timeout: 5), "Assign scroll view should exist")
+                                 ^
+XCUIAutomation.XCUIElement.waitForExistence:2:22: note: calls to instance method 'waitForExistence(timeout:)' from outside of its actor context are implicitly asynchronous
+@MainActor open func waitForExistence(timeout: TimeInterval) -> Bool}
+                     ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:182:11: warning: main actor-isolated property 'firstMatch' can not be referenced from a nonisolated context
+        ).firstMatch
+          ^
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCUIAutomation.framework/Headers/XCUIElementTypeQueryProvider.h:105:35: note: property declared here
+@property (readonly) XCUIElement *firstMatch;
+                                  ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:173:10: note: add '@MainActor' to make instance method 'testReorderPersistsAfterNavigation()' part of global actor 'MainActor'
+    func testReorderPersistsAfterNavigation() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:180:48: warning: call to main actor-isolated instance method 'matching' in a synchronous nonisolated context
+        let focusBlockCard = app.otherElements.matching(
+                                               ^
+XCUIAutomation.XCUIElementQuery.matching:2:22: note: calls to instance method 'matching' from outside of its actor context are implicitly asynchronous
+@MainActor open func matching(_ predicate: NSPredicate) -> XCUIElementQuery}
+                     ^
+XCUIAutomation.XCUIElementQuery.matching:2:22: note: main actor isolation inferred from conformance to protocol 'XCUIElementTypeQueryProvider'
+@MainActor open func matching(_ predicate: NSPredicate) -> XCUIElementQuery}
+                     ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:173:10: note: add '@MainActor' to make instance method 'testReorderPersistsAfterNavigation()' part of global actor 'MainActor'
+    func testReorderPersistsAfterNavigation() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:180:34: warning: main actor-isolated property 'otherElements' can not be referenced from a nonisolated context
+        let focusBlockCard = app.otherElements.matching(
+                                 ^
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCUIAutomation.framework/Headers/XCUIElementTypeQueryProvider.h:95:46: note: property declared here
+@property (readonly, copy) XCUIElementQuery *otherElements;
+                                             ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:173:10: note: add '@MainActor' to make instance method 'testReorderPersistsAfterNavigation()' part of global actor 'MainActor'
+    func testReorderPersistsAfterNavigation() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:184:30: warning: call to main actor-isolated instance method 'waitForExistence(timeout:)' in a synchronous nonisolated context
+        guard focusBlockCard.waitForExistence(timeout: 3) else {
+                             ^
+XCUIAutomation.XCUIElement.waitForExistence:2:22: note: calls to instance method 'waitForExistence(timeout:)' from outside of its actor context are implicitly asynchronous
+@MainActor open func waitForExistence(timeout: TimeInterval) -> Bool}
+                     ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:173:10: note: add '@MainActor' to make instance method 'testReorderPersistsAfterNavigation()' part of global actor 'MainActor'
+    func testReorderPersistsAfterNavigation() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:190:57: warning: call to main actor-isolated instance method 'matching' in a synchronous nonisolated context
+        let tasksInBlock = focusBlockCard.otherElements.matching(
+                                                        ^
+XCUIAutomation.XCUIElementQuery.matching:2:22: note: calls to instance method 'matching' from outside of its actor context are implicitly asynchronous
+@MainActor open func matching(_ predicate: NSPredicate) -> XCUIElementQuery}
+                     ^
+XCUIAutomation.XCUIElementQuery.matching:2:22: note: main actor isolation inferred from conformance to protocol 'XCUIElementTypeQueryProvider'
+@MainActor open func matching(_ predicate: NSPredicate) -> XCUIElementQuery}
+                     ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:173:10: note: add '@MainActor' to make instance method 'testReorderPersistsAfterNavigation()' part of global actor 'MainActor'
+    func testReorderPersistsAfterNavigation() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:190:43: warning: main actor-isolated property 'otherElements' can not be referenced from a nonisolated context
+        let tasksInBlock = focusBlockCard.otherElements.matching(
+                                          ^
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCUIAutomation.framework/Headers/XCUIElementTypeQueryProvider.h:95:46: note: property declared here
+@property (readonly, copy) XCUIElementQuery *otherElements;
+                                             ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:173:10: note: add '@MainActor' to make instance method 'testReorderPersistsAfterNavigation()' part of global actor 'MainActor'
+    func testReorderPersistsAfterNavigation() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:194:28: warning: main actor-isolated property 'count' can not be referenced from a nonisolated context
+        guard tasksInBlock.count >= 2 else {
+                           ^
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCUIAutomation.framework/Headers/XCUIElementQuery.h:29:33: note: property declared here
+@property (readonly) NSUInteger count;
+                                ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:173:10: note: add '@MainActor' to make instance method 'testReorderPersistsAfterNavigation()' part of global actor 'MainActor'
+    func testReorderPersistsAfterNavigation() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:202:11: warning: main actor-isolated property 'firstMatch' can not be referenced from a nonisolated context
+        ).firstMatch
+          ^
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCUIAutomation.framework/Headers/XCUIElementTypeQueryProvider.h:105:35: note: property declared here
+@property (readonly) XCUIElement *firstMatch;
+                                  ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:173:10: note: add '@MainActor' to make instance method 'testReorderPersistsAfterNavigation()' part of global actor 'MainActor'
+    func testReorderPersistsAfterNavigation() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:200:75: warning: call to main actor-isolated instance method 'matching' in a synchronous nonisolated context
+        let firstTaskTitle = tasksInBlock.element(boundBy: 0).staticTexts.matching(
+                                                                          ^
+XCUIAutomation.XCUIElementQuery.matching:2:22: note: calls to instance method 'matching' from outside of its actor context are implicitly asynchronous
+@MainActor open func matching(_ predicate: NSPredicate) -> XCUIElementQuery}
+                     ^
+XCUIAutomation.XCUIElementQuery.matching:2:22: note: main actor isolation inferred from conformance to protocol 'XCUIElementTypeQueryProvider'
+@MainActor open func matching(_ predicate: NSPredicate) -> XCUIElementQuery}
+                     ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:173:10: note: add '@MainActor' to make instance method 'testReorderPersistsAfterNavigation()' part of global actor 'MainActor'
+    func testReorderPersistsAfterNavigation() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:200:63: warning: main actor-isolated property 'staticTexts' can not be referenced from a nonisolated context
+        let firstTaskTitle = tasksInBlock.element(boundBy: 0).staticTexts.matching(
+                                                              ^
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCUIAutomation.framework/Headers/XCUIElementTypeQueryProvider.h:62:46: note: property declared here
+@property (readonly, copy) XCUIElementQuery *staticTexts;
+                                             ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:173:10: note: add '@MainActor' to make instance method 'testReorderPersistsAfterNavigation()' part of global actor 'MainActor'
+    func testReorderPersistsAfterNavigation() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:200:43: warning: call to main actor-isolated instance method 'element(boundBy:)' in a synchronous nonisolated context
+        let firstTaskTitle = tasksInBlock.element(boundBy: 0).staticTexts.matching(
+                                          ^
+XCUIAutomation.XCUIElementQuery.element:2:22: note: calls to instance method 'element(boundBy:)' from outside of its actor context are implicitly asynchronous
+@MainActor open func element(boundBy index: Int) -> XCUIElement}
+                     ^
+XCUIAutomation.XCUIElementQuery.element:2:22: note: main actor isolation inferred from conformance to protocol 'XCUIElementTypeQueryProvider'
+@MainActor open func element(boundBy index: Int) -> XCUIElement}
+                     ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:173:10: note: add '@MainActor' to make instance method 'testReorderPersistsAfterNavigation()' part of global actor 'MainActor'
+    func testReorderPersistsAfterNavigation() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:204:30: warning: main actor-isolated property 'exists' can not be referenced from a nonisolated context
+        guard firstTaskTitle.exists else {
+                             ^
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCUIAutomation.framework/Headers/XCUIElement.h:54:27: note: property declared here
+@property (readonly) BOOL exists;
+                          ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:173:10: note: add '@MainActor' to make instance method 'testReorderPersistsAfterNavigation()' part of global actor 'MainActor'
+    func testReorderPersistsAfterNavigation() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:209:49: warning: main actor-isolated property 'label' can not be referenced from a nonisolated context
+        let originalFirstTitle = firstTaskTitle.label
+                                                ^
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCUIAutomation.framework/Headers/XCUIElementAttributes.h:47:38: note: property declared here
+@property (readonly, copy) NSString *label;
+                                     ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:173:10: note: add '@MainActor' to make instance method 'testReorderPersistsAfterNavigation()' part of global actor 'MainActor'
+    func testReorderPersistsAfterNavigation() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:214:11: warning: main actor-isolated property 'firstMatch' can not be referenced from a nonisolated context
+        ).firstMatch
+          ^
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCUIAutomation.framework/Headers/XCUIElementTypeQueryProvider.h:105:35: note: property declared here
+@property (readonly) XCUIElement *firstMatch;
+                                  ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:173:10: note: add '@MainActor' to make instance method 'testReorderPersistsAfterNavigation()' part of global actor 'MainActor'
+    func testReorderPersistsAfterNavigation() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:212:71: warning: call to main actor-isolated instance method 'matching' in a synchronous nonisolated context
+        let firstDragHandle = tasksInBlock.element(boundBy: 0).images.matching(
+                                                                      ^
+XCUIAutomation.XCUIElementQuery.matching:2:22: note: calls to instance method 'matching' from outside of its actor context are implicitly asynchronous
+@MainActor open func matching(_ predicate: NSPredicate) -> XCUIElementQuery}
+                     ^
+XCUIAutomation.XCUIElementQuery.matching:2:22: note: main actor isolation inferred from conformance to protocol 'XCUIElementTypeQueryProvider'
+@MainActor open func matching(_ predicate: NSPredicate) -> XCUIElementQuery}
+                     ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:173:10: note: add '@MainActor' to make instance method 'testReorderPersistsAfterNavigation()' part of global actor 'MainActor'
+    func testReorderPersistsAfterNavigation() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:212:64: warning: main actor-isolated property 'images' can not be referenced from a nonisolated context
+        let firstDragHandle = tasksInBlock.element(boundBy: 0).images.matching(
+                                                               ^
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCUIAutomation.framework/Headers/XCUIElementTypeQueryProvider.h:57:46: note: property declared here
+@property (readonly, copy) XCUIElementQuery *images;
+                                             ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:173:10: note: add '@MainActor' to make instance method 'testReorderPersistsAfterNavigation()' part of global actor 'MainActor'
+    func testReorderPersistsAfterNavigation() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:212:44: warning: call to main actor-isolated instance method 'element(boundBy:)' in a synchronous nonisolated context
+        let firstDragHandle = tasksInBlock.element(boundBy: 0).images.matching(
+                                           ^
+XCUIAutomation.XCUIElementQuery.element:2:22: note: calls to instance method 'element(boundBy:)' from outside of its actor context are implicitly asynchronous
+@MainActor open func element(boundBy index: Int) -> XCUIElement}
+                     ^
+XCUIAutomation.XCUIElementQuery.element:2:22: note: main actor isolation inferred from conformance to protocol 'XCUIElementTypeQueryProvider'
+@MainActor open func element(boundBy index: Int) -> XCUIElement}
+                     ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:173:10: note: add '@MainActor' to make instance method 'testReorderPersistsAfterNavigation()' part of global actor 'MainActor'
+    func testReorderPersistsAfterNavigation() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:217:29: warning: call to main actor-isolated instance method 'waitForExistence(timeout:)' in a synchronous nonisolated context
+            firstDragHandle.waitForExistence(timeout: 3),
+                            ^
+XCUIAutomation.XCUIElement.waitForExistence:2:22: note: calls to instance method 'waitForExistence(timeout:)' from outside of its actor context are implicitly asynchronous
+@MainActor open func waitForExistence(timeout: TimeInterval) -> Bool}
+                     ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:222:39: warning: call to main actor-isolated instance method 'element(boundBy:)' in a synchronous nonisolated context
+        let secondTask = tasksInBlock.element(boundBy: 1)
+                                      ^
+XCUIAutomation.XCUIElementQuery.element:2:22: note: calls to instance method 'element(boundBy:)' from outside of its actor context are implicitly asynchronous
+@MainActor open func element(boundBy index: Int) -> XCUIElement}
+                     ^
+XCUIAutomation.XCUIElementQuery.element:2:22: note: main actor isolation inferred from conformance to protocol 'XCUIElementTypeQueryProvider'
+@MainActor open func element(boundBy index: Int) -> XCUIElement}
+                     ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:173:10: note: add '@MainActor' to make instance method 'testReorderPersistsAfterNavigation()' part of global actor 'MainActor'
+    func testReorderPersistsAfterNavigation() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:223:25: warning: call to main actor-isolated instance method 'press(forDuration:thenDragTo:)' in a synchronous nonisolated context
+        firstDragHandle.press(forDuration: 0.5, thenDragTo: secondTask)
+                        ^
+XCUIAutomation.XCUIElement.press:2:22: note: calls to instance method 'press(forDuration:thenDragTo:)' from outside of its actor context are implicitly asynchronous
+@MainActor open func press(forDuration duration: TimeInterval, thenDragTo otherElement: XCUIElement)}
+                     ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:173:10: note: add '@MainActor' to make instance method 'testReorderPersistsAfterNavigation()' part of global actor 'MainActor'
+    func testReorderPersistsAfterNavigation() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:226:37: warning: main actor-isolated subscript 'subscript(_:)' can not be referenced from a nonisolated context
+        let backlogTab = app.buttons["tab-backlog"]
+                                    ^
+XCUIAutomation.XCUIElementQuery.subscript:2:17: note: subscript declared here
+@MainActor open subscript(key: String) -> XCUIElement { get }}
+                ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:173:10: note: add '@MainActor' to make instance method 'testReorderPersistsAfterNavigation()' part of global actor 'MainActor'
+    func testReorderPersistsAfterNavigation() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:226:30: warning: main actor-isolated property 'buttons' can not be referenced from a nonisolated context
+        let backlogTab = app.buttons["tab-backlog"]
+                             ^
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCUIAutomation.framework/Headers/XCUIElementTypeQueryProvider.h:22:46: note: property declared here
+@property (readonly, copy) XCUIElementQuery *buttons;
+                                             ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:173:10: note: add '@MainActor' to make instance method 'testReorderPersistsAfterNavigation()' part of global actor 'MainActor'
+    func testReorderPersistsAfterNavigation() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:227:20: warning: call to main actor-isolated instance method 'tap()' in a synchronous nonisolated context
+        backlogTab.tap()
+                   ^
+XCUIAutomation.XCUIElement.tap:2:22: note: calls to instance method 'tap()' from outside of its actor context are implicitly asynchronous
+@MainActor open func tap()}
+                     ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:173:10: note: add '@MainActor' to make instance method 'testReorderPersistsAfterNavigation()' part of global actor 'MainActor'
+    func testReorderPersistsAfterNavigation() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:233:36: warning: main actor-isolated subscript 'subscript(_:)' can not be referenced from a nonisolated context
+        let assignTab = app.buttons["tab-assign"]
+                                   ^
+XCUIAutomation.XCUIElementQuery.subscript:2:17: note: subscript declared here
+@MainActor open subscript(key: String) -> XCUIElement { get }}
+                ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:173:10: note: add '@MainActor' to make instance method 'testReorderPersistsAfterNavigation()' part of global actor 'MainActor'
+    func testReorderPersistsAfterNavigation() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:233:29: warning: main actor-isolated property 'buttons' can not be referenced from a nonisolated context
+        let assignTab = app.buttons["tab-assign"]
+                            ^
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCUIAutomation.framework/Headers/XCUIElementTypeQueryProvider.h:22:46: note: property declared here
+@property (readonly, copy) XCUIElementQuery *buttons;
+                                             ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:173:10: note: add '@MainActor' to make instance method 'testReorderPersistsAfterNavigation()' part of global actor 'MainActor'
+    func testReorderPersistsAfterNavigation() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:234:19: warning: call to main actor-isolated instance method 'tap()' in a synchronous nonisolated context
+        assignTab.tap()
+                  ^
+XCUIAutomation.XCUIElement.tap:2:22: note: calls to instance method 'tap()' from outside of its actor context are implicitly asynchronous
+@MainActor open func tap()}
+                     ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:173:10: note: add '@MainActor' to make instance method 'testReorderPersistsAfterNavigation()' part of global actor 'MainActor'
+    func testReorderPersistsAfterNavigation() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:237:48: warning: main actor-isolated subscript 'subscript(_:)' can not be referenced from a nonisolated context
+        let updatedScrollView = app.scrollViews["assignTabScrollView"]
+                                               ^
+XCUIAutomation.XCUIElementQuery.subscript:2:17: note: subscript declared here
+@MainActor open subscript(key: String) -> XCUIElement { get }}
+                ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:173:10: note: add '@MainActor' to make instance method 'testReorderPersistsAfterNavigation()' part of global actor 'MainActor'
+    func testReorderPersistsAfterNavigation() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:237:37: warning: main actor-isolated property 'scrollViews' can not be referenced from a nonisolated context
+        let updatedScrollView = app.scrollViews["assignTabScrollView"]
+                                    ^
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCUIAutomation.framework/Headers/XCUIElementTypeQueryProvider.h:60:46: note: property declared here
+@property (readonly, copy) XCUIElementQuery *scrollViews;
+                                             ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:173:10: note: add '@MainActor' to make instance method 'testReorderPersistsAfterNavigation()' part of global actor 'MainActor'
+    func testReorderPersistsAfterNavigation() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:238:41: warning: call to main actor-isolated instance method 'waitForExistence(timeout:)' in a synchronous nonisolated context
+        XCTAssertTrue(updatedScrollView.waitForExistence(timeout: 5), "Assign scroll view should exist after navigation")
+                                        ^
+XCUIAutomation.XCUIElement.waitForExistence:2:22: note: calls to instance method 'waitForExistence(timeout:)' from outside of its actor context are implicitly asynchronous
+@MainActor open func waitForExistence(timeout: TimeInterval) -> Bool}
+                     ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:242:11: warning: main actor-isolated property 'firstMatch' can not be referenced from a nonisolated context
+        ).firstMatch
+          ^
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCUIAutomation.framework/Headers/XCUIElementTypeQueryProvider.h:105:35: note: property declared here
+@property (readonly) XCUIElement *firstMatch;
+                                  ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:173:10: note: add '@MainActor' to make instance method 'testReorderPersistsAfterNavigation()' part of global actor 'MainActor'
+    func testReorderPersistsAfterNavigation() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:240:55: warning: call to main actor-isolated instance method 'matching' in a synchronous nonisolated context
+        let updatedFocusBlockCard = app.otherElements.matching(
+                                                      ^
+XCUIAutomation.XCUIElementQuery.matching:2:22: note: calls to instance method 'matching' from outside of its actor context are implicitly asynchronous
+@MainActor open func matching(_ predicate: NSPredicate) -> XCUIElementQuery}
+                     ^
+XCUIAutomation.XCUIElementQuery.matching:2:22: note: main actor isolation inferred from conformance to protocol 'XCUIElementTypeQueryProvider'
+@MainActor open func matching(_ predicate: NSPredicate) -> XCUIElementQuery}
+                     ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:173:10: note: add '@MainActor' to make instance method 'testReorderPersistsAfterNavigation()' part of global actor 'MainActor'
+    func testReorderPersistsAfterNavigation() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:240:41: warning: main actor-isolated property 'otherElements' can not be referenced from a nonisolated context
+        let updatedFocusBlockCard = app.otherElements.matching(
+                                        ^
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCUIAutomation.framework/Headers/XCUIElementTypeQueryProvider.h:95:46: note: property declared here
+@property (readonly, copy) XCUIElementQuery *otherElements;
+                                             ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:173:10: note: add '@MainActor' to make instance method 'testReorderPersistsAfterNavigation()' part of global actor 'MainActor'
+    func testReorderPersistsAfterNavigation() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:244:37: warning: call to main actor-isolated instance method 'waitForExistence(timeout:)' in a synchronous nonisolated context
+        guard updatedFocusBlockCard.waitForExistence(timeout: 3) else {
+                                    ^
+XCUIAutomation.XCUIElement.waitForExistence:2:22: note: calls to instance method 'waitForExistence(timeout:)' from outside of its actor context are implicitly asynchronous
+@MainActor open func waitForExistence(timeout: TimeInterval) -> Bool}
+                     ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:173:10: note: add '@MainActor' to make instance method 'testReorderPersistsAfterNavigation()' part of global actor 'MainActor'
+    func testReorderPersistsAfterNavigation() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:249:71: warning: call to main actor-isolated instance method 'matching' in a synchronous nonisolated context
+        let updatedTasksInBlock = updatedFocusBlockCard.otherElements.matching(
+                                                                      ^
+XCUIAutomation.XCUIElementQuery.matching:2:22: note: calls to instance method 'matching' from outside of its actor context are implicitly asynchronous
+@MainActor open func matching(_ predicate: NSPredicate) -> XCUIElementQuery}
+                     ^
+XCUIAutomation.XCUIElementQuery.matching:2:22: note: main actor isolation inferred from conformance to protocol 'XCUIElementTypeQueryProvider'
+@MainActor open func matching(_ predicate: NSPredicate) -> XCUIElementQuery}
+                     ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:173:10: note: add '@MainActor' to make instance method 'testReorderPersistsAfterNavigation()' part of global actor 'MainActor'
+    func testReorderPersistsAfterNavigation() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:249:57: warning: main actor-isolated property 'otherElements' can not be referenced from a nonisolated context
+        let updatedTasksInBlock = updatedFocusBlockCard.otherElements.matching(
+                                                        ^
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCUIAutomation.framework/Headers/XCUIElementTypeQueryProvider.h:95:46: note: property declared here
+@property (readonly, copy) XCUIElementQuery *otherElements;
+                                             ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:173:10: note: add '@MainActor' to make instance method 'testReorderPersistsAfterNavigation()' part of global actor 'MainActor'
+    func testReorderPersistsAfterNavigation() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:256:11: warning: main actor-isolated property 'firstMatch' can not be referenced from a nonisolated context
+        ).firstMatch
+          ^
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCUIAutomation.framework/Headers/XCUIElementTypeQueryProvider.h:105:35: note: property declared here
+@property (readonly) XCUIElement *firstMatch;
+                                  ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:173:10: note: add '@MainActor' to make instance method 'testReorderPersistsAfterNavigation()' part of global actor 'MainActor'
+    func testReorderPersistsAfterNavigation() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:254:86: warning: call to main actor-isolated instance method 'matching' in a synchronous nonisolated context
+        let newSecondTaskTitle = updatedTasksInBlock.element(boundBy: 1).staticTexts.matching(
+                                                                                     ^
+XCUIAutomation.XCUIElementQuery.matching:2:22: note: calls to instance method 'matching' from outside of its actor context are implicitly asynchronous
+@MainActor open func matching(_ predicate: NSPredicate) -> XCUIElementQuery}
+                     ^
+XCUIAutomation.XCUIElementQuery.matching:2:22: note: main actor isolation inferred from conformance to protocol 'XCUIElementTypeQueryProvider'
+@MainActor open func matching(_ predicate: NSPredicate) -> XCUIElementQuery}
+                     ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:173:10: note: add '@MainActor' to make instance method 'testReorderPersistsAfterNavigation()' part of global actor 'MainActor'
+    func testReorderPersistsAfterNavigation() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:254:74: warning: main actor-isolated property 'staticTexts' can not be referenced from a nonisolated context
+        let newSecondTaskTitle = updatedTasksInBlock.element(boundBy: 1).staticTexts.matching(
+                                                                         ^
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCUIAutomation.framework/Headers/XCUIElementTypeQueryProvider.h:62:46: note: property declared here
+@property (readonly, copy) XCUIElementQuery *staticTexts;
+                                             ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:173:10: note: add '@MainActor' to make instance method 'testReorderPersistsAfterNavigation()' part of global actor 'MainActor'
+    func testReorderPersistsAfterNavigation() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:254:54: warning: call to main actor-isolated instance method 'element(boundBy:)' in a synchronous nonisolated context
+        let newSecondTaskTitle = updatedTasksInBlock.element(boundBy: 1).staticTexts.matching(
+                                                     ^
+XCUIAutomation.XCUIElementQuery.element:2:22: note: calls to instance method 'element(boundBy:)' from outside of its actor context are implicitly asynchronous
+@MainActor open func element(boundBy index: Int) -> XCUIElement}
+                     ^
+XCUIAutomation.XCUIElementQuery.element:2:22: note: main actor isolation inferred from conformance to protocol 'XCUIElementTypeQueryProvider'
+@MainActor open func element(boundBy index: Int) -> XCUIElement}
+                     ^
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:173:10: note: add '@MainActor' to make instance method 'testReorderPersistsAfterNavigation()' part of global actor 'MainActor'
+    func testReorderPersistsAfterNavigation() throws {
+         ^
+    @MainActor 
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:259:32: warning: main actor-isolated property 'label' can not be referenced from a nonisolated autoclosure
+            newSecondTaskTitle.label,
+                               ^
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCUIAutomation.framework/Headers/XCUIElementAttributes.h:47:38: note: property declared here
+@property (readonly, copy) NSString *label;
+                                     ^
+
+SwiftEmitModule normal arm64 Emitting\ module\ for\ FocusBloxUITests (in target 'FocusBloxUITests' from project 'FocusBlox')
+
+EmitSwiftModule normal arm64 (in target 'FocusBloxUITests' from project 'FocusBlox')
+    cd /Users/hem/Documents/opt/my-daily-sprints
+    
+
+SwiftDriverJobDiscovery normal arm64 Emitting module for FocusBloxUITests (in target 'FocusBloxUITests' from project 'FocusBlox')
+
+SwiftDriver\ Compilation\ Requirements FocusBloxUITests normal arm64 com.apple.xcode.tools.swift.compiler (in target 'FocusBloxUITests' from project 'FocusBlox')
+    cd /Users/hem/Documents/opt/my-daily-sprints
+    builtin-Swift-Compilation-Requirements -- /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name FocusBloxUITests -Onone -enforce-exclusivity\=checked @/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/Objects-normal/arm64/FocusBloxUITests.SwiftFileList -DDEBUG -module-alias Testing\=_Testing_Unavailable -plugin-path /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk -target arm64-apple-ios26.2-simulator -g -module-cache-path /Users/hem/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -Xfrontend -serialize-debugging-options -profile-coverage-mapping -profile-generate -enable-testing -index-store-path /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Index.noindex/DataStore -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -swift-version 6 -I /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator -Isystem /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib -F /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator -F /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks -F /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk/Developer/Library/Frameworks -c -j10 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /Users/hem/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator26.2-23C53-7d00a8b37fbd7999ea79df8ebc024bf0.sdkstatcache -output-file-map /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/Objects-normal/arm64/FocusBloxUITests-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -explicit-module-build -module-cache-path /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -clang-scanner-module-cache-path /Users/hem/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -sdk-module-cache-path /Users/hem/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/Objects-normal/arm64/FocusBloxUITests.swiftmodule -validate-clang-modules-once -clang-build-session-file /Users/hem/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/Objects-normal/arm64/FocusBloxUITests_const_extract_protocols.json -Xcc -iquote -Xcc /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/FocusBloxUITests-generated-files.hmap -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/FocusBloxUITests-own-target-headers.hmap -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/FocusBloxUITests-all-target-headers.hmap -Xcc -iquote -Xcc /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/FocusBloxUITests-project-headers.hmap -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/include -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/DerivedSources-normal/arm64 -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/DerivedSources/arm64 -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/DerivedSources -Xcc -DDEBUG\=1 -emit-objc-header -emit-objc-header-path /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/Objects-normal/arm64/FocusBloxUITests-Swift.h -working-directory /Users/hem/Documents/opt/my-daily-sprints -experimental-emit-module-separately -disable-cmo
+
+Copy /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBloxUITests.swiftmodule/Project/arm64-apple-ios-simulator.swiftsourceinfo /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/Objects-normal/arm64/FocusBloxUITests.swiftsourceinfo (in target 'FocusBloxUITests' from project 'FocusBlox')
+    cd /Users/hem/Documents/opt/my-daily-sprints
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/Objects-normal/arm64/FocusBloxUITests.swiftsourceinfo /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBloxUITests.swiftmodule/Project/arm64-apple-ios-simulator.swiftsourceinfo
+
+Copy /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBloxUITests.swiftmodule/arm64-apple-ios-simulator.abi.json /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/Objects-normal/arm64/FocusBloxUITests.abi.json (in target 'FocusBloxUITests' from project 'FocusBlox')
+    cd /Users/hem/Documents/opt/my-daily-sprints
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/Objects-normal/arm64/FocusBloxUITests.abi.json /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBloxUITests.swiftmodule/arm64-apple-ios-simulator.abi.json
+
+Copy /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBloxUITests.swiftmodule/arm64-apple-ios-simulator.swiftdoc /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/Objects-normal/arm64/FocusBloxUITests.swiftdoc (in target 'FocusBloxUITests' from project 'FocusBlox')
+    cd /Users/hem/Documents/opt/my-daily-sprints
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/Objects-normal/arm64/FocusBloxUITests.swiftdoc /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBloxUITests.swiftmodule/arm64-apple-ios-simulator.swiftdoc
+
+SwiftDriverJobDiscovery normal arm64 Compiling FocusBlockReorderUITests.swift (in target 'FocusBloxUITests' from project 'FocusBlox')
+
+SwiftDriver\ Compilation FocusBloxUITests normal arm64 com.apple.xcode.tools.swift.compiler (in target 'FocusBloxUITests' from project 'FocusBlox')
+    cd /Users/hem/Documents/opt/my-daily-sprints
+    builtin-Swift-Compilation -- /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name FocusBloxUITests -Onone -enforce-exclusivity\=checked @/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/Objects-normal/arm64/FocusBloxUITests.SwiftFileList -DDEBUG -module-alias Testing\=_Testing_Unavailable -plugin-path /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk -target arm64-apple-ios26.2-simulator -g -module-cache-path /Users/hem/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -Xfrontend -serialize-debugging-options -profile-coverage-mapping -profile-generate -enable-testing -index-store-path /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Index.noindex/DataStore -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -swift-version 6 -I /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator -Isystem /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib -F /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator -F /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks -F /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk/Developer/Library/Frameworks -c -j10 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /Users/hem/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator26.2-23C53-7d00a8b37fbd7999ea79df8ebc024bf0.sdkstatcache -output-file-map /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/Objects-normal/arm64/FocusBloxUITests-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -explicit-module-build -module-cache-path /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -clang-scanner-module-cache-path /Users/hem/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -sdk-module-cache-path /Users/hem/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/Objects-normal/arm64/FocusBloxUITests.swiftmodule -validate-clang-modules-once -clang-build-session-file /Users/hem/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/Objects-normal/arm64/FocusBloxUITests_const_extract_protocols.json -Xcc -iquote -Xcc /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/FocusBloxUITests-generated-files.hmap -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/FocusBloxUITests-own-target-headers.hmap -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/FocusBloxUITests-all-target-headers.hmap -Xcc -iquote -Xcc /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/FocusBloxUITests-project-headers.hmap -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/include -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/DerivedSources-normal/arm64 -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/DerivedSources/arm64 -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/DerivedSources -Xcc -DDEBUG\=1 -emit-objc-header -emit-objc-header-path /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/Objects-normal/arm64/FocusBloxUITests-Swift.h -working-directory /Users/hem/Documents/opt/my-daily-sprints -experimental-emit-module-separately -disable-cmo
+
+Ld /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBloxUITests-Runner.app/PlugIns/FocusBloxUITests.xctest/FocusBloxUITests normal (in target 'FocusBloxUITests' from project 'FocusBlox')
+    cd /Users/hem/Documents/opt/my-daily-sprints
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -Xlinker -reproducible -target arm64-apple-ios26.2-simulator -bundle -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk -O0 -L/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/EagerLinkingTBDs/Debug-iphonesimulator -L/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator -L/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib -F/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/EagerLinkingTBDs/Debug-iphonesimulator -F/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator -iframework /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks -iframework /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk/Developer/Library/Frameworks -filelist /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/Objects-normal/arm64/FocusBloxUITests.LinkFileList -Xlinker -rpath -Xlinker @loader_path/Frameworks -Xlinker -rpath -Xlinker @executable_path/Frameworks -dead_strip -Xlinker -object_path_lto -Xlinker /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/Objects-normal/arm64/FocusBloxUITests_lto.o -rdynamic -Xlinker -no_deduplicate -Xlinker -objc_abi_version -Xlinker 2 -Xlinker -debug_variant -Xlinker -dependency_info -Xlinker /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/Objects-normal/arm64/FocusBloxUITests_dependency_info.dat -fobjc-link-runtime -fprofile-instr-generate -L/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphonesimulator -L/usr/lib/swift -Xlinker -add_ast_path -Xlinker /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/Objects-normal/arm64/FocusBloxUITests.swiftmodule @/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/Objects-normal/arm64/FocusBloxUITests-linker-args.resp -Xlinker -needed_framework -Xlinker XCTest -framework XCTest -Xlinker -needed-lXCTestSwiftSupport -lXCTestSwiftSupport -o /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBloxUITests-Runner.app/PlugIns/FocusBloxUITests.xctest/FocusBloxUITests
+
+CopySwiftLibs /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBloxUITests-Runner.app/PlugIns/FocusBloxUITests.xctest (in target 'FocusBloxUITests' from project 'FocusBlox')
+    cd /Users/hem/Documents/opt/my-daily-sprints
+    builtin-swiftStdLibTool --copy --verbose --scan-executable /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBloxUITests-Runner.app/PlugIns/FocusBloxUITests.xctest/FocusBloxUITests --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBloxUITests-Runner.app/PlugIns/FocusBloxUITests.xctest/Frameworks --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBloxUITests-Runner.app/PlugIns/FocusBloxUITests.xctest/PlugIns --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBloxUITests-Runner.app/PlugIns/FocusBloxUITests.xctest/SystemExtensions --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBloxUITests-Runner.app/PlugIns/FocusBloxUITests.xctest/Extensions --platform iphonesimulator --toolchain /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain --destination /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBloxUITests-Runner.app/PlugIns/FocusBloxUITests.xctest/Frameworks --strip-bitcode --scan-executable /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib/libXCTestSwiftSupport.dylib --strip-bitcode-tool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/bitcode_strip --emit-dependency-info /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/SwiftStdLibToolInputDependencies.dep --filter-for-swift-os
+Ignoring --strip-bitcode because --sign was not passed
+
+ExtractAppIntentsMetadata (in target 'FocusBloxUITests' from project 'FocusBlox')
+    cd /Users/hem/Documents/opt/my-daily-sprints
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/appintentsmetadataprocessor --toolchain-dir /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain --module-name FocusBloxUITests --sdk-root /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk --xcode-version 17C52 --platform-family iOS --deployment-target 26.2 --bundle-identifier com.henning.timebox.uitests --output /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBloxUITests-Runner.app/PlugIns/FocusBloxUITests.xctest --target-triple arm64-apple-ios26.2-simulator --binary-file /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBloxUITests-Runner.app/PlugIns/FocusBloxUITests.xctest/FocusBloxUITests --dependency-file /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/Objects-normal/arm64/FocusBloxUITests_dependency_info.dat --stringsdata-file /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/Objects-normal/arm64/ExtractedAppShortcutsMetadata.stringsdata --source-file-list /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/Objects-normal/arm64/FocusBloxUITests.SwiftFileList --metadata-file-list /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/FocusBloxUITests.DependencyMetadataFileList --static-metadata-file-list /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/FocusBloxUITests.DependencyStaticMetadataFileList --swift-const-vals-list /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/Objects-normal/arm64/FocusBloxUITests.SwiftConstValuesFileList --compile-time-extraction --deployment-aware-processing --validate-assistant-intents --no-app-shortcuts-localization
+2026-01-31 13:45:57.699 appintentsmetadataprocessor[12480:43742126] Starting appintentsmetadataprocessor export
+2026-01-31 13:45:57.700 appintentsmetadataprocessor[12480:43742126] warning: Metadata extraction skipped. No AppIntents.framework dependency found.
+
+2026-01-31 13:46:09.548164+0100 FocusBloxUITests-Runner[12530:43742791] [Default] Running tests...
+2026-01-31 13:46:09.622617+0100 FocusBloxUITests-Runner[12530:43742923] [General] Failed to send CA Event for app launch measurements for ca_event_type: 0 event_name: com.apple.app_launch_measurement.FirstFramePresentationMetric
+2026-01-31 13:46:09.665428+0100 FocusBloxUITests-Runner[12530:43742932] [General] Failed to send CA Event for app launch measurements for ca_event_type: 1 event_name: com.apple.app_launch_measurement.ExtendedLaunchMetrics
+    t =      nans Interface orientation changed to Portrait
+Test Suite 'Selected tests' started at 2026-01-31 13:46:14.285.
+Test Suite 'FocusBloxUITests.xctest' started at 2026-01-31 13:46:14.285.
+Test Suite 'FocusBlockReorderUITests' started at 2026-01-31 13:46:14.286.
+Test Case '-[FocusBloxUITests.FocusBlockReorderUITests testDragHandleAccessibilityIdentifier]' started (Iteration 1 of 3).
+    t =     0.00s Start Test at 2026-01-31 13:46:14.286
+    t =     0.40s Set Up
+    t =     0.41s     Open com.henning.timebox
+    t =     0.41s         Launch com.henning.timebox
+    t =     3.97s             Setting up automation session
+    t =     5.48s             Wait for com.henning.timebox to idle
+    t =     7.76s Waiting 5.0s for "tab-assign" Button to exist
+    t =     8.84s     Checking `Expect predicate `existsNoRetry == 1` for object "tab-assign" Button`
+    t =     8.84s         Checking existence of `"tab-assign" Button`
+    t =     8.97s Tap "tab-assign" Button
+    t =     8.97s     Wait for com.henning.timebox to idle
+    t =     8.97s     Find the "tab-assign" Button
+    t =     9.04s     Check for interrupting elements affecting "tab-assign" Button
+    t =     9.13s     Synthesize event
+    t =     9.55s     Wait for com.henning.timebox to idle
+    t =     9.65s Waiting 5.0s for "assignTabScrollView" ScrollView to exist
+    t =    10.73s     Checking `Expect predicate `existsNoRetry == 1` for object "assignTabScrollView" ScrollView`
+    t =    10.74s         Checking existence of `"assignTabScrollView" ScrollView`
+    t =    10.81s Checking existence of `Image (First Match)`
+    t =    10.87s Tear Down
+Test Case '-[FocusBloxUITests.FocusBlockReorderUITests testDragHandleAccessibilityIdentifier]' passed (11.147 seconds).
+Test Case '-[FocusBloxUITests.FocusBlockReorderUITests testDragHandleExistsForTasksInBlock]' started (Iteration 1 of 3).
+    t =     0.00s Start Test at 2026-01-31 13:46:25.434
+    t =     0.05s Set Up
+    t =     0.05s     Open com.henning.timebox
+    t =     0.05s         Launch com.henning.timebox
+    t =     0.05s             Terminate com.henning.timebox:12569
+    t =     1.50s             Setting up automation session
+    t =     2.65s             Wait for com.henning.timebox to idle
+    t =     4.39s Waiting 5.0s for "tab-assign" Button to exist
+    t =     5.47s     Checking `Expect predicate `existsNoRetry == 1` for object "tab-assign" Button`
+    t =     5.47s         Checking existence of `"tab-assign" Button`
+    t =     5.58s Tap "tab-assign" Button
+    t =     5.58s     Wait for com.henning.timebox to idle
+    t =     5.58s     Find the "tab-assign" Button
+    t =     5.64s     Check for interrupting elements affecting "tab-assign" Button
+    t =     5.68s     Synthesize event
+    t =     5.98s     Wait for com.henning.timebox to idle
+    t =     5.98s Waiting 5.0s for "assignTabScrollView" ScrollView to exist
+    t =     7.06s     Checking `Expect predicate `existsNoRetry == 1` for object "assignTabScrollView" ScrollView`
+    t =     7.06s         Checking existence of `"assignTabScrollView" ScrollView`
+    t =     7.11s Waiting 3.0s for Other (First Match) to exist
+    t =     8.18s     Checking `Expect predicate `existsNoRetry == 1` for object Other (First Match)`
+    t =     8.18s         Checking existence of `Other (First Match)`
+    t =     8.23s Waiting 3.0s for Image (First Match) to exist
+    t =     9.30s     Checking `Expect predicate `existsNoRetry == 1` for object Image (First Match)`
+    t =     9.30s         Checking existence of `Image (First Match)`
+    t =     9.48s Tear Down
+Test Case '-[FocusBloxUITests.FocusBlockReorderUITests testDragHandleExistsForTasksInBlock]' passed (9.715 seconds).
+Test Case '-[FocusBloxUITests.FocusBlockReorderUITests testReorderPersistsAfterNavigation]' started (Iteration 1 of 3).
+    t =     0.00s Start Test at 2026-01-31 13:46:35.150
+    t =     0.02s Set Up
+    t =     0.02s     Open com.henning.timebox
+    t =     0.02s         Launch com.henning.timebox
+    t =     0.02s             Terminate com.henning.timebox:12604
+    t =     1.34s             Setting up automation session
+    t =     2.27s             Wait for com.henning.timebox to idle
+    t =     3.93s Waiting 5.0s for "tab-assign" Button to exist
+    t =     5.00s     Checking `Expect predicate `existsNoRetry == 1` for object "tab-assign" Button`
+    t =     5.00s         Checking existence of `"tab-assign" Button`
+    t =     5.13s Tap "tab-assign" Button
+    t =     5.13s     Wait for com.henning.timebox to idle
+    t =     5.13s     Find the "tab-assign" Button
+    t =     5.18s     Check for interrupting elements affecting "tab-assign" Button
+    t =     5.22s     Synthesize event
+    t =     5.51s     Wait for com.henning.timebox to idle
+    t =     5.53s Waiting 5.0s for "assignTabScrollView" ScrollView to exist
+    t =     6.61s     Checking `Expect predicate `existsNoRetry == 1` for object "assignTabScrollView" ScrollView`
+    t =     6.61s         Checking existence of `"assignTabScrollView" ScrollView`
+    t =     6.66s Waiting 3.0s for Other (First Match) to exist
+    t =     7.74s     Checking `Expect predicate `existsNoRetry == 1` for object Other (First Match)`
+    t =     7.74s         Checking existence of `Other (First Match)`
+    t =     7.79s Get number of matches for: Elements matching predicate 'identifier BEGINSWITH "taskInBlock_"'
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:196: -[FocusBloxUITests.FocusBlockReorderUITests testReorderPersistsAfterNavigation] : Test skipped - Need at least 2 tasks to test persistence
+    t =     7.85s Tear Down
+Test Case '-[FocusBloxUITests.FocusBlockReorderUITests testReorderPersistsAfterNavigation]' skipped (8.084 seconds).
+Test Case '-[FocusBloxUITests.FocusBlockReorderUITests testReorderTaskByDrag]' started (Iteration 1 of 3).
+    t =     0.00s Start Test at 2026-01-31 13:46:43.234
+    t =     0.02s Set Up
+    t =     0.02s     Open com.henning.timebox
+    t =     0.02s         Launch com.henning.timebox
+    t =     0.02s             Terminate com.henning.timebox:12621
+    t =     1.53s             Setting up automation session
+    t =     2.40s             Wait for com.henning.timebox to idle
+    t =     4.04s Waiting 5.0s for "tab-assign" Button to exist
+    t =     5.12s     Checking `Expect predicate `existsNoRetry == 1` for object "tab-assign" Button`
+    t =     5.12s         Checking existence of `"tab-assign" Button`
+    t =     5.23s Tap "tab-assign" Button
+    t =     5.23s     Wait for com.henning.timebox to idle
+    t =     5.23s     Find the "tab-assign" Button
+    t =     5.28s     Check for interrupting elements affecting "tab-assign" Button
+    t =     5.32s     Synthesize event
+    t =     5.62s     Wait for com.henning.timebox to idle
+    t =     5.64s Waiting 5.0s for "assignTabScrollView" ScrollView to exist
+    t =     6.71s     Checking `Expect predicate `existsNoRetry == 1` for object "assignTabScrollView" ScrollView`
+    t =     6.71s         Checking existence of `"assignTabScrollView" ScrollView`
+    t =     6.75s Waiting 3.0s for Other (First Match) to exist
+    t =     7.82s     Checking `Expect predicate `existsNoRetry == 1` for object Other (First Match)`
+    t =     7.82s         Checking existence of `Other (First Match)`
+    t =     7.86s Get number of matches for: Elements matching predicate 'identifier BEGINSWITH "taskInBlock_"'
+/Users/hem/Documents/opt/my-daily-sprints/FocusBloxUITests/FocusBlockReorderUITests.swift:133: -[FocusBloxUITests.FocusBlockReorderUITests testReorderTaskByDrag] : Test skipped - Need at least 2 tasks in block to test reordering
+    t =     7.89s Tear Down
+Test Case '-[FocusBloxUITests.FocusBlockReorderUITests testReorderTaskByDrag]' skipped (8.133 seconds).
+Test Suite 'FocusBlockReorderUITests' passed at 2026-01-31 13:46:51.367.
+	 Executed 4 tests, with 2 tests skipped and 0 failures (0 unexpected) in 37.079 (37.081) seconds
+Test Suite 'FocusBloxUITests.xctest' passed at 2026-01-31 13:46:51.368.
+	 Executed 4 tests, with 2 tests skipped and 0 failures (0 unexpected) in 37.079 (37.082) seconds
+Test Suite 'Selected tests' passed at 2026-01-31 13:46:51.368.
+	 Executed 4 tests, with 2 tests skipped and 0 failures (0 unexpected) in 37.079 (37.083) seconds
+2026-01-31 13:46:51.818 xcodebuild[12372:43740770] [MT] IDETestOperationsObserverDebug: 54.092 elapsed -- Testing started completed.
+2026-01-31 13:46:51.818 xcodebuild[12372:43740770] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2026-01-31 13:46:51.818 xcodebuild[12372:43740770] [MT] IDETestOperationsObserverDebug: 54.092 sec, +54.092 sec -- end
+
+Test session results, code coverage, and logs:
+	/Users/hem/Documents/opt/my-daily-sprints/TestResults_1769863544.xcresult
+
+** TEST SUCCEEDED **
+
+Testing started
+[0;32m[SUCCESS][0m Alle Tests bestanden!
+
+============================================
+[0;32m[SUCCESS][0m ALLE TESTS BESTANDEN
+============================================

@@ -310,6 +310,11 @@ struct FocusBlockCard: View {
     let onEditBlock: () -> Void
 
     @State private var isTargeted = false
+    @State private var orderedTaskIDs: [String] = []
+
+    private var orderedTasks: [PlanItem] {
+        orderedTaskIDs.compactMap { id in tasks.first { $0.id == id } }
+    }
 
     private var timeRangeText: String {
         let formatter = DateFormatter()
@@ -375,16 +380,27 @@ struct FocusBlockCard: View {
                 }
                 .padding(.vertical, 20)
             } else {
-                // Use VStack instead of List to preserve accessibility identifiers
-                // (List with editMode absorbs cell accessibility)
+                // Use VStack with dropDestination for intra-block reordering
+                // Preserves accessibility identifiers (List with editMode absorbs them)
                 VStack(spacing: 6) {
-                    ForEach(tasks) { task in
+                    ForEach(orderedTasks) { task in
                         TaskRowInBlock(task: task) {
                             onRemoveTask(task.id)
+                        }
+                        .dropDestination(for: PlanItemTransfer.self) { items, _ in
+                            guard let draggedItem = items.first else { return false }
+                            reorderTask(draggedID: draggedItem.id, targetID: task.id)
+                            return true
                         }
                     }
                 }
                 .frame(maxHeight: min(CGFloat(tasks.count * 50), 300))
+                .onAppear {
+                    orderedTaskIDs = tasks.map { $0.id }
+                }
+                .onChange(of: tasks.map { $0.id }) { _, newTaskIDs in
+                    orderedTaskIDs = newTaskIDs
+                }
             }
         }
         .padding()
@@ -407,6 +423,23 @@ struct FocusBlockCard: View {
         }
         .accessibilityIdentifier("focusBlockCard_\(block.id)")
     }
+
+    // MARK: - Reorder Logic
+
+    private func reorderTask(draggedID: String, targetID: String) {
+        guard draggedID != targetID else { return }
+        guard orderedTaskIDs.contains(draggedID) else { return }
+
+        var newOrder = orderedTaskIDs
+        newOrder.removeAll { $0 == draggedID }
+
+        if let targetIndex = newOrder.firstIndex(of: targetID) {
+            newOrder.insert(draggedID, at: targetIndex)
+        }
+
+        orderedTaskIDs = newOrder
+        onReorderTasks(newOrder)
+    }
 }
 
 // MARK: - Task Row In Block (for Focus Blocks with Drag&Drop)
@@ -419,9 +452,11 @@ struct TaskRowInBlock: View {
         // Outer container for accessibility identifier
         VStack(spacing: 0) {
             HStack(spacing: 8) {
-                Circle()
-                    .fill(.blue)
-                    .frame(width: 6, height: 6)
+                // Drag handle for reordering
+                Image(systemName: "line.3.horizontal")
+                    .font(.system(size: 14))
+                    .foregroundStyle(.tertiary)
+                    .accessibilityIdentifier("dragHandle_\(task.id)")
 
                 Text(task.title)
                     .font(.subheadline)
@@ -448,6 +483,7 @@ struct TaskRowInBlock: View {
             RoundedRectangle(cornerRadius: 6)
                 .fill(.background)
         )
+        .draggable(PlanItemTransfer(from: task))
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("taskInBlock_\(task.id)")
     }
