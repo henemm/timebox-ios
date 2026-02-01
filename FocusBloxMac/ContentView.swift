@@ -38,8 +38,9 @@ struct ContentView: View {
 
     @Environment(\.modelContext) private var modelContext
 
-    // Three-column state
+    // Navigation state
     @State private var columnVisibility: NavigationSplitViewVisibility = .all
+    @State private var selectedSection: MainSection = .backlog
     @State private var selectedFilter: SidebarFilter = .all
     @State private var selectedTasks: Set<UUID> = []
 
@@ -80,25 +81,44 @@ struct ContentView: View {
 
     var body: some View {
         NavigationSplitView(columnVisibility: $columnVisibility) {
-            // Sidebar: Category Filter
+            // Sidebar: Navigation + Filters
             SidebarView(
+                selectedSection: $selectedSection,
                 selectedFilter: $selectedFilter,
                 tbdCount: tbdCount,
                 nextUpCount: nextUpCount
             )
         } content: {
-            // Main: Task List
-            taskListView
+            // Main Content based on selected section
+            mainContentView
         } detail: {
-            // Inspector: Task Details
-            inspectorView
+            // Inspector: Task Details (only for Backlog)
+            if selectedSection == .backlog {
+                inspectorView
+            } else {
+                EmptyView()
+            }
         }
-        .frame(minWidth: 900, minHeight: 600)
+        .frame(minWidth: 1000, minHeight: 600)
     }
 
-    // MARK: - Task List View
+    // MARK: - Main Content View (switches based on section)
 
-    private var taskListView: some View {
+    @ViewBuilder
+    private var mainContentView: some View {
+        switch selectedSection {
+        case .backlog:
+            backlogView
+        case .planning:
+            MacPlanningView()
+        case .review:
+            MacReviewView()
+        }
+    }
+
+    // MARK: - Backlog View
+
+    private var backlogView: some View {
         VStack(spacing: 0) {
             // Quick Add Bar
             HStack {
@@ -229,6 +249,11 @@ struct ContentView: View {
         case "recharge": return "Energie"
         case "learning": return "Lernen"
         case "giving_back": return "Weitergeben"
+        case "deep_work": return "Deep Work"
+        case "shallow_work": return "Shallow Work"
+        case "meetings": return "Meetings"
+        case "creative": return "Kreativ"
+        case "strategic": return "Strategie"
         default: return category
         }
     }
@@ -264,7 +289,6 @@ struct ContentView: View {
 
     func focusNewTaskField() {
         // Native TextField handles focus automatically
-        // Could be enhanced with NSApp.keyWindow?.makeFirstResponder
     }
 
     func completeSelectedTasks() {

@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-/// Inspector panel for editing task details
+/// Inspector panel for editing task details with iOS-style chip controls
 struct TaskInspector: View {
     @Bindable var task: LocalTask
     @Environment(\.modelContext) private var modelContext
@@ -15,110 +15,174 @@ struct TaskInspector: View {
 
     @State private var showDeleteConfirmation = false
 
-    // Computed binding for optional Int importance
-    private var importanceBinding: Binding<Int> {
-        Binding(
-            get: { task.importance ?? 1 },
-            set: { task.importance = $0 }
-        )
-    }
-
-    // Computed binding for duration with default
-    private var durationBinding: Binding<Int> {
-        Binding(
-            get: { task.estimatedDuration ?? 15 },
-            set: { task.estimatedDuration = $0 }
-        )
-    }
-
-    // Computed binding for urgency
-    private var isUrgent: Binding<Bool> {
-        Binding(
-            get: { task.urgency == "urgent" },
-            set: { task.urgency = $0 ? "urgent" : "not_urgent" }
-        )
-    }
-
     var body: some View {
-        Form {
-            Section("Task") {
-                TextField("Titel", text: $task.title)
-                    .font(.headline)
+        ScrollView {
+            VStack(alignment: .leading, spacing: 20) {
+                // MARK: - Title & Description
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Task")
+                        .font(.headline)
+                        .foregroundStyle(.secondary)
 
-                if let description = Binding($task.taskDescription) {
-                    TextField("Beschreibung", text: description, axis: .vertical)
-                        .lineLimit(3...6)
-                } else {
-                    Button("Beschreibung hinzufügen") {
-                        task.taskDescription = ""
+                    TextField("Titel", text: $task.title)
+                        .font(.title3.weight(.semibold))
+                        .textFieldStyle(.plain)
+
+                    if let description = Binding($task.taskDescription) {
+                        TextField("Beschreibung", text: description, axis: .vertical)
+                            .lineLimit(2...5)
+                            .textFieldStyle(.plain)
+                            .foregroundStyle(.secondary)
+                    } else {
+                        Button("+ Beschreibung hinzufügen") {
+                            task.taskDescription = ""
+                        }
+                        .buttonStyle(.plain)
+                        .foregroundStyle(.blue)
+                        .font(.callout)
                     }
                 }
-            }
+                .padding()
+                .background(RoundedRectangle(cornerRadius: 10).fill(.quaternary))
 
-            Section("Priorisierung") {
-                Picker("Wichtigkeit", selection: importanceBinding) {
-                    Text("Niedrig").tag(1)
-                    Text("Mittel").tag(2)
-                    Text("Hoch").tag(3)
-                }
+                // MARK: - Priority Section (Importance + Urgency)
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Priorisierung")
+                        .font(.headline)
+                        .foregroundStyle(.secondary)
 
-                Toggle("Dringend", isOn: isUrgent)
-
-                if task.isTbd {
-                    Label("Unvollständig - bitte alle Felder ausfüllen", systemImage: "exclamationmark.triangle")
-                        .foregroundStyle(.orange)
-                        .font(.caption)
-                }
-            }
-
-            Section("Zeit") {
-                Stepper("Dauer: \(durationBinding.wrappedValue) min",
-                        value: durationBinding,
-                        in: 5...180,
-                        step: 5)
-
-                DatePicker("Fällig",
-                           selection: Binding(
-                               get: { task.dueDate ?? Date() },
-                               set: { task.dueDate = $0 }
-                           ),
-                           displayedComponents: .date)
-
-                if task.dueDate != nil {
-                    Button("Fälligkeitsdatum entfernen", role: .destructive) {
-                        task.dueDate = nil
+                    HStack(spacing: 12) {
+                        // Importance Chips
+                        ForEach([1, 2, 3], id: \.self) { level in
+                            importanceChip(level)
+                        }
                     }
-                    .font(.caption)
+
+                    HStack(spacing: 12) {
+                        // Urgency Chips
+                        urgencyChip(nil, "?", "Ungesetzt", .gray)
+                        urgencyChip("not_urgent", "flame", "Nicht dringend", .gray)
+                        urgencyChip("urgent", "flame.fill", "Dringend", .orange)
+                    }
+
+                    if task.isTbd {
+                        Label("Unvollständig - bitte alle Felder ausfüllen", systemImage: "exclamationmark.triangle")
+                            .foregroundStyle(.orange)
+                            .font(.caption)
+                    }
                 }
-            }
+                .padding()
+                .background(RoundedRectangle(cornerRadius: 10).fill(.quaternary))
 
-            Section("Kategorie") {
-                Picker("Typ", selection: $task.taskType) {
-                    Label("Geld verdienen", systemImage: "dollarsign.circle").tag("income")
-                    Label("Pflege", systemImage: "wrench.and.screwdriver.fill").tag("maintenance")
-                    Label("Energie", systemImage: "battery.100").tag("recharge")
-                    Label("Lernen", systemImage: "book").tag("learning")
-                    Label("Weitergeben", systemImage: "gift").tag("giving_back")
-                    Label("Deep Work", systemImage: "brain").tag("deep_work")
-                    Label("Shallow Work", systemImage: "tray").tag("shallow_work")
-                    Label("Meetings", systemImage: "person.2").tag("meetings")
-                    Label("Kreativ", systemImage: "paintbrush").tag("creative")
-                    Label("Strategie", systemImage: "lightbulb").tag("strategic")
+                // MARK: - Time Section
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Zeit")
+                        .font(.headline)
+                        .foregroundStyle(.secondary)
+
+                    // Duration Chips
+                    HStack(spacing: 8) {
+                        Text("Dauer:")
+                            .foregroundStyle(.secondary)
+
+                        ForEach([15, 30, 45, 60, 90, 120], id: \.self) { mins in
+                            durationChip(mins)
+                        }
+                    }
+
+                    // Due Date
+                    HStack {
+                        Text("Fällig:")
+                            .foregroundStyle(.secondary)
+
+                        if task.dueDate != nil {
+                            DatePicker("",
+                                       selection: Binding(
+                                           get: { task.dueDate ?? Date() },
+                                           set: { task.dueDate = $0 }
+                                       ),
+                                       displayedComponents: .date)
+                                .labelsHidden()
+
+                            Button {
+                                task.dueDate = nil
+                            } label: {
+                                Image(systemName: "xmark.circle.fill")
+                                    .foregroundStyle(.secondary)
+                            }
+                            .buttonStyle(.plain)
+                        } else {
+                            Button("+ Datum setzen") {
+                                task.dueDate = Date()
+                            }
+                            .buttonStyle(.plain)
+                            .foregroundStyle(.blue)
+                        }
+                    }
                 }
-            }
+                .padding()
+                .background(RoundedRectangle(cornerRadius: 10).fill(.quaternary))
 
-            Section("Status") {
-                Toggle("Erledigt", isOn: $task.isCompleted)
-                Toggle("Next Up", isOn: $task.isNextUp)
-            }
+                // MARK: - Category Section
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Kategorie")
+                        .font(.headline)
+                        .foregroundStyle(.secondary)
 
-            Section {
-                Button("Task löschen", role: .destructive) {
+                    // Category Grid
+                    LazyVGrid(columns: [
+                        GridItem(.flexible()),
+                        GridItem(.flexible()),
+                        GridItem(.flexible()),
+                        GridItem(.flexible()),
+                        GridItem(.flexible())
+                    ], spacing: 8) {
+                        categoryChip("income", "Geld", "dollarsign.circle", .green)
+                        categoryChip("maintenance", "Pflege", "wrench.and.screwdriver.fill", .orange)
+                        categoryChip("recharge", "Energie", "battery.100", .cyan)
+                        categoryChip("learning", "Lernen", "book", .purple)
+                        categoryChip("giving_back", "Geben", "gift", .pink)
+                        categoryChip("deep_work", "Deep", "brain", .indigo)
+                        categoryChip("shallow_work", "Shallow", "tray", .gray)
+                        categoryChip("meetings", "Meeting", "person.2", .teal)
+                        categoryChip("creative", "Kreativ", "paintbrush", .mint)
+                        categoryChip("strategic", "Strategie", "lightbulb", .yellow)
+                    }
+                }
+                .padding()
+                .background(RoundedRectangle(cornerRadius: 10).fill(.quaternary))
+
+                // MARK: - Status Section
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Status")
+                        .font(.headline)
+                        .foregroundStyle(.secondary)
+
+                    HStack(spacing: 12) {
+                        statusChip("Erledigt", "checkmark.circle.fill", task.isCompleted, .green) {
+                            task.isCompleted.toggle()
+                        }
+
+                        statusChip("Next Up", "arrow.up.circle.fill", task.isNextUp, .blue) {
+                            task.isNextUp.toggle()
+                        }
+                    }
+                }
+                .padding()
+                .background(RoundedRectangle(cornerRadius: 10).fill(.quaternary))
+
+                // MARK: - Delete Button
+                Button(role: .destructive) {
                     showDeleteConfirmation = true
+                } label: {
+                    Label("Task löschen", systemImage: "trash")
+                        .frame(maxWidth: .infinity)
                 }
+                .buttonStyle(.bordered)
+                .tint(.red)
             }
+            .padding()
         }
-        .formStyle(.grouped)
         .navigationTitle("Details")
         .confirmationDialog("Task löschen?",
                             isPresented: $showDeleteConfirmation,
@@ -130,6 +194,122 @@ struct TaskInspector: View {
         } message: {
             Text("Diese Aktion kann nicht rückgängig gemacht werden.")
         }
+    }
+
+    // MARK: - Chip Views
+
+    private func importanceChip(_ level: Int) -> some View {
+        let isSelected = task.importance == level
+        let color: Color = level == 3 ? .red : (level == 2 ? .yellow : .blue)
+        let icon = level == 3 ? "exclamationmark.3" : (level == 2 ? "exclamationmark.2" : "exclamationmark")
+        let label = level == 3 ? "Hoch" : (level == 2 ? "Mittel" : "Niedrig")
+
+        return Button {
+            task.importance = level
+        } label: {
+            HStack(spacing: 4) {
+                Image(systemName: icon)
+                Text(label)
+            }
+            .font(.caption)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 6)
+            .background(
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(isSelected ? color.opacity(0.3) : Color.clear)
+                    .stroke(color, lineWidth: isSelected ? 2 : 1)
+            )
+            .foregroundStyle(color)
+        }
+        .buttonStyle(.plain)
+    }
+
+    private func urgencyChip(_ value: String?, _ icon: String, _ label: String, _ color: Color) -> some View {
+        let isSelected = task.urgency == value
+
+        return Button {
+            task.urgency = value
+        } label: {
+            HStack(spacing: 4) {
+                Image(systemName: icon)
+                Text(label)
+            }
+            .font(.caption)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 6)
+            .background(
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(isSelected ? color.opacity(0.3) : Color.clear)
+                    .stroke(color, lineWidth: isSelected ? 2 : 1)
+            )
+            .foregroundStyle(color)
+        }
+        .buttonStyle(.plain)
+    }
+
+    private func durationChip(_ minutes: Int) -> some View {
+        let isSelected = task.estimatedDuration == minutes
+
+        return Button {
+            task.estimatedDuration = minutes
+        } label: {
+            Text("\(minutes)m")
+                .font(.caption)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 4)
+                .background(
+                    Capsule()
+                        .fill(isSelected ? Color.blue.opacity(0.3) : Color.clear)
+                        .stroke(Color.blue, lineWidth: isSelected ? 2 : 1)
+                )
+                .foregroundStyle(.blue)
+        }
+        .buttonStyle(.plain)
+    }
+
+    private func categoryChip(_ id: String, _ label: String, _ icon: String, _ color: Color) -> some View {
+        let isSelected = task.taskType == id
+
+        return Button {
+            task.taskType = id
+        } label: {
+            VStack(spacing: 4) {
+                Image(systemName: icon)
+                    .font(.system(size: 16))
+                Text(label)
+                    .font(.caption2)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 8)
+            .background(
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(isSelected ? color.opacity(0.3) : Color.clear)
+                    .stroke(color, lineWidth: isSelected ? 2 : 1)
+            )
+            .foregroundStyle(color)
+        }
+        .buttonStyle(.plain)
+    }
+
+    private func statusChip(_ label: String, _ icon: String, _ isActive: Bool, _ color: Color, action: @escaping () -> Void) -> some View {
+        Button {
+            action()
+        } label: {
+            HStack(spacing: 6) {
+                Image(systemName: isActive ? icon : icon.replacingOccurrences(of: ".fill", with: ""))
+                Text(label)
+            }
+            .font(.callout)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .background(
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(isActive ? color.opacity(0.3) : Color.clear)
+                    .stroke(color, lineWidth: isActive ? 2 : 1)
+            )
+            .foregroundStyle(color)
+        }
+        .buttonStyle(.plain)
     }
 }
 
@@ -198,15 +378,15 @@ struct TaskInspectorMultiSelection: View {
 
 #Preview("Inspector") {
     TaskInspector(task: LocalTask(title: "Sample Task", importance: 2, estimatedDuration: 30))
-        .frame(width: 300)
+        .frame(width: 320)
 }
 
 #Preview("Empty State") {
     TaskInspectorEmptyState()
-        .frame(width: 300)
+        .frame(width: 320)
 }
 
 #Preview("Multi-Selection") {
     TaskInspectorMultiSelection(count: 3)
-        .frame(width: 300)
+        .frame(width: 320)
 }
