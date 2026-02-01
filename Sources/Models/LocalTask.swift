@@ -10,20 +10,33 @@ final class LocalTask {
     var uuid: UUID = UUID()
     var title: String = ""
     var isCompleted: Bool = false
-    var priority: Int = 1  // Default: Low priority (1=Low, 2=Medium, 3=High)
     var tags: [String] = []  // Multi-select tags (e.g., ["Hausarbeit", "Recherche"])
     var dueDate: Date?
     var createdAt: Date = Date()
     var sortOrder: Int = 0
-    var manualDuration: Int?
 
-    // MARK: - Phase 1: Enhanced Task Fields
+    // MARK: - TBD Tasks (Optional Fields - keine Fake-Defaults)
+
+    /// Importance for Eisenhower Matrix (1=Niedrig, 2=Mittel, 3=Hoch)
+    /// nil = nicht gesetzt (to be defined)
+    var importance: Int?
 
     /// Urgency level for Eisenhower Matrix (urgent/not_urgent)
-    var urgency: String = "not_urgent"
+    /// nil = nicht gesetzt (to be defined)
+    var urgency: String?
+
+    /// Estimated duration in minutes
+    /// nil = nicht gesetzt (to be defined)
+    var estimatedDuration: Int?
+
+    /// Task is incomplete (missing importance, urgency, or duration)
+    var isTbd: Bool {
+        importance == nil || urgency == nil || estimatedDuration == nil
+    }
 
     /// Task categorization type (income/maintenance/recharge/learning/giving_back)
-    var taskType: String = "maintenance"
+    /// Empty string = not set (TBD concept - no defaults)
+    var taskType: String = ""
 
     /// Recurrence pattern (none/daily/weekly/biweekly/monthly)
     var recurrencePattern: String = "none"
@@ -40,6 +53,9 @@ final class LocalTask {
     /// Marks task as staged for "Next Up" (ready for assignment to Focus Blocks)
     var isNextUp: Bool = false
 
+    /// Sort order within the Next Up section (for drag & drop reordering)
+    var nextUpSortOrder: Int?
+
     /// External system identifier for sync (e.g., Notion page ID)
     var externalID: String?
 
@@ -52,31 +68,32 @@ final class LocalTask {
     init(
         uuid: UUID = UUID(),
         title: String,
-        priority: Int = 1,
+        importance: Int? = nil,
         isCompleted: Bool = false,
         tags: [String] = [],
         dueDate: Date? = nil,
         createdAt: Date = Date(),
         sortOrder: Int = 0,
-        manualDuration: Int? = nil,
-        urgency: String = "not_urgent",
-        taskType: String = "maintenance",
+        estimatedDuration: Int? = nil,
+        urgency: String? = nil,
+        taskType: String = "",
         recurrencePattern: String = "none",
         recurrenceWeekdays: [Int]? = nil,
         recurrenceMonthDay: Int? = nil,
         taskDescription: String? = nil,
         externalID: String? = nil,
-        sourceSystem: String = "local"
+        sourceSystem: String = "local",
+        nextUpSortOrder: Int? = nil
     ) {
         self.uuid = uuid
         self.title = title
-        self.priority = priority
+        self.importance = importance
         self.isCompleted = isCompleted
         self.tags = tags
         self.dueDate = dueDate
         self.createdAt = createdAt
         self.sortOrder = sortOrder
-        self.manualDuration = manualDuration
+        self.estimatedDuration = estimatedDuration
         self.urgency = urgency
         self.taskType = taskType
         self.recurrencePattern = recurrencePattern
@@ -85,6 +102,7 @@ final class LocalTask {
         self.taskDescription = taskDescription
         self.externalID = externalID
         self.sourceSystem = sourceSystem
+        self.nextUpSortOrder = nextUpSortOrder
     }
 }
 

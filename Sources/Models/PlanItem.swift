@@ -4,31 +4,48 @@ struct PlanItem: Identifiable, Sendable {
     let id: String
     let title: String
     let isCompleted: Bool
-    let priorityValue: Int
     var rank: Int
     var effectiveDuration: Int
     let durationSource: DurationSource
 
-    // Enhanced task fields (Phase 2)
+    // TBD Tasks (Optional Fields)
+    let importance: Int?
+    let urgency: String?
+    let estimatedDuration: Int?
+
+    // Enhanced task fields
     let tags: [String]
-    let urgency: String
     let taskType: String
     let dueDate: Date?
     let taskDescription: String?
 
-    // Next Up staging (Phase 3)
+    // Next Up staging
     let isNextUp: Bool
 
+    /// Sort order within the Next Up section (for drag & drop reordering)
+    let nextUpSortOrder: Int?
+
+    /// Task is incomplete (missing importance, urgency, or duration)
+    var isTbd: Bool {
+        importance == nil || urgency == nil || estimatedDuration == nil
+    }
+
+    /// Backwards compatibility for priority-based code
     var priority: TaskPriority {
-        TaskPriority(rawValue: priorityValue) ?? .low
+        guard let imp = importance else { return .low }
+        return TaskPriority(rawValue: imp) ?? .low
     }
 
     init(reminder: ReminderData, metadata: TaskMetadata) {
         self.id = reminder.id
         self.title = reminder.title
         self.isCompleted = reminder.isCompleted
-        self.priorityValue = reminder.priority
         self.rank = metadata.sortOrder
+
+        // Reminders haben keine TBD-Felder → als definiert behandeln
+        self.importance = reminder.priority > 0 ? reminder.priority : nil
+        self.urgency = nil  // Reminders haben keine Urgency
+        self.estimatedDuration = metadata.manualDuration
 
         let (duration, source) = Self.resolveDuration(
             manual: metadata.manualDuration,
@@ -39,22 +56,26 @@ struct PlanItem: Identifiable, Sendable {
 
         // Enhanced fields (defaults for Reminders integration)
         self.tags = []
-        self.urgency = "not_urgent"
-        self.taskType = "maintenance"
+        self.taskType = ""  // Empty = TBD (not set)
         self.dueDate = nil
         self.taskDescription = nil
         self.isNextUp = false
+        self.nextUpSortOrder = nil
     }
 
     init(localTask: LocalTask) {
         self.id = localTask.id
         self.title = localTask.title
         self.isCompleted = localTask.isCompleted
-        self.priorityValue = localTask.priority
         self.rank = localTask.sortOrder
 
+        // TBD Fields from LocalTask
+        self.importance = localTask.importance
+        self.urgency = localTask.urgency
+        self.estimatedDuration = localTask.estimatedDuration
+
         let (duration, source) = Self.resolveDuration(
-            manual: localTask.manualDuration,
+            manual: localTask.estimatedDuration,
             title: localTask.title
         )
         self.effectiveDuration = duration
@@ -62,11 +83,11 @@ struct PlanItem: Identifiable, Sendable {
 
         // Enhanced fields from LocalTask
         self.tags = localTask.tags
-        self.urgency = localTask.urgency
         self.taskType = localTask.taskType
         self.dueDate = localTask.dueDate
         self.taskDescription = localTask.taskDescription
         self.isNextUp = localTask.isNextUp
+        self.nextUpSortOrder = localTask.nextUpSortOrder
     }
 
     private static func resolveDuration(manual: Int?, title: String?) -> (Int, DurationSource) {

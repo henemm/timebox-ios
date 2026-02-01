@@ -34,7 +34,7 @@ struct TaskFormSheet: View {
     @State private var tags: [String] = []
     @State private var newTag: String = ""
     @State private var urgency: String? = nil  // nil = TBD (not set)
-    @State private var taskType: String = "maintenance"
+    @State private var taskType: String = ""  // Empty = TBD (not set)
     @State private var hasDueDate = false
     @State private var dueDate = Date()
     @State private var taskDescription: String = ""

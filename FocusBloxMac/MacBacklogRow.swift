@@ -14,8 +14,8 @@ struct MacBacklogRow: View {
     var onToggleComplete: (() -> Void)?
     var onImportanceCycle: ((Int) -> Void)?
     var onUrgencyToggle: ((String?) -> Void)?
-    var onCategoryTap: (() -> Void)?
-    var onDurationTap: (() -> Void)?
+    var onCategorySelect: ((String) -> Void)?  // Direct category selection (macOS Menu)
+    var onDurationSelect: ((Int?) -> Void)?    // Direct duration selection (macOS Menu)
 
     var body: some View {
         HStack(spacing: 10) {
@@ -171,11 +171,41 @@ struct MacBacklogRow: View {
         }
     }
 
-    // MARK: - Category Badge (iOS-aligned, all 10 categories)
+    // MARK: - Category Badge (macOS Menu Picker)
 
     private var categoryBadge: some View {
-        Button {
-            onCategoryTap?()
+        Menu {
+            Button {
+                onCategorySelect?("income")
+            } label: {
+                Label("Geld verdienen", systemImage: "dollarsign.circle")
+            }
+            Button {
+                onCategorySelect?("maintenance")
+            } label: {
+                Label("Pflege", systemImage: "wrench.and.screwdriver.fill")
+            }
+            Button {
+                onCategorySelect?("recharge")
+            } label: {
+                Label("Energie", systemImage: "battery.100")
+            }
+            Button {
+                onCategorySelect?("learning")
+            } label: {
+                Label("Lernen", systemImage: "book")
+            }
+            Button {
+                onCategorySelect?("giving_back")
+            } label: {
+                Label("Weitergeben", systemImage: "gift")
+            }
+            Divider()
+            Button {
+                onCategorySelect?("")
+            } label: {
+                Label("Nicht gesetzt", systemImage: "questionmark.circle")
+            }
         } label: {
             HStack(spacing: 3) {
                 Image(systemName: categoryIcon)
@@ -191,7 +221,7 @@ struct MacBacklogRow: View {
                     .fill(categoryColor.opacity(0.2))
             )
         }
-        .buttonStyle(.plain)
+        .menuStyle(.borderlessButton)
         .fixedSize()
         .accessibilityIdentifier("categoryBadge_\(task.id)")
     }
@@ -229,15 +259,27 @@ struct MacBacklogRow: View {
         }
     }
 
-    // MARK: - Duration Badge (iOS-aligned)
+    // MARK: - Duration Badge (macOS Menu Picker)
 
     private var isDurationSet: Bool {
         task.estimatedDuration != nil
     }
 
     private var durationBadge: some View {
-        Button {
-            onDurationTap?()
+        Menu {
+            ForEach([5, 15, 30, 45, 60, 90, 120], id: \.self) { minutes in
+                Button {
+                    onDurationSelect?(minutes)
+                } label: {
+                    Label("\(minutes) Min", systemImage: "timer")
+                }
+            }
+            Divider()
+            Button {
+                onDurationSelect?(nil)
+            } label: {
+                Label("Nicht gesetzt", systemImage: "questionmark")
+            }
         } label: {
             HStack(spacing: 3) {
                 Image(systemName: isDurationSet ? "timer" : "questionmark")
@@ -255,7 +297,7 @@ struct MacBacklogRow: View {
                     .fill((isDurationSet ? Color.blue : Color.gray).opacity(0.2))
             )
         }
-        .buttonStyle(.plain)
+        .menuStyle(.borderlessButton)
         .fixedSize()
         .accessibilityIdentifier("durationBadge_\(task.id)")
     }

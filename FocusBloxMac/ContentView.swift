@@ -166,27 +166,12 @@ struct ContentView: View {
                             task.urgency = newValue
                             try? modelContext.save()
                         },
-                        onCategoryTap: {
-                            // Cycle through the 5 defined categories
-                            let categories = ["income", "maintenance", "recharge", "learning", "giving_back"]
-                            if let currentIndex = categories.firstIndex(of: task.taskType) {
-                                let nextIndex = (currentIndex + 1) % categories.count
-                                task.taskType = categories[nextIndex]
-                            } else {
-                                task.taskType = categories[0]
-                            }
+                        onCategorySelect: { category in
+                            task.taskType = category
                             try? modelContext.save()
                         },
-                        onDurationTap: {
-                            // Cycle through duration presets
-                            let presets = [15, 30, 45, 60, 90, 120]
-                            if let current = task.estimatedDuration,
-                               let currentIndex = presets.firstIndex(of: current) {
-                                let nextIndex = (currentIndex + 1) % presets.count
-                                task.estimatedDuration = presets[nextIndex]
-                            } else {
-                                task.estimatedDuration = presets[0]
-                            }
+                        onDurationSelect: { duration in
+                            task.estimatedDuration = duration
                             try? modelContext.save()
                         }
                     )

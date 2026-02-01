@@ -17,7 +17,7 @@ struct CreateTaskView: View {
 
     @State private var duration: Int? = nil  // nil = TBD (not set)
     @State private var urgency: String? = nil  // nil = TBD (not set)
-    @State private var taskType: String = "maintenance"
+    @State private var taskType: String = ""  // Empty = TBD (not set)
     @State private var recurrencePattern: RecurrencePattern = .none
     @State private var selectedWeekdays: Set<Int> = []
     @State private var monthDay: Int = 1
