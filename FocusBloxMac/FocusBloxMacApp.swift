@@ -118,6 +118,11 @@ struct FocusBloxMacApp: App {
             Label("FocusBlox", systemImage: "cube.fill")
         }
         .menuBarExtraStyle(.window)
+
+        // Settings window (Cmd+,)
+        Settings {
+            MacSettingsView()
+        }
     }
 
     private func handleURL(_ url: URL) {
