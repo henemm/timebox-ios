@@ -217,6 +217,7 @@ struct TaskInspector: View {
             .foregroundStyle(color)
         }
         .buttonStyle(.plain)
+        .accessibilityIdentifier("importanceChip_\(level)")
     }
 
     private func urgencyChip(_ value: String?, _ icon: String, _ label: String, _ color: Color) -> some View {
@@ -240,6 +241,7 @@ struct TaskInspector: View {
             .foregroundStyle(color)
         }
         .buttonStyle(.plain)
+        .accessibilityIdentifier("urgencyChip_\(value ?? "nil")")
     }
 
     private func durationChip(_ minutes: Int) -> some View {
@@ -260,6 +262,7 @@ struct TaskInspector: View {
                 .foregroundStyle(.blue)
         }
         .buttonStyle(.plain)
+        .accessibilityIdentifier("durationChip_\(minutes)")
     }
 
     private func categoryChip(_ id: String, _ label: String, _ icon: String, _ color: Color) -> some View {
@@ -284,6 +287,7 @@ struct TaskInspector: View {
             .foregroundStyle(color)
         }
         .buttonStyle(.plain)
+        .accessibilityIdentifier("categoryChip_\(id)")
     }
 
     private func statusChip(_ label: String, _ icon: String, _ isActive: Bool, _ color: Color, action: @escaping () -> Void) -> some View {

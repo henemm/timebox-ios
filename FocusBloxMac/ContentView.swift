@@ -38,11 +38,18 @@ struct ContentView: View {
 
     @Environment(\.modelContext) private var modelContext
 
+    // EventKit for Reminders sync
+    private let eventKitRepo = EventKitRepository()
+
     // Navigation state
     @State private var columnVisibility: NavigationSplitViewVisibility = .all
     @State private var selectedSection: MainSection = .backlog
     @State private var selectedFilter: SidebarFilter = .all
     @State private var selectedTasks: Set<UUID> = []
+
+    // Sync state
+    @State private var isSyncing = false
+    @State private var syncError: String?
 
     // Quick Add
     @State private var newTaskTitle = ""
@@ -220,9 +227,37 @@ struct ContentView: View {
         .navigationTitle(filterTitle)
         .toolbar {
             ToolbarItem {
+                // Sync status indicator
+                if isSyncing {
+                    ProgressView()
+                        .scaleEffect(0.7)
+                        .accessibilityIdentifier("syncStatusIndicator")
+                } else {
+                    Image(systemName: "checkmark.icloud")
+                        .foregroundStyle(.green)
+                        .accessibilityIdentifier("syncStatusIndicator")
+                }
+            }
+
+            ToolbarItem {
+                Button {
+                    Task { await syncWithReminders() }
+                } label: {
+                    Image(systemName: "arrow.triangle.2.circlepath")
+                }
+                .disabled(isSyncing)
+                .accessibilityIdentifier("syncRemindersButton")
+                .help("Mit Apple Erinnerungen synchronisieren")
+            }
+
+            ToolbarItem {
                 Text("\(filteredTasks.count) Tasks")
                     .foregroundStyle(.secondary)
             }
+        }
+        .task {
+            // Sync on appear if enabled
+            await syncWithReminders()
         }
     }
 
@@ -285,6 +320,42 @@ struct ContentView: View {
 
     func deleteSelectedTasks() {
         deleteTasksByIds(selectedTasks)
+    }
+
+    // MARK: - Sync Actions
+
+    private func syncWithReminders() async {
+        // Default to enabled if not set
+        if !UserDefaults.standard.bool(forKey: "remindersSyncEnabledSet") {
+            UserDefaults.standard.set(true, forKey: "remindersSyncEnabled")
+            UserDefaults.standard.set(true, forKey: "remindersSyncEnabledSet")
+        }
+
+        guard UserDefaults.standard.bool(forKey: "remindersSyncEnabled") else { return }
+
+        isSyncing = true
+        syncError = nil
+
+        do {
+            // Request access if needed
+            let hasAccess = try await eventKitRepo.requestReminderAccess()
+            guard hasAccess else {
+                syncError = "Kein Zugriff auf Erinnerungen"
+                isSyncing = false
+                return
+            }
+
+            // Import from Reminders
+            let syncService = RemindersSyncService(
+                eventKitRepo: eventKitRepo,
+                modelContext: modelContext
+            )
+            _ = try await syncService.importFromReminders()
+        } catch {
+            syncError = error.localizedDescription
+        }
+
+        isSyncing = false
     }
 
     // MARK: - Task Actions

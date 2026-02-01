@@ -23,7 +23,7 @@ enum SharedModelContainer {
             config = ModelConfiguration(
                 schema: schema,
                 groupContainer: .identifier(appGroupID),
-                cloudKitDatabase: .none
+                cloudKitDatabase: .automatic
             )
         } else {
             // Fallback for unit tests without code signing

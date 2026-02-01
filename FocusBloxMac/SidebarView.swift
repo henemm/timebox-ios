@@ -43,6 +43,7 @@ struct SidebarView: View {
                 ForEach(MainSection.allCases, id: \.self) { section in
                     HStack {
                         Label(section.rawValue, systemImage: section.icon)
+                            .accessibilityIdentifier("sidebarSection_\(sectionIdentifier(section))")
                         Spacer()
                         if section == .backlog && nextUpCount > 0 {
                             Text("\(nextUpCount)")
@@ -69,6 +70,7 @@ struct SidebarView: View {
 
                     HStack {
                         Label("Next Up", systemImage: "arrow.up.circle.fill")
+                            .accessibilityIdentifier("sidebarFilter_nextUp")
                         Spacer()
                         if nextUpCount > 0 {
                             Text("\(nextUpCount)")
@@ -86,6 +88,7 @@ struct SidebarView: View {
 
                     HStack {
                         Label("TBD", systemImage: "questionmark.circle")
+                            .accessibilityIdentifier("sidebarFilter_tbd")
                         Spacer()
                         if tbdCount > 0 {
                             Text("\(tbdCount)")
@@ -117,6 +120,7 @@ struct SidebarView: View {
 
     private func filterRow(label: String, icon: String, filter: SidebarFilter) -> some View {
         Label(label, systemImage: icon)
+            .accessibilityIdentifier("sidebarFilter_\(filterIdentifier(filter))")
             .tag(filter)
             .contentShape(Rectangle())
             .onTapGesture { selectedFilter = filter }
@@ -125,10 +129,28 @@ struct SidebarView: View {
 
     private func categoryRow(_ id: String, _ label: String, _ icon: String) -> some View {
         Label(label, systemImage: icon)
+            .accessibilityIdentifier("sidebarCategory_\(id)")
             .tag(SidebarFilter.category(id))
             .contentShape(Rectangle())
             .onTapGesture { selectedFilter = .category(id) }
             .listRowBackground(selectedFilter == .category(id) ? Color.accentColor.opacity(0.15) : Color.clear)
+    }
+
+    private func sectionIdentifier(_ section: MainSection) -> String {
+        switch section {
+        case .backlog: return "backlog"
+        case .planning: return "planning"
+        case .review: return "review"
+        }
+    }
+
+    private func filterIdentifier(_ filter: SidebarFilter) -> String {
+        switch filter {
+        case .all: return "all"
+        case .nextUp: return "nextUp"
+        case .tbd: return "tbd"
+        case .category(let id): return id
+        }
     }
 }
 
