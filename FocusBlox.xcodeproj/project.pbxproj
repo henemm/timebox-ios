@@ -76,6 +76,7 @@
 		B9D12D9BF22325ADDE757862 /* CalendarEventTransfer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D1F03B35977548B59D7269F /* CalendarEventTransfer.swift */; };
 		BC2B829A833F87522CFFB6BC /* MockEventKitRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 993E45CA1F0174CC0345C92C /* MockEventKitRepository.swift */; };
 		BDEDB5DE393186FC2D0BFF58 /* DurationEditingUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF402517A33C6BA497EFE1AC /* DurationEditingUITests.swift */; };
+		DCHIPSCRL01BUILD001 /* DurationChipScrollUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCHIPSCRL01FILE0001 /* DurationChipScrollUITests.swift */; };
 		BFEDE0F6D0C383A49101B8D2 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F364C9B1BB1D787792360427 /* SettingsView.swift */; };
 		C2A1677B81BC3C8D2C548495 /* HourRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 821E6E3E951900DF99190196 /* HourRow.swift */; };
 		C2ED3FE95B938EB35CB3C24C /* LocalTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A27D4BE199FA040FC61FFD6 /* LocalTask.swift */; };
@@ -396,6 +397,7 @@
 		D5F22CE94E29A523114817BF /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		D7ED51F72D6039EFAC3D85A3 /* SchedulingUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchedulingUITests.swift; sourceTree = "<group>"; };
 		DAILYR01FILEREF00001 /* DailyReviewUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyReviewUITests.swift; sourceTree = "<group>"; };
+		DCHIPSCRL01FILE0001 /* DurationChipScrollUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DurationChipScrollUITests.swift; sourceTree = "<group>"; };
 		DF402517A33C6BA497EFE1AC /* DurationEditingUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DurationEditingUITests.swift; sourceTree = "<group>"; };
 		DFD460F955B924EB6F6C5B94 /* TaskFormTbdUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TaskFormTbdUITests.swift; sourceTree = "<group>"; };
 		DSGNSYS01FILE00001 /* DesignSystemTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignSystemTests.swift; sourceTree = "<group>"; };
@@ -462,14 +464,14 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		B7A16CEA2F1FE3BE00165284 /* Exceptions for "FocusBloxWidgets" folder in "FocusBloxWidgetsExtension" target */ = {
+		B7A16CEA2F1FE3BE00165284 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
 			);
 			target = B7A16CCF2F1FE3BC00165284 /* FocusBloxWidgetsExtension */;
 		};
-		RESRC001EXCEPTION00001 /* Exceptions for "Resources" folder in "FocusBlox" target */ = {
+		RESRC001EXCEPTION00001 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
@@ -479,118 +481,16 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		B7A16CD62F1FE3BC00165284 /* FocusBloxWidgets */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				B7A16CEA2F1FE3BE00165284 /* Exceptions for "FocusBloxWidgets" folder in "FocusBloxWidgetsExtension" target */,
-			);
-			explicitFileTypes = {
-			};
-			explicitFolders = (
-			);
-			path = FocusBloxWidgets;
-			sourceTree = "<group>";
-		};
-		B7A16D0D2F20FDD400165284 /* FocusBloxCore */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
-			explicitFileTypes = {
-			};
-			explicitFolders = (
-			);
-			path = FocusBloxCore;
-			sourceTree = "<group>";
-		};
-		B7A16D1C2F20FDD400165284 /* FocusBloxCoreTests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
-			explicitFileTypes = {
-			};
-			explicitFolders = (
-			);
-			path = FocusBloxCoreTests;
-			sourceTree = "<group>";
-		};
-		B7DFC0342F2E73EC009C2881 /* FocusBloxWatch Watch App */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
-			explicitFileTypes = {
-			};
-			explicitFolders = (
-			);
-			path = "FocusBloxWatch Watch App";
-			sourceTree = "<group>";
-		};
-		B7DFC0422F2E73ED009C2881 /* FocusBloxWatch Watch AppTests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
-			explicitFileTypes = {
-			};
-			explicitFolders = (
-			);
-			path = "FocusBloxWatch Watch AppTests";
-			sourceTree = "<group>";
-		};
-		B7DFC04C2F2E73ED009C2881 /* FocusBloxWatch Watch AppUITests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
-			explicitFileTypes = {
-			};
-			explicitFolders = (
-			);
-			path = "FocusBloxWatch Watch AppUITests";
-			sourceTree = "<group>";
-		};
-		B7DFC06E2F2E8C60009C2881 /* FocusBloxMac */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
-			explicitFileTypes = {
-			};
-			explicitFolders = (
-			);
-			path = FocusBloxMac;
-			sourceTree = "<group>";
-		};
-		B7DFC07C2F2E8C62009C2881 /* FocusBloxMacTests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
-			explicitFileTypes = {
-			};
-			explicitFolders = (
-			);
-			path = FocusBloxMacTests;
-			sourceTree = "<group>";
-		};
-		B7DFC0862F2E8C62009C2881 /* FocusBloxMacUITests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
-			explicitFileTypes = {
-			};
-			explicitFolders = (
-			);
-			path = FocusBloxMacUITests;
-			sourceTree = "<group>";
-		};
-		RESRC001SYNCGROUP00001 /* Resources */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				RESRC001EXCEPTION00001 /* Exceptions for "Resources" folder in "FocusBlox" target */,
-			);
-			explicitFileTypes = {
-			};
-			explicitFolders = (
-			);
-			path = Resources;
-			sourceTree = "<group>";
-		};
+		B7A16CD62F1FE3BC00165284 /* FocusBloxWidgets */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (B7A16CEA2F1FE3BE00165284 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = FocusBloxWidgets; sourceTree = "<group>"; };
+		B7A16D0D2F20FDD400165284 /* FocusBloxCore */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = FocusBloxCore; sourceTree = "<group>"; };
+		B7A16D1C2F20FDD400165284 /* FocusBloxCoreTests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = FocusBloxCoreTests; sourceTree = "<group>"; };
+		B7DFC0342F2E73EC009C2881 /* FocusBloxWatch Watch App */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = "FocusBloxWatch Watch App"; sourceTree = "<group>"; };
+		B7DFC0422F2E73ED009C2881 /* FocusBloxWatch Watch AppTests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = "FocusBloxWatch Watch AppTests"; sourceTree = "<group>"; };
+		B7DFC04C2F2E73ED009C2881 /* FocusBloxWatch Watch AppUITests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = "FocusBloxWatch Watch AppUITests"; sourceTree = "<group>"; };
+		B7DFC06E2F2E8C60009C2881 /* FocusBloxMac */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = FocusBloxMac; sourceTree = "<group>"; };
+		B7DFC07C2F2E8C62009C2881 /* FocusBloxMacTests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = FocusBloxMacTests; sourceTree = "<group>"; };
+		B7DFC0862F2E8C62009C2881 /* FocusBloxMacUITests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = FocusBloxMacUITests; sourceTree = "<group>"; };
+		RESRC001SYNCGROUP00001 /* Resources */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (RESRC001EXCEPTION00001 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = Resources; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -680,6 +580,7 @@
 				339BBA1A3799CB0C6CF5897A /* BacklogViewUITests.swift */,
 				9356580BE3C5699878A6B87D /* BeforeScreenshotTest.swift */,
 				BCFB47E31C1D91935DCB9374 /* DebugLogReaderTest.swift */,
+				DCHIPSCRL01FILE0001 /* DurationChipScrollUITests.swift */,
 				DF402517A33C6BA497EFE1AC /* DurationEditingUITests.swift */,
 				3B596C16F99039490702E0B7 /* ErrorStateUITests.swift */,
 				C40AFBB545C0FA15517B9CE4 /* PlanningViewUITests.swift */,
@@ -1444,6 +1345,7 @@
 				4702F3D2CAF394E0AC9AAF96 /* BeforeScreenshotTest.swift in Sources */,
 				6C17452E66E837CD8225506C /* DebugLogReaderTest.swift in Sources */,
 				BDEDB5DE393186FC2D0BFF58 /* DurationEditingUITests.swift in Sources */,
+				DCHIPSCRL01BUILD001 /* DurationChipScrollUITests.swift in Sources */,
 				9F9185F5A9BD5A8CFF79DECA /* ErrorStateUITests.swift in Sources */,
 				DE5811F4F48BE79B9EB7C818 /* PlanningViewUITests.swift in Sources */,
 				A37B483E47D5F1A662D498CC /* SchedulingUITests.swift in Sources */,
@@ -2335,6 +2237,7 @@
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_ENTITLEMENTS = FocusBloxMac/FocusBloxMac.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
@@ -2380,6 +2283,7 @@
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_ENTITLEMENTS = FocusBloxMac/FocusBloxMac.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;

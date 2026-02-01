@@ -2,6 +2,7 @@ import SwiftUI
 
 struct BacklogRow: View {
     let item: PlanItem
+    var onComplete: (() -> Void)?  // Mark task as completed
     var onDurationTap: (() -> Void)?
     var onAddToNextUp: (() -> Void)?
     var onTap: (() -> Void)?
@@ -21,6 +22,18 @@ struct BacklogRow: View {
 
     var body: some View {
         HStack(spacing: 12) {
+            // Completion Checkbox
+            Button {
+                onComplete?()
+            } label: {
+                Image(systemName: "circle")
+                    .font(.system(size: 22))
+                    .foregroundStyle(.secondary)
+            }
+            .buttonStyle(.plain)
+            .accessibilityIdentifier("completeButton_\(item.id)")
+            .accessibilityLabel("Als erledigt markieren")
+
             // Left Column: Content (Title + Metadata)
             contentSection
 
@@ -109,51 +122,49 @@ struct BacklogRow: View {
         isEditingTitle = false
     }
 
-    // MARK: - Metadata Row (Scrollable, fixed size badges)
+    // MARK: - Metadata Row (fixed size badges, no nested ScrollView to avoid scroll issues)
 
     private var metadataRow: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 6) {
-                // 1. Importance Badge (always visible, gray "?" if not set)
-                importanceBadge
+        HStack(spacing: 6) {
+            // 1. Importance Badge (always visible, gray "?" if not set)
+            importanceBadge
 
-                // 2. Urgency Badge
-                urgencyBadge
+            // 2. Urgency Badge
+            urgencyBadge
 
-                // 3. Category Badge
-                categoryBadge
+            // 3. Category Badge
+            categoryBadge
 
-                // 4. Tags (max 2, dann "+N") - plain text, no chips
-                if !item.tags.isEmpty {
-                    ForEach(item.tags.prefix(2), id: \.self) { tag in
-                        Text("#\(tag)")
-                            .font(.caption2)
-                            .lineLimit(1)
-                            .foregroundStyle(.secondary)
-                            .fixedSize()
-                    }
-
-                    if item.tags.count > 2 {
-                        Text("+\(item.tags.count - 2)")
-                            .font(.caption2)
-                            .foregroundStyle(.secondary)
-                            .fixedSize()
-                    }
+            // 4. Tags (max 2, dann "+N") - plain text, no chips
+            if !item.tags.isEmpty {
+                ForEach(item.tags.prefix(2), id: \.self) { tag in
+                    Text("#\(tag)")
+                        .font(.caption2)
+                        .lineLimit(1)
+                        .foregroundStyle(.secondary)
+                        .fixedSize()
                 }
 
-                // 5. Duration Badge
-                durationBadge
-
-                // 6. Due Date Badge
-                if let dueDate = item.dueDate {
-                    HStack(spacing: 2) {
-                        Image(systemName: "calendar")
-                        Text(dueDateText(dueDate))
-                    }
-                    .font(.caption2)
-                    .foregroundStyle(isDueToday(dueDate) ? .red : .secondary)
-                    .fixedSize()
+                if item.tags.count > 2 {
+                    Text("+\(item.tags.count - 2)")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                        .fixedSize()
                 }
+            }
+
+            // 5. Duration Badge
+            durationBadge
+
+            // 6. Due Date Badge
+            if let dueDate = item.dueDate {
+                HStack(spacing: 2) {
+                    Image(systemName: "calendar")
+                    Text(dueDateText(dueDate))
+                }
+                .font(.caption2)
+                .foregroundStyle(isDueToday(dueDate) ? .red : .secondary)
+                .fixedSize()
             }
         }
     }
