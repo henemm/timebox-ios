@@ -129,7 +129,7 @@ struct TaskInspector: View {
                         .font(.headline)
                         .foregroundStyle(.secondary)
 
-                    // Category Grid
+                    // Category Grid - nur die 5 definierten Kategorien
                     LazyVGrid(columns: [
                         GridItem(.flexible()),
                         GridItem(.flexible()),
@@ -142,11 +142,6 @@ struct TaskInspector: View {
                         categoryChip("recharge", "Energie", "battery.100", .cyan)
                         categoryChip("learning", "Lernen", "book", .purple)
                         categoryChip("giving_back", "Geben", "gift", .pink)
-                        categoryChip("deep_work", "Deep", "brain", .indigo)
-                        categoryChip("shallow_work", "Shallow", "tray", .gray)
-                        categoryChip("meetings", "Meeting", "person.2", .teal)
-                        categoryChip("creative", "Kreativ", "paintbrush", .mint)
-                        categoryChip("strategic", "Strategie", "lightbulb", .yellow)
                     }
                 }
                 .padding()
@@ -354,12 +349,6 @@ struct TaskInspectorMultiSelection: View {
                     Button("Energie") { onSetCategory?("recharge") }
                     Button("Lernen") { onSetCategory?("learning") }
                     Button("Weitergeben") { onSetCategory?("giving_back") }
-                    Divider()
-                    Button("Deep Work") { onSetCategory?("deep_work") }
-                    Button("Shallow Work") { onSetCategory?("shallow_work") }
-                    Button("Meetings") { onSetCategory?("meetings") }
-                    Button("Kreativ") { onSetCategory?("creative") }
-                    Button("Strategie") { onSetCategory?("strategic") }
                 }
                 .buttonStyle(.bordered)
 

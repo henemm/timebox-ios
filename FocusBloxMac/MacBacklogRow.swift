@@ -203,11 +203,6 @@ struct MacBacklogRow: View {
         case "recharge": return .cyan
         case "learning": return .purple
         case "giving_back": return .pink
-        case "deep_work": return .indigo
-        case "shallow_work": return .gray
-        case "meetings": return .teal
-        case "creative": return .mint
-        case "strategic": return .yellow
         default: return .gray
         }
     }
@@ -219,11 +214,6 @@ struct MacBacklogRow: View {
         case "recharge": return "battery.100"
         case "learning": return "book"
         case "giving_back": return "gift"
-        case "deep_work": return "brain"
-        case "shallow_work": return "tray"
-        case "meetings": return "person.2"
-        case "creative": return "paintbrush"
-        case "strategic": return "lightbulb"
         default: return "questionmark.circle"
         }
     }
@@ -235,11 +225,6 @@ struct MacBacklogRow: View {
         case "recharge": return "Energie"
         case "learning": return "Lernen"
         case "giving_back": return "Geben"
-        case "deep_work": return "Deep Work"
-        case "shallow_work": return "Shallow"
-        case "meetings": return "Meeting"
-        case "creative": return "Kreativ"
-        case "strategic": return "Strategie"
         default: return "Typ"
         }
     }
@@ -342,11 +327,6 @@ struct CategoryBadge: View {
         case "recharge": return .cyan
         case "learning": return .purple
         case "giving_back": return .pink
-        case "deep_work": return .indigo
-        case "shallow_work": return .gray
-        case "meetings": return .teal
-        case "creative": return .mint
-        case "strategic": return .yellow
         default: return .gray
         }
     }
@@ -358,11 +338,6 @@ struct CategoryBadge: View {
         case "recharge": return "battery.100"
         case "learning": return "book"
         case "giving_back": return "gift"
-        case "deep_work": return "brain"
-        case "shallow_work": return "tray"
-        case "meetings": return "person.2"
-        case "creative": return "paintbrush"
-        case "strategic": return "lightbulb"
         default: return "questionmark.circle"
         }
     }
@@ -374,11 +349,6 @@ struct CategoryBadge: View {
         case "recharge": return "Energie"
         case "learning": return "Lernen"
         case "giving_back": return "Geben"
-        case "deep_work": return "Deep Work"
-        case "shallow_work": return "Shallow"
-        case "meetings": return "Meeting"
-        case "creative": return "Kreativ"
-        case "strategic": return "Strategie"
         default: return "Typ"
         }
     }

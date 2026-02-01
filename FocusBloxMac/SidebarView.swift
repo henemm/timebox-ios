@@ -108,14 +108,6 @@ struct SidebarView: View {
                     categoryRow("recharge", "Energie", "battery.100")
                     categoryRow("learning", "Lernen", "book")
                     categoryRow("giving_back", "Weitergeben", "gift")
-
-                    Divider()
-
-                    categoryRow("deep_work", "Deep Work", "brain")
-                    categoryRow("shallow_work", "Shallow Work", "tray")
-                    categoryRow("meetings", "Meetings", "person.2")
-                    categoryRow("creative", "Kreativ", "paintbrush")
-                    categoryRow("strategic", "Strategie", "lightbulb")
                 }
             }
         }

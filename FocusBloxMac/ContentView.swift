@@ -160,9 +160,8 @@ struct ContentView: View {
                             try? modelContext.save()
                         },
                         onCategoryTap: {
-                            // Cycle through categories
-                            let categories = ["income", "maintenance", "recharge", "learning", "giving_back",
-                                              "deep_work", "shallow_work", "meetings", "creative", "strategic"]
+                            // Cycle through the 5 defined categories
+                            let categories = ["income", "maintenance", "recharge", "learning", "giving_back"]
                             if let currentIndex = categories.firstIndex(of: task.taskType) {
                                 let nextIndex = (currentIndex + 1) % categories.count
                                 task.taskType = categories[nextIndex]
@@ -202,12 +201,6 @@ struct ContentView: View {
                         Button("Energie") { setCategory("recharge", for: selection) }
                         Button("Lernen") { setCategory("learning", for: selection) }
                         Button("Weitergeben") { setCategory("giving_back", for: selection) }
-                        Divider()
-                        Button("Deep Work") { setCategory("deep_work", for: selection) }
-                        Button("Shallow Work") { setCategory("shallow_work", for: selection) }
-                        Button("Meetings") { setCategory("meetings", for: selection) }
-                        Button("Kreativ") { setCategory("creative", for: selection) }
-                        Button("Strategie") { setCategory("strategic", for: selection) }
                     }
 
                     Button("Zu Next Up hinzufügen") {
@@ -249,11 +242,6 @@ struct ContentView: View {
         case "recharge": return "Energie"
         case "learning": return "Lernen"
         case "giving_back": return "Weitergeben"
-        case "deep_work": return "Deep Work"
-        case "shallow_work": return "Shallow Work"
-        case "meetings": return "Meetings"
-        case "creative": return "Kreativ"
-        case "strategic": return "Strategie"
         default: return category
         }
     }
