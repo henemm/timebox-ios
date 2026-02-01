@@ -11,12 +11,16 @@ import SwiftUI
 enum MainSection: String, Hashable, CaseIterable {
     case backlog = "Backlog"
     case planning = "Planen"
+    case assign = "Zuweisen"
+    case focus = "Focus"
     case review = "Review"
 
     var icon: String {
         switch self {
         case .backlog: return "tray.full"
         case .planning: return "calendar"
+        case .assign: return "arrow.up.arrow.down"
+        case .focus: return "target"
         case .review: return "chart.bar"
         }
     }
@@ -28,6 +32,9 @@ enum SidebarFilter: Hashable {
     case category(String)
     case nextUp
     case tbd
+    case overdue
+    case upcoming
+    case completed
 }
 
 struct SidebarView: View {
@@ -35,6 +42,9 @@ struct SidebarView: View {
     @Binding var selectedFilter: SidebarFilter
     let tbdCount: Int
     let nextUpCount: Int
+    let overdueCount: Int
+    let upcomingCount: Int
+    let completedCount: Int
 
     var body: some View {
         List {
@@ -103,6 +113,63 @@ struct SidebarView: View {
                     .contentShape(Rectangle())
                     .onTapGesture { selectedFilter = .tbd }
                     .listRowBackground(selectedFilter == .tbd ? Color.accentColor.opacity(0.15) : Color.clear)
+
+                    // Overdue (überfällige Tasks)
+                    HStack {
+                        Label("Überfällig", systemImage: "exclamationmark.circle.fill")
+                            .accessibilityIdentifier("sidebarFilter_overdue")
+                        Spacer()
+                        if overdueCount > 0 {
+                            Text("\(overdueCount)")
+                                .font(.caption)
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 2)
+                                .background(.red.opacity(0.2))
+                                .clipShape(Capsule())
+                        }
+                    }
+                    .tag(SidebarFilter.overdue)
+                    .contentShape(Rectangle())
+                    .onTapGesture { selectedFilter = .overdue }
+                    .listRowBackground(selectedFilter == .overdue ? Color.accentColor.opacity(0.15) : Color.clear)
+
+                    // Upcoming (bald fällig)
+                    HStack {
+                        Label("Bald fällig", systemImage: "clock.fill")
+                            .accessibilityIdentifier("sidebarFilter_upcoming")
+                        Spacer()
+                        if upcomingCount > 0 {
+                            Text("\(upcomingCount)")
+                                .font(.caption)
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 2)
+                                .background(.yellow.opacity(0.2))
+                                .clipShape(Capsule())
+                        }
+                    }
+                    .tag(SidebarFilter.upcoming)
+                    .contentShape(Rectangle())
+                    .onTapGesture { selectedFilter = .upcoming }
+                    .listRowBackground(selectedFilter == .upcoming ? Color.accentColor.opacity(0.15) : Color.clear)
+
+                    // Completed (erledigte Tasks)
+                    HStack {
+                        Label("Erledigt", systemImage: "checkmark.circle.fill")
+                            .accessibilityIdentifier("sidebarFilter_completed")
+                        Spacer()
+                        if completedCount > 0 {
+                            Text("\(completedCount)")
+                                .font(.caption)
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 2)
+                                .background(.green.opacity(0.2))
+                                .clipShape(Capsule())
+                        }
+                    }
+                    .tag(SidebarFilter.completed)
+                    .contentShape(Rectangle())
+                    .onTapGesture { selectedFilter = .completed }
+                    .listRowBackground(selectedFilter == .completed ? Color.accentColor.opacity(0.15) : Color.clear)
                 }
 
                 Section("Kategorien") {
@@ -140,6 +207,8 @@ struct SidebarView: View {
         switch section {
         case .backlog: return "backlog"
         case .planning: return "planning"
+        case .assign: return "assign"
+        case .focus: return "focus"
         case .review: return "review"
         }
     }
@@ -149,6 +218,9 @@ struct SidebarView: View {
         case .all: return "all"
         case .nextUp: return "nextUp"
         case .tbd: return "tbd"
+        case .overdue: return "overdue"
+        case .upcoming: return "upcoming"
+        case .completed: return "completed"
         case .category(let id): return id
         }
     }
@@ -159,7 +231,10 @@ struct SidebarView: View {
         selectedSection: .constant(.backlog),
         selectedFilter: .constant(.all),
         tbdCount: 3,
-        nextUpCount: 5
+        nextUpCount: 5,
+        overdueCount: 2,
+        upcomingCount: 4,
+        completedCount: 10
     )
     .frame(width: 220)
 }

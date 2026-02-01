@@ -75,10 +75,30 @@ struct MacBacklogRow: View {
             // 3. Category Badge (tappable)
             categoryBadge
 
-            // 4. Duration Badge
+            // 4. Tags (max 2, dann "+N") - plain text, iOS-aligned
+            if !task.tags.isEmpty {
+                ForEach(Array(task.tags.prefix(2).enumerated()), id: \.offset) { index, tag in
+                    Text("#\(tag)")
+                        .font(.caption2)
+                        .lineLimit(1)
+                        .foregroundStyle(.secondary)
+                        .fixedSize()
+                        .accessibilityIdentifier("tag_\(task.id)_\(index)")
+                }
+
+                if task.tags.count > 2 {
+                    Text("+\(task.tags.count - 2)")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                        .fixedSize()
+                        .accessibilityIdentifier("tagOverflow_\(task.id)")
+                }
+            }
+
+            // 5. Duration Badge
             durationBadge
 
-            // 5. Due Date Badge
+            // 6. Due Date Badge
             if let dueDate = task.dueDate {
                 dueDateBadge(dueDate)
             }
@@ -267,7 +287,7 @@ struct MacBacklogRow: View {
 
     private var durationBadge: some View {
         Menu {
-            ForEach([5, 15, 30, 45, 60, 90, 120], id: \.self) { minutes in
+            ForEach([5, 15, 30, 60], id: \.self) { minutes in
                 Button {
                     onDurationSelect?(minutes)
                 } label: {

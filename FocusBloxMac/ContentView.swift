@@ -63,19 +63,53 @@ struct ContentView: View {
         tasks.filter { $0.isNextUp && !$0.isCompleted }.count
     }
 
+    private var overdueCount: Int {
+        let now = Date()
+        return tasks.filter { task in
+            guard !task.isCompleted, let dueDate = task.dueDate else { return false }
+            return dueDate < now
+        }.count
+    }
+
+    private var upcomingCount: Int {
+        let now = Date()
+        let weekFromNow = Calendar.current.date(byAdding: .day, value: 7, to: now) ?? now
+        return tasks.filter { task in
+            guard !task.isCompleted, let dueDate = task.dueDate else { return false }
+            return dueDate >= now && dueDate <= weekFromNow
+        }.count
+    }
+
+    private var completedCount: Int {
+        tasks.filter { $0.isCompleted }.count
+    }
+
     // Filtered tasks based on sidebar selection
     private var filteredTasks: [LocalTask] {
-        let incomplete = tasks.filter { !$0.isCompleted }
-
         switch selectedFilter {
         case .all:
-            return incomplete
+            return tasks.filter { !$0.isCompleted }
         case .category(let category):
-            return incomplete.filter { $0.taskType == category }
+            return tasks.filter { !$0.isCompleted && $0.taskType == category }
         case .nextUp:
-            return incomplete.filter { $0.isNextUp }
+            return tasks.filter { !$0.isCompleted && $0.isNextUp }
         case .tbd:
-            return incomplete.filter { $0.isTbd }
+            return tasks.filter { !$0.isCompleted && $0.isTbd }
+        case .overdue:
+            let now = Date()
+            return tasks.filter { task in
+                guard !task.isCompleted, let dueDate = task.dueDate else { return false }
+                return dueDate < now
+            }
+        case .upcoming:
+            let now = Date()
+            let weekFromNow = Calendar.current.date(byAdding: .day, value: 7, to: now) ?? now
+            return tasks.filter { task in
+                guard !task.isCompleted, let dueDate = task.dueDate else { return false }
+                return dueDate >= now && dueDate <= weekFromNow
+            }
+        case .completed:
+            return tasks.filter { $0.isCompleted }
         }
     }
 
@@ -93,7 +127,10 @@ struct ContentView: View {
                 selectedSection: $selectedSection,
                 selectedFilter: $selectedFilter,
                 tbdCount: tbdCount,
-                nextUpCount: nextUpCount
+                nextUpCount: nextUpCount,
+                overdueCount: overdueCount,
+                upcomingCount: upcomingCount,
+                completedCount: completedCount
             )
         } content: {
             // Main Content based on selected section
@@ -118,6 +155,10 @@ struct ContentView: View {
             backlogView
         case .planning:
             MacPlanningView()
+        case .assign:
+            MacAssignView()
+        case .focus:
+            MacFocusView()
         case .review:
             MacReviewView()
         }
@@ -252,6 +293,9 @@ struct ContentView: View {
         case .category(let cat): return categoryName(cat)
         case .nextUp: return "Next Up"
         case .tbd: return "TBD"
+        case .overdue: return "Überfällig"
+        case .upcoming: return "Bald fällig"
+        case .completed: return "Erledigt"
         }
     }
 
