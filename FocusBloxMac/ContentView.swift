@@ -166,6 +166,46 @@ struct ContentView: View {
 
     // MARK: - Backlog View
 
+    // Next Up tasks (sorted by nextUpSortOrder)
+    private var nextUpTasks: [LocalTask] {
+        tasks.filter { $0.isNextUp && !$0.isCompleted }
+            .sorted { ($0.nextUpSortOrder ?? Int.max) < ($1.nextUpSortOrder ?? Int.max) }
+    }
+
+    // Regular tasks (non-Next Up, filtered)
+    private var regularFilteredTasks: [LocalTask] {
+        switch selectedFilter {
+        case .all:
+            return tasks.filter { !$0.isCompleted && !$0.isNextUp }
+        case .category(let category):
+            return tasks.filter { !$0.isCompleted && !$0.isNextUp && $0.taskType == category }
+        case .nextUp:
+            return []  // Next Up section handles this
+        case .tbd:
+            return tasks.filter { !$0.isCompleted && !$0.isNextUp && $0.isTbd }
+        case .overdue:
+            let now = Date()
+            return tasks.filter { task in
+                guard !task.isCompleted && !task.isNextUp, let dueDate = task.dueDate else { return false }
+                return dueDate < now
+            }
+        case .upcoming:
+            let now = Date()
+            let weekFromNow = Calendar.current.date(byAdding: .day, value: 7, to: now) ?? now
+            return tasks.filter { task in
+                guard !task.isCompleted && !task.isNextUp, let dueDate = task.dueDate else { return false }
+                return dueDate >= now && dueDate <= weekFromNow
+            }
+        case .completed:
+            return tasks.filter { $0.isCompleted }
+        }
+    }
+
+    // Show Next Up section only in "All" filter
+    private var showNextUpSection: Bool {
+        selectedFilter == .all && !nextUpTasks.isEmpty
+    }
+
     private var backlogView: some View {
         VStack(spacing: 0) {
             // Quick Add Bar
@@ -190,35 +230,48 @@ struct ContentView: View {
 
             Divider()
 
-            // Task List with Multi-Selection
+            // Task List with Multi-Selection and Sections
             List(selection: $selectedTasks) {
-                ForEach(filteredTasks, id: \.uuid) { task in
-                    MacBacklogRow(
-                        task: task,
-                        onToggleComplete: {
-                            task.isCompleted.toggle()
-                            try? modelContext.save()
-                        },
-                        onImportanceCycle: { newValue in
-                            task.importance = newValue
-                            try? modelContext.save()
-                        },
-                        onUrgencyToggle: { newValue in
-                            task.urgency = newValue
-                            try? modelContext.save()
-                        },
-                        onCategorySelect: { category in
-                            task.taskType = category
-                            try? modelContext.save()
-                        },
-                        onDurationSelect: { duration in
-                            task.estimatedDuration = duration
-                            try? modelContext.save()
+                // MARK: Next Up Section (only in "All" filter)
+                if showNextUpSection {
+                    Section {
+                        ForEach(nextUpTasks, id: \.uuid) { task in
+                            makeBacklogRow(task: task)
+                                .tag(task.uuid)
                         }
-                    )
-                    .tag(task.uuid)
+                        .onMove { from, to in
+                            moveNextUpTasks(from: from, to: to)
+                        }
+                    } header: {
+                        HStack {
+                            Label("Next Up", systemImage: "arrow.up.circle.fill")
+                                .foregroundStyle(.blue)
+                            Spacer()
+                            Text("\(nextUpTasks.count)")
+                                .font(.caption)
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 2)
+                                .background(.blue.opacity(0.2))
+                                .clipShape(Capsule())
+                        }
+                    }
                 }
-                .onDelete(perform: deleteTasks)
+
+                // MARK: Regular Tasks Section
+                Section {
+                    ForEach(selectedFilter == .nextUp ? nextUpTasks : regularFilteredTasks, id: \.uuid) { task in
+                        makeBacklogRow(task: task)
+                            .tag(task.uuid)
+                    }
+                    .onMove { from, to in
+                        moveRegularTasks(from: from, to: to)
+                    }
+                    .onDelete(perform: deleteTasks)
+                } header: {
+                    if showNextUpSection {
+                        Text("Backlog")
+                    }
+                }
             }
             .contextMenu(forSelectionType: UUID.self) { selection in
                 if !selection.isEmpty {
@@ -238,6 +291,10 @@ struct ContentView: View {
 
                     Button("Zu Next Up hinzufügen") {
                         addToNextUp(selection)
+                    }
+
+                    Button("Aus Next Up entfernen") {
+                        removeFromNextUp(selection)
                     }
 
                     Divider()
@@ -398,8 +455,11 @@ struct ContentView: View {
     }
 
     private func deleteTasks(at offsets: IndexSet) {
+        let tasksToDelete = selectedFilter == .nextUp ? nextUpTasks : regularFilteredTasks
         for index in offsets {
-            modelContext.delete(filteredTasks[index])
+            if index < tasksToDelete.count {
+                modelContext.delete(tasksToDelete[index])
+            }
         }
         try? modelContext.save()
     }
@@ -433,12 +493,79 @@ struct ContentView: View {
     }
 
     private func addToNextUp(_ ids: Set<UUID>) {
+        let maxOrder = nextUpTasks.compactMap(\.nextUpSortOrder).max() ?? 0
+        var order = maxOrder + 1
         for id in ids {
             if let task = tasks.first(where: { $0.uuid == id }) {
                 task.isNextUp = true
+                task.nextUpSortOrder = order
+                order += 1
             }
         }
         try? modelContext.save()
+    }
+
+    private func removeFromNextUp(_ ids: Set<UUID>) {
+        for id in ids {
+            if let task = tasks.first(where: { $0.uuid == id }) {
+                task.isNextUp = false
+                task.nextUpSortOrder = nil
+            }
+        }
+        try? modelContext.save()
+    }
+
+    // MARK: - Drag Reorder
+
+    private func moveNextUpTasks(from source: IndexSet, to destination: Int) {
+        var orderedTasks = nextUpTasks
+        orderedTasks.move(fromOffsets: source, toOffset: destination)
+
+        // Update sort order
+        for (index, task) in orderedTasks.enumerated() {
+            task.nextUpSortOrder = index
+        }
+        try? modelContext.save()
+    }
+
+    private func moveRegularTasks(from source: IndexSet, to destination: Int) {
+        var orderedTasks = regularFilteredTasks
+        orderedTasks.move(fromOffsets: source, toOffset: destination)
+
+        // Update sort order
+        for (index, task) in orderedTasks.enumerated() {
+            task.sortOrder = index
+        }
+        try? modelContext.save()
+    }
+
+    // MARK: - Row Builder
+
+    @ViewBuilder
+    private func makeBacklogRow(task: LocalTask) -> some View {
+        MacBacklogRow(
+            task: task,
+            onToggleComplete: {
+                task.isCompleted.toggle()
+                try? modelContext.save()
+            },
+            onImportanceCycle: { newValue in
+                task.importance = newValue
+                try? modelContext.save()
+            },
+            onUrgencyToggle: { newValue in
+                task.urgency = newValue
+                try? modelContext.save()
+            },
+            onCategorySelect: { category in
+                task.taskType = category
+                try? modelContext.save()
+            },
+            onDurationSelect: { duration in
+                task.estimatedDuration = duration
+                try? modelContext.save()
+            }
+        )
     }
 }
 
