@@ -68,7 +68,7 @@ final class RemindersSyncService {
         try eventKitRepo.updateReminder(
             id: externalID,
             title: task.title,
-            priority: task.priority,
+            priority: mapToReminderPriority(task.importance),
             dueDate: task.dueDate,
             notes: task.taskDescription,
             isCompleted: task.isCompleted
@@ -105,7 +105,7 @@ final class RemindersSyncService {
     private func createTask(from reminder: ReminderData) -> LocalTask {
         LocalTask(
             title: reminder.title,
-            priority: reminder.priority,
+            importance: mapReminderPriority(reminder.priority),
             dueDate: reminder.dueDate,
             taskDescription: reminder.notes,
             externalID: reminder.id,
@@ -116,11 +116,43 @@ final class RemindersSyncService {
     private func updateTask(_ task: LocalTask, from reminder: ReminderData) {
         // Update Apple-synced fields
         task.title = reminder.title
-        task.priority = reminder.priority
         task.isCompleted = reminder.isCompleted
         task.dueDate = reminder.dueDate
         task.taskDescription = reminder.notes
+
+        // Importance: Preserve local value if set, otherwise use Apple's priority
+        // This allows users to override Apple's priority locally
+        let appleImportance = mapReminderPriority(reminder.priority)
+        if task.importance == nil {
+            // User hasn't set importance locally → use Apple's value
+            task.importance = appleImportance
+        }
+        // If task.importance is already set, keep it (user's local override)
+
         // Local-only fields (tags, urgency, taskType, isNextUp) are preserved
+    }
+
+    /// Convert EKReminder priority to FocusBlox importance
+    /// EKReminder: 0=none, 1-4=high, 5=medium, 6-9=low
+    /// FocusBlox: nil=tbd, 1=low, 2=medium, 3=high
+    private func mapReminderPriority(_ ekPriority: Int) -> Int? {
+        switch ekPriority {
+        case 1...4: return 3  // High
+        case 5: return 2      // Medium
+        case 6...9: return 1  // Low
+        default: return nil   // None (0) → TBD (keine Fake-Defaults)
+        }
+    }
+
+    /// Convert FocusBlox importance back to EKReminder priority for export
+    private func mapToReminderPriority(_ importance: Int?) -> Int {
+        guard let importance else { return 0 }  // nil → None
+        switch importance {
+        case 3: return 1  // High
+        case 2: return 5  // Medium
+        case 1: return 9  // Low
+        default: return 0 // None
+        }
     }
 
     private func handleDeletedReminders(currentReminderIDs: Set<String>) throws {

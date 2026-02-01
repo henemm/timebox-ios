@@ -58,6 +58,7 @@ struct BacklogView: View {
     @State private var durationFeedback = false
     @State private var showCreateTask = false
     @State private var nextUpFeedback = false
+    @State private var completeFeedback = false
     @State private var taskToEdit: PlanItem?
 
     // MARK: - Next Up Tasks
@@ -233,6 +234,7 @@ struct BacklogView: View {
             .sensoryFeedback(.impact(weight: .medium), trigger: reorderTrigger)
             .sensoryFeedback(.success, trigger: durationFeedback)
             .sensoryFeedback(.success, trigger: nextUpFeedback)
+            .sensoryFeedback(.success, trigger: completeFeedback)
             .sheet(item: $selectedItemForDuration) { item in
                 DurationPicker(currentDuration: item.effectiveDuration) { newDuration in
                     updateDuration(for: item, minutes: newDuration)
@@ -318,6 +320,18 @@ struct BacklogView: View {
         isLoading = false
     }
 
+    /// Refresh tasks from local database only - no loading indicator, no Reminders import.
+    /// Use this for Quick Edits to preserve scroll position and avoid overwriting local changes.
+    private func refreshLocalTasks() async {
+        do {
+            let taskSource = LocalTaskSource(modelContext: modelContext)
+            let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
+            planItems = try await syncEngine.sync()
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
     private func moveItems(from source: IndexSet, to destination: Int) {
         planItems.move(fromOffsets: source, toOffset: destination)
 
@@ -380,7 +394,10 @@ struct BacklogView: View {
             let taskSource = LocalTaskSource(modelContext: modelContext)
             let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
             try syncEngine.updateTask(itemID: item.id, title: item.title, importance: importance, duration: item.estimatedDuration, tags: item.tags, urgency: item.urgency, taskType: item.taskType, dueDate: item.dueDate, description: item.taskDescription)
-            Task { await loadTasks() }
+
+            // Refresh local data only - no loading indicator, no Reminders import
+            // This preserves scroll position and avoids overwriting local changes
+            Task { await refreshLocalTasks() }
         } catch {
             errorMessage = "Wichtigkeit konnte nicht aktualisiert werden."
         }
@@ -391,7 +408,9 @@ struct BacklogView: View {
             let taskSource = LocalTaskSource(modelContext: modelContext)
             let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
             try syncEngine.updateTask(itemID: item.id, title: item.title, importance: item.importance, duration: item.estimatedDuration, tags: item.tags, urgency: urgency, taskType: item.taskType, dueDate: item.dueDate, description: item.taskDescription)
-            Task { await loadTasks() }
+
+            // Refresh local data only - no loading indicator, no Reminders import
+            Task { await refreshLocalTasks() }
         } catch {
             errorMessage = "Dringlichkeit konnte nicht aktualisiert werden."
         }
@@ -443,6 +462,21 @@ struct BacklogView: View {
             }
         } catch {
             errorMessage = "Titel konnte nicht gespeichert werden."
+        }
+    }
+
+    private func completeTask(_ item: PlanItem) {
+        do {
+            let taskSource = LocalTaskSource(modelContext: modelContext)
+            let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
+            try syncEngine.completeTask(itemID: item.id)
+            completeFeedback.toggle()
+
+            Task {
+                await loadTasks()
+            }
+        } catch {
+            errorMessage = "Task konnte nicht als erledigt markiert werden."
         }
     }
 
@@ -499,6 +533,7 @@ struct BacklogView: View {
                 ForEach(backlogTasks) { item in
                     BacklogRow(
                         item: item,
+                        onComplete: { completeTask(item) },
                         onDurationTap: { selectedItemForDuration = item },
                         onAddToNextUp: { updateNextUp(for: item, isNextUp: true) },
                         onImportanceCycle: { newImportance in updateImportance(for: item, importance: newImportance) },
@@ -531,6 +566,7 @@ struct BacklogView: View {
                     tasks: doFirstTasks,
                     onDurationTap: { item in selectedItemForDuration = item },
                     onAddToNextUp: { item in updateNextUp(for: item, isNextUp: true) },
+                    onComplete: { item in completeTask(item) },
                     onImportanceCycle: { item, newImportance in updateImportance(for: item, importance: newImportance) },
                     onUrgencyToggle: { item, newUrgency in updateUrgency(for: item, urgency: newUrgency) },
                     onCategoryTap: { item in selectedItemForCategory = item },
@@ -547,6 +583,7 @@ struct BacklogView: View {
                     tasks: scheduleTasks,
                     onDurationTap: { item in selectedItemForDuration = item },
                     onAddToNextUp: { item in updateNextUp(for: item, isNextUp: true) },
+                    onComplete: { item in completeTask(item) },
                     onImportanceCycle: { item, newImportance in updateImportance(for: item, importance: newImportance) },
                     onUrgencyToggle: { item, newUrgency in updateUrgency(for: item, urgency: newUrgency) },
                     onCategoryTap: { item in selectedItemForCategory = item },
@@ -563,6 +600,7 @@ struct BacklogView: View {
                     tasks: delegateTasks,
                     onDurationTap: { item in selectedItemForDuration = item },
                     onAddToNextUp: { item in updateNextUp(for: item, isNextUp: true) },
+                    onComplete: { item in completeTask(item) },
                     onImportanceCycle: { item, newImportance in updateImportance(for: item, importance: newImportance) },
                     onUrgencyToggle: { item, newUrgency in updateUrgency(for: item, urgency: newUrgency) },
                     onCategoryTap: { item in selectedItemForCategory = item },
@@ -579,6 +617,7 @@ struct BacklogView: View {
                     tasks: eliminateTasks,
                     onDurationTap: { item in selectedItemForDuration = item },
                     onAddToNextUp: { item in updateNextUp(for: item, isNextUp: true) },
+                    onComplete: { item in completeTask(item) },
                     onImportanceCycle: { item, newImportance in updateImportance(for: item, importance: newImportance) },
                     onUrgencyToggle: { item, newUrgency in updateUrgency(for: item, urgency: newUrgency) },
                     onCategoryTap: { item in selectedItemForCategory = item },
@@ -609,6 +648,7 @@ struct BacklogView: View {
                             ForEach(group.tasks) { item in
                                 BacklogRow(
                                     item: item,
+                                    onComplete: { completeTask(item) },
                                     onDurationTap: { selectedItemForDuration = item },
                                     onAddToNextUp: { updateNextUp(for: item, isNextUp: true) },
                                     onTap: { taskToEdit = item },
@@ -645,6 +685,7 @@ struct BacklogView: View {
                             ForEach(group.tasks) { item in
                                 BacklogRow(
                                     item: item,
+                                    onComplete: { completeTask(item) },
                                     onDurationTap: { selectedItemForDuration = item },
                                     onAddToNextUp: { updateNextUp(for: item, isNextUp: true) },
                                     onTap: { taskToEdit = item },
@@ -681,6 +722,7 @@ struct BacklogView: View {
                             ForEach(group.tasks) { item in
                                 BacklogRow(
                                     item: item,
+                                    onComplete: { completeTask(item) },
                                     onDurationTap: { selectedItemForDuration = item },
                                     onAddToNextUp: { updateNextUp(for: item, isNextUp: true) },
                                     onTap: { taskToEdit = item },
@@ -709,6 +751,7 @@ struct BacklogView: View {
                 ForEach(tbdTasks) { item in
                     BacklogRow(
                         item: item,
+                        onComplete: { completeTask(item) },
                         onDurationTap: { selectedItemForDuration = item },
                         onAddToNextUp: { updateNextUp(for: item, isNextUp: true) },
                         onTap: { taskToEdit = item },
@@ -757,6 +800,7 @@ struct QuadrantCard: View {
     let tasks: [PlanItem]
     let onDurationTap: (PlanItem) -> Void
     let onAddToNextUp: (PlanItem) -> Void
+    var onComplete: ((PlanItem) -> Void)?
     var onImportanceCycle: ((PlanItem, Int) -> Void)?
     var onUrgencyToggle: ((PlanItem, String) -> Void)?
     var onCategoryTap: ((PlanItem) -> Void)?
@@ -796,6 +840,7 @@ struct QuadrantCard: View {
                 ForEach(tasks.prefix(5)) { task in
                     BacklogRow(
                         item: task,
+                        onComplete: onComplete.map { callback in { callback(task) } },
                         onDurationTap: { onDurationTap(task) },
                         onAddToNextUp: { onAddToNextUp(task) },
                         onImportanceCycle: onImportanceCycle.map { callback in { newImportance in callback(task, newImportance) } },
