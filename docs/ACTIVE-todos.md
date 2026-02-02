@@ -20,6 +20,75 @@
 
 ## 🔴 OFFEN - Neue Bugs/Features
 
+### Bug 19: Wiederkehrende Aufgaben Feature fehlt in TaskFormSheet
+**Status:** OFFEN
+**Gemeldet:** 2026-02-02
+**Location:** `Sources/Views/TaskFormSheet.swift`
+
+**Problem:**
+- Das Feature "Wiederkehrende Aufgaben" ist im TaskFormSheet nicht vorhanden
+- Screenshot zeigt: Tags-Feld mit "Wiederkehrend" als Workaround, aber keine echte Recurrence-UI
+- Das Feature existiert in `CreateTaskView.swift` (Zeile 138-174), wurde aber nicht in TaskFormSheet übernommen
+
+**Bestehende Komponenten (ungenutzt):**
+- `RecurrencePattern.swift` - Enum: none, daily, weekly, biweekly, monthly
+- `WeekdayButton.swift` - UI für Wochentag-Auswahl (Mo-So Kreise)
+- `LocalTask` hat Felder: `recurrencePattern`, `recurrenceWeekdays`, `recurrenceMonthDay`
+
+**Was fehlt in TaskFormSheet:**
+1. State-Variablen: `recurrencePattern`, `selectedWeekdays`, `monthDay`
+2. UI-Section für Wiederholung (Picker + Wochentag-Buttons)
+3. Übergabe an `createTask()` - aktuell hardcoded `"none"` (Zeile 392)
+4. Edit-Mode: Recurrence-Werte aus PlanItem laden
+
+**Best Practice Verbesserung (zusätzlich):**
+- "Werktags"-Preset (Mo-Fr) als Schnellauswahl hinzufügen
+- Wie Apple Reminders: Picker + optionale Wochentage
+
+**Betroffene Dateien für Fix:**
+- `Sources/Views/TaskFormSheet.swift` (~50 LoC)
+
+**Priorität:** MITTEL (Feature existiert, nur UI fehlt)
+
+---
+
+### Bug 18: Reminders-Tasks - Dringlichkeit/Wichtigkeit nicht speicherbar
+**Status:** OFFEN (Root Cause identifiziert)
+**Gemeldet:** 2026-02-01
+**Location:**
+- `RemindersSyncService.swift:116-124`
+- `BacklogView.swift:380-400`
+- `BacklogRow.swift:247`
+
+**Problem:**
+1. Bei Tasks aus Apple Reminders: Tippen auf Dringlichkeit/Wichtigkeit Badge setzt Wert nicht
+2. View springt nach oben nach jedem Tap
+3. In Full Edit: Dringlichkeit setzen + Speichern - Wert wird nicht persistiert
+4. Keine Fehlermeldung
+
+**Root Cause (4 Probleme):**
+1. **RC1:** `RemindersSyncService.updateTask()` ueberschreibt `importance` bei JEDEM Sync (Zeile 119)
+2. **RC2:** `loadTasks()` wird nach jedem Update aufgerufen → triggert Re-Import
+3. **RC3:** `isLoading = true` in `loadTasks()` resettet Scroll-Position
+4. **RC4:** `BacklogRow` konvertiert `nil` urgency zu `""` (leerer String)
+
+**Fix-Vorschlag:**
+1. `RemindersSyncService.updateTask()`: Lokale Felder (importance, urgency, etc.) NICHT ueberschreiben wenn bereits gesetzt
+2. `BacklogRow`: Callback-Signatur auf `String?` aendern, nil korrekt durchreichen
+3. `BacklogView`: isLoading nur bei initialem Load setzen
+
+**Test:**
+1. Reminders Sync aktivieren
+2. Task aus Reminders importieren
+3. Importance-Badge tippen → Wert muss wechseln und erhalten bleiben
+4. Urgency-Badge tippen → Wert muss wechseln und erhalten bleiben
+5. Full Edit → Dringlichkeit aendern → Speichern → Erneut oeffnen → Wert muss erhalten sein
+6. Pull-to-Refresh → Werte muessen erhalten bleiben
+
+**Prioritaet:** HOCH (Core Feature fuer Reminders-Integration)
+
+---
+
 ### Bug 17: BacklogRow - Touchbare Elemente nicht als Chips (Spec-Abweichung)
 **Status:** OFFEN
 **Gemeldet:** 2026-01-29
