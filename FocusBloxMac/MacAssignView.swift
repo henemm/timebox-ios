@@ -92,6 +92,9 @@ struct MacAssignView: View {
                             },
                             onRemoveTask: { taskID in
                                 Task { await removeTaskFromBlock(taskID: taskID, block: block) }
+                            },
+                            onReorderTasks: { newOrder in
+                                Task { await reorderTasksInBlock(newOrder: newOrder, block: block) }
                             }
                         )
                     }
@@ -232,6 +235,21 @@ struct MacAssignView: View {
             errorMessage = "Fehler beim Entfernen: \(error.localizedDescription)"
         }
     }
+
+    private func reorderTasksInBlock(newOrder: [String], block: FocusBlock) async {
+        do {
+            try eventKitRepo.updateFocusBlock(
+                eventID: block.id,
+                taskIDs: newOrder,
+                completedTaskIDs: block.completedTaskIDs,
+                taskTimes: block.taskTimes
+            )
+
+            await loadFocusBlocks()
+        } catch {
+            errorMessage = "Fehler beim Umsortieren: \(error.localizedDescription)"
+        }
+    }
 }
 
 // MARK: - Focus Block Card (for Assign View)
@@ -241,8 +259,10 @@ struct MacFocusBlockCard: View {
     let tasks: [LocalTask]
     let onDropTask: (String) -> Void
     let onRemoveTask: (String) -> Void
+    let onReorderTasks: ([String]) -> Void
 
     @State private var isDropTargeted = false
+    @State private var orderedTasks: [LocalTask] = []
 
     private var timeRangeText: String {
         let formatter = DateFormatter()
@@ -291,7 +311,7 @@ struct MacFocusBlockCard: View {
             Divider()
 
             // Tasks in block
-            if tasks.isEmpty {
+            if orderedTasks.isEmpty {
                 HStack {
                     Spacer()
                     Text("Tasks hierher ziehen")
@@ -301,14 +321,24 @@ struct MacFocusBlockCard: View {
                 }
                 .padding(.vertical, 20)
             } else {
-                VStack(spacing: 6) {
-                    ForEach(tasks, id: \.uuid) { task in
+                List {
+                    ForEach(orderedTasks, id: \.uuid) { task in
                         MacTaskInBlockRow(task: task) {
                             onRemoveTask(task.id)
                         }
                     }
+                    .onMove(perform: moveTask)
                 }
+                .listStyle(.plain)
+                .frame(minHeight: CGFloat(orderedTasks.count * 50))
+                .scrollDisabled(true)
             }
+        }
+        .onAppear {
+            orderedTasks = tasks
+        }
+        .onChange(of: tasks) {
+            orderedTasks = tasks
         }
         .padding()
         .background(
@@ -329,6 +359,12 @@ struct MacFocusBlockCard: View {
             }
         }
         .accessibilityIdentifier("focusBlockCard_\(block.id)")
+    }
+
+    private func moveTask(from source: IndexSet, to destination: Int) {
+        orderedTasks.move(fromOffsets: source, toOffset: destination)
+        let newOrder = orderedTasks.map { $0.id }
+        onReorderTasks(newOrder)
     }
 }
 
