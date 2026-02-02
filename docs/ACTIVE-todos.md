@@ -37,39 +37,18 @@
 ---
 
 ### Bug 23: macOS App - Kalender/Erinnerungen Zugriff funktioniert nicht
-**Status:** OFFEN
+**Status:** ✅ ERLEDIGT (2026-02-02)
 **Gemeldet:** 2026-02-02
 **Platform:** macOS
-**Location:** `FocusBloxMac/Info.plist`, `FocusBloxMac/MacSettingsView.swift`
-
-**Problem:**
-- "Zugriff anfordern" Button in macOS Settings funktioniert nicht
-- Weder Kalender noch Erinnerungen Berechtigung wird angefragt
-- Console-Fehler: `Type "com.henning.timebox.mactask" was expected to be declared`
+**Location:** `FocusBloxMac/Info.plist`
 
 **Root Cause:**
-1. **Info.plist fehlen Usage Descriptions:**
-   - `NSCalendarsUsageDescription` ❌ fehlt
-   - `NSRemindersUsageDescription` ❌ fehlt
-   - Ohne diese kann macOS keinen Berechtigungs-Dialog anzeigen
-
-2. **UTType nicht deklariert:**
-   - `com.henning.timebox.mactask` fehlt in Info.plist
-
-**Entitlements sind korrekt:**
-- `com.apple.security.personal-information.calendars` ✅
-- `com.apple.security.personal-information.reminders` ✅
+Info.plist fehlten `NSCalendarsUsageDescription` und `NSRemindersUsageDescription`.
 
 **Fix:**
-Zu `FocusBloxMac/Info.plist` hinzufügen:
-```xml
-<key>NSCalendarsUsageDescription</key>
-<string>FocusBlox benötigt Zugriff auf deinen Kalender um Focus Blocks anzuzeigen.</string>
-<key>NSRemindersUsageDescription</key>
-<string>FocusBlox importiert Tasks aus deinen Erinnerungen in den Backlog.</string>
-```
+Usage Descriptions zu `FocusBloxMac/Info.plist` hinzugefügt.
 
-**Priorität:** HOCH (macOS App nicht nutzbar ohne Kalender/Erinnerungen)
+**Priorität:** HOCH - GEFIXT
 
 ---
 

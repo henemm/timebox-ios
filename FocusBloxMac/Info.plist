@@ -13,5 +13,9 @@
             </array>
         </dict>
     </array>
+    <key>NSCalendarsUsageDescription</key>
+    <string>FocusBlox benötigt Zugriff auf deinen Kalender um Focus Blocks anzuzeigen.</string>
+    <key>NSRemindersUsageDescription</key>
+    <string>FocusBlox importiert Tasks aus deinen Erinnerungen in den Backlog.</string>
 </dict>
 </plist>
