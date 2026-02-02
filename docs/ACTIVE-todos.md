@@ -21,32 +21,18 @@
 ## 🔴 OFFEN - Neue Bugs/Features
 
 ### Bug 24: iOS App - Keine Tasks angezeigt (SwiftData/CloudKit Fehler)
-**Status:** OFFEN
+**Status:** ✅ ERLEDIGT (2026-02-02)
 **Gemeldet:** 2026-02-02
 **Platform:** iOS
 **Location:** `Resources/Info.plist`
 
-**Fehlermeldungen:**
-```
-SwiftData.SwiftDataError 1
-BUG IN CLIENT OF CLOUDKIT: CloudKit push notifications require the 'remote-notification' background mode in your info plist.
-Couldn't read values in CFPrefsPlistSource (Domain: group.com.henning.focusblox...)
-```
-
 **Root Cause:**
-`Resources/Info.plist` fehlt `UIBackgroundModes` mit `remote-notification`.
-CloudKit/SwiftData benötigt dies für Push-basierte Sync-Notifications.
+`UIBackgroundModes` mit `remote-notification` fehlte in Info.plist.
 
 **Fix:**
-Zu `Resources/Info.plist` hinzufügen:
-```xml
-<key>UIBackgroundModes</key>
-<array>
-    <string>remote-notification</string>
-</array>
-```
+`UIBackgroundModes` Array mit `remote-notification` zu Info.plist hinzugefügt.
 
-**Priorität:** KRITISCH (iOS App komplett nicht nutzbar)
+**Priorität:** KRITISCH - GEFIXT
 
 ---
 
