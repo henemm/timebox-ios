@@ -1,8 +1,10 @@
 import SwiftUI
+@preconcurrency import Combine
 
 /// App-wide settings stored in UserDefaults
 @MainActor
-class AppSettings: ObservableObject {
+final class AppSettings: ObservableObject {
+    nonisolated let objectWillChange = ObservableObjectPublisher()
     /// Shared singleton instance
     static let shared = AppSettings()
 

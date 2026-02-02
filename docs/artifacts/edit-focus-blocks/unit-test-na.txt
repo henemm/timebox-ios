@@ -1,0 +1,7 @@
+N/A - UI-only change
+
+This change only adds an accessibilityIdentifier to ExistingBlockRow.
+There is no business logic to unit test.
+
+The UI test (testExistingBlockHasIdentifier) covers the requirement.
+

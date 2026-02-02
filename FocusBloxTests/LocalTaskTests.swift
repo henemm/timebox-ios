@@ -23,7 +23,7 @@ final class LocalTaskTests: XCTestCase {
         let context = container.mainContext
         let task = LocalTask(
             title: "Test Task",
-            priority: 1
+            importance: 1
         )
         context.insert(task)
 
@@ -31,7 +31,7 @@ final class LocalTaskTests: XCTestCase {
         XCTAssertFalse(task.id.isEmpty)
         XCTAssertEqual(task.title, "Test Task")
         XCTAssertFalse(task.isCompleted)
-        XCTAssertEqual(task.priority, 1)
+        XCTAssertEqual(task.importance, 1)
         XCTAssertTrue(task.tags.isEmpty)
         XCTAssertNil(task.dueDate)
         XCTAssertNotNil(task.createdAt)
@@ -43,7 +43,7 @@ final class LocalTaskTests: XCTestCase {
         let dueDate = Date()
         let task = LocalTask(
             title: "Task with extras",
-            priority: 2,
+            importance: 2,
             tags: ["Work"],
             dueDate: dueDate
         )
@@ -57,7 +57,7 @@ final class LocalTaskTests: XCTestCase {
 
     func test_localTask_canBeSaved() throws {
         let context = container.mainContext
-        let task = LocalTask(title: "Persistent Task", priority: 0)
+        let task = LocalTask(title: "Persistent Task", importance: 0)
         context.insert(task)
 
         try context.save()
@@ -70,7 +70,7 @@ final class LocalTaskTests: XCTestCase {
 
     func test_localTask_canBeUpdated() throws {
         let context = container.mainContext
-        let task = LocalTask(title: "Original", priority: 0)
+        let task = LocalTask(title: "Original", importance: 0)
         context.insert(task)
         try context.save()
 
@@ -86,7 +86,7 @@ final class LocalTaskTests: XCTestCase {
 
     func test_localTask_canBeDeleted() throws {
         let context = container.mainContext
-        let task = LocalTask(title: "To Delete", priority: 0)
+        let task = LocalTask(title: "To Delete", importance: 0)
         context.insert(task)
         try context.save()
 
@@ -103,10 +103,10 @@ final class LocalTaskTests: XCTestCase {
     func test_localTask_canFetchIncomplete() throws {
         let context = container.mainContext
 
-        let task1 = LocalTask(title: "Task 1", priority: 0)
-        let task2 = LocalTask(title: "Task 2", priority: 0)
+        let task1 = LocalTask(title: "Task 1", importance: 0)
+        let task2 = LocalTask(title: "Task 2", importance: 0)
         task2.isCompleted = true
-        let task3 = LocalTask(title: "Task 3", priority: 0)
+        let task3 = LocalTask(title: "Task 3", importance: 0)
 
         context.insert(task1)
         context.insert(task2)
@@ -126,11 +126,11 @@ final class LocalTaskTests: XCTestCase {
     func test_localTask_canSortBySortOrder() throws {
         let context = container.mainContext
 
-        let task1 = LocalTask(title: "Third", priority: 0)
+        let task1 = LocalTask(title: "Third", importance: 0)
         task1.sortOrder = 2
-        let task2 = LocalTask(title: "First", priority: 0)
+        let task2 = LocalTask(title: "First", importance: 0)
         task2.sortOrder = 0
-        let task3 = LocalTask(title: "Second", priority: 0)
+        let task3 = LocalTask(title: "Second", importance: 0)
         task3.sortOrder = 1
 
         context.insert(task1)
@@ -149,36 +149,36 @@ final class LocalTaskTests: XCTestCase {
 
     // MARK: - Manual Duration
 
-    func test_localTask_manualDuration_defaultsToNil() throws {
+    func test_localTask_estimatedDuration_defaultsToNil() throws {
         let context = container.mainContext
-        let task = LocalTask(title: "Task", priority: 0)
+        let task = LocalTask(title: "Task", importance: 0)
         context.insert(task)
 
-        XCTAssertNil(task.manualDuration)
+        XCTAssertNil(task.estimatedDuration)
     }
 
-    func test_localTask_manualDuration_canBeSet() throws {
+    func test_localTask_estimatedDuration_canBeSet() throws {
         let context = container.mainContext
-        let task = LocalTask(title: "Task", priority: 0)
+        let task = LocalTask(title: "Task", importance: 0)
         context.insert(task)
 
-        task.manualDuration = 30
+        task.estimatedDuration = 30
         try context.save()
 
-        XCTAssertEqual(task.manualDuration, 30)
+        XCTAssertEqual(task.estimatedDuration, 30)
     }
 
-    func test_localTask_manualDuration_canBeReset() throws {
+    func test_localTask_estimatedDuration_canBeReset() throws {
         let context = container.mainContext
-        let task = LocalTask(title: "Task", priority: 0)
-        task.manualDuration = 45
+        let task = LocalTask(title: "Task", importance: 0)
+        task.estimatedDuration = 45
         context.insert(task)
         try context.save()
 
-        task.manualDuration = nil
+        task.estimatedDuration = nil
         try context.save()
 
-        XCTAssertNil(task.manualDuration)
+        XCTAssertNil(task.estimatedDuration)
     }
 
     // MARK: - TaskSourceData Conformance
@@ -187,7 +187,7 @@ final class LocalTaskTests: XCTestCase {
         let context = container.mainContext
         let task = LocalTask(
             title: "Source Task",
-            priority: 1,
+            importance: 1,
             tags: ["Personal"],
             dueDate: Date()
         )
@@ -196,7 +196,7 @@ final class LocalTaskTests: XCTestCase {
         // Test that LocalTask can be used where TaskSourceData is expected
         let sourceData: any TaskSourceData = task
         XCTAssertEqual(sourceData.title, "Source Task")
-        XCTAssertEqual(sourceData.priority, 1)
+        XCTAssertEqual(sourceData.importance, 1)
         XCTAssertEqual(sourceData.tags, ["Personal"])
         XCTAssertFalse(sourceData.isCompleted)
     }
@@ -205,7 +205,7 @@ final class LocalTaskTests: XCTestCase {
 
     func test_localTask_defaultValues_phase1() throws {
         let context = container.mainContext
-        let task = LocalTask(title: "Test Task", priority: 1)
+        let task = LocalTask(title: "Test Task", importance: 1)
         context.insert(task)
 
         XCTAssertEqual(task.urgency, "not_urgent")
@@ -220,7 +220,7 @@ final class LocalTaskTests: XCTestCase {
         let context = container.mainContext
         let task = LocalTask(
             title: "Urgent Task",
-            priority: 3,
+            importance: 3,
             urgency: "urgent"
         )
         context.insert(task)
@@ -230,9 +230,9 @@ final class LocalTaskTests: XCTestCase {
 
     func test_localTask_taskTypeCanBeSet() throws {
         let context = container.mainContext
-        let taskIncome = LocalTask(title: "Work", priority: 2, taskType: "income")
-        let taskMaintenance = LocalTask(title: "Fix", priority: 1, taskType: "maintenance")
-        let taskRecharge = LocalTask(title: "Rest", priority: 0, taskType: "recharge")
+        let taskIncome = LocalTask(title: "Work", importance: 2, taskType: "income")
+        let taskMaintenance = LocalTask(title: "Fix", importance: 1, taskType: "maintenance")
+        let taskRecharge = LocalTask(title: "Rest", importance: 0, taskType: "recharge")
 
         context.insert(taskIncome)
         context.insert(taskMaintenance)
@@ -247,7 +247,7 @@ final class LocalTaskTests: XCTestCase {
         let context = container.mainContext
         let recurringTask = LocalTask(
             title: "Weekly Review",
-            priority: 2,
+            importance: 2,
             recurrencePattern: "weekly"
         )
         context.insert(recurringTask)
@@ -259,7 +259,7 @@ final class LocalTaskTests: XCTestCase {
         let context = container.mainContext
         let task = LocalTask(
             title: "Research",
-            priority: 1,
+            importance: 1,
             taskDescription: "Investigate new frameworks for iOS development"
         )
         context.insert(task)
@@ -271,7 +271,7 @@ final class LocalTaskTests: XCTestCase {
         let context = container.mainContext
         let task = LocalTask(
             title: "Synced Task",
-            priority: 2,
+            importance: 2,
             externalID: "notion-page-abc123"
         )
         context.insert(task)
@@ -281,8 +281,8 @@ final class LocalTaskTests: XCTestCase {
 
     func test_localTask_sourceSystemCanBeSet() throws {
         let context = container.mainContext
-        let localTask = LocalTask(title: "Local", priority: 1, sourceSystem: "local")
-        let notionTask = LocalTask(title: "Notion", priority: 1, sourceSystem: "notion")
+        let localTask = LocalTask(title: "Local", importance: 1, sourceSystem: "local")
+        let notionTask = LocalTask(title: "Notion", importance: 1, sourceSystem: "notion")
 
         context.insert(localTask)
         context.insert(notionTask)
@@ -296,12 +296,12 @@ final class LocalTaskTests: XCTestCase {
         let dueDate = Date()
         let task = LocalTask(
             title: "Complete Task",
-            priority: 3,
+            importance: 3,
             tags: ["Work"],
             dueDate: dueDate,
             createdAt: Date(),
             sortOrder: 5,
-            manualDuration: 30,
+            estimatedDuration: 30,
             urgency: "urgent",
             taskType: "income",
             recurrencePattern: "weekly",
@@ -314,11 +314,11 @@ final class LocalTaskTests: XCTestCase {
         context.insert(task)
 
         XCTAssertEqual(task.title, "Complete Task")
-        XCTAssertEqual(task.priority, 3)
+        XCTAssertEqual(task.importance, 3)
         XCTAssertEqual(task.tags, ["Work"])
         XCTAssertEqual(task.dueDate, dueDate)
         XCTAssertEqual(task.sortOrder, 5)
-        XCTAssertEqual(task.manualDuration, 30)
+        XCTAssertEqual(task.estimatedDuration, 30)
         XCTAssertEqual(task.urgency, "urgent")
         XCTAssertEqual(task.taskType, "income")
         XCTAssertEqual(task.recurrencePattern, "weekly")
@@ -355,7 +355,7 @@ final class LocalTaskTests: XCTestCase {
     /// EXPECTED: PASS - Struct now exists in CreateTaskView.swift
     func test_quickPriorityButton_structExists() throws {
         // QuickPriorityButton is now defined in CreateTaskView.swift with:
-        // - priority: Int (1-3)
+        // - importance: Int (1-3)
         // - selectedPriority: Binding<Int>
         // - displayName: computed property
         // - isSelected: computed property
@@ -408,12 +408,12 @@ final class LocalTaskTests: XCTestCase {
         let context = container.mainContext
 
         // Create task with priority 3 (as if selected via button in UI)
-        let task = LocalTask(title: "High Priority Task", priority: 3)
+        let task = LocalTask(title: "High Priority Task", importance: 3)
         context.insert(task)
         try context.save()
 
         // Data model and UI are both working
-        XCTAssertEqual(task.priority, 3, "Priority 3 should be saved")
+        XCTAssertEqual(task.importance, 3, "Priority 3 should be saved")
 
         // QuickPriorityButton is now implemented and integrated with saveTask()
         XCTAssertTrue(true, "Priority quick-select button interaction fully implemented")

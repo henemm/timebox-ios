@@ -16,7 +16,9 @@ struct FocusBlockTasksSheet: View {
         NavigationStack {
             contentView
                 .navigationTitle("Tasks im Block")
+                #if os(iOS)
                 .navigationBarTitleDisplayMode(.inline)
+                #endif
                 .toolbar {
                     ToolbarItem(placement: .confirmationAction) {
                         Button("Fertig") {
@@ -77,7 +79,11 @@ struct FocusBlockTasksSheet: View {
                 .onMove(perform: moveTask)
                 .onDelete(perform: deleteTask)
             }
+            #if os(iOS)
             .listStyle(.insetGrouped)
+            #else
+            .listStyle(.plain)
+            #endif
 
             // Footer with Add Task button
             HStack {

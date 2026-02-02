@@ -1,0 +1,23 @@
+TDD RED - BacklogRow Glass Card Redesign
+=========================================
+
+Date: 2026-01-28 22:00:15
+Test Suite: BacklogViewUITests (Visual Redesign)
+
+BASELINE TESTS:
+---------------
+Visual redesign - no new functional tests needed.
+Existing tests must continue to pass after styling changes.
+
+BASELINE RESULTS (before redesign):
+✓ testBacklogNavigationTitleExists (11.114s)
+✓ testTaskRowShowsDurationBadge (16.424s)
+
+** BASELINE ESTABLISHED **
+
+NOTE: This is a visual styling change only.
+- No new UI elements added
+- No new accessibility identifiers needed
+- Existing functionality must be preserved
+
+Next Step: Apply DesignSystem tokens to BacklogRow.swift

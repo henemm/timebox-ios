@@ -1,0 +1,2 @@
+This is a scroll behavior bug fix, not a visual UI change.
+The fix removes the nested ScrollView to prevent unwanted scroll jumps.

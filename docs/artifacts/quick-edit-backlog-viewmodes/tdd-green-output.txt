@@ -1,0 +1,36 @@
+TDD GREEN - Bug Fix Verification
+================================
+
+Date: 2026-01-28 17:42:03
+Test Suite: QuickEditBacklogUITests (View Mode Callback Bug Fix)
+
+FIX APPLIED:
+------------
+Added missing callbacks (onImportanceTap, onCategoryTap, onEditTap, onDeleteTap) to:
+1. listView
+2. categoryView
+3. durationView
+4. dueDateView
+5. tbdView
+6. QuadrantCard (Eisenhower Matrix)
+
+RESULTS:
+--------
+All tests passed:
+
+Original Tests (8/8):
+✓ testImportanceBadgeExists
+✓ testImportanceBadgeTapOpensPicker
+✓ testImportancePickerSelectionUpdates
+✓ testCategoryBadgeExists
+✓ testCategoryBadgeTapOpensPicker
+✓ testCategoryPickerSelectionUpdates
+✓ testLongPressShowsContextMenu
+✓ testContextMenuEditOpensFormSheet
+
+View Mode Bug Tests (3/3):
+✓ testImportanceBadgeTapWorksInTbdViewMode
+✓ testCategoryBadgeTapWorksInCategoryViewMode
+✓ testContextMenuEditWorksInDurationViewMode
+
+** TEST SUCCEEDED ** - 11/11 tests passed

@@ -1,0 +1,26 @@
+=== TDD GREEN: MAC-014 Planning View ===
+Date: $(date)
+
+=== Test 1: MacPlanningView.swift exists ===
+-rw-r--r--@ 1 hem  staff  7827 31 Jan. 22:13 FocusBloxMac/MacPlanningView.swift
+PASS
+
+=== Test 2: MacTimelineView.swift exists ===
+-rw-r--r--@ 1 hem  staff  7245 31 Jan. 22:13 FocusBloxMac/MacTimelineView.swift
+PASS
+
+=== Test 3: Calendar Entitlement ===
+1
+PASS
+
+=== Test 4: TabView in MainWindowView ===
+1
+PASS
+
+=== macOS Build ===
+BUILD SUCCEEDED
+
+=== iOS Build (Regression) ===
+BUILD SUCCEEDED
+
+=== ALL TESTS PASSED ===

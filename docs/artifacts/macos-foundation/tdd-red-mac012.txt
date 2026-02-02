@@ -1,0 +1,16 @@
+=== TDD RED: MAC-012 Keyboard Shortcuts ===
+Date: Sa. 31 Jan. 2026 21:55:06 CET
+
+=== Verify: KeyboardShortcutsView.swift does NOT exist ===
+PASS: File does not exist (expected for RED phase)
+
+=== Verify: No keyboard shortcuts in ContentView ===
+0
+PASS: No selectedTask state (expected for RED)
+
+=== Verify: Limited commands in App ===
+1
+(Only 1 CommandGroup expected - Quick Capture)
+
+=== Current Build Status ===
+** BUILD SUCCEEDED **

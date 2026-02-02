@@ -34,7 +34,7 @@ final class NextUpTests: XCTestCase {
     /// EXPECTED TO FAIL: Property isNextUp does not exist on LocalTask
     func test_localTask_isNextUp_defaultsFalse() throws {
         let context = container.mainContext
-        let task = LocalTask(title: "Test Task", priority: 1)
+        let task = LocalTask(title: "Test Task", importance: 1)
         context.insert(task)
 
         // This line will fail to compile: 'isNextUp' is not a member of 'LocalTask'
@@ -49,7 +49,7 @@ final class NextUpTests: XCTestCase {
     /// EXPECTED TO FAIL: Property isNextUp does not exist on LocalTask
     func test_localTask_isNextUp_canBeSetToTrue() throws {
         let context = container.mainContext
-        let task = LocalTask(title: "Next Up Task", priority: 2)
+        let task = LocalTask(title: "Next Up Task", importance: 2)
         context.insert(task)
 
         task.isNextUp = true
@@ -66,7 +66,7 @@ final class NextUpTests: XCTestCase {
     /// EXPECTED TO FAIL: Property isNextUp does not exist on LocalTask
     func test_localTask_isNextUp_persistsAfterSave() throws {
         let context = container.mainContext
-        let task = LocalTask(title: "Persistent Task", priority: 1)
+        let task = LocalTask(title: "Persistent Task", importance: 1)
         task.isNextUp = true
         context.insert(task)
         try context.save()
@@ -88,7 +88,7 @@ final class NextUpTests: XCTestCase {
     /// EXPECTED TO FAIL: Property isNextUp does not exist on PlanItem
     func test_planItem_preservesIsNextUp_true() throws {
         let context = container.mainContext
-        let task = LocalTask(title: "Next Up Task", priority: 2)
+        let task = LocalTask(title: "Next Up Task", importance: 2)
         task.isNextUp = true
         context.insert(task)
 
@@ -105,7 +105,7 @@ final class NextUpTests: XCTestCase {
     /// EXPECTED TO FAIL: Property isNextUp does not exist on PlanItem
     func test_planItem_preservesIsNextUp_false() throws {
         let context = container.mainContext
-        let task = LocalTask(title: "Regular Task", priority: 1)
+        let task = LocalTask(title: "Regular Task", importance: 1)
         context.insert(task)
 
         let planItem = PlanItem(localTask: task)
@@ -123,7 +123,7 @@ final class NextUpTests: XCTestCase {
     /// EXPECTED TO FAIL: Method updateNextUp does not exist on SyncEngine
     func test_syncEngine_updateNextUp_setsTrue() throws {
         let context = container.mainContext
-        let task = LocalTask(title: "Task", priority: 1)
+        let task = LocalTask(title: "Task", importance: 1)
         context.insert(task)
         try context.save()
 
@@ -141,7 +141,7 @@ final class NextUpTests: XCTestCase {
     /// EXPECTED TO FAIL: Method updateNextUp does not exist on SyncEngine
     func test_syncEngine_updateNextUp_setsFalse() throws {
         let context = container.mainContext
-        let task = LocalTask(title: "Task", priority: 1)
+        let task = LocalTask(title: "Task", importance: 1)
         task.isNextUp = true
         context.insert(task)
         try context.save()
@@ -174,11 +174,11 @@ final class NextUpTests: XCTestCase {
     func test_fetch_onlyNextUpTasks() throws {
         let context = container.mainContext
 
-        let task1 = LocalTask(title: "Next Up 1", priority: 1)
+        let task1 = LocalTask(title: "Next Up 1", importance: 1)
         task1.isNextUp = true
-        let task2 = LocalTask(title: "Regular", priority: 1)
+        let task2 = LocalTask(title: "Regular", importance: 1)
         task2.isNextUp = false
-        let task3 = LocalTask(title: "Next Up 2", priority: 2)
+        let task3 = LocalTask(title: "Next Up 2", importance: 2)
         task3.isNextUp = true
 
         context.insert(task1)
@@ -206,11 +206,11 @@ final class NextUpTests: XCTestCase {
     func test_backlogFilter_excludesNextUpTasks() throws {
         let context = container.mainContext
 
-        let regularTask = LocalTask(title: "Regular Task", priority: 1)
+        let regularTask = LocalTask(title: "Regular Task", importance: 1)
         regularTask.isNextUp = false
         regularTask.isCompleted = false
 
-        let nextUpTask = LocalTask(title: "Next Up Task", priority: 2)
+        let nextUpTask = LocalTask(title: "Next Up Task", importance: 2)
         nextUpTask.isNextUp = true
         nextUpTask.isCompleted = false
 
@@ -238,13 +238,13 @@ final class NextUpTests: XCTestCase {
         let context = container.mainContext
 
         // Regular urgent+important task
-        let regularTask = LocalTask(title: "Regular Urgent", priority: 3)
+        let regularTask = LocalTask(title: "Regular Urgent", importance: 3)
         regularTask.urgency = "urgent"
         regularTask.isNextUp = false
         regularTask.isCompleted = false
 
         // Next Up urgent+important task (should be excluded from quadrant)
-        let nextUpTask = LocalTask(title: "Next Up Urgent", priority: 3)
+        let nextUpTask = LocalTask(title: "Next Up Urgent", importance: 3)
         nextUpTask.urgency = "urgent"
         nextUpTask.isNextUp = true
         nextUpTask.isCompleted = false
@@ -257,7 +257,7 @@ final class NextUpTests: XCTestCase {
         let descriptor = FetchDescriptor<LocalTask>()
         let allTasks = try context.fetch(descriptor)
         let doFirstTasks = allTasks.filter {
-            $0.urgency == "urgent" && $0.priority == 3 && !$0.isCompleted && !$0.isNextUp
+            $0.urgency == "urgent" && $0.importance == 3 && !$0.isCompleted && !$0.isNextUp
         }
 
         XCTAssertEqual(doFirstTasks.count, 1, "Do First should only contain non-NextUp tasks")

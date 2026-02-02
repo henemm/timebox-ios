@@ -2,128 +2,32 @@ import XCTest
 import SwiftData
 @testable import FocusBlox
 
-/// Tests for App Group SwiftData migration and shared container access.
-/// TDD RED: These tests should FAIL until implementation is complete.
-final class AppGroupSwiftDataTests: XCTestCase {
-
-    private let appGroupID = "group.com.henning.focusblox"
-
-    override func setUp() {
-        super.setUp()
-        // Reset migration flag for each test
-        UserDefaults.standard.removeObject(forKey: "appGroupMigrationDone")
-    }
-
-    override func tearDown() {
-        UserDefaults.standard.removeObject(forKey: "appGroupMigrationDone")
-        super.tearDown()
-    }
+/// Tests for SharedModelContainer (local storage).
+/// Bug 25 fix: App Group was removed - causes SwiftDataError on devices.
+final class SharedModelContainerTests: XCTestCase {
 
     // MARK: - SharedModelContainer Tests
 
     /// Test that SharedModelContainer can be created without error
     func testSharedContainerAccessible() throws {
-        // GIVEN: App Group is configured in entitlements
-
         // WHEN: Creating shared container
-        // This should use SharedModelContainer.create() which doesn't exist yet
         let container = try SharedModelContainer.create()
 
         // THEN: Container is created successfully
         XCTAssertNotNil(container)
     }
 
-    /// Test that SharedModelContainer uses App Group
-    func testSharedContainerUsesAppGroup() throws {
-        // Skip if App Group not available (unsigned builds/unit tests)
-        guard FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: appGroupID) != nil else {
-            throw XCTSkip("App Group not available - requires signed build")
-        }
-
-        // GIVEN: SharedModelContainer exists
-
-        // WHEN: Creating container
+    /// Test that SharedModelContainer uses local storage (not App Group)
+    func testSharedContainerUsesLocalStorage() throws {
+        // GIVEN/WHEN: Creating container
         let container = try SharedModelContainer.create()
 
-        // THEN: Container uses App Group path
-        // The store URL should contain the app group identifier
+        // THEN: Container uses local storage (no App Group in path)
         let storeURL = container.configurations.first?.url
         XCTAssertNotNil(storeURL)
-        // App Group containers have a specific path pattern
-        XCTAssertTrue(storeURL?.path.contains("group.com.henning.focusblox") == true ||
-                     storeURL?.path.contains("AppGroup") == true,
-                     "Store should be in App Group container")
-    }
-
-    // MARK: - Migration Tests
-
-    /// Test that migration copies all tasks from default to App Group container
-    func testMigrationCopiesAllTasks() throws {
-        // Skip if App Group not available (unsigned builds)
-        guard FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: appGroupID) != nil else {
-            throw XCTSkip("App Group not available - requires signed build")
-        }
-
-        // GIVEN: 3 tasks exist in default container
-        let schema = Schema([LocalTask.self, TaskMetadata.self])
-        let defaultConfig = ModelConfiguration(schema: schema, cloudKitDatabase: .none)
-        let defaultContainer = try ModelContainer(for: schema, configurations: [defaultConfig])
-        let defaultContext = ModelContext(defaultContainer)
-
-        let task1 = LocalTask(title: "Migration Test Task 1")
-        let task2 = LocalTask(title: "Migration Test Task 2")
-        let task3 = LocalTask(title: "Migration Test Task 3")
-        defaultContext.insert(task1)
-        defaultContext.insert(task2)
-        defaultContext.insert(task3)
-        try defaultContext.save()
-
-        // WHEN: Migration runs
-        // This calls AppGroupMigration.migrateIfNeeded() which doesn't exist yet
-        try AppGroupMigration.migrateIfNeeded()
-
-        // THEN: All 3 tasks exist in App Group container
-        let appGroupContainer = try SharedModelContainer.create()
-        let appGroupContext = ModelContext(appGroupContainer)
-        let descriptor = FetchDescriptor<LocalTask>()
-        let migratedTasks = try appGroupContext.fetch(descriptor)
-
-        XCTAssertGreaterThanOrEqual(migratedTasks.count, 3, "Should have at least 3 migrated tasks")
-
-        let titles = Set(migratedTasks.map(\.title))
-        XCTAssertTrue(titles.contains("Migration Test Task 1"))
-        XCTAssertTrue(titles.contains("Migration Test Task 2"))
-        XCTAssertTrue(titles.contains("Migration Test Task 3"))
-    }
-
-    /// Test that migration only runs once
-    func testMigrationOnlyRunsOnce() throws {
-        // GIVEN: Migration has already completed
-        UserDefaults.standard.set(true, forKey: "appGroupMigrationDone")
-
-        // WHEN: Checking if migration is needed
-        // This calls AppGroupMigration.needsMigration() which doesn't exist yet
-        let needsMigration = AppGroupMigration.needsMigration()
-
-        // THEN: Migration is not needed
-        XCTAssertFalse(needsMigration, "Migration should not run twice")
-    }
-
-    /// Test that migration sets completion flag
-    func testMigrationSetsCompletionFlag() throws {
-        // Skip if App Group not available
-        guard FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: appGroupID) != nil else {
-            throw XCTSkip("App Group not available - requires signed build")
-        }
-
-        // GIVEN: Migration has not run
-        XCTAssertFalse(UserDefaults.standard.bool(forKey: "appGroupMigrationDone"))
-
-        // WHEN: Migration runs
-        try AppGroupMigration.migrateIfNeeded()
-
-        // THEN: Flag is set
-        XCTAssertTrue(UserDefaults.standard.bool(forKey: "appGroupMigrationDone"))
+        // Bug 25 fix: Should NOT contain App Group path
+        XCTAssertFalse(storeURL?.path.contains("group.com.henning.focusblox") == true,
+                      "Store should NOT be in App Group container (Bug 25 fix)")
     }
 }
 

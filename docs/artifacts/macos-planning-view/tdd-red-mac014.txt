@@ -1,0 +1,15 @@
+=== TDD RED: MAC-014 Planning View ===
+Date: $(date)
+
+=== Test 1: MacPlanningView.swift exists ===
+NOT FOUND (expected)
+
+=== Test 2: MacTimelineView.swift exists ===
+NOT FOUND (expected)
+
+=== Test 3: Calendar Entitlement ===
+0
+0 (NOT FOUND - expected)
+
+=== RED PHASE CONFIRMED ===
+All features missing - ready for implementation.

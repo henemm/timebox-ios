@@ -2,10 +2,22 @@
   "files_changed": [
     "Sources/Views/BlockPlanningView.swift",
     "FocusBloxUITests/PlanningViewUITests.swift",
-    "Sources/Services/TaskSources/LocalTaskSource.swift"
+    "Sources/Services/TaskSources/LocalTaskSource.swift",
+    "Sources/Views/FocusBloxIconLayers.swift",
+    "FocusBloxMacUITests/MacPlanningViewUITests.swift",
+    "FocusBloxMac/MacTimelineView.swift",
+    "FocusBloxMac/MacPlanningView.swift",
+    "Sources/Models/AppSettings.swift",
+    "Sources/Views/EditFocusBlockSheet.swift",
+    "Sources/Views/FocusBlockTasksSheet.swift",
+    "scripts/render-icon.swift",
+    "FocusBloxMacUITests/MacToolbarNavigationUITests.swift",
+    "FocusBloxMac/SidebarView.swift",
+    "FocusBloxMac/ContentView.swift",
+    "FocusBloxMac/MacAssignView.swift"
   ],
   "last_validation": "2026-02-02T18:40:00.000000",
-  "last_change": "2026-02-02T18:43:03.284156",
+  "last_change": "2026-02-02T19:46:34.266289",
   "validation_result": {
     "status": "passed",
     "build_status": "success",

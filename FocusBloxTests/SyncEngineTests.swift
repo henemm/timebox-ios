@@ -26,10 +26,10 @@ final class SyncEngineTests: XCTestCase {
 
     func test_sync_returnsIncompleteTasks() async throws {
         let context = container.mainContext
-        let task1 = LocalTask(title: "Task 1", priority: 0)
-        let task2 = LocalTask(title: "Task 2", priority: 0)
+        let task1 = LocalTask(title: "Task 1", importance: 0)
+        let task2 = LocalTask(title: "Task 2", importance: 0)
         task2.isCompleted = true
-        let task3 = LocalTask(title: "Task 3", priority: 0)
+        let task3 = LocalTask(title: "Task 3", importance: 0)
 
         context.insert(task1)
         context.insert(task2)
@@ -44,11 +44,11 @@ final class SyncEngineTests: XCTestCase {
 
     func test_sync_sortsByRank() async throws {
         let context = container.mainContext
-        let task1 = LocalTask(title: "Third", priority: 0)
+        let task1 = LocalTask(title: "Third", importance: 0)
         task1.sortOrder = 2
-        let task2 = LocalTask(title: "First", priority: 0)
+        let task2 = LocalTask(title: "First", importance: 0)
         task2.sortOrder = 0
-        let task3 = LocalTask(title: "Second", priority: 0)
+        let task3 = LocalTask(title: "Second", importance: 0)
         task3.sortOrder = 1
 
         context.insert(task1)
@@ -67,25 +67,25 @@ final class SyncEngineTests: XCTestCase {
 
     func test_updateDuration_setsManualDuration() async throws {
         let context = container.mainContext
-        let task = LocalTask(title: "Task", priority: 0)
+        let task = LocalTask(title: "Task", importance: 0)
         context.insert(task)
         try context.save()
 
         try await syncEngine.updateDuration(itemID: task.id, minutes: 30)
 
-        XCTAssertEqual(task.manualDuration, 30)
+        XCTAssertEqual(task.estimatedDuration, 30)
     }
 
     func test_updateDuration_resetsToNil() async throws {
         let context = container.mainContext
-        let task = LocalTask(title: "Task", priority: 0)
-        task.manualDuration = 30
+        let task = LocalTask(title: "Task", importance: 0)
+        task.estimatedDuration = 30
         context.insert(task)
         try context.save()
 
         try await syncEngine.updateDuration(itemID: task.id, minutes: nil)
 
-        XCTAssertNil(task.manualDuration)
+        XCTAssertNil(task.estimatedDuration)
     }
 
     func test_updateDuration_withInvalidID_doesNotCrash() async throws {
@@ -97,9 +97,9 @@ final class SyncEngineTests: XCTestCase {
 
     func test_updateSortOrder_updatesTasksSortOrder() async throws {
         let context = container.mainContext
-        let task1 = LocalTask(title: "Task 1", priority: 0)
+        let task1 = LocalTask(title: "Task 1", importance: 0)
         task1.sortOrder = 0
-        let task2 = LocalTask(title: "Task 2", priority: 0)
+        let task2 = LocalTask(title: "Task 2", importance: 0)
         task2.sortOrder = 1
 
         context.insert(task1)

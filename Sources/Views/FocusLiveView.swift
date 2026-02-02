@@ -1,33 +1,27 @@
 import SwiftUI
 import SwiftData
-
 struct FocusLiveView: View {
     @Environment(\.modelContext) private var modelContext
     @State private var eventKitRepo: any EventKitRepositoryProtocol = FocusLiveView.createRepository()
     @State private var activeBlock: FocusBlock?
-
     /// Creates the appropriate repository based on launch mode
     /// Use -MockData launch argument to test Live Activity with mock data
     private static func createRepository() -> any EventKitRepositoryProtocol {
         let isUITesting = ProcessInfo.processInfo.arguments.contains("-UITesting")
         let isMockData = ProcessInfo.processInfo.arguments.contains("-MockData")
         let useMock = isUITesting || isMockData
-
         print("🔧 [FocusLiveView] createRepository: isUITesting=\(isUITesting), isMockData=\(isMockData)")
-
         if useMock {
             return createMockRepository()
         }
         print("🔧 [FocusLiveView] Using real EventKitRepository")
         return EventKitRepository()
     }
-
     /// Creates a mock repository with an active Focus Block for testing Live Activity
     private static func createMockRepository() -> MockEventKitRepository {
         let mock = MockEventKitRepository()
         mock.mockCalendarAuthStatus = .fullAccess
         mock.mockReminderAuthStatus = .fullAccess
-
         // Create an always-active Focus Block for testing Live Activity
         let calendar = Calendar.current
         let now = Date()
@@ -55,7 +49,6 @@ struct FocusLiveView: View {
     @State private var errorMessage: String?
     @State private var showSprintReview = false
     @State private var completionFeedback = false
-
     // Timer for progress updates
     @State private var currentTime = Date()
     @State private var taskStartTime: Date?
@@ -65,11 +58,9 @@ struct FocusLiveView: View {
     @State private var skipFeedback = false
     private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     private let overdueReminderInterval: TimeInterval = 120 // 2 Minuten
-
     // Live Activity Manager
     @State private var liveActivityManager = LiveActivityManager()
     @State private var liveActivityStarted = false
-
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
@@ -130,23 +121,16 @@ struct FocusLiveView: View {
             }
         }
     }
-
     // MARK: - Live Activity Management
-
     private func startLiveActivity(for block: FocusBlock) {
         let tasks = tasksForBlock(block)
         let remainingTasks = tasks.filter { !block.completedTaskIDs.contains($0.id) }
         let currentTask = remainingTasks.first
-
-        // Calculate task end date for task-specific countdown
-        let taskEndDate = calculateTaskEndDate(for: currentTask)
-
         Task {
             do {
                 try await liveActivityManager.startActivity(
                     for: block,
-                    currentTask: currentTask?.title,
-                    taskEndDate: taskEndDate
+                    currentTask: currentTask?.title
                 )
                 liveActivityStarted = true
             } catch {
@@ -155,54 +139,39 @@ struct FocusLiveView: View {
             }
         }
     }
-
     private func updateLiveActivity(for block: FocusBlock) {
         let tasks = tasksForBlock(block)
         let remainingTasks = tasks.filter { !block.completedTaskIDs.contains($0.id) }
         let currentTask = remainingTasks.first
-
-        // Calculate task end date for task-specific countdown
-        let taskEndDate = calculateTaskEndDate(for: currentTask)
-
         liveActivityManager.updateActivity(
             currentTask: currentTask?.title,
-            completedCount: block.completedTaskIDs.count,
-            taskEndDate: taskEndDate
+            completedCount: block.completedTaskIDs.count
         )
     }
-
     /// Calculate when the current task should end based on task start time and duration
     private func calculateTaskEndDate(for task: PlanItem?) -> Date? {
         guard let task = task else { return nil }
-
         // Use taskStartTime if available, otherwise use current time
         let startTime = taskStartTime ?? Date()
         return startTime.addingTimeInterval(Double(task.effectiveDuration * 60))
     }
-
     // MARK: - Active Focus Content
-
     private func activeFocusContent(block: FocusBlock) -> some View {
         let tasks = tasksForBlock(block)
         let remainingTasks = tasks.filter { !block.completedTaskIDs.contains($0.id) }
         let currentTask = remainingTasks.first
         let upcomingTasks = Array(remainingTasks.dropFirst())
-
         return VStack(spacing: 0) {
             // Progress header
             progressHeader(block: block)
-
             Spacer()
-
             // Current task (prominent)
             if let task = currentTask {
                 currentTaskView(task: task, block: block)
             } else {
                 allTasksCompletedView(block: block)
             }
-
             Spacer()
-
             // Upcoming tasks queue OR "No more tasks" hint
             if !upcomingTasks.isEmpty {
                 upcomingTasksView(tasks: upcomingTasks)
@@ -212,9 +181,7 @@ struct FocusLiveView: View {
             }
         }
     }
-
     // MARK: - No More Tasks Hint (Bug 16)
-
     private var noMoreTasksHint: some View {
         HStack(spacing: 8) {
             Image(systemName: "checkmark.circle")
@@ -228,52 +195,42 @@ struct FocusLiveView: View {
         .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 8))
         .accessibilityIdentifier("noMoreTasksHint")
     }
-
     // MARK: - Progress Header
-
     private func progressHeader(block: FocusBlock) -> some View {
         let progress = calculateProgress(block: block)
         let remainingMinutes = calculateRemainingMinutes(block: block)
-
         return VStack(spacing: 8) {
             // Time info
             HStack {
                 Text(block.title)
                     .font(.headline)
-
                 // Live Activity status indicator (show when block is active)
                 Image(systemName: "dot.radiowaves.left.and.right")
                     .font(.caption)
                     .foregroundStyle(liveActivityStarted ? .blue : .secondary)
                     .accessibilityIdentifier("liveActivityBadge")
-
                 Spacer()
-
                 // Live Activity status text
                 Text(liveActivityStarted ? "Live" : "Aktiv")
                     .font(.caption2)
                     .foregroundStyle(liveActivityStarted ? .blue : .secondary)
                     .accessibilityIdentifier("liveActivityStatus")
-
                 Text(timeRangeText(block: block))
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
-
             // Progress bar
             GeometryReader { geometry in
                 ZStack(alignment: .leading) {
                     RoundedRectangle(cornerRadius: 4)
                         .fill(.secondary.opacity(0.2))
                         .frame(height: 8)
-
                     RoundedRectangle(cornerRadius: 4)
                         .fill(progress >= 1 ? .orange : .blue)
                         .frame(width: geometry.size.width * min(progress, 1), height: 8)
                 }
             }
             .frame(height: 8)
-
             // Remaining time
             HStack {
                 if remainingMinutes > 0 {
@@ -294,27 +251,22 @@ struct FocusLiveView: View {
         .padding()
         .background(.ultraThinMaterial)
     }
-
     // MARK: - Current Task View
-
     private func currentTaskView(task: PlanItem, block: FocusBlock) -> some View {
         let taskProgress = calculateTaskProgress(task: task)
         let remainingTaskMinutes = calculateRemainingTaskMinutes(task: task)
         let isOverdue = remainingTaskMinutes <= 0
-
         return VStack(spacing: 24) {
             Text(isOverdue ? "⏰ Zeit abgelaufen" : "Aktueller Task")
                 .font(.subheadline)
                 .foregroundStyle(isOverdue ? .red : .secondary)
                 .accessibilityIdentifier("currentTaskLabel")
-
             // Task progress ring
             ZStack {
                 // Background circle
                 Circle()
                     .stroke(.secondary.opacity(0.2), lineWidth: 8)
                     .frame(width: 120, height: 120)
-
                 // Progress circle - red when overdue
                 Circle()
                     .trim(from: 0, to: min(taskProgress, 1))
@@ -325,7 +277,6 @@ struct FocusLiveView: View {
                     .frame(width: 120, height: 120)
                     .rotationEffect(.degrees(-90))
                     .animation(.smooth, value: taskProgress)
-
                 // Time display in center
                 VStack(spacing: 2) {
                     if remainingTaskMinutes > 0 {
@@ -343,16 +294,13 @@ struct FocusLiveView: View {
                     }
                 }
             }
-
             Text(task.title)
                 .font(.title2.weight(.semibold))
                 .multilineTextAlignment(.center)
                 .padding(.horizontal)
-
             Text("\(task.effectiveDuration) min geschätzt")
                 .font(.caption)
                 .foregroundStyle(.secondary)
-
             // Action buttons
             HStack(spacing: 16) {
                 // Skip button (Nicht erledigt)
@@ -368,7 +316,6 @@ struct FocusLiveView: View {
                 }
                 .buttonStyle(.plain)
                 .accessibilityIdentifier("taskSkipButton")
-
                 // Complete button (Erledigt)
                 Button {
                     markTaskComplete(taskID: task.id, block: block)
@@ -394,23 +341,18 @@ struct FocusLiveView: View {
             trackTaskStart(taskID: newID)
         }
     }
-
     // MARK: - All Tasks Completed View
-
     private func allTasksCompletedView(block: FocusBlock) -> some View {
         VStack(spacing: 16) {
             Image(systemName: "checkmark.circle.fill")
                 .font(.system(size: 64))
                 .foregroundStyle(.green)
-
             Text("Alle Tasks erledigt!")
                 .font(.title2.weight(.semibold))
-
             Text("Warte auf Block-Ende oder starte Sprint Review")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
-
             Button {
                 showSprintReview = true
             } label: {
@@ -426,16 +368,13 @@ struct FocusLiveView: View {
         }
         .padding()
     }
-
     // MARK: - Upcoming Tasks View
-
     private func upcomingTasksView(tasks: [PlanItem]) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Als Nächstes")
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .padding(.horizontal)
-
             VStack(spacing: 6) {
                 ForEach(tasks) { task in
                     UpcomingTaskChip(task: task)
@@ -446,24 +385,19 @@ struct FocusLiveView: View {
         .padding(.vertical, 12)
         .background(.ultraThinMaterial)
     }
-
     // MARK: - No Active Block Content
-
     private var noActiveBlockContent: some View {
         VStack(spacing: 16) {
             Image(systemName: "moon.zzz.fill")
                 .font(.system(size: 64))
                 .foregroundStyle(.secondary)
-
             Text("Kein aktiver Focus Block")
                 .font(.title2.weight(.semibold))
-
             Text("Focus Blocks werden automatisch aktiv, wenn ihre Startzeit erreicht ist")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 32)
-
             Button {
                 Task {
                     await loadData()
@@ -475,14 +409,11 @@ struct FocusLiveView: View {
             .padding(.top, 8)
         }
     }
-
     // MARK: - Helper Functions
-
     private func loadData() async {
         isLoading = true
         errorMessage = nil
         print("📥 [FocusLiveView] loadData: starting...")
-
         do {
             let hasAccess = try await eventKitRepo.requestAccess()
             print("📥 [FocusLiveView] loadData: hasAccess=\(hasAccess)")
@@ -491,7 +422,6 @@ struct FocusLiveView: View {
                 isLoading = false
                 return
             }
-
             let blocks = try eventKitRepo.fetchFocusBlocks(for: Date())
             print("📥 [FocusLiveView] loadData: found \(blocks.count) blocks")
             for block in blocks {
@@ -499,54 +429,44 @@ struct FocusLiveView: View {
             }
             activeBlock = blocks.first { $0.isActive }
             print("📥 [FocusLiveView] activeBlock=\(activeBlock?.title ?? "nil")")
-
             let taskSource = LocalTaskSource(modelContext: modelContext)
             let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
             allTasks = try await syncEngine.sync()
-
         } catch {
             errorMessage = error.localizedDescription
         }
-
         isLoading = false
     }
-
     private func tasksForBlock(_ block: FocusBlock) -> [PlanItem] {
         block.taskIDs.compactMap { taskID in
             allTasks.first { $0.id == taskID }
         }
     }
-
     private func markTaskComplete(taskID: String, block: FocusBlock) {
         // Cancel notification for completed task
         NotificationService.cancelTaskNotification(taskID: taskID)
-
         Task {
             do {
                 var updatedCompletedIDs = block.completedTaskIDs
                 if !updatedCompletedIDs.contains(taskID) {
                     updatedCompletedIDs.append(taskID)
                 }
-
                 // Calculate time spent on this task
                 var updatedTaskTimes = block.taskTimes
                 if let startTime = taskStartTime {
                     let secondsSpent = Int(Date().timeIntervalSince(startTime))
                     updatedTaskTimes[taskID] = (updatedTaskTimes[taskID] ?? 0) + secondsSpent
                 }
-
                 try eventKitRepo.updateFocusBlock(
                     eventID: block.id,
                     taskIDs: block.taskIDs,
                     completedTaskIDs: updatedCompletedIDs,
                     taskTimes: updatedTaskTimes
                 )
-
                 taskStartTime = nil  // Reset for next task
                 completionFeedback.toggle()
                 lastOverdueReminderTime = nil  // Reset overdue reminder
                 await loadData()
-
                 // Update Live Activity with new task
                 if let updatedBlock = activeBlock {
                     updateLiveActivity(for: updatedBlock)
@@ -556,35 +476,29 @@ struct FocusLiveView: View {
             }
         }
     }
-
     /// Skip task without marking as complete - moves to next task in queue
     /// Bug 15 Fix: If all tasks have been skipped once, end the block instead of looping
     private func skipTask(taskID: String, block: FocusBlock) {
         // Cancel notification for skipped task
         NotificationService.cancelTaskNotification(taskID: taskID)
-
         Task {
             do {
                 // Get remaining (non-completed) task IDs
                 let remainingTaskIDs = block.taskIDs.filter { !block.completedTaskIDs.contains($0) }
-
                 // Bug 15 Fix: If this is the only remaining task, mark as completed to end block
                 // Skipping the only task would cause it to reappear (infinite loop)
                 let isOnlyRemainingTask = remainingTaskIDs.count == 1 && remainingTaskIDs.first == taskID
-
                 // Preserve partial time spent on skipped task
                 var updatedTaskTimes = block.taskTimes
                 if let startTime = taskStartTime {
                     let secondsSpent = Int(Date().timeIntervalSince(startTime))
                     updatedTaskTimes[taskID] = (updatedTaskTimes[taskID] ?? 0) + secondsSpent
                 }
-
                 if isOnlyRemainingTask {
                     // Bug 15 Fix: Only 1 task remaining → mark as completed to end block
                     // This triggers allTasksCompletedView instead of looping
                     var updatedCompletedIDs = block.completedTaskIDs
                     updatedCompletedIDs.append(taskID)
-
                     try eventKitRepo.updateFocusBlock(
                         eventID: block.id,
                         taskIDs: block.taskIDs,
@@ -598,7 +512,6 @@ struct FocusLiveView: View {
                         updatedTaskIDs.remove(at: index)
                         updatedTaskIDs.append(taskID)  // Move to end
                     }
-
                     try eventKitRepo.updateFocusBlock(
                         eventID: block.id,
                         taskIDs: updatedTaskIDs,
@@ -606,13 +519,11 @@ struct FocusLiveView: View {
                         taskTimes: updatedTaskTimes
                     )
                 }
-
                 skipFeedback.toggle()
                 lastOverdueReminderTime = nil  // Reset overdue reminder
                 taskStartTime = nil  // Reset task timer for next task
                 lastTaskID = nil
                 await loadData()
-
                 // Update Live Activity with new task
                 if let updatedBlock = activeBlock {
                     updateLiveActivity(for: updatedBlock)
@@ -622,65 +533,53 @@ struct FocusLiveView: View {
             }
         }
     }
-
     private func calculateProgress(block: FocusBlock) -> Double {
         let totalDuration = block.endDate.timeIntervalSince(block.startDate)
         let elapsed = currentTime.timeIntervalSince(block.startDate)
         return elapsed / totalDuration
     }
-
     private func calculateRemainingMinutes(block: FocusBlock) -> Int {
         let remaining = block.endDate.timeIntervalSince(currentTime)
         return max(0, Int(remaining / 60))
     }
-
     private func timeRangeText(block: FocusBlock) -> String {
         let formatter = DateFormatter()
         formatter.timeStyle = .short
         return "\(formatter.string(from: block.startDate)) - \(formatter.string(from: block.endDate))"
     }
-
     private func checkBlockEnd() {
         guard let block = activeBlock else { return }
-
         let progress = calculateProgress(block: block)
         let warningThreshold = AppSettings.shared.warningTiming.percentComplete
-
         // Check for warning (only once per block, when threshold reached)
         if progress >= warningThreshold && !warningPlayed && !block.isPast {
             SoundService.playWarning()
             warningPlayed = true
         }
-
         // If block just ended, play sound and show sprint review
         if block.isPast && !showSprintReview {
             SoundService.playEndGong()
             showSprintReview = true
             warningPlayed = false  // Reset for next block
-
             // End Live Activity
             liveActivityManager.endActivity()
             liveActivityStarted = false
         }
     }
-
     /// Check if current task is overdue and play reminder every 2 minutes
     private func checkTaskOverdue() {
         guard let block = activeBlock else { return }
         guard !block.isPast else { return }  // Don't remind if block is over
-
         // Get current task
         let tasks = tasksForBlock(block)
         let remainingTasks = tasks.filter { !block.completedTaskIDs.contains($0.id) }
         guard let currentTask = remainingTasks.first else { return }
-
         // Check if task is overdue
         let remainingMinutes = calculateRemainingTaskMinutes(task: currentTask)
         guard remainingMinutes <= 0 else {
             lastOverdueReminderTime = nil  // Reset if not overdue anymore
             return
         }
-
         // Play reminder every 2 minutes
         let now = Date()
         if let lastReminder = lastOverdueReminderTime {
@@ -694,19 +593,15 @@ struct FocusLiveView: View {
             lastOverdueReminderTime = now
         }
     }
-
     // MARK: - Task Progress Tracking
-
     private func trackTaskStart(taskID: String) {
         if lastTaskID != taskID {
             // Cancel previous task notification
             if let previousTaskID = lastTaskID {
                 NotificationService.cancelTaskNotification(taskID: previousTaskID)
             }
-
             lastTaskID = taskID
             taskStartTime = Date()
-
             // Schedule notification for new task
             if let block = activeBlock {
                 let tasks = tasksForBlock(block)
@@ -720,14 +615,12 @@ struct FocusLiveView: View {
             }
         }
     }
-
     private func calculateTaskProgress(task: PlanItem) -> Double {
         guard let startTime = taskStartTime else { return 0 }
         let elapsed = currentTime.timeIntervalSince(startTime)
         let estimated = Double(task.effectiveDuration * 60)
         return elapsed / estimated
     }
-
     private func calculateRemainingTaskMinutes(task: PlanItem) -> Int {
         guard let startTime = taskStartTime else { return task.effectiveDuration }
         let elapsed = currentTime.timeIntervalSince(startTime)
@@ -736,22 +629,17 @@ struct FocusLiveView: View {
         return max(0, Int(remaining / 60))
     }
 }
-
 // MARK: - Upcoming Task Chip
-
 struct UpcomingTaskChip: View {
     let task: PlanItem
-
     var body: some View {
         HStack(spacing: 4) {
             Circle()
                 .fill(.secondary)
                 .frame(width: 6, height: 6)
-
             Text(task.title)
                 .font(.caption)
                 .lineLimit(1)
-
             Text("\(task.effectiveDuration)m")
                 .font(.caption2)
                 .foregroundStyle(.secondary)

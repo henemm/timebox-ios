@@ -1,0 +1,9 @@
+N/A - UI-only change
+
+This change only adds:
+1. accessibilityIdentifier to TaskRowInBlock row
+2. accessibilityIdentifier to task title text
+3. accessibilityIdentifier to remove button
+
+There is no business logic to unit test.
+The UI test (AssignTabTaskVisibilityUITests) covers the requirement.

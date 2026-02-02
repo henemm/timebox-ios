@@ -40,7 +40,9 @@ struct EditFocusBlockSheet: View {
                 }
             }
             .navigationTitle("Block bearbeiten")
+            #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
+            #endif
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Abbrechen") {

@@ -1,0 +1,14 @@
+TDD RED - Edit Focus Blocks
+
+Test: testExistingBlockHasIdentifier()
+Result: FAILED
+
+Failure: XCTAssertTrue failed
+Message: TDD RED: Focus Block row MUST have identifier starting with 'existingBlock_'
+
+The test searches for UI elements with identifier pattern 'existingBlock_*'
+but no such identifier exists in ExistingBlockRow component.
+
+Implementation needed:
+- Add .accessibilityIdentifier("existingBlock_\(block.id)") to ExistingBlockRow
+

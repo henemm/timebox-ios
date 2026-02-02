@@ -21,25 +21,14 @@ struct FocusBloxApp: App {
 
         let isUITesting = ProcessInfo.processInfo.arguments.contains("-UITesting")
 
+        let modelConfiguration = ModelConfiguration(
+            schema: schema,
+            isStoredInMemoryOnly: isUITesting,
+            cloudKitDatabase: .none
+        )
+
         do {
-            let container: ModelContainer
-
-            if isUITesting {
-                // UI tests use in-memory storage for isolation
-                let inMemoryConfig = ModelConfiguration(
-                    schema: schema,
-                    isStoredInMemoryOnly: true,
-                    cloudKitDatabase: .none
-                )
-                container = try ModelContainer(for: schema, configurations: [inMemoryConfig])
-            } else {
-                // Production: Migrate from default to App Group, then use App Group
-                try AppGroupMigration.migrateIfNeeded()
-                container = try SharedModelContainer.create()
-
-                // Fix: Deduplicate tasks that may have been duplicated during migration
-                FocusBloxApp.deduplicateTasksIfNeeded(in: container.mainContext)
-            }
+            let container = try ModelContainer(for: schema, configurations: [modelConfiguration])
 
             // Seed mock data BEFORE any view loads
             // Fixes race condition: child .task fires before parent .onAppear,
@@ -267,51 +256,6 @@ struct FocusBloxApp: App {
         UserDefaults.standard.set(false, forKey: "remindersSyncEnabled")
         UserDefaults.standard.removeObject(forKey: "visibleReminderListIDs")
         UserDefaults.standard.synchronize()
-    }
-
-    /// Deduplicate tasks that may have been duplicated during migration
-    /// This fixes the "ForEach: the ID occurs multiple times" issue
-    /// Only runs once per device (uses UserDefaults flag)
-    private static func deduplicateTasksIfNeeded(in context: ModelContext) {
-        let deduplicationKey = "tasksDeduplicatedV1"
-
-        // Only run once
-        guard !UserDefaults.standard.bool(forKey: deduplicationKey) else { return }
-
-        do {
-            // Fetch all tasks
-            let descriptor = FetchDescriptor<LocalTask>()
-            let allTasks = try context.fetch(descriptor)
-
-            // Group by UUID
-            var tasksByUUID: [UUID: [LocalTask]] = [:]
-            for task in allTasks {
-                tasksByUUID[task.uuid, default: []].append(task)
-            }
-
-            // Find duplicates and delete older ones
-            var deletedCount = 0
-            for (_, tasks) in tasksByUUID where tasks.count > 1 {
-                // Sort by createdAt descending (newest first)
-                let sorted = tasks.sorted { $0.createdAt > $1.createdAt }
-
-                // Keep the newest, delete the rest
-                for task in sorted.dropFirst() {
-                    context.delete(task)
-                    deletedCount += 1
-                }
-            }
-
-            if deletedCount > 0 {
-                try context.save()
-                print("FocusBloxApp: Deduplicated \(deletedCount) duplicate tasks")
-            }
-
-            // Mark as done
-            UserDefaults.standard.set(true, forKey: deduplicationKey)
-        } catch {
-            print("FocusBloxApp: Deduplication failed: \(error)")
-        }
     }
 
     /// Seed mock data for UI testing

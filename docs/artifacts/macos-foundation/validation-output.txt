@@ -1,0 +1,31 @@
+=== macOS Foundation Validation ===
+Date: Sa. 31 Jan. 2026 21:47:22 CET
+
+=== 1. macOS Build Test ===
+    cd /Users/hem/Documents/opt/my-daily-sprints
+    builtin-swiftStdLibTool --copy --verbose --sign 2C8277A4C1E6A1A1CC4B45484D787F1647143A06 --scan-executable /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug/FocusBloxMac.app/Contents/MacOS/FocusBloxMac.debug.dylib --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug/FocusBloxMac.app/Contents/Frameworks --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug/FocusBloxMac.app/Contents/PlugIns --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug/FocusBloxMac.app/Contents/Library/SystemExtensions --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug/FocusBloxMac.app/Contents/Extensions --platform macosx --toolchain /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain --destination /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug/FocusBloxMac.app/Contents/Frameworks --strip-bitcode --strip-bitcode-tool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/bitcode_strip --emit-dependency-info /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/FocusBlox.build/Debug/FocusBloxMac.build/SwiftStdLibToolInputDependencies.dep --filter-for-swift-os
+
+** BUILD SUCCEEDED **
+
+
+=== 2. iOS Build Test (Regression) ===
+    cd /Users/hem/Documents/opt/my-daily-sprints
+    /Applications/Xcode.app/Contents/Developer/usr/bin/embeddedBinaryValidationUtility /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBlox.app/PlugIns/FocusBloxWidgetsExtension.appex -signing-cert - -info-plist-path /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Products/Debug-iphonesimulator/FocusBlox.app/Info.plist
+
+** BUILD SUCCEEDED **
+
+
+=== 3. Shared Files Count ===
+Files shared with macOS target:
+26
+
+=== 4. macOS Target Files ===
+total 56
+drwxr-xr-x    8 hem  staff   256 31 Jan. 21:45 .
+drwxr-xr-x@ 121 hem  staff  3872 31 Jan. 21:45 ..
+drwxr-xr-x@   5 hem  staff   160 31 Jan. 20:15 Assets.xcassets
+-rw-r--r--@   1 hem  staff  2954 31 Jan. 20:18 ContentView.swift
+-rw-r--r--@   1 hem  staff   377 31 Jan. 20:18 FocusBloxMac.entitlements
+-rw-r--r--@   1 hem  staff  2367 31 Jan. 21:44 FocusBloxMacApp.swift
+-rw-r--r--@   1 hem  staff  6407 31 Jan. 21:43 MenuBarView.swift
+-rw-r--r--@   1 hem  staff  5179 31 Jan. 21:44 QuickCapturePanel.swift

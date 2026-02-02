@@ -1,7 +1,7 @@
 {
-  "file": "/Users/hem/Documents/opt/my-daily-sprints/TimeBox/Sources/Views/BacklogView.swift",
-  "before_screenshot": "/Users/hem/Documents/opt/my-daily-sprints/docs/artifacts/focusblox-rebrand/screenshots/before-backlog-view.png",
-  "timestamp": "2026-01-23T11:19:42.315273",
-  "workflow": "focusblox-rebrand",
+  "file": "/Users/hem/Documents/opt/my-daily-sprints/Sources/Views/FocusBlockTasksSheet.swift",
+  "before_screenshot": "/Users/hem/Documents/opt/my-daily-sprints/docs/artifacts/macos-category-default-fix/screenshots/before-icon.png",
+  "timestamp": "2026-02-02T19:00:30.963799",
+  "workflow": "macos-category-default-fix",
   "awaiting_after": true
 }

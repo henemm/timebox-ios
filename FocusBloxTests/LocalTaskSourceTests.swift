@@ -45,10 +45,10 @@ final class LocalTaskSourceTests: XCTestCase {
     func test_fetchIncompleteTasks_returnsOnlyIncomplete() async throws {
         // Setup: Create tasks directly in context
         let context = container.mainContext
-        let task1 = LocalTask(title: "Task 1", priority: 1)
-        let task2 = LocalTask(title: "Task 2", priority: 1)
+        let task1 = LocalTask(title: "Task 1", importance: 1)
+        let task2 = LocalTask(title: "Task 2", importance: 1)
         task2.isCompleted = true
-        let task3 = LocalTask(title: "Task 3", priority: 1)
+        let task3 = LocalTask(title: "Task 3", importance: 1)
 
         context.insert(task1)
         context.insert(task2)
@@ -65,11 +65,11 @@ final class LocalTaskSourceTests: XCTestCase {
     func test_fetchIncompleteTasks_sortsBySortOrder() async throws {
         let context = container.mainContext
 
-        let task1 = LocalTask(title: "Third", priority: 1)
+        let task1 = LocalTask(title: "Third", importance: 1)
         task1.sortOrder = 2
-        let task2 = LocalTask(title: "First", priority: 1)
+        let task2 = LocalTask(title: "First", importance: 1)
         task2.sortOrder = 0
-        let task3 = LocalTask(title: "Second", priority: 1)
+        let task3 = LocalTask(title: "Second", importance: 1)
         task3.sortOrder = 1
 
         context.insert(task1)
@@ -88,7 +88,7 @@ final class LocalTaskSourceTests: XCTestCase {
 
     func test_markComplete_updatesTask() async throws {
         let context = container.mainContext
-        let task = LocalTask(title: "Test", priority: 1)
+        let task = LocalTask(title: "Test", importance: 1)
         context.insert(task)
         try context.save()
 
@@ -99,7 +99,7 @@ final class LocalTaskSourceTests: XCTestCase {
 
     func test_markIncomplete_updatesTask() async throws {
         let context = container.mainContext
-        let task = LocalTask(title: "Test", priority: 1)
+        let task = LocalTask(title: "Test", importance: 1)
         task.isCompleted = true
         context.insert(task)
         try context.save()
@@ -116,12 +116,12 @@ final class LocalTaskSourceTests: XCTestCase {
             title: "New Task",
             tags: ["Work"],
             dueDate: Date(),
-            priority: 2
+            importance: 2
         )
 
         XCTAssertEqual(newTask.title, "New Task")
         XCTAssertEqual(newTask.tags, ["Work"])
-        XCTAssertEqual(newTask.priority, 2)
+        XCTAssertEqual(newTask.importance, 2)
         XCTAssertFalse(newTask.isCompleted)
 
         // Verify persisted
@@ -131,10 +131,10 @@ final class LocalTaskSourceTests: XCTestCase {
 
     func test_createTask_assignsNextSortOrder() async throws {
         // Create first task
-        let task1 = try await source.createTask(title: "First", tags: [], dueDate: nil, priority: 1)
+        let task1 = try await source.createTask(title: "First", tags: [], dueDate: nil, importance: 1)
 
         // Create second task
-        let task2 = try await source.createTask(title: "Second", tags: [], dueDate: nil, priority: 1)
+        let task2 = try await source.createTask(title: "Second", tags: [], dueDate: nil, importance: 1)
 
         XCTAssertEqual(task1.sortOrder, 0)
         XCTAssertEqual(task2.sortOrder, 1)
@@ -144,7 +144,7 @@ final class LocalTaskSourceTests: XCTestCase {
 
     func test_updateTask_modifiesExistingTask() async throws {
         let context = container.mainContext
-        let task = LocalTask(title: "Original", priority: 1)
+        let task = LocalTask(title: "Original", importance: 1)
         context.insert(task)
         try context.save()
 
@@ -153,25 +153,25 @@ final class LocalTaskSourceTests: XCTestCase {
             title: "Updated",
             tags: ["Personal"],
             dueDate: nil,
-            priority: 3
+            importance: 3
         )
 
         XCTAssertEqual(task.title, "Updated")
         XCTAssertEqual(task.tags, ["Personal"])
-        XCTAssertEqual(task.priority, 3)
+        XCTAssertEqual(task.importance, 3)
     }
 
     func test_updateTask_preservesUnchangedFields() async throws {
         let context = container.mainContext
-        let task = LocalTask(title: "Original", priority: 5, tags: ["Work"], dueDate: Date())
+        let task = LocalTask(title: "Original", importance: 5, tags: ["Work"], dueDate: Date())
         context.insert(task)
         try context.save()
 
         // Update only title (pass nil for fields to preserve)
-        try await source.updateTask(taskID: task.id, title: "New Title", tags: nil, dueDate: nil, priority: nil)
+        try await source.updateTask(taskID: task.id, title: "New Title", tags: nil, dueDate: nil, importance: nil)
 
         XCTAssertEqual(task.title, "New Title")
-        XCTAssertEqual(task.priority, 5) // unchanged
+        XCTAssertEqual(task.importance, 5) // unchanged
         XCTAssertEqual(task.tags, ["Work"]) // unchanged
     }
 
@@ -179,7 +179,7 @@ final class LocalTaskSourceTests: XCTestCase {
 
     func test_deleteTask_removesTask() async throws {
         let context = container.mainContext
-        let task = LocalTask(title: "To Delete", priority: 1)
+        let task = LocalTask(title: "To Delete", importance: 1)
         context.insert(task)
         try context.save()
 

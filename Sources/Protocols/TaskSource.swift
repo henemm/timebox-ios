@@ -8,14 +8,15 @@ protocol TaskSourceData {
     var id: String { get }
     var title: String { get }
     var isCompleted: Bool { get }
-    var priority: Int { get }
+    var importance: Int? { get }
     var tags: [String] { get }
     var dueDate: Date? { get }
 
     // MARK: - Phase 1: Enhanced Task Fields
 
     /// Urgency level for Eisenhower Matrix (urgent/not_urgent)
-    var urgency: String { get }
+    /// nil = not set (TBD concept)
+    var urgency: String? { get }
 
     /// Task categorization type (income/maintenance/recharge)
     var taskType: String { get }
@@ -77,9 +78,9 @@ protocol TaskSourceWritable: TaskSource {
         title: String,
         tags: [String],
         dueDate: Date?,
-        priority: Int,
-        duration: Int?,
-        urgency: String,
+        importance: Int?,
+        estimatedDuration: Int?,
+        urgency: String?,
         taskType: String,
         recurrencePattern: String,
         recurrenceWeekdays: [Int]?,
@@ -93,8 +94,8 @@ protocol TaskSourceWritable: TaskSource {
         title: String?,
         tags: [String]?,
         dueDate: Date?,
-        priority: Int?,
-        duration: Int?,
+        importance: Int?,
+        estimatedDuration: Int?,
         urgency: String?,
         taskType: String?,
         recurrencePattern: String?,

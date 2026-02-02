@@ -1,0 +1,20 @@
+Test session results, code coverage, and logs:
+	/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Logs/Test/Test-FocusBlox-2026.01.27_06-39-06-+0100.xcresult
+
+Testing failed:
+	Type 'NotificationService' has no member 'scheduleFocusBlockStartNotification'
+	Type 'NotificationService' has no member 'scheduleFocusBlockStartNotification'
+	Type 'NotificationService' has no member 'scheduleFocusBlockStartNotification'
+	Type 'NotificationService' has no member 'scheduleFocusBlockStartNotification'
+	Type 'NotificationService' has no member 'cancelFocusBlockNotification'
+	Type 'NotificationService' has no member 'scheduleFocusBlockStartNotification'
+	Testing cancelled because the build failed.
+
+** TEST FAILED **
+
+
+The following build commands failed:
+	SwiftCompile normal arm64 /Users/hem/Documents/opt/my-daily-sprints/FocusBloxTests/FocusBlockStartNotificationTests.swift (in target 'FocusBloxTests' from project 'FocusBlox')
+	SwiftCompile normal arm64 Compiling\ FocusBlockStartNotificationTests.swift /Users/hem/Documents/opt/my-daily-sprints/FocusBloxTests/FocusBlockStartNotificationTests.swift (in target 'FocusBloxTests' from project 'FocusBlox')
+	Testing project FocusBlox with scheme FocusBlox
+(3 failures)

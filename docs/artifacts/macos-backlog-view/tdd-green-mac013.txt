@@ -1,0 +1,24 @@
+=== TDD GREEN: MAC-013 Backlog View ===
+Date: Sa. 31 Jan. 2026 22:07:45 CET
+
+=== Test 1: NavigationSplitView with 3 columns ===
+1
+PASS: Three-column layout found
+
+=== Test 2: Multi-Selection State ===
+5
+PASS: Multi-selection implemented
+
+=== Test 3: SidebarView ===
+-rw-r--r--@ 1 hem  staff  2611 31 Jan. 22:05 FocusBloxMac/SidebarView.swift
+PASS: SidebarView.swift created
+
+=== Test 4: TaskInspector ===
+-rw-r--r--@ 1 hem  staff  6311 31 Jan. 22:06 FocusBloxMac/TaskInspector.swift
+PASS: TaskInspector.swift created
+
+=== macOS Build ===
+BUILD SUCCEEDED
+
+=== iOS Build (Regression) ===
+BUILD SUCCEEDED

@@ -20,6 +20,77 @@
 
 ## 🔴 OFFEN - Neue Bugs/Features
 
+### Bug 26: macOS "Zuweisen" View - Drag&Drop funktioniert nicht
+**Status:** OFFEN
+**Gemeldet:** 2026-02-02
+**Platform:** macOS
+**Location:** `FocusBloxMac/MacTaskTransfer.swift:12-14`, `FocusBloxMac/Info.plist`
+
+**Problem:**
+- Tasks aus "Next Up" Sidebar lassen sich nicht in FocusBlocks ziehen
+- Keine visuelle Reaktion beim Drag-Over
+- Drop wird nicht akzeptiert
+
+**Root Cause:**
+Der custom UTType `com.henning.timebox.mactask` ist wahrscheinlich nicht in der Info.plist als "Exported Type Identifier" deklariert. Ohne diese Deklaration kann macOS die Transferable-Daten nicht zwischen Views transportieren.
+
+**Code-Stelle:**
+```swift
+// MacTaskTransfer.swift:12-14
+extension UTType {
+    static let macTask = UTType(exportedAs: "com.henning.timebox.mactask")
+}
+```
+
+**Fix erfordert:**
+1. UTType in `FocusBloxMac/Info.plist` als Exported Type deklarieren
+2. `UTExportedTypeDeclarations` Array mit conformsTo: `public.data`
+3. Optional: Debugging mit Console.app waehrend Drag&Drop
+
+**Test:**
+1. macOS App starten → "Zuweisen" Tab
+2. Task aus "Next Up" auf FocusBlock ziehen
+3. **Expected:** FocusBlock wird blau, Task erscheint im Block
+
+**Prioritaet:** HOCH (Core Feature kaputt)
+
+---
+
+### Bug 25: macOS "Planen" View - Keine echten Kalender-Daten (nur Samples)
+**Status:** OFFEN
+**Gemeldet:** 2026-02-02
+**Platform:** macOS
+**Location:** `FocusBloxMac/MacPlanningView.swift:196-246`
+
+**Problem:**
+- Timeline zeigt nur hardcoded Sample-Events ("Team Meeting", "Lunch", "Deep Work")
+- Echte Kalender-Events werden NICHT geladen
+- FocusBlock "Deep Work" mit "2 Tasks" ist Fake-Daten
+
+**Root Cause:**
+Die Funktion `loadCalendarEvents()` in MacPlanningView ist **nicht fertig implementiert**:
+- Zeile 201-204: Kommentar "Simulate loading" und "For now, create sample events"
+- Zeile 210-238: Hardcoded `CalendarEvent` Array statt `eventKitRepo.fetchCalendarEvents()`
+
+Die iOS-Version (`BlockPlanningView.swift:428`) nutzt korrekt:
+```swift
+calendarEvents = try eventKitRepo.fetchCalendarEvents(for: selectedDate)
+```
+
+**Fix erfordert:**
+1. `MacPlanningView` muss `EventKitRepository` nutzen (wie iOS)
+2. Sample-Events entfernen
+3. Kalender-Berechtigung pruefen (`requestCalendarAccess()`)
+
+**Test:**
+1. macOS App starten → "Planen" Tab
+2. **Expected:** Echte Kalender-Events aus dem System-Kalender sichtbar
+3. **Aktuell:** Nur "Team Meeting", "Lunch", "Deep Work" (Samples)
+
+**Prioritaet:** HOCH (Core Feature nicht funktional)
+
+---
+
 ### Bug 24: iOS App - Keine Tasks angezeigt (SwiftData/CloudKit Fehler)
 **Status:** ✅ ERLEDIGT (2026-02-02)
 **Gemeldet:** 2026-02-02

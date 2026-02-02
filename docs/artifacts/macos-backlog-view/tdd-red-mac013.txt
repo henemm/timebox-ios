@@ -1,0 +1,28 @@
+=== TDD RED: MAC-013 Backlog View ===
+Date: $(date)
+
+=== Test 1: NavigationSplitView with 3 columns ===
+Checking for: NavigationSplitView { sidebar } content: { list } detail: { inspector }
+EXPECTED: NOT FOUND (current ContentView has only 2 columns)
+
+=== Test 2: Multi-Selection State ===
+Checking for: @State private var selectedTasks: Set<UUID>
+EXPECTED: NOT FOUND (current uses single selection: selectedTask: UUID?)
+
+=== Test 3: SidebarView with Categories ===
+Checking for: struct SidebarView or category filter in sidebar
+EXPECTED: NOT FOUND
+
+=== Test 4: TaskInspector View ===
+Checking for: struct TaskInspector
+EXPECTED: NOT FOUND
+
+=== Verification Commands ===
+grep -c "content:" FocusBloxMac/ContentView.swift
+# Expected: 0 (no three-column layout yet)
+
+grep -c "Set<UUID>" FocusBloxMac/ContentView.swift
+# Expected: 0 (no multi-selection yet)
+
+=== RED PHASE CONFIRMED ===
+All features are missing - ready for implementation.

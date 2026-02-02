@@ -1,0 +1,33 @@
+TDD RED - Bug Reproduction Tests
+================================
+
+Date: 2026-01-28 17:12:51
+Test Suite: QuickEditBacklogUITests (View Mode Callback Bug)
+
+RESULTS:
+--------
+✗ testCategoryBadgeTapWorksInCategoryViewMode - FAILED (28.489 seconds)
+  Reason: CategoryPicker should open after tapping category badge in Category view mode
+  Root Cause: onCategoryTap callback not passed to BacklogRow in categoryView
+
+✗ testContextMenuEditWorksInDurationViewMode - FAILED (28.328 seconds)
+  Reason: TaskFormSheet should open from context menu in Duration view mode
+  Root Cause: onEditTap callback not passed to BacklogRow in durationView
+
+✓ testImportanceBadgeTapWorksInTbdViewMode - PASSED (22.331 seconds)
+  Note: XCTSkip - No TBD tasks available in test environment
+
+BUG CONFIRMED:
+--------------
+In BacklogView.swift, the following view modes do NOT pass QuickEdit callbacks
+(onImportanceTap, onCategoryTap, onEditTap, onDeleteTap) to BacklogRow:
+
+1. categoryView (line 486-500)
+2. durationView (line 508-523)
+3. dueDateView (line 530-545)
+4. tbdView (line 552-567)
+5. QuadrantCard (line 631-636)
+
+Only listView correctly passes all callbacks.
+
+** TEST FAILED ** - 2/3 tests failed as expected

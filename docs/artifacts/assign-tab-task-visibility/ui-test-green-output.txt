@@ -1,0 +1,6 @@
+TEST SUCCEEDED - All 4 tests passed
+
+testAssignedTasksAreVisible - PASSED
+testRemoveTaskFromBlock - PASSED
+testTaskHasRemoveButton - PASSED
+testTaskTitleIsVisible - PASSED
