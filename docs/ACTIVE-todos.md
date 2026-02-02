@@ -120,6 +120,66 @@
 
 ---
 
+### Bug 22: Edit-Button in Backlog Toolbar ohne Funktion
+**Status:** OFFEN
+**Gemeldet:** 2026-02-02
+**Location:** `Sources/Views/BacklogView.swift:218`
+
+**Problem:**
+- Der `EditButton()` in der Backlog-Toolbar ist sichtbar, hat aber keine Funktion
+- Tap auf "Bearbeiten" zeigt "Fertig" an, aber nichts passiert
+- Keine Drag-Handles erscheinen, Tasks können nicht verschoben werden
+
+**Root Cause:**
+- `EditButton()` existiert (Zeile 218), aber `List` hat keinen `.onMove` Handler
+- Ohne `.onMove` kann SwiftUI keine Drag-Reorder-Funktion aktivieren
+- Der Edit-Mode wird zwar umgeschaltet, aber es gibt keine sichtbare Änderung
+
+**Spec-Anforderung (timebox-project-spec.md):**
+> "Manual Reordering: Users must be able to drag rows up/down. On move, update TaskMetadata.sortOrder"
+
+**Fix erfordert:**
+1. `.onMove(perform:)` Handler zu List hinzufügen
+2. `reorderTasks(_:)` Funktion implementieren
+3. `TaskMetadata.sortOrder` bei Move aktualisieren
+4. Optional: Drag-Handles für bessere UX
+
+**Betroffene Dateien:**
+- `Sources/Views/BacklogView.swift` (~30 LoC)
+- `Sources/Services/SyncEngine.swift` (neue Methode `updateSortOrder`)
+
+**Priorität:** MITTEL (Feature existiert in UI, tut aber nichts)
+
+---
+
+### Bug 21: Tags-Eingabe ohne Autocomplete und Vorschläge
+**Status:** OFFEN
+**Gemeldet:** 2026-02-02
+**Location:** `Sources/Views/EditTaskSheet.swift:70`, `Sources/Views/TaskFormSheet.swift`
+
+**Problem:**
+- Tags-Feld ist ein einfaches `TextField` mit Komma-Trennung
+- Bestehende/häufig verwendete Tags werden nicht vorgeschlagen
+- Keine Autocomplete-Funktion bei Eingabe
+- Kein schneller Zugriff auf bereits verwendete Tags
+
+**Expected:**
+1. Häufig verwendete Tags als auswählbare Chips über dem Textfeld anzeigen
+2. Autocomplete bei Eingabe (bestehende Tags vorschlagen)
+3. Eingegebene Tags als Chips darstellen (statt Komma-getrennter Text)
+4. Tap auf Chip → Tag entfernen
+
+**Betroffene Dateien:**
+- `Sources/Views/EditTaskSheet.swift` (~100 LoC)
+- `Sources/Views/TaskFormSheet.swift` (~50 LoC)
+- Neuer View: `Sources/Views/TagInputView.swift` (~150 LoC)
+
+**Scope:** Mittel (neuer Component + 2 Integrationen)
+
+**Priorität:** NIEDRIG
+
+---
+
 ### Bug 17: BacklogRow - Touchbare Elemente nicht als Chips (Spec-Abweichung)
 **Status:** OFFEN
 **Gemeldet:** 2026-01-29
