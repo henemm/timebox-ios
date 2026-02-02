@@ -164,8 +164,7 @@ struct ViewfinderSymbol: View {
 // MARK: - Render to PNG
 
 @MainActor
-func renderIconToPNG() {
-    let size: CGFloat = 1024
+func renderIcon(size: CGFloat) -> Data? {
     let icon = FocusBloxIcon()
         .frame(width: size, height: size)
 
@@ -173,32 +172,68 @@ func renderIconToPNG() {
     renderer.scale = 1.0
 
     guard let cgImage = renderer.cgImage else {
-        print("ERROR: Failed to render icon to CGImage")
-        exit(1)
+        print("ERROR: Failed to render icon at size \(Int(size))")
+        return nil
     }
 
     let bitmap = NSBitmapImageRep(cgImage: cgImage)
-    guard let pngData = bitmap.representation(using: .png, properties: [:]) else {
-        print("ERROR: Failed to convert to PNG")
-        exit(1)
-    }
+    return bitmap.representation(using: .png, properties: [:])
+}
 
-    // Get script directory and navigate to AppIcon.icon/Assets
+@MainActor
+func renderAllIcons() {
     let scriptPath = URL(fileURLWithPath: #file)
     let projectRoot = scriptPath.deletingLastPathComponent().deletingLastPathComponent()
-    let foregroundPath = projectRoot.appendingPathComponent("AppIcon.icon/Assets/foreground.png")
 
-    do {
-        try pngData.write(to: foregroundPath)
-        print("SUCCESS: Icon rendered to \(foregroundPath.path)")
-    } catch {
-        print("ERROR: Failed to write PNG: \(error)")
-        exit(1)
+    // 1. Render for iOS Icon Composer (foreground.png)
+    let foregroundPath = projectRoot.appendingPathComponent("AppIcon.icon/Assets/foreground.png")
+    if let pngData = renderIcon(size: 1024) {
+        do {
+            try pngData.write(to: foregroundPath)
+            print("✓ iOS Icon Composer: foreground.png (1024x1024)")
+        } catch {
+            print("✗ Failed: foreground.png - \(error)")
+        }
     }
+
+    // 2. Render for macOS (all sizes)
+    let macOSPath = projectRoot.appendingPathComponent("FocusBloxMac/Assets.xcassets/AppIcon.appiconset")
+
+    // macOS icon sizes: base size -> @1x and @2x
+    let macOSSizes: [(base: Int, scale: String, pixels: Int)] = [
+        (16, "1x", 16),
+        (16, "2x", 32),
+        (32, "1x", 32),
+        (32, "2x", 64),
+        (128, "1x", 128),
+        (128, "2x", 256),
+        (256, "1x", 256),
+        (256, "2x", 512),
+        (512, "1x", 512),
+        (512, "2x", 1024),
+    ]
+
+    for sizeInfo in macOSSizes {
+        let filename = sizeInfo.scale == "1x"
+            ? "icon_\(sizeInfo.base)x\(sizeInfo.base).png"
+            : "icon_\(sizeInfo.base)x\(sizeInfo.base)@2x.png"
+        let filePath = macOSPath.appendingPathComponent(filename)
+
+        if let pngData = renderIcon(size: CGFloat(sizeInfo.pixels)) {
+            do {
+                try pngData.write(to: filePath)
+                print("✓ macOS: \(filename) (\(sizeInfo.pixels)x\(sizeInfo.pixels))")
+            } catch {
+                print("✗ Failed: \(filename) - \(error)")
+            }
+        }
+    }
+
+    print("\n🎉 Icon generation complete!")
 }
 
 // Run on MainActor
 Task { @MainActor in
-    renderIconToPNG()
+    renderAllIcons()
 }
-RunLoop.main.run(until: Date(timeIntervalSinceNow: 2))
+RunLoop.main.run(until: Date(timeIntervalSinceNow: 5))

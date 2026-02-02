@@ -37,8 +37,8 @@ enum SidebarFilter: Hashable {
     case completed
 }
 
+/// Sidebar view showing only filters (navigation moved to toolbar)
 struct SidebarView: View {
-    @Binding var selectedSection: MainSection
     @Binding var selectedFilter: SidebarFilter
     let tbdCount: Int
     let nextUpCount: Int
@@ -48,141 +48,96 @@ struct SidebarView: View {
 
     var body: some View {
         List {
-            // MARK: - Main Navigation
-            Section("Bereiche") {
-                ForEach(MainSection.allCases, id: \.self) { section in
-                    HStack {
-                        Label(section.rawValue, systemImage: section.icon)
-                            .accessibilityIdentifier("sidebarSection_\(sectionIdentifier(section))")
-                        Spacer()
-                        if section == .backlog && nextUpCount > 0 {
-                            Text("\(nextUpCount)")
-                                .font(.caption)
-                                .padding(.horizontal, 6)
-                                .padding(.vertical, 2)
-                                .background(.blue.opacity(0.2))
-                                .clipShape(Capsule())
-                        }
+            // MARK: - Backlog Filters
+            Section("Filter") {
+                filterRow(label: "Alle Tasks", icon: "tray.full", filter: .all)
+
+                HStack {
+                    Label("Next Up", systemImage: "arrow.up.circle.fill")
+                        .accessibilityIdentifier("sidebarFilter_nextUp")
+                    Spacer()
+                    if nextUpCount > 0 {
+                        badgeView(count: nextUpCount, color: .blue)
                     }
-                    .tag(section)
-                    .contentShape(Rectangle())
-                    .onTapGesture {
-                        selectedSection = section
-                    }
-                    .listRowBackground(selectedSection == section ? Color.accentColor.opacity(0.2) : Color.clear)
                 }
+                .tag(SidebarFilter.nextUp)
+                .contentShape(Rectangle())
+                .onTapGesture { selectedFilter = .nextUp }
+                .listRowBackground(selectedFilter == .nextUp ? Color.accentColor.opacity(0.15) : Color.clear)
+
+                HStack {
+                    Label("TBD", systemImage: "questionmark.circle")
+                        .accessibilityIdentifier("sidebarFilter_tbd")
+                    Spacer()
+                    if tbdCount > 0 {
+                        badgeView(count: tbdCount, color: .orange)
+                    }
+                }
+                .tag(SidebarFilter.tbd)
+                .contentShape(Rectangle())
+                .onTapGesture { selectedFilter = .tbd }
+                .listRowBackground(selectedFilter == .tbd ? Color.accentColor.opacity(0.15) : Color.clear)
+
+                HStack {
+                    Label("Überfällig", systemImage: "exclamationmark.circle.fill")
+                        .accessibilityIdentifier("sidebarFilter_overdue")
+                    Spacer()
+                    if overdueCount > 0 {
+                        badgeView(count: overdueCount, color: .red)
+                    }
+                }
+                .tag(SidebarFilter.overdue)
+                .contentShape(Rectangle())
+                .onTapGesture { selectedFilter = .overdue }
+                .listRowBackground(selectedFilter == .overdue ? Color.accentColor.opacity(0.15) : Color.clear)
+
+                HStack {
+                    Label("Bald fällig", systemImage: "clock.fill")
+                        .accessibilityIdentifier("sidebarFilter_upcoming")
+                    Spacer()
+                    if upcomingCount > 0 {
+                        badgeView(count: upcomingCount, color: .yellow)
+                    }
+                }
+                .tag(SidebarFilter.upcoming)
+                .contentShape(Rectangle())
+                .onTapGesture { selectedFilter = .upcoming }
+                .listRowBackground(selectedFilter == .upcoming ? Color.accentColor.opacity(0.15) : Color.clear)
+
+                HStack {
+                    Label("Erledigt", systemImage: "checkmark.circle.fill")
+                        .accessibilityIdentifier("sidebarFilter_completed")
+                    Spacer()
+                    if completedCount > 0 {
+                        badgeView(count: completedCount, color: .green)
+                    }
+                }
+                .tag(SidebarFilter.completed)
+                .contentShape(Rectangle())
+                .onTapGesture { selectedFilter = .completed }
+                .listRowBackground(selectedFilter == .completed ? Color.accentColor.opacity(0.15) : Color.clear)
             }
 
-            // MARK: - Backlog Filters (only show when Backlog is selected)
-            if selectedSection == .backlog {
-                Section("Filter") {
-                    filterRow(label: "Alle Tasks", icon: "tray.full", filter: .all)
-
-                    HStack {
-                        Label("Next Up", systemImage: "arrow.up.circle.fill")
-                            .accessibilityIdentifier("sidebarFilter_nextUp")
-                        Spacer()
-                        if nextUpCount > 0 {
-                            Text("\(nextUpCount)")
-                                .font(.caption)
-                                .padding(.horizontal, 6)
-                                .padding(.vertical, 2)
-                                .background(.blue.opacity(0.2))
-                                .clipShape(Capsule())
-                        }
-                    }
-                    .tag(SidebarFilter.nextUp)
-                    .contentShape(Rectangle())
-                    .onTapGesture { selectedFilter = .nextUp }
-                    .listRowBackground(selectedFilter == .nextUp ? Color.accentColor.opacity(0.15) : Color.clear)
-
-                    HStack {
-                        Label("TBD", systemImage: "questionmark.circle")
-                            .accessibilityIdentifier("sidebarFilter_tbd")
-                        Spacer()
-                        if tbdCount > 0 {
-                            Text("\(tbdCount)")
-                                .font(.caption)
-                                .padding(.horizontal, 6)
-                                .padding(.vertical, 2)
-                                .background(.orange.opacity(0.2))
-                                .clipShape(Capsule())
-                        }
-                    }
-                    .tag(SidebarFilter.tbd)
-                    .contentShape(Rectangle())
-                    .onTapGesture { selectedFilter = .tbd }
-                    .listRowBackground(selectedFilter == .tbd ? Color.accentColor.opacity(0.15) : Color.clear)
-
-                    // Overdue (überfällige Tasks)
-                    HStack {
-                        Label("Überfällig", systemImage: "exclamationmark.circle.fill")
-                            .accessibilityIdentifier("sidebarFilter_overdue")
-                        Spacer()
-                        if overdueCount > 0 {
-                            Text("\(overdueCount)")
-                                .font(.caption)
-                                .padding(.horizontal, 6)
-                                .padding(.vertical, 2)
-                                .background(.red.opacity(0.2))
-                                .clipShape(Capsule())
-                        }
-                    }
-                    .tag(SidebarFilter.overdue)
-                    .contentShape(Rectangle())
-                    .onTapGesture { selectedFilter = .overdue }
-                    .listRowBackground(selectedFilter == .overdue ? Color.accentColor.opacity(0.15) : Color.clear)
-
-                    // Upcoming (bald fällig)
-                    HStack {
-                        Label("Bald fällig", systemImage: "clock.fill")
-                            .accessibilityIdentifier("sidebarFilter_upcoming")
-                        Spacer()
-                        if upcomingCount > 0 {
-                            Text("\(upcomingCount)")
-                                .font(.caption)
-                                .padding(.horizontal, 6)
-                                .padding(.vertical, 2)
-                                .background(.yellow.opacity(0.2))
-                                .clipShape(Capsule())
-                        }
-                    }
-                    .tag(SidebarFilter.upcoming)
-                    .contentShape(Rectangle())
-                    .onTapGesture { selectedFilter = .upcoming }
-                    .listRowBackground(selectedFilter == .upcoming ? Color.accentColor.opacity(0.15) : Color.clear)
-
-                    // Completed (erledigte Tasks)
-                    HStack {
-                        Label("Erledigt", systemImage: "checkmark.circle.fill")
-                            .accessibilityIdentifier("sidebarFilter_completed")
-                        Spacer()
-                        if completedCount > 0 {
-                            Text("\(completedCount)")
-                                .font(.caption)
-                                .padding(.horizontal, 6)
-                                .padding(.vertical, 2)
-                                .background(.green.opacity(0.2))
-                                .clipShape(Capsule())
-                        }
-                    }
-                    .tag(SidebarFilter.completed)
-                    .contentShape(Rectangle())
-                    .onTapGesture { selectedFilter = .completed }
-                    .listRowBackground(selectedFilter == .completed ? Color.accentColor.opacity(0.15) : Color.clear)
-                }
-
-                Section("Kategorien") {
-                    categoryRow("income", "Geld verdienen", "dollarsign.circle")
-                    categoryRow("maintenance", "Pflege", "wrench.and.screwdriver.fill")
-                    categoryRow("recharge", "Energie", "battery.100")
-                    categoryRow("learning", "Lernen", "book")
-                    categoryRow("giving_back", "Weitergeben", "gift")
-                }
+            Section("Kategorien") {
+                categoryRow("income", "Geld verdienen", "dollarsign.circle")
+                categoryRow("maintenance", "Pflege", "wrench.and.screwdriver.fill")
+                categoryRow("recharge", "Energie", "battery.100")
+                categoryRow("learning", "Lernen", "book")
+                categoryRow("giving_back", "Weitergeben", "gift")
             }
         }
         .listStyle(.sidebar)
-        .navigationTitle("FocusBlox")
+        .navigationTitle("Filter")
+    }
+
+    @ViewBuilder
+    private func badgeView(count: Int, color: Color) -> some View {
+        Text("\(count)")
+            .font(.caption)
+            .padding(.horizontal, 6)
+            .padding(.vertical, 2)
+            .background(color.opacity(0.2))
+            .clipShape(Capsule())
     }
 
     private func filterRow(label: String, icon: String, filter: SidebarFilter) -> some View {
@@ -203,16 +158,6 @@ struct SidebarView: View {
             .listRowBackground(selectedFilter == .category(id) ? Color.accentColor.opacity(0.15) : Color.clear)
     }
 
-    private func sectionIdentifier(_ section: MainSection) -> String {
-        switch section {
-        case .backlog: return "backlog"
-        case .planning: return "planning"
-        case .assign: return "assign"
-        case .focus: return "focus"
-        case .review: return "review"
-        }
-    }
-
     private func filterIdentifier(_ filter: SidebarFilter) -> String {
         switch filter {
         case .all: return "all"
@@ -228,7 +173,6 @@ struct SidebarView: View {
 
 #Preview {
     SidebarView(
-        selectedSection: .constant(.backlog),
         selectedFilter: .constant(.all),
         tbdCount: 3,
         nextUpCount: 5,

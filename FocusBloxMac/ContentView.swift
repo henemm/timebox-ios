@@ -122,16 +122,25 @@ struct ContentView: View {
 
     var body: some View {
         NavigationSplitView(columnVisibility: $columnVisibility) {
-            // Sidebar: Navigation + Filters
-            SidebarView(
-                selectedSection: $selectedSection,
-                selectedFilter: $selectedFilter,
-                tbdCount: tbdCount,
-                nextUpCount: nextUpCount,
-                overdueCount: overdueCount,
-                upcomingCount: upcomingCount,
-                completedCount: completedCount
-            )
+            // Sidebar: Only show filter options when Backlog is selected
+            if selectedSection == .backlog {
+                SidebarView(
+                    selectedFilter: $selectedFilter,
+                    tbdCount: tbdCount,
+                    nextUpCount: nextUpCount,
+                    overdueCount: overdueCount,
+                    upcomingCount: upcomingCount,
+                    completedCount: completedCount
+                )
+            } else {
+                // Empty sidebar for other sections
+                List {
+                    Text("Keine Filter")
+                        .foregroundStyle(.secondary)
+                }
+                .listStyle(.sidebar)
+                .navigationTitle(selectedSection.rawValue)
+            }
         } content: {
             // Main Content based on selected section
             mainContentView
@@ -144,6 +153,19 @@ struct ContentView: View {
             }
         }
         .frame(minWidth: 1000, minHeight: 600)
+        .toolbar(id: "mainNavigation") {
+            // Main navigation in toolbar
+            ToolbarItem(id: "navigationPicker", placement: .principal) {
+                Picker("Bereich", selection: $selectedSection) {
+                    ForEach(MainSection.allCases, id: \.self) { section in
+                        Label(section.rawValue, systemImage: section.icon)
+                            .tag(section)
+                    }
+                }
+                .pickerStyle(.segmented)
+                .accessibilityIdentifier("mainNavigationPicker")
+            }
+        }
     }
 
     // MARK: - Main Content View (switches based on section)
