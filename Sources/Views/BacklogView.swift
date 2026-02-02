@@ -526,29 +526,47 @@ struct BacklogView: View {
     }
 
     // MARK: - List View
-    // Using ScrollView + LazyVStack instead of List for proper accessibility identifier exposure
+    // Using List for swipe actions support (swipe left = Next Up, swipe right = Edit)
     private var listView: some View {
-        ScrollView {
-            LazyVStack(spacing: 8) {
-                ForEach(backlogTasks) { item in
-                    BacklogRow(
-                        item: item,
-                        onComplete: { completeTask(item) },
-                        onDurationTap: { selectedItemForDuration = item },
-                        onAddToNextUp: { updateNextUp(for: item, isNextUp: true) },
-                        onImportanceCycle: { newImportance in updateImportance(for: item, importance: newImportance) },
-                        onUrgencyToggle: { newUrgency in updateUrgency(for: item, urgency: newUrgency) },
-                        onCategoryTap: { selectedItemForCategory = item },
-                        onEditTap: { taskToEditDirectly = item },
-                        onDeleteTap: { deleteTask(item) },
-                        onTitleSave: { newTitle in
-                            saveTitleEdit(for: item, title: newTitle)
-                        }
-                    )
+        List {
+            ForEach(backlogTasks) { item in
+                BacklogRow(
+                    item: item,
+                    onComplete: { completeTask(item) },
+                    onDurationTap: { selectedItemForDuration = item },
+                    onAddToNextUp: { updateNextUp(for: item, isNextUp: true) },
+                    onImportanceCycle: { newImportance in updateImportance(for: item, importance: newImportance) },
+                    onUrgencyToggle: { newUrgency in updateUrgency(for: item, urgency: newUrgency) },
+                    onCategoryTap: { selectedItemForCategory = item },
+                    onEditTap: { taskToEditDirectly = item },
+                    onDeleteTap: { deleteTask(item) },
+                    onTitleSave: { newTitle in
+                        saveTitleEdit(for: item, title: newTitle)
+                    }
+                )
+                .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
+                .listRowBackground(Color.clear)
+                .listRowSeparator(.hidden)
+                .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                    Button {
+                        updateNextUp(for: item, isNextUp: true)
+                    } label: {
+                        Label("Next Up", systemImage: "arrow.up.circle.fill")
+                    }
+                    .tint(.green)
+                }
+                .swipeActions(edge: .leading, allowsFullSwipe: true) {
+                    Button {
+                        taskToEditDirectly = item
+                    } label: {
+                        Label("Bearbeiten", systemImage: "pencil")
+                    }
+                    .tint(.blue)
                 }
             }
-            .padding(.horizontal, 16)
         }
+        .listStyle(.plain)
+        .scrollContentBackground(.hidden)
         .refreshable {
             await loadTasks()
         }
