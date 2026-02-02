@@ -183,19 +183,15 @@
 ---
 
 ### Bug 16: Focus Tab - Weitere Tasks nicht sichtbar / kein "keine weiteren Tasks" Hinweis
-**Status:** OFFEN
+**Status:** ✅ ERLEDIGT (bereits im Code)
 **Gemeldet:** 2026-01-29
 **Location:** `FocusLiveView.swift`
 
-**Problem:**
-- Während Focus Modus: Weitere Tasks im Block nicht sichtbar
-- Oder: Kein Hinweis wenn keine weiteren Tasks vorhanden sind
+**Fix:**
+- `upcomingTasksView(tasks:)` zeigt kommende Tasks (Line 207-208)
+- `noMoreTasksHint` zeigt "Keine weiteren Tasks" wenn Queue leer (Line 218-230)
 
-**Expected:**
-- Liste der kommenden Tasks sichtbar (z.B. "Nächste: Task A, Task B")
-- Oder: "Keine weiteren Tasks" Hinweis wenn Block leer/fertig
-
-**Priorität:** MITTEL
+**Priorität:** MITTEL - GEFIXT
 
 ---
 
@@ -224,9 +220,11 @@
 ---
 
 ### Bug 14: Assign Tab - Next Up nicht sichtbar bei mehreren Blox
-**Status:** OFFEN
+**Status:** ✅ ERLEDIGT (bereits im Code)
 **Gemeldet:** 2026-01-29
 **Location:** `TaskAssignmentView.swift`
+
+**Fix:** Unified ScrollView für Focus Blocks + Next Up Section (Line 40-51)
 **Screenshot:** Downloads/Bildschirmfoto 2026-01-29 um 23.03.21.png
 
 **Problem:**
