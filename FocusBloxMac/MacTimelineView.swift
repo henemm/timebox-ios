@@ -109,6 +109,12 @@ struct MacTimelineView: View {
         .background(Color(nsColor: .textBackgroundColor))
         .dropDestination(for: MacTaskTransfer.self) { items, location in
             guard let task = items.first else { return false }
+
+            // Check if drop is over an existing focus block - if so, let the block handle it
+            if isLocationOverFocusBlock(location) {
+                return false
+            }
+
             let dropTime = calculateTimeFromLocation(location)
             onCreateFocusBlock?(dropTime, task.duration, task.id)
             return true
@@ -227,6 +233,33 @@ struct MacTimelineView: View {
         }
 
         return groups
+    }
+
+    // MARK: - Hit Testing
+
+    /// Checks if the given location is over an existing focus block
+    private func isLocationOverFocusBlock(_ location: CGPoint) -> Bool {
+        let adjustedX = location.x - timeColumnWidth
+        let adjustedY = location.y
+
+        for block in focusBlocks {
+            let calendar = Calendar.current
+            let hour = calendar.component(.hour, from: block.startDate)
+            let minute = calendar.component(.minute, from: block.startDate)
+            let hoursFromStart = CGFloat(hour - startHour) + CGFloat(minute) / 60.0
+            let blockTop = hoursFromStart * hourHeight
+            let blockHeight = CGFloat(block.durationMinutes) / 60.0 * hourHeight
+
+            // Check Y (vertical) - is the drop within the block's time range?
+            if adjustedY >= blockTop && adjustedY <= blockTop + blockHeight {
+                // For simplicity, assume block spans full width if it's in the time range
+                // This is good enough since we want drops in the time range to go to the block
+                if adjustedX >= 0 {
+                    return true
+                }
+            }
+        }
+        return false
     }
 
     // MARK: - Time Calculation

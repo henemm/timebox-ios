@@ -48,8 +48,7 @@ struct MacPlanningView: View {
         .navigationTitle("Planen")
         .toolbar {
             ToolbarItem(placement: .automatic) {
-                DatePicker("", selection: $selectedDate, displayedComponents: .date)
-                    .labelsHidden()
+                MacDateNavigator(selectedDate: $selectedDate)
             }
 
             ToolbarItem(placement: .automatic) {
@@ -78,8 +77,12 @@ struct MacPlanningView: View {
                     removeTaskFromBlock(block: block, taskID: taskID)
                 },
                 onAddTask: {
+                    // Store block reference, dismiss this sheet, then show picker
                     blockForAddingTask = block
-                    showTaskPicker = true
+                    blockForTasks = nil // Dismiss current sheet first
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                        showTaskPicker = true
+                    }
                 }
             )
         }
@@ -455,6 +458,74 @@ struct TaskPickerSheet: View {
             }
         }
         .frame(minWidth: 350, minHeight: 300)
+    }
+}
+
+// MARK: - Date Navigator
+
+/// Custom date navigation toolbar component with readable format
+struct MacDateNavigator: View {
+    @Binding var selectedDate: Date
+
+    private var dateText: String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "de_DE")
+
+        if Calendar.current.isDateInToday(selectedDate) {
+            return "Heute"
+        } else if Calendar.current.isDateInYesterday(selectedDate) {
+            return "Gestern"
+        } else if Calendar.current.isDateInTomorrow(selectedDate) {
+            return "Morgen"
+        } else {
+            formatter.dateFormat = "E, d. MMM yyyy"
+            return formatter.string(from: selectedDate)
+        }
+    }
+
+    var body: some View {
+        HStack(spacing: 4) {
+            // Previous day
+            Button {
+                selectedDate = Calendar.current.date(byAdding: .day, value: -1, to: selectedDate) ?? selectedDate
+            } label: {
+                Image(systemName: "chevron.left")
+                    .font(.system(size: 11, weight: .semibold))
+            }
+            .buttonStyle(.borderless)
+            .help("Vorheriger Tag")
+
+            // Date display with popover picker
+            Menu {
+                Button("Heute") {
+                    selectedDate = Date()
+                }
+                Divider()
+                // The DatePicker in a menu shows a proper calendar
+                DatePicker("Datum wählen", selection: $selectedDate, displayedComponents: .date)
+            } label: {
+                Text(dateText)
+                    .font(.system(size: 12, weight: .medium))
+                    .frame(minWidth: 120)
+            }
+            .menuStyle(.borderlessButton)
+
+            // Next day
+            Button {
+                selectedDate = Calendar.current.date(byAdding: .day, value: 1, to: selectedDate) ?? selectedDate
+            } label: {
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 11, weight: .semibold))
+            }
+            .buttonStyle(.borderless)
+            .help("Nächster Tag")
+        }
+        .padding(.horizontal, 8)
+        .padding(.vertical, 4)
+        .background(
+            RoundedRectangle(cornerRadius: 6)
+                .fill(Color(nsColor: .controlBackgroundColor))
+        )
     }
 }
 
