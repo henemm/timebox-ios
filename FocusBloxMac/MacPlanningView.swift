@@ -21,6 +21,13 @@ struct MacPlanningView: View {
     @State private var errorMessage: String?
     @State private var hasCalendarAccess = false
 
+    // Sheet states for Focus Block interactions
+    @State private var blockForTasks: FocusBlock?
+    @State private var blockToEdit: FocusBlock?
+
+    // EventKit repository for real calendar access
+    private let eventKitRepo = EventKitRepository()
+
     // Focus blocks extracted from calendar events
     private var focusBlocks: [FocusBlock] {
         calendarEvents.compactMap { FocusBlock(from: $0) }
@@ -58,6 +65,32 @@ struct MacPlanningView: View {
         .onChange(of: selectedDate) {
             Task { await loadCalendarEvents() }
         }
+        .sheet(item: $blockForTasks) { block in
+            FocusBlockTasksSheet(
+                block: block,
+                tasks: tasksForBlock(block),
+                onReorder: { newOrder in
+                    reorderTasksInBlock(block: block, newOrder: newOrder)
+                },
+                onRemoveTask: { taskID in
+                    removeTaskFromBlock(block: block, taskID: taskID)
+                },
+                onAddTask: {
+                    // TODO: Show task picker
+                }
+            )
+        }
+        .sheet(item: $blockToEdit) { block in
+            EditFocusBlockSheet(
+                block: block,
+                onSave: { start, end in
+                    updateBlockTime(block: block, start: start, end: end)
+                },
+                onDelete: {
+                    deleteBlock(block: block)
+                }
+            )
+        }
     }
 
     // MARK: - Timeline Section
@@ -89,6 +122,12 @@ struct MacPlanningView: View {
                 },
                 onAddTaskToBlock: { blockID, taskID in
                     Task { await addTaskToBlock(blockID: blockID, taskID: taskID) }
+                },
+                onTapBlock: { block in
+                    blockForTasks = block
+                },
+                onTapEditBlock: { block in
+                    blockToEdit = block
                 }
             )
         }
@@ -145,12 +184,14 @@ struct MacPlanningView: View {
     // MARK: - Calendar Access
 
     private func requestCalendarAccess() async {
-        // For now, we'll use a simple check
-        // In production, this would use EventKit's requestAccess
         do {
-            // Try to load events - this will trigger permission dialog
-            await loadCalendarEvents()
-            hasCalendarAccess = true
+            let granted = try await eventKitRepo.requestCalendarAccess()
+            hasCalendarAccess = granted
+            if granted {
+                await loadCalendarEvents()
+            } else {
+                errorMessage = "Kalender-Zugriff verweigert"
+            }
         } catch {
             hasCalendarAccess = false
             errorMessage = "Kalender-Zugriff verweigert"
@@ -161,46 +202,8 @@ struct MacPlanningView: View {
         isLoading = true
         errorMessage = nil
 
-        // Simulate loading calendar events
-        // In production, this would use EventKitRepository
         do {
-            try await Task.sleep(for: .milliseconds(300))
-
-            // For now, create sample events to show the UI works
-            let calendar = Calendar.current
-            let today = calendar.startOfDay(for: selectedDate)
-
-            // Sample events for demonstration
-            calendarEvents = [
-                CalendarEvent(
-                    id: "sample-1",
-                    title: "Team Meeting",
-                    startDate: calendar.date(byAdding: .hour, value: 9, to: today)!,
-                    endDate: calendar.date(byAdding: .hour, value: 10, to: today)!,
-                    isAllDay: false,
-                    calendarColor: nil,
-                    notes: nil
-                ),
-                CalendarEvent(
-                    id: "sample-2",
-                    title: "Lunch",
-                    startDate: calendar.date(byAdding: .hour, value: 12, to: today)!,
-                    endDate: calendar.date(byAdding: .hour, value: 13, to: today)!,
-                    isAllDay: false,
-                    calendarColor: nil,
-                    notes: nil
-                ),
-                CalendarEvent(
-                    id: "focus-1",
-                    title: "Deep Work",
-                    startDate: calendar.date(byAdding: .hour, value: 14, to: today)!,
-                    endDate: calendar.date(byAdding: .hour, value: 16, to: today)!,
-                    isAllDay: false,
-                    calendarColor: nil,
-                    notes: "focusBlock:true\ntasks:task1|task2"
-                )
-            ]
-
+            calendarEvents = try eventKitRepo.fetchCalendarEvents(for: selectedDate)
             hasCalendarAccess = true
         } catch {
             errorMessage = error.localizedDescription
@@ -265,6 +268,76 @@ struct MacPlanningView: View {
             task.isNextUp = false
             try? modelContext.save()
         }
+    }
+
+    // MARK: - Focus Block Sheet Actions
+
+    private func tasksForBlock(_ block: FocusBlock) -> [PlanItem] {
+        // Convert task IDs to PlanItems
+        return block.taskIDs.compactMap { taskID in
+            if let task = nextUpTasks.first(where: { $0.id == taskID }) {
+                return PlanItem(localTask: task)
+            }
+            return nil
+        }
+    }
+
+    private func reorderTasksInBlock(block: FocusBlock, newOrder: [String]) {
+        guard let index = calendarEvents.firstIndex(where: { $0.id == block.id }) else { return }
+
+        let event = calendarEvents[index]
+        let updatedEvent = CalendarEvent(
+            id: event.id,
+            title: event.title,
+            startDate: event.startDate,
+            endDate: event.endDate,
+            isAllDay: event.isAllDay,
+            calendarColor: event.calendarColor,
+            notes: FocusBlock.serializeToNotes(taskIDs: newOrder, completedTaskIDs: event.focusBlockCompletedIDs)
+        )
+
+        calendarEvents[index] = updatedEvent
+    }
+
+    private func removeTaskFromBlock(block: FocusBlock, taskID: String) {
+        guard let index = calendarEvents.firstIndex(where: { $0.id == block.id }) else { return }
+
+        let event = calendarEvents[index]
+        var taskIDs = event.focusBlockTaskIDs
+        taskIDs.removeAll { $0 == taskID }
+
+        let updatedEvent = CalendarEvent(
+            id: event.id,
+            title: event.title,
+            startDate: event.startDate,
+            endDate: event.endDate,
+            isAllDay: event.isAllDay,
+            calendarColor: event.calendarColor,
+            notes: FocusBlock.serializeToNotes(taskIDs: taskIDs, completedTaskIDs: event.focusBlockCompletedIDs)
+        )
+
+        calendarEvents[index] = updatedEvent
+    }
+
+    private func updateBlockTime(block: FocusBlock, start: Date, end: Date) {
+        guard let index = calendarEvents.firstIndex(where: { $0.id == block.id }) else { return }
+
+        let event = calendarEvents[index]
+        let updatedEvent = CalendarEvent(
+            id: event.id,
+            title: event.title,
+            startDate: start,
+            endDate: end,
+            isAllDay: event.isAllDay,
+            calendarColor: event.calendarColor,
+            notes: event.notes
+        )
+
+        calendarEvents[index] = updatedEvent
+    }
+
+    private func deleteBlock(block: FocusBlock) {
+        calendarEvents.removeAll { $0.id == block.id }
     }
 }
 

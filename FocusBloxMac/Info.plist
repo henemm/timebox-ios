@@ -17,5 +17,20 @@
     <string>FocusBlox benötigt Zugriff auf deinen Kalender um Focus Blocks anzuzeigen.</string>
     <key>NSRemindersUsageDescription</key>
     <string>FocusBlox importiert Tasks aus deinen Erinnerungen in den Backlog.</string>
+    <key>UTExportedTypeDeclarations</key>
+    <array>
+        <dict>
+            <key>UTTypeConformsTo</key>
+            <array>
+                <string>public.data</string>
+            </array>
+            <key>UTTypeDescription</key>
+            <string>FocusBlox Task</string>
+            <key>UTTypeIdentifier</key>
+            <string>com.henning.timebox.mactask</string>
+            <key>UTTypeTagSpecification</key>
+            <dict/>
+        </dict>
+    </array>
 </dict>
 </plist>
