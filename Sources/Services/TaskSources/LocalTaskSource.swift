@@ -40,14 +40,20 @@ final class LocalTaskSource: @preconcurrency TaskSource, @preconcurrency TaskSou
     }
 
     func fetchCompletedTasks(withinDays days: Int) async throws -> [LocalTask] {
-        let cutoffDate = Calendar.current.date(byAdding: .day, value: -days, to: Date()) ?? Date()
+        // Einfaches Predicate - komplexe Date-Logik verursacht SwiftDataError
         var descriptor = FetchDescriptor<LocalTask>(
-            predicate: #Predicate<LocalTask> { task in
-                task.isCompleted && (task.completedAt != nil && task.completedAt! >= cutoffDate)
-            }
+            predicate: #Predicate<LocalTask> { $0.isCompleted }
         )
         descriptor.sortBy = [SortDescriptor(\.completedAt, order: .reverse)]
-        return try modelContext.fetch(descriptor)
+
+        let allCompleted = try modelContext.fetch(descriptor)
+
+        // Swift-seitiges Filtern für completedAt (vermeidet Predicate-Problem)
+        let cutoffDate = Calendar.current.date(byAdding: .day, value: -days, to: Date()) ?? Date()
+        return allCompleted.filter { task in
+            guard let completedAt = task.completedAt else { return false }
+            return completedAt >= cutoffDate
+        }
     }
 
     func markComplete(taskID: String) async throws {
