@@ -1,14 +1,18 @@
 import SwiftUI
+import SwiftData
 
 struct BlockPlanningView: View {
     @Environment(\.eventKitRepository) private var eventKitRepo
+    @Environment(\.modelContext) private var modelContext
     @State private var selectedDate = Date()
     @State private var calendarEvents: [CalendarEvent] = []
     @State private var focusBlocks: [FocusBlock] = []
+    @State private var allTasks: [PlanItem] = []
     @State private var isLoading = false
     @State private var errorMessage: String?
     @State private var selectedSlot: TimeSlot?
     @State private var blockToEdit: FocusBlock?
+    @State private var blockForTasks: FocusBlock?
     @State private var eventToCategories: CalendarEvent?
 
     private let hourHeight: CGFloat = 60
@@ -31,7 +35,7 @@ struct BlockPlanningView: View {
                     )
                     Spacer()
                 } else {
-                    smartGapsContent
+                    timelineContent
                 }
             }
             .navigationTitle("Blox")
@@ -70,6 +74,21 @@ struct BlockPlanningView: View {
                     event: event,
                     onSelect: { category in
                         updateEventCategory(event: event, category: category)
+                    }
+                )
+            }
+            .sheet(item: $blockForTasks) { block in
+                FocusBlockTasksSheet(
+                    block: block,
+                    tasks: tasksForBlock(block),
+                    onReorder: { newOrder in
+                        reorderTasksInBlock(block, taskIDs: newOrder)
+                    },
+                    onRemoveTask: { taskID in
+                        removeTaskFromBlock(block, taskID: taskID)
+                    },
+                    onAddTask: {
+                        // Will be implemented: show task picker
                     }
                 )
             }
@@ -134,6 +153,43 @@ struct BlockPlanningView: View {
             .refreshable {
                 await loadData()
             }
+        }
+    }
+
+    // MARK: - Timeline Content (Unified Planning View)
+
+    private var timelineContent: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 0) {
+                // Hour rows with events and blocks
+                ForEach(startHour..<endHour, id: \.self) { hour in
+                    TimelineHourRow(
+                        hour: hour,
+                        hourHeight: hourHeight,
+                        date: selectedDate,
+                        events: calendarEvents.filter { !$0.isAllDay && !$0.isFocusBlock },
+                        focusBlocks: focusBlocks,
+                        freeSlots: computedFreeSlots,
+                        onTapBlock: { block in
+                            blockForTasks = block
+                        },
+                        onTapEditBlock: { block in
+                            blockToEdit = block
+                        },
+                        onTapFreeSlot: { slot in
+                            selectedSlot = slot
+                        },
+                        onTapEvent: { event in
+                            eventToCategories = event
+                        }
+                    )
+                }
+            }
+            .padding(.top, 8)
+        }
+        .accessibilityIdentifier("planningTimeline")
+        .refreshable {
+            await loadData()
         }
     }
 
@@ -275,6 +331,40 @@ struct BlockPlanningView: View {
         )
     }
 
+    private func reorderTasksInBlock(_ block: FocusBlock, taskIDs: [String]) {
+        Task {
+            do {
+                try eventKitRepo.updateFocusBlock(
+                    eventID: block.id,
+                    taskIDs: taskIDs,
+                    completedTaskIDs: block.completedTaskIDs,
+                    taskTimes: block.taskTimes
+                )
+                await loadData()
+            } catch {
+                errorMessage = "Task-Reihenfolge konnte nicht gespeichert werden."
+            }
+        }
+    }
+
+    private func removeTaskFromBlock(_ block: FocusBlock, taskID: String) {
+        Task {
+            do {
+                var newTaskIDs = block.taskIDs
+                newTaskIDs.removeAll { $0 == taskID }
+                try eventKitRepo.updateFocusBlock(
+                    eventID: block.id,
+                    taskIDs: newTaskIDs,
+                    completedTaskIDs: block.completedTaskIDs,
+                    taskTimes: block.taskTimes
+                )
+                await loadData()
+            } catch {
+                errorMessage = "Task konnte nicht entfernt werden."
+            }
+        }
+    }
+
     private func deleteBlock(_ block: FocusBlock) {
         Task {
             do {
@@ -337,11 +427,22 @@ struct BlockPlanningView: View {
 
             calendarEvents = try eventKitRepo.fetchCalendarEvents(for: selectedDate)
             focusBlocks = try eventKitRepo.fetchFocusBlocks(for: selectedDate)
+
+            // Load tasks for the blocks
+            let taskSource = LocalTaskSource(modelContext: modelContext)
+            let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
+            allTasks = try await syncEngine.sync()
         } catch {
             errorMessage = error.localizedDescription
         }
 
         isLoading = false
+    }
+
+    private func tasksForBlock(_ block: FocusBlock) -> [PlanItem] {
+        block.taskIDs.compactMap { taskID in
+            allTasks.first { $0.id == taskID }
+        }
     }
 
     private func createFocusBlock(startDate: Date, endDate: Date) {
@@ -1064,5 +1165,297 @@ struct CalendarEventRow: View {
             )
         }
         .buttonStyle(.plain)
+    }
+}
+
+// MARK: - Timeline Hour Row (Unified Planning View)
+
+/// A single hour row in the unified timeline view
+/// Displays hour marker, focus blocks, free slots, and calendar events
+struct TimelineHourRow: View {
+    let hour: Int
+    let hourHeight: CGFloat
+    let date: Date
+    let events: [CalendarEvent]
+    let focusBlocks: [FocusBlock]
+    let freeSlots: [TimeSlot]
+    let onTapBlock: (FocusBlock) -> Void
+    let onTapEditBlock: (FocusBlock) -> Void
+    let onTapFreeSlot: (TimeSlot) -> Void
+    let onTapEvent: (CalendarEvent) -> Void
+
+    private let timeFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.dateFormat = "HH:mm"
+        return f
+    }()
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 8) {
+            // Hour marker
+            Text(String(format: "%02d:00", hour))
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .frame(width: 45, alignment: .trailing)
+                .accessibilityIdentifier("hourMarker_\(hour)")
+
+            // Content area for this hour
+            VStack(alignment: .leading, spacing: 4) {
+                // Horizontal line
+                Rectangle()
+                    .fill(.secondary.opacity(0.2))
+                    .frame(height: 1)
+
+                // Focus blocks that start in this hour
+                ForEach(blocksInHour) { block in
+                    TimelineFocusBlockRow(
+                        block: block,
+                        onTapBlock: { onTapBlock(block) },
+                        onTapEdit: { onTapEditBlock(block) }
+                    )
+                }
+
+                // Free slots in this hour
+                ForEach(slotsInHour) { slot in
+                    TimelineFreeSlotRow(
+                        slot: slot,
+                        timeFormatter: timeFormatter,
+                        onTap: { onTapFreeSlot(slot) }
+                    )
+                }
+
+                // Calendar events in this hour
+                ForEach(eventsInHour) { event in
+                    TimelineEventRow(
+                        event: event,
+                        timeFormatter: timeFormatter,
+                        onTap: { onTapEvent(event) }
+                    )
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .frame(minHeight: hourHeight)
+        .padding(.trailing)
+    }
+
+    // MARK: - Filtered Items
+
+    private var blocksInHour: [FocusBlock] {
+        let hourStart = createDateForHour(hour: hour, minute: 0)
+        let hourEnd = createDateForHour(hour: hour + 1, minute: 0)
+        return focusBlocks.filter { block in
+            block.startDate >= hourStart && block.startDate < hourEnd
+        }
+    }
+
+    private var slotsInHour: [TimeSlot] {
+        let hourStart = createDateForHour(hour: hour, minute: 0)
+        let hourEnd = createDateForHour(hour: hour + 1, minute: 0)
+        return freeSlots.filter { slot in
+            slot.startDate >= hourStart && slot.startDate < hourEnd
+        }
+    }
+
+    private var eventsInHour: [CalendarEvent] {
+        let hourStart = createDateForHour(hour: hour, minute: 0)
+        let hourEnd = createDateForHour(hour: hour + 1, minute: 0)
+        return events.filter { event in
+            event.startDate >= hourStart && event.startDate < hourEnd
+        }
+    }
+
+    private func createDateForHour(hour: Int, minute: Int) -> Date {
+        var components = Calendar.current.dateComponents([.year, .month, .day], from: date)
+        components.hour = hour
+        components.minute = minute
+        return Calendar.current.date(from: components) ?? date
+    }
+}
+
+// MARK: - Timeline Focus Block Row
+
+/// A focus block displayed in the timeline
+struct TimelineFocusBlockRow: View {
+    let block: FocusBlock
+    let onTapBlock: () -> Void
+    let onTapEdit: () -> Void
+
+    private let timeFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.timeStyle = .short
+        return f
+    }()
+
+    var body: some View {
+        HStack {
+            // Tappable content area (opens Tasks Sheet)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(block.title)
+                    .font(.subheadline.weight(.medium))
+                    .lineLimit(1)
+
+                HStack(spacing: 8) {
+                    Text("\(timeFormatter.string(from: block.startDate)) - \(timeFormatter.string(from: block.endDate))")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+
+                    if !block.taskIDs.isEmpty {
+                        Text("\(block.taskIDs.count) Tasks")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 2)
+                            .background(Capsule().fill(.blue.opacity(0.15)))
+                    }
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .contentShape(Rectangle())
+            .onTapGesture {
+                onTapBlock()
+            }
+            .accessibilityAddTraits(.isButton)
+            .accessibilityLabel("Tasks anzeigen")
+
+            // Edit button (ellipsis) - opens Edit Sheet
+            Button {
+                onTapEdit()
+            } label: {
+                Image(systemName: "ellipsis")
+                    .font(.body)
+                    .foregroundStyle(.secondary)
+                    .padding(8)
+                    .background(Circle().fill(.ultraThinMaterial))
+            }
+            .buttonStyle(.borderless)
+            .accessibilityLabel("Block bearbeiten")
+            .accessibilityIdentifier("focusBlockEditButton_\(block.id)")
+        }
+        .padding(.vertical, 8)
+        .padding(.horizontal, 12)
+        .background(
+            RoundedRectangle(cornerRadius: 8)
+                .fill(.blue.opacity(0.15))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 8)
+                .strokeBorder(.blue.opacity(0.3), lineWidth: 1)
+        )
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("focusBlock_\(block.id)")
+    }
+}
+
+// MARK: - Timeline Free Slot Row
+
+/// A free slot displayed in the timeline (dashed green border)
+struct TimelineFreeSlotRow: View {
+    let slot: TimeSlot
+    let timeFormatter: DateFormatter
+    let onTap: () -> Void
+
+    var body: some View {
+        HStack {
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Freier Slot")
+                    .font(.subheadline.weight(.medium))
+                    .foregroundStyle(.green)
+
+                Text("\(timeFormatter.string(from: slot.startDate)) - \(timeFormatter.string(from: slot.endDate))")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
+            Spacer()
+
+            Text("\(slot.durationMinutes) min")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 4)
+                .background(Capsule().fill(.green.opacity(0.15)))
+
+            Button {
+                onTap()
+            } label: {
+                Image(systemName: "plus.circle.fill")
+                    .font(.title2)
+                    .foregroundStyle(.green)
+            }
+            .buttonStyle(.plain)
+        }
+        .padding(.vertical, 8)
+        .padding(.horizontal, 12)
+        .background(
+            RoundedRectangle(cornerRadius: 8)
+                .fill(.green.opacity(0.05))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 8)
+                .strokeBorder(style: StrokeStyle(lineWidth: 1, dash: [5, 3]))
+                .foregroundStyle(.green.opacity(0.5))
+        )
+        .contentShape(Rectangle())
+        .onTapGesture {
+            onTap()
+        }
+        .accessibilityIdentifier("freeSlot_\(timeFormatter.string(from: slot.startDate))")
+    }
+}
+
+// MARK: - Timeline Event Row
+
+/// A calendar event displayed in the timeline
+struct TimelineEventRow: View {
+    let event: CalendarEvent
+    let timeFormatter: DateFormatter
+    let onTap: () -> Void
+
+    /// Get category color if event has a category
+    private var categoryColor: Color? {
+        guard let categoryString = event.category,
+              let category = CategoryConfig(rawValue: categoryString) else {
+            return nil
+        }
+        return category.color
+    }
+
+    var body: some View {
+        HStack(spacing: 8) {
+            // Category indicator
+            if let color = categoryColor {
+                RoundedRectangle(cornerRadius: 2)
+                    .fill(color)
+                    .frame(width: 4)
+            }
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(event.title)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+
+                Text("\(timeFormatter.string(from: event.startDate)) - \(timeFormatter.string(from: event.endDate))")
+                    .font(.caption)
+                    .foregroundStyle(.tertiary)
+            }
+
+            Spacer()
+
+            Image(systemName: "tag")
+                .foregroundStyle(.tertiary)
+                .font(.caption)
+        }
+        .padding(.vertical, 6)
+        .padding(.horizontal, categoryColor == nil ? 12 : 8)
+        .background(
+            RoundedRectangle(cornerRadius: 8)
+                .fill(.gray.opacity(0.1))
+        )
+        .contentShape(Rectangle())
+        .onTapGesture {
+            onTap()
+        }
     }
 }
