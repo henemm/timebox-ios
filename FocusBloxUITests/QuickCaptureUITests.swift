@@ -114,13 +114,14 @@ final class QuickCaptureUITests: XCTestCase {
         let keyboard = app.keyboards.firstMatch
         if keyboard.exists {
             // Tap on the sheet area above the keyboard to dismiss it
-            app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.2)).tap()
+            // Sheet is now .medium (~0.5), so tap higher up
+            app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.3)).tap()
             // Wait for keyboard to dismiss
             _ = keyboard.waitForNonExistence(timeout: 2)
         }
 
-        // Swipe down on the drag indicator area (sheet is at 0.4 fraction now)
-        let startPoint = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.65))
+        // Swipe down on the drag indicator area (sheet is now .medium ~0.5)
+        let startPoint = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.55))
         let endPoint = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.98))
         startPoint.press(forDuration: 0.1, thenDragTo: endPoint)
 
@@ -161,6 +162,47 @@ final class QuickCaptureUITests: XCTestCase {
     }
 
     // MARK: - Metadata Button Tests
+
+    /// GIVEN: QuickCaptureView is displayed with keyboard visible
+    /// WHEN: User wants to set metadata
+    /// THEN: Metadata buttons should be hittable (not covered by keyboard)
+    /// BUG 20: Currently fails because .fraction(0.4) sheet is too small with keyboard
+    func testMetadataButtonsVisibleWithKeyboard() throws {
+        let textField = app.textFields["quickCaptureTextField"]
+        XCTAssertTrue(textField.waitForExistence(timeout: 3),
+                      "Quick capture text field should exist")
+
+        // Keyboard should be visible (auto-focused)
+        let keyboard = app.keyboards.firstMatch
+        XCTAssertTrue(keyboard.waitForExistence(timeout: 3),
+                      "Keyboard should be visible")
+
+        // While keyboard is showing, metadata buttons must be hittable
+        // This means they are not covered by the keyboard
+        let importanceBtn = app.buttons["qc_importanceButton"]
+        let urgencyBtn = app.buttons["qc_urgencyButton"]
+        let categoryBtn = app.buttons["qc_categoryButton"]
+        let durationBtn = app.buttons["qc_durationButton"]
+
+        XCTAssertTrue(importanceBtn.waitForExistence(timeout: 2),
+                      "Importance button should exist")
+        XCTAssertTrue(importanceBtn.isHittable,
+                      "Importance button should be hittable (not covered by keyboard)")
+
+        XCTAssertTrue(urgencyBtn.isHittable,
+                      "Urgency button should be hittable (not covered by keyboard)")
+
+        XCTAssertTrue(categoryBtn.isHittable,
+                      "Category button should be hittable (not covered by keyboard)")
+
+        XCTAssertTrue(durationBtn.isHittable,
+                      "Duration button should be hittable (not covered by keyboard)")
+
+        // Verify we can actually tap them while keyboard is showing
+        importanceBtn.tap()
+        // Should still work - no crash, button cycles
+        XCTAssertTrue(importanceBtn.exists, "Button should still exist after tap")
+    }
 
     /// GIVEN: QuickCaptureView is displayed
     /// WHEN: View appears
@@ -267,7 +309,8 @@ final class QuickCaptureUITests: XCTestCase {
         let keyboard = app.keyboards.firstMatch
         if keyboard.exists {
             // Tap on sheet background to dismiss keyboard
-            app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.3)).tap()
+            // Sheet is now .medium (~0.5), so tap in the sheet area
+            app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.35)).tap()
             _ = keyboard.waitForNonExistence(timeout: 2)
         }
 

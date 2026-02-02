@@ -21,33 +21,20 @@
 ## 🔴 OFFEN - Neue Bugs/Features
 
 ### Bug 20: QuickCapture Metadaten-Buttons nicht sichtbar (Tastatur verdeckt)
-**Status:** OFFEN
+**Status:** ✅ ERLEDIGT (2026-02-02)
 **Gemeldet:** 2026-02-02
 **Location:** `Sources/Views/QuickCaptureView.swift`
-**Commit:** `76ad5e6` (Feature implementiert, aber nicht sichtbar)
 
 **Problem:**
-- Metadaten-Buttons (Wichtigkeit, Dringlichkeit, Kategorie, Dauer) wurden implementiert
-- UI Tests bestehen (Simulator ohne echte Tastatur)
-- Auf echtem Device: Buttons nicht sichtbar
+- Metadaten-Buttons wurden von Tastatur verdeckt
+- Sheet-Höhe `.fraction(0.4)` zu klein
 
-**Root Cause:**
-1. `.onAppear { isFocused = true }` → Tastatur erscheint sofort bei Sheet-Open
-2. Sheet-Höhe: `.presentationDetents([.fraction(0.4)])` zu klein mit Tastatur
-3. Metadata-Buttons sind zwischen TextField und Speichern-Button
-4. → Tastatur verdeckt die komplette metadataRow
+**Fix:**
+1. VStack in ScrollView gewrappt mit `.scrollDismissesKeyboard(.interactively)`
+2. Sheet-Detent von `.fraction(0.4)` auf `.medium` erhöht
+3. UI Test-Koordinaten angepasst
 
-**Fix-Optionen:**
-1. **Option A:** Sheet größer machen `.fraction(0.6)` oder `.medium`
-2. **Option B:** Metadata-Row ÜBER das TextField verschieben
-3. **Option C:** Tastatur erst fokussieren wenn User tippt (nicht automatisch)
-4. **Option D:** ScrollView innerhalb des Sheets für Scroll bei Tastatur
-
-**Empfehlung:** Option A + D kombinieren - größeres Sheet mit ScrollView
-
-**Betroffene Datei:** `Sources/Views/QuickCaptureView.swift` (~10 LoC)
-
-**Priorität:** HOCH (Feature existiert aber unsichtbar)
+**Priorität:** HOCH (Feature existiert aber unsichtbar) - GEFIXT
 
 ---
 

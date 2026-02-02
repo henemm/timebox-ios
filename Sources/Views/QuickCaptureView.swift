@@ -23,50 +23,53 @@ struct QuickCaptureView: View {
     @State private var showDurationPicker = false
 
     var body: some View {
-        VStack(spacing: 16) {
-            if showSuccess {
-                // Success feedback before auto-dismiss
-                Image(systemName: "checkmark.circle.fill")
-                    .accessibilityIdentifier("quickCaptureSuccessIcon")
-                    .font(.system(size: 48))
-                    .foregroundStyle(.green)
-                    .transition(.scale.combined(with: .opacity))
-            } else {
-                TextField("Was gibt es zu tun?", text: $title)
-                    .accessibilityIdentifier("quickCaptureTextField")
-                    .focused($isFocused)
-                    .font(.title2)
-                    .padding()
-                    .glassEffect()
-                    .clipShape(RoundedRectangle(cornerRadius: 16))
-                    .submitLabel(.done)
-                    .onSubmit {
+        ScrollView {
+            VStack(spacing: 16) {
+                if showSuccess {
+                    // Success feedback before auto-dismiss
+                    Image(systemName: "checkmark.circle.fill")
+                        .accessibilityIdentifier("quickCaptureSuccessIcon")
+                        .font(.system(size: 48))
+                        .foregroundStyle(.green)
+                        .transition(.scale.combined(with: .opacity))
+                } else {
+                    TextField("Was gibt es zu tun?", text: $title)
+                        .accessibilityIdentifier("quickCaptureTextField")
+                        .focused($isFocused)
+                        .font(.title2)
+                        .padding()
+                        .glassEffect()
+                        .clipShape(RoundedRectangle(cornerRadius: 16))
+                        .submitLabel(.done)
+                        .onSubmit {
+                            saveTask()
+                        }
+
+                    // Metadata row with cycle buttons
+                    metadataRow
+
+                    Button {
                         saveTask()
+                    } label: {
+                        Label("Speichern", systemImage: "arrow.up.circle.fill")
+                            .font(.headline)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 4)
                     }
-
-                // Metadata row with cycle buttons
-                metadataRow
-
-                Button {
-                    saveTask()
-                } label: {
-                    Label("Speichern", systemImage: "arrow.up.circle.fill")
-                        .font(.headline)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 4)
+                    .accessibilityIdentifier("quickCaptureSaveButton")
+                    .buttonStyle(.borderedProminent)
+                    .buttonBorderShape(.capsule)
+                    .controlSize(.large)
+                    .sensoryFeedback(.impact, trigger: isSaving)
+                    .disabled(title.trimmingCharacters(in: .whitespaces).isEmpty || isSaving)
                 }
-                .accessibilityIdentifier("quickCaptureSaveButton")
-                .buttonStyle(.borderedProminent)
-                .buttonBorderShape(.capsule)
-                .controlSize(.large)
-                .sensoryFeedback(.impact, trigger: isSaving)
-                .disabled(title.trimmingCharacters(in: .whitespaces).isEmpty || isSaving)
             }
+            .padding(.horizontal, 20)
+            .padding(.top, 24)
         }
-        .padding(.horizontal, 20)
-        .padding(.top, 24)
+        .scrollDismissesKeyboard(.interactively)
         .animation(.spring, value: showSuccess)
-        .presentationDetents([.fraction(0.4)])
+        .presentationDetents([.medium])
         .presentationDragIndicator(.visible)
         .presentationBackground(.ultraThinMaterial)
         .onAppear {
