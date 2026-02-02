@@ -264,8 +264,8 @@ struct BacklogView: View {
             .sheet(item: $taskToEditDirectly) { task in
                 TaskFormSheet(
                     task: task,
-                    onSave: { title, priority, duration, tags, urgency, taskType, dueDate, description in
-                        updateTask(task, title: title, priority: priority, duration: duration, tags: tags, urgency: urgency, taskType: taskType, dueDate: dueDate, description: description)
+                    onSave: { title, priority, duration, tags, urgency, taskType, dueDate, description, recurrencePattern, recurrenceWeekdays, recurrenceMonthDay in
+                        updateTask(task, title: title, priority: priority, duration: duration, tags: tags, urgency: urgency, taskType: taskType, dueDate: dueDate, description: description, recurrencePattern: recurrencePattern, recurrenceWeekdays: recurrenceWeekdays, recurrenceMonthDay: recurrenceMonthDay)
                     },
                     onDelete: {
                         deleteTask(task)
@@ -386,11 +386,11 @@ struct BacklogView: View {
         }
     }
 
-    private func updateTask(_ task: PlanItem, title: String, priority: TaskPriority, duration: Int?, tags: [String], urgency: String?, taskType: String, dueDate: Date?, description: String?) {
+    private func updateTask(_ task: PlanItem, title: String, priority: TaskPriority, duration: Int?, tags: [String], urgency: String?, taskType: String, dueDate: Date?, description: String?, recurrencePattern: String? = nil, recurrenceWeekdays: [Int]? = nil, recurrenceMonthDay: Int? = nil) {
         do {
             let taskSource = LocalTaskSource(modelContext: modelContext)
             let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
-            try syncEngine.updateTask(itemID: task.id, title: title, importance: priority.rawValue, duration: duration, tags: tags, urgency: urgency, taskType: taskType, dueDate: dueDate, description: description)
+            try syncEngine.updateTask(itemID: task.id, title: title, importance: priority.rawValue, duration: duration, tags: tags, urgency: urgency, taskType: taskType, dueDate: dueDate, description: description, recurrencePattern: recurrencePattern, recurrenceWeekdays: recurrenceWeekdays, recurrenceMonthDay: recurrenceMonthDay)
 
             Task {
                 await loadTasks()

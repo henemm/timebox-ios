@@ -19,6 +19,11 @@ struct PlanItem: Identifiable, Sendable {
     let dueDate: Date?
     let taskDescription: String?
 
+    // Recurrence fields
+    let recurrencePattern: String?
+    let recurrenceWeekdays: [Int]?
+    let recurrenceMonthDay: Int?
+
     // Next Up staging
     let isNextUp: Bool
 
@@ -69,6 +74,11 @@ struct PlanItem: Identifiable, Sendable {
         self.nextUpSortOrder = nil
         self.assignedFocusBlockID = nil
         self.completedAt = nil
+
+        // Recurrence fields (Reminders don't have recurrence in this app)
+        self.recurrencePattern = nil
+        self.recurrenceWeekdays = nil
+        self.recurrenceMonthDay = nil
     }
 
     init(localTask: LocalTask) {
@@ -98,6 +108,11 @@ struct PlanItem: Identifiable, Sendable {
         self.nextUpSortOrder = localTask.nextUpSortOrder
         self.assignedFocusBlockID = localTask.assignedFocusBlockID
         self.completedAt = localTask.completedAt
+
+        // Recurrence fields from LocalTask
+        self.recurrencePattern = localTask.recurrencePattern
+        self.recurrenceWeekdays = localTask.recurrenceWeekdays
+        self.recurrenceMonthDay = localTask.recurrenceMonthDay
     }
 
     private static func resolveDuration(manual: Int?, title: String?) -> (Int, DurationSource) {

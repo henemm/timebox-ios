@@ -64,7 +64,7 @@ final class SyncEngine {
         try modelContext.save()
     }
 
-    func updateTask(itemID: String, title: String, importance: Int?, duration: Int?, tags: [String], urgency: String?, taskType: String, dueDate: Date?, description: String?) throws {
+    func updateTask(itemID: String, title: String, importance: Int?, duration: Int?, tags: [String], urgency: String?, taskType: String, dueDate: Date?, description: String?, recurrencePattern: String? = nil, recurrenceWeekdays: [Int]? = nil, recurrenceMonthDay: Int? = nil) throws {
         guard let task = try findTask(byID: itemID) else {
             return
         }
@@ -76,6 +76,9 @@ final class SyncEngine {
         task.taskType = taskType
         task.dueDate = dueDate
         task.taskDescription = description
+        task.recurrencePattern = recurrencePattern ?? "none"
+        task.recurrenceWeekdays = recurrenceWeekdays
+        task.recurrenceMonthDay = recurrenceMonthDay
         try modelContext.save()
     }
 

@@ -22,7 +22,7 @@ struct TaskFormSheet: View {
     }
 
     let mode: Mode
-    let onSave: ((String, TaskPriority, Int?, [String], String?, String, Date?, String?) -> Void)?
+    let onSave: ((String, TaskPriority, Int?, [String], String?, String, Date?, String?, String, [Int]?, Int?) -> Void)?
     let onDelete: (() -> Void)?
     var onCreateComplete: (() -> Void)?
 
@@ -40,6 +40,11 @@ struct TaskFormSheet: View {
     @State private var taskDescription: String = ""
     @State private var isSaving = false
 
+    // Recurrence State
+    @State private var recurrencePattern: RecurrencePattern = .none
+    @State private var selectedWeekdays: Set<Int> = []
+    @State private var monthDay: Int = 1
+
     // MARK: - Initializers
 
     /// Create mode initializer
@@ -52,7 +57,7 @@ struct TaskFormSheet: View {
 
     /// Edit mode initializer
     init(task: PlanItem,
-         onSave: @escaping (String, TaskPriority, Int?, [String], String?, String, Date?, String?) -> Void,
+         onSave: @escaping (String, TaskPriority, Int?, [String], String?, String, Date?, String?, String, [Int]?, Int?) -> Void,
          onDelete: @escaping () -> Void) {
         self.mode = .edit(task)
         self.onSave = onSave
@@ -69,6 +74,11 @@ struct TaskFormSheet: View {
         _hasDueDate = State(initialValue: task.dueDate != nil)
         _dueDate = State(initialValue: task.dueDate ?? Date())
         _taskDescription = State(initialValue: task.taskDescription ?? "")
+
+        // Initialize recurrence state from task
+        _recurrencePattern = State(initialValue: RecurrencePattern(rawValue: task.recurrencePattern ?? "none") ?? .none)
+        _selectedWeekdays = State(initialValue: Set(task.recurrenceWeekdays ?? []))
+        _monthDay = State(initialValue: task.recurrenceMonthDay ?? 1)
     }
 
     // MARK: - Task Type Options
@@ -242,6 +252,44 @@ struct TaskFormSheet: View {
                         }
                     }
 
+                    // MARK: - Recurrence
+                    glassCardSection(id: "recurrence", header: "Wiederholung") {
+                        Picker("Wiederholt sich", selection: $recurrencePattern) {
+                            ForEach(RecurrencePattern.allCases) { pattern in
+                                Text(pattern.displayName).tag(pattern)
+                            }
+                        }
+                        .pickerStyle(.menu)
+                        .accessibilityIdentifier("recurrencePicker")
+
+                        // Inline: Weekdays for weekly/biweekly
+                        if recurrencePattern.requiresWeekdays {
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text("An folgenden Tagen:")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+
+                                HStack(spacing: 8) {
+                                    ForEach(Weekday.all) { weekday in
+                                        WeekdayButton(weekday: weekday, selectedWeekdays: $selectedWeekdays)
+                                            .accessibilityIdentifier("weekdayButton_\(weekday.value)")
+                                    }
+                                }
+                            }
+                        }
+
+                        // Inline: Month day for monthly
+                        if recurrencePattern.requiresMonthDay {
+                            Picker("Am Tag", selection: $monthDay) {
+                                ForEach(1...31, id: \.self) { day in
+                                    Text("\(day).").tag(day)
+                                }
+                                Text("Letzter Tag").tag(32)
+                            }
+                            .accessibilityIdentifier("monthDayPicker")
+                        }
+                    }
+
                     // MARK: - Description
                     glassCardSection(id: "description", header: "Beschreibung (optional)") {
                         TextEditor(text: $taskDescription)
@@ -378,6 +426,10 @@ struct TaskFormSheet: View {
 
         switch mode {
         case .create:
+            // Prepare recurrence data
+            let weekdays: [Int]? = recurrencePattern.requiresWeekdays ? Array(selectedWeekdays).sorted() : nil
+            let monthDayValue: Int? = recurrencePattern.requiresMonthDay ? monthDay : nil
+
             Task {
                 do {
                     let taskSource = LocalTaskSource(modelContext: modelContext)
@@ -389,9 +441,9 @@ struct TaskFormSheet: View {
                         estimatedDuration: duration,
                         urgency: urgency,
                         taskType: taskType,
-                        recurrencePattern: "none",
-                        recurrenceWeekdays: nil,
-                        recurrenceMonthDay: nil,
+                        recurrencePattern: recurrencePattern.rawValue,
+                        recurrenceWeekdays: weekdays,
+                        recurrenceMonthDay: monthDayValue,
                         description: finalDescription
                     )
 
@@ -405,6 +457,10 @@ struct TaskFormSheet: View {
             }
 
         case .edit:
+            // Prepare recurrence data
+            let weekdays: [Int]? = recurrencePattern.requiresWeekdays ? Array(selectedWeekdays).sorted() : nil
+            let monthDayValue: Int? = recurrencePattern.requiresMonthDay ? monthDay : nil
+
             onSave?(
                 title.trimmingCharacters(in: .whitespaces),
                 taskPriority,
@@ -413,7 +469,10 @@ struct TaskFormSheet: View {
                 urgency,
                 taskType,
                 finalDueDate,
-                finalDescription
+                finalDescription,
+                recurrencePattern.rawValue,
+                weekdays,
+                monthDayValue
             )
             dismiss()
         }
