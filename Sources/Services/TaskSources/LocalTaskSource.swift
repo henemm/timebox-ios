@@ -39,6 +39,17 @@ final class LocalTaskSource: @preconcurrency TaskSource, @preconcurrency TaskSou
         return try modelContext.fetch(descriptor)
     }
 
+    func fetchCompletedTasks(withinDays days: Int) async throws -> [LocalTask] {
+        let cutoffDate = Calendar.current.date(byAdding: .day, value: -days, to: Date()) ?? Date()
+        var descriptor = FetchDescriptor<LocalTask>(
+            predicate: #Predicate<LocalTask> { task in
+                task.isCompleted && (task.completedAt != nil && task.completedAt! >= cutoffDate)
+            }
+        )
+        descriptor.sortBy = [SortDescriptor(\.completedAt, order: .reverse)]
+        return try modelContext.fetch(descriptor)
+    }
+
     func markComplete(taskID: String) async throws {
         guard let task = try findTask(byID: taskID) else { return }
         task.isCompleted = true
@@ -57,9 +68,9 @@ final class LocalTaskSource: @preconcurrency TaskSource, @preconcurrency TaskSou
         title: String,
         tags: [String] = [],
         dueDate: Date? = nil,
-        priority: Int = 1,
-        duration: Int? = nil,
-        urgency: String = "not_urgent",
+        importance: Int? = nil,
+        estimatedDuration: Int? = nil,
+        urgency: String? = nil,
         taskType: String = "maintenance",
         recurrencePattern: String = "none",
         recurrenceWeekdays: [Int]? = nil,
@@ -70,11 +81,11 @@ final class LocalTaskSource: @preconcurrency TaskSource, @preconcurrency TaskSou
 
         let task = LocalTask(
             title: title,
-            priority: priority,
+            importance: importance,
             tags: tags,
             dueDate: dueDate,
             sortOrder: nextSortOrder,
-            manualDuration: duration,
+            estimatedDuration: estimatedDuration,
             urgency: urgency,
             taskType: taskType,
             recurrencePattern: recurrencePattern,
@@ -93,8 +104,8 @@ final class LocalTaskSource: @preconcurrency TaskSource, @preconcurrency TaskSou
         title: String? = nil,
         tags: [String]? = nil,
         dueDate: Date? = nil,
-        priority: Int? = nil,
-        duration: Int? = nil,
+        importance: Int? = nil,
+        estimatedDuration: Int? = nil,
         urgency: String? = nil,
         taskType: String? = nil,
         recurrencePattern: String? = nil,
@@ -113,11 +124,11 @@ final class LocalTaskSource: @preconcurrency TaskSource, @preconcurrency TaskSou
         if let dueDate = dueDate {
             task.dueDate = dueDate
         }
-        if let priority = priority {
-            task.priority = priority
+        if let importance = importance {
+            task.importance = importance
         }
-        if let duration = duration {
-            task.manualDuration = duration
+        if let estimatedDuration = estimatedDuration {
+            task.estimatedDuration = estimatedDuration
         }
         if let urgency = urgency {
             task.urgency = urgency

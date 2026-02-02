@@ -10,6 +10,7 @@ struct BacklogView: View {
         case duration = "Dauer"
         case dueDate = "Fälligkeit"
         case tbd = "TBD"
+        case completed = "Erledigt"
 
         var id: String { rawValue }
 
@@ -21,6 +22,7 @@ struct BacklogView: View {
             case .duration: return "clock"
             case .dueDate: return "calendar"
             case .tbd: return "questionmark.circle"
+            case .completed: return "checkmark.circle"
             }
         }
 
@@ -38,6 +40,8 @@ struct BacklogView: View {
                 return ("Keine Tasks mit Fälligkeitsdatum", "Setze Fälligkeitsdaten für deine Tasks.")
             case .tbd:
                 return ("Keine unvollständigen Tasks", "Alle Tasks haben Wichtigkeit, Dringlichkeit und Dauer.")
+            case .completed:
+                return ("Keine erledigten Tasks", "Erledigte Tasks der letzten 7 Tage erscheinen hier.")
             }
         }
     }
@@ -60,6 +64,7 @@ struct BacklogView: View {
     @State private var nextUpFeedback = false
     @State private var completeFeedback = false
     @State private var taskToEdit: PlanItem?
+    @State private var completedTasks: [PlanItem] = []
 
     // MARK: - Next Up Tasks
     private var nextUpTasks: [PlanItem] {
@@ -67,7 +72,8 @@ struct BacklogView: View {
     }
 
     private var backlogTasks: [PlanItem] {
-        planItems.filter { !$0.isCompleted && !$0.isNextUp }
+        // Filter: nicht erledigt, nicht Next Up, nicht einem FocusBlock zugeordnet
+        planItems.filter { !$0.isCompleted && !$0.isNextUp && $0.assignedFocusBlockID == nil }
     }
 
     // MARK: - Eisenhower Matrix Filters (nur vollständige Tasks, keine TBDs)
@@ -207,6 +213,8 @@ struct BacklogView: View {
                             dueDateView
                         case .tbd:
                             tbdView
+                        case .completed:
+                            completedView
                         }
                     }
                 }
@@ -313,6 +321,9 @@ struct BacklogView: View {
             let taskSource = LocalTaskSource(modelContext: modelContext)
             let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
             planItems = try await syncEngine.sync()
+
+            // 3. Erledigte Tasks der letzten 7 Tage laden
+            completedTasks = try await syncEngine.syncCompletedTasks(days: 7)
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -786,6 +797,124 @@ struct BacklogView: View {
         .refreshable {
             await loadTasks()
         }
+    }
+
+    // MARK: - Completed View (erledigte Tasks der letzten 7 Tage)
+    private var completedView: some View {
+        ScrollView {
+            if completedTasks.isEmpty {
+                let emptyState = ViewMode.completed.emptyStateMessage
+                ContentUnavailableView(
+                    emptyState.title,
+                    systemImage: "checkmark.circle",
+                    description: Text(emptyState.description)
+                )
+                .padding(.top, 40)
+            } else {
+                LazyVStack(spacing: 8) {
+                    ForEach(completedTasks) { item in
+                        CompletedTaskRow(
+                            item: item,
+                            onUncomplete: { uncompleteTask(item) },
+                            onDelete: { deleteTask(item) }
+                        )
+                    }
+                }
+                .padding(.horizontal, 16)
+            }
+        }
+        .refreshable {
+            await loadTasks()
+        }
+    }
+
+    private func uncompleteTask(_ item: PlanItem) {
+        do {
+            let taskSource = LocalTaskSource(modelContext: modelContext)
+            let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
+            try syncEngine.uncompleteTask(itemID: item.id)
+            completeFeedback.toggle()
+
+            Task {
+                await loadTasks()
+            }
+        } catch {
+            errorMessage = "Task konnte nicht wiederhergestellt werden."
+        }
+    }
+}
+
+// MARK: - Completed Task Row
+
+struct CompletedTaskRow: View {
+    let item: PlanItem
+    let onUncomplete: () -> Void
+    let onDelete: () -> Void
+
+    private var completedDateText: String {
+        guard let completedAt = item.completedAt else { return "" }
+        let formatter = RelativeDateTimeFormatter()
+        formatter.unitsStyle = .abbreviated
+        return formatter.localizedString(for: completedAt, relativeTo: Date())
+    }
+
+    var body: some View {
+        HStack(spacing: 12) {
+            // Checkmark icon
+            Image(systemName: "checkmark.circle.fill")
+                .font(.title3)
+                .foregroundStyle(.green)
+
+            VStack(alignment: .leading, spacing: 2) {
+                // Strikethrough title
+                Text(item.title)
+                    .font(.subheadline)
+                    .strikethrough()
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+
+                if !completedDateText.isEmpty {
+                    Text("Erledigt \(completedDateText)")
+                        .font(.caption2)
+                        .foregroundStyle(.tertiary)
+                }
+            }
+
+            Spacer()
+
+            // Undo button
+            Button {
+                onUncomplete()
+            } label: {
+                Image(systemName: "arrow.uturn.backward.circle")
+                    .font(.title2)
+                    .foregroundStyle(.blue)
+            }
+            .buttonStyle(.plain)
+            .accessibilityIdentifier("undoCompleteButton_\(item.id)")
+
+            // Delete button
+            Button {
+                onDelete()
+            } label: {
+                Image(systemName: "trash.circle")
+                    .font(.title2)
+                    .foregroundStyle(.red.opacity(0.7))
+            }
+            .buttonStyle(.plain)
+            .accessibilityIdentifier("deleteCompletedButton_\(item.id)")
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 10)
+        .background(
+            RoundedRectangle(cornerRadius: 10)
+                .fill(.ultraThinMaterial)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 10)
+                .strokeBorder(.secondary.opacity(0.2), lineWidth: 1)
+        )
+        .accessibilityIdentifier("completedTaskRow_\(item.id)")
     }
 }
 

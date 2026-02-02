@@ -209,10 +209,11 @@ struct TaskAssignmentView: View {
                     taskTimes: block.taskTimes
                 )
 
-                // Remove from Next Up after assignment
+                // Remove from Next Up and set assignedFocusBlockID
                 let taskSource = LocalTaskSource(modelContext: modelContext)
                 let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
                 try syncEngine.updateNextUp(itemID: taskID, isNextUp: false)
+                try syncEngine.updateAssignedFocusBlock(itemID: taskID, focusBlockID: block.id)
 
                 await loadData()
                 assignmentFeedback.toggle()
@@ -235,9 +236,10 @@ struct TaskAssignmentView: View {
                     taskTimes: block.taskTimes
                 )
 
-                // Restore to Next Up after removal from block
+                // Clear assignedFocusBlockID and restore to Next Up
                 let taskSource = LocalTaskSource(modelContext: modelContext)
                 let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
+                try syncEngine.updateAssignedFocusBlock(itemID: taskID, focusBlockID: nil)
                 try syncEngine.updateNextUp(itemID: taskID, isNextUp: true)
 
                 await loadData()
@@ -310,10 +312,12 @@ struct FocusBlockCard: View {
     let onEditBlock: () -> Void
 
     @State private var isTargeted = false
-    @State private var orderedTaskIDs: [String] = []
+    @State private var orderedTaskIDs: [String]?
 
     private var orderedTasks: [PlanItem] {
-        orderedTaskIDs.compactMap { id in tasks.first { $0.id == id } }
+        // Use orderedTaskIDs if set, otherwise fall back to tasks order
+        let ids = orderedTaskIDs ?? tasks.map { $0.id }
+        return ids.compactMap { id in tasks.first { $0.id == id } }
     }
 
     private var timeRangeText: String {
@@ -395,11 +399,12 @@ struct FocusBlockCard: View {
                     }
                 }
                 .frame(maxHeight: min(CGFloat(tasks.count * 50), 300))
-                .onAppear {
-                    orderedTaskIDs = tasks.map { $0.id }
-                }
                 .onChange(of: tasks.map { $0.id }) { _, newTaskIDs in
-                    orderedTaskIDs = newTaskIDs
+                    // Only update if reordering hasn't happened (user didn't drag)
+                    // or if tasks were added/removed externally
+                    if orderedTaskIDs == nil || Set(orderedTaskIDs!) != Set(newTaskIDs) {
+                        orderedTaskIDs = newTaskIDs
+                    }
                 }
             }
         }
@@ -421,6 +426,8 @@ struct FocusBlockCard: View {
                 isTargeted = targeted
             }
         }
+        // Use accessibilityElement with .isContainer to allow children to have their own identifiers
+        .accessibilityElement(children: .contain)
         .accessibilityIdentifier("focusBlockCard_\(block.id)")
     }
 
@@ -428,17 +435,19 @@ struct FocusBlockCard: View {
 
     private func reorderTask(draggedID: String, targetID: String) {
         guard draggedID != targetID else { return }
-        guard orderedTaskIDs.contains(draggedID) else { return }
 
-        var newOrder = orderedTaskIDs
-        newOrder.removeAll { $0 == draggedID }
+        // Initialize with current task order if not yet set
+        var currentOrder = orderedTaskIDs ?? tasks.map { $0.id }
+        guard currentOrder.contains(draggedID) else { return }
 
-        if let targetIndex = newOrder.firstIndex(of: targetID) {
-            newOrder.insert(draggedID, at: targetIndex)
+        currentOrder.removeAll { $0 == draggedID }
+
+        if let targetIndex = currentOrder.firstIndex(of: targetID) {
+            currentOrder.insert(draggedID, at: targetIndex)
         }
 
-        orderedTaskIDs = newOrder
-        onReorderTasks(newOrder)
+        orderedTaskIDs = currentOrder
+        onReorderTasks(currentOrder)
     }
 }
 
@@ -484,6 +493,7 @@ struct TaskRowInBlock: View {
                 .fill(.background)
         )
         .draggable(PlanItemTransfer(from: task))
+        // Use accessibilityElement with .contain to allow children to have their own identifiers
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("taskInBlock_\(task.id)")
     }

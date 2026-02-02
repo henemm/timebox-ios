@@ -25,6 +25,12 @@ struct PlanItem: Identifiable, Sendable {
     /// Sort order within the Next Up section (for drag & drop reordering)
     let nextUpSortOrder: Int?
 
+    /// ID of the Focus Block this task is assigned to (nil = not assigned)
+    let assignedFocusBlockID: String?
+
+    /// Timestamp when task was completed (for "completed in last 7 days" filter)
+    let completedAt: Date?
+
     /// Task is incomplete (missing importance, urgency, or duration)
     var isTbd: Bool {
         importance == nil || urgency == nil || estimatedDuration == nil
@@ -61,6 +67,8 @@ struct PlanItem: Identifiable, Sendable {
         self.taskDescription = nil
         self.isNextUp = false
         self.nextUpSortOrder = nil
+        self.assignedFocusBlockID = nil
+        self.completedAt = nil
     }
 
     init(localTask: LocalTask) {
@@ -88,6 +96,8 @@ struct PlanItem: Identifiable, Sendable {
         self.taskDescription = localTask.taskDescription
         self.isNextUp = localTask.isNextUp
         self.nextUpSortOrder = localTask.nextUpSortOrder
+        self.assignedFocusBlockID = localTask.assignedFocusBlockID
+        self.completedAt = localTask.completedAt
     }
 
     private static func resolveDuration(manual: Int?, title: String?) -> (Int, DurationSource) {

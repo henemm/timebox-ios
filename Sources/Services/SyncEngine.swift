@@ -18,6 +18,12 @@ final class SyncEngine {
                     .sorted { $0.rank < $1.rank }
     }
 
+    func syncCompletedTasks(days: Int) async throws -> [PlanItem] {
+        let tasks = try await taskSource.fetchCompletedTasks(withinDays: days)
+        return tasks.map { PlanItem(localTask: $0) }
+                    .sorted { ($0.completedAt ?? .distantPast) > ($1.completedAt ?? .distantPast) }
+    }
+
     func updateSortOrder(for items: [PlanItem]) throws {
         for (index, item) in items.enumerated() {
             if let task = try findTask(byID: item.id) {
@@ -31,7 +37,7 @@ final class SyncEngine {
         guard let task = try findTask(byID: itemID) else {
             return
         }
-        task.manualDuration = minutes
+        task.estimatedDuration = minutes
         try modelContext.save()
     }
 
@@ -40,16 +46,36 @@ final class SyncEngine {
             return
         }
         task.isNextUp = isNextUp
+        // Assign sort order when adding to Next Up
+        if isNextUp && task.nextUpSortOrder == nil {
+            task.nextUpSortOrder = Int.max  // Add to end
+        } else if !isNextUp {
+            task.nextUpSortOrder = nil  // Clear when removing
+        }
         try modelContext.save()
     }
 
-    func updateTask(itemID: String, title: String, priority: TaskPriority, duration: Int) throws {
+    func updateNextUpSortOrder(for items: [PlanItem]) throws {
+        for (index, item) in items.enumerated() {
+            if let task = try findTask(byID: item.id) {
+                task.nextUpSortOrder = index
+            }
+        }
+        try modelContext.save()
+    }
+
+    func updateTask(itemID: String, title: String, importance: Int?, duration: Int?, tags: [String], urgency: String?, taskType: String, dueDate: Date?, description: String?) throws {
         guard let task = try findTask(byID: itemID) else {
             return
         }
         task.title = title
-        task.priority = Int(priority.rawValue)
-        task.manualDuration = duration
+        task.importance = importance
+        task.estimatedDuration = duration
+        task.tags = tags
+        task.urgency = urgency
+        task.taskType = taskType
+        task.dueDate = dueDate
+        task.taskDescription = description
         try modelContext.save()
     }
 
@@ -58,6 +84,35 @@ final class SyncEngine {
             return
         }
         modelContext.delete(task)
+        try modelContext.save()
+    }
+
+    func completeTask(itemID: String) throws {
+        guard let task = try findTask(byID: itemID) else {
+            return
+        }
+        task.isCompleted = true
+        task.completedAt = Date()
+        // Clear assignment when completing
+        task.assignedFocusBlockID = nil
+        task.isNextUp = false
+        try modelContext.save()
+    }
+
+    func uncompleteTask(itemID: String) throws {
+        guard let task = try findTask(byID: itemID) else {
+            return
+        }
+        task.isCompleted = false
+        task.completedAt = nil
+        try modelContext.save()
+    }
+
+    func updateAssignedFocusBlock(itemID: String, focusBlockID: String?) throws {
+        guard let task = try findTask(byID: itemID) else {
+            return
+        }
+        task.assignedFocusBlockID = focusBlockID
         try modelContext.save()
     }
 

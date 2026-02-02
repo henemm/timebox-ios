@@ -56,6 +56,12 @@ final class LocalTask {
     /// Sort order within the Next Up section (for drag & drop reordering)
     var nextUpSortOrder: Int?
 
+    /// ID of the Focus Block this task is assigned to (nil = not assigned)
+    var assignedFocusBlockID: String?
+
+    /// Timestamp when task was completed (for "completed in last 7 days" filter)
+    var completedAt: Date?
+
     /// External system identifier for sync (e.g., Notion page ID)
     var externalID: String?
 
