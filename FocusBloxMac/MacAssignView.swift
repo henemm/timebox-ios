@@ -39,8 +39,7 @@ struct MacAssignView: View {
         .navigationTitle("Zuweisen")
         .toolbar {
             ToolbarItem(placement: .automatic) {
-                DatePicker("", selection: $selectedDate, displayedComponents: .date)
-                    .labelsHidden()
+                MacDateNavigator(selectedDate: $selectedDate)
             }
 
             ToolbarItem(placement: .automatic) {
