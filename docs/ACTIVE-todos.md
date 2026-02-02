@@ -20,6 +20,36 @@
 
 ## 🔴 OFFEN - Neue Bugs/Features
 
+### Bug 24: iOS App - Keine Tasks angezeigt (SwiftData/CloudKit Fehler)
+**Status:** OFFEN
+**Gemeldet:** 2026-02-02
+**Platform:** iOS
+**Location:** `Resources/Info.plist`
+
+**Fehlermeldungen:**
+```
+SwiftData.SwiftDataError 1
+BUG IN CLIENT OF CLOUDKIT: CloudKit push notifications require the 'remote-notification' background mode in your info plist.
+Couldn't read values in CFPrefsPlistSource (Domain: group.com.henning.focusblox...)
+```
+
+**Root Cause:**
+`Resources/Info.plist` fehlt `UIBackgroundModes` mit `remote-notification`.
+CloudKit/SwiftData benötigt dies für Push-basierte Sync-Notifications.
+
+**Fix:**
+Zu `Resources/Info.plist` hinzufügen:
+```xml
+<key>UIBackgroundModes</key>
+<array>
+    <string>remote-notification</string>
+</array>
+```
+
+**Priorität:** KRITISCH (iOS App komplett nicht nutzbar)
+
+---
+
 ### Bug 23: macOS App - Kalender/Erinnerungen Zugriff funktioniert nicht
 **Status:** OFFEN
 **Gemeldet:** 2026-02-02
