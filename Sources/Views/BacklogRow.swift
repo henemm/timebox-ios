@@ -7,7 +7,7 @@ struct BacklogRow: View {
     var onAddToNextUp: (() -> Void)?
     var onTap: (() -> Void)?
     var onImportanceCycle: ((Int) -> Void)?  // Cycles: 1 → 2 → 3 → 1
-    var onUrgencyToggle: ((String) -> Void)?  // Toggles: "urgent" ↔ "not_urgent"
+    var onUrgencyToggle: ((String?) -> Void)?  // Cycles: nil → not_urgent → urgent → nil
     var onCategoryTap: (() -> Void)?
     var onEditTap: (() -> Void)?
     var onDeleteTap: (() -> Void)?
@@ -242,7 +242,7 @@ struct BacklogRow: View {
             case "urgent": newUrgency = nil
             default: newUrgency = nil
             }
-            onUrgencyToggle?(newUrgency ?? "")
+            onUrgencyToggle?(newUrgency)
         } label: {
             Image(systemName: urgencyIcon)
                 .font(.system(size: 14))

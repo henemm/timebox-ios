@@ -414,7 +414,7 @@ struct BacklogView: View {
         }
     }
 
-    private func updateUrgency(for item: PlanItem, urgency: String) {
+    private func updateUrgency(for item: PlanItem, urgency: String?) {
         do {
             let taskSource = LocalTaskSource(modelContext: modelContext)
             let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
@@ -949,7 +949,7 @@ struct QuadrantCard: View {
     let onAddToNextUp: (PlanItem) -> Void
     var onComplete: ((PlanItem) -> Void)?
     var onImportanceCycle: ((PlanItem, Int) -> Void)?
-    var onUrgencyToggle: ((PlanItem, String) -> Void)?
+    var onUrgencyToggle: ((PlanItem, String?) -> Void)?
     var onCategoryTap: ((PlanItem) -> Void)?
     var onEditTap: ((PlanItem) -> Void)?
     var onDeleteTap: ((PlanItem) -> Void)?

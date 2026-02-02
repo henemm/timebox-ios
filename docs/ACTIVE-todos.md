@@ -71,39 +71,34 @@
 ---
 
 ### Bug 18: Reminders-Tasks - Dringlichkeit/Wichtigkeit nicht speicherbar
-**Status:** OFFEN (Root Cause identifiziert)
+**Status:** ✅ TEILWEISE GEFIXT (2026-02-02)
 **Gemeldet:** 2026-02-01
 **Location:**
 - `RemindersSyncService.swift:116-124`
 - `BacklogView.swift:380-400`
-- `BacklogRow.swift:247`
+- `BacklogRow.swift:245`
 
 **Problem:**
 1. Bei Tasks aus Apple Reminders: Tippen auf Dringlichkeit/Wichtigkeit Badge setzt Wert nicht
 2. View springt nach oben nach jedem Tap
 3. In Full Edit: Dringlichkeit setzen + Speichern - Wert wird nicht persistiert
-4. Keine Fehlermeldung
 
-**Root Cause (4 Probleme):**
-1. **RC1:** `RemindersSyncService.updateTask()` ueberschreibt `importance` bei JEDEM Sync (Zeile 119)
-2. **RC2:** `loadTasks()` wird nach jedem Update aufgerufen → triggert Re-Import
-3. **RC3:** `isLoading = true` in `loadTasks()` resettet Scroll-Position
-4. **RC4:** `BacklogRow` konvertiert `nil` urgency zu `""` (leerer String)
+**Root Cause Analyse:**
 
-**Fix-Vorschlag:**
-1. `RemindersSyncService.updateTask()`: Lokale Felder (importance, urgency, etc.) NICHT ueberschreiben wenn bereits gesetzt
-2. `BacklogRow`: Callback-Signatur auf `String?` aendern, nil korrekt durchreichen
-3. `BacklogView`: isLoading nur bei initialem Load setzen
+| RC | Problem | Status |
+|----|---------|--------|
+| RC1 | RemindersSyncService überschreibt importance | ✅ War bereits gefixt (prüft auf nil) |
+| RC2 | loadTasks() triggert Re-Import | ✅ War bereits gefixt (refreshLocalTasks() wird verwendet) |
+| RC3 | isLoading resettet Scroll | ✅ Nur bei loadTasks(), nicht refreshLocalTasks() |
+| RC4 | nil urgency → "" String | ✅ **GEFIXT** |
 
-**Test:**
-1. Reminders Sync aktivieren
-2. Task aus Reminders importieren
-3. Importance-Badge tippen → Wert muss wechseln und erhalten bleiben
-4. Urgency-Badge tippen → Wert muss wechseln und erhalten bleiben
-5. Full Edit → Dringlichkeit aendern → Speichern → Erneut oeffnen → Wert muss erhalten sein
-6. Pull-to-Refresh → Werte muessen erhalten bleiben
+**Fix RC4 (2026-02-02):**
+- BacklogRow: `onUrgencyToggle: ((String?) -> Void)?` statt `((String) -> Void)?`
+- BacklogRow: `onUrgencyToggle?(newUrgency)` statt `onUrgencyToggle?(newUrgency ?? "")`
+- BacklogView: `updateUrgency(for:urgency:)` nimmt jetzt `String?`
+- QuadrantSection: Callback-Signatur angepasst
 
-**Prioritaet:** HOCH (Core Feature fuer Reminders-Integration)
+**Prioritaet:** HOCH - Teilweise gefixt, manueller Test auf Device empfohlen
 
 ---
 
