@@ -24,6 +24,8 @@ struct MacPlanningView: View {
     // Sheet states for Focus Block interactions
     @State private var blockForTasks: FocusBlock?
     @State private var blockToEdit: FocusBlock?
+    @State private var showTaskPicker = false
+    @State private var blockForAddingTask: FocusBlock?
 
     // EventKit repository for real calendar access
     private let eventKitRepo = EventKitRepository()
@@ -76,7 +78,8 @@ struct MacPlanningView: View {
                     removeTaskFromBlock(block: block, taskID: taskID)
                 },
                 onAddTask: {
-                    // TODO: Show task picker
+                    blockForAddingTask = block
+                    showTaskPicker = true
                 }
             )
         }
@@ -88,6 +91,18 @@ struct MacPlanningView: View {
                 },
                 onDelete: {
                     deleteBlock(block: block)
+                }
+            )
+        }
+        .sheet(isPresented: $showTaskPicker) {
+            TaskPickerSheet(
+                availableTasks: nextUpTasks,
+                onSelectTask: { task in
+                    if let block = blockForAddingTask {
+                        Task { await addTaskToBlock(blockID: block.id, taskID: task.id) }
+                    }
+                    showTaskPicker = false
+                    blockForAddingTask = nil
                 }
             )
         }
@@ -377,6 +392,69 @@ struct NextUpTaskRow: View {
             }
         }
         .padding(.vertical, 4)
+    }
+}
+
+// MARK: - Task Picker Sheet
+
+/// Sheet for selecting a task to add to a Focus Block
+struct TaskPickerSheet: View {
+    let availableTasks: [LocalTask]
+    let onSelectTask: (LocalTask) -> Void
+
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        NavigationStack {
+            if availableTasks.isEmpty {
+                ContentUnavailableView(
+                    "Keine Tasks verfügbar",
+                    systemImage: "tray",
+                    description: Text("Füge zuerst Tasks zu Next Up hinzu.")
+                )
+            } else {
+                List {
+                    ForEach(availableTasks, id: \.uuid) { task in
+                        Button {
+                            onSelectTask(task)
+                        } label: {
+                            HStack(spacing: 12) {
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(task.title)
+                                        .foregroundStyle(.primary)
+
+                                    HStack(spacing: 8) {
+                                        if let duration = task.estimatedDuration {
+                                            Label("\(duration) min", systemImage: "clock")
+                                                .font(.caption)
+                                                .foregroundStyle(.secondary)
+                                        }
+
+                                        CategoryBadge(taskType: task.taskType)
+                                    }
+                                }
+
+                                Spacer()
+
+                                Image(systemName: "plus.circle")
+                                    .foregroundStyle(.blue)
+                            }
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+                .listStyle(.plain)
+            }
+        }
+        .navigationTitle("Task hinzufügen")
+        .toolbar {
+            ToolbarItem(placement: .cancellationAction) {
+                Button("Abbrechen") {
+                    dismiss()
+                }
+            }
+        }
+        .frame(minWidth: 350, minHeight: 300)
     }
 }
 
