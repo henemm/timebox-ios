@@ -14,10 +14,11 @@
     "FocusBloxMacUITests/MacToolbarNavigationUITests.swift",
     "FocusBloxMac/SidebarView.swift",
     "FocusBloxMac/ContentView.swift",
-    "FocusBloxMac/MacAssignView.swift"
+    "FocusBloxMac/MacAssignView.swift",
+    "Sources/Models/GapFinder.swift"
   ],
   "last_validation": "2026-02-02T18:40:00.000000",
-  "last_change": "2026-02-02T19:46:34.266289",
+  "last_change": "2026-02-02T19:56:55.427946",
   "validation_result": {
     "status": "passed",
     "build_status": "success",

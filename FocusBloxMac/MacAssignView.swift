@@ -18,7 +18,9 @@ struct MacAssignView: View {
     @Query(filter: #Predicate<LocalTask> { !$0.isCompleted })
     private var allTasks: [LocalTask]
 
-    @State private var selectedDate = Date()
+    @Binding var selectedDate: Date
+    @Binding var highlightedBlockID: String?
+
     @State private var focusBlocks: [FocusBlock] = []
     @State private var isLoading = false
     @State private var errorMessage: String?
@@ -34,7 +36,7 @@ struct MacAssignView: View {
 
             // Right: Next Up Tasks (available for assignment)
             nextUpSection
-                .frame(minWidth: 250, maxWidth: 350)
+                .frame(minWidth: 250, maxWidth: 350, maxHeight: .infinity)
         }
         .navigationTitle("Zuweisen")
         .toolbar {
@@ -73,33 +75,50 @@ struct MacAssignView: View {
                 systemImage: "exclamationmark.triangle",
                 description: Text(error)
             )
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else if focusBlocks.isEmpty {
             ContentUnavailableView(
                 "Keine Focus Blocks",
                 systemImage: "rectangle.split.3x1",
                 description: Text("Erstelle Focus Blocks in der Planen-Ansicht")
             )
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else {
-            ScrollView {
-                LazyVStack(spacing: 16) {
-                    ForEach(focusBlocks) { block in
-                        MacFocusBlockCard(
-                            block: block,
-                            tasks: tasksForBlock(block),
-                            onDropTask: { taskID in
-                                Task { await assignTaskToBlock(taskID: taskID, block: block) }
-                            },
-                            onRemoveTask: { taskID in
-                                Task { await removeTaskFromBlock(taskID: taskID, block: block) }
-                            },
-                            onReorderTasks: { newOrder in
-                                Task { await reorderTasksInBlock(newOrder: newOrder, block: block) }
-                            }
-                        )
+            ScrollViewReader { proxy in
+                ScrollView {
+                    LazyVStack(spacing: 16) {
+                        ForEach(focusBlocks) { block in
+                            MacFocusBlockCard(
+                                block: block,
+                                tasks: tasksForBlock(block),
+                                onDropTask: { taskID in
+                                    Task { await assignTaskToBlock(taskID: taskID, block: block) }
+                                },
+                                onRemoveTask: { taskID in
+                                    Task { await removeTaskFromBlock(taskID: taskID, block: block) }
+                                },
+                                onReorderTasks: { newOrder in
+                                    Task { await reorderTasksInBlock(newOrder: newOrder, block: block) }
+                                }
+                            )
+                            .id(block.id)
+                        }
+                    }
+                    .padding()
+                }
+                .onChange(of: highlightedBlockID) { _, newValue in
+                    if let blockID = newValue {
+                        withAnimation(.smooth) {
+                            proxy.scrollTo(blockID, anchor: .top)
+                        }
+                        // Reset after scroll
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                            highlightedBlockID = nil
+                        }
                     }
                 }
-                .padding()
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
     }
 
@@ -449,6 +468,9 @@ struct MacDraggableTaskRow: View {
 }
 
 #Preview {
-    MacAssignView()
-        .frame(width: 800, height: 600)
+    MacAssignView(
+        selectedDate: .constant(Date()),
+        highlightedBlockID: .constant(nil)
+    )
+    .frame(width: 800, height: 600)
 }

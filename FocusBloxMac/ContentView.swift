@@ -47,6 +47,10 @@ struct ContentView: View {
     @State private var selectedFilter: SidebarFilter = .all
     @State private var selectedTasks: Set<UUID> = []
 
+    // Shared state between Planen and Zuweisen tabs
+    @State private var sharedDate = Date()
+    @State private var highlightedBlockID: String?
+
     // Sync state
     @State private var isSyncing = false
     @State private var syncError: String?
@@ -176,9 +180,18 @@ struct ContentView: View {
         case .backlog:
             backlogView
         case .planning:
-            MacPlanningView()
+            MacPlanningView(
+                selectedDate: $sharedDate,
+                onNavigateToBlock: { blockID in
+                    highlightedBlockID = blockID
+                    selectedSection = .assign
+                }
+            )
         case .assign:
-            MacAssignView()
+            MacAssignView(
+                selectedDate: $sharedDate,
+                highlightedBlockID: $highlightedBlockID
+            )
         case .focus:
             MacFocusView()
         case .review:

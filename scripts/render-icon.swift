@@ -128,36 +128,54 @@ struct ViewfinderSymbol: View {
     let width: CGFloat
 
     var body: some View {
-        ZStack {
+        let symbolWidth = width * 0.32
+        let symbolHeight = width * 0.22
+        let arm = width * 0.08
+        let strokeWidth = width * 0.035
+
+        return Canvas { context, size in
+            let centerX = size.width / 2
+            let centerY = size.height / 2
+            let halfW = symbolWidth / 2
+            let halfH = symbolHeight / 2
+
             // Linke Klammer [
-            Path { path in
-                let arm = width * 0.08
-                let h = width * 0.22
-                path.move(to: CGPoint(x: arm, y: 0))
-                path.addLine(to: CGPoint(x: 0, y: 0))
-                path.addLine(to: CGPoint(x: 0, y: h))
-                path.addLine(to: CGPoint(x: arm, y: h))
-            }
-            .stroke(Color.white, style: StrokeStyle(lineWidth: width * 0.035, lineCap: .round, lineJoin: .round))
-            .offset(x: -width * 0.12, y: -width * 0.11)
+            var leftBracket = Path()
+            leftBracket.move(to: CGPoint(x: centerX - halfW + arm, y: centerY - halfH))
+            leftBracket.addLine(to: CGPoint(x: centerX - halfW, y: centerY - halfH))
+            leftBracket.addLine(to: CGPoint(x: centerX - halfW, y: centerY + halfH))
+            leftBracket.addLine(to: CGPoint(x: centerX - halfW + arm, y: centerY + halfH))
+
+            context.stroke(
+                leftBracket,
+                with: .color(.white),
+                style: StrokeStyle(lineWidth: strokeWidth, lineCap: .round, lineJoin: .round)
+            )
 
             // Rechte Klammer ]
-            Path { path in
-                let arm = width * 0.08
-                let h = width * 0.22
-                path.move(to: CGPoint(x: 0, y: 0))
-                path.addLine(to: CGPoint(x: arm, y: 0))
-                path.addLine(to: CGPoint(x: arm, y: h))
-                path.addLine(to: CGPoint(x: 0, y: h))
-            }
-            .stroke(Color.white, style: StrokeStyle(lineWidth: width * 0.035, lineCap: .round, lineJoin: .round))
-            .offset(x: width * 0.12, y: -width * 0.11)
+            var rightBracket = Path()
+            rightBracket.move(to: CGPoint(x: centerX + halfW - arm, y: centerY - halfH))
+            rightBracket.addLine(to: CGPoint(x: centerX + halfW, y: centerY - halfH))
+            rightBracket.addLine(to: CGPoint(x: centerX + halfW, y: centerY + halfH))
+            rightBracket.addLine(to: CGPoint(x: centerX + halfW - arm, y: centerY + halfH))
 
-            // Zen Dot
-            Circle()
-                .fill(Color.white)
-                .frame(width: width * 0.07)
+            context.stroke(
+                rightBracket,
+                with: .color(.white),
+                style: StrokeStyle(lineWidth: strokeWidth, lineCap: .round, lineJoin: .round)
+            )
+
+            // Zen-Punkt
+            let dotSize = width * 0.07
+            let dotRect = CGRect(
+                x: centerX - dotSize / 2,
+                y: centerY - dotSize / 2,
+                width: dotSize,
+                height: dotSize
+            )
+            context.fill(Path(ellipseIn: dotRect), with: .color(.white))
         }
+        .frame(width: width * 0.5, height: width * 0.4)
     }
 }
 
@@ -185,14 +203,24 @@ func renderAllIcons() {
     let scriptPath = URL(fileURLWithPath: #file)
     let projectRoot = scriptPath.deletingLastPathComponent().deletingLastPathComponent()
 
-    // 1. Render for iOS Icon Composer (foreground.png)
-    let foregroundPath = projectRoot.appendingPathComponent("AppIcon.icon/Assets/foreground.png")
+    // 1. Render for iOS Icon Composer (foreground.png) AND iOS Assets (AppIcon.png)
     if let pngData = renderIcon(size: 1024) {
+        // Icon Composer foreground
+        let foregroundPath = projectRoot.appendingPathComponent("AppIcon.icon/Assets/foreground.png")
         do {
             try pngData.write(to: foregroundPath)
             print("✓ iOS Icon Composer: foreground.png (1024x1024)")
         } catch {
             print("✗ Failed: foreground.png - \(error)")
+        }
+
+        // iOS Assets AppIcon.png
+        let iOSIconPath = projectRoot.appendingPathComponent("Resources/Assets.xcassets/AppIcon.appiconset/AppIcon.png")
+        do {
+            try pngData.write(to: iOSIconPath)
+            print("✓ iOS Assets: AppIcon.png (1024x1024)")
+        } catch {
+            print("✗ Failed: AppIcon.png - \(error)")
         }
     }
 

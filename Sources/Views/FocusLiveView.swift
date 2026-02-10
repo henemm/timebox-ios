@@ -47,6 +47,7 @@ struct FocusLiveView: View {
     @State private var allTasks: [PlanItem] = []
     @State private var isLoading = false
     @State private var errorMessage: String?
+    @State private var isPermissionDenied = false
     @State private var showSprintReview = false
     @State private var completionFeedback = false
     // Timer for progress updates
@@ -70,11 +71,24 @@ struct FocusLiveView: View {
                     Spacer()
                 } else if let error = errorMessage {
                     Spacer()
-                    ContentUnavailableView(
-                        "Fehler",
-                        systemImage: "exclamationmark.triangle",
-                        description: Text(error)
-                    )
+                    VStack(spacing: 16) {
+                        ContentUnavailableView(
+                            isPermissionDenied ? "Berechtigung erforderlich" : "Fehler",
+                            systemImage: isPermissionDenied ? "lock.shield" : "exclamationmark.triangle",
+                            description: Text(error)
+                        )
+
+                        if isPermissionDenied {
+                            Button {
+                                if let url = URL(string: UIApplication.openSettingsURLString) {
+                                    UIApplication.shared.open(url)
+                                }
+                            } label: {
+                                Label("Einstellungen öffnen", systemImage: "gear")
+                            }
+                            .buttonStyle(.borderedProminent)
+                        }
+                    }
                     Spacer()
                 } else if let block = activeBlock {
                     activeFocusContent(block: block)
@@ -413,12 +427,14 @@ struct FocusLiveView: View {
     private func loadData() async {
         isLoading = true
         errorMessage = nil
+        isPermissionDenied = false
         print("📥 [FocusLiveView] loadData: starting...")
         do {
             let hasAccess = try await eventKitRepo.requestAccess()
             print("📥 [FocusLiveView] loadData: hasAccess=\(hasAccess)")
             guard hasAccess else {
-                errorMessage = "Zugriff verweigert."
+                errorMessage = "Zugriff auf Kalender/Erinnerungen verweigert. Bitte in den Einstellungen aktivieren."
+                isPermissionDenied = true
                 isLoading = false
                 return
             }

@@ -9,6 +9,7 @@ struct PlanningView: View {
     @State private var unscheduledTasks: [PlanItem] = []
     @State private var isLoading = false
     @State private var errorMessage: String?
+    @State private var isPermissionDenied = false
     @State private var scheduleFeedback = false
     @State private var selectedEvent: CalendarEvent?
     @State private var showEventActions = false
@@ -22,11 +23,24 @@ struct PlanningView: View {
                     Spacer()
                 } else if let error = errorMessage {
                     Spacer()
-                    ContentUnavailableView(
-                        "Fehler",
-                        systemImage: "exclamationmark.triangle",
-                        description: Text(error)
-                    )
+                    VStack(spacing: 16) {
+                        ContentUnavailableView(
+                            isPermissionDenied ? "Berechtigung erforderlich" : "Fehler",
+                            systemImage: isPermissionDenied ? "lock.shield" : "exclamationmark.triangle",
+                            description: Text(error)
+                        )
+
+                        if isPermissionDenied {
+                            Button {
+                                if let url = URL(string: UIApplication.openSettingsURLString) {
+                                    UIApplication.shared.open(url)
+                                }
+                            } label: {
+                                Label("Einstellungen öffnen", systemImage: "gear")
+                            }
+                            .buttonStyle(.borderedProminent)
+                        }
+                    }
                     Spacer()
                 } else {
                     TimelineView(
@@ -91,12 +105,14 @@ struct PlanningView: View {
     private func loadData() async {
         isLoading = true
         errorMessage = nil
+        isPermissionDenied = false
 
         do {
             // Request both permissions
             let hasAccess = try await eventKitRepo.requestAccess()
             guard hasAccess else {
-                errorMessage = "Zugriff auf Kalender/Erinnerungen verweigert."
+                errorMessage = "Zugriff auf Kalender/Erinnerungen verweigert. Bitte in den Einstellungen aktivieren."
+                isPermissionDenied = true
                 isLoading = false
                 return
             }

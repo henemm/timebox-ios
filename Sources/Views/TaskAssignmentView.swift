@@ -10,6 +10,7 @@ struct TaskAssignmentView: View {
     @State private var allTasks: [PlanItem] = []  // All tasks for block display
     @State private var isLoading = false
     @State private var errorMessage: String?
+    @State private var isPermissionDenied = false
     @State private var assignmentFeedback = false
     @State private var blockToEdit: FocusBlock?
 
@@ -22,11 +23,24 @@ struct TaskAssignmentView: View {
                     Spacer()
                 } else if let error = errorMessage {
                     Spacer()
-                    ContentUnavailableView(
-                        "Fehler",
-                        systemImage: "exclamationmark.triangle",
-                        description: Text(error)
-                    )
+                    VStack(spacing: 16) {
+                        ContentUnavailableView(
+                            isPermissionDenied ? "Berechtigung erforderlich" : "Fehler",
+                            systemImage: isPermissionDenied ? "lock.shield" : "exclamationmark.triangle",
+                            description: Text(error)
+                        )
+
+                        if isPermissionDenied {
+                            Button {
+                                if let url = URL(string: UIApplication.openSettingsURLString) {
+                                    UIApplication.shared.open(url)
+                                }
+                            } label: {
+                                Label("Einstellungen öffnen", systemImage: "gear")
+                            }
+                            .buttonStyle(.borderedProminent)
+                        }
+                    }
                     Spacer()
                 } else if focusBlocks.isEmpty {
                     Spacer()
@@ -159,11 +173,13 @@ struct TaskAssignmentView: View {
     private func loadData() async {
         isLoading = true
         errorMessage = nil
+        isPermissionDenied = false
 
         do {
             let hasAccess = try await eventKitRepo.requestAccess()
             guard hasAccess else {
-                errorMessage = "Zugriff auf Kalender/Erinnerungen verweigert."
+                errorMessage = "Zugriff auf Kalender/Erinnerungen verweigert. Bitte in den Einstellungen aktivieren."
+                isPermissionDenied = true
                 isLoading = false
                 return
             }

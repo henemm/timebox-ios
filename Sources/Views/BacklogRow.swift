@@ -34,13 +34,10 @@ struct BacklogRow: View {
             .accessibilityIdentifier("completeButton_\(item.id)")
             .accessibilityLabel("Als erledigt markieren")
 
-            // Left Column: Content (Title + Metadata)
+            // Content (Title + Metadata) - full width, no right column
+            // Swipe actions handle Next Up (right) and Edit/Delete (left)
             contentSection
-
-            Spacer(minLength: 8)
-
-            // Right Column: 2 Buttons (Next Up + Menu)
-            rightColumnButtons
+                .frame(maxWidth: .infinity, alignment: .leading)
         }
         .padding(12)
         .background(
@@ -394,64 +391,6 @@ struct BacklogRow: View {
         .accessibilityIdentifier("durationBadge_\(item.id)")
         .accessibilityLabel(isDurationSet ? "Dauer: \(item.effectiveDuration) Minuten" : "Dauer nicht gesetzt")
     }
-
-    // MARK: - Right Column (2 Buttons Vertical)
-
-    private var rightColumnButtons: some View {
-        VStack(spacing: 0) {
-            // Next Up Button (hidden if already in Next Up)
-            if !item.isNextUp {
-                nextUpButton
-            }
-
-            // Actions Menu
-            actionsMenu
-        }
-        .frame(width: 44)
-    }
-
-    // MARK: - Next Up Button
-
-    private var nextUpButton: some View {
-        Button {
-            onAddToNextUp?()
-        } label: {
-            Image(systemName: "arrow.up.circle")
-                .font(.system(size: 20))
-                .foregroundStyle(.blue)
-                .frame(width: 44, height: 44)
-                .contentShape(Rectangle())
-        }
-        .accessibilityIdentifier("nextUpButton_\(item.id)")
-        .accessibilityLabel("Zu Next Up hinzufuegen")
-    }
-
-    // MARK: - Actions Menu (only Edit + Delete)
-
-    private var actionsMenu: some View {
-        Menu {
-            Button {
-                onEditTap?()
-            } label: {
-                Label("Bearbeiten", systemImage: "pencil")
-            }
-
-            Divider()
-
-            Button(role: .destructive) {
-                onDeleteTap?()
-            } label: {
-                Label("Löschen", systemImage: "trash")
-            }
-        } label: {
-            Image(systemName: "ellipsis")
-                .foregroundStyle(.secondary)
-                .frame(width: 44, height: 44)
-                .contentShape(Rectangle())
-        }
-        .accessibilityIdentifier("actionsMenu_\(item.id)")
-    }
-
 
     // MARK: - Helper Functions
 

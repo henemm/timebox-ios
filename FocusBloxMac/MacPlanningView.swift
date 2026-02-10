@@ -15,17 +15,16 @@ struct MacPlanningView: View {
            sort: \LocalTask.nextUpSortOrder)
     private var nextUpTasks: [LocalTask]
 
-    @State private var selectedDate = Date()
+    @Binding var selectedDate: Date
+    let onNavigateToBlock: (String) -> Void
+
     @State private var calendarEvents: [CalendarEvent] = []
     @State private var isLoading = false
     @State private var errorMessage: String?
     @State private var hasCalendarAccess = false
 
-    // Sheet states for Focus Block interactions
-    @State private var blockForTasks: FocusBlock?
+    // Sheet state for editing block time
     @State private var blockToEdit: FocusBlock?
-    @State private var showTaskPicker = false
-    @State private var blockForAddingTask: FocusBlock?
 
     // EventKit repository for real calendar access
     private let eventKitRepo = EventKitRepository()
@@ -35,6 +34,15 @@ struct MacPlanningView: View {
         calendarEvents.compactMap { FocusBlock(from: $0) }
     }
 
+    // Free time slots for smart suggestions
+    private var computedFreeSlots: [TimeSlot] {
+        let finder = GapFinder(events: calendarEvents, focusBlocks: focusBlocks, date: selectedDate)
+        return finder.findFreeSlots(minMinutes: 30, maxMinutes: 60)
+    }
+
+    // Sheet state for creating new blocks from free slots
+    @State private var selectedSlot: TimeSlot?
+
     var body: some View {
         HSplitView {
             // Left: Timeline
@@ -43,7 +51,7 @@ struct MacPlanningView: View {
 
             // Right: Next Up Tasks
             nextUpSection
-                .frame(minWidth: 250, maxWidth: 350)
+                .frame(minWidth: 250, maxWidth: 350, maxHeight: .infinity)
         }
         .navigationTitle("Planen")
         .toolbar {
@@ -66,26 +74,6 @@ struct MacPlanningView: View {
         .onChange(of: selectedDate) {
             Task { await loadCalendarEvents() }
         }
-        .sheet(item: $blockForTasks) { block in
-            FocusBlockTasksSheet(
-                block: block,
-                tasks: tasksForBlock(block),
-                onReorder: { newOrder in
-                    reorderTasksInBlock(block: block, newOrder: newOrder)
-                },
-                onRemoveTask: { taskID in
-                    removeTaskFromBlock(block: block, taskID: taskID)
-                },
-                onAddTask: {
-                    // Store block reference, dismiss this sheet, then show picker
-                    blockForAddingTask = block
-                    blockForTasks = nil // Dismiss current sheet first
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                        showTaskPicker = true
-                    }
-                }
-            )
-        }
         .sheet(item: $blockToEdit) { block in
             EditFocusBlockSheet(
                 block: block,
@@ -97,15 +85,11 @@ struct MacPlanningView: View {
                 }
             )
         }
-        .sheet(isPresented: $showTaskPicker) {
-            TaskPickerSheet(
-                availableTasks: nextUpTasks,
-                onSelectTask: { task in
-                    if let block = blockForAddingTask {
-                        Task { await addTaskToBlock(blockID: block.id, taskID: task.id) }
-                    }
-                    showTaskPicker = false
-                    blockForAddingTask = nil
+        .sheet(item: $selectedSlot) { slot in
+            MacCreateFocusBlockSheet(
+                slot: slot,
+                onCreate: { start, end in
+                    Task { await createFocusBlockFromSlot(start: start, end: end) }
                 }
             )
         }
@@ -124,17 +108,20 @@ struct MacPlanningView: View {
                 systemImage: "exclamationmark.triangle",
                 description: Text(error)
             )
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else if !hasCalendarAccess {
             ContentUnavailableView(
                 "Kalender-Zugriff erforderlich",
                 systemImage: "calendar.badge.exclamationmark",
                 description: Text("Bitte erlaube den Zugriff auf deinen Kalender in den Systemeinstellungen.")
             )
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else {
             MacTimelineView(
                 date: selectedDate,
                 events: calendarEvents,
                 focusBlocks: focusBlocks,
+                freeSlots: computedFreeSlots,
                 onCreateFocusBlock: { startTime, duration, taskID in
                     Task { await createFocusBlock(at: startTime, duration: duration, taskID: taskID) }
                 },
@@ -142,10 +129,13 @@ struct MacPlanningView: View {
                     Task { await addTaskToBlock(blockID: blockID, taskID: taskID) }
                 },
                 onTapBlock: { block in
-                    blockForTasks = block
+                    onNavigateToBlock(block.id)
                 },
                 onTapEditBlock: { block in
                     blockToEdit = block
+                },
+                onTapFreeSlot: { slot in
+                    selectedSlot = slot
                 }
             )
         }
@@ -216,8 +206,8 @@ struct MacPlanningView: View {
         }
     }
 
-    private func loadCalendarEvents() async {
-        isLoading = true
+    private func loadCalendarEvents(showSpinner: Bool = true) async {
+        if showSpinner { isLoading = true }
         errorMessage = nil
 
         do {
@@ -227,48 +217,72 @@ struct MacPlanningView: View {
             errorMessage = error.localizedDescription
         }
 
-        isLoading = false
+        if showSpinner { isLoading = false }
     }
 
     // MARK: - Focus Block Actions
 
     private func createFocusBlock(at startTime: Date, duration: Int, taskID: String) async {
-        // Calculate end time
-        let endTime = Calendar.current.date(byAdding: .minute, value: duration, to: startTime) ?? startTime
+        do {
+            // Calculate end time
+            let endTime = Calendar.current.date(byAdding: .minute, value: duration, to: startTime) ?? startTime
 
-        // Create new focus block event
-        let newBlock = CalendarEvent(
-            id: UUID().uuidString,
-            title: "Focus Block",
-            startDate: startTime,
-            endDate: endTime,
-            isAllDay: false,
-            calendarColor: nil,
-            notes: FocusBlock.serializeToNotes(taskIDs: [taskID], completedTaskIDs: [])
-        )
+            // Create focus block in calendar via EventKit
+            let blockID = try eventKitRepo.createFocusBlock(startDate: startTime, endDate: endTime)
 
-        // Add to calendar events (in production, this would use EventKit)
-        calendarEvents.append(newBlock)
+            // Add the task to the newly created block
+            try eventKitRepo.updateFocusBlock(
+                eventID: blockID,
+                taskIDs: [taskID],
+                completedTaskIDs: [],
+                taskTimes: [:]
+            )
 
-        // Remove task from Next Up
-        if let task = nextUpTasks.first(where: { $0.id == taskID }) {
-            task.isNextUp = false
-            try? modelContext.save()
+            // Optimistic UI: add synthetic event to local array immediately
+            let formatter = DateFormatter()
+            formatter.timeStyle = .short
+            let notes = FocusBlock.serializeToNotes(taskIDs: [taskID], completedTaskIDs: [])
+            let syntheticEvent = CalendarEvent(
+                id: blockID,
+                title: "Focus Block \(formatter.string(from: startTime))",
+                startDate: startTime,
+                endDate: endTime,
+                isAllDay: false,
+                calendarColor: nil,
+                notes: notes
+            )
+            calendarEvents.append(syntheticEvent)
+
+            // Remove task from Next Up
+            if let task = nextUpTasks.first(where: { $0.id == taskID }) {
+                task.isNextUp = false
+                try? modelContext.save()
+            }
+
+            // Background sync to get accurate calendar colors etc.
+            await loadCalendarEvents(showSpinner: false)
+        } catch {
+            errorMessage = "Fehler beim Erstellen: \(error.localizedDescription)"
         }
     }
 
     private func addTaskToBlock(blockID: String, taskID: String) async {
-        // Find the event and update its notes
-        guard let index = calendarEvents.firstIndex(where: { $0.id == blockID }) else { return }
+        // Find the event to get current task list
+        guard let eventIndex = calendarEvents.firstIndex(where: { $0.id == blockID }) else { return }
+        let event = calendarEvents[eventIndex]
 
-        let event = calendarEvents[index]
         var taskIDs = event.focusBlockTaskIDs
 
         // Don't add duplicate
         guard !taskIDs.contains(taskID) else { return }
         taskIDs.append(taskID)
 
-        // Update the event with new task list
+        // Optimistic UI: update local event notes immediately
+        let updatedNotes = FocusBlock.serializeToNotes(
+            taskIDs: taskIDs,
+            completedTaskIDs: event.focusBlockCompletedIDs,
+            taskTimes: event.focusBlockTaskTimes
+        )
         let updatedEvent = CalendarEvent(
             id: event.id,
             title: event.title,
@@ -276,66 +290,32 @@ struct MacPlanningView: View {
             endDate: event.endDate,
             isAllDay: event.isAllDay,
             calendarColor: event.calendarColor,
-            notes: FocusBlock.serializeToNotes(taskIDs: taskIDs, completedTaskIDs: event.focusBlockCompletedIDs)
+            notes: updatedNotes
         )
+        calendarEvents[eventIndex] = updatedEvent
 
-        calendarEvents[index] = updatedEvent
-
-        // Remove task from Next Up
+        // Remove task from Next Up immediately
         if let task = nextUpTasks.first(where: { $0.id == taskID }) {
             task.isNextUp = false
             try? modelContext.save()
         }
-    }
 
-    // MARK: - Focus Block Sheet Actions
-
-    private func tasksForBlock(_ block: FocusBlock) -> [PlanItem] {
-        // Convert task IDs to PlanItems
-        return block.taskIDs.compactMap { taskID in
-            if let task = nextUpTasks.first(where: { $0.id == taskID }) {
-                return PlanItem(localTask: task)
-            }
-            return nil
+        // Persist to EventKit in background
+        do {
+            try eventKitRepo.updateFocusBlock(
+                eventID: blockID,
+                taskIDs: taskIDs,
+                completedTaskIDs: event.focusBlockCompletedIDs,
+                taskTimes: [:]
+            )
+        } catch {
+            // Rollback on failure
+            calendarEvents[eventIndex] = event
+            errorMessage = "Fehler beim Zuweisen: \(error.localizedDescription)"
         }
     }
 
-    private func reorderTasksInBlock(block: FocusBlock, newOrder: [String]) {
-        guard let index = calendarEvents.firstIndex(where: { $0.id == block.id }) else { return }
-
-        let event = calendarEvents[index]
-        let updatedEvent = CalendarEvent(
-            id: event.id,
-            title: event.title,
-            startDate: event.startDate,
-            endDate: event.endDate,
-            isAllDay: event.isAllDay,
-            calendarColor: event.calendarColor,
-            notes: FocusBlock.serializeToNotes(taskIDs: newOrder, completedTaskIDs: event.focusBlockCompletedIDs)
-        )
-
-        calendarEvents[index] = updatedEvent
-    }
-
-    private func removeTaskFromBlock(block: FocusBlock, taskID: String) {
-        guard let index = calendarEvents.firstIndex(where: { $0.id == block.id }) else { return }
-
-        let event = calendarEvents[index]
-        var taskIDs = event.focusBlockTaskIDs
-        taskIDs.removeAll { $0 == taskID }
-
-        let updatedEvent = CalendarEvent(
-            id: event.id,
-            title: event.title,
-            startDate: event.startDate,
-            endDate: event.endDate,
-            isAllDay: event.isAllDay,
-            calendarColor: event.calendarColor,
-            notes: FocusBlock.serializeToNotes(taskIDs: taskIDs, completedTaskIDs: event.focusBlockCompletedIDs)
-        )
-
-        calendarEvents[index] = updatedEvent
-    }
+    // MARK: - Focus Block Edit Actions
 
     private func updateBlockTime(block: FocusBlock, start: Date, end: Date) {
         guard let index = calendarEvents.firstIndex(where: { $0.id == block.id }) else { return }
@@ -356,6 +336,73 @@ struct MacPlanningView: View {
 
     private func deleteBlock(block: FocusBlock) {
         calendarEvents.removeAll { $0.id == block.id }
+    }
+
+    private func createFocusBlockFromSlot(start: Date, end: Date) async {
+        do {
+            // Create focus block in calendar via EventKit
+            _ = try eventKitRepo.createFocusBlock(startDate: start, endDate: end)
+
+            // Reload to show new block
+            await loadCalendarEvents()
+        } catch {
+            errorMessage = "Fehler beim Erstellen: \(error.localizedDescription)"
+        }
+    }
+}
+
+// MARK: - Create Focus Block Sheet (macOS)
+
+struct MacCreateFocusBlockSheet: View {
+    let slot: TimeSlot
+    let onCreate: (Date, Date) -> Void
+    @Environment(\.dismiss) private var dismiss
+
+    @State private var startTime: Date
+    @State private var endTime: Date
+
+    init(slot: TimeSlot, onCreate: @escaping (Date, Date) -> Void) {
+        self.slot = slot
+        self.onCreate = onCreate
+        _startTime = State(initialValue: slot.startDate)
+        _endTime = State(initialValue: slot.endDate)
+    }
+
+    var body: some View {
+        VStack(spacing: 20) {
+            Text("Focus Block erstellen")
+                .font(.headline)
+
+            Form {
+                DatePicker("Start", selection: $startTime, displayedComponents: .hourAndMinute)
+                DatePicker("Ende", selection: $endTime, displayedComponents: .hourAndMinute)
+                Text("Dauer: \(durationText)")
+                    .foregroundStyle(.secondary)
+            }
+            .formStyle(.grouped)
+
+            HStack {
+                Button("Abbrechen") { dismiss() }
+                    .keyboardShortcut(.cancelAction)
+                Spacer()
+                Button("Erstellen") {
+                    onCreate(startTime, endTime)
+                    dismiss()
+                }
+                .keyboardShortcut(.defaultAction)
+                .disabled(endTime <= startTime)
+            }
+        }
+        .padding()
+        .frame(width: 350, height: 280)
+    }
+
+    private var durationText: String {
+        let minutes = Int(endTime.timeIntervalSince(startTime) / 60)
+        if minutes < 60 { return "\(minutes) Min" }
+        let hours = minutes / 60
+        let rem = minutes % 60
+        return rem == 0 ? "\(hours) Std" : "\(hours) Std \(rem) Min"
     }
 }
 
@@ -398,74 +445,12 @@ struct NextUpTaskRow: View {
     }
 }
 
-// MARK: - Task Picker Sheet
-
-/// Sheet for selecting a task to add to a Focus Block
-struct TaskPickerSheet: View {
-    let availableTasks: [LocalTask]
-    let onSelectTask: (LocalTask) -> Void
-
-    @Environment(\.dismiss) private var dismiss
-
-    var body: some View {
-        NavigationStack {
-            if availableTasks.isEmpty {
-                ContentUnavailableView(
-                    "Keine Tasks verfügbar",
-                    systemImage: "tray",
-                    description: Text("Füge zuerst Tasks zu Next Up hinzu.")
-                )
-            } else {
-                List {
-                    ForEach(availableTasks, id: \.uuid) { task in
-                        Button {
-                            onSelectTask(task)
-                        } label: {
-                            HStack(spacing: 12) {
-                                VStack(alignment: .leading, spacing: 2) {
-                                    Text(task.title)
-                                        .foregroundStyle(.primary)
-
-                                    HStack(spacing: 8) {
-                                        if let duration = task.estimatedDuration {
-                                            Label("\(duration) min", systemImage: "clock")
-                                                .font(.caption)
-                                                .foregroundStyle(.secondary)
-                                        }
-
-                                        CategoryBadge(taskType: task.taskType)
-                                    }
-                                }
-
-                                Spacer()
-
-                                Image(systemName: "plus.circle")
-                                    .foregroundStyle(.blue)
-                            }
-                        }
-                        .buttonStyle(.plain)
-                    }
-                }
-                .listStyle(.plain)
-            }
-        }
-        .navigationTitle("Task hinzufügen")
-        .toolbar {
-            ToolbarItem(placement: .cancellationAction) {
-                Button("Abbrechen") {
-                    dismiss()
-                }
-            }
-        }
-        .frame(minWidth: 350, minHeight: 300)
-    }
-}
-
 // MARK: - Date Navigator
 
 /// Custom date navigation toolbar component with readable format
 struct MacDateNavigator: View {
     @Binding var selectedDate: Date
+    @State private var showDatePicker = false
 
     private var dateText: String {
         let formatter = DateFormatter()
@@ -484,52 +469,71 @@ struct MacDateNavigator: View {
     }
 
     var body: some View {
-        HStack(spacing: 4) {
+        HStack(spacing: 8) {
             // Previous day
             Button {
                 selectedDate = Calendar.current.date(byAdding: .day, value: -1, to: selectedDate) ?? selectedDate
             } label: {
                 Image(systemName: "chevron.left")
-                    .font(.system(size: 11, weight: .semibold))
+                    .font(.system(size: 12, weight: .medium))
             }
             .buttonStyle(.borderless)
             .help("Vorheriger Tag")
 
-            // Date display with popover picker
-            Menu {
-                Button("Heute") {
-                    selectedDate = Date()
-                }
-                Divider()
-                // The DatePicker in a menu shows a proper calendar
-                DatePicker("Datum wählen", selection: $selectedDate, displayedComponents: .date)
+            // Date display - tap to open calendar
+            Button {
+                showDatePicker.toggle()
             } label: {
                 Text(dateText)
-                    .font(.system(size: 12, weight: .medium))
-                    .frame(minWidth: 120)
+                    .font(.system(size: 13, weight: .medium))
+                    .frame(minWidth: 100)
             }
-            .menuStyle(.borderlessButton)
+            .buttonStyle(.borderless)
+            .popover(isPresented: $showDatePicker, arrowEdge: .bottom) {
+                VStack(spacing: 12) {
+                    DatePicker(
+                        "Datum",
+                        selection: $selectedDate,
+                        displayedComponents: .date
+                    )
+                    .datePickerStyle(.graphical)
+                    .labelsHidden()
+
+                    Divider()
+
+                    Button("Heute") {
+                        selectedDate = Date()
+                        showDatePicker = false
+                    }
+                    .buttonStyle(.link)
+                }
+                .padding()
+                .frame(width: 280)
+            }
 
             // Next day
             Button {
                 selectedDate = Calendar.current.date(byAdding: .day, value: 1, to: selectedDate) ?? selectedDate
             } label: {
                 Image(systemName: "chevron.right")
-                    .font(.system(size: 11, weight: .semibold))
+                    .font(.system(size: 12, weight: .medium))
             }
             .buttonStyle(.borderless)
             .help("Nächster Tag")
         }
-        .padding(.horizontal, 8)
-        .padding(.vertical, 4)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 6)
         .background(
-            RoundedRectangle(cornerRadius: 6)
+            RoundedRectangle(cornerRadius: 8)
                 .fill(Color(nsColor: .controlBackgroundColor))
         )
     }
 }
 
 #Preview {
-    MacPlanningView()
-        .frame(width: 800, height: 600)
+    MacPlanningView(
+        selectedDate: .constant(Date()),
+        onNavigateToBlock: { _ in }
+    )
+    .frame(width: 800, height: 600)
 }

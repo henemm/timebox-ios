@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		03A94D15FBA2530D8C629546 /* BacklogRowRedesignUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54C8A326C1D84FA7A3BD27A8 /* BacklogRowRedesignUITests.swift */; };
+		109CE59305D35DA0570AB33E /* GapFinder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84C370C5BEDCC25CA912E79F /* GapFinder.swift */; };
 		170C6E63339A92E86F659F7E /* TaskFormGlassCardUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDB06B85B45AB03356A14914 /* TaskFormGlassCardUITests.swift */; };
 		1800BB7020E3D6044A62475A /* DailyReviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A36E40124EBA31D7428EAA80 /* DailyReviewView.swift */; };
 		1B489799D0D38661913FCC34 /* TimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C945F5092F6FFB66C11FD4C2 /* TimelineView.swift */; };
@@ -107,6 +108,7 @@
 		EA6560340794C06D21D9CD85 /* PlanningView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8537E6312F33871F310A843F /* PlanningView.swift */; };
 		EDE19804EA6D5CB9BCCB6981 /* CalendarSelectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1CCA00FEA15FD7BA149CDDE /* CalendarSelectionTests.swift */; };
 		EDITTSK01BUILD001 /* EditTaskSheetUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDITTSK01FILE0001 /* EditTaskSheetUITests.swift */; };
+		EE490C26458482C3B76400EE /* GapFinder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84C370C5BEDCC25CA912E79F /* GapFinder.swift */; };
 		EFBUI001BUILD000001 /* EditFocusBlockUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFBUI001FILEREF00001 /* EditFocusBlockUITests.swift */; };
 		FBREORD01BUILD0001 /* FocusBlockReorderUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBREORD01FILE00001 /* FocusBlockReorderUITests.swift */; };
 		FBRND001BUILDFILE0001 /* FocusBloxRebrandUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBRND001FILEREF00001 /* FocusBloxRebrandUITests.swift */; };
@@ -357,6 +359,7 @@
 		76E1CD1DD36A7476E82D9003 /* TbdTasksUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TbdTasksUITests.swift; sourceTree = "<group>"; };
 		7D81A830A7874C023E289830 /* NextUpTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NextUpTests.swift; sourceTree = "<group>"; };
 		821E6E3E951900DF99190196 /* HourRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HourRow.swift; sourceTree = "<group>"; };
+		84C370C5BEDCC25CA912E79F /* GapFinder.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GapFinder.swift; sourceTree = "<group>"; };
 		8537E6312F33871F310A843F /* PlanningView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanningView.swift; sourceTree = "<group>"; };
 		86453EFF3FD7231E39EC5E4D /* BacklogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BacklogView.swift; sourceTree = "<group>"; };
 		8702D64FB57BA327C378D4F4 /* TbdTasksTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TbdTasksTests.swift; sourceTree = "<group>"; };
@@ -702,6 +705,7 @@
 				E1F3228806B919AB0836326F /* ReminderData.swift */,
 				REMLIST2FILEREF0001 /* ReminderListInfo.swift */,
 				42790F5402B3E1F632874F5A /* TaskMetadata.swift */,
+				84C370C5BEDCC25CA912E79F /* GapFinder.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -1343,6 +1347,7 @@
 				INTENT06BUILD00001 /* CountOpenTasksIntent.swift in Sources */,
 				INTENT07BUILD00001 /* FocusBloxShortcuts.swift in Sources */,
 				792737AC7F345E919BFF3453 /* FocusBlockTasksSheet.swift in Sources */,
+				EE490C26458482C3B76400EE /* GapFinder.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1500,6 +1505,7 @@
 				MAC001BUILD00000013 /* RemindersSyncService.swift in Sources */,
 				MAC024BUILD00000001 /* EditFocusBlockSheet.swift in Sources */,
 				MAC024BUILD00000002 /* FocusBlockTasksSheet.swift in Sources */,
+				109CE59305D35DA0570AB33E /* GapFinder.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

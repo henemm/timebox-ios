@@ -37,19 +37,24 @@ final class MacPlanningViewUITests: XCTestCase {
 
     // MARK: - Helper
 
+    /// Navigate to Planen tab via radio group (macOS Picker(.segmented) in toolbar)
+    /// Radio buttons use SF Symbol names as identifiers, not section labels
     private func navigateToPlanning() {
-        // macOS uses sidebar navigation - look for "Planen" tab
-        let planenTab = app.buttons["Planen"]
-        if planenTab.waitForExistence(timeout: 3) {
-            planenTab.click()
-            sleep(1)
-            return
+        let radioGroup = app.radioGroups["mainNavigationPicker"]
+        if radioGroup.waitForExistence(timeout: 3) {
+            // "calendar" is the SF Symbol identifier for Planen
+            let planenRadio = radioGroup.radioButtons["calendar"]
+            if planenRadio.waitForExistence(timeout: 2) {
+                planenRadio.click()
+                sleep(1)
+                return
+            }
         }
 
-        // Alternative: try sidebar item
-        let sidebarItem = app.outlineRows["Planen"].firstMatch
-        if sidebarItem.waitForExistence(timeout: 3) {
-            sidebarItem.click()
+        // Fallback: try direct button
+        let planenTab = app.buttons["Planen"]
+        if planenTab.waitForExistence(timeout: 2) {
+            planenTab.click()
             sleep(1)
         }
     }
@@ -104,10 +109,10 @@ final class MacPlanningViewUITests: XCTestCase {
         )
     }
 
-    // MARK: - Test 3: Tap on block opens tasks sheet
+    // MARK: - Test 3: Tap on block navigates to Zuweisen tab
 
-    /// Test: Clicking on a Focus Block should open the tasks sheet (not edit sheet)
-    /// TDD RED: Tests FAIL because tap handler doesn't exist on macOS
+    /// Test: Clicking on a Focus Block should navigate to Zuweisen tab (unified navigation)
+    /// Updated: Previously opened tasks sheet, now navigates to Zuweisen for unified editing
     func testTapBlockOpensTasksSheet() throws {
         navigateToPlanning()
 
@@ -118,7 +123,7 @@ final class MacPlanningViewUITests: XCTestCase {
 
         XCTAssertTrue(
             focusBlock.waitForExistence(timeout: 5),
-            "TDD RED: Cannot click block - identifier 'focusBlock_' not found"
+            "Cannot click block - identifier 'focusBlock_' not found"
         )
 
         focusBlock.click()
@@ -130,21 +135,17 @@ final class MacPlanningViewUITests: XCTestCase {
         screenshot.lifetime = .keepAlways
         add(screenshot)
 
-        // Verify TASKS sheet opened (not edit sheet)
-        // Tasks sheet has identifier "focusBlockTasksSheet" or title "Tasks im Block"
-        let tasksSheet = app.sheets.matching(
-            NSPredicate(format: "identifier == 'focusBlockTasksSheet'")
-        ).firstMatch
+        // Verify: Should navigate to Zuweisen tab (not open a sheet)
+        // MacAssignView shows "Tasks in einen Focus Block ziehen"
+        let zuweisenFooter = app.staticTexts["Tasks in einen Focus Block ziehen"]
+        XCTAssertTrue(
+            zuweisenFooter.waitForExistence(timeout: 3),
+            "Clicking block MUST navigate to Zuweisen tab"
+        )
+
+        // Verify: No tasks sheet should appear
         let tasksSheetTitle = app.staticTexts["Tasks im Block"]
-
-        let tasksSheetOpened = tasksSheet.waitForExistence(timeout: 3) || tasksSheetTitle.exists
-
-        // Also verify it's NOT the edit sheet
-        let editSheetTitle = app.staticTexts["Block bearbeiten"]
-        let isEditSheet = editSheetTitle.exists
-
-        XCTAssertTrue(tasksSheetOpened, "TDD RED: Clicking block MUST open tasks sheet")
-        XCTAssertFalse(isEditSheet, "TDD RED: Clicking block should NOT open edit sheet directly")
+        XCTAssertFalse(tasksSheetTitle.exists, "Tasks sheet should NOT appear - unified navigation replaces it")
     }
 
     // MARK: - Test 4: Tap ellipsis opens edit sheet
@@ -182,9 +183,10 @@ final class MacPlanningViewUITests: XCTestCase {
         XCTAssertTrue(editSheetOpened, "TDD RED: Clicking ellipsis MUST open edit sheet")
     }
 
-    // MARK: - Test 5: Tasks sheet can be dismissed
+    // MARK: - Test 5: Block tap navigates away from Planen
 
-    /// Test: Tasks sheet should have a "Fertig" button to close it
+    /// Test: After tapping a block, we should no longer be on the Planen tab
+    /// Updated: Previously tested tasks sheet dismiss button, now tests navigation
     func testTasksSheetHasDoneButton() throws {
         navigateToPlanning()
 
@@ -194,7 +196,7 @@ final class MacPlanningViewUITests: XCTestCase {
         ).firstMatch
 
         guard focusBlock.waitForExistence(timeout: 5) else {
-            XCTFail("TDD RED: Focus Block not found")
+            XCTFail("Focus Block not found")
             return
         }
 
@@ -203,17 +205,16 @@ final class MacPlanningViewUITests: XCTestCase {
 
         // Take screenshot
         let screenshot = XCTAttachment(screenshot: app.screenshot())
-        screenshot.name = "MacPlanning-TasksSheetDoneButton"
+        screenshot.name = "MacPlanning-AfterBlockTapNavigation"
         screenshot.lifetime = .keepAlways
         add(screenshot)
 
-        // Look for "Fertig" button
-        let doneButton = app.buttons["Fertig"]
-        let doneButtonEN = app.buttons["Done"]
-
-        let hasDoneButton = doneButton.waitForExistence(timeout: 3) || doneButtonEN.exists
-
-        XCTAssertTrue(hasDoneButton, "TDD RED: Tasks sheet MUST have 'Fertig' button")
+        // Verify: Planen-specific content should no longer be visible
+        let planenFooter = app.staticTexts["Tasks in die Timeline ziehen"]
+        XCTAssertFalse(
+            planenFooter.exists,
+            "After tapping block, should have navigated away from Planen tab"
+        )
     }
 
     // MARK: - Test 6: Edit sheet has save button

@@ -133,7 +133,7 @@ All entities/components need specs before implementation:
 ## Testing
 
 **Designated Test Simulator:**
-- Identifier: `D9E26087-132A-44CB-9883-59073DD9CC54`
+- Identifier: `548B4A2F-FDFF-4F9E-8335-1A7A7B98E492`
 - Name: "FocusBlox"
 
 All automated tests (Unit Tests, UI Tests) must run on this specific simulator.
@@ -141,7 +141,7 @@ All automated tests (Unit Tests, UI Tests) must run on this specific simulator.
 Example command:
 ```bash
 xcodebuild test -project FocusBlox.xcodeproj -scheme FocusBlox \
-  -destination 'id=D9E26087-132A-44CB-9883-59073DD9CC54'
+  -destination 'id=548B4A2F-FDFF-4F9E-8335-1A7A7B98E492'
 ```
 
 ## Learnings & Gotchas

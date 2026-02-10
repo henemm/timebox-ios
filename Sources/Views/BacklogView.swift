@@ -537,7 +537,7 @@ struct BacklogView: View {
     }
 
     // MARK: - List View
-    // Using List for swipe actions support (swipe left = Next Up, swipe right = Edit)
+    // Using List for swipe actions support (swipe right = Next Up, swipe left = Edit)
     private var listView: some View {
         List {
             ForEach(backlogTasks) { item in
@@ -558,7 +558,7 @@ struct BacklogView: View {
                 .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
                 .listRowBackground(Color.clear)
                 .listRowSeparator(.hidden)
-                .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                .swipeActions(edge: .leading, allowsFullSwipe: true) {
                     Button {
                         updateNextUp(for: item, isNextUp: true)
                     } label: {
@@ -566,7 +566,13 @@ struct BacklogView: View {
                     }
                     .tint(.green)
                 }
-                .swipeActions(edge: .leading, allowsFullSwipe: true) {
+                .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                    Button(role: .destructive) {
+                        deleteTask(item)
+                    } label: {
+                        Label("Löschen", systemImage: "trash")
+                    }
+
                     Button {
                         taskToEditDirectly = item
                     } label: {

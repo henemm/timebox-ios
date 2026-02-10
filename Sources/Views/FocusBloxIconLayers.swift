@@ -148,42 +148,64 @@ struct ViewfinderSymbol: View {
     let width: CGFloat
 
     var body: some View {
-        ZStack {
+        let symbolWidth = width * 0.32   // Gesamtbreite des Symbols
+        let symbolHeight = width * 0.22  // Gesamthöhe des Symbols
+        let arm = width * 0.08           // Länge der waagerechten Striche
+        let strokeWidth = width * 0.035
+
+        return Canvas { context, size in
+            let centerX = size.width / 2
+            let centerY = size.height / 2
+            let halfW = symbolWidth / 2
+            let halfH = symbolHeight / 2
+
             // Linke Klammer [
-            Path { path in
-                let arm = width * 0.08
-                let h = width * 0.22
-                path.move(to: CGPoint(x: arm, y: 0))
-                path.addLine(to: CGPoint(x: 0, y: 0))
-                path.addLine(to: CGPoint(x: 0, y: h))
-                path.addLine(to: CGPoint(x: arm, y: h))
-            }
-            .stroke(Color.white, style: StrokeStyle(lineWidth: width * 0.035, lineCap: .round, lineJoin: .round))
-            .offset(x: -width * 0.12, y: -width * 0.11)
+            var leftBracket = Path()
+            leftBracket.move(to: CGPoint(x: centerX - halfW + arm, y: centerY - halfH))
+            leftBracket.addLine(to: CGPoint(x: centerX - halfW, y: centerY - halfH))
+            leftBracket.addLine(to: CGPoint(x: centerX - halfW, y: centerY + halfH))
+            leftBracket.addLine(to: CGPoint(x: centerX - halfW + arm, y: centerY + halfH))
+
+            context.stroke(
+                leftBracket,
+                with: .color(.white),
+                style: StrokeStyle(lineWidth: strokeWidth, lineCap: .round, lineJoin: .round)
+            )
 
             // Rechte Klammer ]
-            Path { path in
-                let arm = width * 0.08
-                let h = width * 0.22
-                path.move(to: CGPoint(x: 0, y: 0))
-                path.addLine(to: CGPoint(x: arm, y: 0))
-                path.addLine(to: CGPoint(x: arm, y: h))
-                path.addLine(to: CGPoint(x: 0, y: h))
-            }
-            .stroke(Color.white, style: StrokeStyle(lineWidth: width * 0.035, lineCap: .round, lineJoin: .round))
-            .offset(x: width * 0.12, y: -width * 0.11)
+            var rightBracket = Path()
+            rightBracket.move(to: CGPoint(x: centerX + halfW - arm, y: centerY - halfH))
+            rightBracket.addLine(to: CGPoint(x: centerX + halfW, y: centerY - halfH))
+            rightBracket.addLine(to: CGPoint(x: centerX + halfW, y: centerY + halfH))
+            rightBracket.addLine(to: CGPoint(x: centerX + halfW - arm, y: centerY + halfH))
 
-            // Zen Dot •
-            Circle()
-                .fill(Color.white)
-                .frame(width: width * 0.07)
+            context.stroke(
+                rightBracket,
+                with: .color(.white),
+                style: StrokeStyle(lineWidth: strokeWidth, lineCap: .round, lineJoin: .round)
+            )
+
+            // Zen-Punkt in der Mitte •
+            let dotSize = width * 0.07
+            let dotRect = CGRect(
+                x: centerX - dotSize / 2,
+                y: centerY - dotSize / 2,
+                width: dotSize,
+                height: dotSize
+            )
+            context.fill(Path(ellipseIn: dotRect), with: .color(.white))
         }
+        .frame(width: width * 0.5, height: width * 0.4)
     }
 }
 
 #Preview {
-    FocusBloxIcon()
-        .frame(width: 512, height: 512)
-        .padding()
-        .background(Color.black)
+    ZStack {
+        // Schwarzer Hintergrund für die Preview
+        Color.black.ignoresSafeArea()
+        // Das Icon in voller Größe (512x512pt)
+        FocusBloxIcon()
+            .frame(width: 512, height: 512)
+            .padding()
+    }
 }

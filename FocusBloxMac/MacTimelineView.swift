@@ -9,6 +9,41 @@ import SwiftUI
 
 // MARK: - Event Layout Model
 
+/// Unified time item for combined collision detection
+private struct TimelineItem: Identifiable {
+    let id: String
+    let startDate: Date
+    let endDate: Date
+    let type: ItemType
+
+    enum ItemType {
+        case event(CalendarEvent)
+        case focusBlock(FocusBlock)
+    }
+
+    init(event: CalendarEvent) {
+        self.id = event.id
+        self.startDate = event.startDate
+        self.endDate = event.endDate
+        self.type = .event(event)
+    }
+
+    init(block: FocusBlock) {
+        self.id = block.id
+        self.startDate = block.startDate
+        self.endDate = block.endDate
+        self.type = .focusBlock(block)
+    }
+}
+
+/// Represents a positioned item with column information for side-by-side layout
+private struct PositionedItem: Identifiable {
+    let id: String
+    let item: TimelineItem
+    let column: Int
+    let totalColumns: Int
+}
+
 /// Represents a positioned event with column information for side-by-side layout
 private struct PositionedEvent: Identifiable {
     let id: String
@@ -22,10 +57,12 @@ struct MacTimelineView: View {
     let date: Date
     let events: [CalendarEvent]
     let focusBlocks: [FocusBlock]
+    var freeSlots: [TimeSlot] = []
     var onCreateFocusBlock: ((Date, Int, String) -> Void)?
     var onAddTaskToBlock: ((String, String) -> Void)?
     var onTapBlock: ((FocusBlock) -> Void)?
     var onTapEditBlock: ((FocusBlock) -> Void)?
+    var onTapFreeSlot: ((TimeSlot) -> Void)?
 
     // Timeline configuration
     private let startHour = 6
@@ -51,42 +88,64 @@ struct MacTimelineView: View {
                     // Events container with proper width
                     let contentWidth = geometry.size.width - timeColumnWidth - 16
 
-                    // Regular calendar events (with collision detection)
-                    ForEach(positionedEvents) { positioned in
-                        EventBlockView(
-                            event: positioned.event,
-                            hourHeight: hourHeight,
-                            startHour: startHour,
-                            column: positioned.column,
-                            totalColumns: positioned.totalColumns,
-                            containerWidth: contentWidth
-                        )
-                        .padding(.leading, timeColumnWidth)
-                    }
+                    // TimelineLayout positions ALL views with correct hit-testing!
+                    // Uses place() instead of offset() so Hit-Areas match visual position
+                    TimelineLayout(hourHeight: hourHeight, startHour: startHour, endHour: endHour) {
+                        // Regular calendar events (with collision detection)
+                        ForEach(positionedEvents) { positioned in
+                            EventBlockView(event: positioned.event)
+                                .timelinePosition(
+                                    hour: Calendar.current.component(.hour, from: positioned.event.startDate),
+                                    minute: Calendar.current.component(.minute, from: positioned.event.startDate),
+                                    durationMinutes: positioned.event.durationMinutes,
+                                    column: positioned.column,
+                                    totalColumns: positioned.totalColumns
+                                )
+                        }
 
-                    // Focus blocks (with collision detection)
-                    ForEach(positionedFocusBlocks) { positioned in
-                        FocusBlockView(
-                            block: positioned.block,
-                            hourHeight: hourHeight,
-                            startHour: startHour,
-                            column: positioned.column,
-                            totalColumns: positioned.totalColumns,
-                            containerWidth: contentWidth,
-                            onAddTask: { taskID in
-                                onAddTaskToBlock?(positioned.block.id, taskID)
-                            },
-                            onTapBlock: {
-                                onTapBlock?(positioned.block)
-                            },
-                            onTapEdit: {
-                                onTapEditBlock?(positioned.block)
-                            }
-                        )
-                        .padding(.leading, timeColumnWidth)
-                    }
+                        // Focus blocks (with collision detection)
+                        ForEach(positionedFocusBlocks) { positioned in
+                            FocusBlockView(
+                                block: positioned.block,
+                                onAddTask: { taskID in
+                                    onAddTaskToBlock?(positioned.block.id, taskID)
+                                },
+                                onTapBlock: {
+                                    onTapBlock?(positioned.block)
+                                },
+                                onTapEdit: {
+                                    onTapEditBlock?(positioned.block)
+                                }
+                            )
+                            .timelinePosition(
+                                hour: Calendar.current.component(.hour, from: positioned.block.startDate),
+                                minute: Calendar.current.component(.minute, from: positioned.block.startDate),
+                                durationMinutes: positioned.block.durationMinutes,
+                                column: positioned.column,
+                                totalColumns: positioned.totalColumns
+                            )
+                        }
 
-                    // Drop preview indicator
+                        // Free slots (suggestions for new blocks)
+                        ForEach(freeSlots) { slot in
+                            FreeSlotView(
+                                slot: slot,
+                                onTap: {
+                                    onTapFreeSlot?(slot)
+                                }
+                            )
+                            .timelinePosition(
+                                hour: Calendar.current.component(.hour, from: slot.startDate),
+                                minute: Calendar.current.component(.minute, from: slot.startDate),
+                                durationMinutes: slot.durationMinutes,
+                                column: 0,
+                                totalColumns: 1
+                            )
+                        }
+                    }
+                    .padding(.leading, timeColumnWidth)
+
+                    // Drop preview indicator (separate from TimelineLayout - uses offset for realtime preview)
                     if isDropTargeted {
                         DropPreviewIndicator(
                             location: dropLocation,
@@ -97,7 +156,7 @@ struct MacTimelineView: View {
                         .padding(.leading, timeColumnWidth)
                     }
 
-                    // Current time indicator
+                    // Current time indicator (separate from TimelineLayout - special styling)
                     if Calendar.current.isDateInToday(date) {
                         CurrentTimeIndicator(hourHeight: hourHeight, startHour: startHour)
                             .padding(.leading, timeColumnWidth - 4)
@@ -110,11 +169,13 @@ struct MacTimelineView: View {
         .dropDestination(for: MacTaskTransfer.self) { items, location in
             guard let task = items.first else { return false }
 
-            // Check if drop is over an existing focus block - if so, let the block handle it
-            if isLocationOverFocusBlock(location) {
-                return false
+            // Check if drop is over an existing focus block - assign to that block
+            if let blockID = focusBlockAtLocation(location) {
+                onAddTaskToBlock?(blockID, task.id)
+                return true
             }
 
+            // Otherwise create new focus block at this time
             let dropTime = calculateTimeFromLocation(location)
             onCreateFocusBlock?(dropTime, task.duration, task.id)
             return true
@@ -131,100 +192,94 @@ struct MacTimelineView: View {
         }
     }
 
-    // MARK: - Collision Detection & Layout
+    // MARK: - Collision Detection & Layout (Combined)
 
-    /// Groups overlapping events and assigns columns
+    /// All positioned items (events + focus blocks) with unified collision detection
+    private var positionedItems: [PositionedItem] {
+        // Filter regular events (exclude FocusBlocks, all-day, and very long events)
+        let regularEvents = events.filter { event in
+            !event.isFocusBlock &&
+            !event.isAllDay &&
+            event.durationMinutes <= 480 // 8 hours max
+        }
+
+        // Combine events and focus blocks into unified items
+        var allItems: [TimelineItem] = []
+        allItems.append(contentsOf: regularEvents.map { TimelineItem(event: $0) })
+        allItems.append(contentsOf: focusBlocks.map { TimelineItem(block: $0) })
+
+        // Run unified collision detection
+        let groups = groupOverlappingItems(allItems)
+
+        // Build positioned items with correct column assignments
+        var result: [PositionedItem] = []
+        for group in groups {
+            for (index, item) in group.enumerated() {
+                result.append(PositionedItem(
+                    id: item.id,
+                    item: item,
+                    column: index,
+                    totalColumns: group.count
+                ))
+            }
+        }
+        return result
+    }
+
+    /// Extracts positioned events from the unified positioned items
     private var positionedEvents: [PositionedEvent] {
-        let regularEvents = events.filter { !$0.isFocusBlock }
-        let groups = groupOverlappingEvents(regularEvents)
-
-        var result: [PositionedEvent] = []
-        for group in groups {
-            for (index, event) in group.enumerated() {
-                result.append(PositionedEvent(
-                    id: event.id,
+        positionedItems.compactMap { positioned -> PositionedEvent? in
+            if case .event(let event) = positioned.item.type {
+                return PositionedEvent(
+                    id: positioned.id,
                     event: event,
-                    column: index,
-                    totalColumns: group.count
-                ))
+                    column: positioned.column,
+                    totalColumns: positioned.totalColumns
+                )
             }
+            return nil
         }
-        return result
     }
 
-    /// Groups overlapping focus blocks
+    /// Extracts positioned focus blocks from the unified positioned items
     private var positionedFocusBlocks: [PositionedFocusBlock] {
-        let groups = groupOverlappingFocusBlocks(focusBlocks)
-
-        var result: [PositionedFocusBlock] = []
-        for group in groups {
-            for (index, block) in group.enumerated() {
-                result.append(PositionedFocusBlock(
-                    id: block.id,
+        positionedItems.compactMap { positioned -> PositionedFocusBlock? in
+            if case .focusBlock(let block) = positioned.item.type {
+                return PositionedFocusBlock(
+                    id: positioned.id,
                     block: block,
-                    column: index,
-                    totalColumns: group.count
-                ))
+                    column: positioned.column,
+                    totalColumns: positioned.totalColumns
+                )
             }
+            return nil
         }
-        return result
     }
 
-    /// Groups events that overlap in time
-    private func groupOverlappingEvents(_ events: [CalendarEvent]) -> [[CalendarEvent]] {
-        guard !events.isEmpty else { return [] }
+    /// Groups items that overlap in time - unified for both events and focus blocks
+    private func groupOverlappingItems(_ items: [TimelineItem]) -> [[TimelineItem]] {
+        guard !items.isEmpty else { return [] }
 
-        let sorted = events.sorted { $0.startDate < $1.startDate }
-        var groups: [[CalendarEvent]] = []
-        var currentGroup: [CalendarEvent] = []
+        let sorted = items.sorted { $0.startDate < $1.startDate }
+        var groups: [[TimelineItem]] = []
+        var currentGroup: [TimelineItem] = []
         var currentGroupEndTime: Date?
 
-        for event in sorted {
-            if let endTime = currentGroupEndTime, event.startDate < endTime {
+        for item in sorted {
+            if let endTime = currentGroupEndTime, item.startDate < endTime {
                 // Overlaps with current group
-                currentGroup.append(event)
+                currentGroup.append(item)
                 // Extend group end time if needed
-                if event.endDate > endTime {
-                    currentGroupEndTime = event.endDate
+                if item.endDate > endTime {
+                    currentGroupEndTime = item.endDate
                 }
             } else {
                 // No overlap, start new group
                 if !currentGroup.isEmpty {
                     groups.append(currentGroup)
                 }
-                currentGroup = [event]
-                currentGroupEndTime = event.endDate
-            }
-        }
-
-        if !currentGroup.isEmpty {
-            groups.append(currentGroup)
-        }
-
-        return groups
-    }
-
-    /// Groups focus blocks that overlap in time
-    private func groupOverlappingFocusBlocks(_ blocks: [FocusBlock]) -> [[FocusBlock]] {
-        guard !blocks.isEmpty else { return [] }
-
-        let sorted = blocks.sorted { $0.startDate < $1.startDate }
-        var groups: [[FocusBlock]] = []
-        var currentGroup: [FocusBlock] = []
-        var currentGroupEndTime: Date?
-
-        for block in sorted {
-            if let endTime = currentGroupEndTime, block.startDate < endTime {
-                currentGroup.append(block)
-                if block.endDate > endTime {
-                    currentGroupEndTime = block.endDate
-                }
-            } else {
-                if !currentGroup.isEmpty {
-                    groups.append(currentGroup)
-                }
-                currentGroup = [block]
-                currentGroupEndTime = block.endDate
+                currentGroup = [item]
+                currentGroupEndTime = item.endDate
             }
         }
 
@@ -237,9 +292,8 @@ struct MacTimelineView: View {
 
     // MARK: - Hit Testing
 
-    /// Checks if the given location is over an existing focus block
-    private func isLocationOverFocusBlock(_ location: CGPoint) -> Bool {
-        let adjustedX = location.x - timeColumnWidth
+    /// Returns the FocusBlock ID at the given location, or nil if not over a block
+    private func focusBlockAtLocation(_ location: CGPoint) -> String? {
         let adjustedY = location.y
 
         for block in focusBlocks {
@@ -252,14 +306,10 @@ struct MacTimelineView: View {
 
             // Check Y (vertical) - is the drop within the block's time range?
             if adjustedY >= blockTop && adjustedY <= blockTop + blockHeight {
-                // For simplicity, assume block spans full width if it's in the time range
-                // This is good enough since we want drops in the time range to go to the block
-                if adjustedX >= 0 {
-                    return true
-                }
+                return block.id
             }
         }
-        return false
+        return nil
     }
 
     // MARK: - Time Calculation
@@ -317,34 +367,27 @@ private struct PositionedFocusBlock: Identifiable {
 
 // MARK: - Event Block View (readonly calendar events)
 
+/// Calendar event view - positioned by TimelineLayout using place()
 struct EventBlockView: View {
     let event: CalendarEvent
-    let hourHeight: CGFloat
-    let startHour: Int
-    let column: Int
-    let totalColumns: Int
-    let containerWidth: CGFloat
-
-    private let spacing: CGFloat = 2
-    private let minHeight: CGFloat = 24
 
     var body: some View {
+        // TimelineLayout provides size via ProposedViewSize - use frame modifiers
         VStack(alignment: .leading, spacing: 2) {
-            Text(event.title)
+            Text(displayTitle)
                 .font(.system(size: 11, weight: .semibold))
                 .foregroundStyle(.white)
-                .lineLimit(blockHeight > 40 ? 2 : 1)
+                .lineLimit(2)
 
-            if blockHeight > 35 {
-                Text(timeRange)
-                    .font(.system(size: 10))
-                    .foregroundStyle(.white.opacity(0.8))
-            }
+            Text(timeRange)
+                .font(.system(size: 10))
+                .foregroundStyle(.white.opacity(0.8))
+
+            Spacer(minLength: 0)
         }
         .padding(.horizontal, 6)
         .padding(.vertical, 4)
-        .frame(width: columnWidth, alignment: .leading)
-        .frame(height: max(blockHeight, minHeight), alignment: .top)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .background(
             RoundedRectangle(cornerRadius: 4)
                 .fill(eventColor)
@@ -353,28 +396,10 @@ struct EventBlockView: View {
             RoundedRectangle(cornerRadius: 4)
                 .strokeBorder(eventColor.opacity(0.8), lineWidth: 0.5)
         )
-        .offset(x: columnOffset, y: topOffset)
     }
 
-    private var columnWidth: CGFloat {
-        let availableWidth = containerWidth - (CGFloat(totalColumns - 1) * spacing)
-        return availableWidth / CGFloat(totalColumns)
-    }
-
-    private var columnOffset: CGFloat {
-        CGFloat(column) * (columnWidth + spacing)
-    }
-
-    private var blockHeight: CGFloat {
-        CGFloat(event.durationMinutes) / 60.0 * hourHeight
-    }
-
-    private var topOffset: CGFloat {
-        let calendar = Calendar.current
-        let hour = calendar.component(.hour, from: event.startDate)
-        let minute = calendar.component(.minute, from: event.startDate)
-        let hoursFromStart = CGFloat(hour - startHour) + CGFloat(minute) / 60.0
-        return hoursFromStart * hourHeight
+    private var displayTitle: String {
+        event.title.isEmpty ? "(Kein Titel)" : event.title
     }
 
     private var timeRange: String {
@@ -385,7 +410,6 @@ struct EventBlockView: View {
 
     /// Generates consistent color from event title
     private var eventColor: Color {
-        // Generate consistent color from event title hash
         let hash = abs(event.title.hashValue)
         let colors: [Color] = [
             Color(red: 0.35, green: 0.55, blue: 0.75),  // Blue
@@ -400,13 +424,10 @@ struct EventBlockView: View {
 
 // MARK: - Focus Block View (interactive)
 
+/// Interactive FocusBlock view - positioned by TimelineLayout using place()
+/// Supports tap, hover, and drag & drop because place() sets correct hit-areas
 struct FocusBlockView: View {
     let block: FocusBlock
-    let hourHeight: CGFloat
-    let startHour: Int
-    let column: Int
-    let totalColumns: Int
-    let containerWidth: CGFloat
     var onAddTask: ((String) -> Void)?
     var onTapBlock: (() -> Void)?
     var onTapEdit: (() -> Void)?
@@ -414,36 +435,34 @@ struct FocusBlockView: View {
     @State private var isDropTargeted = false
     @State private var isHovered = false
 
-    private let spacing: CGFloat = 2
-    private let minHeight: CGFloat = 40
+    private var timeRange: String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "HH:mm"
+        return "\(formatter.string(from: block.startDate)) - \(formatter.string(from: block.endDate))"
+    }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            // Header with icon and title
+        // Same structure as EventBlockView that works
+        VStack(alignment: .leading, spacing: 2) {
+            // Header row with icon
             HStack(spacing: 4) {
                 Image(systemName: "target")
                     .font(.system(size: 10, weight: .bold))
                 Text(block.title)
                     .font(.system(size: 11, weight: .bold))
                     .lineLimit(1)
-                Spacer()
-                if isHovered || isDropTargeted {
-                    Button {
-                        onTapEdit?()
-                    } label: {
-                        Image(systemName: "ellipsis")
-                            .font(.system(size: 10))
-                    }
-                    .buttonStyle(.borderless)
-                    .accessibilityIdentifier("focusBlockEditButton_\(block.id)")
-                }
             }
             .foregroundStyle(.white)
+
+            // Time range
+            Text(timeRange)
+                .font(.system(size: 10))
+                .foregroundStyle(.white.opacity(0.8))
 
             // Task count
             Text("\(block.taskIDs.count) Tasks")
                 .font(.system(size: 10))
-                .foregroundStyle(.white.opacity(0.8))
+                .foregroundStyle(.white.opacity(0.7))
 
             // Drop indicator
             if isDropTargeted {
@@ -451,10 +470,12 @@ struct FocusBlockView: View {
                     .font(.system(size: 10, weight: .medium))
                     .foregroundStyle(.white)
             }
+
+            Spacer(minLength: 0)
         }
-        .padding(8)
-        .frame(width: columnWidth, alignment: .leading)
-        .frame(height: max(blockHeight, minHeight), alignment: .top)
+        .padding(.horizontal, 6)
+        .padding(.vertical, 4)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .background(
             RoundedRectangle(cornerRadius: 6)
                 .fill(blockColor.gradient)
@@ -464,7 +485,7 @@ struct FocusBlockView: View {
                 .strokeBorder(.white.opacity(isDropTargeted ? 0.5 : 0.2), lineWidth: isDropTargeted ? 2 : 1)
         )
         .shadow(color: blockColor.opacity(0.3), radius: isDropTargeted ? 8 : 4, y: 2)
-        .offset(x: columnOffset, y: topOffset)
+        .contentShape(Rectangle())
         .onHover { hovering in
             withAnimation(.easeInOut(duration: 0.15)) {
                 isHovered = hovering
@@ -486,15 +507,6 @@ struct FocusBlockView: View {
         .accessibilityIdentifier("focusBlock_\(block.id)")
     }
 
-    private var columnWidth: CGFloat {
-        let availableWidth = containerWidth - (CGFloat(totalColumns - 1) * spacing)
-        return availableWidth / CGFloat(totalColumns)
-    }
-
-    private var columnOffset: CGFloat {
-        CGFloat(column) * (columnWidth + spacing)
-    }
-
     private var blockColor: Color {
         if block.isActive {
             return Color(red: 0.2, green: 0.7, blue: 0.4)  // Green
@@ -503,18 +515,6 @@ struct FocusBlockView: View {
         } else {
             return Color(red: 0.25, green: 0.5, blue: 0.85) // Blue
         }
-    }
-
-    private var blockHeight: CGFloat {
-        CGFloat(block.durationMinutes) / 60.0 * hourHeight
-    }
-
-    private var topOffset: CGFloat {
-        let calendar = Calendar.current
-        let hour = calendar.component(.hour, from: block.startDate)
-        let minute = calendar.component(.minute, from: block.startDate)
-        let hoursFromStart = CGFloat(hour - startHour) + CGFloat(minute) / 60.0
-        return hoursFromStart * hourHeight
     }
 }
 
@@ -599,11 +599,73 @@ struct DropPreviewIndicator: View {
     }
 }
 
+// MARK: - Free Slot View (Smart Suggestions)
+
+/// View for displaying a free time slot - positioned by TimelineLayout using place()
+struct FreeSlotView: View {
+    let slot: TimeSlot
+    var onTap: (() -> Void)?
+
+    @State private var isHovered = false
+
+    private let timeFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "HH:mm"
+        return formatter
+    }()
+
+    var body: some View {
+        // TimelineLayout provides size via ProposedViewSize - use frame modifiers
+        VStack(alignment: .leading, spacing: 4) {
+            HStack(spacing: 4) {
+                Image(systemName: "plus.circle.fill")
+                    .font(.system(size: 12))
+                Text("Freie Zeit")
+                    .font(.system(size: 11, weight: .medium))
+                Spacer()
+                Text("\(slot.durationMinutes) min")
+                    .font(.system(size: 10))
+            }
+            .foregroundStyle(.green)
+
+            Text("\(timeFormatter.string(from: slot.startDate)) - \(timeFormatter.string(from: slot.endDate))")
+                .font(.system(size: 10))
+                .foregroundStyle(.secondary)
+
+            Spacer(minLength: 0)
+        }
+        .padding(8)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .background(
+            RoundedRectangle(cornerRadius: 6)
+                .strokeBorder(
+                    style: StrokeStyle(lineWidth: 2, dash: [5, 3])
+                )
+                .foregroundStyle(.green.opacity(isHovered ? 0.6 : 0.4))
+        )
+        .background(
+            RoundedRectangle(cornerRadius: 6)
+                .fill(.green.opacity(isHovered ? 0.15 : 0.05))
+        )
+        .contentShape(Rectangle())
+        .onHover { hovering in
+            withAnimation(.easeInOut(duration: 0.15)) {
+                isHovered = hovering
+            }
+        }
+        .onTapGesture {
+            onTap?()
+        }
+        .accessibilityIdentifier("freeSlot_\(slot.id)")
+    }
+}
+
 #Preview {
     MacTimelineView(
         date: Date(),
         events: [],
-        focusBlocks: []
+        focusBlocks: [],
+        freeSlots: []
     )
     .frame(width: 400, height: 600)
 }
