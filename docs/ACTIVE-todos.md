@@ -18,6 +18,24 @@
 
 ---
 
+## ✅ Kürzlich erledigt
+
+### Bug 32: Importance/Urgency Werte gehen verloren (Race Condition)
+**Status:** ✅ ERLEDIGT (2026-02-10) - War bereits gefixt: TaskInspector hat explizites save(), ContentView synct nur einmal
+
+### Bug 31: Focus Block erstellen - Startzeit verschiebt Endzeit nicht
+**Status:** ✅ ERLEDIGT (2026-02-10)
+**Fix:** `.onChange(of: startTime)` in MacCreateFocusBlockSheet - Dauer bleibt konstant wenn Start verschoben wird
+
+### Bug 29: Duration-Werte passen nicht zur Spec
+**Status:** ✅ ERLEDIGT (2026-02-10)
+**Fix:** `[15, 30, 45, 60, 90, 120]` → `[5, 15, 30, 60]` in TaskInspector.swift (Spec: step4-duration-editing.md)
+
+### Bug 25: macOS Planen View - Keine echten Kalender-Daten
+**Status:** ✅ ERLEDIGT (2026-02-10) - War bereits gefixt: MacPlanningView nutzt EventKitRepository
+
+---
+
 ## 🔴 OFFEN - Neue Bugs/Features
 
 ### Bug 26: macOS "Zuweisen" View - Drag&Drop funktioniert nicht
@@ -57,7 +75,7 @@ extension UTType {
 ---
 
 ### Bug 25: macOS "Planen" View - Keine echten Kalender-Daten (nur Samples)
-**Status:** OFFEN
+**Status:** ✅ ERLEDIGT (2026-02-10)
 **Gemeldet:** 2026-02-02
 **Platform:** macOS
 **Location:** `FocusBloxMac/MacPlanningView.swift:196-246`

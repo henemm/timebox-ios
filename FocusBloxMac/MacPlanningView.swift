@@ -380,6 +380,10 @@ struct MacCreateFocusBlockSheet: View {
                     .foregroundStyle(.secondary)
             }
             .formStyle(.grouped)
+            .onChange(of: startTime) { oldStart, newStart in
+                let duration = endTime.timeIntervalSince(oldStart)
+                endTime = newStart.addingTimeInterval(duration)
+            }
 
             HStack {
                 Button("Abbrechen") { dismiss() }

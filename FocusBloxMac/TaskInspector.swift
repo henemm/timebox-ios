@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import SwiftData
 
 /// Inspector panel for editing task details with iOS-style chip controls
 struct TaskInspector: View {
@@ -86,7 +85,7 @@ struct TaskInspector: View {
                         Text("Dauer:")
                             .foregroundStyle(.secondary)
 
-                        ForEach([15, 30, 45, 60, 90, 120], id: \.self) { mins in
+                        ForEach([5, 15, 30, 60], id: \.self) { mins in
                             durationChip(mins)
                         }
                     }
@@ -202,7 +201,6 @@ struct TaskInspector: View {
 
         return Button {
             task.importance = level
-            try? modelContext.save()
         } label: {
             HStack(spacing: 4) {
                 Image(systemName: icon)
@@ -227,7 +225,6 @@ struct TaskInspector: View {
 
         return Button {
             task.urgency = value
-            try? modelContext.save()
         } label: {
             HStack(spacing: 4) {
                 Image(systemName: icon)
