@@ -225,34 +225,26 @@ Usage Descriptions zu `FocusBloxMac/Info.plist` hinzugefügt.
 ---
 
 ### Bug 18: Reminders-Tasks - Dringlichkeit/Wichtigkeit nicht speicherbar
-**Status:** ✅ TEILWEISE GEFIXT (2026-02-02)
+**Status:** ✅ ERLEDIGT (2026-02-10)
 **Gemeldet:** 2026-02-01
-**Location:**
-- `RemindersSyncService.swift:116-124`
-- `BacklogView.swift:380-400`
-- `BacklogRow.swift:245`
+**Location:** BacklogView.swift, EditTaskSheet.swift, TaskDetailSheet.swift
 
-**Problem:**
-1. Bei Tasks aus Apple Reminders: Tippen auf Dringlichkeit/Wichtigkeit Badge setzt Wert nicht
-2. View springt nach oben nach jedem Tap
-3. In Full Edit: Dringlichkeit setzen + Speichern - Wert wird nicht persistiert
-
-**Root Cause Analyse:**
+**Root Cause Analyse (7 RCs, alle gefixt):**
 
 | RC | Problem | Status |
 |----|---------|--------|
-| RC1 | RemindersSyncService überschreibt importance | ✅ War bereits gefixt (prüft auf nil) |
-| RC2 | loadTasks() triggert Re-Import | ✅ War bereits gefixt (refreshLocalTasks() wird verwendet) |
-| RC3 | isLoading resettet Scroll | ✅ Nur bei loadTasks(), nicht refreshLocalTasks() |
-| RC4 | nil urgency → "" String | ✅ **GEFIXT** |
+| RC1 | RemindersSyncService ueberschreibt importance | ✅ Gefixt |
+| RC2 | loadTasks() triggert Re-Import bei Badge-Tap | ✅ Gefixt |
+| RC3 | isLoading resettet Scroll bei Badge-Tap | ✅ Gefixt |
+| RC4 | nil urgency → "" String | ✅ Gefixt (2026-02-02) |
+| RC5 | Full Edit ruft loadTasks() statt refreshLocalTasks() | ✅ Gefixt (2026-02-10) |
+| RC6 | EditTaskSheet urgency Default "not_urgent" statt nil | ✅ Gefixt (2026-02-10) |
+| RC7 | Duration/NextUp/Category ruft loadTasks() | ✅ Gefixt (2026-02-10) |
 
-**Fix RC4 (2026-02-02):**
-- BacklogRow: `onUrgencyToggle: ((String?) -> Void)?` statt `((String) -> Void)?`
-- BacklogRow: `onUrgencyToggle?(newUrgency)` statt `onUrgencyToggle?(newUrgency ?? "")`
-- BacklogView: `updateUrgency(for:urgency:)` nimmt jetzt `String?`
-- QuadrantSection: Callback-Signatur angepasst
-
-**Prioritaet:** HOCH - Teilweise gefixt, manueller Test auf Device empfohlen
+**Fix RC5-RC7 (2026-02-10):**
+- BacklogView: 4x `loadTasks()` → `refreshLocalTasks()` (updateDuration, updateNextUp, updateTask, updateCategory)
+- EditTaskSheet: urgency `String` → `String?`, nil-Option "Nicht gesetzt" hinzugefuegt
+- TaskDetailSheet: onSave-Signatur auf `String?` angepasst
 
 ---
 

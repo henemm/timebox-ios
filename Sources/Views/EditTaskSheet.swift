@@ -2,29 +2,29 @@ import SwiftUI
 
 struct EditTaskSheet: View {
     let task: PlanItem
-    let onSave: (String, TaskPriority, Int, [String], String, String, Date?, String?) -> Void
+    let onSave: (String, TaskPriority, Int, [String], String?, String, Date?, String?) -> Void
     let onDelete: () -> Void
 
     @State private var title: String
     @State private var priority: TaskPriority
     @State private var duration: Int
     @State private var tags: String
-    @State private var urgency: String
+    @State private var urgency: String?
     @State private var taskType: String
     @State private var hasDueDate: Bool
     @State private var dueDate: Date
     @State private var taskDescription: String
     @Environment(\.dismiss) private var dismiss
 
-    private let urgencyOptions = [
-        ("normal", "Normal"),
-        ("urgent", "Dringend"),
-        ("not_urgent", "Kann warten")
+    private let urgencyOptions: [(String?, String)] = [
+        (nil, "Nicht gesetzt"),
+        ("not_urgent", "Nicht dringend"),
+        ("urgent", "Dringend")
     ]
 
     private let taskTypeOptions = TaskCategory.allCases.map { ($0.rawValue, $0.displayName) }
 
-    init(task: PlanItem, onSave: @escaping (String, TaskPriority, Int, [String], String, String, Date?, String?) -> Void, onDelete: @escaping () -> Void) {
+    init(task: PlanItem, onSave: @escaping (String, TaskPriority, Int, [String], String?, String, Date?, String?) -> Void, onDelete: @escaping () -> Void) {
         self.task = task
         self.onSave = onSave
         self.onDelete = onDelete
@@ -32,7 +32,7 @@ struct EditTaskSheet: View {
         _priority = State(initialValue: task.priority)
         _duration = State(initialValue: task.effectiveDuration)
         _tags = State(initialValue: task.tags.joined(separator: ", "))
-        _urgency = State(initialValue: task.urgency ?? "not_urgent")
+        _urgency = State(initialValue: task.urgency)
         _taskType = State(initialValue: task.taskType)
         _hasDueDate = State(initialValue: task.dueDate != nil)
         _dueDate = State(initialValue: task.dueDate ?? Date())
@@ -64,7 +64,7 @@ struct EditTaskSheet: View {
                         .accessibilityIdentifier("Tags")
 
                     Picker("Dringlichkeit", selection: $urgency) {
-                        ForEach(urgencyOptions, id: \.0) { value, label in
+                        ForEach(urgencyOptions, id: \.1) { value, label in
                             Text(label).tag(value)
                         }
                     }

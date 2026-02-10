@@ -2,7 +2,7 @@ import SwiftUI
 
 struct TaskDetailSheet: View {
     let task: PlanItem
-    let onSave: (String, TaskPriority, Int, [String], String, String, Date?, String?) -> Void
+    let onSave: (String, TaskPriority, Int, [String], String?, String, Date?, String?) -> Void
     let onDelete: () -> Void
 
     @State private var showEditSheet = false

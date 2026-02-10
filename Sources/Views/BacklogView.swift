@@ -363,9 +363,7 @@ struct BacklogView: View {
             try syncEngine.updateDuration(itemID: item.id, minutes: minutes)
             durationFeedback.toggle()
 
-            Task {
-                await loadTasks()
-            }
+            Task { await refreshLocalTasks() }
         } catch {
             errorMessage = "Dauer konnte nicht gespeichert werden."
         }
@@ -378,9 +376,7 @@ struct BacklogView: View {
             try syncEngine.updateNextUp(itemID: item.id, isNextUp: isNextUp)
             nextUpFeedback.toggle()
 
-            Task {
-                await loadTasks()
-            }
+            Task { await refreshLocalTasks() }
         } catch {
             errorMessage = "Next Up Status konnte nicht geändert werden."
         }
@@ -392,9 +388,7 @@ struct BacklogView: View {
             let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
             try syncEngine.updateTask(itemID: task.id, title: title, importance: priority.rawValue, duration: duration, tags: tags, urgency: urgency, taskType: taskType, dueDate: dueDate, description: description, recurrencePattern: recurrencePattern, recurrenceWeekdays: recurrenceWeekdays, recurrenceMonthDay: recurrenceMonthDay)
 
-            Task {
-                await loadTasks()
-            }
+            Task { await refreshLocalTasks() }
         } catch {
             errorMessage = "Task konnte nicht aktualisiert werden."
         }
@@ -432,7 +426,7 @@ struct BacklogView: View {
             let taskSource = LocalTaskSource(modelContext: modelContext)
             let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
             try syncEngine.updateTask(itemID: item.id, title: item.title, importance: item.importance, duration: item.estimatedDuration, tags: item.tags, urgency: item.urgency, taskType: category, dueDate: item.dueDate, description: item.taskDescription)
-            Task { await loadTasks() }
+            Task { await refreshLocalTasks() }
         } catch {
             errorMessage = "Kategorie konnte nicht aktualisiert werden."
         }
