@@ -207,6 +207,7 @@ struct TaskInspector: View {
                 Text(label)
             }
             .font(.caption)
+            .fixedSize()
             .padding(.horizontal, 10)
             .padding(.vertical, 6)
             .background(
@@ -231,6 +232,7 @@ struct TaskInspector: View {
                 Text(label)
             }
             .font(.caption)
+            .fixedSize()
             .padding(.horizontal, 10)
             .padding(.vertical, 6)
             .background(
@@ -252,6 +254,7 @@ struct TaskInspector: View {
         } label: {
             Text("\(minutes)m")
                 .font(.caption)
+            .fixedSize()
                 .padding(.horizontal, 8)
                 .padding(.vertical, 4)
                 .background(
@@ -276,6 +279,7 @@ struct TaskInspector: View {
                     .font(.system(size: 16))
                 Text(label)
                     .font(.caption2)
+                    .fixedSize()
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 8)
