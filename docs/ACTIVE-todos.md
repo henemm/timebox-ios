@@ -39,52 +39,15 @@
 ## 🔴 OFFEN - Neue Bugs/Features
 
 ### Bug 32: Importance/Urgency Werte gehen verloren (Reminders-Sync Race Condition)
-**Status:** OFFEN
-**Gemeldet:** 2026-02-10
-**Platform:** macOS (primaer), iOS (sekundaer)
-**Location:** `FocusBloxMac/ContentView.swift:376-378`, `FocusBloxMac/TaskInspector.swift:203,227`, `Sources/Services/RemindersSyncService.swift:125-129`
+**Status:** ✅ ERLEDIGT (2026-02-10)
+**Platform:** macOS
+**Location:** `FocusBloxMac/TaskInspector.swift`, `FocusBloxMac/ContentView.swift`
 
-**Problem:**
-- User setzt Importance/Urgency fuer alle Tasks (z.B. via TaskInspector auf macOS)
-- Nach Tab-Wechsel oder App-Neustart sind alle Werte wieder TBD (nil)
-- Betrifft Tasks mit `sourceSystem == "reminders"` (aus Apple Erinnerungen importiert)
+**Root Cause:** Race Condition - TaskInspector hatte kein explizites `modelContext.save()` nach Importance/Urgency-Aenderungen. Sync lief bei jedem Tab-Wechsel und ueberschrieb unsaved Werte.
 
-**Root Cause: Race Condition zwischen Edit und Sync**
-
-1. User setzt `task.importance = 3` im TaskInspector (`@Bindable` - direkte SwiftData Mutation)
-2. SwiftData **autosave noch nicht abgeschlossen**
-3. User wechselt Tab → ContentView `.task {}` feuert → `syncWithReminders()` startet
-4. Sync fetcht Task aus ModelContext → liest alten Wert (`importance = nil`)
-5. `RemindersSyncService.updateTask()` Zeile 126: `if task.importance == nil` → TRUE (alter Wert!)
-6. Setzt `task.importance = appleImportance` (= nil, da Apple Reminders keine Importance hat)
-7. **Aenderung ueberschrieben**
-
-**Verschaerfende Faktoren:**
-- macOS: `syncWithReminders()` laeuft bei **jedem** ContentView-Erscheinen (Zeile 376-378)
-- TaskInspector: Kein explizites `modelContext.save()` nach Aenderung
-- Kein Debouncing/Guard gegen Sync waehrend laufender Edits
-
-**Fix (2 Teile, ~15 LoC):**
-
-**Teil 1: Explizites Save im TaskInspector** (`TaskInspector.swift`)
-```swift
-// Nach task.importance = level (Zeile 203):
-try? modelContext.save()
-
-// Nach task.urgency = value (Zeile 227):
-try? modelContext.save()
-```
-
-**Teil 2: Sync-Debouncing auf macOS** (`ContentView.swift`)
-```swift
-// Statt sofort syncen bei jedem Erscheinen:
-// Option A: Nur beim ersten Erscheinen syncen (einmalig)
-// Option B: Minimum 30s zwischen Syncs
-// Option C: Flag "editInProgress" das Sync blockiert
-```
-
-**Betroffene Dateien:** 2-3 Dateien, ~15 LoC
-**Prioritaet:** HOCH (Datenverlust - User-Aenderungen gehen verloren)
+**Fix (2 Teile):**
+1. **Explicit Save:** `try? modelContext.save()` nach importance und urgency Chip-Klick in TaskInspector
+2. **Sync-Throttling:** `lastSyncDate` State + 60s Minimum zwischen Syncs in ContentView
 
 ---
 

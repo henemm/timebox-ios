@@ -54,6 +54,7 @@ struct ContentView: View {
     // Sync state
     @State private var isSyncing = false
     @State private var syncError: String?
+    @State private var lastSyncDate: Date?
 
     // Quick Add
     @State private var newTaskTitle = ""
@@ -454,6 +455,11 @@ struct ContentView: View {
 
         guard UserDefaults.standard.bool(forKey: "remindersSyncEnabled") else { return }
 
+        // Throttle: max once per 60 seconds to prevent race conditions with unsaved edits
+        if let lastSync = lastSyncDate, Date().timeIntervalSince(lastSync) < 60 {
+            return
+        }
+
         isSyncing = true
         syncError = nil
 
@@ -472,6 +478,7 @@ struct ContentView: View {
                 modelContext: modelContext
             )
             _ = try await syncService.importFromReminders()
+            lastSyncDate = Date()
         } catch {
             syncError = error.localizedDescription
         }
