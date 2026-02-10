@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 /// Inspector panel for editing task details with iOS-style chip controls
 struct TaskInspector: View {
@@ -201,6 +202,7 @@ struct TaskInspector: View {
 
         return Button {
             task.importance = level
+            try? modelContext.save()
         } label: {
             HStack(spacing: 4) {
                 Image(systemName: icon)
@@ -225,6 +227,7 @@ struct TaskInspector: View {
 
         return Button {
             task.urgency = value
+            try? modelContext.save()
         } label: {
             HStack(spacing: 4) {
                 Image(systemName: icon)

@@ -54,6 +54,7 @@ struct ContentView: View {
     // Sync state
     @State private var isSyncing = false
     @State private var syncError: String?
+    @State private var hasSynced = false
 
     // Quick Add
     @State private var newTaskTitle = ""
@@ -374,7 +375,9 @@ struct ContentView: View {
             }
         }
         .task {
-            // Sync on appear if enabled
+            // Sync only once per app start (not on every tab switch)
+            guard !hasSynced else { return }
+            hasSynced = true
             await syncWithReminders()
         }
     }
