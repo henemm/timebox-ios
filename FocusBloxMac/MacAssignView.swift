@@ -150,13 +150,16 @@ struct MacAssignView: View {
                     description: Text("Markiere Tasks als Next Up im Backlog")
                 )
             } else {
-                List {
-                    ForEach(nextUpTasks, id: \.uuid) { task in
-                        MacDraggableTaskRow(task: task)
-                            .draggable(MacTaskTransfer(from: task))
+                ScrollView {
+                    LazyVStack(spacing: 4) {
+                        ForEach(nextUpTasks, id: \.uuid) { task in
+                            MacDraggableTaskRow(task: task)
+                                .draggable(MacTaskTransfer(from: task))
+                                .padding(.horizontal, 8)
+                        }
                     }
+                    .padding(.vertical, 4)
                 }
-                .listStyle(.plain)
             }
 
             Divider()

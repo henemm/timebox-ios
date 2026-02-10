@@ -100,38 +100,13 @@ FocusBlox in der Timeline per Drag&Drop verschieben. Aktuell nur ueber Dialog mi
 ---
 
 ### Bug 26: macOS "Zuweisen" View - Drag&Drop funktioniert nicht
-**Status:** OFFEN
-**Gemeldet:** 2026-02-02
+**Status:** ✅ ERLEDIGT (2026-02-10)
 **Platform:** macOS
-**Location:** `FocusBloxMac/MacTaskTransfer.swift:12-14`, `FocusBloxMac/Info.plist`
+**Location:** `FocusBloxMac/MacAssignView.swift`
 
-**Problem:**
-- Tasks aus "Next Up" Sidebar lassen sich nicht in FocusBlocks ziehen
-- Keine visuelle Reaktion beim Drag-Over
-- Drop wird nicht akzeptiert
+**Root Cause:** `List` auf macOS wraps `NSTableView`, das eigene Drag-Gesten abfaengt bevor SwiftUI `.draggable()` greifen kann. UTType-Deklaration in Info.plist war bereits korrekt.
 
-**Root Cause:**
-Der custom UTType `com.henning.timebox.mactask` ist wahrscheinlich nicht in der Info.plist als "Exported Type Identifier" deklariert. Ohne diese Deklaration kann macOS die Transferable-Daten nicht zwischen Views transportieren.
-
-**Code-Stelle:**
-```swift
-// MacTaskTransfer.swift:12-14
-extension UTType {
-    static let macTask = UTType(exportedAs: "com.henning.timebox.mactask")
-}
-```
-
-**Fix erfordert:**
-1. UTType in `FocusBloxMac/Info.plist` als Exported Type deklarieren
-2. `UTExportedTypeDeclarations` Array mit conformsTo: `public.data`
-3. Optional: Debugging mit Console.app waehrend Drag&Drop
-
-**Test:**
-1. macOS App starten → "Zuweisen" Tab
-2. Task aus "Next Up" auf FocusBlock ziehen
-3. **Expected:** FocusBlock wird blau, Task erscheint im Block
-
-**Prioritaet:** HOCH (Core Feature kaputt)
+**Fix:** `List` durch `ScrollView + LazyVStack` in der Next Up Section ersetzt.
 
 ---
 
