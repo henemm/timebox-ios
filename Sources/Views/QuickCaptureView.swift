@@ -243,36 +243,15 @@ struct QuickCaptureView: View {
     }
 
     private var categoryIcon: String {
-        switch taskType {
-        case "income": return "dollarsign.circle"
-        case "maintenance": return "wrench.and.screwdriver"
-        case "recharge": return "battery.100"
-        case "learning": return "book"
-        case "giving_back": return "gift"
-        default: return "folder"
-        }
+        TaskCategory(rawValue: taskType)?.icon ?? "folder"
     }
 
     private var categoryColor: Color {
-        switch taskType {
-        case "income": return .green
-        case "maintenance": return .orange
-        case "recharge": return .purple
-        case "learning": return .blue
-        case "giving_back": return .pink
-        default: return .gray
-        }
+        TaskCategory(rawValue: taskType)?.color ?? .gray
     }
 
     private var categoryLabel: String {
-        switch taskType {
-        case "income": return "Einkommen"
-        case "maintenance": return "Maintenance"
-        case "recharge": return "Recharge"
-        case "learning": return "Lernen"
-        case "giving_back": return "Giving Back"
-        default: return "Kategorie"
-        }
+        TaskCategory(rawValue: taskType)?.displayName ?? "Kategorie"
     }
 
     // MARK: - Duration Button (opens sheet)

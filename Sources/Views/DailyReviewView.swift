@@ -7,44 +7,8 @@ enum ReviewMode: String, CaseIterable {
     case week = "Diese Woche"
 }
 
-/// Category configuration with display info
-enum CategoryConfig: String, CaseIterable {
-    case income = "income"
-    case maintenance = "maintenance"
-    case recharge = "recharge"
-    case learning = "learning"
-    case givingBack = "giving_back"
-
-    var displayName: String {
-        switch self {
-        case .income: return "Geld verdienen"
-        case .maintenance: return "Schneeschaufeln"
-        case .recharge: return "Energie aufladen"
-        case .learning: return "Lernen"
-        case .givingBack: return "Weitergeben"
-        }
-    }
-
-    var icon: String {
-        switch self {
-        case .income: return "dollarsign.circle"
-        case .maintenance: return "wrench.and.screwdriver"
-        case .recharge: return "battery.100"
-        case .learning: return "book"
-        case .givingBack: return "gift"
-        }
-    }
-
-    var color: Color {
-        switch self {
-        case .income: return .green
-        case .maintenance: return .orange
-        case .recharge: return .blue
-        case .learning: return .purple
-        case .givingBack: return .pink
-        }
-    }
-}
+/// Category configuration - delegates to central TaskCategory
+typealias CategoryConfig = TaskCategory
 
 /// Category stat for weekly view
 struct CategoryStat: Identifiable {

@@ -31,19 +31,7 @@ struct TaskDetailSheet: View {
     }
 
     private var categoryText: String {
-        switch task.taskType {
-        case "deep_work": return "Deep Work"
-        case "shallow_work": return "Shallow Work"
-        case "meetings": return "Meetings"
-        case "maintenance": return "Maintenance"
-        case "creative": return "Creative"
-        case "strategic": return "Strategic"
-        case "income": return "Geld verdienen"
-        case "recharge": return "Energie aufladen"
-        case "learning": return "Lernen"
-        case "giving_back": return "Weitergeben"
-        default: return task.taskType.capitalized
-        }
+        TaskCategory(rawValue: task.taskType)?.displayName ?? task.taskType.capitalized
     }
 
     var body: some View {

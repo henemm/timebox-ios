@@ -1,43 +1,5 @@
 import SwiftUI
 
-enum CategoryPickerOption: String, CaseIterable {
-    case income = "income"
-    case maintenance = "maintenance"
-    case recharge = "recharge"
-    case learning = "learning"
-    case givingBack = "giving_back"
-
-    var displayName: String {
-        switch self {
-        case .income: return "Einkommen"
-        case .maintenance: return "Maintenance"
-        case .recharge: return "Recharge"
-        case .learning: return "Lernen"
-        case .givingBack: return "Giving Back"
-        }
-    }
-
-    var sfSymbol: String {
-        switch self {
-        case .income: return "dollarsign.circle"
-        case .maintenance: return "wrench.and.screwdriver"
-        case .recharge: return "battery.100"
-        case .learning: return "book"
-        case .givingBack: return "gift"
-        }
-    }
-
-    var tint: Color {
-        switch self {
-        case .income: return .green
-        case .maintenance: return .orange
-        case .recharge: return .purple
-        case .learning: return .blue
-        case .givingBack: return .pink
-        }
-    }
-}
-
 struct CategoryPicker: View {
     let currentCategory: String
     let onSelect: (String) -> Void
@@ -52,21 +14,21 @@ struct CategoryPicker: View {
                 GridItem(.flexible()),
                 GridItem(.flexible())
             ], spacing: 12) {
-                ForEach(CategoryPickerOption.allCases, id: \.rawValue) { option in
+                ForEach(TaskCategory.allCases, id: \.rawValue) { category in
                     Button {
-                        onSelect(option.rawValue)
+                        onSelect(category.rawValue)
                     } label: {
                         VStack(spacing: 4) {
-                            Image(systemName: option.sfSymbol)
+                            Image(systemName: category.icon)
                                 .font(.title3)
-                            Text(option.displayName)
+                            Text(category.displayName)
                                 .font(.caption2)
                         }
                         .frame(maxWidth: .infinity)
                     }
                     .buttonStyle(.borderedProminent)
-                    .tint(currentCategory == option.rawValue ? option.tint : .gray)
-                    .accessibilityIdentifier("category-\(option.rawValue)")
+                    .tint(currentCategory == category.rawValue ? category.color : .gray)
+                    .accessibilityIdentifier("category-\(category.rawValue)")
                 }
             }
         }

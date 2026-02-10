@@ -371,36 +371,15 @@ struct CategoryStat: Identifiable {
     let count: Int
 
     var label: String {
-        switch category {
-        case "income": return "Geld verdienen"
-        case "maintenance": return "Pflege"
-        case "recharge": return "Energie"
-        case "learning": return "Lernen"
-        case "giving_back": return "Weitergeben"
-        default: return category
-        }
+        TaskCategory(rawValue: category)?.displayName ?? category
     }
 
     var color: Color {
-        switch category {
-        case "income": return .green
-        case "maintenance": return .orange
-        case "recharge": return .cyan
-        case "learning": return .purple
-        case "giving_back": return .pink
-        default: return .gray
-        }
+        TaskCategory(rawValue: category)?.color ?? .gray
     }
 
     var icon: String {
-        switch category {
-        case "income": return "dollarsign.circle"
-        case "maintenance": return "wrench.and.screwdriver"
-        case "recharge": return "battery.100"
-        case "learning": return "book"
-        case "giving_back": return "gift"
-        default: return "questionmark.circle"
-        }
+        TaskCategory(rawValue: category)?.icon ?? "questionmark.circle"
     }
 }
 

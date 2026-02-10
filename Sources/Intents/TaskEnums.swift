@@ -73,11 +73,11 @@ enum TaskCategoryEnum: String, AppEnum {
     static let typeDisplayRepresentation = TypeDisplayRepresentation(name: "Kategorie")
 
     static let caseDisplayRepresentations: [TaskCategoryEnum: DisplayRepresentation] = [
-        .income: "Einkommen",
-        .maintenance: "Pflege",
-        .recharge: "Aufladen",
-        .learning: "Lernen",
-        .givingBack: "Zurueckgeben"
+        .income: "Earn",
+        .maintenance: "Essentials",
+        .recharge: "Self Care",
+        .learning: "Learn",
+        .givingBack: "Social"
     ]
 
     /// Maps to LocalTask.taskType String value

@@ -138,11 +138,9 @@ struct TaskInspector: View {
                         GridItem(.flexible()),
                         GridItem(.flexible())
                     ], spacing: 8) {
-                        categoryChip("income", "Geld", "dollarsign.circle", .green)
-                        categoryChip("maintenance", "Pflege", "wrench.and.screwdriver.fill", .orange)
-                        categoryChip("recharge", "Energie", "battery.100", .cyan)
-                        categoryChip("learning", "Lernen", "book", .purple)
-                        categoryChip("giving_back", "Geben", "gift", .pink)
+                        ForEach(TaskCategory.allCases, id: \.rawValue) { category in
+                            categoryChip(category.rawValue, category.displayName, category.icon, category.color)
+                        }
                     }
                 }
                 .padding()

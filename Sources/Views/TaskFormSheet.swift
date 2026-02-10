@@ -83,14 +83,7 @@ struct TaskFormSheet: View {
 
     // MARK: - Task Type Options
 
-    // 5 Lebensarbeit-Kategorien (Bug 12 fix)
-    private let taskTypeOptions = [
-        ("income", "Geld verdienen", "dollarsign.circle"),
-        ("maintenance", "Schneeschaufeln", "wrench.and.screwdriver"),
-        ("recharge", "Energie aufladen", "battery.100"),
-        ("learning", "Lernen", "book"),
-        ("giving_back", "Weitergeben", "gift")
-    ]
+    private let taskTypeOptions = TaskCategory.allCases.map { ($0.rawValue, $0.displayName, $0.icon) }
 
     // MARK: - Body
 

@@ -22,18 +22,7 @@ struct EditTaskSheet: View {
         ("not_urgent", "Kann warten")
     ]
 
-    private let taskTypeOptions = [
-        ("deep_work", "Deep Work"),
-        ("shallow_work", "Shallow Work"),
-        ("meetings", "Meetings"),
-        ("maintenance", "Maintenance"),
-        ("creative", "Creative"),
-        ("strategic", "Strategic"),
-        ("income", "Geld verdienen"),
-        ("recharge", "Energie aufladen"),
-        ("learning", "Lernen"),
-        ("giving_back", "Weitergeben")
-    ]
+    private let taskTypeOptions = TaskCategory.allCases.map { ($0.rawValue, $0.displayName) }
 
     init(task: PlanItem, onSave: @escaping (String, TaskPriority, Int, [String], String, String, Date?, String?) -> Void, onDelete: @escaping () -> Void) {
         self.task = task

@@ -195,30 +195,12 @@ struct MacBacklogRow: View {
 
     private var categoryBadge: some View {
         Menu {
-            Button {
-                onCategorySelect?("income")
-            } label: {
-                Label("Geld verdienen", systemImage: "dollarsign.circle")
-            }
-            Button {
-                onCategorySelect?("maintenance")
-            } label: {
-                Label("Pflege", systemImage: "wrench.and.screwdriver.fill")
-            }
-            Button {
-                onCategorySelect?("recharge")
-            } label: {
-                Label("Energie", systemImage: "battery.100")
-            }
-            Button {
-                onCategorySelect?("learning")
-            } label: {
-                Label("Lernen", systemImage: "book")
-            }
-            Button {
-                onCategorySelect?("giving_back")
-            } label: {
-                Label("Weitergeben", systemImage: "gift")
+            ForEach(TaskCategory.allCases, id: \.rawValue) { category in
+                Button {
+                    onCategorySelect?(category.rawValue)
+                } label: {
+                    Label(category.displayName, systemImage: category.icon)
+                }
             }
             Divider()
             Button {
@@ -247,36 +229,15 @@ struct MacBacklogRow: View {
     }
 
     private var categoryColor: Color {
-        switch task.taskType {
-        case "income": return .green
-        case "maintenance": return .orange
-        case "recharge": return .cyan
-        case "learning": return .purple
-        case "giving_back": return .pink
-        default: return .gray
-        }
+        TaskCategory(rawValue: task.taskType)?.color ?? .gray
     }
 
     private var categoryIcon: String {
-        switch task.taskType {
-        case "income": return "dollarsign.circle"
-        case "maintenance": return "wrench.and.screwdriver.fill"
-        case "recharge": return "battery.100"
-        case "learning": return "book"
-        case "giving_back": return "gift"
-        default: return "questionmark.circle"
-        }
+        TaskCategory(rawValue: task.taskType)?.icon ?? "questionmark.circle"
     }
 
     private var categoryLabel: String {
-        switch task.taskType {
-        case "income": return "Geld"
-        case "maintenance": return "Pflege"
-        case "recharge": return "Energie"
-        case "learning": return "Lernen"
-        case "giving_back": return "Geben"
-        default: return "Typ"
-        }
+        TaskCategory(rawValue: task.taskType)?.displayName ?? "Typ"
     }
 
     // MARK: - Duration Badge (macOS Menu Picker)

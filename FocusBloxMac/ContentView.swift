@@ -393,14 +393,7 @@ struct ContentView: View {
     }
 
     private func categoryName(_ category: String) -> String {
-        switch category {
-        case "income": return "Geld verdienen"
-        case "maintenance": return "Pflege"
-        case "recharge": return "Energie"
-        case "learning": return "Lernen"
-        case "giving_back": return "Weitergeben"
-        default: return category
-        }
+        TaskCategory(rawValue: category)?.displayName ?? category
     }
 
     // MARK: - Inspector View

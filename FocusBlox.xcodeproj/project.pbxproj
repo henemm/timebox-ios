@@ -74,6 +74,7 @@
 		B7B87F222F1BCD9B0069B457 /* EisenhowerMatrixUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7B87F212F1BCD9B0069B457 /* EisenhowerMatrixUITests.swift */; };
 		B7DFC0532F2E73ED009C2881 /* FocusBloxWatch Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = B7DFC0332F2E73EC009C2881 /* FocusBloxWatch Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		B7DFC0952F2E9646009C2881 /* LocalTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A27D4BE199FA040FC61FFD6 /* LocalTask.swift */; };
+		TASKCAT01BUILD00001 /* TaskCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = TASKCAT01FILEREF0001 /* TaskCategory.swift */; };
 		B7DFC0962F2E965E009C2881 /* TaskSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 414BC475930C1DCDA3E9033B /* TaskSource.swift */; };
 		B95825BFA85A0C001D1310A4 /* TaskSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 414BC475930C1DCDA3E9033B /* TaskSource.swift */; };
 		B9D12D9BF22325ADDE757862 /* CalendarEventTransfer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D1F03B35977548B59D7269F /* CalendarEventTransfer.swift */; };
@@ -82,6 +83,7 @@
 		BFEDE0F6D0C383A49101B8D2 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F364C9B1BB1D787792360427 /* SettingsView.swift */; };
 		C2A1677B81BC3C8D2C548495 /* HourRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 821E6E3E951900DF99190196 /* HourRow.swift */; };
 		C2ED3FE95B938EB35CB3C24C /* LocalTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A27D4BE199FA040FC61FFD6 /* LocalTask.swift */; };
+		TASKCAT02BUILD00001 /* TaskCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = TASKCAT01FILEREF0001 /* TaskCategory.swift */; };
 		C3F49C8B0CD3C6552054BE7D /* EventKitRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4451B46B76517090C636FA94 /* EventKitRepository.swift */; };
 		C89E9F957213671FF1B0DC91 /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4383C656C07E4B4F56335921 /* MainTabView.swift */; };
 		CALCATUI01BUILD0001 /* CalendarCategoryUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CALCATUI01FILE00001 /* CalendarCategoryUITests.swift */; };
@@ -329,6 +331,7 @@
 		14E16E8941781A7134CBEE3A /* SyncEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncEngineTests.swift; sourceTree = "<group>"; };
 		16DB1BDF5EBAC3B508866AAF /* EditRedesignUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = EditRedesignUITests.swift; sourceTree = "<group>"; };
 		1A27D4BE199FA040FC61FFD6 /* LocalTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalTask.swift; sourceTree = "<group>"; };
+		TASKCAT01FILEREF0001 /* TaskCategory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskCategory.swift; sourceTree = "<group>"; };
 		20D808247CA55763ACF23BC5 /* BlockPlanningView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockPlanningView.swift; sourceTree = "<group>"; };
 		26CD9467C8156E2C66B2DC9C /* SettingsToolbarModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsToolbarModifier.swift; sourceTree = "<group>"; };
 		31904CA661DB113E1D4F523F /* FocusBloxUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FocusBloxUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -700,6 +703,7 @@
 				5D1F03B35977548B59D7269F /* CalendarEventTransfer.swift */,
 				A0B1EE7295AF0AD91CA0027A /* FocusBlock.swift */,
 				1A27D4BE199FA040FC61FFD6 /* LocalTask.swift */,
+				TASKCAT01FILEREF0001 /* TaskCategory.swift */,
 				9826FCF9A087183038C6ACED /* PlanItem.swift */,
 				548F5CBBB14618043F38ACE6 /* PlanItemTransfer.swift */,
 				E1F3228806B919AB0836326F /* ReminderData.swift */,
@@ -1310,6 +1314,7 @@
 				60EF444FADDBAC17F14380E0 /* FocusLiveView.swift in Sources */,
 				C2A1677B81BC3C8D2C548495 /* HourRow.swift in Sources */,
 				C2ED3FE95B938EB35CB3C24C /* LocalTask.swift in Sources */,
+				TASKCAT02BUILD00001 /* TaskCategory.swift in Sources */,
 				88ED9B394FA2293A587D7952 /* LocalTaskSource.swift in Sources */,
 				C89E9F957213671FF1B0DC91 /* MainTabView.swift in Sources */,
 				586B7D1F1588622970BCEED8 /* MiniBacklogView.swift in Sources */,
@@ -1489,6 +1494,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B7DFC0952F2E9646009C2881 /* LocalTask.swift in Sources */,
+				TASKCAT01BUILD00001 /* TaskCategory.swift in Sources */,
 				B7DFC0962F2E965E009C2881 /* TaskSource.swift in Sources */,
 				MAC001BUILD00000001 /* PlanItem.swift in Sources */,
 				MAC001BUILD00000002 /* FocusBlock.swift in Sources */,

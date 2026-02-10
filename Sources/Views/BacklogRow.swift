@@ -309,46 +309,15 @@ struct BacklogRow: View {
     }
 
     private var categoryColor: Color {
-        switch item.taskType {
-        case "income": return .green
-        case "maintenance": return .orange
-        case "recharge": return .cyan
-        case "learning": return .purple
-        case "giving_back": return .pink
-        default: return .gray
-        }
+        TaskCategory(rawValue: item.taskType)?.color ?? .gray
     }
 
     private var categoryIcon: String {
-        switch item.taskType {
-        case "income": return "dollarsign.circle"
-        case "maintenance": return "wrench.and.screwdriver.fill"
-        case "recharge": return "battery.100"
-        case "learning": return "book"
-        case "giving_back": return "gift"
-        case "deep_work": return "brain"
-        case "shallow_work": return "tray"
-        case "meetings": return "person.2"
-        case "creative": return "paintbrush"
-        case "strategic": return "lightbulb"
-        default: return "questionmark.circle"
-        }
+        TaskCategory(rawValue: item.taskType)?.icon ?? "questionmark.circle"
     }
 
     private var categoryLabel: String {
-        switch item.taskType {
-        case "income": return "Geld"
-        case "maintenance": return "Pflege"
-        case "recharge": return "Energie"
-        case "learning": return "Lernen"
-        case "giving_back": return "Geben"
-        case "deep_work": return "Deep Work"
-        case "shallow_work": return "Shallow"
-        case "meetings": return "Meeting"
-        case "creative": return "Kreativ"
-        case "strategic": return "Strategie"
-        default: return "Typ"
-        }
+        TaskCategory(rawValue: item.taskType)?.displayName ?? item.taskType.capitalized
     }
 
     // MARK: - Duration Badge

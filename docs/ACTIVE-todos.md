@@ -87,15 +87,12 @@ FocusBlox in der Timeline per Drag&Drop verschieben. Aktuell nur ueber Dialog mi
 ---
 
 ### Bug 30: Kategorie-Bezeichnungen zwischen iOS und macOS inkonsistent
-**Status:** OFFEN
-**Gemeldet:** 2026-02-10
+**Status:** ✅ ERLEDIGT (2026-02-10)
 **Platform:** iOS + macOS + App Intents
 
-**Problem:**
-20+ separate Switch-Statements in 12 Dateien, jede mit eigener Uebersetzung. iOS mischt Deutsch/Englisch, macOS deutsche Labels, App Intents nochmal andere.
+**Root Cause:** 25+ separate Switch-Statements in 14 Dateien mit je eigener Uebersetzung. Mischung aus Deutsch/Englisch.
 
-**Empfohlener Fix:** Zentrales `displayName`-Property auf Category-Enum.
-**Prioritaet:** MITTEL (UX-Inkonsistenz)
+**Fix:** Zentrales `TaskCategory`-Enum in `Sources/Models/TaskCategory.swift` mit `displayName`, `icon`, `color`. Alle 14 Dateien auf dieses Enum umgestellt. Einheitliche englische Namen: Earn, Essentials, Self Care, Learn, Social.
 
 ---
 
