@@ -38,6 +38,104 @@
 
 ## 🔴 OFFEN - Neue Bugs/Features
 
+### Bug 32: Importance/Urgency Werte gehen verloren (Reminders-Sync Race Condition)
+**Status:** OFFEN
+**Gemeldet:** 2026-02-10
+**Platform:** macOS (primaer), iOS (sekundaer)
+**Location:** `FocusBloxMac/ContentView.swift:376-378`, `FocusBloxMac/TaskInspector.swift:203,227`, `Sources/Services/RemindersSyncService.swift:125-129`
+
+**Problem:**
+- User setzt Importance/Urgency fuer alle Tasks (z.B. via TaskInspector auf macOS)
+- Nach Tab-Wechsel oder App-Neustart sind alle Werte wieder TBD (nil)
+- Betrifft Tasks mit `sourceSystem == "reminders"` (aus Apple Erinnerungen importiert)
+
+**Root Cause: Race Condition zwischen Edit und Sync**
+
+1. User setzt `task.importance = 3` im TaskInspector (`@Bindable` - direkte SwiftData Mutation)
+2. SwiftData **autosave noch nicht abgeschlossen**
+3. User wechselt Tab → ContentView `.task {}` feuert → `syncWithReminders()` startet
+4. Sync fetcht Task aus ModelContext → liest alten Wert (`importance = nil`)
+5. `RemindersSyncService.updateTask()` Zeile 126: `if task.importance == nil` → TRUE (alter Wert!)
+6. Setzt `task.importance = appleImportance` (= nil, da Apple Reminders keine Importance hat)
+7. **Aenderung ueberschrieben**
+
+**Verschaerfende Faktoren:**
+- macOS: `syncWithReminders()` laeuft bei **jedem** ContentView-Erscheinen (Zeile 376-378)
+- TaskInspector: Kein explizites `modelContext.save()` nach Aenderung
+- Kein Debouncing/Guard gegen Sync waehrend laufender Edits
+
+**Fix (2 Teile, ~15 LoC):**
+
+**Teil 1: Explizites Save im TaskInspector** (`TaskInspector.swift`)
+```swift
+// Nach task.importance = level (Zeile 203):
+try? modelContext.save()
+
+// Nach task.urgency = value (Zeile 227):
+try? modelContext.save()
+```
+
+**Teil 2: Sync-Debouncing auf macOS** (`ContentView.swift`)
+```swift
+// Statt sofort syncen bei jedem Erscheinen:
+// Option A: Nur beim ersten Erscheinen syncen (einmalig)
+// Option B: Minimum 30s zwischen Syncs
+// Option C: Flag "editInProgress" das Sync blockiert
+```
+
+**Betroffene Dateien:** 2-3 Dateien, ~15 LoC
+**Prioritaet:** HOCH (Datenverlust - User-Aenderungen gehen verloren)
+
+---
+
+### Bug 31: macOS "Focus Block erstellen" - Startzeit aendern verschiebt Endzeit nicht
+**Status:** OFFEN
+**Gemeldet:** 2026-02-10
+**Platform:** macOS
+**Location:** `FocusBloxMac/MacPlanningView.swift:356-407` (`MacCreateFocusBlockSheet`)
+
+**Problem:**
+- User oeffnet "Focus Block erstellen" Dialog (z.B. Slot 12:00-13:00)
+- User aendert Startzeit auf 14:00
+- Endzeit bleibt bei 13:00 → Dauer zeigt "-60 Min"
+
+**Root Cause:**
+Kein `.onChange(of: startTime)` Handler. DatePicker fuer Start/Ende sind komplett unabhaengig.
+
+**Fix (1 Datei, ~5 LoC):**
+`.onChange(of: startTime)` hinzufuegen, der die Dauer konstant haelt und `endTime` verschiebt.
+
+**Prioritaet:** MITTEL (UX-Bug, Workaround: Endzeit manuell anpassen)
+
+---
+
+### Feature Request: macOS FocusBlox Drag&Drop in Timeline
+**Status:** OFFEN
+**Gemeldet:** 2026-02-10
+**Platform:** macOS
+**Location:** `FocusBloxMac/MacPlanningView.swift`
+
+**Beschreibung:**
+FocusBlox in der Timeline per Drag&Drop verschieben. Aktuell nur ueber Dialog mit festen Zeiten erstellbar.
+
+**Scope:** Noch zu evaluieren (braucht eigene Spec)
+**Prioritaet:** NIEDRIG (Nice-to-have)
+
+---
+
+### Bug 30: Kategorie-Bezeichnungen zwischen iOS und macOS inkonsistent
+**Status:** OFFEN
+**Gemeldet:** 2026-02-10
+**Platform:** iOS + macOS + App Intents
+
+**Problem:**
+20+ separate Switch-Statements in 12 Dateien, jede mit eigener Uebersetzung. iOS mischt Deutsch/Englisch, macOS deutsche Labels, App Intents nochmal andere.
+
+**Empfohlener Fix:** Zentrales `displayName`-Property auf Category-Enum.
+**Prioritaet:** MITTEL (UX-Inkonsistenz)
+
+---
+
 ### Bug 26: macOS "Zuweisen" View - Drag&Drop funktioniert nicht
 **Status:** OFFEN
 **Gemeldet:** 2026-02-02
