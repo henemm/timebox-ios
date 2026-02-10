@@ -45,6 +45,9 @@ Thumbs.db
 # Build artifacts
 build/
 
+# Test results
+*.xcresult
+
 # Secrets (never commit)
 *.env
 *.secrets
