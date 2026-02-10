@@ -124,6 +124,17 @@ struct TaskInspector: View {
                 .padding()
                 .background(RoundedRectangle(cornerRadius: 10).fill(.quaternary))
 
+                // MARK: - Tags Section
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Tags")
+                        .font(.headline)
+                        .foregroundStyle(.secondary)
+
+                    TagInputView(tags: $task.tags)
+                }
+                .padding()
+                .background(RoundedRectangle(cornerRadius: 10).fill(.quaternary))
+
                 // MARK: - Category Section
                 VStack(alignment: .leading, spacing: 12) {
                     Text("Kategorie")

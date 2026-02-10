@@ -32,7 +32,6 @@ struct TaskFormSheet: View {
     @State private var priority: Int? = nil  // nil = TBD (not set)
     @State private var duration: Int? = nil  // nil = TBD (not set)
     @State private var tags: [String] = []
-    @State private var newTag: String = ""
     @State private var urgency: String? = nil  // nil = TBD (not set)
     @State private var taskType: String = ""  // Empty = TBD (not set)
     @State private var hasDueDate = false
@@ -189,47 +188,7 @@ struct TaskFormSheet: View {
 
                     // MARK: - Tags
                     glassCardSection(id: "tags", header: "Tags") {
-                        if !tags.isEmpty {
-                            ScrollView(.horizontal, showsIndicators: false) {
-                                HStack(spacing: 8) {
-                                    ForEach(tags, id: \.self) { tag in
-                                        HStack(spacing: 4) {
-                                            Text("#\(tag)")
-                                                .font(.caption)
-                                            Button {
-                                                tags.removeAll { $0 == tag }
-                                            } label: {
-                                                Image(systemName: "xmark.circle.fill")
-                                                    .font(.caption)
-                                            }
-                                            .buttonStyle(.plain)
-                                        }
-                                        .padding(.horizontal, 10)
-                                        .padding(.vertical, 6)
-                                        .background(
-                                            Capsule().fill(Color(.secondarySystemFill))
-                                        )
-                                    }
-                                }
-                            }
-                        }
-
-                        HStack {
-                            TextField("Neuer Tag", text: $newTag)
-                                .textFieldStyle(.plain)
-                                .accessibilityIdentifier("Tags")
-                            Button {
-                                let trimmed = newTag.trimmingCharacters(in: .whitespacesAndNewlines)
-                                if !trimmed.isEmpty && !tags.contains(trimmed) {
-                                    tags.append(trimmed)
-                                    newTag = ""
-                                }
-                            } label: {
-                                Image(systemName: "plus.circle.fill")
-                                    .foregroundColor(.accentColor)
-                            }
-                            .disabled(newTag.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                        }
+                        TagInputView(tags: $tags)
                     }
 
                     // MARK: - Due Date

@@ -164,6 +164,23 @@ final class LocalTaskSource: @preconcurrency TaskSource, @preconcurrency TaskSou
         try modelContext.save()
     }
 
+    // MARK: - Tag Suggestions
+
+    /// Returns all unique tags used across all tasks, sorted by frequency (most used first)
+    func fetchAllUsedTags() throws -> [String] {
+        let descriptor = FetchDescriptor<LocalTask>()
+        let allTasks = try modelContext.fetch(descriptor)
+
+        var tagCounts: [String: Int] = [:]
+        for task in allTasks {
+            for tag in task.tags {
+                tagCounts[tag, default: 0] += 1
+            }
+        }
+
+        return tagCounts.sorted { $0.value > $1.value }.map(\.key)
+    }
+
     // MARK: - Private Helpers
 
     private func findTask(byID id: String) throws -> LocalTask? {

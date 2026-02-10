@@ -280,31 +280,18 @@ Usage Descriptions zu `FocusBloxMac/Info.plist` hinzugefügt.
 
 ---
 
-### Bug 21: Tags-Eingabe ohne Autocomplete und Vorschläge
-**Status:** OFFEN
+### Bug 21: Tags-Eingabe ohne Autocomplete und Vorschlaege
+**Status:** ✅ ERLEDIGT (2026-02-10)
 **Gemeldet:** 2026-02-02
-**Location:** `Sources/Views/EditTaskSheet.swift:70`, `Sources/Views/TaskFormSheet.swift`
+**Platform:** iOS + macOS
 
-**Problem:**
-- Tags-Feld ist ein einfaches `TextField` mit Komma-Trennung
-- Bestehende/häufig verwendete Tags werden nicht vorgeschlagen
-- Keine Autocomplete-Funktion bei Eingabe
-- Kein schneller Zugriff auf bereits verwendete Tags
-
-**Expected:**
-1. Häufig verwendete Tags als auswählbare Chips über dem Textfeld anzeigen
-2. Autocomplete bei Eingabe (bestehende Tags vorschlagen)
-3. Eingegebene Tags als Chips darstellen (statt Komma-getrennter Text)
-4. Tap auf Chip → Tag entfernen
-
-**Betroffene Dateien:**
-- `Sources/Views/EditTaskSheet.swift` (~100 LoC)
-- `Sources/Views/TaskFormSheet.swift` (~50 LoC)
-- Neuer View: `Sources/Views/TagInputView.swift` (~150 LoC)
-
-**Scope:** Mittel (neuer Component + 2 Integrationen)
-
-**Priorität:** NIEDRIG
+**Fix:**
+- Neuer `TagInputView` Component (`Sources/Views/TagInputView.swift`) mit Chips + Autocomplete
+- `LocalTaskSource.fetchAllUsedTags()` liest alle verwendeten Tags sortiert nach Haeufigkeit
+- `FlowLayout` von TaskDetailSheet nach TagInputView verschoben (shared zwischen iOS/macOS)
+- TaskFormSheet: Tag-Section durch TagInputView ersetzt (-30 LoC)
+- EditTaskSheet: Komma-TextField durch TagInputView ersetzt, tags `String` → `[String]`
+- TaskInspector (macOS): Neue Tags-Section mit TagInputView hinzugefuegt
 
 ---
 

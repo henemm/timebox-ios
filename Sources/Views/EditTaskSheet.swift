@@ -1,4 +1,5 @@
 import SwiftUI
+import SwiftData
 
 struct EditTaskSheet: View {
     let task: PlanItem
@@ -8,7 +9,7 @@ struct EditTaskSheet: View {
     @State private var title: String
     @State private var priority: TaskPriority
     @State private var duration: Int
-    @State private var tags: String
+    @State private var tags: [String]
     @State private var urgency: String?
     @State private var taskType: String
     @State private var hasDueDate: Bool
@@ -31,7 +32,7 @@ struct EditTaskSheet: View {
         _title = State(initialValue: task.title)
         _priority = State(initialValue: task.priority)
         _duration = State(initialValue: task.effectiveDuration)
-        _tags = State(initialValue: task.tags.joined(separator: ", "))
+        _tags = State(initialValue: task.tags)
         _urgency = State(initialValue: task.urgency)
         _taskType = State(initialValue: task.taskType)
         _hasDueDate = State(initialValue: task.dueDate != nil)
@@ -60,8 +61,7 @@ struct EditTaskSheet: View {
 
                 // MARK: - Kategorisierung
                 Section("Kategorisierung") {
-                    TextField("Tags", text: $tags)
-                        .accessibilityIdentifier("Tags")
+                    TagInputView(tags: $tags)
 
                     Picker("Dringlichkeit", selection: $urgency) {
                         ForEach(urgencyOptions, id: \.1) { value, label in
@@ -130,11 +130,6 @@ struct EditTaskSheet: View {
     }
 
     private func saveTask() {
-        let parsedTags = tags
-            .split(separator: ",")
-            .map { $0.trimmingCharacters(in: .whitespaces) }
-            .filter { !$0.isEmpty }
-
         let finalDueDate: Date? = hasDueDate ? dueDate : nil
         let finalDescription: String? = taskDescription.isEmpty ? nil : taskDescription
 
@@ -142,7 +137,7 @@ struct EditTaskSheet: View {
             title,
             priority,
             duration,
-            parsedTags,
+            tags,
             urgency,
             taskType,
             finalDueDate,
