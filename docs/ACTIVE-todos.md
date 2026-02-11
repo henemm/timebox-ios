@@ -20,6 +20,11 @@
 
 ## ✅ Kürzlich erledigt
 
+### Feature: Kalender-Events in Review-Statistiken integriert (macOS + iOS)
+**Status:** ✅ ERLEDIGT (2026-02-11)
+**Fix:** Kategorisierte Kalender-Events fliessen automatisch in Tages- und Wochen-Review-Statistiken ein. macOS: Tap auf Event in Timeline oeffnet Kategorie-Sheet. Neuer ReviewStatsCalculator als shared Utility.
+**Commit:** `e6abc5d`
+
 ### Bug 32: Importance/Urgency Werte gehen verloren (Race Condition)
 **Status:** ✅ ERLEDIGT (2026-02-10) - War bereits gefixt: TaskInspector hat explizites save(), ContentView synct nur einmal
 
@@ -37,6 +42,93 @@
 ---
 
 ## 🔴 OFFEN - Neue Bugs/Features
+
+### Bug 33: Task-Attribute (Importance, Urgency, Tags, etc.) synchen nicht zwischen macOS und iOS
+**Status:** OFFEN
+**Gemeldet:** 2026-02-11
+**Platform:** macOS + iOS (Cross-Platform Sync)
+**Location:** `Sources/FocusBloxApp.swift:27`, `FocusBloxMac/FocusBloxMacApp.swift:148-173`
+
+**Problem:**
+- Wenn auf macOS Importance/Urgency/Tags etc. im TaskInspector gesetzt werden, erscheinen diese Aenderungen NICHT auf iOS
+- Umgekehrt genauso: iOS-Aenderungen kommen nicht auf macOS an
+- Betrifft ALLE LocalTask-Felder, nicht nur importance/urgency
+
+**Root Cause (3 Ursachen):**
+
+**RC1 - HAUPTURSACHE: iOS hat KEIN CloudKit, macOS schon**
+- `Sources/FocusBloxApp.swift:27` → `cloudKitDatabase: .none` (iOS: kein CloudKit!)
+- `FocusBloxMac/FocusBloxMacApp.swift:162` → `cloudKitDatabase: .automatic` (macOS: CloudKit aktiv)
+- iOS und macOS haben SEPARATE lokale Datenbanken ohne jede Verbindung
+- Selbst wenn CloudKit auf macOS schreibt, liest iOS NIEMALS davon
+
+**RC2 - iOS hat KEINEN App Group Container**
+- `Sources/FocusBloxApp.swift` → Kein `groupContainer` konfiguriert (Standard-Pfad)
+- `FocusBloxMac/FocusBloxMacApp.swift:159` → `groupContainer: .identifier("group.com.henning.focusblox")`
+- Die SwiftData-Dateien liegen an voellig verschiedenen Pfaden
+- Selbst wenn beide CloudKit haetten, wuerden unterschiedliche Container-Pfade Probleme machen
+
+**RC3 - Reminders-Sync exportiert NUR title/priority/dueDate/notes/isCompleted**
+- `RemindersSyncService.exportToReminders()` (Zeile 63-76) schreibt nur:
+  - title, priority (mapped from importance), dueDate, notes, isCompleted
+- NICHT exportiert: urgency, tags, taskType, estimatedDuration, isNextUp, assignedFocusBlockID, recurrence
+- Apple Reminders (EKReminder) hat keine Felder fuer urgency, tags, taskType etc.
+- Selbst bei funktionierender Reminders-Sync gehen diese Felder verloren
+
+**Sync-Fluss (IST-Zustand):**
+```
+macOS:  LocalTask (SwiftData + CloudKit .automatic) ← TaskInspector editiert
+                    ↕ CloudKit (nur macOS)
+iOS:    LocalTask (SwiftData + CloudKit .none) ← KOMPLETT ISOLIERT
+
+Reminders-Sync (iOS):
+  Apple Reminders → RemindersSyncService.importFromReminders() → LocalTask
+                  ← RemindersSyncService.exportToReminders() ← LocalTask
+  Nur: title, priority/importance, dueDate, notes, isCompleted
+  NICHT: urgency, tags, taskType, estimatedDuration, isNextUp, recurrence
+```
+
+**Felder-Status:**
+
+| Feld | Via CloudKit | Via Reminders-Sync | Cross-Platform? |
+|------|-------------|-------------------|-----------------|
+| title | Nur macOS→macOS | Ja (bidirektional) | Nur via Reminders |
+| importance | Nur macOS→macOS | Ja (als priority) | Nur via Reminders |
+| urgency | Nur macOS→macOS | NEIN | NEIN |
+| tags | Nur macOS→macOS | NEIN | NEIN |
+| taskType | Nur macOS→macOS | NEIN | NEIN |
+| estimatedDuration | Nur macOS→macOS | NEIN | NEIN |
+| dueDate | Nur macOS→macOS | Ja | Nur via Reminders |
+| isNextUp | Nur macOS→macOS | NEIN | NEIN |
+| assignedFocusBlockID | Nur macOS→macOS | NEIN | NEIN |
+| recurrence* | Nur macOS→macOS | NEIN | NEIN |
+| taskDescription | Nur macOS→macOS | Ja (als notes) | Nur via Reminders |
+
+**Fix-Optionen (Empfehlung: Option A):**
+
+**Option A: CloudKit auf iOS aktivieren (einfachster Fix)**
+- `Sources/FocusBloxApp.swift:27` → `cloudKitDatabase: .automatic`
+- App Group Container auf iOS konfigurieren: `groupContainer: .identifier("group.com.henning.focusblox")`
+- Ergebnis: ALLE LocalTask-Felder synchen automatisch via iCloud
+- Aufwand: Klein (2-3 Zeilen Code)
+- Risiko: Migration bestehender lokaler Daten, iCloud-Entitlement pruefen
+
+**Option B: Reminders-Sync um fehlende Felder erweitern**
+- Urgency, tags, taskType etc. in EKReminder.notes als JSON serialisieren
+- Aufwand: Mittel (RemindersSyncService umbauen)
+- Nachteil: Hacky, notes-Feld wird missbraucht, fragil
+
+**Empfehlung:** Option A - CloudKit auf beiden Plattformen aktivieren
+
+**Test nach Fix:**
+1. macOS: Task erstellen, Importance=Hoch, Urgency=Dringend, Tags=["test"] setzen
+2. iOS: App oeffnen, gleicher Task muss mit allen Attributen erscheinen
+3. iOS: Urgency aendern → macOS muss Aenderung zeigen
+4. Edge Case: Offline-Edits auf beiden Plattformen → Merge-Verhalten pruefen
+
+**Geschaetzter Aufwand:** Klein (Option A) / Mittel (Option B)
+
+---
 
 ### Bug 32: Importance/Urgency Werte gehen verloren (Reminders-Sync Race Condition)
 **Status:** ✅ ERLEDIGT (2026-02-10)
