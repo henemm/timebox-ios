@@ -211,6 +211,8 @@ struct FocusBloxApp: App {
             }
             .onAppear {
                 resetUserDefaultsIfNeeded()
+                // One-time dedup cleanup for Bug 34 (Reminders duplicates after CloudKit activation)
+                cleanupRemindersDuplicates()
                 // Request calendar/reminders permission on app launch (Bug 8 fix)
                 requestPermissionsOnLaunch()
                 // Check for CC trigger (App Group flag)
@@ -273,6 +275,49 @@ struct FocusBloxApp: App {
         UserDefaults.standard.set(false, forKey: "remindersSyncEnabled")
         UserDefaults.standard.removeObject(forKey: "visibleReminderListIDs")
         UserDefaults.standard.synchronize()
+    }
+
+    /// One-time cleanup of Reminders duplicates (Bug 34)
+    /// After CloudKit activation, tasks exist both as full CloudKit versions (sourceSystem="local")
+    /// and stripped Reminders imports (sourceSystem="reminders"). Delete the stripped copies.
+    private func cleanupRemindersDuplicates() {
+        let isUITesting = ProcessInfo.processInfo.arguments.contains("-UITesting")
+        guard !isUITesting else { return }
+        guard !UserDefaults.standard.bool(forKey: "dedupCleanupBug34Done") else { return }
+
+        let context = sharedModelContainer.mainContext
+        do {
+            // Fetch all reminders-sourced tasks
+            let remindersTasks = try context.fetch(
+                FetchDescriptor<LocalTask>(predicate: #Predicate { $0.sourceSystem == "reminders" })
+            )
+            guard !remindersTasks.isEmpty else {
+                UserDefaults.standard.set(true, forKey: "dedupCleanupBug34Done")
+                return
+            }
+
+            // Fetch all non-reminders tasks (CloudKit/local originals)
+            let localTasks = try context.fetch(
+                FetchDescriptor<LocalTask>(predicate: #Predicate { $0.sourceSystem != "reminders" })
+            )
+            let localTitles = Set(localTasks.map { $0.title })
+
+            // Delete reminders tasks that have a matching local/CloudKit version
+            var deletedCount = 0
+            for task in remindersTasks {
+                if localTitles.contains(task.title) {
+                    context.delete(task)
+                    deletedCount += 1
+                }
+            }
+
+            if deletedCount > 0 {
+                try context.save()
+            }
+            UserDefaults.standard.set(true, forKey: "dedupCleanupBug34Done")
+        } catch {
+            // Silent failure - will retry on next launch
+        }
     }
 
     /// Seed mock data for UI testing
