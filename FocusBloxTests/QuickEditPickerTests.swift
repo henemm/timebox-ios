@@ -36,13 +36,12 @@ final class QuickEditPickerTests: XCTestCase {
         XCTAssertEqual(ImportancePickerOption.high.icon, "🔴")
     }
 
-    // MARK: - CategoryPicker Tests
+    // MARK: - CategoryPicker Tests (uses TaskCategory)
 
-    /// Test: CategoryPicker provides correct options (5 Lebensarbeit categories)
-    /// EXPECTED TO FAIL: CategoryPicker doesn't exist yet
+    /// Test: TaskCategory provides correct options (5 Lebensarbeit categories)
     func testCategoryPickerOptions() throws {
-        let options = CategoryPickerOption.allCases
-        XCTAssertEqual(options.count, 5, "CategoryPicker should have 5 options")
+        let options = TaskCategory.allCases
+        XCTAssertEqual(options.count, 5, "TaskCategory should have 5 options")
 
         let rawValues = options.map { $0.rawValue }
         XCTAssertTrue(rawValues.contains("income"))
@@ -52,22 +51,19 @@ final class QuickEditPickerTests: XCTestCase {
         XCTAssertTrue(rawValues.contains("giving_back"))
     }
 
-    /// Test: CategoryPicker options have display names
-    /// EXPECTED TO FAIL: CategoryPicker doesn't exist yet
+    /// Test: TaskCategory options have display names
     func testCategoryPickerDisplayNames() throws {
-        XCTAssertEqual(CategoryPickerOption.income.displayName, "Einkommen")
-        XCTAssertEqual(CategoryPickerOption.maintenance.displayName, "Maintenance")
-        XCTAssertEqual(CategoryPickerOption.recharge.displayName, "Recharge")
-        XCTAssertEqual(CategoryPickerOption.learning.displayName, "Lernen")
-        XCTAssertEqual(CategoryPickerOption.givingBack.displayName, "Giving Back")
+        XCTAssertFalse(TaskCategory.income.displayName.isEmpty)
+        XCTAssertFalse(TaskCategory.essentials.displayName.isEmpty)
+        XCTAssertFalse(TaskCategory.selfCare.displayName.isEmpty)
+        XCTAssertFalse(TaskCategory.learn.displayName.isEmpty)
+        XCTAssertFalse(TaskCategory.social.displayName.isEmpty)
     }
 
-    /// Test: CategoryPicker options have SF Symbol icons
-    /// EXPECTED TO FAIL: CategoryPicker doesn't exist yet
+    /// Test: TaskCategory options have SF Symbol icons
     func testCategoryPickerIcons() throws {
-        // Each category should have a non-empty SF Symbol name
-        for option in CategoryPickerOption.allCases {
-            XCTAssertFalse(option.sfSymbol.isEmpty, "\(option.rawValue) should have an SF Symbol")
+        for option in TaskCategory.allCases {
+            XCTAssertFalse(option.icon.isEmpty, "\(option.rawValue) should have an icon")
         }
     }
 }

@@ -63,6 +63,7 @@ struct MacTimelineView: View {
     var onTapBlock: ((FocusBlock) -> Void)?
     var onTapEditBlock: ((FocusBlock) -> Void)?
     var onTapFreeSlot: ((TimeSlot) -> Void)?
+    var onTapEvent: ((CalendarEvent) -> Void)?
 
     // Timeline configuration
     private let startHour = 6
@@ -93,7 +94,9 @@ struct MacTimelineView: View {
                     TimelineLayout(hourHeight: hourHeight, startHour: startHour, endHour: endHour) {
                         // Regular calendar events (with collision detection)
                         ForEach(positionedEvents) { positioned in
-                            EventBlockView(event: positioned.event)
+                            EventBlockView(event: positioned.event, onTap: {
+                                onTapEvent?(positioned.event)
+                            })
                                 .timelinePosition(
                                     hour: Calendar.current.component(.hour, from: positioned.event.startDate),
                                     minute: Calendar.current.component(.minute, from: positioned.event.startDate),
@@ -370,23 +373,35 @@ private struct PositionedFocusBlock: Identifiable {
 /// Calendar event view - positioned by TimelineLayout using place()
 struct EventBlockView: View {
     let event: CalendarEvent
+    var onTap: (() -> Void)?
 
     var body: some View {
         // TimelineLayout provides size via ProposedViewSize - use frame modifiers
-        VStack(alignment: .leading, spacing: 2) {
-            Text(displayTitle)
-                .font(.system(size: 11, weight: .semibold))
-                .foregroundStyle(.white)
-                .lineLimit(2)
+        HStack(spacing: 0) {
+            // Category color stripe (left edge)
+            if let category = event.category,
+               let config = TaskCategory(rawValue: category) {
+                RoundedRectangle(cornerRadius: 2)
+                    .fill(config.color)
+                    .frame(width: 4)
+                    .padding(.vertical, 2)
+            }
 
-            Text(timeRange)
-                .font(.system(size: 10))
-                .foregroundStyle(.white.opacity(0.8))
+            VStack(alignment: .leading, spacing: 2) {
+                Text(displayTitle)
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundStyle(.white)
+                    .lineLimit(2)
 
-            Spacer(minLength: 0)
+                Text(timeRange)
+                    .font(.system(size: 10))
+                    .foregroundStyle(.white.opacity(0.8))
+
+                Spacer(minLength: 0)
+            }
+            .padding(.horizontal, 6)
+            .padding(.vertical, 4)
         }
-        .padding(.horizontal, 6)
-        .padding(.vertical, 4)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .background(
             RoundedRectangle(cornerRadius: 4)
@@ -396,6 +411,11 @@ struct EventBlockView: View {
             RoundedRectangle(cornerRadius: 4)
                 .strokeBorder(eventColor.opacity(0.8), lineWidth: 0.5)
         )
+        .contentShape(Rectangle())
+        .onTapGesture {
+            onTap?()
+        }
+        .accessibilityIdentifier("calendarEvent_\(event.id)")
     }
 
     private var displayTitle: String {

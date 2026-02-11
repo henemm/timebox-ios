@@ -15,6 +15,9 @@ struct MacReviewView: View {
     private var completedTasks: [LocalTask]
 
     @State private var selectedView: ReviewScope = .today
+    @State private var calendarEvents: [CalendarEvent] = []
+    private let eventKitRepo = EventKitRepository()
+    private let statsCalculator = ReviewStatsCalculator()
 
     enum ReviewScope: String, CaseIterable {
         case today = "Heute"
@@ -40,11 +43,18 @@ struct MacReviewView: View {
             case .today:
                 DayReviewContent(completedTasks: todayTasks)
             case .week:
-                WeekReviewContent(completedTasks: weekTasks)
+                WeekReviewContent(
+                    completedTasks: weekTasks,
+                    calendarEvents: calendarEvents,
+                    statsCalculator: statsCalculator
+                )
             }
         }
         .navigationTitle("Review")
         .frame(minWidth: 600, minHeight: 400)
+        .task {
+            await loadCalendarEvents()
+        }
     }
 
     // MARK: - Filtered Tasks
@@ -64,6 +74,26 @@ struct MacReviewView: View {
         }
         return completedTasks.filter { task in
             task.createdAt >= startOfWeek
+        }
+    }
+
+    // MARK: - Calendar Events
+
+    private func loadCalendarEvents() async {
+        do {
+            var allEvents: [CalendarEvent] = []
+            let calendar = Calendar.current
+            if let weekInterval = calendar.dateInterval(of: .weekOfYear, for: Date()) {
+                var currentDate = weekInterval.start
+                while currentDate < weekInterval.end {
+                    let dayEvents = try eventKitRepo.fetchCalendarEvents(for: currentDate)
+                    allEvents.append(contentsOf: dayEvents)
+                    currentDate = calendar.date(byAdding: .day, value: 1, to: currentDate) ?? weekInterval.end
+                }
+            }
+            calendarEvents = allEvents
+        } catch {
+            calendarEvents = []
         }
     }
 }
@@ -138,11 +168,32 @@ struct DayReviewContent: View {
 
 struct WeekReviewContent: View {
     let completedTasks: [LocalTask]
+    var calendarEvents: [CalendarEvent] = []
+    var statsCalculator: ReviewStatsCalculator = ReviewStatsCalculator()
 
     private var categoryStats: [CategoryStat] {
         let grouped = Dictionary(grouping: completedTasks) { $0.taskType }
-        return grouped.map { CategoryStat(category: $0.key, count: $0.value.count) }
+        var stats = grouped.map { CategoryStat(category: $0.key, count: $0.value.count) }
             .sorted { $0.count > $1.count }
+
+        // Add event minutes to matching categories
+        let eventMinutes = statsCalculator.computeCategoryMinutes(
+            tasks: [],
+            calendarEvents: calendarEvents
+        )
+        for (category, minutes) in eventMinutes {
+            if let index = stats.firstIndex(where: { $0.category == category }) {
+                stats[index] = CategoryStat(
+                    category: category,
+                    count: stats[index].count,
+                    eventMinutes: minutes
+                )
+            } else {
+                stats.append(CategoryStat(category: category, count: 0, eventMinutes: minutes))
+            }
+        }
+
+        return stats.sorted { $0.count + ($0.eventMinutes ?? 0) > $1.count + ($1.eventMinutes ?? 0) }
     }
 
     private var totalFocusMinutes: Int {
@@ -195,6 +246,13 @@ struct WeekReviewContent: View {
                         }
                         .frame(height: CGFloat(categoryStats.count * 44))
                         .padding(.horizontal)
+
+                        // Marker for UI tests: events contribute to stats
+                        if categoryStats.contains(where: { $0.hasEventContribution }) {
+                            Color.clear
+                                .frame(width: 1, height: 1)
+                                .accessibilityIdentifier("eventMinutesIncluded")
+                        }
                     }
 
                     Divider()
@@ -369,6 +427,7 @@ struct CategoryStat: Identifiable {
     let id = UUID()
     let category: String
     let count: Int
+    var eventMinutes: Int? = nil
 
     var label: String {
         TaskCategory(rawValue: category)?.displayName ?? category
@@ -380,6 +439,10 @@ struct CategoryStat: Identifiable {
 
     var icon: String {
         TaskCategory(rawValue: category)?.icon ?? "questionmark.circle"
+    }
+
+    var hasEventContribution: Bool {
+        (eventMinutes ?? 0) > 0
     }
 }
 

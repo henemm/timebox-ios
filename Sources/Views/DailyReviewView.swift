@@ -24,8 +24,10 @@ struct DailyReviewView: View {
     @State private var eventKitRepo = EventKitRepository()
     @State private var blocks: [FocusBlock] = []
     @State private var allTasks: [PlanItem] = []
+    @State private var calendarEvents: [CalendarEvent] = []
     @State private var isLoading = true
     @State private var reviewMode: ReviewMode = .today
+    private let statsCalculator = ReviewStatsCalculator()
 
     // MARK: - Computed Properties
 
@@ -46,22 +48,28 @@ struct DailyReviewView: View {
         }
     }
 
-    /// Category statistics for weekly view
+    /// Category statistics for weekly view (tasks + calendar events)
     private var categoryStats: [CategoryStat] {
-        var stats: [String: Int] = [:]
+        var taskStats: [String: Int] = [:]
 
         // Get all completed task IDs from week blocks
         let completedIDs = Set(weekBlocks.flatMap { $0.completedTaskIDs })
 
-        // Calculate total minutes per category
+        // Calculate total minutes per category from tasks
         for task in allTasks where completedIDs.contains(task.id) {
             let category = task.taskType
-            stats[category, default: 0] += task.effectiveDuration
+            taskStats[category, default: 0] += task.effectiveDuration
         }
+
+        // Combine task stats with calendar event stats
+        let combinedStats = statsCalculator.computeCategoryMinutes(
+            taskMinutesByCategory: taskStats,
+            calendarEvents: calendarEvents
+        )
 
         // Convert to CategoryStat array sorted by minutes
         return CategoryConfig.allCases.compactMap { config in
-            guard let minutes = stats[config.rawValue], minutes > 0 else { return nil }
+            guard let minutes = combinedStats[config.rawValue], minutes > 0 else { return nil }
             return CategoryStat(config: config, minutes: minutes)
         }.sorted { $0.minutes > $1.minutes }
     }
@@ -436,19 +444,23 @@ struct DailyReviewView: View {
         isLoading = true
 
         do {
-            // Load focus blocks for the week (to support both today and week views)
+            // Load focus blocks and calendar events for the week
             var allBlocks: [FocusBlock] = []
+            var allEvents: [CalendarEvent] = []
             let calendar = Calendar.current
             if let weekInterval = calendar.dateInterval(of: .weekOfYear, for: Date()) {
-                // Load blocks for each day of the week
+                // Load blocks and events for each day of the week
                 var currentDate = weekInterval.start
                 while currentDate < weekInterval.end {
                     let dayBlocks = try eventKitRepo.fetchFocusBlocks(for: currentDate)
                     allBlocks.append(contentsOf: dayBlocks)
+                    let dayEvents = try eventKitRepo.fetchCalendarEvents(for: currentDate)
+                    allEvents.append(contentsOf: dayEvents)
                     currentDate = calendar.date(byAdding: .day, value: 1, to: currentDate) ?? weekInterval.end
                 }
             }
             blocks = allBlocks
+            calendarEvents = allEvents
 
             // Load all tasks via SyncEngine
             let taskSource = LocalTaskSource(modelContext: modelContext)
@@ -458,6 +470,7 @@ struct DailyReviewView: View {
             // Silently fail - UI will show empty state
             blocks = []
             allTasks = []
+            calendarEvents = []
         }
 
         isLoading = false
