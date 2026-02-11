@@ -3,15 +3,16 @@ import SwiftUI
 import AppIntents
 
 /// Intent that opens the app and triggers Quick Capture
-/// Uses openAppWhenRun with URL intent for reliable widget→app communication
+/// Sets App Group flag, then openAppWhenRun brings app to foreground.
+/// App checks flag on activation via checkCCQuickCaptureTrigger().
 struct QuickAddLaunchIntent: AppIntent {
     static var title: LocalizedStringResource = "Quick Add Task"
     static var openAppWhenRun: Bool = true
 
-    func perform() async throws -> some IntentResult & OpensIntent {
-        // Return intent that opens the URL scheme
-        // This triggers the app's onOpenURL handler
-        return .result(opensIntent: OpenURLIntent(URL(string: "focusblox://create-task")!))
+    func perform() async throws -> some IntentResult {
+        let defaults = UserDefaults(suiteName: "group.com.henning.focusblox")
+        defaults?.set(true, forKey: "quickCaptureFromCC")
+        return .result()
     }
 }
 
