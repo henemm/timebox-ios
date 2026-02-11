@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import AppIntents
 import FocusBloxCore
 
 // MARK: - Notification Name for Control Center Widget
@@ -14,6 +15,11 @@ struct FocusBloxApp: App {
     @State private var permissionRequested = false
 
     private static let appGroupID = "group.com.henning.focusblox"
+
+    init() {
+        // Register shared state for Interactive Snippets (iOS 26)
+        AppDependencyManager.shared.add(dependency: QuickCaptureState())
+    }
 
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([

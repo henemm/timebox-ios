@@ -3,16 +3,15 @@ import SwiftData
 
 // MARK: - Shared ModelContainer
 
-/// Centralized ModelContainer for SwiftData.
-/// Bug 25 fix: App Group removed - was causing SwiftDataError error 1 on devices.
-/// Note: Shortcuts/Intents currently cannot access SwiftData (would need App Group).
+/// Centralized ModelContainer for SwiftData shared between app and intents.
+/// Uses App Group container for data exchange between main app and Siri/Shortcuts.
 enum SharedModelContainer {
-    /// Creates a ModelContainer using simple local storage.
     static func create() throws -> ModelContainer {
         let schema = Schema([LocalTask.self, TaskMetadata.self])
         let config = ModelConfiguration(
             schema: schema,
-            cloudKitDatabase: .none
+            groupContainer: .identifier("group.com.henning.focusblox"),
+            cloudKitDatabase: .automatic
         )
         return try ModelContainer(for: schema, configurations: [config])
     }
