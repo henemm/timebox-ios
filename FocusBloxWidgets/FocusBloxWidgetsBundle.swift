@@ -14,6 +14,9 @@ struct FocusBloxWidgetsBundle: WidgetBundle {
         // QuickAdd mit Intent aus FocusBloxCore Framework
         QuickAddTaskControl()
 
+        // Home/Lock Screen Widget for quick task capture
+        QuickCaptureWidget()
+
         // Live Activity for Focus Blocks
         FocusBlockLiveActivity()
     }
