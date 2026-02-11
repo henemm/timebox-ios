@@ -11,8 +11,11 @@ import SwiftUI
 @main
 struct FocusBloxWidgetsBundle: WidgetBundle {
     var body: some Widget {
-        // QuickAdd mit Intent aus FocusBloxCore Framework
-        QuickAddTaskControl()
+        // Bug 36 Diagnostic: 4 CC-Buttons mit verschiedenen Mechanismen
+        TestAControl()  // star.fill  - Pure openAppWhenRun
+        TestBControl()  // flame.fill - App Group Flag + openAppWhenRun
+        TestCControl()  // link       - OpenURLIntent + openAppWhenRun
+        TestDControl()  // bolt.fill  - App Group Flag ohne openAppWhenRun
 
         // Home/Lock Screen Widget for quick task capture
         QuickCaptureWidget()
