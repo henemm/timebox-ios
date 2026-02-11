@@ -272,25 +272,37 @@ struct FocusBloxApp: App {
         showQuickCapture = true
     }
 
-    /// Remove Reminders duplicates that have a matching CloudKit/local task (Bug 34).
+    /// Remove duplicate tasks sharing the same externalID (Bug 34 v2).
+    /// Groups by externalID, keeps the most enriched task per group.
     /// Returns number of deleted tasks, or -1 on error.
     @discardableResult
     static func cleanupRemindersDuplicates(in context: ModelContext) -> Int {
         do {
-            let remindersTasks = try context.fetch(
-                FetchDescriptor<LocalTask>(predicate: #Predicate { $0.sourceSystem == "reminders" })
-            )
-            guard !remindersTasks.isEmpty else { return 0 }
+            let allTasks = try context.fetch(FetchDescriptor<LocalTask>())
+            let tasksWithExternalID = allTasks.filter { $0.externalID != nil }
+            guard !tasksWithExternalID.isEmpty else { return 0 }
 
-            let localTasks = try context.fetch(
-                FetchDescriptor<LocalTask>(predicate: #Predicate { $0.sourceSystem != "reminders" })
-            )
-            let localTitles = Set(localTasks.map { $0.title })
+            // Group by externalID
+            var groups: [String: [LocalTask]] = [:]
+            for task in tasksWithExternalID {
+                let key = task.externalID!
+                groups[key, default: []].append(task)
+            }
 
             var deletedCount = 0
-            for task in remindersTasks where localTitles.contains(task.title) {
-                context.delete(task)
-                deletedCount += 1
+            for (_, tasks) in groups where tasks.count > 1 {
+                // Sort by attribute score descending, then by createdAt ascending (older first)
+                let sorted = tasks.sorted { a, b in
+                    let scoreA = Self.attributeScore(a)
+                    let scoreB = Self.attributeScore(b)
+                    if scoreA != scoreB { return scoreA > scoreB }
+                    return a.createdAt < b.createdAt
+                }
+                // Keep first (highest score / oldest), delete rest
+                for task in sorted.dropFirst() {
+                    context.delete(task)
+                    deletedCount += 1
+                }
             }
 
             if deletedCount > 0 {
@@ -300,6 +312,17 @@ struct FocusBloxApp: App {
         } catch {
             return -1
         }
+    }
+
+    /// Score how many enrichment attributes a task has filled.
+    private static func attributeScore(_ task: LocalTask) -> Int {
+        var score = 0
+        if task.importance != nil { score += 1 }
+        if task.urgency != nil { score += 1 }
+        if task.estimatedDuration != nil { score += 1 }
+        if !task.taskType.isEmpty { score += 1 }
+        if !task.tags.isEmpty { score += 1 }
+        return score
     }
 
     /// Reset UserDefaults for UI test isolation

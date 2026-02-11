@@ -20,58 +20,64 @@ final class DedupCleanupTests: XCTestCase {
         context = nil
     }
 
-    // MARK: - Test 1: Duplicate deleted, original kept
+    // MARK: - Test 1: Enriched kept, stripped deleted (same externalID)
 
-    func testDedupDeletesRemindersTaskWhenLocalExists() throws {
-        // GIVEN: A local/CloudKit task and a reminders duplicate with same title
-        let localTask = LocalTask(title: "Einkaufen", importance: 3, sourceSystem: "local")
-        localTask.urgency = "urgent"
-        localTask.estimatedDuration = 30
+    func testDedupKeepsEnrichedDeletesStripped() throws {
+        // GIVEN: Two tasks with SAME externalID, both sourceSystem="reminders"
+        // One enriched (via CloudKit sync), one stripped (direct Reminders import)
+        let enriched = LocalTask(title: "Einkaufen", importance: 3, externalID: "REM-ABC-123", sourceSystem: "reminders")
+        enriched.urgency = "urgent"
+        enriched.estimatedDuration = 30
+        enriched.taskType = "shallow_work"
+        enriched.tags = ["einkauf"]
 
-        let remindersTask = LocalTask(title: "Einkaufen", sourceSystem: "reminders")
-        // remindersTask has no importance, urgency, duration (stripped copy)
+        let stripped = LocalTask(title: "Einkaufen", externalID: "REM-ABC-123", sourceSystem: "reminders")
+        // stripped has no importance, urgency, duration, taskType, tags
 
-        context.insert(localTask)
-        context.insert(remindersTask)
+        context.insert(enriched)
+        context.insert(stripped)
         try context.save()
 
         // WHEN: Dedup cleanup runs
         let deletedCount = FocusBloxApp.cleanupRemindersDuplicates(in: context)
 
-        // THEN: Reminders copy deleted, local kept
+        // THEN: Stripped deleted, enriched kept
         let remaining = try context.fetch(FetchDescriptor<LocalTask>())
         XCTAssertEqual(deletedCount, 1, "Should delete 1 duplicate")
         XCTAssertEqual(remaining.count, 1, "Should keep 1 task")
-        XCTAssertEqual(remaining.first?.sourceSystem, "local", "Kept task should be local")
-        XCTAssertEqual(remaining.first?.importance, 3, "Kept task should have full attributes")
+        XCTAssertEqual(remaining.first?.importance, 3, "Kept task should have enriched attributes")
+        XCTAssertEqual(remaining.first?.urgency, "urgent", "Kept task should have urgency")
+        XCTAssertEqual(remaining.first?.estimatedDuration, 30, "Kept task should have duration")
     }
 
-    // MARK: - Test 2: Non-duplicate reminders task kept
+    // MARK: - Test 2: Unique externalID task kept
 
-    func testDedupKeepsRemindersTaskWithoutLocalMatch() throws {
-        // GIVEN: A reminders task with no matching local task
-        let remindersTask = LocalTask(title: "Nur in Reminders", sourceSystem: "reminders")
-        let localTask = LocalTask(title: "Anderer Task", sourceSystem: "local")
+    func testDedupKeepsTaskWithUniqueExternalID() throws {
+        // GIVEN: A task with externalID but NO duplicate
+        let unique = LocalTask(title: "Nur einmal", externalID: "REM-UNIQUE-1", sourceSystem: "reminders")
+        unique.importance = 2
 
-        context.insert(remindersTask)
-        context.insert(localTask)
+        let otherTask = LocalTask(title: "Anderer Task", externalID: "REM-OTHER-1", sourceSystem: "reminders")
+
+        context.insert(unique)
+        context.insert(otherTask)
         try context.save()
 
         // WHEN: Dedup cleanup runs
         let deletedCount = FocusBloxApp.cleanupRemindersDuplicates(in: context)
 
-        // THEN: Both tasks kept
+        // THEN: Both tasks kept (no duplicates)
         let remaining = try context.fetch(FetchDescriptor<LocalTask>())
         XCTAssertEqual(deletedCount, 0, "Should delete nothing")
         XCTAssertEqual(remaining.count, 2, "Both tasks should remain")
     }
 
-    // MARK: - Test 3: No reminders tasks = nothing to do
+    // MARK: - Test 3: No tasks with externalID = nothing to do
 
-    func testDedupDoesNothingWithoutRemindersTasks() throws {
-        // GIVEN: Only local tasks, no reminders tasks
-        let task1 = LocalTask(title: "Task A", sourceSystem: "local")
-        let task2 = LocalTask(title: "Task B", sourceSystem: "local")
+    func testDedupDoesNothingWithoutExternalIDs() throws {
+        // GIVEN: Tasks without externalID (manually created, not from Reminders)
+        let task1 = LocalTask(title: "Task A")
+        let task2 = LocalTask(title: "Task B")
 
         context.insert(task1)
         context.insert(task2)
@@ -80,33 +86,42 @@ final class DedupCleanupTests: XCTestCase {
         // WHEN: Dedup cleanup runs
         let deletedCount = FocusBloxApp.cleanupRemindersDuplicates(in: context)
 
-        // THEN: Nothing deleted
+        // THEN: Nothing deleted, return 0
         let remaining = try context.fetch(FetchDescriptor<LocalTask>())
         XCTAssertEqual(deletedCount, 0, "Should delete nothing")
         XCTAssertEqual(remaining.count, 2, "All tasks should remain")
     }
 
-    // MARK: - Test 4: Multiple duplicates cleaned up
+    // MARK: - Test 4: Three duplicates, only most enriched survives
 
-    func testDedupDeletesMultipleDuplicates() throws {
-        // GIVEN: 3 local tasks and 2 reminders duplicates
-        let local1 = LocalTask(title: "Einkaufen", importance: 3, sourceSystem: "local")
-        let local2 = LocalTask(title: "Sport", importance: 2, sourceSystem: "local")
-        let local3 = LocalTask(title: "Lesen", importance: 1, sourceSystem: "local")
+    func testDedupKeepsMostEnrichedOfThree() throws {
+        // GIVEN: Three tasks with SAME externalID, different enrichment levels
+        // Level 0: bare minimum (no attributes)
+        let bare = LocalTask(title: "Sport machen", externalID: "REM-SPORT-1", sourceSystem: "reminders")
 
-        let dup1 = LocalTask(title: "Einkaufen", sourceSystem: "reminders")
-        let dup2 = LocalTask(title: "Sport", sourceSystem: "reminders")
+        // Level 2: partially enriched (importance + duration)
+        let partial = LocalTask(title: "Sport machen", importance: 2, estimatedDuration: 45, externalID: "REM-SPORT-1", sourceSystem: "reminders")
 
-        [local1, local2, local3, dup1, dup2].forEach { context.insert($0) }
+        // Level 5: fully enriched (all attributes)
+        let full = LocalTask(title: "Sport machen", importance: 3, estimatedDuration: 60, externalID: "REM-SPORT-1", sourceSystem: "reminders")
+        full.urgency = "urgent"
+        full.taskType = "deep_work"
+        full.tags = ["fitness"]
+
+        context.insert(bare)
+        context.insert(partial)
+        context.insert(full)
         try context.save()
 
         // WHEN: Dedup cleanup runs
         let deletedCount = FocusBloxApp.cleanupRemindersDuplicates(in: context)
 
-        // THEN: 2 duplicates deleted, 3 originals kept
+        // THEN: Only the fully enriched task survives
         let remaining = try context.fetch(FetchDescriptor<LocalTask>())
-        XCTAssertEqual(deletedCount, 2, "Should delete 2 duplicates")
-        XCTAssertEqual(remaining.count, 3, "Should keep 3 original tasks")
-        XCTAssertTrue(remaining.allSatisfy { $0.sourceSystem == "local" }, "All remaining should be local")
+        XCTAssertEqual(deletedCount, 2, "Should delete 2 less-enriched duplicates")
+        XCTAssertEqual(remaining.count, 1, "Should keep only 1 task")
+        XCTAssertEqual(remaining.first?.importance, 3, "Kept task should be the fully enriched one")
+        XCTAssertEqual(remaining.first?.urgency, "urgent", "Kept task should have urgency")
+        XCTAssertEqual(remaining.first?.taskType, "deep_work", "Kept task should have taskType")
     }
 }
