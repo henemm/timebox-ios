@@ -2,17 +2,9 @@ import WidgetKit
 import SwiftUI
 import AppIntents
 
-// MARK: - Test A: Pure openAppWhenRun (star.fill)
-// Testet: Öffnet die App überhaupt vom CC aus?
-
-struct TestA_PureOpenIntent: AppIntent {
-    static var title: LocalizedStringResource = "Test A: Pure Open"
-    static var openAppWhenRun: Bool = true
-
-    func perform() async throws -> some IntentResult {
-        return .result()
-    }
-}
+// MARK: - Bug 36 Diagnostic: 4 CC-Buttons
+// Intent-Definitionen sind in Sources/Intents/CCQuickAddIntents.swift
+// (kompiliert in BEIDE Targets: FocusBlox + FocusBloxWidgetsExtension)
 
 struct TestAControl: ControlWidget {
     static let kind = "com.focusblox.cc.testA"
@@ -25,20 +17,6 @@ struct TestAControl: ControlWidget {
         }
         .displayName("A: Pure Open")
         .description("Nur openAppWhenRun")
-    }
-}
-
-// MARK: - Test B: App Group Flag + openAppWhenRun (flame.fill)
-// Testet: Flag-basierter Trigger mit App-Öffnung
-
-struct TestB_FlagIntent: AppIntent {
-    static var title: LocalizedStringResource = "Test B: Flag"
-    static var openAppWhenRun: Bool = true
-
-    func perform() async throws -> some IntentResult {
-        let defaults = UserDefaults(suiteName: "group.com.henning.focusblox")
-        defaults?.set(true, forKey: "quickCaptureFromCC")
-        return .result()
     }
 }
 
@@ -56,18 +34,6 @@ struct TestBControl: ControlWidget {
     }
 }
 
-// MARK: - Test C: OpenURLIntent + openAppWhenRun (link)
-// Testet: Aktueller Ansatz mit URL-Scheme
-
-struct TestC_URLIntent: AppIntent {
-    static var title: LocalizedStringResource = "Test C: URL"
-    static var openAppWhenRun: Bool = true
-
-    func perform() async throws -> some IntentResult & OpensIntent {
-        return .result(opensIntent: OpenURLIntent(URL(string: "focusblox://create-task")!))
-    }
-}
-
 struct TestCControl: ControlWidget {
     static let kind = "com.focusblox.cc.testC"
 
@@ -79,21 +45,6 @@ struct TestCControl: ControlWidget {
         }
         .displayName("C: URL")
         .description("OpenURLIntent + openAppWhenRun")
-    }
-}
-
-// MARK: - Test D: App Group Flag OHNE openAppWhenRun (bolt.fill)
-// Testet: Läuft der Intent überhaupt? (App öffnet sich NICHT)
-// Nach Tap: App manuell öffnen - wenn QuickCapture erscheint, lief der Intent.
-
-struct TestD_FlagOnlyIntent: AppIntent {
-    static var title: LocalizedStringResource = "Test D: Flag Only"
-    static var openAppWhenRun: Bool = false
-
-    func perform() async throws -> some IntentResult {
-        let defaults = UserDefaults(suiteName: "group.com.henning.focusblox")
-        defaults?.set(true, forKey: "quickCaptureFromCC")
-        return .result()
     }
 }
 
