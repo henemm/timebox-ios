@@ -308,8 +308,14 @@ struct BacklogView: View {
         let syncEnabled = UserDefaults.standard.bool(forKey: "remindersSyncEnabled")
 
         do {
-            // 1. Wenn Sync aktiviert: Reminders importieren
-            if syncEnabled {
+            // 1. Wenn Sync aktiviert UND CloudKit nicht aktiv: Reminders importieren
+            // Bei aktivem CloudKit synct macOS die Reminders-Daten via iCloud.
+            // Direkter Reminders-Import auf iOS wuerde Duplikate erzeugen (Bug 34).
+            let isCloudKitActive = FileManager.default.containerURL(
+                forSecurityApplicationGroupIdentifier: "group.com.henning.focusblox"
+            ) != nil && !ProcessInfo.processInfo.arguments.contains("-UITesting")
+
+            if syncEnabled && !isCloudKitActive {
                 let syncService = RemindersSyncService(
                     eventKitRepo: eventKitRepo,
                     modelContext: modelContext

@@ -43,6 +43,15 @@
 
 ## 🔴 OFFEN - Neue Bugs/Features
 
+### Bug 34: Duplikate nach CloudKit-Aktivierung (Reminders-Import + CloudKit parallel)
+**Status:** ✅ ERLEDIGT (2026-02-11)
+**Platform:** iOS
+**Location:** `Sources/Views/BacklogView.swift:312-318`
+
+**Problem:** Nach Bug 33 Fix (CloudKit auf iOS) erscheinen Tasks doppelt: einmal korrekt via CloudKit, einmal abgespeckt via Reminders-Import.
+**Root Cause:** Zwei unabhaengige Sync-Pfade (CloudKit + Reminders) fuettern dieselbe DB. Reminders-Dedup sucht nur sourceSystem="reminders", findet CloudKit-Tasks nicht.
+**Fix:** Reminders-Import auf iOS ueberspringen wenn CloudKit aktiv ist. macOS bleibt Quelle fuer Reminders-Import, iOS bekommt alles via CloudKit.
+
 ### Bug 34: Doppelte Tasks nach CloudKit-Aktivierung (Reminders-Sync Duplikate)
 **Status:** OFFEN
 **Gemeldet:** 2026-02-11
