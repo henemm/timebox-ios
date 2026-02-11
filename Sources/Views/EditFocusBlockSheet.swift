@@ -23,6 +23,9 @@ struct EditFocusBlockSheet: View {
                 Section("Zeitraum") {
                     DatePicker("Start", selection: $startTime, displayedComponents: .hourAndMinute)
                     DatePicker("Ende", selection: $endTime, displayedComponents: .hourAndMinute)
+                        .onChange(of: endTime) {
+                            endTime = FocusBlock.normalizeEndTime(startTime: startTime, endTime: endTime)
+                        }
                 }
 
                 Section {

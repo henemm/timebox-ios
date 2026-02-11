@@ -193,25 +193,14 @@ Usage Descriptions zu `FocusBloxMac/Info.plist` hinzugefügt.
 ---
 
 ### Bug 19: Wiederkehrende Aufgaben Feature fehlt in TaskFormSheet
-**Status:** OFFEN
+**Status:** ✅ ERLEDIGT (bereits implementiert)
 **Gemeldet:** 2026-02-02
 **Location:** `Sources/Views/TaskFormSheet.swift`
 
-**Problem:**
-- Das Feature "Wiederkehrende Aufgaben" ist im TaskFormSheet nicht vorhanden
-- Screenshot zeigt: Tags-Feld mit "Wiederkehrend" als Workaround, aber keine echte Recurrence-UI
-- Das Feature existiert in `CreateTaskView.swift` (Zeile 138-174), wurde aber nicht in TaskFormSheet übernommen
-
-**Bestehende Komponenten (ungenutzt):**
-- `RecurrencePattern.swift` - Enum: none, daily, weekly, biweekly, monthly
-- `WeekdayButton.swift` - UI für Wochentag-Auswahl (Mo-So Kreise)
-- `LocalTask` hat Felder: `recurrencePattern`, `recurrenceWeekdays`, `recurrenceMonthDay`
-
-**Was fehlt in TaskFormSheet:**
-1. State-Variablen: `recurrencePattern`, `selectedWeekdays`, `monthDay`
-2. UI-Section für Wiederholung (Picker + Wochentag-Buttons)
-3. Übergabe an `createTask()` - aktuell hardcoded `"none"` (Zeile 392)
-4. Edit-Mode: Recurrence-Werte aus PlanItem laden
+**Befund (2026-02-10):** Feature ist bereits vollstaendig implementiert:
+- State-Variablen: `recurrencePattern`, `selectedWeekdays`, `monthDay` (Zeile 43-46)
+- UI-Section "Wiederholung" mit Picker + WeekdayButtons + MonthDay (Zeile 208-243)
+- Create + Edit uebergeben Recurrence-Daten korrekt (Zeile 381-398, 412-425)
 
 **Best Practice Verbesserung (zusätzlich):**
 - "Werktags"-Preset (Mo-Fr) als Schnellauswahl hinzufügen
@@ -654,10 +643,13 @@ Usage Descriptions zu `FocusBloxMac/Info.plist` hinzugefügt.
 - Status: **OFFEN**
 
 **Bug 14: Focus Block Zeiteinstellung zeigt "25 Std" statt Minuten**
-- Location: Vermutlich `BlockPlanningView.swift` oder `FocusBlockCard.swift`
-- Problem: Dauer-Anzeige zeigt "25 Std" statt "25 min"
-- Root Cause: Formatierung oder falsche Zeiteinheit
-- Status: **OFFEN**
+- Location: `Sources/Views/EditFocusBlockSheet.swift`, `Sources/Views/BlockPlanningView.swift` (CreateFocusBlockSheet), `FocusBloxMac/MacPlanningView.swift` (MacCreateFocusBlockSheet)
+- Problem: Dauer-Anzeige in Create/Edit Focus Block Sheet zeigt "25 Std" statt "25 Min"
+- Root Cause: DatePicker mit `.hourAndMinute` kann End-Datum auf den naechsten Tag wrappen
+- Fix: `FocusBlock.normalizeEndTime()` normalisiert endTime auf startTime's Kalendertag. Bei Mitternacht-Uebergang (end < start) wird 1 Tag addiert. `onChange(of: endTime)` in allen 3 Sheets.
+- Geaenderte Dateien: `FocusBlock.swift` (+normalizeEndTime), `EditFocusBlockSheet.swift`, `BlockPlanningView.swift`, `MacPlanningView.swift` (je +onChange)
+- Unit Tests: `FocusBlockDurationTests.swift` (4 Tests GRUEN)
+- Status: ✅ **ERLEDIGT**
 
 **Bug 15: Neue Task-Erstellung nutzt Default-Werte**
 - Location: `TaskFormSheet.swift`, `CreateTaskView.swift`
@@ -702,6 +694,29 @@ Usage Descriptions zu `FocusBloxMac/Info.plist` hinzugefügt.
 - Problem: Versehentlich zu Next Up hinzugefügt → Shake soll rückgängig machen
 - Implementation: UIResponder.motionEnded + UndoManager
 - Status: **OFFEN** (Feature Request)
+
+---
+
+## Tooling / Infrastruktur
+
+### Workflow-System: Parallele Workflows verhaken sich gegenseitig
+**Status:** OFFEN
+**Gemeldet:** 2026-02-11
+**Location:** `.claude/hooks/workflow_gate.py`, `.claude/hooks/workflow_state_multi.py`
+
+**Problem:**
+Das Multi-Workflow-System hat einen globalen `active_workflow`-Zeiger (Singleton). Obwohl `workflow_state.json` mehrere Workflows speichern kann, prueft der `workflow_gate.py`-Hook nur den aktiven Workflow. Das fuehrt zu:
+1. **Session-Neustart:** `active_workflow` geht verloren → alle Edits blockiert
+2. **Unrelated Dateien:** Auch Dateien, die zu keinem Workflow gehoeren, werden blockiert
+3. **Kein echter Parallelismus:** Nur der `active_workflow` kann Dateien editieren
+
+**Loesung (Vorschlag):**
+- Dateibasierte Zuordnung: Jeder Workflow "besitzt" bestimmte Dateien (`affected_files`)
+- Hook prueft ob die editierte Datei zu einem Workflow gehoert und ob DIESER Workflow in der richtigen Phase ist
+- Dateien ohne Workflow-Zuordnung werden nicht blockiert
+- Session-Neustart: Automatische Erkennung des passenden Workflows anhand der editierten Datei
+
+**Prioritaet:** MITTEL (Workaround: manuell `switch` ausfuehren)
 
 ---
 

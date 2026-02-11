@@ -56,6 +56,32 @@ struct FocusBlock: Identifiable, Sendable {
     }
 }
 
+// MARK: - Date Normalization
+
+extension FocusBlock {
+    /// Normalize endTime to the same calendar day as startTime.
+    /// Fixes Bug 14: DatePicker with .hourAndMinute can wrap endTime to the next day
+    /// when the user scrolls past midnight, causing duration to show "25 Std" instead of minutes.
+    static func normalizeEndTime(startTime: Date, endTime: Date) -> Date {
+        let calendar = Calendar.current
+        guard !calendar.isDate(startTime, inSameDayAs: endTime) else {
+            return endTime
+        }
+        // Put endTime's hour:minute on startTime's calendar day
+        let endComponents = calendar.dateComponents([.hour, .minute, .second], from: endTime)
+        let normalized = calendar.date(bySettingHour: endComponents.hour ?? 0,
+                                       minute: endComponents.minute ?? 0,
+                                       second: endComponents.second ?? 0,
+                                       of: startTime) ?? endTime
+        // If normalized is before/equal startTime, it means a midnight crossing
+        // (e.g. start 23:00, end 00:25 → add 1 day to get 85 min duration)
+        if normalized <= startTime {
+            return calendar.date(byAdding: .day, value: 1, to: normalized) ?? normalized
+        }
+        return normalized
+    }
+}
+
 // MARK: - Notes Serialization
 
 extension FocusBlock {

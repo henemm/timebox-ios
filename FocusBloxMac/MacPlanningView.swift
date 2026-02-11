@@ -26,6 +26,9 @@ struct MacPlanningView: View {
     // Sheet state for editing block time
     @State private var blockToEdit: FocusBlock?
 
+    // Sheet state for event category assignment
+    @State private var eventToCategories: CalendarEvent?
+
     // EventKit repository for real calendar access
     private let eventKitRepo = EventKitRepository()
 
@@ -93,6 +96,11 @@ struct MacPlanningView: View {
                 }
             )
         }
+        .sheet(item: $eventToCategories) { event in
+            MacEventCategorySheet(event: event) { category in
+                updateEventCategory(event: event, category: category)
+            }
+        }
     }
 
     // MARK: - Timeline Section
@@ -136,6 +144,9 @@ struct MacPlanningView: View {
                 },
                 onTapFreeSlot: { slot in
                     selectedSlot = slot
+                },
+                onTapEvent: { event in
+                    eventToCategories = event
                 }
             )
         }
@@ -338,6 +349,16 @@ struct MacPlanningView: View {
         calendarEvents.removeAll { $0.id == block.id }
     }
 
+    private func updateEventCategory(event: CalendarEvent, category: String?) {
+        do {
+            try eventKitRepo.updateEventCategory(eventID: event.id, category: category)
+            // Reload to reflect updated category
+            Task { await loadCalendarEvents(showSpinner: false) }
+        } catch {
+            errorMessage = "Fehler beim Speichern: \(error.localizedDescription)"
+        }
+    }
+
     private func createFocusBlockFromSlot(start: Date, end: Date) async {
         do {
             // Create focus block in calendar via EventKit
@@ -348,6 +369,85 @@ struct MacPlanningView: View {
         } catch {
             errorMessage = "Fehler beim Erstellen: \(error.localizedDescription)"
         }
+    }
+}
+
+// MARK: - Event Category Sheet (macOS)
+
+/// Sheet for selecting a category for a calendar event on macOS
+struct MacEventCategorySheet: View {
+    let event: CalendarEvent
+    let onSelect: (String?) -> Void
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        VStack(spacing: 16) {
+            Text("Kategorie wählen")
+                .font(.headline)
+
+            Text(event.title)
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .lineLimit(1)
+
+            VStack(spacing: 8) {
+                ForEach(TaskCategory.allCases, id: \.self) { category in
+                    Button {
+                        onSelect(category.rawValue)
+                        dismiss()
+                    } label: {
+                        HStack {
+                            Image(systemName: category.icon)
+                                .foregroundStyle(category.color)
+                                .frame(width: 24)
+
+                            Text(category.displayName)
+                                .foregroundStyle(.primary)
+
+                            Spacer()
+
+                            if event.category == category.rawValue {
+                                Image(systemName: "checkmark")
+                                    .foregroundStyle(.blue)
+                            }
+                        }
+                        .padding(.vertical, 6)
+                        .padding(.horizontal, 12)
+                        .background(
+                            RoundedRectangle(cornerRadius: 6)
+                                .fill(event.category == category.rawValue
+                                      ? category.color.opacity(0.1)
+                                      : Color.clear)
+                        )
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityIdentifier("categoryOption_\(category.rawValue)")
+                }
+            }
+
+            if event.category != nil {
+                Divider()
+                Button(role: .destructive) {
+                    onSelect(nil)
+                    dismiss()
+                } label: {
+                    HStack {
+                        Image(systemName: "xmark.circle")
+                        Text("Kategorie entfernen")
+                    }
+                    .foregroundStyle(.red)
+                }
+                .buttonStyle(.plain)
+            }
+
+            HStack {
+                Spacer()
+                Button("Abbrechen") { dismiss() }
+                    .keyboardShortcut(.cancelAction)
+            }
+        }
+        .padding()
+        .frame(width: 300)
     }
 }
 
@@ -376,6 +476,9 @@ struct MacCreateFocusBlockSheet: View {
             Form {
                 DatePicker("Start", selection: $startTime, displayedComponents: .hourAndMinute)
                 DatePicker("Ende", selection: $endTime, displayedComponents: .hourAndMinute)
+                    .onChange(of: endTime) {
+                        endTime = FocusBlock.normalizeEndTime(startTime: startTime, endTime: endTime)
+                    }
                 Text("Dauer: \(durationText)")
                     .foregroundStyle(.secondary)
             }
