@@ -211,13 +211,10 @@ struct FocusBloxApp: App {
             }
             .onAppear {
                 resetUserDefaultsIfNeeded()
-                // One-time dedup cleanup for Bug 34 (Reminders duplicates after CloudKit activation)
-                if !ProcessInfo.processInfo.arguments.contains("-UITesting"),
-                   !UserDefaults.standard.bool(forKey: "dedupCleanupBug34Done") {
-                    let deleted = Self.cleanupRemindersDuplicates(in: sharedModelContainer.mainContext)
-                    if deleted >= 0 {
-                        UserDefaults.standard.set(true, forKey: "dedupCleanupBug34Done")
-                    }
+                // Dedup cleanup for Bug 34 (Reminders duplicates after CloudKit activation)
+                // Runs every launch - idempotent and fast (no-op if no reminders tasks exist)
+                if !ProcessInfo.processInfo.arguments.contains("-UITesting") {
+                    Self.cleanupRemindersDuplicates(in: sharedModelContainer.mainContext)
                 }
                 // Request calendar/reminders permission on app launch (Bug 8 fix)
                 requestPermissionsOnLaunch()
