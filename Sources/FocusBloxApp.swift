@@ -211,6 +211,14 @@ struct FocusBloxApp: App {
             }
             .onAppear {
                 resetUserDefaultsIfNeeded()
+                // One-time dedup cleanup for Bug 34 (Reminders duplicates after CloudKit activation)
+                if !ProcessInfo.processInfo.arguments.contains("-UITesting"),
+                   !UserDefaults.standard.bool(forKey: "dedupCleanupBug34Done") {
+                    let deleted = Self.cleanupRemindersDuplicates(in: sharedModelContainer.mainContext)
+                    if deleted >= 0 {
+                        UserDefaults.standard.set(true, forKey: "dedupCleanupBug34Done")
+                    }
+                }
                 // Request calendar/reminders permission on app launch (Bug 8 fix)
                 requestPermissionsOnLaunch()
                 // Check for CC trigger (App Group flag)
@@ -265,6 +273,36 @@ struct FocusBloxApp: App {
         // Clear flag and show QuickCapture
         defaults.removeObject(forKey: "quickCaptureFromCC")
         showQuickCapture = true
+    }
+
+    /// Remove Reminders duplicates that have a matching CloudKit/local task (Bug 34).
+    /// Returns number of deleted tasks, or -1 on error.
+    @discardableResult
+    static func cleanupRemindersDuplicates(in context: ModelContext) -> Int {
+        do {
+            let remindersTasks = try context.fetch(
+                FetchDescriptor<LocalTask>(predicate: #Predicate { $0.sourceSystem == "reminders" })
+            )
+            guard !remindersTasks.isEmpty else { return 0 }
+
+            let localTasks = try context.fetch(
+                FetchDescriptor<LocalTask>(predicate: #Predicate { $0.sourceSystem != "reminders" })
+            )
+            let localTitles = Set(localTasks.map { $0.title })
+
+            var deletedCount = 0
+            for task in remindersTasks where localTitles.contains(task.title) {
+                context.delete(task)
+                deletedCount += 1
+            }
+
+            if deletedCount > 0 {
+                try context.save()
+            }
+            return deletedCount
+        } catch {
+            return -1
+        }
     }
 
     /// Reset UserDefaults for UI test isolation
