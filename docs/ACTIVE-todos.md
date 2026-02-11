@@ -44,7 +44,7 @@
 ## 🔴 OFFEN - Neue Bugs/Features
 
 ### Bug 33: Task-Attribute (Importance, Urgency, Tags, etc.) synchen nicht zwischen macOS und iOS
-**Status:** OFFEN
+**Status:** ✅ ERLEDIGT (2026-02-11) - CloudKit + App Group auf iOS aktiviert (wie macOS)
 **Gemeldet:** 2026-02-11
 **Platform:** macOS + iOS (Cross-Platform Sync)
 **Location:** `Sources/FocusBloxApp.swift:27`, `FocusBloxMac/FocusBloxMacApp.swift:148-173`

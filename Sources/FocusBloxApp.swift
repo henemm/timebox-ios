@@ -13,6 +13,8 @@ struct FocusBloxApp: App {
     @State private var showQuickCapture = false
     @State private var permissionRequested = false
 
+    private static let appGroupID = "group.com.henning.focusblox"
+
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
             LocalTask.self,
@@ -21,11 +23,26 @@ struct FocusBloxApp: App {
 
         let isUITesting = ProcessInfo.processInfo.arguments.contains("-UITesting")
 
-        let modelConfiguration = ModelConfiguration(
-            schema: schema,
-            isStoredInMemoryOnly: isUITesting,
-            cloudKitDatabase: .none
-        )
+        let modelConfiguration: ModelConfiguration
+        if isUITesting {
+            modelConfiguration = ModelConfiguration(
+                schema: schema,
+                isStoredInMemoryOnly: true,
+                cloudKitDatabase: .none
+            )
+        } else if FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: appGroupID) != nil {
+            modelConfiguration = ModelConfiguration(
+                schema: schema,
+                groupContainer: .identifier(appGroupID),
+                cloudKitDatabase: .automatic
+            )
+        } else {
+            modelConfiguration = ModelConfiguration(
+                schema: schema,
+                isStoredInMemoryOnly: false,
+                cloudKitDatabase: .none
+            )
+        }
 
         do {
             let container = try ModelContainer(for: schema, configurations: [modelConfiguration])
