@@ -68,18 +68,59 @@ def get_active_workflow(state: dict) -> dict | None:
     return None
 
 
-def check_user_override(state: dict) -> bool:
+def find_workflow_for_file(state: dict, file_path: str) -> tuple[dict | None, str | None]:
+    """Find the workflow that owns a file via affected_files.
+
+    Returns (workflow_dict, workflow_name) or (None, None) if no match.
+    """
+    workflows = state.get("workflows", {})
+    # Normalize: strip project root prefix for matching
+    root = str(get_project_root())
+    rel_path = file_path
+    if rel_path.startswith(root):
+        rel_path = rel_path[len(root):].lstrip("/")
+
+    for name, wf in workflows.items():
+        for af in wf.get("affected_files", []):
+            # Match if file_path ends with the affected_file or vice versa
+            if rel_path == af or rel_path.endswith("/" + af) or af.endswith("/" + rel_path):
+                return wf, name
+    return None, None
+
+
+def resolve_workflow(state: dict, file_path: str) -> tuple[dict | None, str | None]:
+    """Resolve which workflow applies for a file edit.
+
+    Priority:
+    1. Workflow that owns the file (via affected_files)
+    2. Active workflow (fallback)
+    3. None (no workflow found)
+    """
+    # First: check if any workflow owns this file
+    wf, name = find_workflow_for_file(state, file_path)
+    if wf:
+        return wf, name
+
+    # Fallback: active workflow
+    active_name = state.get("active_workflow")
+    if active_name and active_name in state.get("workflows", {}):
+        return state["workflows"][active_name], active_name
+
+    return None, None
+
+
+def check_user_override(state: dict, file_path: str = "") -> bool:
     """Check if user has granted manual override."""
     # Global override
     if state.get("user_override", False):
         return True
 
-    # Check active workflow for override
-    workflow = get_active_workflow(state)
+    # Resolve the relevant workflow for this file
+    workflow, _ = resolve_workflow(state, file_path) if file_path else (get_active_workflow(state), None)
     if workflow and workflow.get("user_override", False):
         return True
 
-    # Check if spec_approved is set in active workflow (v2)
+    # Check if spec_approved is set in workflow
     if workflow and workflow.get("spec_approved", False):
         return True
 
@@ -105,9 +146,17 @@ def requires_workflow(file_path: str) -> bool:
     return False
 
 
-def get_current_phase(state: dict) -> str:
-    """Get current phase from v1 or v2 state structure."""
-    # Try v2 structure first
+def get_current_phase(state: dict, file_path: str = "") -> str:
+    """Get current phase from v1 or v2 state structure.
+
+    If file_path is given, resolves the owning workflow first.
+    """
+    if file_path:
+        workflow, _ = resolve_workflow(state, file_path)
+        if workflow:
+            return workflow.get("current_phase", "idle")
+
+    # Try active workflow
     workflow = get_active_workflow(state)
     if workflow:
         return workflow.get("current_phase", "idle")
@@ -287,11 +336,19 @@ def main():
     # Load state
     state = load_state()
 
-    # Check for user override FIRST
-    if check_user_override(state):
+    # Check for user override FIRST (file-aware)
+    if check_user_override(state, file_path):
         sys.exit(0)  # User has granted override, allow through
 
-    phase = get_current_phase(state)
+    # Resolve which workflow applies for this file
+    workflow, wf_name = resolve_workflow(state, file_path)
+
+    # No workflow found at all -> allow (don't block unowned files)
+    if not workflow and not state.get("workflows"):
+        sys.exit(0)
+
+    # Get phase from the resolved workflow
+    phase = workflow.get("current_phase", "idle") if workflow else get_current_phase(state, file_path)
 
     # Allowed phases for implementation (v1 and v2 names)
     allowed_phases = [
@@ -301,9 +358,8 @@ def main():
     ]
 
     if phase in allowed_phases:
-        # Additional check: in phase5/phase6, need red_test_done or user_override
+        # Additional check: in phase5, need red_test_done
         if phase in ["phase5_tdd_red"]:
-            workflow = get_active_workflow(state)
             if workflow:
                 red_done = workflow.get("red_test_done", False) or workflow.get("ui_test_red_done", False)
                 if red_done:

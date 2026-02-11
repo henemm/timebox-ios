@@ -43,6 +43,41 @@
 
 ## 🔴 OFFEN - Neue Bugs/Features
 
+### Bug 34: Doppelte Tasks nach CloudKit-Aktivierung (Reminders-Sync Duplikate)
+**Status:** OFFEN
+**Gemeldet:** 2026-02-11
+**Platform:** iOS (nach Bug 33 Fix)
+**Location:** `Sources/Services/RemindersSyncService.swift:42-50, 91-96`, `Sources/Views/BacklogView.swift:312-317`
+
+**Problem:**
+- Nach Aktivierung von CloudKit auf iOS (Bug 33 Fix) erscheinen Tasks DOPPELT im Backlog
+- Duplikat 1: Vollstaendige Task via CloudKit (alle Attribute: importance, urgency, tags, duration)
+- Duplikat 2: Abgespeckte Task via Reminders-Import (nur title, priority, dueDate, notes)
+- Betrifft alle Tasks die sowohl in CloudKit ALS AUCH in Apple Reminders existieren
+
+**Root Cause:**
+- Zwei unabhaengige Sync-Pfade fuettern dieselbe SwiftData-Datenbank auf iOS:
+  - **Pfad A (CloudKit):** Synchronisiert vollstaendige `LocalTask` mit `sourceSystem="local"`, `externalID=nil`
+  - **Pfad B (Reminders-Sync):** Importiert Reminders als neue `LocalTask` mit `sourceSystem="reminders"`, `externalID=<reminder-id>`
+- `RemindersSyncService.findTask(byExternalID:)` (Zeile 91-96) sucht NUR Tasks mit `sourceSystem=="reminders"` + passendem `externalID`
+- Die CloudKit-synchronisierte Task hat `sourceSystem="local"` und keine `externalID` -> wird NICHT gefunden
+- Resultat: `createTask(from:)` (Zeile 105-113) erstellt NEUE Task -> Duplikat
+
+**Fix-Empfehlung: Option A - Reminders-Sync ueberspringen wenn CloudKit aktiv**
+- `BacklogView.loadTasks()` (Zeile 312): Wenn CloudKit aktiv ist, Reminders-Import ueberspringen
+- Begruendung: CloudKit liefert bereits ALLE Task-Daten, Reminders-Sync ist redundant und erzeugt Duplikate
+- Aufwand: Klein (1 Datei, ~5-10 LoC)
+
+**Test nach Fix:**
+1. macOS: Task mit Importance=Hoch, Urgency=Dringend, Tags=["test"] erstellen
+2. iOS: App oeffnen, Backlog pruefen
+3. Erwartung: Task erscheint genau EINMAL mit allen Attributen
+4. Edge Case: Reminders-Sync Toggle aktivieren/deaktivieren -> keine Duplikate
+
+**Geschaetzter Aufwand:** Klein
+
+---
+
 ### Bug 33: Task-Attribute (Importance, Urgency, Tags, etc.) synchen nicht zwischen macOS und iOS
 **Status:** ✅ ERLEDIGT (2026-02-11) - CloudKit + App Group auf iOS aktiviert (wie macOS)
 **Gemeldet:** 2026-02-11
@@ -792,23 +827,14 @@ Usage Descriptions zu `FocusBloxMac/Info.plist` hinzugefügt.
 ## Tooling / Infrastruktur
 
 ### Workflow-System: Parallele Workflows verhaken sich gegenseitig
-**Status:** OFFEN
-**Gemeldet:** 2026-02-11
-**Location:** `.claude/hooks/workflow_gate.py`, `.claude/hooks/workflow_state_multi.py`
+**Status:** ✅ ERLEDIGT (2026-02-11)
+**Location:** `.claude/hooks/workflow_gate.py`
 
-**Problem:**
-Das Multi-Workflow-System hat einen globalen `active_workflow`-Zeiger (Singleton). Obwohl `workflow_state.json` mehrere Workflows speichern kann, prueft der `workflow_gate.py`-Hook nur den aktiven Workflow. Das fuehrt zu:
-1. **Session-Neustart:** `active_workflow` geht verloren → alle Edits blockiert
-2. **Unrelated Dateien:** Auch Dateien, die zu keinem Workflow gehoeren, werden blockiert
-3. **Kein echter Parallelismus:** Nur der `active_workflow` kann Dateien editieren
-
-**Loesung (Vorschlag):**
-- Dateibasierte Zuordnung: Jeder Workflow "besitzt" bestimmte Dateien (`affected_files`)
-- Hook prueft ob die editierte Datei zu einem Workflow gehoert und ob DIESER Workflow in der richtigen Phase ist
-- Dateien ohne Workflow-Zuordnung werden nicht blockiert
-- Session-Neustart: Automatische Erkennung des passenden Workflows anhand der editierten Datei
-
-**Prioritaet:** MITTEL (Workaround: manuell `switch` ausfuehren)
+**Fix:** `workflow_gate.py` nutzt jetzt dateibasierte Workflow-Aufloesung statt nur den `active_workflow`:
+1. `find_workflow_for_file()` - Findet den Workflow der eine Datei via `affected_files` besitzt
+2. `resolve_workflow()` - Prueft erst Datei-Besitz, dann Fallback auf aktiven Workflow
+3. Dateien ohne Workflow-Zuordnung werden nicht mehr blockiert wenn kein aktiver Workflow existiert
+4. `check_user_override()` ist jetzt datei-aware und prueft den richtigen Workflow
 
 ---
 
