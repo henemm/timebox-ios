@@ -43,10 +43,12 @@ struct CalendarEvent: Identifiable, Sendable {
 
     // MARK: - Category Support
 
-    /// Returns the category if stored in notes (format: "category:xxx")
+    /// Returns the category from notes or iCloud fallback (for read-only events with attendees)
     var category: String? {
-        guard let notes else { return nil }
-        return parseNotesValue(prefix: "category:", from: notes)
+        if let notes, let fromNotes = parseNotesValue(prefix: "category:", from: notes) {
+            return fromNotes
+        }
+        return NSUbiquitousKeyValueStore.default.string(forKey: "eventCat_\(id)")
     }
 
     /// Parse a single value from notes with format "prefix:value"

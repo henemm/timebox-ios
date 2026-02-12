@@ -119,10 +119,10 @@ enum NotificationService {
 
         let content = UNMutableNotificationContent()
         if notifyDate <= now {
-            content.title = "Focus Block startet jetzt"
+            content.title = "FocusBlox startet jetzt"
             content.body = "\(blockTitle) beginnt jetzt"
         } else {
-            content.title = "Focus Block startet gleich"
+            content.title = "FocusBlox startet gleich"
             content.body = "\(blockTitle) beginnt in \(minutesBefore) Minuten"
         }
         content.sound = .default

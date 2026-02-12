@@ -468,7 +468,7 @@ struct BlockPlanningView: View {
 
                 let formatter = DateFormatter()
                 formatter.timeStyle = .short
-                let title = "Focus Block \(formatter.string(from: startDate))"
+                let title = "FocusBlox \(formatter.string(from: startDate))"
                 NotificationService.scheduleFocusBlockStartNotification(
                     blockID: blockID,
                     blockTitle: title,
@@ -477,7 +477,7 @@ struct BlockPlanningView: View {
 
                 await loadData()
             } catch {
-                errorMessage = "Focus Block konnte nicht erstellt werden."
+                errorMessage = "FocusBlox konnte nicht erstellt werden."
             }
         }
     }
@@ -727,7 +727,11 @@ struct CreateFocusBlockSheet: View {
                         .foregroundStyle(.secondary)
                 }
             }
-            .navigationTitle("Focus Block erstellen")
+            .onChange(of: startTime) { oldStart, newStart in
+                let duration = endTime.timeIntervalSince(oldStart)
+                endTime = newStart.addingTimeInterval(duration)
+            }
+            .navigationTitle("FocusBlox erstellen")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {

@@ -23,7 +23,7 @@ final class FocusBlockStartNotificationTests: XCTestCase {
         )
 
         XCTAssertNotNil(request)
-        XCTAssertEqual(request?.content.title, "Focus Block startet gleich")
+        XCTAssertEqual(request?.content.title, "FocusBlox startet gleich")
         XCTAssertTrue(request?.content.body.contains("Focus Block 10:00") ?? false)
         XCTAssertTrue(request?.content.body.contains("5 Minuten") ?? false)
     }
@@ -43,7 +43,7 @@ final class FocusBlockStartNotificationTests: XCTestCase {
         )
 
         XCTAssertNotNil(request)
-        XCTAssertEqual(request?.content.title, "Focus Block startet jetzt")
+        XCTAssertEqual(request?.content.title, "FocusBlox startet jetzt")
         XCTAssertTrue(request?.content.body.contains("Focus Block Soon") ?? false)
     }
 

@@ -388,10 +388,17 @@ struct EventBlockView: View {
             }
 
             VStack(alignment: .leading, spacing: 2) {
-                Text(displayTitle)
-                    .font(.system(size: 11, weight: .semibold))
-                    .foregroundStyle(.white)
-                    .lineLimit(2)
+                HStack(spacing: 4) {
+                    if let category = event.category,
+                       let config = TaskCategory(rawValue: category) {
+                        Image(systemName: config.icon)
+                            .font(.system(size: 10, weight: .bold))
+                    }
+                    Text(displayTitle)
+                        .font(.system(size: 11, weight: .semibold))
+                        .lineLimit(2)
+                }
+                .foregroundStyle(.white)
 
                 Text(timeRange)
                     .font(.system(size: 10))
@@ -405,7 +412,7 @@ struct EventBlockView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .background(
             RoundedRectangle(cornerRadius: 4)
-                .fill(eventColor)
+                .fill(categoryColor ?? eventColor)
         )
         .overlay(
             RoundedRectangle(cornerRadius: 4)
@@ -426,6 +433,13 @@ struct EventBlockView: View {
         let formatter = DateFormatter()
         formatter.dateFormat = "HH:mm"
         return "\(formatter.string(from: event.startDate)) - \(formatter.string(from: event.endDate))"
+    }
+
+    /// Category-based background color (if categorized)
+    private var categoryColor: Color? {
+        guard let category = event.category,
+              let config = TaskCategory(rawValue: category) else { return nil }
+        return config.color.opacity(0.85)
     }
 
     /// Generates consistent color from event title

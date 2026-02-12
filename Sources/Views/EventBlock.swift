@@ -18,12 +18,18 @@ struct EventBlock: View {
         let height = calculateHeight()
 
         RoundedRectangle(cornerRadius: 6)
-            .fill(.blue.opacity(0.3))
+            .fill(categoryConfig?.color.opacity(0.3) ?? .blue.opacity(0.3))
             .overlay(
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(event.title)
-                        .font(.caption.weight(.medium))
-                        .lineLimit(1)
+                    HStack(spacing: 4) {
+                        if let config = categoryConfig {
+                            Image(systemName: config.icon)
+                                .font(.caption2.weight(.semibold))
+                        }
+                        Text(event.title)
+                            .font(.caption.weight(.medium))
+                            .lineLimit(1)
+                    }
                     Text(timeRangeText)
                         .font(.caption2)
                         .foregroundStyle(.secondary)
@@ -40,6 +46,11 @@ struct EventBlock: View {
                 onTap?()
             }
             .draggable(CalendarEventTransfer(from: event))
+    }
+
+    private var categoryConfig: TaskCategory? {
+        guard let category = event.category else { return nil }
+        return TaskCategory(rawValue: category)
     }
 
     private var timeRangeText: String {

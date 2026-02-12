@@ -42,6 +42,10 @@ struct EditFocusBlockSheet: View {
                     }
                 }
             }
+            .onChange(of: startTime) { oldStart, newStart in
+                let duration = endTime.timeIntervalSince(oldStart)
+                endTime = newStart.addingTimeInterval(duration)
+            }
             .navigationTitle("Block bearbeiten")
             #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)

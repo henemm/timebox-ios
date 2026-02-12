@@ -245,21 +245,26 @@ final class EventKitRepository: EventKitRepositoryProtocol, @unchecked Sendable 
             return // Silent fail if event not found
         }
 
-        // Update notes with category, preserving existing content
-        var notes = event.notes ?? ""
-
-        // Remove existing category line
-        var lines = notes.components(separatedBy: "\n")
-        lines.removeAll { $0.hasPrefix("category:") }
-
-        // Add new category if provided
-        if let category = category, !category.isEmpty {
-            lines.append("category:\(category)")
+        // Try saving to EKEvent notes first
+        do {
+            var notes = event.notes ?? ""
+            var lines = notes.components(separatedBy: "\n")
+            lines.removeAll { $0.hasPrefix("category:") }
+            if let category = category, !category.isEmpty {
+                lines.append("category:\(category)")
+            }
+            event.notes = lines.filter { !$0.isEmpty }.joined(separator: "\n")
+            try eventStore.save(event, span: .thisEvent)
+        } catch {
+            // Fallback for read-only events (e.g. with attendees): save to iCloud KV Store
+            let store = NSUbiquitousKeyValueStore.default
+            if let category = category, !category.isEmpty {
+                store.set(category, forKey: "eventCat_\(eventID)")
+            } else {
+                store.removeObject(forKey: "eventCat_\(eventID)")
+            }
+            store.synchronize()
         }
-
-        // Rebuild notes, removing empty lines at the end
-        event.notes = lines.filter { !$0.isEmpty }.joined(separator: "\n")
-        try eventStore.save(event, span: .thisEvent)
     }
 
     // MARK: - Focus Block Methods
@@ -272,7 +277,7 @@ final class EventKitRepository: EventKitRepositoryProtocol, @unchecked Sendable 
         let event = EKEvent(eventStore: eventStore)
         let formatter = DateFormatter()
         formatter.timeStyle = .short
-        event.title = "Focus Block \(formatter.string(from: startDate))"
+        event.title = "FocusBlox \(formatter.string(from: startDate))"
         event.startDate = startDate
         event.endDate = endDate
         event.calendar = calendarForEvents()

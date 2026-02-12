@@ -255,7 +255,7 @@ struct MacPlanningView: View {
             let notes = FocusBlock.serializeToNotes(taskIDs: [taskID], completedTaskIDs: [])
             let syntheticEvent = CalendarEvent(
                 id: blockID,
-                title: "Focus Block \(formatter.string(from: startTime))",
+                title: "FocusBlox \(formatter.string(from: startTime))",
                 startDate: startTime,
                 endDate: endTime,
                 isAllDay: false,
@@ -470,7 +470,7 @@ struct MacCreateFocusBlockSheet: View {
 
     var body: some View {
         VStack(spacing: 20) {
-            Text("Focus Block erstellen")
+            Text("FocusBlox erstellen")
                 .font(.headline)
 
             Form {
