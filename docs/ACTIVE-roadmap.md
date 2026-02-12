@@ -108,6 +108,22 @@ Versehentlich zu Next Up hinzugefuegt → Shake soll rueckgaengig machen.
 
 ## Abgeschlossen (Done)
 
+### Bug 41: LiveActivity Timer Fixes
+**Status:** Done ✅ (2026-02-12)
+**Commit:** `dd74009`
+
+### Bug 40: Review Tab Fixes
+**Status:** Done ✅ (2026-02-12)
+**Commit:** `ccbcf0f`
+
+### Bug 39: FocusBlock Lifecycle
+**Status:** Done ✅ (2026-02-12)
+**Commit:** `149ab4e`
+
+### Bug 38: Cross-Platform Sync
+**Status:** Done ✅ (2026-02-12)
+**Commit:** `49f5f9c`
+
 ### Feature: Kalender-Events in Review-Statistiken (macOS + iOS)
 **Status:** Done ✅ (2026-02-11)
 **Commit:** `e6abc5d`

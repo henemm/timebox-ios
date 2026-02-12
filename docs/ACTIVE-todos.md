@@ -42,7 +42,53 @@
 
 ---
 
+### Bug 35: Quick Capture - Spotlight zeigt keine Metadaten, CC Button funktionslos
+**Status:** OFFEN
+**Gemeldet:** 2026-02-11
+**Platform:** iOS
+**Location:** `Sources/Intents/CreateTaskIntent.swift`, `FocusBloxWidgets/QuickAddTaskControl.swift`, `FocusBloxCore/QuickAddTaskIntent.swift`
+**Prioritaet:** HOCH
+
+**Problem:**
+- Spotlight "Task erstellen" Dialog zeigt nur Titel-Feld, keine Metadaten-Buttons (Wichtigkeit, Dringlichkeit, Dauer, Kategorie)
+- Control Center "Quick Add Task" Button tut nichts beim Tap
+
+**Root Causes:**
+- RC1: `CreateTaskIntent` hat `openAppWhenRun = false` und kein `parameterSummary` - Spotlight zeigt nur Pflichtparameter
+- RC2: `QuickAddTaskIntent` (FocusBloxCore) ist nur Logging-Stub ohne Funktionalitaet
+- RC3: Doppelte `AppShortcutsProvider` (Sources/Intents/ + FocusBloxCore/) - Namespace-Konflikt
+- RC4: `SharedModelContainer` nutzt nicht den App Group Container - kein Datenaustausch
+
+**Fix-Empfehlung:** Beide Wege (Spotlight + CC) sollen App oeffnen und QuickCaptureView zeigen (hat bereits alle 4 Metadaten-Buttons).
+
+---
+
 ## ✅ Kuerzlich erledigt
+
+### Bug 41: LiveActivity Timer Fixes
+**Status:** ✅ ERLEDIGT (2026-02-12)
+**Fix 1:** Timer stoppt bei 0:00 statt hochzuzaehlen (`timerInterval:countsDown:`)
+**Fix 2:** Timer zeigt Task-Restzeit statt Block-Restzeit (`taskEndDate` in ContentState)
+**Commit:** `dd74009`
+
+### Bug 40: Review Tab zeigt erledigte Tasks nicht
+**Status:** ✅ ERLEDIGT (2026-02-12)
+**Fix:** `markTaskComplete()` setzt jetzt auch `LocalTask.isCompleted = true` in SwiftData
+**Commit:** `ccbcf0f`
+
+### Bug 39: FocusBlock Lifecycle
+**Status:** ✅ ERLEDIGT (2026-02-12)
+**Fix 1:** Block bleibt nach Ende sichtbar (Sprint Review moeglich)
+**Fix 2:** Unerledigte Tasks zurueck in Next Up
+**Fix 3:** Abgelaufene Blocks nicht in Zuweisen-Tab
+**Fix 4:** Push-Notification bei Block-Ende
+**Commit:** `149ab4e`
+
+### Bug 38: Cross-Platform Sync
+**Status:** ✅ ERLEDIGT (2026-02-12)
+**Fix 1:** FocusBlocks aus ALLEN Kalendern laden (nicht nur sichtbare)
+**Fix 2:** SyncedSettings mit iCloud Key-Value Store
+**Commit:** `49f5f9c`
 
 ### Bug 34: Duplikate nach CloudKit-Aktivierung
 **Status:** ✅ ERLEDIGT (2026-02-11)
