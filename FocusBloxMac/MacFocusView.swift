@@ -12,7 +12,7 @@ import Combine
 /// Focus View showing current active Focus Block with timer and task management
 struct MacFocusView: View {
     @Environment(\.modelContext) private var modelContext
-    @Query(filter: #Predicate<LocalTask> { !$0.isCompleted })
+    @Query
     private var allTasks: [LocalTask]
 
     @State private var activeBlock: FocusBlock?

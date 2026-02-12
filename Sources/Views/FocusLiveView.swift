@@ -462,9 +462,10 @@ struct FocusLiveView: View {
                 showSprintReview = true
             }
             print("📥 [FocusLiveView] activeBlock=\(activeBlock?.title ?? "nil")")
-            let taskSource = LocalTaskSource(modelContext: modelContext)
-            let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
-            allTasks = try await syncEngine.sync()
+            // Alle Tasks laden (nicht nur incomplete) - Sprint Review braucht auch erledigte
+            let fetchDescriptor = FetchDescriptor<LocalTask>()
+            let localTasks = try modelContext.fetch(fetchDescriptor)
+            allTasks = localTasks.map { PlanItem(localTask: $0) }
         } catch {
             errorMessage = error.localizedDescription
         }

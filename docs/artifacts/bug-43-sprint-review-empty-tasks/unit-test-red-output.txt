@@ -1,0 +1,18 @@
+TDD RED - SprintReviewTaskVisibilityTests
+==========================================
+Date: 2026-02-12T13:15:00
+Result: TEST FAILED
+
+Root Cause Analysis:
+- macOS: @Query(filter: #Predicate<LocalTask> { !$0.isCompleted }) filters out completed tasks
+- iOS: SyncEngine.sync() calls fetchIncompleteTasks() which uses same !isCompleted filter
+- Sprint Review receives empty task array on both platforms
+
+Evidence:
+- macOS Screenshot: 100% geschafft, 0 Erledigt, 0 Offen, 0m geplant, 28m gebraucht
+- 4 Tasks waren dem FocusBlock zugewiesen, keiner erscheint im Sprint Review
+- syncEngine.syncAllTasks() method does not exist yet (build would fail)
+
+Fix needed:
+1. macOS: Remove !isCompleted filter from @Query in MacFocusView.swift
+2. iOS: Add syncAllTasks() to SyncEngine or load all tasks directly in loadData()
