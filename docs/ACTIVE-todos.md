@@ -42,28 +42,15 @@
 
 ---
 
-### Bug 35: Quick Capture - Spotlight zeigt keine Metadaten, CC Button funktionslos
-**Status:** OFFEN
-**Gemeldet:** 2026-02-11
-**Platform:** iOS
-**Location:** `Sources/Intents/CreateTaskIntent.swift`, `FocusBloxWidgets/QuickAddTaskControl.swift`, `FocusBloxCore/QuickAddTaskIntent.swift`
-**Prioritaet:** HOCH
-
-**Problem:**
-- Spotlight "Task erstellen" Dialog zeigt nur Titel-Feld, keine Metadaten-Buttons (Wichtigkeit, Dringlichkeit, Dauer, Kategorie)
-- Control Center "Quick Add Task" Button tut nichts beim Tap
-
-**Root Causes:**
-- RC1: `CreateTaskIntent` hat `openAppWhenRun = false` und kein `parameterSummary` - Spotlight zeigt nur Pflichtparameter
-- RC2: `QuickAddTaskIntent` (FocusBloxCore) ist nur Logging-Stub ohne Funktionalitaet
-- RC3: Doppelte `AppShortcutsProvider` (Sources/Intents/ + FocusBloxCore/) - Namespace-Konflikt
-- RC4: `SharedModelContainer` nutzt nicht den App Group Container - kein Datenaustausch
-
-**Fix-Empfehlung:** Beide Wege (Spotlight + CC) sollen App oeffnen und QuickCaptureView zeigen (hat bereits alle 4 Metadaten-Buttons).
-
 ---
 
 ## ✅ Kuerzlich erledigt
+
+### Bug 35: Quick Capture - Spotlight + CC Button
+**Status:** ✅ ERLEDIGT (2026-02-12)
+**Fix 1:** CC Button setzt UserDefaults-Flag statt OpenURLIntent (Widget-Extension kompatibel)
+**Fix 2:** Spotlight oeffnet App mit Titel-Vorbelegung statt Interactive Snippet
+**Commit:** `382a5a1`
 
 ### Bug 41: LiveActivity Timer Fixes
 **Status:** ✅ ERLEDIGT (2026-02-12)

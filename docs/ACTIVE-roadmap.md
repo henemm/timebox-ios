@@ -46,16 +46,6 @@ Button-Tap → Spracheingabe → Task landet im Backlog (als tbd).
 
 ---
 
-### Quick Add Widget (iOS) - Bundle-Registrierung
-**Status:** Open (Code existiert, nicht aktiviert)
-**Priorität:** Must
-**Bereich:** iOS WidgetKit
-
-**Kurzbeschreibung:**
-`QuickCaptureWidget.swift` ist fertig implementiert (systemSmall + systemMedium, öffnet App via `focusblox://create-task`). Muss nur noch in `FocusBloxWidgetsBundle.swift` registriert werden.
-
----
-
 ### Bug 22: Edit-Button in Backlog Toolbar ohne Funktion
 **Status:** Open
 **Priorität:** Mittel
@@ -107,6 +97,14 @@ Versehentlich zu Next Up hinzugefuegt → Shake soll rueckgaengig machen.
 ---
 
 ## Abgeschlossen (Done)
+
+### Bug 35: Quick Capture Spotlight + CC
+**Status:** Done ✅ (2026-02-12)
+**Commit:** `382a5a1`
+
+### Quick Add Widget (iOS) - Bundle-Registrierung
+**Status:** Done ✅ (2026-02-12)
+**Hinweis:** War bereits registriert in FocusBloxWidgetsBundle.swift
 
 ### Bug 41: LiveActivity Timer Fixes
 **Status:** Done ✅ (2026-02-12)
