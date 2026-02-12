@@ -457,6 +457,13 @@ struct MacFocusView: View {
                     taskTimes: updatedTaskTimes
                 )
 
+                // Auch LocalTask.isCompleted in SwiftData setzen (fuer Review Tab)
+                let fetchDescriptor = FetchDescriptor<LocalTask>()
+                if let localTasks = try? modelContext.fetch(fetchDescriptor),
+                   let localTask = localTasks.first(where: { $0.id == taskID }) {
+                    localTask.isCompleted = true
+                    try? modelContext.save()
+                }
                 taskStartTime = nil
                 await loadData()
             } catch {
