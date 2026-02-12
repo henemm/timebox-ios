@@ -1,10 +1,15 @@
 import XCTest
 @testable import FocusBlox
 
-/// Diagnostic tests for Bug 36: CC Quick Task Button
-/// Tests verify that the 4 diagnostic intents exist and compile.
+/// Tests for Bug 36: CC Quick Task Button
 @MainActor
-final class CCQuickTaskDiagTests: XCTestCase {
+final class CCQuickTaskTests: XCTestCase {
+
+    func testQuickAddLaunchIntentExists() throws {
+        // Verify the intent type compiles and can be instantiated
+        let intent = QuickAddLaunchIntent()
+        XCTAssertNotNil(intent)
+    }
 
     func testAppGroupFlagMechanism() throws {
         // Test that App Group flag can be set and read
