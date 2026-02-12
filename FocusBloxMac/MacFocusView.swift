@@ -890,7 +890,7 @@ struct MacSprintReviewSheet: View {
 
 // MARK: - Mac Stat Item
 
-private struct MacStatItem: View {
+struct MacStatItem: View {
     let value: String
     let label: String
     let color: Color

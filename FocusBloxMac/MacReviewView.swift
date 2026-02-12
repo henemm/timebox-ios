@@ -7,7 +7,6 @@
 
 import SwiftUI
 import SwiftData
-import Charts
 
 /// Review Dashboard with daily and weekly statistics
 struct MacReviewView: View {
@@ -16,6 +15,7 @@ struct MacReviewView: View {
 
     @State private var selectedView: ReviewScope = .today
     @State private var calendarEvents: [CalendarEvent] = []
+    @State private var blocks: [FocusBlock] = []
     private let eventKitRepo = EventKitRepository()
     private let statsCalculator = ReviewStatsCalculator()
 
@@ -43,12 +43,14 @@ struct MacReviewView: View {
             case .today:
                 DayReviewContent(
                     completedTasks: todayTasks,
+                    blocks: todayBlocks,
                     calendarEvents: todayCalendarEvents,
                     statsCalculator: statsCalculator
                 )
             case .week:
                 WeekReviewContent(
                     completedTasks: weekTasks,
+                    blocks: weekBlocks,
                     calendarEvents: calendarEvents,
                     statsCalculator: statsCalculator
                 )
@@ -57,7 +59,7 @@ struct MacReviewView: View {
         .navigationTitle("Review")
         .frame(minWidth: 600, minHeight: 400)
         .task {
-            await loadCalendarEvents()
+            await loadData()
         }
     }
 
@@ -83,6 +85,24 @@ struct MacReviewView: View {
         }
     }
 
+    // MARK: - Filtered Blocks
+
+    private var todayBlocks: [FocusBlock] {
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: Date())
+        return blocks.filter { calendar.isDate($0.startDate, inSameDayAs: today) }
+    }
+
+    private var weekBlocks: [FocusBlock] {
+        let calendar = Calendar.current
+        guard let weekInterval = calendar.dateInterval(of: .weekOfYear, for: Date()) else {
+            return []
+        }
+        return blocks.filter { block in
+            block.startDate >= weekInterval.start && block.startDate < weekInterval.end
+        }
+    }
+
     /// Calendar events filtered to today
     private var todayCalendarEvents: [CalendarEvent] {
         let calendar = Calendar.current
@@ -93,23 +113,28 @@ struct MacReviewView: View {
         }
     }
 
-    // MARK: - Calendar Events
+    // MARK: - Load Data
 
-    private func loadCalendarEvents() async {
+    private func loadData() async {
         do {
             var allEvents: [CalendarEvent] = []
+            var allBlocks: [FocusBlock] = []
             let calendar = Calendar.current
             if let weekInterval = calendar.dateInterval(of: .weekOfYear, for: Date()) {
                 var currentDate = weekInterval.start
                 while currentDate < weekInterval.end {
                     let dayEvents = try eventKitRepo.fetchCalendarEvents(for: currentDate)
                     allEvents.append(contentsOf: dayEvents)
+                    let dayBlocks = try eventKitRepo.fetchFocusBlocks(for: currentDate)
+                    allBlocks.append(contentsOf: dayBlocks)
                     currentDate = calendar.date(byAdding: .day, value: 1, to: currentDate) ?? weekInterval.end
                 }
             }
             calendarEvents = allEvents
+            blocks = allBlocks
         } catch {
             calendarEvents = []
+            blocks = []
         }
     }
 }
@@ -118,22 +143,30 @@ struct MacReviewView: View {
 
 struct DayReviewContent: View {
     let completedTasks: [LocalTask]
+    var blocks: [FocusBlock] = []
     var calendarEvents: [CalendarEvent] = []
     var statsCalculator: ReviewStatsCalculator = ReviewStatsCalculator()
 
-    private var totalFocusMinutes: Int {
-        completedTasks.compactMap(\.estimatedDuration).reduce(0, +)
+    private var totalCompleted: Int {
+        blocks.reduce(0) { $0 + $1.completedTaskIDs.count }
+    }
+
+    private var totalPlanned: Int {
+        blocks.reduce(0) { $0 + $1.taskIDs.count }
+    }
+
+    private var completionPercentage: Int {
+        guard totalPlanned > 0 else { return 0 }
+        return Int((Double(totalCompleted) / Double(totalPlanned)) * 100)
     }
 
     private var dayCategoryStats: [MacCategoryStat] {
-        // Build task minutes by category
         let grouped = Dictionary(grouping: completedTasks) { $0.taskType }
         var taskMinutes: [String: Int] = [:]
         for (category, tasks) in grouped {
             taskMinutes[category] = tasks.compactMap(\.estimatedDuration).reduce(0, +)
         }
 
-        // Combine with calendar events
         let combined = statsCalculator.computeCategoryMinutes(
             taskMinutesByCategory: taskMinutes,
             calendarEvents: calendarEvents
@@ -150,62 +183,29 @@ struct DayReviewContent: View {
     }
 
     var body: some View {
-        if completedTasks.isEmpty && calendarEvents.isEmpty {
+        if blocks.isEmpty && completedTasks.isEmpty && calendarEvents.isEmpty {
             ContentUnavailableView(
-                "Noch keine Tasks erledigt",
-                systemImage: "checkmark.circle",
-                description: Text("Erledigte Tasks werden hier angezeigt.")
+                "Noch keine Focus Blocks heute",
+                systemImage: "clock.arrow.circlepath",
+                description: Text("Plane einen Focus Block im Planen-Tab.")
             )
         } else {
             ScrollView {
                 VStack(spacing: 20) {
-                    // Stats Row
-                    HStack(spacing: 16) {
-                        StatCard(
-                            title: "Erledigt",
-                            value: "\(completedTasks.count)",
-                            icon: "checkmark.circle.fill",
-                            color: .green
-                        )
-
-                        StatCard(
-                            title: "Fokuszeit",
-                            value: formatDuration(totalFocusMinutes),
-                            icon: "clock.fill",
-                            color: .blue
-                        )
-                    }
-                    .padding(.horizontal)
+                    // Completion Ring + Stats
+                    reviewStatsHeader
 
                     Divider()
 
                     // Category Time Breakdown
                     if !dayCategoryStats.isEmpty {
-                        VStack(alignment: .leading, spacing: 12) {
-                            Text("Zeit pro Kategorie")
-                                .font(.headline)
-                                .padding(.horizontal)
-
-                            VStack(spacing: 8) {
-                                ForEach(dayCategoryStats) { stat in
-                                    MacCategoryBar(stat: stat, totalMinutes: dayTotalMinutes)
-                                }
-                            }
-                            .padding(.horizontal)
-                        }
-
+                        categorySection
                         Divider()
                     }
 
-                    // Task List
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text("Erledigte Tasks")
-                            .font(.headline)
-                            .padding(.horizontal)
-
-                        ForEach(completedTasks, id: \.uuid) { task in
-                            CompletedTaskRow(task: task)
-                        }
+                    // Focus Block Cards
+                    if !blocks.isEmpty {
+                        blocksSection
                     }
                 }
                 .padding(.vertical)
@@ -213,14 +213,88 @@ struct DayReviewContent: View {
         }
     }
 
-    private func formatDuration(_ minutes: Int) -> String {
-        if minutes < 60 {
-            return "\(minutes) min"
-        } else {
-            let hours = minutes / 60
-            let mins = minutes % 60
-            return mins > 0 ? "\(hours)h \(mins)m" : "\(hours)h"
+    // MARK: - Stats Header with Completion Ring
+
+    private var reviewStatsHeader: some View {
+        VStack(spacing: 16) {
+            Text(todayDateString)
+                .font(.title2.weight(.semibold))
+
+            // Completion Ring
+            ZStack {
+                Circle()
+                    .stroke(.secondary.opacity(0.2), lineWidth: 10)
+
+                Circle()
+                    .trim(from: 0, to: CGFloat(completionPercentage) / 100)
+                    .stroke(
+                        completionPercentage == 100 ? .green : .blue,
+                        style: StrokeStyle(lineWidth: 10, lineCap: .round)
+                    )
+                    .rotationEffect(.degrees(-90))
+                    .animation(.spring(), value: completionPercentage)
+
+                VStack(spacing: 4) {
+                    Text("\(completionPercentage)%")
+                        .font(.title.weight(.bold))
+                    Text("geschafft")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+            .frame(width: 100, height: 100)
+
+            // Stats Row
+            HStack(spacing: 32) {
+                MacStatItem(value: "\(totalCompleted)", label: "Erledigt", color: .green)
+                MacStatItem(
+                    value: "\(totalPlanned - totalCompleted)",
+                    label: "Offen",
+                    color: totalPlanned == totalCompleted ? .secondary : .orange
+                )
+                MacStatItem(value: "\(blocks.count)", label: "Blocks", color: .blue)
+            }
         }
+        .padding()
+    }
+
+    // MARK: - Category Section
+
+    private var categorySection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Zeit pro Kategorie")
+                .font(.headline)
+                .padding(.horizontal)
+
+            VStack(spacing: 8) {
+                ForEach(dayCategoryStats) { stat in
+                    MacCategoryBar(stat: stat, totalMinutes: dayTotalMinutes)
+                }
+            }
+            .padding(.horizontal)
+        }
+    }
+
+    // MARK: - Blocks Section
+
+    private var blocksSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Focus Blocks")
+                .font(.headline)
+                .padding(.horizontal)
+
+            ForEach(blocks.sorted { $0.startDate < $1.startDate }) { block in
+                MacBlockCard(block: block, completedTasks: completedTasks)
+            }
+            .padding(.horizontal)
+        }
+    }
+
+    private var todayDateString: String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "de_DE")
+        formatter.dateFormat = "'Heute,' d. MMMM"
+        return formatter.string(from: Date())
     }
 }
 
@@ -228,109 +302,74 @@ struct DayReviewContent: View {
 
 struct WeekReviewContent: View {
     let completedTasks: [LocalTask]
+    var blocks: [FocusBlock] = []
     var calendarEvents: [CalendarEvent] = []
     var statsCalculator: ReviewStatsCalculator = ReviewStatsCalculator()
 
-    private var categoryStats: [CategoryStat] {
-        let grouped = Dictionary(grouping: completedTasks) { $0.taskType }
-        var stats = grouped.map { CategoryStat(category: $0.key, count: $0.value.count) }
-            .sorted { $0.count > $1.count }
-
-        // Add event minutes to matching categories
-        let eventMinutes = statsCalculator.computeCategoryMinutes(
-            tasks: [],
-            calendarEvents: calendarEvents
-        )
-        for (category, minutes) in eventMinutes {
-            if let index = stats.firstIndex(where: { $0.category == category }) {
-                stats[index] = CategoryStat(
-                    category: category,
-                    count: stats[index].count,
-                    eventMinutes: minutes
-                )
-            } else {
-                stats.append(CategoryStat(category: category, count: 0, eventMinutes: minutes))
-            }
-        }
-
-        return stats.sorted { $0.count + ($0.eventMinutes ?? 0) > $1.count + ($1.eventMinutes ?? 0) }
+    private var totalCompleted: Int {
+        blocks.reduce(0) { $0 + $1.completedTaskIDs.count }
     }
 
-    private var totalFocusMinutes: Int {
-        completedTasks.compactMap(\.estimatedDuration).reduce(0, +)
+    private var totalPlanned: Int {
+        blocks.reduce(0) { $0 + $1.taskIDs.count }
+    }
+
+    private var completionPercentage: Int {
+        guard totalPlanned > 0 else { return 0 }
+        return Int((Double(totalCompleted) / Double(totalPlanned)) * 100)
+    }
+
+    private var weekCategoryStats: [MacCategoryStat] {
+        let grouped = Dictionary(grouping: completedTasks) { $0.taskType }
+        var taskMinutes: [String: Int] = [:]
+        for (category, tasks) in grouped {
+            taskMinutes[category] = tasks.compactMap(\.estimatedDuration).reduce(0, +)
+        }
+
+        let combined = statsCalculator.computeCategoryMinutes(
+            taskMinutesByCategory: taskMinutes,
+            calendarEvents: calendarEvents
+        )
+
+        return combined.compactMap { (category, minutes) in
+            guard minutes > 0 else { return nil }
+            return MacCategoryStat(category: category, minutes: minutes)
+        }.sorted { $0.minutes > $1.minutes }
+    }
+
+    private var weekTotalMinutes: Int {
+        weekCategoryStats.reduce(0) { $0 + $1.minutes }
     }
 
     var body: some View {
-        if completedTasks.isEmpty {
+        if blocks.isEmpty && completedTasks.isEmpty {
             ContentUnavailableView(
-                "Noch keine Tasks diese Woche",
-                systemImage: "chart.bar",
-                description: Text("Erledigte Tasks werden hier als Statistik angezeigt.")
+                "Noch keine Focus Blocks diese Woche",
+                systemImage: "calendar.badge.clock",
+                description: Text("Plane Focus Blocks im Planen-Tab.")
             )
         } else {
             ScrollView {
                 VStack(spacing: 24) {
-                    // Stats Row
-                    HStack(spacing: 16) {
-                        StatCard(
-                            title: "Erledigt",
-                            value: "\(completedTasks.count)",
-                            icon: "checkmark.circle.fill",
-                            color: .green
-                        )
-
-                        StatCard(
-                            title: "Fokuszeit",
-                            value: formatDuration(totalFocusMinutes),
-                            icon: "clock.fill",
-                            color: .blue
-                        )
-                    }
-                    .padding(.horizontal)
+                    // Completion Ring + Stats
+                    weekStatsHeader
 
                     Divider()
 
-                    // Category Chart
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text("Kategorien-Verteilung")
-                            .font(.headline)
-                            .padding(.horizontal)
+                    // Category Time Breakdown
+                    if !weekCategoryStats.isEmpty {
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text("Zeit pro Kategorie")
+                                .font(.headline)
+                                .padding(.horizontal)
 
-                        Chart(categoryStats) { stat in
-                            BarMark(
-                                x: .value("Anzahl", stat.count),
-                                y: .value("Kategorie", stat.label)
-                            )
-                            .foregroundStyle(stat.color)
-                            .cornerRadius(4)
-                        }
-                        .frame(height: CGFloat(categoryStats.count * 44))
-                        .padding(.horizontal)
-
-                        // Marker for UI tests: events contribute to stats
-                        if categoryStats.contains(where: { $0.hasEventContribution }) {
-                            Color.clear
-                                .frame(width: 1, height: 1)
-                                .accessibilityIdentifier("eventMinutesIncluded")
-                        }
-                    }
-
-                    Divider()
-
-                    // Category Cards
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text("Kategorien im Detail")
-                            .font(.headline)
-                            .padding(.horizontal)
-
-                        LazyVGrid(columns: [
-                            GridItem(.adaptive(minimum: 150, maximum: 200))
-                        ], spacing: 12) {
-                            ForEach(categoryStats) { stat in
-                                CategoryStatCard(stat: stat)
+                            VStack(spacing: 8) {
+                                ForEach(weekCategoryStats) { stat in
+                                    MacCategoryBar(stat: stat, totalMinutes: weekTotalMinutes)
+                                }
                             }
+                            .padding(.horizontal)
                         }
-                        .padding(.horizontal)
                     }
                 }
                 .padding(.vertical)
@@ -338,171 +377,154 @@ struct WeekReviewContent: View {
         }
     }
 
-    private func formatDuration(_ minutes: Int) -> String {
-        if minutes < 60 {
-            return "\(minutes) min"
-        } else {
-            let hours = minutes / 60
-            let mins = minutes % 60
-            return mins > 0 ? "\(hours)h \(mins)m" : "\(hours)h"
+    // MARK: - Week Stats Header
+
+    private var weekStatsHeader: some View {
+        VStack(spacing: 16) {
+            Text(weekDateRangeString)
+                .font(.title2.weight(.semibold))
+
+            // Completion Ring
+            ZStack {
+                Circle()
+                    .stroke(.secondary.opacity(0.2), lineWidth: 10)
+
+                Circle()
+                    .trim(from: 0, to: CGFloat(completionPercentage) / 100)
+                    .stroke(
+                        completionPercentage == 100 ? .green : .blue,
+                        style: StrokeStyle(lineWidth: 10, lineCap: .round)
+                    )
+                    .rotationEffect(.degrees(-90))
+                    .animation(.spring(), value: completionPercentage)
+
+                VStack(spacing: 4) {
+                    Text("\(completionPercentage)%")
+                        .font(.title.weight(.bold))
+                    Text("geschafft")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+            .frame(width: 100, height: 100)
+
+            // Stats Row
+            HStack(spacing: 32) {
+                MacStatItem(value: "\(totalCompleted)", label: "Erledigt", color: .green)
+                MacStatItem(
+                    value: "\(totalPlanned - totalCompleted)",
+                    label: "Offen",
+                    color: totalPlanned == totalCompleted ? .secondary : .orange
+                )
+                MacStatItem(value: "\(blocks.count)", label: "Blocks", color: .blue)
+            }
         }
+        .padding()
+    }
+
+    private var weekDateRangeString: String {
+        let calendar = Calendar.current
+        guard let weekInterval = calendar.dateInterval(of: .weekOfYear, for: Date()) else {
+            return "Diese Woche"
+        }
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "de_DE")
+        formatter.dateFormat = "d."
+        let startDay = formatter.string(from: weekInterval.start)
+        let endDate = weekInterval.end.addingTimeInterval(-1)
+        formatter.dateFormat = "d. MMM"
+        let endDayMonth = formatter.string(from: endDate)
+        return "\(startDay) - \(endDayMonth)"
     }
 }
 
 // MARK: - Supporting Views
 
-struct StatCard: View {
-    let title: String
-    let value: String
-    let icon: String
-    let color: Color
+// MARK: - Block Card
+
+struct MacBlockCard: View {
+    let block: FocusBlock
+    let completedTasks: [LocalTask]
+
+    private var tasksForBlock: [LocalTask] {
+        completedTasks.filter { block.taskIDs.contains($0.id) }
+    }
+
+    private var completedCount: Int {
+        block.completedTaskIDs.count
+    }
+
+    private var totalCount: Int {
+        block.taskIDs.count
+    }
+
+    private var blockPercentage: Int {
+        guard totalCount > 0 else { return 0 }
+        return Int((Double(completedCount) / Double(totalCount)) * 100)
+    }
 
     var body: some View {
-        VStack(spacing: 8) {
-            Image(systemName: icon)
-                .font(.title)
-                .foregroundStyle(color)
+        VStack(alignment: .leading, spacing: 10) {
+            // Block header
+            HStack {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(block.title)
+                        .font(.headline)
+                    Text(timeRangeText)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                Spacer()
+                Text("\(blockPercentage)%")
+                    .font(.title3.weight(.bold))
+                    .foregroundStyle(blockPercentage == 100 ? .green : .blue)
+            }
 
-            Text(value)
-                .font(.title2.bold())
+            // Completed tasks in this block
+            if tasksForBlock.isEmpty {
+                Text("Keine Tasks erledigt")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            } else {
+                VStack(spacing: 6) {
+                    ForEach(tasksForBlock, id: \.uuid) { task in
+                        HStack(spacing: 8) {
+                            Image(systemName: block.completedTaskIDs.contains(task.id)
+                                ? "checkmark.circle.fill" : "circle")
+                                .foregroundStyle(block.completedTaskIDs.contains(task.id) ? .green : .secondary)
+                                .font(.subheadline)
 
-            Text(title)
-                .font(.caption)
-                .foregroundStyle(.secondary)
+                            Text(task.title)
+                                .font(.subheadline)
+                                .strikethrough(block.completedTaskIDs.contains(task.id), color: .secondary)
+
+                            Spacer()
+
+                            if let category = TaskCategory(rawValue: task.taskType) {
+                                Image(systemName: category.icon)
+                                    .font(.caption)
+                                    .foregroundStyle(category.color)
+                            }
+
+                            if let duration = task.estimatedDuration {
+                                Text("\(duration) min")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                    }
+                }
+            }
         }
-        .frame(maxWidth: .infinity)
         .padding()
         .background(Color(nsColor: .controlBackgroundColor))
         .clipShape(RoundedRectangle(cornerRadius: 12))
     }
-}
 
-struct CompletedTaskRow: View {
-    let task: LocalTask
-
-    var body: some View {
-        HStack(spacing: 12) {
-            Image(systemName: "checkmark.circle.fill")
-                .foregroundStyle(.green)
-
-            VStack(alignment: .leading, spacing: 2) {
-                Text(task.title)
-                    .strikethrough(true, color: .secondary)
-
-                HStack(spacing: 8) {
-                    ReviewCategoryBadge(taskType: task.taskType)
-
-                    if let duration = task.estimatedDuration {
-                        Text("\(duration) min")
-                            .font(.caption2)
-                            .foregroundStyle(.secondary)
-                    }
-                }
-            }
-
-            Spacer()
-        }
-        .padding(.horizontal)
-        .padding(.vertical, 6)
-    }
-}
-
-struct CategoryStatCard: View {
-    let stat: CategoryStat
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                Image(systemName: stat.icon)
-                    .foregroundStyle(stat.color)
-                Text(stat.label)
-                    .font(.subheadline.bold())
-            }
-
-            Text("\(stat.count) Tasks")
-                .font(.caption)
-                .foregroundStyle(.secondary)
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding()
-        .background(stat.color.opacity(0.1))
-        .clipShape(RoundedRectangle(cornerRadius: 8))
-    }
-}
-
-/// Category badge for review view (local to avoid conflicts)
-struct ReviewCategoryBadge: View {
-    let taskType: String
-
-    var body: some View {
-        HStack(spacing: 4) {
-            Image(systemName: icon)
-            Text(label)
-        }
-        .font(.caption2)
-        .foregroundStyle(color)
-        .padding(.horizontal, 6)
-        .padding(.vertical, 3)
-        .background(color.opacity(0.15))
-        .clipShape(Capsule())
-    }
-
-    private var color: Color {
-        switch taskType {
-        case "income": return .green
-        case "maintenance": return .orange
-        case "recharge": return .cyan
-        case "learning": return .purple
-        case "giving_back": return .pink
-        default: return .gray
-        }
-    }
-
-    private var icon: String {
-        switch taskType {
-        case "income": return "dollarsign.circle"
-        case "maintenance": return "wrench.and.screwdriver"
-        case "recharge": return "battery.100"
-        case "learning": return "book"
-        case "giving_back": return "gift"
-        default: return "questionmark.circle"
-        }
-    }
-
-    private var label: String {
-        switch taskType {
-        case "income": return "Geld"
-        case "maintenance": return "Pflege"
-        case "recharge": return "Energie"
-        case "learning": return "Lernen"
-        case "giving_back": return "Geben"
-        default: return taskType
-        }
-    }
-}
-
-// MARK: - Data Model
-
-struct CategoryStat: Identifiable {
-    let id = UUID()
-    let category: String
-    let count: Int
-    var eventMinutes: Int? = nil
-
-    var label: String {
-        TaskCategory(rawValue: category)?.displayName ?? category
-    }
-
-    var color: Color {
-        TaskCategory(rawValue: category)?.color ?? .gray
-    }
-
-    var icon: String {
-        TaskCategory(rawValue: category)?.icon ?? "questionmark.circle"
-    }
-
-    var hasEventContribution: Bool {
-        (eventMinutes ?? 0) > 0
+    private var timeRangeText: String {
+        let formatter = DateFormatter()
+        formatter.timeStyle = .short
+        return "\(formatter.string(from: block.startDate)) - \(formatter.string(from: block.endDate))"
     }
 }
 
