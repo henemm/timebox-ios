@@ -41,7 +41,11 @@ struct MacReviewView: View {
             // Content based on selection
             switch selectedView {
             case .today:
-                DayReviewContent(completedTasks: todayTasks)
+                DayReviewContent(
+                    completedTasks: todayTasks,
+                    calendarEvents: todayCalendarEvents,
+                    statsCalculator: statsCalculator
+                )
             case .week:
                 WeekReviewContent(
                     completedTasks: weekTasks,
@@ -63,7 +67,8 @@ struct MacReviewView: View {
         let calendar = Calendar.current
         let startOfToday = calendar.startOfDay(for: Date())
         return completedTasks.filter { task in
-            task.createdAt >= startOfToday
+            guard let completedAt = task.completedAt else { return false }
+            return completedAt >= startOfToday
         }
     }
 
@@ -73,7 +78,18 @@ struct MacReviewView: View {
             return []
         }
         return completedTasks.filter { task in
-            task.createdAt >= startOfWeek
+            guard let completedAt = task.completedAt else { return false }
+            return completedAt >= startOfWeek
+        }
+    }
+
+    /// Calendar events filtered to today
+    private var todayCalendarEvents: [CalendarEvent] {
+        let calendar = Calendar.current
+        let startOfToday = calendar.startOfDay(for: Date())
+        let endOfToday = calendar.date(byAdding: .day, value: 1, to: startOfToday) ?? startOfToday
+        return calendarEvents.filter {
+            $0.startDate >= startOfToday && $0.startDate < endOfToday
         }
     }
 
@@ -102,13 +118,39 @@ struct MacReviewView: View {
 
 struct DayReviewContent: View {
     let completedTasks: [LocalTask]
+    var calendarEvents: [CalendarEvent] = []
+    var statsCalculator: ReviewStatsCalculator = ReviewStatsCalculator()
 
     private var totalFocusMinutes: Int {
         completedTasks.compactMap(\.estimatedDuration).reduce(0, +)
     }
 
+    private var dayCategoryStats: [MacCategoryStat] {
+        // Build task minutes by category
+        let grouped = Dictionary(grouping: completedTasks) { $0.taskType }
+        var taskMinutes: [String: Int] = [:]
+        for (category, tasks) in grouped {
+            taskMinutes[category] = tasks.compactMap(\.estimatedDuration).reduce(0, +)
+        }
+
+        // Combine with calendar events
+        let combined = statsCalculator.computeCategoryMinutes(
+            taskMinutesByCategory: taskMinutes,
+            calendarEvents: calendarEvents
+        )
+
+        return combined.compactMap { (category, minutes) in
+            guard minutes > 0 else { return nil }
+            return MacCategoryStat(category: category, minutes: minutes)
+        }.sorted { $0.minutes > $1.minutes }
+    }
+
+    private var dayTotalMinutes: Int {
+        dayCategoryStats.reduce(0) { $0 + $1.minutes }
+    }
+
     var body: some View {
-        if completedTasks.isEmpty {
+        if completedTasks.isEmpty && calendarEvents.isEmpty {
             ContentUnavailableView(
                 "Noch keine Tasks erledigt",
                 systemImage: "checkmark.circle",
@@ -136,6 +178,24 @@ struct DayReviewContent: View {
                     .padding(.horizontal)
 
                     Divider()
+
+                    // Category Time Breakdown
+                    if !dayCategoryStats.isEmpty {
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text("Zeit pro Kategorie")
+                                .font(.headline)
+                                .padding(.horizontal)
+
+                            VStack(spacing: 8) {
+                                ForEach(dayCategoryStats) { stat in
+                                    MacCategoryBar(stat: stat, totalMinutes: dayTotalMinutes)
+                                }
+                            }
+                            .padding(.horizontal)
+                        }
+
+                        Divider()
+                    }
 
                     // Task List
                     VStack(alignment: .leading, spacing: 12) {
@@ -443,6 +503,76 @@ struct CategoryStat: Identifiable {
 
     var hasEventContribution: Bool {
         (eventMinutes ?? 0) > 0
+    }
+}
+
+// MARK: - Time-based Category Stat (for daily/weekly time breakdown)
+
+struct MacCategoryStat: Identifiable {
+    let id = UUID()
+    let category: String
+    let minutes: Int
+
+    var label: String {
+        TaskCategory(rawValue: category)?.displayName ?? category
+    }
+
+    var color: Color {
+        TaskCategory(rawValue: category)?.color ?? .gray
+    }
+
+    var icon: String {
+        TaskCategory(rawValue: category)?.icon ?? "questionmark.circle"
+    }
+
+    var formattedTime: String {
+        let hours = minutes / 60
+        let mins = minutes % 60
+        if hours > 0 {
+            return "\(hours)h \(mins)m"
+        }
+        return "\(mins)m"
+    }
+}
+
+// MARK: - Category Time Bar
+
+struct MacCategoryBar: View {
+    let stat: MacCategoryStat
+    let totalMinutes: Int
+
+    private var percentage: CGFloat {
+        guard totalMinutes > 0 else { return 0 }
+        return CGFloat(stat.minutes) / CGFloat(totalMinutes)
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack {
+                Image(systemName: stat.icon)
+                    .foregroundStyle(stat.color)
+                Text(stat.label)
+                    .font(.subheadline)
+                Spacer()
+                Text(stat.formattedTime)
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(stat.color)
+            }
+
+            GeometryReader { geometry in
+                ZStack(alignment: .leading) {
+                    RoundedRectangle(cornerRadius: 4)
+                        .fill(.secondary.opacity(0.2))
+                        .frame(height: 8)
+
+                    RoundedRectangle(cornerRadius: 4)
+                        .fill(stat.color)
+                        .frame(width: geometry.size.width * percentage, height: 8)
+                        .animation(.spring(), value: percentage)
+                }
+            }
+            .frame(height: 8)
+        }
     }
 }
 

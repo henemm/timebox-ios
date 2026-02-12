@@ -1,0 +1,222 @@
+TDD RED - ReviewDailyCategoryTests
+==========================================
+Date: 2026-02-12T15:05:00
+Result: TESTS DOCUMENT BROKEN BEHAVIOR
+
+Root Cause Analysis:
+- iOS: DailyReviewView.loadData() uses syncEngine.sync() which filters completed tasks
+-2026-02-12 16:17:52.953 xcodebuild[73252:2709660]  DVTAssertions: Warning in DVTiOSFrameworks/DTDeviceKitBase/DTDKRemoteDeviceData.m:409
+Details:  (null) deviceType from 00008310-00171B462E80E01E was NULL when -platform called.
+Object:   <DTDKMobileDeviceToken: 0x9e616c000>
+Method:   -platform
+Thread:   <NSThread: 0x9e6e714c0>{number = 297, name = (null)}
+Please file a bug at https://feedbackassistant.apple.com with this warning message and any useful information you can provide.
+2026-02-12 16:17:52.953 xcodebuild[73252:2711070]  DVTAssertions: Warning in DVTiOSFrameworks/DTDeviceKitBase/DTDKRemoteDeviceData.m:409
+Details:  (null) deviceType from 00008310-00171B462E80E01E was NULL when -platform called.
+Object:   <DTDKMobileDeviceToken: 0x9e616c000>
+Method:   -platform
+Thread:   <NSThread: 0x9e6e71740>{number = 303, name = (null)}
+Please file a bug at https://feedbackassistant.apple.com with this warning message and any useful information you can provide.
+2026-02-12 16:17:52.953 xcodebuild[73252:2707164]  DVTAssertions: Warning in DVTiOSFrameworks/DTDeviceKitBase/DTDKRemoteDeviceData.m:409
+Details:  (null) deviceType from 00008310-00171B462E80E01E was NULL when -platform called.
+Object:   <DTDKMobileDeviceToken: 0x9e616c000>
+Method:   -platform
+Thread:   <NSThread: 0x9e6e71500>{number = 286, name = (null)}
+Please file a bug at https://feedbackassistant.apple.com with this warning message and any useful information you can provide.
+2026-02-12 16:17:52.953 xcodebuild[73252:2606591]  DVTAssertions: Warning in DVTiOSFrameworks/DTDeviceKitBase/DTDKRemoteDeviceData.m:409
+Details:  (null) deviceType from 00008310-00171B462E80E01E was NULL when -platform called.
+Object:   <DTDKMobileDeviceToken: 0x9e616c000>
+Method:   -platform
+Thread:   <NSThread: 0x9e6e76280>{number = 2, name = (null)}
+Please file a bug at https://feedbackassistant.apple.com with this warning message and any useful information you can provide.
+2026-02-12 16:17:52.953 xcodebuild[73252:2705668]  DVTAssertions: Warning in DVTiOSFrameworks/DTDeviceKitBase/DTDKRemoteDeviceData.m:409
+Details:  (null) deviceType from 00008310-00171B462E80E01E was NULL when -platform called.
+Object:   <DTDKMobileDeviceToken: 0x9e616c000>
+Method:   -platform
+Thread:   <NSThread: 0x9e5c7a240>{number = 280, name = (null)}
+Please file a bug at https://feedbackassistant.apple.com with this warning message and any useful information you can provide.
+2026-02-12 16:17:52.953 xcodebuild[73252:2625326]  DVTAssertions: Warning in DVTiOSFrameworks/DTDeviceKitBase/DTDKRemoteDeviceData.m:409
+Details:  (null) deviceType from 00008310-00171B462E80E01E was NULL when -platform called.
+Object:   <DTDKMobileDeviceToken: 0x9e616c000>
+Method:   -platform
+Thread:   <NSThread: 0x9e6e70640>{number = 81, name = (null)}
+Please file a bug at https://feedbackassistant.apple.com with this warning message and any useful information you can provide.
+2026-02-12 16:17:52.953 xcodebuild[73252:2617184]  DVTAssertions: Warning in DVTiOSFrameworks/DTDeviceKitBase/DTDKRemoteDeviceData.m:409
+Details:  (null) deviceType from 00008310-00171B462E80E01E was NULL when -platform called.
+Object:   <DTDKMobileDeviceToken: 0x9e616c000>
+Method:   -platform
+Thread:   <NSThread: 0x9e5c791c0>{number = 44, name = (null)}
+Please file a bug at https://feedbackassistant.apple.com with this warning message and any useful information you can provide.
+2026-02-12 16:17:52.953 xcodebuild[73252:2709234]  DVTAssertions: Warning in DVTiOSFrameworks/DTDeviceKitBase/DTDKRemoteDeviceData.m:409
+Details:  (null) deviceType from 00008310-00171B462E80E01E was NULL when -platform called.
+Object:   <DTDKMobileDeviceToken: 0x9e616c000>
+Method:   -platform
+Thread:   <NSThread: 0x9e6e71640>{number = 296, name = (null)}
+Please file a bug at https://feedbackassistant.apple.com with this warning message and any useful information you can provide.
+2026-02-12 16:17:52.953 xcodebuild[73252:2707499]  DVTAssertions: Warning in DVTiOSFrameworks/DTDeviceKitBase/DTDKRemoteDeviceData.m:409
+Details:  (null) deviceType from 00008310-00171B462E80E01E was NULL when -platform called.
+Object:   <DTDKMobileDeviceToken: 0x9e616c000>
+Method:   -platform
+Thread:   <NSThread: 0x9e6e71480>{number = 288, name = (null)}
+Please file a bug at https://feedbackassistant.apple.com with this warning message and any useful information you can provide.
+2026-02-12 16:17:52.953 xcodebuild[73252:2705436]  DVTAssertions: Warning in DVTiOSFrameworks/DTDeviceKitBase/DTDKRemoteDeviceData.m:409
+Details:  (null) deviceType from 00008310-00171B462E80E01E was NULL when -platform called.
+Object:   <DTDKMobileDeviceToken: 0x9e616c000>
+Method:   -platform
+Thread:   <NSThread: 0x9e6e70880>{number = 278, name = (null)}
+Please file a bug at https://feedbackassistant.apple.com with this warning message and any useful information you can provide.
+2026-02-12 16:17:52.953 xcodebuild[73252:2663302]  DVTAssertions: Warning in DVTiOSFrameworks/DTDeviceKitBase/DTDKRemoteDeviceData.m:409
+Details:  (null) deviceType from 00008310-00171B462E80E01E was NULL when -platform called.
+Object:   <DTDKMobileDeviceToken: 0x9e616c000>
+Method:   -platform
+Thread:   <NSThread: 0x9e6e70780>{number = 213, name = (null)}
+Please file a bug at https://feedbackassistant.apple.com with this warning message and any useful information you can provide.
+2026-02-12 16:17:52.953 xcodebuild[73252:2707244]  DVTAssertions: Warning in DVTiOSFrameworks/DTDeviceKitBase/DTDKRemoteDeviceData.m:409
+Details:  (null) deviceType from 00008310-00171B462E80E01E was NULL when -platform called.
+Object:   <DTDKMobileDeviceToken: 0x9e616c000>
+Method:   -platform
+Thread:   <NSThread: 0x9e6e71540>{number = 287, name = (null)}
+Please file a bug at https://feedbackassistant.apple.com with this warning message and any useful information you can provide.
+2026-02-12 16:17:52.953 xcodebuild[73252:2694371]  DVTAssertions: Warning in DVTiOSFrameworks/DTDeviceKitBase/DTDKRemoteDeviceData.m:409
+Details:  (null) deviceType from 00008310-00171B462E80E01E was NULL when -platform called.
+Object:   <DTDKMobileDeviceToken: 0x9e616c000>
+Method:   -platform
+Thread:   <NSThread: 0x9e6e70840>{number = 274, name = (null)}
+Please file a bug at https://feedbackassistant.apple.com with this warning message and any useful information you can provide.
+2026-02-12 16:17:52.953 xcodebuild[73252:2661559]  DVTAssertions: Warning in DVTiOSFrameworks/DTDeviceKitBase/DTDKRemoteDeviceData.m:409
+Details:  (null) deviceType from 00008310-00171B462E80E01E was NULL when -platform called.
+Object:   <DTDKMobileDeviceToken: 0x9e616c000>
+Method:   -platform
+Thread:   <NSThread: 0x9e6e70700>{number = 206, name = (null)}
+Please file a bug at https://feedbackassistant.apple.com with this warning message and any useful information you can provide.
+2026-02-12 16:17:52.953 xcodebuild[73252:2653463]  DVTAssertions: Warning in DVTiOSFrameworks/DTDeviceKitBase/DTDKRemoteDeviceData.m:409
+Details:  (null) deviceType from 00008310-00171B462E80E01E was NULL when -platform called.
+Object:   <DTDKMobileDeviceToken: 0x9e616c000>
+Method:   -platform
+Thread:   <NSThread: 0x9e6e70500>{number = 180, name = (null)}
+Please file a bug at https://feedbackassistant.apple.com with this warning message and any useful information you can provide.
+2026-02-12 16:17:52.953 xcodebuild[73252:2705076]  DVTAssertions: Warning in DVTiOSFrameworks/DTDeviceKitBase/DTDKRemoteDeviceData.m:409
+Details:  (null) deviceType from 00008310-00171B462E80E01E was NULL when -platform called.
+Object:   <DTDKMobileDeviceToken: 0x9e616c000>
+Method:   -platform
+Thread:   <NSThread: 0x9e6e707c0>{number = 276, name = (null)}
+Please file a bug at https://feedbackassistant.apple.com with this warning message and any useful information you can provide.
+2026-02-12 16:17:52.953 xcodebuild[73252:2671289]  DVTAssertions: Warning in DVTiOSFrameworks/DTDeviceKitBase/DTDKRemoteDeviceData.m:409
+Details:  (null) deviceType from 00008310-00171B462E80E01E was NULL when -platform called.
+Object:   <DTDKMobileDeviceToken: 0x9e616c000>
+Method:   -platform
+Thread:   <NSThread: 0x9e6e70800>{number = 242, name = (null)}
+Please file a bug at https://feedbackassistant.apple.com with this warning message and any useful information you can provide.
+2026-02-12 16:17:52.953 xcodebuild[73252:2616624]  DVTAssertions: Warning in DVTiOSFrameworks/DTDeviceKitBase/DTDKRemoteDeviceData.m:409
+Details:  (null) deviceType from 00008310-00171B462E80E01E was NULL when -platform called.
+Object:   <DTDKMobileDeviceToken: 0x9e616c000>
+Method:   -platform
+Thread:   <NSThread: 0x9e6e70600>{number = 39, name = (null)}
+Please file a bug at https://feedbackassistant.apple.com with this warning message and any useful information you can provide.
+2026-02-12 16:17:52.953 xcodebuild[73252:2707798]  DVTAssertions: Warning in DVTiOSFrameworks/DTDeviceKitBase/DTDKRemoteDeviceData.m:409
+Details:  (null) deviceType from 00008310-00171B462E80E01E was NULL when -platform called.
+Object:   <DTDKMobileDeviceToken: 0x9e616c000>
+Method:   -platform
+Thread:   <NSThread: 0x9e6e71580>{number = 290, name = (null)}
+Please file a bug at https://feedbackassistant.apple.com with this warning message and any useful information you can provide.
+2026-02-12 16:17:52.953 xcodebuild[73252:2662071]  DVTAssertions: Warning in DVTiOSFrameworks/DTDeviceKitBase/DTDKRemoteDeviceData.m:409
+Details:  (null) deviceType from 00008310-00171B462E80E01E was NULL when -platform called.
+Object:   <DTDKMobileDeviceToken: 0x9e616c000>
+Method:   -platform
+Thread:   <NSThread: 0x9e6e70680>{number = 208, name = (null)}
+Please file a bug at https://feedbackassistant.apple.com with this warning message and any useful information you can provide.
+2026-02-12 16:17:52.953 xcodebuild[73252:2708760]  DVTAssertions: Warning in DVTiOSFrameworks/DTDeviceKitBase/DTDKRemoteDeviceData.m:409
+Details:  (null) deviceType from 00008310-00171B462E80E01E was NULL when -platform called.
+Object:   <DTDKMobileDeviceToken: 0x9e616c000>
+Method:   -platform
+Thread:   <NSThread: 0x9e6e71600>{number = 294, name = (null)}
+Please file a bug at https://feedbackassistant.apple.com with this warning message and any useful information you can provide.
+2026-02-12 16:17:52.953 xcodebuild[73252:2710762]  DVTAssertions: Warning in DVTiOSFrameworks/DTDeviceKitBase/DTDKRemoteDeviceData.m:409
+Details:  (null) deviceType from 00008310-00171B462E80E01E was NULL when -platform called.
+Object:   <DTDKMobileDeviceToken: 0x9e616c000>
+Method:   -platform
+Thread:   <NSThread: 0x9e6e716c0>{number = 300, name = (null)}
+Please file a bug at https://feedbackassistant.apple.com with this warning message and any useful information you can provide.
+2026-02-12 16:17:52.953 xcodebuild[73252:2708761]  DVTAssertions: Warning in DVTiOSFrameworks/DTDeviceKitBase/DTDKRemoteDeviceData.m:409
+Details:  (null) deviceType from 00008310-00171B462E80E01E was NULL when -platform called.
+Object:   <DTDKMobileDeviceToken: 0x9e616c000>
+Method:   -platform
+Thread:   <NSThread: 0x9e6e715c0>{number = 295, name = (null)}
+Please file a bug at https://feedbackassistant.apple.com with this warning message and any useful information you can provide.
+2026-02-12 16:17:52.953 xcodebuild[73252:2705413]  DVTAssertions: Warning in DVTiOSFrameworks/DTDeviceKitBase/DTDKRemoteDeviceData.m:409
+Details:  (null) deviceType from 00008310-00171B462E80E01E was NULL when -platform called.
+Object:   <DTDKMobileDeviceToken: 0x9e616c000>
+Method:   -platform
+Thread:   <NSThread: 0x9e6e70740>{number = 277, name = (null)}
+Please file a bug at https://feedbackassistant.apple.com with this warning message and any useful information you can provide.
+2026-02-12 16:17:52.953 xcodebuild[73252:2610501]  DVTAssertions: Warning in DVTiOSFrameworks/DTDeviceKitBase/DTDKRemoteDeviceData.m:409
+Details:  (null) deviceType from 00008310-00171B462E80E01E was NULL when -platform called.
+Object:   <DTDKMobileDeviceToken: 0x9e616c000>
+Method:   -platform
+Thread:   <NSThread: 0x9e5c78640>{number = 13, name = (null)}
+Please file a bug at https://feedbackassistant.apple.com with this warning message and any useful information you can provide.
+ComputePackagePrebuildTargetDependencyGraph
+
+Prepare packages
+
+CreateBuildRequest
+
+SendProjectDescription
+
+CreateBuildOperation
+
+ComputeTargetDependencyGraph
+note: Building targets in dependency order
+note: Target dependency graph (6 targets)
+    Target 'FocusBloxUITests' in project 'FocusBlox'
+        ➜ Explicit dependency on target 'FocusBlox' in project 'FocusBlox'
+    Target 'FocusBloxTests' in project 'FocusBlox'
+        ➜ Explicit dependency on target 'FocusBlox' in project 'FocusBlox'
+    Target 'FocusBlox' in project 'FocusBlox'
+        ➜ Explicit dependency on target 'FocusBloxWidgetsExtension' in project 'FocusBlox'
+        ➜ Explicit dependency on target 'FocusBloxCore' in project 'FocusBlox'
+        ➜ Explicit dependency on target 'FocusBloxWatch Watch App' in project 'FocusBlox'
+    Target 'FocusBloxWatch Watch App' in project 'FocusBlox' (no dependencies)
+    Target 'FocusBloxWidgetsExtension' in project 'FocusBlox'
+        ➜ Explicit dependency on target 'FocusBloxCore' in project 'FocusBlox'
+    Target 'FocusBloxCore' in project 'FocusBlox' (no dependencies)
+
+GatherProvisioningInputs
+
+CreateBuildDescription
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -v -E -dM -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk -x c -c /dev/null
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/usr/bin/actool --version --output-format xml1
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/usr/bin/actool --print-asset-tag-combinations --output-format xml1 /Users/hem/Documents/opt/my-daily-sprints/FocusBloxWatch Watch App/Assets.xcassets
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -v -E -dM -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk -x c -c /dev/null
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/usr/bin/actool --print-asset-tag-combinations --output-format xml1 /Users/hem/Documents/opt/my-daily-sprints/Resources/Assets.xcassets
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc --version
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -v -E -dM -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/WatchSimulator.platform/Developer/SDKs/WatchSimulator26.2.sdk -x c -c /dev/null
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld -version_details
+
+ReadFileContents /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/share/docc/features.json
+
+Build description signature: 58a327bf84b4dd86d75e92e72b123d19
+Build description path: /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/XCBuildData/58a327bf84b4dd86d75e92e72b123d19.xcbuilddata
+error: unable to attach DB: error: accessing build database "/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/XCBuildData/build.db": database is locked Possibly there are two concurrent builds running in the same filesystem location.
+
+Test session results, code coverage, and logs:
+	/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Logs/Test/Test-FocusBlox-2026.02.12_16-17-53-+0100.xcresult
+
+Testing failed:
+	unable to attach DB: error: accessing build database "/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-awtxlldmubwqcwggsrfosewjcyoq/Build/Intermediates.noindex/XCBuildData/build.db": database is locked Possibly there are two concurrent builds running in the same filesystem location.
+	Testing cancelled because the build failed.
+
+** TEST FAILED **
+
+
+The following build commands failed:
+	Testing project FocusBlox with scheme FocusBlox
+(1 failure)

@@ -48,12 +48,37 @@ struct DailyReviewView: View {
         }
     }
 
+    /// Calendar events filtered to today only
+    private var todayCalendarEvents: [CalendarEvent] {
+        let calendar = Calendar.current
+        let startOfToday = calendar.startOfDay(for: Date())
+        let endOfToday = calendar.date(byAdding: .day, value: 1, to: startOfToday) ?? startOfToday
+        return calendarEvents.filter {
+            $0.startDate >= startOfToday && $0.startDate < endOfToday
+        }
+    }
+
+    /// Category statistics for daily view (tasks + calendar events)
+    private var dailyCategoryStats: [CategoryStat] {
+        computeCategoryStats(blocks: todayBlocks, events: todayCalendarEvents)
+    }
+
+    /// Total minutes for daily category stats
+    private var dailyTotalMinutes: Int {
+        dailyCategoryStats.reduce(0) { $0 + $1.minutes }
+    }
+
     /// Category statistics for weekly view (tasks + calendar events)
     private var categoryStats: [CategoryStat] {
+        computeCategoryStats(blocks: weekBlocks, events: calendarEvents)
+    }
+
+    /// Shared computation for category stats from blocks and events
+    private func computeCategoryStats(blocks: [FocusBlock], events: [CalendarEvent]) -> [CategoryStat] {
         var taskStats: [String: Int] = [:]
 
-        // Get all completed task IDs from week blocks
-        let completedIDs = Set(weekBlocks.flatMap { $0.completedTaskIDs })
+        // Get all completed task IDs from blocks
+        let completedIDs = Set(blocks.flatMap { $0.completedTaskIDs })
 
         // Calculate total minutes per category from tasks
         for task in allTasks where completedIDs.contains(task.id) {
@@ -64,7 +89,7 @@ struct DailyReviewView: View {
         // Combine task stats with calendar event stats
         let combinedStats = statsCalculator.computeCategoryMinutes(
             taskMinutesByCategory: taskStats,
-            calendarEvents: calendarEvents
+            calendarEvents: events
         )
 
         // Convert to CategoryStat array sorted by minutes
@@ -133,6 +158,7 @@ struct DailyReviewView: View {
                             } else {
                                 VStack(spacing: 24) {
                                     dailyStatsHeader
+                                    dailyCategoryStatsSection
                                     blocksSection
                                 }
                                 .padding(.horizontal)
@@ -257,7 +283,34 @@ struct DailyReviewView: View {
         )
     }
 
-    // MARK: - Category Stats Section
+    // MARK: - Daily Category Stats Section
+
+    private var dailyCategoryStatsSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Zeit pro Kategorie")
+                .font(.headline)
+
+            if dailyCategoryStats.isEmpty {
+                Text("Keine Daten vorhanden")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .padding(.vertical, 8)
+            } else {
+                VStack(spacing: 12) {
+                    ForEach(dailyCategoryStats) { stat in
+                        CategoryBar(stat: stat, totalMinutes: dailyTotalMinutes)
+                    }
+                }
+            }
+        }
+        .padding()
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(.ultraThinMaterial)
+        )
+    }
+
+    // MARK: - Weekly Category Stats Section
 
     private var categoryStatsSection: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -462,10 +515,10 @@ struct DailyReviewView: View {
             blocks = allBlocks
             calendarEvents = allEvents
 
-            // Load all tasks via SyncEngine
-            let taskSource = LocalTaskSource(modelContext: modelContext)
-            let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
-            allTasks = try await syncEngine.sync()
+            // Load ALL tasks (including completed) via FetchDescriptor
+            let descriptor = FetchDescriptor<LocalTask>()
+            let localTasks = try modelContext.fetch(descriptor)
+            allTasks = localTasks.map { PlanItem(localTask: $0) }
         } catch {
             // Silently fail - UI will show empty state
             blocks = []
