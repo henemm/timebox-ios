@@ -6,6 +6,7 @@ enum NotificationService {
     private static let taskOverdueCategory = "TASK_OVERDUE"
     private static let taskNotificationPrefix = "task-timer-"
     private static let focusBlockNotificationPrefix = "focus-block-start-"
+    private static let focusBlockEndPrefix = "focus-block-end-"
 
     // MARK: - Permission
 
@@ -144,8 +145,64 @@ enum NotificationService {
     /// - Parameter blockID: The block ID to cancel notification for
     static func cancelFocusBlockNotification(blockID: String) {
         let identifier = "\(focusBlockNotificationPrefix)\(blockID)"
+        let endIdentifier = "\(focusBlockEndPrefix)\(blockID)"
         UNUserNotificationCenter.current()
-            .removePendingNotificationRequests(withIdentifiers: [identifier])
+            .removePendingNotificationRequests(withIdentifiers: [identifier, endIdentifier])
+    }
+
+    // MARK: - Focus Block End Notifications
+
+    /// Schedule a notification when a focus block ends
+    static func scheduleFocusBlockEndNotification(
+        blockID: String,
+        blockTitle: String,
+        endDate: Date,
+        completedCount: Int,
+        totalCount: Int
+    ) {
+        guard let request = buildFocusBlockEndNotificationRequest(
+            blockID: blockID,
+            blockTitle: blockTitle,
+            endDate: endDate,
+            completedCount: completedCount,
+            totalCount: totalCount
+        ) else { return }
+
+        UNUserNotificationCenter.current().add(request) { error in
+            if let error = error {
+                print("Failed to schedule block end notification: \(error)")
+            }
+        }
+    }
+
+    /// Build a notification request for a focus block end (testable)
+    static func buildFocusBlockEndNotificationRequest(
+        blockID: String,
+        blockTitle: String,
+        endDate: Date,
+        completedCount: Int,
+        totalCount: Int,
+        now: Date = Date()
+    ) -> UNNotificationRequest? {
+        let timeInterval = endDate.timeIntervalSince(now)
+        guard timeInterval > 0 else { return nil }
+
+        let content = UNMutableNotificationContent()
+        content.title = "FocusBlox beendet"
+        content.body = "\(blockTitle) - \(completedCount)/\(totalCount) Tasks erledigt. Zeit fuer dein Sprint Review!"
+        content.sound = .default
+
+        let trigger = UNTimeIntervalNotificationTrigger(
+            timeInterval: timeInterval,
+            repeats: false
+        )
+
+        let identifier = "\(focusBlockEndPrefix)\(blockID)"
+        return UNNotificationRequest(
+            identifier: identifier,
+            content: content,
+            trigger: trigger
+        )
     }
 
     // MARK: - Cancel All

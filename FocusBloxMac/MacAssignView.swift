@@ -187,7 +187,9 @@ struct MacAssignView: View {
                 return
             }
 
+            // Nur zukuenftige und aktive Bloecke anzeigen (keine abgelaufenen)
             focusBlocks = try eventKitRepo.fetchFocusBlocks(for: selectedDate)
+                .filter { !$0.isPast }
         } catch {
             errorMessage = error.localizedDescription
         }

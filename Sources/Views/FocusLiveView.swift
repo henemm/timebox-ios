@@ -107,6 +107,10 @@ struct FocusLiveView: View {
                         completedTaskIDs: block.completedTaskIDs,
                         onDismiss: {
                             Task {
+                                // Unerledigte Tasks zurueck nach Next Up
+                                if block.isPast {
+                                    returnIncompleteTasksToNextUp(block: block)
+                                }
                                 await loadData()
                             }
                         }
@@ -443,7 +447,12 @@ struct FocusLiveView: View {
             for block in blocks {
                 print("📥 [FocusLiveView] block: \(block.title), isActive=\(block.isActive)")
             }
+            // Aktiven Block bevorzugen, sonst letzten abgelaufenen fuer Review
             activeBlock = blocks.first { $0.isActive }
+                ?? blocks.filter { $0.isPast }.last
+            if activeBlock?.isPast == true {
+                showSprintReview = true
+            }
             print("📥 [FocusLiveView] activeBlock=\(activeBlock?.title ?? "nil")")
             let taskSource = LocalTaskSource(modelContext: modelContext)
             let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
@@ -643,6 +652,22 @@ struct FocusLiveView: View {
         let estimated = Double(task.effectiveDuration * 60)
         let remaining = estimated - elapsed
         return max(0, Int(remaining / 60))
+    }
+
+    /// Unerledigte Tasks nach Sprint Review zurueck in Next Up
+    private func returnIncompleteTasksToNextUp(block: FocusBlock) {
+        let incompleteTasks = block.taskIDs.filter { !block.completedTaskIDs.contains($0) }
+        guard !incompleteTasks.isEmpty else { return }
+
+        let fetchDescriptor = FetchDescriptor<LocalTask>()
+        guard let localTasks = try? modelContext.fetch(fetchDescriptor) else { return }
+
+        for taskID in incompleteTasks {
+            if let task = localTasks.first(where: { $0.id == taskID }) {
+                task.isNextUp = true
+            }
+        }
+        try? modelContext.save()
     }
 }
 // MARK: - Upcoming Task Chip

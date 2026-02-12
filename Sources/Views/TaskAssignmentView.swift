@@ -184,7 +184,9 @@ struct TaskAssignmentView: View {
                 return
             }
 
+            // Nur zukuenftige und aktive Bloecke anzeigen (keine abgelaufenen)
             focusBlocks = try eventKitRepo.fetchFocusBlocks(for: selectedDate)
+                .filter { !$0.isPast }
 
             let taskSource = LocalTaskSource(modelContext: modelContext)
             let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)

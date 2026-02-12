@@ -69,7 +69,12 @@ struct MacFocusView: View {
                     block: block,
                     tasks: tasksForBlock(block),
                     onDismiss: {
-                        Task { await loadData() }
+                        Task {
+                            if block.isPast {
+                                returnIncompleteTasksToNextUp(block: block)
+                            }
+                            await loadData()
+                        }
                     }
                 )
             }
@@ -401,7 +406,12 @@ struct MacFocusView: View {
             }
 
             let blocks = try eventKitRepo.fetchFocusBlocks(for: Date())
+            // Aktiven Block bevorzugen, sonst letzten abgelaufenen fuer Review
             activeBlock = blocks.first { $0.isActive }
+                ?? blocks.filter { $0.isPast }.last
+            if activeBlock?.isPast == true {
+                showSprintReview = true
+            }
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -540,6 +550,22 @@ struct MacFocusView: View {
         if block.isPast && !showSprintReview {
             showSprintReview = true
         }
+    }
+
+    /// Unerledigte Tasks nach Sprint Review zurueck in Next Up
+    private func returnIncompleteTasksToNextUp(block: FocusBlock) {
+        let incompleteTasks = block.taskIDs.filter { !block.completedTaskIDs.contains($0) }
+        guard !incompleteTasks.isEmpty else { return }
+
+        let fetchDescriptor = FetchDescriptor<LocalTask>()
+        guard let localTasks = try? modelContext.fetch(fetchDescriptor) else { return }
+
+        for taskID in incompleteTasks {
+            if let task = localTasks.first(where: { $0.id == taskID }) {
+                task.isNextUp = true
+            }
+        }
+        try? modelContext.save()
     }
 }
 
