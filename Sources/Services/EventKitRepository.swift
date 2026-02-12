@@ -300,8 +300,26 @@ final class EventKitRepository: EventKitRepositoryProtocol, @unchecked Sendable 
     }
 
     func fetchFocusBlocks(for date: Date) throws -> [FocusBlock] {
-        let events = try fetchCalendarEvents(for: date)
-        return events.compactMap { FocusBlock(from: $0) }
+        guard calendarAuthStatus == .fullAccess else {
+            throw EventKitError.notAuthorized
+        }
+
+        let calendar = Calendar.current
+        let startOfDay = calendar.startOfDay(for: date)
+        guard let endOfDay = calendar.date(byAdding: .day, value: 1, to: startOfDay) else {
+            throw EventKitError.fetchFailed
+        }
+
+        // FocusBlocks aus ALLEN Kalendern laden (nil = kein Filter)
+        // damit Bloecke von anderen Geraeten sichtbar sind
+        let predicate = eventStore.predicateForEvents(
+            withStart: startOfDay,
+            end: endOfDay,
+            calendars: nil
+        )
+
+        let events = eventStore.events(matching: predicate)
+        return events.map { CalendarEvent(from: $0) }.compactMap { FocusBlock(from: $0) }
     }
 
     func deleteFocusBlock(eventID: String) throws {

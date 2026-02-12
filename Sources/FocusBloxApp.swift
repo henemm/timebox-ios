@@ -16,6 +16,9 @@ struct FocusBloxApp: App {
 
     private static let appGroupID = "group.com.henning.focusblox"
 
+    /// SyncedSettings fuer iCloud KV Store Sync zwischen Geraeten
+    private let syncedSettings = SyncedSettings()
+
     init() {
         // Register shared state for Interactive Snippets (iOS 26)
         AppDependencyManager.shared.add(dependency: QuickCaptureState())
@@ -235,6 +238,7 @@ struct FocusBloxApp: App {
             .onChange(of: scenePhase) { _, newPhase in
                 if newPhase == .active {
                     checkCCQuickCaptureTrigger()
+                    syncedSettings.pushToCloud()
                 }
             }
             .onOpenURL { url in

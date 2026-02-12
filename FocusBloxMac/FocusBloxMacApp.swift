@@ -17,6 +17,9 @@ struct FocusBloxMacApp: App {
     @State private var showShortcuts = false
     @FocusedValue(\.taskActions) private var taskActions
 
+    /// SyncedSettings fuer iCloud KV Store Sync zwischen Geraeten
+    private let syncedSettings = SyncedSettings()
+
     init() {
         // CRITICAL: Set activation policy to regular app (not accessory/background)
         // This ensures the app can receive keyboard and mouse events
@@ -29,6 +32,9 @@ struct FocusBloxMacApp: App {
         } catch {
             fatalError("Failed to create ModelContainer: \(error)")
         }
+
+        // Lokale Einstellungen in iCloud pushen
+        syncedSettings.pushToCloud()
     }
 
     private func indexQuickCaptureAction() {
