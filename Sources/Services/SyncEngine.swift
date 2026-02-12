@@ -115,6 +115,12 @@ final class SyncEngine {
         guard let task = try findTask(byID: itemID) else {
             return
         }
+        // Track reschedules: if moving from one block to a different block
+        if let oldBlock = task.assignedFocusBlockID,
+           let newBlock = focusBlockID,
+           oldBlock != newBlock {
+            task.rescheduleCount += 1
+        }
         task.assignedFocusBlockID = focusBlockID
         try modelContext.save()
     }

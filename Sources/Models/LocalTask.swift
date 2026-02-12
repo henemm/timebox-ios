@@ -59,6 +59,9 @@ final class LocalTask {
     /// ID of the Focus Block this task is assigned to (nil = not assigned)
     var assignedFocusBlockID: String?
 
+    /// Number of times this task was rescheduled (moved to a different block)
+    var rescheduleCount: Int = 0
+
     /// Timestamp when task was completed (for "completed in last 7 days" filter)
     var completedAt: Date?
 

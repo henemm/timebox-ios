@@ -36,6 +36,9 @@ struct PlanItem: Identifiable, Sendable {
     /// Timestamp when task was completed (for "completed in last 7 days" filter)
     let completedAt: Date?
 
+    /// Number of times this task was rescheduled
+    let rescheduleCount: Int
+
     /// Task is incomplete (missing importance, urgency, or duration)
     var isTbd: Bool {
         importance == nil || urgency == nil || estimatedDuration == nil
@@ -74,6 +77,7 @@ struct PlanItem: Identifiable, Sendable {
         self.nextUpSortOrder = nil
         self.assignedFocusBlockID = nil
         self.completedAt = nil
+        self.rescheduleCount = 0
 
         // Recurrence fields (Reminders don't have recurrence in this app)
         self.recurrencePattern = nil
@@ -108,6 +112,7 @@ struct PlanItem: Identifiable, Sendable {
         self.nextUpSortOrder = localTask.nextUpSortOrder
         self.assignedFocusBlockID = localTask.assignedFocusBlockID
         self.completedAt = localTask.completedAt
+        self.rescheduleCount = localTask.rescheduleCount
 
         // Recurrence fields from LocalTask
         self.recurrencePattern = localTask.recurrencePattern

@@ -159,6 +159,7 @@ struct DailyReviewView: View {
                                 VStack(spacing: 24) {
                                     dailyStatsHeader
                                     dailyCategoryStatsSection
+                                    planningAccuracySection(blocks: todayBlocks)
                                     blocksSection
                                 }
                                 .padding(.horizontal)
@@ -170,6 +171,7 @@ struct DailyReviewView: View {
                                 VStack(spacing: 24) {
                                     weeklyStatsHeader
                                     categoryStatsSection
+                                    planningAccuracySection(blocks: weekBlocks)
                                 }
                                 .padding(.horizontal)
                             }
@@ -335,6 +337,73 @@ struct DailyReviewView: View {
             RoundedRectangle(cornerRadius: 16)
                 .fill(.ultraThinMaterial)
         )
+    }
+
+    // MARK: - Planning Accuracy Section
+
+    @ViewBuilder
+    private func planningAccuracySection(blocks: [FocusBlock]) -> some View {
+        let stats = statsCalculator.computePlanningAccuracy(blocks: blocks, allTasks: allTasks)
+
+        if stats.hasData {
+            VStack(alignment: .leading, spacing: 16) {
+                Text("Planungsgenauigkeit")
+                    .font(.headline)
+
+                if stats.trackedTaskCount > 0 {
+                    // Average deviation
+                    HStack {
+                        Image(systemName: stats.averageDeviation < -0.05 ? "hare" : stats.averageDeviation > 0.05 ? "tortoise" : "checkmark.seal")
+                            .foregroundStyle(stats.averageDeviation < -0.05 ? .green : stats.averageDeviation > 0.05 ? .orange : .blue)
+                        Text("Durchschnitt: \(stats.averageDeviationFormatted)")
+                            .font(.subheadline)
+                        Spacer()
+                        Text("\(stats.trackedTaskCount) Tasks")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+
+                    // Faster / On Time / Slower
+                    HStack(spacing: 0) {
+                        accuracyPill(count: stats.fasterCount, label: "Schneller", color: .green, icon: "arrow.up.circle.fill")
+                        accuracyPill(count: stats.onTimeCount, label: "Im Plan", color: .blue, icon: "checkmark.circle.fill")
+                        accuracyPill(count: stats.slowerCount, label: "Langsamer", color: .orange, icon: "arrow.down.circle.fill")
+                    }
+                }
+
+                if stats.rescheduledTaskCount > 0 {
+                    HStack {
+                        Image(systemName: "arrow.triangle.2.circlepath")
+                            .foregroundStyle(.purple)
+                        Text("\(stats.rescheduledTaskCount) Tasks umgeplant")
+                            .font(.subheadline)
+                        Spacer()
+                        Text("\(stats.totalReschedules)x total")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+            }
+            .padding()
+            .background(
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(.ultraThinMaterial)
+            )
+        }
+    }
+
+    private func accuracyPill(count: Int, label: String, color: Color, icon: String) -> some View {
+        VStack(spacing: 6) {
+            Image(systemName: icon)
+                .font(.title3)
+                .foregroundStyle(color)
+            Text("\(count)")
+                .font(.title3.weight(.bold))
+            Text(label)
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity)
     }
 
     /// Week date range string (e.g., "20. - 26. Jan")
