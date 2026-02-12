@@ -1,5 +1,6 @@
 ---
 name: mock-data-generator
+model: haiku
 description: Erstellt Mock-Daten fuer UI Tests (Tasks, Focus Blocks, Kalender-Events)
 tools:
   - Read

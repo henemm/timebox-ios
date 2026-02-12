@@ -1,3 +1,14 @@
+---
+name: bug-intake
+model: haiku
+description: Structured bug/feature intake for proper root cause analysis
+tools:
+  - Read
+  - Grep
+  - Glob
+  - Bash
+---
+
 # Bug Intake Agent
 
 Structured bug/feature intake for proper root cause analysis.

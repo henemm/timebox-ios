@@ -1,3 +1,15 @@
+---
+name: docs-updater
+model: sonnet
+description: Updates documentation after code changes to maintain consistency
+tools:
+  - Read
+  - Glob
+  - Grep
+  - Edit
+  - Write
+---
+
 # Docs Updater Agent
 
 Updates documentation after code changes to maintain consistency.

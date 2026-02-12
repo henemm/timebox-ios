@@ -1,5 +1,6 @@
 ---
 name: feature-planner
+model: sonnet
 description: Plant neue Features UND Aenderungen an bestehenden Features - erst verstehen, dann dokumentieren, dann implementieren
 tools:
   - Read

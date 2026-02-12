@@ -1,3 +1,13 @@
+---
+name: spec-validator
+model: haiku
+description: Validates entity specifications for completeness and correctness
+tools:
+  - Read
+  - Glob
+  - Grep
+---
+
 # Spec Validator Agent
 
 Validates entity specifications for completeness and correctness.

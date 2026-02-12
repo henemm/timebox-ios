@@ -1,5 +1,6 @@
 ---
 name: ui-test-debugger
+model: haiku
 description: Diagnostiziert und fixt iOS XCUITest Probleme - Environment, Timing, State
 tools:
   - Read

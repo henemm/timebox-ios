@@ -2,28 +2,12 @@
 
 You are starting the **Validation Phase**.
 
-## ⛔ CRITICAL: ALL TESTS MUST PASS
+## CRITICAL: ALL TESTS MUST PASS
 
 **Before validation can succeed:**
 1. ALL Unit Tests must PASS
 2. ALL UI Tests must PASS
 3. NO manual testing requests allowed
-
-```bash
-# Run ALL tests
-xcodebuild test -project TimeBox.xcodeproj -scheme TimeBox \
-  -destination 'id=D9E26087-132A-44CB-9883-59073DD9CC54' \
-  2>&1 | tee docs/artifacts/[workflow]/validation-test-output.txt
-
-# Check results
-grep -E "(passed|failed)" docs/artifacts/[workflow]/validation-test-output.txt
-```
-
-**If ANY test fails:**
-1. DO NOT proceed to validation
-2. GO BACK and FIX THE CODE
-3. Re-run tests until ALL PASS
-4. **NEVER ask user to test manually**
 
 ## Prerequisites
 
@@ -37,33 +21,74 @@ Required:
 - `ui_test_red_done`: `true`
 - `ui_test_red_result`: contains "failed"
 
-## Validation Checklist
+## Your Tasks
 
-- [ ] ⛔ ALL Unit Tests PASS (green)
-- [ ] ⛔ ALL UI Tests PASS (green)
-- [ ] Build compiles without errors
-- [ ] No regressions introduced
-- [ ] Edge cases handled
+### Step 1: Parallele Validierung (4x Haiku)
 
-## Run Validation
+Dispatche **4 parallele Haiku-Agenten** fuer umfassende Validierung:
 
-```bash
-# 1. Build check
-xcodebuild build -project TimeBox.xcodeproj -scheme TimeBox \
-  -destination 'id=D9E26087-132A-44CB-9883-59073DD9CC54'
+```
+Task 1 (general-purpose/haiku) - TEST CHECK:
+  "Fuehre ALLE Tests aus:
+  xcodebuild test -project FocusBlox.xcodeproj -scheme FocusBlox \
+    -destination 'id=548B4A2F-FDFF-4F9E-8335-1A7A7B98E492'
+  Report: Anzahl passed/failed, Laufzeit, Fehlerdetails."
 
-# 2. Unit Tests
-xcodebuild test -project TimeBox.xcodeproj -scheme TimeBox \
-  -destination 'id=D9E26087-132A-44CB-9883-59073DD9CC54' \
-  -only-testing:TimeBoxTests 2>&1 | grep -E "(passed|failed)"
+Task 2 (general-purpose/haiku) - SPEC COMPLIANCE:
+  "Lies die Spec: [spec_file_path]
+  Pruefe jeden Acceptance Criterion gegen die Implementation.
+  Report: Welche Kriterien sind erfuellt, welche nicht?"
 
-# 3. UI Tests
-xcodebuild test -project TimeBox.xcodeproj -scheme TimeBox \
-  -destination 'id=D9E26087-132A-44CB-9883-59073DD9CC54' \
-  -only-testing:TimeBoxUITests 2>&1 | grep -E "(passed|failed)"
+Task 3 (general-purpose/haiku) - REGRESSION CHECK:
+  "Fuehre die vollstaendige Test-Suite aus (nicht nur Feature-Tests).
+  Report: Gibt es Regressionen? Welche Tests die vorher gruen waren
+  sind jetzt rot?"
+
+Task 4 (general-purpose/haiku) - SCOPE CHECK:
+  "Vergleiche die geaenderten Dateien mit der Spec.
+  Wurden Dateien ausserhalb des Specs geaendert?
+  Wurden mehr als 5 Dateien / 250 LoC geaendert?"
 ```
 
-## Update Workflow State
+### Step 2: Ergebnis-Auswertung
+
+Werte die 4 Reports aus:
+
+**Step 2a: Alle Checks bestanden**
+-> Weiter zu Step 3
+
+**Step 2b: Fehler gefunden -> Auto-Fix (general-purpose/Sonnet)**
+
+Bei Fehlern dispatche einen **general-purpose/Sonnet Subagenten**:
+
+```
+Task (general-purpose/sonnet): "Folgende Validierungsfehler wurden gefunden:
+  [Fehler-Liste aus den 4 Haiku-Reports]
+
+  Behebe die Fehler. Beachte:
+  - Nur die gemeldeten Fehler fixen, keine anderen Aenderungen
+  - Scoping Limits einhalten
+  - Tests nach dem Fix erneut ausfuehren"
+```
+
+Nach dem Fix: Dispatche die relevanten Haiku-Checks erneut zur Verifikation.
+
+### Step 3: Dokumentation aktualisieren (docs-updater/Sonnet)
+
+Bei erfolgreicher Validierung dispatche den **docs-updater**:
+
+```
+Task (general-purpose/sonnet): "Du bist der docs-updater Agent.
+
+  Input:
+  - changed_files: [Liste der geaenderten Dateien]
+  - feature_summary: [Kurzbeschreibung]
+  - spec_file_path: [Pfad zur Spec]
+
+  Aktualisiere alle betroffene Dokumentation."
+```
+
+### Step 4: Workflow State aktualisieren
 
 **Only after ALL tests pass:**
 
@@ -93,29 +118,56 @@ save_state(state)
 python3 .claude/hooks/workflow_state_multi.py phase phase7_validate
 ```
 
+## Validation Report
+
+Erstelle eine Zusammenfassung:
+
+```markdown
+## Validation Report: [Workflow Name]
+
+### Test Results
+- Unit Tests: [N] passed, [N] failed
+- UI Tests: [N] passed, [N] failed
+- Full Suite: [N] total, [N] passed
+
+### Spec Compliance
+- Acceptance Criteria: [N]/[N] erfuellt
+- [Details zu nicht-erfuellten Kriterien]
+
+### Regression Check
+- Status: [Keine Regressionen / N Regressionen]
+
+### Scope Check
+- Files changed: [N] (Limit: 5)
+- LoC changed: +[N]/-[N] (Limit: 250)
+- Out-of-scope changes: [Keine / Liste]
+
+### Result: PASS / FAIL
+```
+
 ## On Test Failure
 
 **If tests fail:**
-1. ❌ DO NOT say "bitte manuell testen"
-2. ❌ DO NOT proceed to validation
-3. ✅ FIX the code
-4. ✅ Re-run tests
-5. ✅ Repeat until ALL GREEN
+1. DO NOT say "bitte manuell testen"
+2. DO NOT proceed to validation
+3. FIX the code
+4. Re-run tests
+5. Repeat until ALL GREEN
 
 ## Next Step
 
 **Only when ALL tests pass:**
 
-> "Validation successful. All [N] unit tests and [M] UI tests passed. Ready for commit."
+> "Validation successful. All checks passed. Ready for commit."
 
 ```bash
 python3 .claude/hooks/workflow_state_multi.py phase phase8_complete
 ```
 
-## ⛔ FORBIDDEN
+## FORBIDDEN
 
 - "Bitte auf Device testen"
-- "Bitte manuell prüfen"
+- "Bitte manuell pruefen"
 - "UI Test fehlgeschlagen, bitte testen"
 - Any request for manual testing
 

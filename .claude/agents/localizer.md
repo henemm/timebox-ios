@@ -1,5 +1,6 @@
 ---
 name: localizer
+model: sonnet
 description: Spezialisiert auf Lokalisierung fuer iOS Apps
 tools:
   - Read

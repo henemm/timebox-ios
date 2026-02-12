@@ -1,5 +1,6 @@
 ---
 name: bug-investigator
+model: sonnet
 description: Analysiert Bugs nach Analysis-First Prinzip - erst verstehen, dann fixen
 tools:
   - Read

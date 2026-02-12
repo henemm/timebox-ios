@@ -1,3 +1,14 @@
+---
+name: spec-writer
+model: sonnet
+description: Creates and updates entity specifications following the spec-first workflow
+tools:
+  - Read
+  - Glob
+  - Grep
+  - Write
+---
+
 # Spec Writer Agent
 
 Creates and updates entity specifications following the spec-first workflow.

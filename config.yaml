@@ -1,0 +1,57 @@
+# FocusBlox Project Configuration
+# ================================
+# Agent model strategy and project-specific settings.
+# Based on agent-os-openspec core config.
+
+# Agent Configuration
+# Model Strategy: Haiku (mechanical) / Sonnet (creative) / Opus (core, main context)
+agents:
+  # Default model for agents not explicitly configured
+  default_model: "sonnet"
+
+  # Agent-specific model assignments
+  # Haiku: Fast + cheap for mechanical tasks (validation, context loading, scope reviews)
+  # Sonnet: Quality + cost balance for creative/analytical work (specs, tests, planning)
+  # Opus: Highest quality only for core implementation (main context, not delegated)
+
+  # --- Core Agents (from agent-os-openspec) ---
+
+  spec_writer:
+    model: "sonnet"
+    enabled: true
+  spec_validator:
+    model: "haiku"
+    enabled: true
+  docs_updater:
+    model: "sonnet"
+    enabled: true
+  bug_intake:
+    model: "haiku"
+    enabled: true
+  bug_investigator:
+    model: "sonnet"
+    enabled: true
+  test_runner:
+    model: "haiku"
+    enabled: true
+  feature_planner:
+    model: "sonnet"
+    enabled: true
+  user_story_planner:
+    model: "opus"  # Runs in main context for highest quality
+    enabled: true
+  implementation_validator:
+    model: "haiku"
+    enabled: true
+
+  # --- Project-specific Agents ---
+
+  localizer:
+    model: "sonnet"
+    enabled: true
+  mock_data_generator:
+    model: "haiku"
+    enabled: true
+  ui_test_debugger:
+    model: "haiku"
+    enabled: true
