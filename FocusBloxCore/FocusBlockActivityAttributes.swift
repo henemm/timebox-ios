@@ -22,10 +22,12 @@ public struct FocusBlockActivityAttributes: ActivityAttributes {
     public struct ContentState: Codable, Hashable {
         public let currentTaskTitle: String?
         public let completedCount: Int
+        public let taskEndDate: Date?
 
-        public init(currentTaskTitle: String?, completedCount: Int) {
+        public init(currentTaskTitle: String?, completedCount: Int, taskEndDate: Date? = nil) {
             self.currentTaskTitle = currentTaskTitle
             self.completedCount = completedCount
+            self.taskEndDate = taskEndDate
         }
     }
 
@@ -55,7 +57,8 @@ public extension FocusBlockActivityAttributes.ContentState {
     static var sample: FocusBlockActivityAttributes.ContentState {
         FocusBlockActivityAttributes.ContentState(
             currentTaskTitle: "Code Review",
-            completedCount: 1
+            completedCount: 1,
+            taskEndDate: Date().addingTimeInterval(15 * 60)
         )
     }
 }

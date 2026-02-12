@@ -27,5 +27,8 @@ struct FocusBlockActivityAttributes: ActivityAttributes {
 
         /// Number of completed tasks
         let completedCount: Int
+
+        /// When the current task should end (for task-level countdown)
+        let taskEndDate: Date?
     }
 }

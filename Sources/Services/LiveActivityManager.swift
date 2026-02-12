@@ -37,7 +37,8 @@ final class LiveActivityManager: Sendable {
 
         let initialState = FocusBlockActivityAttributes.ContentState(
             currentTaskTitle: currentTask,
-            completedCount: block.completedTaskIDs.count
+            completedCount: block.completedTaskIDs.count,
+            taskEndDate: nil
         )
 
         // Retry loop for transient errors (similar to Meditationstimer)
@@ -69,7 +70,7 @@ final class LiveActivityManager: Sendable {
     }
 
     /// Update the current activity with new task info
-    func updateActivity(currentTask: String?, completedCount: Int) {
+    func updateActivity(currentTask: String?, completedCount: Int, taskEndDate: Date? = nil) {
         guard let activity = currentActivity else {
             print("⚠️ [LiveActivity] UPDATE called but NO ACTIVE ACTIVITY (ignored)")
             return
@@ -77,7 +78,8 @@ final class LiveActivityManager: Sendable {
 
         let newState = FocusBlockActivityAttributes.ContentState(
             currentTaskTitle: currentTask,
-            completedCount: completedCount
+            completedCount: completedCount,
+            taskEndDate: taskEndDate
         )
 
         print("🔄 [LiveActivity] UPDATE: task='\(currentTask ?? "nil")', completed=\(completedCount)")

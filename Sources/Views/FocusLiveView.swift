@@ -161,9 +161,15 @@ struct FocusLiveView: View {
         let tasks = tasksForBlock(block)
         let remainingTasks = tasks.filter { !block.completedTaskIDs.contains($0.id) }
         let currentTask = remainingTasks.first
+        // Task-Ende berechnen: taskStartTime + geschaetzte Dauer
+        var taskEnd: Date?
+        if let duration = currentTask?.estimatedDuration, let start = taskStartTime {
+            taskEnd = start.addingTimeInterval(Double(duration * 60))
+        }
         liveActivityManager.updateActivity(
             currentTask: currentTask?.title,
-            completedCount: block.completedTaskIDs.count
+            completedCount: block.completedTaskIDs.count,
+            taskEndDate: taskEnd
         )
     }
     /// Calculate when the current task should end based on task start time and duration

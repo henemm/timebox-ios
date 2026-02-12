@@ -29,7 +29,8 @@ struct FocusBlockLiveActivity: Widget {
                 }
                 DynamicIslandExpandedRegion(.trailing) {
                     VStack {
-                        Text(context.attributes.endDate, style: .timer)
+                        let endDate = context.state.taskEndDate ?? context.attributes.endDate
+                        Text(timerInterval: Date.now...max(Date.now, endDate), countsDown: true)
                             .font(.system(size: 36, weight: .semibold, design: .rounded))
                             .monospacedDigit()
                             .minimumScaleFactor(0.6)
@@ -73,10 +74,11 @@ struct FocusBlockLiveActivity: Widget {
                 }
             } compactTrailing: {
                 // OVERLAY-TRICK: Hidden placeholder fixes width jitter
+                let compactEndDate = context.state.taskEndDate ?? context.attributes.endDate
                 Text("00:00")
                     .hidden()
                     .overlay(alignment: .trailing) {
-                        Text(context.attributes.endDate, style: .timer)
+                        Text(timerInterval: Date.now...max(Date.now, compactEndDate), countsDown: true)
                             .font(.system(size: 12, weight: .semibold, design: .rounded))
                             .monospacedDigit()
                             .foregroundStyle(.white)
@@ -135,8 +137,9 @@ private struct LockScreenView: View {
 
             Spacer()
 
-            // Trailing: Timer
-            Text(context.attributes.endDate, style: .timer)
+            // Trailing: Timer (Task-Ende oder Block-Ende, stoppt bei 0:00)
+            let lockScreenEndDate = context.state.taskEndDate ?? context.attributes.endDate
+            Text(timerInterval: Date.now...max(Date.now, lockScreenEndDate), countsDown: true)
                 .font(.system(size: 32, weight: .semibold, design: .rounded))
                 .monospacedDigit()
                 .foregroundStyle(.white)
