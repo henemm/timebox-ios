@@ -92,6 +92,29 @@ DEFAULT_UI_EXTENSIONS = [
 # Screenshot file extensions
 SCREENSHOT_EXTENSIONS = [".png", ".jpg", ".jpeg", ".gif", ".webp"]
 
+# Minimum screenshot size (1KB) to reject empty/placeholder files
+MIN_SCREENSHOT_SIZE = 1000
+
+
+def is_valid_image(path: Path) -> bool:
+    """Validate screenshot is a real image (min size + magic bytes)."""
+    try:
+        if path.stat().st_size < MIN_SCREENSHOT_SIZE:
+            return False
+        with open(path, 'rb') as f:
+            header = f.read(8)
+        if header[:4] == b'\x89PNG':
+            return True
+        if header[:3] == b'\xff\xd8\xff':
+            return True
+        if header[:4] == b'GIF8':
+            return True
+        if header[:4] == b'RIFF' and len(header) >= 8:
+            return True  # WebP (RIFF container)
+        return False
+    except OSError:
+        return False
+
 
 def get_ui_config() -> dict:
     """Get UI screenshot configuration."""
@@ -128,13 +151,15 @@ def find_recent_screenshot(workflow_name: str, file_path: str) -> Path | None:
     ui_config = get_ui_config()
     max_age_minutes = ui_config.get("screenshot_max_age_minutes", 30)
 
-    # Look for screenshots
+    # Look for screenshots (must be real images, not placeholders)
     for ext in SCREENSHOT_EXTENSIONS:
         for screenshot in screenshot_dir.glob(f"*{ext}"):
             # Check age
             mtime = datetime.fromtimestamp(screenshot.stat().st_mtime)
             if datetime.now() - mtime < timedelta(minutes=max_age_minutes):
-                return screenshot
+                # Validate it's a real image (not 0-byte or fake)
+                if is_valid_image(screenshot):
+                    return screenshot
 
     return None
 

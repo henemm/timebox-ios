@@ -8,7 +8,7 @@ BLOCKS ALL code file changes unless:
 3. RED test is done (red_test_done=true OR ui_test_red_done=true)
 
 MANUAL OVERRIDE:
-Set "user_override": true OR "spec_approved": true in workflow to bypass TDD check.
+Set "user_override": true in workflow to bypass TDD check.
 This allows the user to grant explicit permission for edge cases
 (e.g., Control Center Widgets that cannot be tested via XCUITest).
 
@@ -111,8 +111,6 @@ def is_code_file(file_path: str) -> bool:
 def check_user_override(workflow: dict) -> bool:
     """Check if user has granted manual override."""
     if workflow.get("user_override", False):
-        return True
-    if workflow.get("spec_approved", False):
         return True
     return False
 

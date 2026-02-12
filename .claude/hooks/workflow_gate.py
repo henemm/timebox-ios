@@ -101,10 +101,14 @@ def resolve_workflow(state: dict, file_path: str) -> tuple[dict | None, str | No
     if wf:
         return wf, name
 
-    # Fallback: active workflow
+    # Fallback: active workflow ONLY if it has no affected_files defined
+    # (i.e., initial state before files are scoped). If affected_files
+    # exist but don't match, this file is out of scope - BLOCK.
     active_name = state.get("active_workflow")
     if active_name and active_name in state.get("workflows", {}):
-        return state["workflows"][active_name], active_name
+        active_wf = state["workflows"][active_name]
+        if not active_wf.get("affected_files"):
+            return active_wf, active_name
 
     return None, None
 
@@ -118,10 +122,6 @@ def check_user_override(state: dict, file_path: str = "") -> bool:
     # Resolve the relevant workflow for this file
     workflow, _ = resolve_workflow(state, file_path) if file_path else (get_active_workflow(state), None)
     if workflow and workflow.get("user_override", False):
-        return True
-
-    # Check if spec_approved is set in workflow
-    if workflow and workflow.get("spec_approved", False):
         return True
 
     return False

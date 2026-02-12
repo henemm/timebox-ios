@@ -381,8 +381,6 @@ def check_user_override() -> bool:
         return False
     if workflow.get("user_override", False):
         return True
-    if workflow.get("spec_approved", False):
-        return True
     return False
 
 

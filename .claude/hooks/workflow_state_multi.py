@@ -461,6 +461,7 @@ def complete_workflow(name: str) -> bool:
 
     state["workflows"][name]["current_phase"] = "phase8_complete"
     state["workflows"][name]["backlog_status"] = "done"  # Explicitly set to done
+    state["workflows"][name]["user_override"] = False  # Remove override on completion
     state["workflows"][name]["last_updated"] = datetime.now().isoformat()
 
     # If this was the active workflow, clear it
