@@ -10,7 +10,11 @@ struct QuickAddLaunchIntent: AppIntent {
     static let description: IntentDescription = "Öffnet FocusBlox zum schnellen Erstellen einer Aufgabe"
     static let openAppWhenRun: Bool = true
 
-    func perform() async throws -> some IntentResult & OpensIntent {
-        return .result(opensIntent: OpenURLIntent(URL(string: "focusblox://create-task")!))
+    func perform() async throws -> some IntentResult {
+        // Flag in App Group UserDefaults setzen - App liest es beim Aktivieren
+        if let defaults = UserDefaults(suiteName: "group.com.henning.focusblox") {
+            defaults.set(true, forKey: "quickCaptureFromCC")
+        }
+        return .result()
     }
 }

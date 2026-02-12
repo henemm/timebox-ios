@@ -7,6 +7,8 @@ struct QuickCaptureView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
 
+    var initialTitle: String = ""
+
     @State private var title = ""
     @State private var isSaving = false
     @State private var showSuccess = false
@@ -73,6 +75,9 @@ struct QuickCaptureView: View {
         .presentationDragIndicator(.visible)
         .presentationBackground(.ultraThinMaterial)
         .onAppear {
+            if !initialTitle.isEmpty {
+                title = initialTitle
+            }
             isFocused = true
         }
         .sheet(isPresented: $showCategoryPicker) {

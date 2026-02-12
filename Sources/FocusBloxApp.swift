@@ -12,6 +12,7 @@ extension Notification.Name {
 struct FocusBloxApp: App {
     @Environment(\.scenePhase) private var scenePhase
     @State private var showQuickCapture = false
+    @State private var quickCaptureTitle = ""
     @State private var permissionRequested = false
 
     private static let appGroupID = "group.com.henning.focusblox"
@@ -243,6 +244,7 @@ struct FocusBloxApp: App {
             }
             .onOpenURL { url in
                 if url.host == "create-task" {
+                    quickCaptureTitle = ""
                     showQuickCapture = true
                 }
             }
@@ -250,7 +252,7 @@ struct FocusBloxApp: App {
                 showQuickCapture = true
             }
             .sheet(isPresented: $showQuickCapture) {
-                QuickCaptureView()
+                QuickCaptureView(initialTitle: quickCaptureTitle)
             }
         }
         .modelContainer(sharedModelContainer)
@@ -277,8 +279,10 @@ struct FocusBloxApp: App {
     private func checkCCQuickCaptureTrigger() {
         guard let defaults = UserDefaults(suiteName: "group.com.henning.focusblox") else { return }
         guard defaults.bool(forKey: "quickCaptureFromCC") else { return }
-        // Clear flag and show QuickCapture
+        // Clear flags and show QuickCapture
         defaults.removeObject(forKey: "quickCaptureFromCC")
+        quickCaptureTitle = defaults.string(forKey: "quickCaptureTitle") ?? ""
+        defaults.removeObject(forKey: "quickCaptureTitle")
         showQuickCapture = true
     }
 
