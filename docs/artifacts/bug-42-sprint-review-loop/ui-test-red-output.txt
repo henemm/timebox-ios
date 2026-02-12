@@ -1,0 +1,22 @@
+TDD RED - MacSprintReviewUITests
+=================================
+Date: 2026-02-12T12:12:04
+Result: TEST FAILED
+
+Test Suite 'MacSprintReviewUITests' failed
+Executed 6 tests, with 5 tests skipped and 1 failure (0 unexpected) in 115.446 seconds
+
+Results:
+- testBacklogButtonExists: FAILED - "Offene Tasks ins Backlog" button does not exist on macOS
+- testSprintReviewStaysClosedAfterDismiss: SKIPPED - Sprint Review not shown (no mock past block)
+- testSprintReviewShowsCompletionPercentage: SKIPPED - Sprint Review not shown
+- testSprintReviewShowsDetailedStats: SKIPPED - Sprint Review not shown
+- testTaskStatusCanBeToggled: SKIPPED - Sprint Review not shown
+- testTaskRowsShowPlannedTime: SKIPPED - Sprint Review not shown
+
+Root cause confirmed:
+1. macOS MacSprintReviewSheet has no Backlog button (placeholder only)
+2. macOS MacSprintReviewSheet has no completion percentage
+3. macOS MacSprintReviewSheet has no interactive task toggling
+4. macOS MacSprintReviewSheet has no detailed stats (geplant/gebraucht)
+5. Loop bug: loadData() always reopens review for past blocks

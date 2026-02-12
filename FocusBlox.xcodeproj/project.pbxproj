@@ -54,8 +54,6 @@
 		ADEEAB024BB9B2C40CD6313D /* DebugLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71582A64B51A62129A2409B7 /* DebugLogger.swift */; };
 		APPGRP02BUILD0001 /* AppGroupSwiftDataTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = APPGRP02FILE00001 /* AppGroupSwiftDataTests.swift */; };
 		APPSET01BUILDFILE0001 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = APPSET01FILEREF00001 /* AppSettings.swift */; };
-		SYNSET02BUILD0001 /* SyncedSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = SYNSET02FILE00001 /* SyncedSettings.swift */; };
-		SYNSET02BUILD0002 /* SyncedSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = SYNSET02FILE00001 /* SyncedSettings.swift */; };
 		ATBE0001BUILD000001 /* AssignTabBlockEditUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ATBE0001FILEREF00001 /* AssignTabBlockEditUITests.swift */; };
 		ATTV0001BUILD000001 /* AssignTabTaskVisibilityUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ATTV0001FILEREF00001 /* AssignTabTaskVisibilityUITests.swift */; };
 		B09A2CF15546B73F96EE0797 /* EditTaskSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03C849D4340F5E92CA1D754E /* EditTaskSheet.swift */; };
@@ -89,7 +87,10 @@
 		BUG35SNP02BUILD0001 /* QuickCaptureState.swift in Sources */ = {isa = PBXBuildFile; fileRef = BUG35SNP02FILEREF01 /* QuickCaptureState.swift */; };
 		BUG35SNP03BUILD0001 /* QuickCaptureSnippetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BUG35SNP03FILEREF01 /* QuickCaptureSnippetView.swift */; };
 		BUG35SNP04BUILD0001 /* QuickCaptureSubIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = BUG35SNP04FILEREF01 /* QuickCaptureSubIntents.swift */; };
+		BUG36CC01BUILD00001 /* CCQuickAddIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = BUG36CC01FILEREF001 /* CCQuickAddIntents.swift */; };
+		BUG36CC01BUILD00002 /* CCQuickAddIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = BUG36CC01FILEREF001 /* CCQuickAddIntents.swift */; };
 		BUG36DIAG01BUILD00001 /* CCQuickTaskDiagTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BUG36DIAG01FILEREF001 /* CCQuickTaskDiagTests.swift */; };
+		BUG39LC01BUILD0001 /* FocusBlockLifecycleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BUG39LC01FILE00001 /* FocusBlockLifecycleTests.swift */; };
 		C2A1677B81BC3C8D2C548495 /* HourRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 821E6E3E951900DF99190196 /* HourRow.swift */; };
 		C2ED3FE95B938EB35CB3C24C /* LocalTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A27D4BE199FA040FC61FFD6 /* LocalTask.swift */; };
 		C3F49C8B0CD3C6552054BE7D /* EventKitRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4451B46B76517090C636FA94 /* EventKitRepository.swift */; };
@@ -124,13 +125,9 @@
 		FBRND001BUILDFILE0001 /* FocusBloxRebrandUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBRND001FILEREF00001 /* FocusBloxRebrandUITests.swift */; };
 		FBRND002BUILDFILE0001 /* FocusBloxRebrandTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBRND002FILEREF00001 /* FocusBloxRebrandTests.swift */; };
 		FBSNOT01BUILD0001 /* FocusBlockStartNotificationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBSNOT01FILE00001 /* FocusBlockStartNotificationTests.swift */; };
-		BUG39LC01BUILD0001 /* FocusBlockLifecycleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BUG39LC01FILE00001 /* FocusBlockLifecycleTests.swift */; };
-		SYNSET01BUILD0001 /* SyncedSettingsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = SYNSET01FILE00001 /* SyncedSettingsTests.swift */; };
 		INTENT01BUILD00001 /* TaskEnums.swift in Sources */ = {isa = PBXBuildFile; fileRef = INTENT01FILEREF0001 /* TaskEnums.swift */; };
 		INTENT02BUILD00001 /* TaskEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = INTENT02FILEREF0001 /* TaskEntity.swift */; };
 		INTENT03BUILD00001 /* CreateTaskIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = INTENT03FILEREF0001 /* CreateTaskIntent.swift */; };
-		BUG36CC01BUILD00001 /* CCQuickAddIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = BUG36CC01FILEREF001 /* CCQuickAddIntents.swift */; };
-		BUG36CC01BUILD00002 /* CCQuickAddIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = BUG36CC01FILEREF001 /* CCQuickAddIntents.swift */; };
 		INTENT04BUILD00001 /* GetNextUpIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = INTENT04FILEREF0001 /* GetNextUpIntent.swift */; };
 		INTENT05BUILD00001 /* CompleteTaskIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = INTENT05FILEREF0001 /* CompleteTaskIntent.swift */; };
 		INTENT06BUILD00001 /* CountOpenTasksIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = INTENT06FILEREF0001 /* CountOpenTasksIntent.swift */; };
@@ -182,6 +179,9 @@
 		SNDSVC02BUILDFILE0001 /* SoundService.swift in Sources */ = {isa = PBXBuildFile; fileRef = SNDSVC02FILEREF00001 /* SoundService.swift */; };
 		SNDUI001BUILDFILE0001 /* SoundSettingsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = SNDUI001FILEREF00001 /* SoundSettingsUITests.swift */; };
 		SPRNTRV01BUILD0001 /* SprintReviewUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = SPRNTRV01FILE00001 /* SprintReviewUITests.swift */; };
+		SYNSET01BUILD0001 /* SyncedSettingsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = SYNSET01FILE00001 /* SyncedSettingsTests.swift */; };
+		SYNSET02BUILD0001 /* SyncedSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = SYNSET02FILE00001 /* SyncedSettings.swift */; };
+		SYNSET02BUILD0002 /* SyncedSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = SYNSET02FILE00001 /* SyncedSettings.swift */; };
 		TAGINP01BUILD000001 /* TagInputView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TAGINP01FILEREF0001 /* TagInputView.swift */; };
 		TAGINP02BUILD000001 /* TagInputView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TAGINP01FILEREF0001 /* TagInputView.swift */; };
 		TASKCAT01BUILD00001 /* TaskCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = TASKCAT01FILEREF0001 /* TaskCategory.swift */; };
@@ -397,7 +397,6 @@
 		A36E40124EBA31D7428EAA80 /* DailyReviewView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DailyReviewView.swift; sourceTree = "<group>"; };
 		APPGRP02FILE00001 /* AppGroupSwiftDataTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppGroupSwiftDataTests.swift; sourceTree = "<group>"; };
 		APPSET01FILEREF00001 /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
-		SYNSET02FILE00001 /* SyncedSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncedSettings.swift; sourceTree = "<group>"; };
 		ATBE0001FILEREF00001 /* AssignTabBlockEditUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssignTabBlockEditUITests.swift; sourceTree = "<group>"; };
 		ATTV0001FILEREF00001 /* AssignTabTaskVisibilityUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssignTabTaskVisibilityUITests.swift; sourceTree = "<group>"; };
 		B31CB18EF0C80E62953F34D6 /* SprintReviewSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SprintReviewSheet.swift; sourceTree = "<group>"; };
@@ -424,7 +423,9 @@
 		BUG35SNP02FILEREF01 /* QuickCaptureState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickCaptureState.swift; sourceTree = "<group>"; };
 		BUG35SNP03FILEREF01 /* QuickCaptureSnippetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickCaptureSnippetView.swift; sourceTree = "<group>"; };
 		BUG35SNP04FILEREF01 /* QuickCaptureSubIntents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickCaptureSubIntents.swift; sourceTree = "<group>"; };
+		BUG36CC01FILEREF001 /* CCQuickAddIntents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CCQuickAddIntents.swift; sourceTree = "<group>"; };
 		BUG36DIAG01FILEREF001 /* CCQuickTaskDiagTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CCQuickTaskDiagTests.swift; sourceTree = "<group>"; };
+		BUG39LC01FILE00001 /* FocusBlockLifecycleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusBlockLifecycleTests.swift; sourceTree = "<group>"; };
 		C40AFBB545C0FA15517B9CE4 /* PlanningViewUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanningViewUITests.swift; sourceTree = "<group>"; };
 		C439255FDECD6C6CB2377237 /* MiniTaskCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MiniTaskCard.swift; sourceTree = "<group>"; };
 		C945F5092F6FFB66C11FD4C2 /* TimelineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineView.swift; sourceTree = "<group>"; };
@@ -455,13 +456,10 @@
 		FBRND001FILEREF00001 /* FocusBloxRebrandUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusBloxRebrandUITests.swift; sourceTree = "<group>"; };
 		FBRND002FILEREF00001 /* FocusBloxRebrandTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusBloxRebrandTests.swift; sourceTree = "<group>"; };
 		FBSNOT01FILE00001 /* FocusBlockStartNotificationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusBlockStartNotificationTests.swift; sourceTree = "<group>"; };
-		BUG39LC01FILE00001 /* FocusBlockLifecycleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusBlockLifecycleTests.swift; sourceTree = "<group>"; };
-		SYNSET01FILE00001 /* SyncedSettingsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncedSettingsTests.swift; sourceTree = "<group>"; };
 		FDD319A3F7DEE05F6A8885FC /* DurationBadge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DurationBadge.swift; sourceTree = "<group>"; };
 		INTENT01FILEREF0001 /* TaskEnums.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskEnums.swift; sourceTree = "<group>"; };
 		INTENT02FILEREF0001 /* TaskEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskEntity.swift; sourceTree = "<group>"; };
 		INTENT03FILEREF0001 /* CreateTaskIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateTaskIntent.swift; sourceTree = "<group>"; };
-		BUG36CC01FILEREF001 /* CCQuickAddIntents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CCQuickAddIntents.swift; sourceTree = "<group>"; };
 		INTENT04FILEREF0001 /* GetNextUpIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetNextUpIntent.swift; sourceTree = "<group>"; };
 		INTENT05FILEREF0001 /* CompleteTaskIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompleteTaskIntent.swift; sourceTree = "<group>"; };
 		INTENT06FILEREF0001 /* CountOpenTasksIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CountOpenTasksIntent.swift; sourceTree = "<group>"; };
@@ -497,6 +495,8 @@
 		SNDSVC02FILEREF00001 /* SoundService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundService.swift; sourceTree = "<group>"; };
 		SNDUI001FILEREF00001 /* SoundSettingsUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundSettingsUITests.swift; sourceTree = "<group>"; };
 		SPRNTRV01FILE00001 /* SprintReviewUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SprintReviewUITests.swift; sourceTree = "<group>"; };
+		SYNSET01FILE00001 /* SyncedSettingsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncedSettingsTests.swift; sourceTree = "<group>"; };
+		SYNSET02FILE00001 /* SyncedSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncedSettings.swift; sourceTree = "<group>"; };
 		TAGINP01FILEREF0001 /* TagInputView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagInputView.swift; sourceTree = "<group>"; };
 		TASKCAT01FILEREF0001 /* TaskCategory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskCategory.swift; sourceTree = "<group>"; };
 		TASKFORM01FILEREF01 /* TaskFormSheet.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TaskFormSheet.swift; sourceTree = "<group>"; };

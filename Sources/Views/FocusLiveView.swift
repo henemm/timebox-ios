@@ -49,6 +49,7 @@ struct FocusLiveView: View {
     @State private var errorMessage: String?
     @State private var isPermissionDenied = false
     @State private var showSprintReview = false
+    @State private var reviewDismissed = false
     @State private var completionFeedback = false
     // Timer for progress updates
     @State private var currentTime = Date()
@@ -106,6 +107,7 @@ struct FocusLiveView: View {
                         tasks: tasksForBlock(block),
                         completedTaskIDs: block.completedTaskIDs,
                         onDismiss: {
+                            reviewDismissed = true
                             Task {
                                 // Unerledigte Tasks zurueck nach Next Up
                                 if block.isPast {
@@ -456,7 +458,7 @@ struct FocusLiveView: View {
             // Aktiven Block bevorzugen, sonst letzten abgelaufenen fuer Review
             activeBlock = blocks.first { $0.isActive }
                 ?? blocks.filter { $0.isPast }.last
-            if activeBlock?.isPast == true {
+            if activeBlock?.isPast == true && !reviewDismissed {
                 showSprintReview = true
             }
             print("📥 [FocusLiveView] activeBlock=\(activeBlock?.title ?? "nil")")
@@ -595,7 +597,7 @@ struct FocusLiveView: View {
             warningPlayed = true
         }
         // If block just ended, play sound and show sprint review
-        if block.isPast && !showSprintReview {
+        if block.isPast && !showSprintReview && !reviewDismissed {
             SoundService.playEndGong()
             showSprintReview = true
             warningPlayed = false  // Reset for next block

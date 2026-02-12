@@ -107,6 +107,11 @@ always_allowed:
   - "\\.md$"
   - "\\.gitignore"
   - "README"
+  - "Tests/"                    # Test files must be writable in TDD RED
+  - "UITests/"                  # UI test files (iOS + macOS)
+  - "FocusBloxTests/"           # Unit tests
+  - "FocusBloxUITests/"         # iOS UI tests
+  - "FocusBloxMacUITests/"      # macOS UI tests
 
 # Specs Configuration
 specs:
