@@ -19,6 +19,7 @@ final class SyncedSettings {
         static let soundEnabled = "sync_soundEnabled"
         static let warningEnabled = "sync_warningEnabled"
         static let warningTimingRaw = "sync_warningTimingRaw"
+        static let defaultTaskDuration = "sync_defaultTaskDuration"
     }
 
     // MARK: - Local Keys (UserDefaults)
@@ -31,6 +32,7 @@ final class SyncedSettings {
         static let soundEnabled = "soundEnabled"
         static let warningEnabled = "warningEnabled"
         static let warningTimingRaw = "warningTiming"
+        static let defaultTaskDuration = "defaultTaskDuration"
     }
 
     // MARK: - Init
@@ -76,6 +78,7 @@ final class SyncedSettings {
         cloud.set(defaults.bool(forKey: LocalKey.soundEnabled), forKey: CloudKey.soundEnabled)
         cloud.set(defaults.bool(forKey: LocalKey.warningEnabled), forKey: CloudKey.warningEnabled)
         cloud.set(defaults.integer(forKey: LocalKey.warningTimingRaw), forKey: CloudKey.warningTimingRaw)
+        cloud.set(defaults.integer(forKey: LocalKey.defaultTaskDuration), forKey: CloudKey.defaultTaskDuration)
 
         cloud.synchronize()
     }
@@ -118,6 +121,7 @@ final class SyncedSettings {
         defaults.set(cloud.bool(forKey: CloudKey.soundEnabled), forKey: LocalKey.soundEnabled)
         defaults.set(cloud.bool(forKey: CloudKey.warningEnabled), forKey: LocalKey.warningEnabled)
         defaults.set(cloud.object(forKey: CloudKey.warningTimingRaw) as? Int ?? 0, forKey: LocalKey.warningTimingRaw)
+        defaults.set(cloud.object(forKey: CloudKey.defaultTaskDuration) as? Int ?? 15, forKey: LocalKey.defaultTaskDuration)
     }
 
     // MARK: - Calendar Name Resolution

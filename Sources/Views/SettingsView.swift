@@ -8,6 +8,7 @@ struct SettingsView: View {
     @AppStorage("warningEnabled") private var warningEnabled: Bool = true
     @AppStorage("warningTiming") private var warningTimingRaw: Int = WarningTiming.standard.rawValue
     @AppStorage("remindersSyncEnabled") private var remindersSyncEnabled: Bool = false
+    @AppStorage("defaultTaskDuration") private var defaultTaskDuration: Int = 15
     @Environment(\.eventKitRepository) private var eventKitRepo
     @State private var visibleCalendarIDs: Set<String> = []
     @State private var visibleReminderListIDs: Set<String> = []
@@ -47,6 +48,20 @@ struct SettingsView: View {
                     Text("Vorwarnung")
                 } footer: {
                     Text("Sound und Vibration vor Block-Ende.")
+                }
+
+                // Section: Task Settings
+                Section {
+                    Picker("Standard-Dauer für neue Tasks", selection: $defaultTaskDuration) {
+                        Text("5 Minuten").tag(5)
+                        Text("10 Minuten").tag(10)
+                        Text("15 Minuten").tag(15)
+                        Text("30 Minuten").tag(30)
+                        Text("60 Minuten").tag(60)
+                    }
+                    .accessibilityIdentifier("defaultDurationPicker")
+                } header: {
+                    Text("Tasks")
                 }
 
                 // Section 1: Target Calendar

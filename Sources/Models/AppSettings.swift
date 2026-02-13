@@ -24,4 +24,9 @@ final class AppSettings: ObservableObject {
         get { WarningTiming(rawValue: warningTimingRaw) ?? .standard }
         set { warningTimingRaw = newValue.rawValue }
     }
+
+    // MARK: - Task Settings
+
+    /// Default duration for new tasks in minutes
+    @AppStorage("defaultTaskDuration") var defaultTaskDuration: Int = 15
 }
