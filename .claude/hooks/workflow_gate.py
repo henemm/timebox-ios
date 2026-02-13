@@ -71,6 +71,10 @@ def get_active_workflow(state: dict) -> dict | None:
 def find_workflow_for_file(state: dict, file_path: str) -> tuple[dict | None, str | None]:
     """Find the workflow that owns a file via affected_files.
 
+    Only returns ACTIVE (non-completed) workflows. Completed workflows
+    (phase8_complete) must not "own" files - otherwise every file that
+    was ever in a completed workflow becomes permanently unprotected.
+
     Returns (workflow_dict, workflow_name) or (None, None) if no match.
     """
     workflows = state.get("workflows", {})
@@ -81,6 +85,9 @@ def find_workflow_for_file(state: dict, file_path: str) -> tuple[dict | None, st
         rel_path = rel_path[len(root):].lstrip("/")
 
     for name, wf in workflows.items():
+        # Skip completed workflows - they don't own files anymore
+        if wf.get("current_phase") == "phase8_complete":
+            continue
         for af in wf.get("affected_files", []):
             # Match if file_path ends with the affected_file or vice versa
             if rel_path == af or rel_path.endswith("/" + af) or af.endswith("/" + rel_path):
@@ -343,12 +350,34 @@ def main():
     # Resolve which workflow applies for this file
     workflow, wf_name = resolve_workflow(state, file_path)
 
-    # No workflow found at all -> allow (don't block unowned files)
+    # No workflow found at all -> allow only if no workflows exist (fresh project)
     if not workflow and not state.get("workflows"):
         sys.exit(0)
 
+    # File doesn't belong to any workflow but workflows exist -> BLOCK
+    if not workflow:
+        active_name = state.get("active_workflow", "unknown")
+        print(f"""
+╔══════════════════════════════════════════════════════════════════╗
+║  BLOCKED: File Not In Any Workflow!                               ║
+╠══════════════════════════════════════════════════════════════════╣
+║  File: {file_path[-55:]:<58}║
+║  Active Workflow: {str(active_name)[:44]:<47}║
+║                                                                  ║
+║  This file is NOT in the active workflow's affected_files.       ║
+║  You may be working on a DIFFERENT task than the active one.     ║
+║                                                                  ║
+║  ACTION REQUIRED:                                                ║
+║  - Start a NEW workflow for this task (/context or /analyse)     ║
+║  - Or update affected_files in the current workflow              ║
+║                                                                  ║
+║  Each task needs its own workflow - no piggybacking!             ║
+╚══════════════════════════════════════════════════════════════════╝
+""", file=sys.stderr)
+        sys.exit(2)
+
     # Get phase from the resolved workflow
-    phase = workflow.get("current_phase", "idle") if workflow else get_current_phase(state, file_path)
+    phase = workflow.get("current_phase", "idle")
 
     # Allowed phases for implementation (v1 and v2 names)
     allowed_phases = [

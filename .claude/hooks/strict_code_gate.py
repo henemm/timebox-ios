@@ -169,10 +169,6 @@ def verify_file_in_workflow(workflow: dict, file_path: str) -> tuple[bool, str]:
             if normalized_file.endswith("/" + pattern.replace("*", "")):
                 return True, f"File matches pattern: {pattern}"
 
-    # If user has approved, allow any file (override scope check)
-    if check_user_override(workflow):
-        return True, "User override - scope check bypassed"
-
     return False, f"File not in workflow's affected_files: {affected_files}"
 
 

@@ -7,7 +7,7 @@
 # Project Information
 project:
   name: "my-daily-sprints"
-  base_path: "/Users/hem/Documents/opt/my-daily-sprints"  # Will be auto-detected if not set
+  base_path: "/Users/hem/Developer/my-daily-sprints"  # Will be auto-detected if not set
 
 # Workflow Configuration (v2.0)
 workflow:
