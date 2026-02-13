@@ -146,6 +146,10 @@ struct FocusLiveView: View {
         let tasks = tasksForBlock(block)
         let remainingTasks = tasks.filter { !block.completedTaskIDs.contains($0.id) }
         let currentTask = remainingTasks.first
+        // Track task start immediately so taskEndDate is available
+        if let task = currentTask {
+            trackTaskStart(taskID: task.id)
+        }
         Task {
             do {
                 try await liveActivityManager.startActivity(
@@ -153,6 +157,8 @@ struct FocusLiveView: View {
                     currentTask: currentTask?.title
                 )
                 liveActivityStarted = true
+                // Immediately update with task-level end date
+                updateLiveActivity(for: block)
             } catch {
                 // Live Activity couldn't be started - not critical
                 liveActivityStarted = false
@@ -163,10 +169,15 @@ struct FocusLiveView: View {
         let tasks = tasksForBlock(block)
         let remainingTasks = tasks.filter { !block.completedTaskIDs.contains($0.id) }
         let currentTask = remainingTasks.first
-        // Task-Ende berechnen: taskStartTime + geschaetzte Dauer
+        // Task-Ende: blockStart + kumulative Dauern bis inkl. aktuellem Task
         var taskEnd: Date?
-        if let duration = currentTask?.estimatedDuration, let start = taskStartTime {
-            taskEnd = start.addingTimeInterval(Double(duration * 60))
+        if let current = currentTask {
+            var cumulativeMinutes = 0
+            for task in tasks {
+                cumulativeMinutes += task.effectiveDuration
+                if task.id == current.id { break }
+            }
+            taskEnd = block.startDate.addingTimeInterval(Double(cumulativeMinutes * 60))
         }
         liveActivityManager.updateActivity(
             currentTask: currentTask?.title,
