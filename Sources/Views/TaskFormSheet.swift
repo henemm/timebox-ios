@@ -301,27 +301,15 @@ struct TaskFormSheet: View {
     // MARK: - Urgency Helper Properties
 
     private var urgencyIcon: String {
-        switch urgency {
-        case "urgent": return "flame.fill"
-        case "not_urgent": return "flame"
-        default: return "questionmark"  // TBD
-        }
+        UrgencyUI.icon(for: urgency)
     }
 
     private var urgencyColor: Color {
-        switch urgency {
-        case "urgent": return .orange
-        case "not_urgent": return .gray
-        default: return .gray  // TBD
-        }
+        UrgencyUI.color(for: urgency)
     }
 
     private var urgencyLabel: String {
-        switch urgency {
-        case "urgent": return "Dringend"
-        case "not_urgent": return "Nicht dringend"
-        default: return "Nicht gesetzt"  // TBD
-        }
+        UrgencyUI.label(for: urgency)
     }
 
     // MARK: - Category Color Helper

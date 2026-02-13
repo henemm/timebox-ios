@@ -147,30 +147,15 @@ struct QuickCaptureView: View {
     }
 
     private var importanceIcon: String {
-        switch importance {
-        case 3: return "exclamationmark.3"
-        case 2: return "exclamationmark.2"
-        case 1: return "exclamationmark"
-        default: return "questionmark"
-        }
+        ImportanceUI.icon(for: importance)
     }
 
     private var importanceColor: Color {
-        switch importance {
-        case 3: return .red
-        case 2: return .yellow
-        case 1: return .blue
-        default: return .gray
-        }
+        ImportanceUI.color(for: importance)
     }
 
     private var importanceLabel: String {
-        switch importance {
-        case 1: return "Niedrig"
-        case 2: return "Mittel"
-        case 3: return "Hoch"
-        default: return "Nicht gesetzt"
-        }
+        ImportanceUI.label(for: importance)
     }
 
     // MARK: - Urgency Button (cycles: nil → not_urgent → urgent → nil)
@@ -204,27 +189,15 @@ struct QuickCaptureView: View {
     }
 
     private var urgencyIcon: String {
-        switch urgency {
-        case "urgent": return "flame.fill"
-        case "not_urgent": return "flame"
-        default: return "questionmark"
-        }
+        UrgencyUI.icon(for: urgency)
     }
 
     private var urgencyColor: Color {
-        switch urgency {
-        case "urgent": return .orange
-        case "not_urgent": return .gray
-        default: return .gray
-        }
+        UrgencyUI.color(for: urgency)
     }
 
     private var urgencyLabel: String {
-        switch urgency {
-        case "urgent": return "Dringend"
-        case "not_urgent": return "Nicht dringend"
-        default: return "Nicht gesetzt"
-        }
+        UrgencyUI.label(for: urgency)
     }
 
     // MARK: - Category Button (opens sheet)

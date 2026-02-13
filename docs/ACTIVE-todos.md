@@ -60,12 +60,9 @@
 ---
 
 ### BACKLOG-009: Importance/Urgency Badge-Logik dupliziert
-**Status:** OFFEN
+**Status:** ✅ ERLEDIGT (2026-02-13)
 **Prioritaet:** MITTEL
-**Dateien:** `MacBacklogRow.swift`, `BacklogRow.swift`, `QuickCaptureView.swift`, `QuickCaptureSnippetView.swift`, `TaskFormSheet.swift`
-**Problem:** `importanceSFSymbol`/`importanceColor` und `urgencyIcon`/`urgencyColor` sind in 4-5 Dateien identisch hardcoded.
-**Fix:** Shared Helper in `Sources/Helpers/TaskMetadataUI.swift` erstellen.
-**Scope:** ~135 LoC, 5 Dateien
+**Fix:** `ImportanceUI` + `UrgencyUI` Enums in `Sources/Helpers/TaskMetadataUI.swift` extrahiert. 5 Dateien auf Shared-Helper umgestellt: `BacklogRow.swift`, `MacBacklogRow.swift`, `QuickCaptureView.swift`, `QuickCaptureSnippetView.swift`, `TaskFormSheet.swift`. 12 Regressions-Tests in `TaskMetadataUITests.swift`.
 
 ---
 

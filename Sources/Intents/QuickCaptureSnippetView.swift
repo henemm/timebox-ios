@@ -53,21 +53,11 @@ struct QuickCaptureSnippetView: View {
     }
 
     private var importanceIcon: String {
-        switch state.importance {
-        case 3: return "exclamationmark.3"
-        case 2: return "exclamationmark.2"
-        case 1: return "exclamationmark"
-        default: return "questionmark"
-        }
+        ImportanceUI.icon(for: state.importance)
     }
 
     private var importanceColor: Color {
-        switch state.importance {
-        case 3: return .red
-        case 2: return .yellow
-        case 1: return .blue
-        default: return .gray
-        }
+        ImportanceUI.color(for: state.importance)
     }
 
     // MARK: - Urgency Button
@@ -87,19 +77,11 @@ struct QuickCaptureSnippetView: View {
     }
 
     private var urgencyIcon: String {
-        switch state.urgency {
-        case "urgent": return "flame.fill"
-        case "not_urgent": return "flame"
-        default: return "questionmark"
-        }
+        UrgencyUI.icon(for: state.urgency)
     }
 
     private var urgencyColor: Color {
-        switch state.urgency {
-        case "urgent": return .orange
-        case "not_urgent": return .gray
-        default: return .gray
-        }
+        UrgencyUI.color(for: state.urgency)
     }
 
     // MARK: - Category Button

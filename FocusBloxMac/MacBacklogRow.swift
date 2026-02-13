@@ -129,21 +129,11 @@ struct MacBacklogRow: View {
     }
 
     private var importanceSFSymbol: String {
-        switch task.importance {
-        case 3: return "exclamationmark.3"
-        case 2: return "exclamationmark.2"
-        case 1: return "exclamationmark"
-        default: return "questionmark"
-        }
+        ImportanceUI.icon(for: task.importance)
     }
 
     private var importanceColor: Color {
-        switch task.importance {
-        case 3: return .red
-        case 2: return .yellow
-        case 1: return .blue
-        default: return .gray
-        }
+        ImportanceUI.color(for: task.importance)
     }
 
     // MARK: - Urgency Badge (iOS-aligned)
@@ -176,19 +166,11 @@ struct MacBacklogRow: View {
     }
 
     private var urgencyIcon: String {
-        switch task.urgency {
-        case "urgent": return "flame.fill"
-        case "not_urgent": return "flame"
-        default: return "questionmark"
-        }
+        UrgencyUI.icon(for: task.urgency)
     }
 
     private var urgencyColor: Color {
-        switch task.urgency {
-        case "urgent": return .orange
-        case "not_urgent": return .gray
-        default: return .gray
-        }
+        UrgencyUI.color(for: task.urgency)
     }
 
     // MARK: - Category Badge (macOS Menu Picker)

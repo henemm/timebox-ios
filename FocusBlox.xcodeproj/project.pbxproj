@@ -53,6 +53,9 @@
 		A4A8AF1E9B1B715FE913F6F4 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 350DD1256F45268992636DEA /* NotificationService.swift */; };
 		AA657A3EBF3967B2DECE4314 /* CreateTaskView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04068491AA7CD2368A273C00 /* CreateTaskView.swift */; };
 		ADEEAB024BB9B2C40CD6313D /* DebugLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71582A64B51A62129A2409B7 /* DebugLogger.swift */; };
+		TMDUI01BUILD000001 /* TaskMetadataUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = TMDUI01FILE0000001 /* TaskMetadataUI.swift */; };
+		TMDUI02BUILD000001 /* TaskMetadataUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = TMDUI01FILE0000001 /* TaskMetadataUI.swift */; };
+		TMDUT01BUILD000001 /* TaskMetadataUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = TMDUT01FILE0000001 /* TaskMetadataUITests.swift */; };
 		APPGRP02BUILD0001 /* AppGroupSwiftDataTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = APPGRP02FILE00001 /* AppGroupSwiftDataTests.swift */; };
 		APPSET01BUILDFILE0001 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = APPSET01FILEREF00001 /* AppSettings.swift */; };
 		ATBE0001BUILD000001 /* AssignTabBlockEditUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ATBE0001FILEREF00001 /* AssignTabBlockEditUITests.swift */; };
@@ -386,6 +389,8 @@
 		64C281ADBE9DA2AC381CB747 /* LocalTaskSourceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalTaskSourceTests.swift; sourceTree = "<group>"; };
 		710817B02FE720EDA21132FA /* FocusLiveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusLiveView.swift; sourceTree = "<group>"; };
 		71582A64B51A62129A2409B7 /* DebugLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugLogger.swift; sourceTree = "<group>"; };
+		TMDUI01FILE0000001 /* TaskMetadataUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskMetadataUI.swift; sourceTree = "<group>"; };
+		TMDUT01FILE0000001 /* TaskMetadataUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskMetadataUITests.swift; sourceTree = "<group>"; };
 		74598614EAF4B9965981C7CB /* FocusBlockTasksSheet.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = FocusBlockTasksSheet.swift; sourceTree = "<group>"; };
 		76296762878DC5D17EA4E12A /* TaskSourceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskSourceTests.swift; sourceTree = "<group>"; };
 		76E1CD1DD36A7476E82D9003 /* TbdTasksUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TbdTasksUITests.swift; sourceTree = "<group>"; };
@@ -822,6 +827,7 @@
 			children = (
 				71582A64B51A62129A2409B7 /* DebugLogger.swift */,
 				3F276F67582A827E523D8ED6 /* EventKitRepositoryEnvironment.swift */,
+				TMDUI01FILE0000001 /* TaskMetadataUI.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -983,6 +989,7 @@
 				CALCATUT01FILE0001 /* CalendarEventCategoryTests.swift */,
 				CATCFGUT01FILE0001 /* CategoryConfigTests.swift */,
 				TSKCAT01FILE000001 /* TaskCategoryTests.swift */,
+				TMDUT01FILE0000001 /* TaskMetadataUITests.swift */,
 				FBSNOT01FILE00001 /* FocusBlockStartNotificationTests.swift */,
 				8326129AA8A1069F1C4589BE /* Testing */,
 				8702D64FB57BA327C378D4F4 /* TbdTasksTests.swift */,
@@ -1499,6 +1506,7 @@
 				SYNSET02BUILD0001 /* SyncedSettings.swift in Sources */,
 				WARNTIM01BUILDFILE001 /* WarningTiming.swift in Sources */,
 				B2607FE51C4B30E5069AA807 /* EventKitRepositoryEnvironment.swift in Sources */,
+				TMDUI01BUILD000001 /* TaskMetadataUI.swift in Sources */,
 				858746851FD293D53D7583E7 /* EventKitRepositoryProtocol.swift in Sources */,
 				B5253CB93F49550930B0AF7C /* FocusBlock.swift in Sources */,
 				60EF444FADDBAC17F14380E0 /* FocusLiveView.swift in Sources */,
@@ -1643,6 +1651,7 @@
 				CALCATUT01BUILD0001 /* CalendarEventCategoryTests.swift in Sources */,
 				CATCFGUT01BUILD0001 /* CategoryConfigTests.swift in Sources */,
 				TSKCAT01BUILD00001 /* TaskCategoryTests.swift in Sources */,
+				TMDUT01BUILD000001 /* TaskMetadataUITests.swift in Sources */,
 				87CA02C51045D666A48CBC84 /* TbdTasksTests.swift in Sources */,
 				FBSNOT01BUILD0001 /* FocusBlockStartNotificationTests.swift in Sources */,
 				QKEDIT02BUILD0001 /* QuickEditPickerTests.swift in Sources */,
@@ -1730,6 +1739,7 @@
 				MAC024BUILD00000002 /* FocusBlockTasksSheet.swift in Sources */,
 				109CE59305D35DA0570AB33E /* GapFinder.swift in Sources */,
 				062C2C62A78FAAB837F02EA6 /* EventKitRepositoryEnvironment.swift in Sources */,
+				TMDUI02BUILD000001 /* TaskMetadataUI.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
