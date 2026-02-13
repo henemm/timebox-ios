@@ -42,11 +42,12 @@ enum FocusBlockActionService {
             taskTimes: updatedTaskTimes
         )
 
-        // Persist LocalTask.isCompleted in SwiftData (for Review Tab)
+        // Persist LocalTask.isCompleted + completedAt in SwiftData (for Review Tab)
         let fetchDescriptor = FetchDescriptor<LocalTask>()
         if let localTasks = try? modelContext.fetch(fetchDescriptor),
            let localTask = localTasks.first(where: { $0.id == taskID }) {
             localTask.isCompleted = true
+            localTask.completedAt = Date()
             try? modelContext.save()
         }
 

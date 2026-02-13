@@ -201,7 +201,8 @@ struct MacFocusView: View {
     private func currentTaskView(task: LocalTask, block: FocusBlock) -> some View {
         let taskProgress = calculateTaskProgress(task: task)
         let remainingTaskMinutes = calculateRemainingTaskMinutes(task: task)
-        let isOverdue = remainingTaskMinutes <= 0
+        let isOverdue = remainingTaskMinutes < 0
+        let overdueMinutes = abs(remainingTaskMinutes)
 
         return VStack(spacing: 24) {
             Text(isOverdue ? "Zeit abgelaufen" : "Aktueller Task")
@@ -225,16 +226,26 @@ struct MacFocusView: View {
                     .animation(.smooth, value: taskProgress)
 
                 VStack(spacing: 4) {
-                    if remainingTaskMinutes > 0 {
+                    if isOverdue {
+                        Text("+\(overdueMinutes)")
+                            .font(.system(size: 48, weight: .bold, design: .rounded).monospacedDigit())
+                            .foregroundStyle(.red)
+                        Text("min")
+                            .font(.subheadline)
+                            .foregroundStyle(.red)
+                    } else if remainingTaskMinutes > 0 {
                         Text("\(remainingTaskMinutes)")
                             .font(.system(size: 48, weight: .bold, design: .rounded).monospacedDigit())
                         Text("min")
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                     } else {
-                        Text("Overdue")
-                            .font(.title2.weight(.semibold))
-                            .foregroundStyle(.red)
+                        Text("0")
+                            .font(.system(size: 48, weight: .bold, design: .rounded).monospacedDigit())
+                            .foregroundStyle(.orange)
+                        Text("min")
+                            .font(.subheadline)
+                            .foregroundStyle(.orange)
                     }
                 }
             }
@@ -489,11 +500,38 @@ struct MacFocusView: View {
     }
 
     private func calculateTaskProgress(task: LocalTask) -> Double {
-        TimerCalculator.taskProgress(startTime: taskStartTime, currentTime: currentTime, durationMinutes: task.estimatedDuration ?? 15)
+        guard let block = activeBlock else {
+            return TimerCalculator.taskProgress(startTime: taskStartTime, currentTime: currentTime, durationMinutes: task.estimatedDuration ?? 15)
+        }
+        let tasks = tasksForBlock(block)
+        let taskDurations = tasks.map { (id: $0.id, durationMinutes: $0.estimatedDuration ?? 15) }
+        let plannedEnd = TimerCalculator.plannedTaskEndDate(
+            blockStartDate: block.startDate,
+            taskDurations: taskDurations,
+            currentTaskID: task.id
+        )
+        let totalSeconds = Double((task.estimatedDuration ?? 15) * 60)
+        let remaining = plannedEnd.timeIntervalSince(currentTime)
+        let elapsed = totalSeconds - remaining
+        return elapsed / totalSeconds
     }
 
     private func calculateRemainingTaskMinutes(task: LocalTask) -> Int {
-        TimerCalculator.remainingTaskMinutes(startTime: taskStartTime, currentTime: currentTime, durationMinutes: task.estimatedDuration ?? 15)
+        guard let block = activeBlock else {
+            return TimerCalculator.remainingTaskMinutes(startTime: taskStartTime, currentTime: currentTime, durationMinutes: task.estimatedDuration ?? 15)
+        }
+        let tasks = tasksForBlock(block)
+        let taskDurations = tasks.map { (id: $0.id, durationMinutes: $0.estimatedDuration ?? 15) }
+        let plannedEnd = TimerCalculator.plannedTaskEndDate(
+            blockStartDate: block.startDate,
+            taskDurations: taskDurations,
+            currentTaskID: task.id
+        )
+        let remainingSec = TimerCalculator.remainingSeconds(until: plannedEnd, now: currentTime)
+        if remainingSec < 0 {
+            return -((-remainingSec + 59) / 60)
+        }
+        return remainingSec / 60
     }
 
     private func checkBlockEnd() {

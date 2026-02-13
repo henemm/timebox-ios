@@ -20,4 +20,26 @@ enum TimerCalculator {
         let remaining = estimated - elapsed
         return max(0, Int(remaining / 60))
     }
+
+    // MARK: - Planned End Date (Block-relative)
+
+    /// Planned end date for a task = blockStart + cumulative durations of all tasks up to and including this one.
+    /// Tasks have fixed planned end times. Overrunning eats into the next task's time.
+    static func plannedTaskEndDate(
+        blockStartDate: Date,
+        taskDurations: [(id: String, durationMinutes: Int)],
+        currentTaskID: String
+    ) -> Date {
+        var cumulativeMinutes = 0
+        for task in taskDurations {
+            cumulativeMinutes += task.durationMinutes
+            if task.id == currentTaskID { break }
+        }
+        return blockStartDate.addingTimeInterval(Double(cumulativeMinutes * 60))
+    }
+
+    /// Remaining seconds until planned task end (negative = overdue).
+    static func remainingSeconds(until plannedEnd: Date, now: Date = Date()) -> Int {
+        Int(plannedEnd.timeIntervalSince(now))
+    }
 }

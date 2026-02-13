@@ -292,7 +292,8 @@ struct FocusLiveView: View {
     private func currentTaskView(task: PlanItem, block: FocusBlock) -> some View {
         let taskProgress = calculateTaskProgress(task: task)
         let remainingTaskMinutes = calculateRemainingTaskMinutes(task: task)
-        let isOverdue = remainingTaskMinutes <= 0
+        let isOverdue = remainingTaskMinutes < 0
+        let overdueMinutes = abs(remainingTaskMinutes)
         return VStack(spacing: 24) {
             Text(isOverdue ? "⏰ Zeit abgelaufen" : "Aktueller Task")
                 .font(.subheadline)
@@ -316,18 +317,26 @@ struct FocusLiveView: View {
                     .animation(.smooth, value: taskProgress)
                 // Time display in center
                 VStack(spacing: 2) {
-                    if remainingTaskMinutes > 0 {
+                    if isOverdue {
+                        Text("+\(overdueMinutes)")
+                            .font(.title.monospacedDigit().weight(.bold))
+                            .foregroundStyle(.red)
+                        Text("min")
+                            .font(.caption)
+                            .foregroundStyle(.red)
+                    } else if remainingTaskMinutes > 0 {
                         Text("\(remainingTaskMinutes)")
                             .font(.title.monospacedDigit().weight(.bold))
                         Text("min")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     } else {
-                        Text("🔥")
-                            .font(.title)
-                        Text("Overdue")
+                        Text("0")
+                            .font(.title.monospacedDigit().weight(.bold))
+                            .foregroundStyle(.orange)
+                        Text("min")
                             .font(.caption)
-                            .foregroundStyle(.red)
+                            .foregroundStyle(.orange)
                     }
                 }
             }
@@ -599,24 +608,62 @@ struct FocusLiveView: View {
             }
             lastTaskID = taskID
             taskStartTime = Date()
-            // Schedule notification for new task
+            // Schedule notification based on planned end time (not full duration)
             if let block = activeBlock {
                 let tasks = tasksForBlock(block)
                 if let task = tasks.first(where: { $0.id == taskID }) {
-                    NotificationService.scheduleTaskOverdueNotification(
-                        taskID: taskID,
-                        taskTitle: task.title,
-                        durationMinutes: task.effectiveDuration
+                    let taskDurations = tasks.map { (id: $0.id, durationMinutes: $0.effectiveDuration) }
+                    let plannedEnd = TimerCalculator.plannedTaskEndDate(
+                        blockStartDate: block.startDate,
+                        taskDurations: taskDurations,
+                        currentTaskID: taskID
                     )
+                    let remainingSec = TimerCalculator.remainingSeconds(until: plannedEnd)
+                    if remainingSec > 0 {
+                        NotificationService.scheduleTaskOverdueNotification(
+                            taskID: taskID,
+                            taskTitle: task.title,
+                            durationMinutes: max(1, remainingSec / 60)
+                        )
+                    }
+                    // If remainingSec <= 0: task is already overdue, no notification needed
                 }
             }
         }
     }
     private func calculateTaskProgress(task: PlanItem) -> Double {
-        TimerCalculator.taskProgress(startTime: taskStartTime, currentTime: currentTime, durationMinutes: task.effectiveDuration)
+        guard let block = activeBlock else {
+            return TimerCalculator.taskProgress(startTime: taskStartTime, currentTime: currentTime, durationMinutes: task.effectiveDuration)
+        }
+        let tasks = tasksForBlock(block)
+        let taskDurations = tasks.map { (id: $0.id, durationMinutes: $0.effectiveDuration) }
+        let plannedEnd = TimerCalculator.plannedTaskEndDate(
+            blockStartDate: block.startDate,
+            taskDurations: taskDurations,
+            currentTaskID: task.id
+        )
+        let totalSeconds = Double(task.effectiveDuration * 60)
+        let remaining = plannedEnd.timeIntervalSince(currentTime)
+        let elapsed = totalSeconds - remaining
+        return elapsed / totalSeconds
     }
     private func calculateRemainingTaskMinutes(task: PlanItem) -> Int {
-        TimerCalculator.remainingTaskMinutes(startTime: taskStartTime, currentTime: currentTime, durationMinutes: task.effectiveDuration)
+        guard let block = activeBlock else {
+            return TimerCalculator.remainingTaskMinutes(startTime: taskStartTime, currentTime: currentTime, durationMinutes: task.effectiveDuration)
+        }
+        let tasks = tasksForBlock(block)
+        let taskDurations = tasks.map { (id: $0.id, durationMinutes: $0.effectiveDuration) }
+        let plannedEnd = TimerCalculator.plannedTaskEndDate(
+            blockStartDate: block.startDate,
+            taskDurations: taskDurations,
+            currentTaskID: task.id
+        )
+        let remainingSec = TimerCalculator.remainingSeconds(until: plannedEnd, now: currentTime)
+        // Negative = overdue, return negative minutes for overdue display
+        if remainingSec < 0 {
+            return -((-remainingSec + 59) / 60) // Round up overdue minutes (negative)
+        }
+        return remainingSec / 60
     }
 
     /// Unerledigte Tasks nach Sprint Review zurueck in Next Up

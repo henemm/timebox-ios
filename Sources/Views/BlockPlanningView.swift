@@ -396,12 +396,19 @@ struct BlockPlanningView: View {
             do {
                 try eventKitRepo.updateFocusBlockTime(eventID: block.id, startDate: startDate, endDate: endDate)
 
-                // Reschedule notification with new start time
+                // Reschedule notifications with new times
                 NotificationService.cancelFocusBlockNotification(blockID: block.id)
                 NotificationService.scheduleFocusBlockStartNotification(
                     blockID: block.id,
                     blockTitle: block.title,
                     startDate: startDate
+                )
+                NotificationService.scheduleFocusBlockEndNotification(
+                    blockID: block.id,
+                    blockTitle: block.title,
+                    endDate: endDate,
+                    completedCount: block.completedTaskIDs.count,
+                    totalCount: block.taskIDs.count
                 )
 
                 await loadData()
@@ -473,6 +480,13 @@ struct BlockPlanningView: View {
                     blockID: blockID,
                     blockTitle: title,
                     startDate: startDate
+                )
+                NotificationService.scheduleFocusBlockEndNotification(
+                    blockID: blockID,
+                    blockTitle: title,
+                    endDate: endDate,
+                    completedCount: 0,
+                    totalCount: 0
                 )
 
                 await loadData()
