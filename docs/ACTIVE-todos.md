@@ -21,12 +21,10 @@
 ## 🔴 OFFEN
 
 ### BACKLOG-003: defaultTaskDuration synct nicht
-**Status:** OFFEN
+**Status:** ✅ ERLEDIGT (2026-02-13)
 **Prioritaet:** MITTEL
-**Dateien:** `MacSettingsView.swift`, `AppSettings.swift`, `SettingsView.swift`
-**Problem:** macOS hat `@AppStorage("defaultTaskDuration")` aber iOS nicht. Wert synct nie zwischen Plattformen.
-**Fix:** Property in `AppSettings` aufnehmen, iOS Settings ergaenzen.
-**Scope:** ~50 LoC, 3 Dateien
+**Dateien:** `AppSettings.swift`, `SettingsView.swift`, `SyncedSettings.swift`
+**Fix:** Property in `AppSettings`, Picker auf iOS, iCloud KV Store Sync. Commit `0d0b0e2`.
 
 ---
 
