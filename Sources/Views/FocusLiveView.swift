@@ -488,38 +488,20 @@ struct FocusLiveView: View {
         }
     }
     private func markTaskComplete(taskID: String, block: FocusBlock) {
-        // Cancel notification for completed task
         NotificationService.cancelTaskNotification(taskID: taskID)
         Task {
             do {
-                var updatedCompletedIDs = block.completedTaskIDs
-                if !updatedCompletedIDs.contains(taskID) {
-                    updatedCompletedIDs.append(taskID)
-                }
-                // Calculate time spent on this task
-                var updatedTaskTimes = block.taskTimes
-                if let startTime = taskStartTime {
-                    let secondsSpent = Int(Date().timeIntervalSince(startTime))
-                    updatedTaskTimes[taskID] = (updatedTaskTimes[taskID] ?? 0) + secondsSpent
-                }
-                try eventKitRepo.updateFocusBlock(
-                    eventID: block.id,
-                    taskIDs: block.taskIDs,
-                    completedTaskIDs: updatedCompletedIDs,
-                    taskTimes: updatedTaskTimes
+                _ = try FocusBlockActionService.completeTask(
+                    taskID: taskID,
+                    block: block,
+                    taskStartTime: taskStartTime,
+                    eventKitRepo: eventKitRepo,
+                    modelContext: modelContext
                 )
-                // Auch LocalTask.isCompleted in SwiftData setzen (fuer Review Tab)
-                let fetchDescriptor = FetchDescriptor<LocalTask>()
-                if let localTasks = try? modelContext.fetch(fetchDescriptor),
-                   let localTask = localTasks.first(where: { $0.id == taskID }) {
-                    localTask.isCompleted = true
-                    try? modelContext.save()
-                }
-                taskStartTime = nil  // Reset for next task
+                taskStartTime = nil
                 completionFeedback.toggle()
-                lastOverdueReminderTime = nil  // Reset overdue reminder
+                lastOverdueReminderTime = nil
                 await loadData()
-                // Update Live Activity with new task
                 if let updatedBlock = activeBlock {
                     updateLiveActivity(for: updatedBlock)
                 }
@@ -531,52 +513,20 @@ struct FocusLiveView: View {
     /// Skip task without marking as complete - moves to next task in queue
     /// Bug 15 Fix: If all tasks have been skipped once, end the block instead of looping
     private func skipTask(taskID: String, block: FocusBlock) {
-        // Cancel notification for skipped task
         NotificationService.cancelTaskNotification(taskID: taskID)
         Task {
             do {
-                // Get remaining (non-completed) task IDs
-                let remainingTaskIDs = block.taskIDs.filter { !block.completedTaskIDs.contains($0) }
-                // Bug 15 Fix: If this is the only remaining task, mark as completed to end block
-                // Skipping the only task would cause it to reappear (infinite loop)
-                let isOnlyRemainingTask = remainingTaskIDs.count == 1 && remainingTaskIDs.first == taskID
-                // Preserve partial time spent on skipped task
-                var updatedTaskTimes = block.taskTimes
-                if let startTime = taskStartTime {
-                    let secondsSpent = Int(Date().timeIntervalSince(startTime))
-                    updatedTaskTimes[taskID] = (updatedTaskTimes[taskID] ?? 0) + secondsSpent
-                }
-                if isOnlyRemainingTask {
-                    // Bug 15 Fix: Only 1 task remaining → mark as completed to end block
-                    // This triggers allTasksCompletedView instead of looping
-                    var updatedCompletedIDs = block.completedTaskIDs
-                    updatedCompletedIDs.append(taskID)
-                    try eventKitRepo.updateFocusBlock(
-                        eventID: block.id,
-                        taskIDs: block.taskIDs,
-                        completedTaskIDs: updatedCompletedIDs,
-                        taskTimes: updatedTaskTimes
-                    )
-                } else {
-                    // Original logic: Move task to end of queue
-                    var updatedTaskIDs = block.taskIDs
-                    if let index = updatedTaskIDs.firstIndex(of: taskID) {
-                        updatedTaskIDs.remove(at: index)
-                        updatedTaskIDs.append(taskID)  // Move to end
-                    }
-                    try eventKitRepo.updateFocusBlock(
-                        eventID: block.id,
-                        taskIDs: updatedTaskIDs,
-                        completedTaskIDs: block.completedTaskIDs,
-                        taskTimes: updatedTaskTimes
-                    )
-                }
+                _ = try FocusBlockActionService.skipTask(
+                    taskID: taskID,
+                    block: block,
+                    taskStartTime: taskStartTime,
+                    eventKitRepo: eventKitRepo
+                )
                 skipFeedback.toggle()
-                lastOverdueReminderTime = nil  // Reset overdue reminder
-                taskStartTime = nil  // Reset task timer for next task
+                lastOverdueReminderTime = nil
+                taskStartTime = nil
                 lastTaskID = nil
                 await loadData()
-                // Update Live Activity with new task
                 if let updatedBlock = activeBlock {
                     updateLiveActivity(for: updatedBlock)
                 }

@@ -442,31 +442,13 @@ struct MacFocusView: View {
     private func markTaskComplete(taskID: String, block: FocusBlock) {
         Task {
             do {
-                var updatedCompletedIDs = block.completedTaskIDs
-                if !updatedCompletedIDs.contains(taskID) {
-                    updatedCompletedIDs.append(taskID)
-                }
-
-                var updatedTaskTimes = block.taskTimes
-                if let startTime = taskStartTime {
-                    let secondsSpent = Int(Date().timeIntervalSince(startTime))
-                    updatedTaskTimes[taskID] = (updatedTaskTimes[taskID] ?? 0) + secondsSpent
-                }
-
-                try eventKitRepo.updateFocusBlock(
-                    eventID: block.id,
-                    taskIDs: block.taskIDs,
-                    completedTaskIDs: updatedCompletedIDs,
-                    taskTimes: updatedTaskTimes
+                _ = try FocusBlockActionService.completeTask(
+                    taskID: taskID,
+                    block: block,
+                    taskStartTime: taskStartTime,
+                    eventKitRepo: eventKitRepo,
+                    modelContext: modelContext
                 )
-
-                // Auch LocalTask.isCompleted in SwiftData setzen (fuer Review Tab)
-                let fetchDescriptor = FetchDescriptor<LocalTask>()
-                if let localTasks = try? modelContext.fetch(fetchDescriptor),
-                   let localTask = localTasks.first(where: { $0.id == taskID }) {
-                    localTask.isCompleted = true
-                    try? modelContext.save()
-                }
                 taskStartTime = nil
                 await loadData()
             } catch {
@@ -478,40 +460,12 @@ struct MacFocusView: View {
     private func skipTask(taskID: String, block: FocusBlock) {
         Task {
             do {
-                let remainingTaskIDs = block.taskIDs.filter { !block.completedTaskIDs.contains($0) }
-                let isOnlyRemainingTask = remainingTaskIDs.count == 1 && remainingTaskIDs.first == taskID
-
-                var updatedTaskTimes = block.taskTimes
-                if let startTime = taskStartTime {
-                    let secondsSpent = Int(Date().timeIntervalSince(startTime))
-                    updatedTaskTimes[taskID] = (updatedTaskTimes[taskID] ?? 0) + secondsSpent
-                }
-
-                if isOnlyRemainingTask {
-                    var updatedCompletedIDs = block.completedTaskIDs
-                    updatedCompletedIDs.append(taskID)
-
-                    try eventKitRepo.updateFocusBlock(
-                        eventID: block.id,
-                        taskIDs: block.taskIDs,
-                        completedTaskIDs: updatedCompletedIDs,
-                        taskTimes: updatedTaskTimes
-                    )
-                } else {
-                    var updatedTaskIDs = block.taskIDs
-                    if let index = updatedTaskIDs.firstIndex(of: taskID) {
-                        updatedTaskIDs.remove(at: index)
-                        updatedTaskIDs.append(taskID)
-                    }
-
-                    try eventKitRepo.updateFocusBlock(
-                        eventID: block.id,
-                        taskIDs: updatedTaskIDs,
-                        completedTaskIDs: block.completedTaskIDs,
-                        taskTimes: updatedTaskTimes
-                    )
-                }
-
+                _ = try FocusBlockActionService.skipTask(
+                    taskID: taskID,
+                    block: block,
+                    taskStartTime: taskStartTime,
+                    eventKitRepo: eventKitRepo
+                )
                 taskStartTime = nil
                 lastTaskID = nil
                 await loadData()

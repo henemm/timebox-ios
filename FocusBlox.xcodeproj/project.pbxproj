@@ -149,6 +149,7 @@
 		MAC001BUILD00000012 /* EventKitRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4451B46B76517090C636FA94 /* EventKitRepository.swift */; };
 		MAC001BUILD00000013 /* RemindersSyncService.swift in Sources */ = {isa = PBXBuildFile; fileRef = REMSYNC3FILEREF0001 /* RemindersSyncService.swift */; };
 		MAC001BUILD00000014 /* SoundService.swift in Sources */ = {isa = PBXBuildFile; fileRef = SNDSVC02FILEREF00001 /* SoundService.swift */; };
+		MAC001BUILD00000015 /* FocusBlockActionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBACTSVC01FILEREF001 /* FocusBlockActionService.swift */; };
 		MAC024BUILD00000001 /* EditFocusBlockSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 515D3A83205F8E00941BD4D0 /* EditFocusBlockSheet.swift */; };
 		MAC024BUILD00000002 /* FocusBlockTasksSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74598614EAF4B9965981C7CB /* FocusBlockTasksSheet.swift */; };
 		NXTDRAG01BUILD0001 /* NextUpDragDropUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = NXTDRAG01FILE00001 /* NextUpDragDropUITests.swift */; };
@@ -178,6 +179,7 @@
 		SMARTGAPS001BUILDFILE00001 /* SmartGapsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = SMARTGAPS001FILEREF000001 /* SmartGapsTests.swift */; };
 		SNDSVC01BUILDFILE0001 /* SoundServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = SNDSVC01FILEREF00001 /* SoundServiceTests.swift */; };
 		SNDSVC02BUILDFILE0001 /* SoundService.swift in Sources */ = {isa = PBXBuildFile; fileRef = SNDSVC02FILEREF00001 /* SoundService.swift */; };
+		FBACTSVC01BUILD00001 /* FocusBlockActionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBACTSVC01FILEREF001 /* FocusBlockActionService.swift */; };
 		SNDUI001BUILDFILE0001 /* SoundSettingsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = SNDUI001FILEREF00001 /* SoundSettingsUITests.swift */; };
 		SPRNTRV01BUILD0001 /* SprintReviewUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = SPRNTRV01FILE00001 /* SprintReviewUITests.swift */; };
 		SYNSET01BUILD0001 /* SyncedSettingsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = SYNSET01FILE00001 /* SyncedSettingsTests.swift */; };
@@ -494,6 +496,7 @@
 		SMARTGAPS001FILEREF000001 /* SmartGapsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartGapsTests.swift; sourceTree = "<group>"; };
 		SNDSVC01FILEREF00001 /* SoundServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundServiceTests.swift; sourceTree = "<group>"; };
 		SNDSVC02FILEREF00001 /* SoundService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundService.swift; sourceTree = "<group>"; };
+		FBACTSVC01FILEREF001 /* FocusBlockActionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusBlockActionService.swift; sourceTree = "<group>"; };
 		SNDUI001FILEREF00001 /* SoundSettingsUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundSettingsUITests.swift; sourceTree = "<group>"; };
 		SPRNTRV01FILE00001 /* SprintReviewUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SprintReviewUITests.swift; sourceTree = "<group>"; };
 		SYNSET01FILE00001 /* SyncedSettingsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncedSettingsTests.swift; sourceTree = "<group>"; };
@@ -884,6 +887,7 @@
 				LIVACT03FILEREF00001 /* LiveActivityManager.swift */,
 				REMSYNC3FILEREF0001 /* RemindersSyncService.swift */,
 				SNDSVC02FILEREF00001 /* SoundService.swift */,
+				FBACTSVC01FILEREF001 /* FocusBlockActionService.swift */,
 				34D186C26C7135F80A5E3B0B /* SyncEngine.swift */,
 				76D00C9F307A1EC64537A9C7 /* TaskSources */,
 				350DD1256F45268992636DEA /* NotificationService.swift */,
@@ -1390,6 +1394,7 @@
 				QCVIEW001BUILDFILE00001 /* QuickCaptureView.swift in Sources */,
 				991544877FDF4CD72B4F2DE4 /* SprintReviewSheet.swift in Sources */,
 				SNDSVC02BUILDFILE0001 /* SoundService.swift in Sources */,
+				FBACTSVC01BUILD00001 /* FocusBlockActionService.swift in Sources */,
 				LIVACT03BUILDFILE0001 /* LiveActivityManager.swift in Sources */,
 				53697A70444E5ECF3B760A1C /* SyncEngine.swift in Sources */,
 				REMSYNC3BUILDFILE001 /* RemindersSyncService.swift in Sources */,
@@ -1586,6 +1591,7 @@
 				MAC001BUILD00000012 /* EventKitRepository.swift in Sources */,
 				MAC001BUILD00000013 /* RemindersSyncService.swift in Sources */,
 				MAC001BUILD00000014 /* SoundService.swift in Sources */,
+				MAC001BUILD00000015 /* FocusBlockActionService.swift in Sources */,
 				MAC024BUILD00000001 /* EditFocusBlockSheet.swift in Sources */,
 				MAC024BUILD00000002 /* FocusBlockTasksSheet.swift in Sources */,
 				109CE59305D35DA0570AB33E /* GapFinder.swift in Sources */,
