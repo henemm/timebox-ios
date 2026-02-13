@@ -7,16 +7,6 @@ enum ReviewMode: String, CaseIterable {
     case week = "Diese Woche"
 }
 
-/// Category configuration - delegates to central TaskCategory
-typealias CategoryConfig = TaskCategory
-
-/// Category stat for weekly view
-struct CategoryStat: Identifiable {
-    let id = UUID()
-    let config: CategoryConfig
-    let minutes: Int
-}
-
 /// Daily Review View (Sprint 5 + 6)
 /// Shows completed tasks for today or the current week, grouped by Focus Blocks.
 struct DailyReviewView: View {
@@ -93,7 +83,7 @@ struct DailyReviewView: View {
         )
 
         // Convert to CategoryStat array sorted by minutes
-        return CategoryConfig.allCases.compactMap { config in
+        return TaskCategory.allCases.compactMap { config in
             guard let minutes = combinedStats[config.rawValue], minutes > 0 else { return nil }
             return CategoryStat(config: config, minutes: minutes)
         }.sorted { $0.minutes > $1.minutes }
@@ -365,9 +355,9 @@ struct DailyReviewView: View {
 
                     // Faster / On Time / Slower
                     HStack(spacing: 0) {
-                        accuracyPill(count: stats.fasterCount, label: "Schneller", color: .green, icon: "arrow.up.circle.fill")
-                        accuracyPill(count: stats.onTimeCount, label: "Im Plan", color: .blue, icon: "checkmark.circle.fill")
-                        accuracyPill(count: stats.slowerCount, label: "Langsamer", color: .orange, icon: "arrow.down.circle.fill")
+                        AccuracyPill(count: stats.fasterCount, label: "Schneller", color: .green, icon: "arrow.up.circle.fill")
+                        AccuracyPill(count: stats.onTimeCount, label: "Im Plan", color: .blue, icon: "checkmark.circle.fill")
+                        AccuracyPill(count: stats.slowerCount, label: "Langsamer", color: .orange, icon: "arrow.down.circle.fill")
                     }
                 }
 
@@ -390,20 +380,6 @@ struct DailyReviewView: View {
                     .fill(.ultraThinMaterial)
             )
         }
-    }
-
-    private func accuracyPill(count: Int, label: String, color: Color, icon: String) -> some View {
-        VStack(spacing: 6) {
-            Image(systemName: icon)
-                .font(.title3)
-                .foregroundStyle(color)
-            Text("\(count)")
-                .font(.title3.weight(.bold))
-            Text(label)
-                .font(.caption2)
-                .foregroundStyle(.secondary)
-        }
-        .frame(maxWidth: .infinity)
     }
 
     /// Week date range string (e.g., "20. - 26. Jan")
@@ -594,54 +570,3 @@ struct DailyReviewView: View {
     }
 }
 
-// MARK: - Category Bar Component
-
-struct CategoryBar: View {
-    let stat: CategoryStat
-    let totalMinutes: Int
-
-    private var percentage: CGFloat {
-        guard totalMinutes > 0 else { return 0 }
-        return CGFloat(stat.minutes) / CGFloat(totalMinutes)
-    }
-
-    private var formattedTime: String {
-        let hours = stat.minutes / 60
-        let mins = stat.minutes % 60
-        if hours > 0 {
-            return "\(hours)h \(mins)m"
-        }
-        return "\(mins)m"
-    }
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            // Label row
-            HStack {
-                Image(systemName: stat.config.icon)
-                    .foregroundStyle(stat.config.color)
-                Text(stat.config.displayName)
-                    .font(.subheadline)
-                Spacer()
-                Text(formattedTime)
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(stat.config.color)
-            }
-
-            // Progress bar
-            GeometryReader { geometry in
-                ZStack(alignment: .leading) {
-                    RoundedRectangle(cornerRadius: 4)
-                        .fill(.secondary.opacity(0.2))
-                        .frame(height: 8)
-
-                    RoundedRectangle(cornerRadius: 4)
-                        .fill(stat.config.color)
-                        .frame(width: geometry.size.width * percentage, height: 8)
-                        .animation(.spring(), value: percentage)
-                }
-            }
-            .frame(height: 8)
-        }
-    }
-}

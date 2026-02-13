@@ -155,6 +155,8 @@
 		TMRCALC01BUILD00002 /* TimerCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = TMRCALC01FILEREF001 /* TimerCalculator.swift */; };
 		CLRHEX01BUILD00001 /* Color+Hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = CLRHEX01FILEREF001 /* Color+Hex.swift */; };
 		CLRHEX01BUILD00002 /* Color+Hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = CLRHEX01FILEREF001 /* Color+Hex.swift */; };
+		RVWCMP01BUILD00001 /* ReviewComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = RVWCMP01FILEREF001 /* ReviewComponents.swift */; };
+		RVWCMP01BUILD00002 /* ReviewComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = RVWCMP01FILEREF001 /* ReviewComponents.swift */; };
 		MAC001BUILD00000015 /* FocusBlockActionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBACTSVC01FILEREF001 /* FocusBlockActionService.swift */; };
 		MAC024BUILD00000001 /* EditFocusBlockSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 515D3A83205F8E00941BD4D0 /* EditFocusBlockSheet.swift */; };
 		MAC024BUILD00000002 /* FocusBlockTasksSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74598614EAF4B9965981C7CB /* FocusBlockTasksSheet.swift */; };
@@ -504,6 +506,7 @@
 		SNDSVC02FILEREF00001 /* SoundService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundService.swift; sourceTree = "<group>"; };
 		TMRCALC01FILEREF001 /* TimerCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerCalculator.swift; sourceTree = "<group>"; };
 		CLRHEX01FILEREF001 /* Color+Hex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Hex.swift"; sourceTree = "<group>"; };
+		RVWCMP01FILEREF001 /* ReviewComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewComponents.swift; sourceTree = "<group>"; };
 		SNDUI001FILEREF00001 /* SoundSettingsUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundSettingsUITests.swift; sourceTree = "<group>"; };
 		SPRNTRV01FILE00001 /* SprintReviewUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SprintReviewUITests.swift; sourceTree = "<group>"; };
 		SYNSET01FILE00001 /* SyncedSettingsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncedSettingsTests.swift; sourceTree = "<group>"; };
@@ -904,6 +907,7 @@
 				TASKFORM01FILEREF01 /* TaskFormSheet.swift */,
 				TSKDTL01FILEREF00001 /* TaskDetailSheet.swift */,
 				A36E40124EBA31D7428EAA80 /* DailyReviewView.swift */,
+				RVWCMP01FILEREF001 /* ReviewComponents.swift */,
 				74598614EAF4B9965981C7CB /* FocusBlockTasksSheet.swift */,
 			);
 			path = Views;
@@ -1516,6 +1520,7 @@
 				SNDSVC02BUILDFILE0001 /* SoundService.swift in Sources */,
 				TMRCALC01BUILD00001 /* TimerCalculator.swift in Sources */,
 				CLRHEX01BUILD00001 /* Color+Hex.swift in Sources */,
+				RVWCMP01BUILD00001 /* ReviewComponents.swift in Sources */,
 				FBACTSVC01BUILD00001 /* FocusBlockActionService.swift in Sources */,
 				LIVACT03BUILDFILE0001 /* LiveActivityManager.swift in Sources */,
 				53697A70444E5ECF3B760A1C /* SyncEngine.swift in Sources */,
@@ -1715,6 +1720,7 @@
 				MAC001BUILD00000014 /* SoundService.swift in Sources */,
 				TMRCALC01BUILD00002 /* TimerCalculator.swift in Sources */,
 				CLRHEX01BUILD00002 /* Color+Hex.swift in Sources */,
+				RVWCMP01BUILD00002 /* ReviewComponents.swift in Sources */,
 				MAC001BUILD00000015 /* FocusBlockActionService.swift in Sources */,
 				MAC024BUILD00000001 /* EditFocusBlockSheet.swift in Sources */,
 				MAC024BUILD00000002 /* FocusBlockTasksSheet.swift in Sources */,

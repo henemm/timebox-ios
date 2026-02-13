@@ -328,25 +328,6 @@ struct SprintReviewSheet: View {
     }
 }
 
-// MARK: - Stat Item
-
-struct StatItem: View {
-    let value: String
-    let label: String
-    let color: Color
-
-    var body: some View {
-        VStack(spacing: 4) {
-            Text(value)
-                .font(.title2.weight(.bold))
-                .foregroundStyle(color)
-            Text(label)
-                .font(.caption)
-                .foregroundStyle(.secondary)
-        }
-    }
-}
-
 // MARK: - Review Task Row (Legacy)
 
 struct ReviewTaskRow: View {

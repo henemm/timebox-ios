@@ -170,7 +170,7 @@ struct DayReviewContent: View {
         return Int((Double(totalCompleted) / Double(totalPlanned)) * 100)
     }
 
-    private var dayCategoryStats: [MacCategoryStat] {
+    private var dayCategoryStats: [CategoryStat] {
         let grouped = Dictionary(grouping: completedTasks) { $0.taskType }
         var taskMinutes: [String: Int] = [:]
         for (category, tasks) in grouped {
@@ -182,9 +182,9 @@ struct DayReviewContent: View {
             calendarEvents: calendarEvents
         )
 
-        return combined.compactMap { (category, minutes) in
-            guard minutes > 0 else { return nil }
-            return MacCategoryStat(category: category, minutes: minutes)
+        return TaskCategory.allCases.compactMap { config in
+            guard let minutes = combined[config.rawValue], minutes > 0 else { return nil }
+            return CategoryStat(config: config, minutes: minutes)
         }.sorted { $0.minutes > $1.minutes }
     }
 
@@ -252,9 +252,9 @@ struct DayReviewContent: View {
                     .padding(.horizontal)
 
                     HStack(spacing: 0) {
-                        macAccuracyPill(count: stats.fasterCount, label: "Schneller", color: .green, icon: "arrow.up.circle.fill")
-                        macAccuracyPill(count: stats.onTimeCount, label: "Im Plan", color: .blue, icon: "checkmark.circle.fill")
-                        macAccuracyPill(count: stats.slowerCount, label: "Langsamer", color: .orange, icon: "arrow.down.circle.fill")
+                        AccuracyPill(count: stats.fasterCount, label: "Schneller", color: .green, icon: "arrow.up.circle.fill")
+                        AccuracyPill(count: stats.onTimeCount, label: "Im Plan", color: .blue, icon: "checkmark.circle.fill")
+                        AccuracyPill(count: stats.slowerCount, label: "Langsamer", color: .orange, icon: "arrow.down.circle.fill")
                     }
                     .padding(.horizontal)
                 }
@@ -276,20 +276,6 @@ struct DayReviewContent: View {
                 Divider()
             }
         }
-    }
-
-    private func macAccuracyPill(count: Int, label: String, color: Color, icon: String) -> some View {
-        VStack(spacing: 6) {
-            Image(systemName: icon)
-                .font(.title3)
-                .foregroundStyle(color)
-            Text("\(count)")
-                .font(.title3.weight(.bold))
-            Text(label)
-                .font(.caption2)
-                .foregroundStyle(.secondary)
-        }
-        .frame(maxWidth: .infinity)
     }
 
     // MARK: - Stats Header with Completion Ring
@@ -325,13 +311,13 @@ struct DayReviewContent: View {
 
             // Stats Row
             HStack(spacing: 32) {
-                MacStatItem(value: "\(totalCompleted)", label: "Erledigt", color: .green)
-                MacStatItem(
+                StatItem(value: "\(totalCompleted)", label: "Erledigt", color: .green)
+                StatItem(
                     value: "\(totalPlanned - totalCompleted)",
                     label: "Offen",
                     color: totalPlanned == totalCompleted ? .secondary : .orange
                 )
-                MacStatItem(value: "\(blocks.count)", label: "Blocks", color: .blue)
+                StatItem(value: "\(blocks.count)", label: "Blocks", color: .blue)
             }
         }
         .padding()
@@ -347,7 +333,7 @@ struct DayReviewContent: View {
 
             VStack(spacing: 8) {
                 ForEach(dayCategoryStats) { stat in
-                    MacCategoryBar(stat: stat, totalMinutes: dayTotalMinutes)
+                    CategoryBar(stat: stat, totalMinutes: dayTotalMinutes)
                 }
             }
             .padding(.horizontal)
@@ -399,7 +385,7 @@ struct WeekReviewContent: View {
         return Int((Double(totalCompleted) / Double(totalPlanned)) * 100)
     }
 
-    private var weekCategoryStats: [MacCategoryStat] {
+    private var weekCategoryStats: [CategoryStat] {
         let grouped = Dictionary(grouping: completedTasks) { $0.taskType }
         var taskMinutes: [String: Int] = [:]
         for (category, tasks) in grouped {
@@ -411,9 +397,9 @@ struct WeekReviewContent: View {
             calendarEvents: calendarEvents
         )
 
-        return combined.compactMap { (category, minutes) in
-            guard minutes > 0 else { return nil }
-            return MacCategoryStat(category: category, minutes: minutes)
+        return TaskCategory.allCases.compactMap { config in
+            guard let minutes = combined[config.rawValue], minutes > 0 else { return nil }
+            return CategoryStat(config: config, minutes: minutes)
         }.sorted { $0.minutes > $1.minutes }
     }
 
@@ -445,7 +431,7 @@ struct WeekReviewContent: View {
 
                             VStack(spacing: 8) {
                                 ForEach(weekCategoryStats) { stat in
-                                    MacCategoryBar(stat: stat, totalMinutes: weekTotalMinutes)
+                                    CategoryBar(stat: stat, totalMinutes: weekTotalMinutes)
                                 }
                             }
                             .padding(.horizontal)
@@ -559,13 +545,13 @@ struct WeekReviewContent: View {
 
             // Stats Row
             HStack(spacing: 32) {
-                MacStatItem(value: "\(totalCompleted)", label: "Erledigt", color: .green)
-                MacStatItem(
+                StatItem(value: "\(totalCompleted)", label: "Erledigt", color: .green)
+                StatItem(
                     value: "\(totalPlanned - totalCompleted)",
                     label: "Offen",
                     color: totalPlanned == totalCompleted ? .secondary : .orange
                 )
-                MacStatItem(value: "\(blocks.count)", label: "Blocks", color: .blue)
+                StatItem(value: "\(blocks.count)", label: "Blocks", color: .blue)
             }
         }
         .padding()
@@ -674,76 +660,6 @@ struct MacBlockCard: View {
         let formatter = DateFormatter()
         formatter.timeStyle = .short
         return "\(formatter.string(from: block.startDate)) - \(formatter.string(from: block.endDate))"
-    }
-}
-
-// MARK: - Time-based Category Stat (for daily/weekly time breakdown)
-
-struct MacCategoryStat: Identifiable {
-    let id = UUID()
-    let category: String
-    let minutes: Int
-
-    var label: String {
-        TaskCategory(rawValue: category)?.displayName ?? category
-    }
-
-    var color: Color {
-        TaskCategory(rawValue: category)?.color ?? .gray
-    }
-
-    var icon: String {
-        TaskCategory(rawValue: category)?.icon ?? "questionmark.circle"
-    }
-
-    var formattedTime: String {
-        let hours = minutes / 60
-        let mins = minutes % 60
-        if hours > 0 {
-            return "\(hours)h \(mins)m"
-        }
-        return "\(mins)m"
-    }
-}
-
-// MARK: - Category Time Bar
-
-struct MacCategoryBar: View {
-    let stat: MacCategoryStat
-    let totalMinutes: Int
-
-    private var percentage: CGFloat {
-        guard totalMinutes > 0 else { return 0 }
-        return CGFloat(stat.minutes) / CGFloat(totalMinutes)
-    }
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            HStack {
-                Image(systemName: stat.icon)
-                    .foregroundStyle(stat.color)
-                Text(stat.label)
-                    .font(.subheadline)
-                Spacer()
-                Text(stat.formattedTime)
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(stat.color)
-            }
-
-            GeometryReader { geometry in
-                ZStack(alignment: .leading) {
-                    RoundedRectangle(cornerRadius: 4)
-                        .fill(.secondary.opacity(0.2))
-                        .frame(height: 8)
-
-                    RoundedRectangle(cornerRadius: 4)
-                        .fill(stat.color)
-                        .frame(width: geometry.size.width * percentage, height: 8)
-                        .animation(.spring(), value: percentage)
-                }
-            }
-            .frame(height: 8)
-        }
     }
 }
 

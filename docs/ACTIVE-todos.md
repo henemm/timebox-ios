@@ -47,12 +47,8 @@
 ---
 
 ### BACKLOG-007: Review-Komponenten dupliziert (StatItem, CategoryBar, AccuracyPill)
-**Status:** OFFEN
-**Prioritaet:** NIEDRIG
-**Dateien:** `MacReviewView.swift`, `DailyReviewView.swift`
-**Problem:** `MacStatItem`/`StatItem`, `MacCategoryStat`/`CategoryStat`, `MacCategoryBar`/`CategoryBar` und `accuracyPill`/`macAccuracyPill` sind identische Komponenten mit unterschiedlichen Namen.
-**Fix:** Unified Components in `Sources/Views/Components/` erstellen.
-**Scope:** ~80 LoC, 3 Dateien
+**Status:** ✅ ERLEDIGT (2026-02-13)
+**Fix:** `ReviewComponents.swift` ins Xcode-Projekt registriert. 8 Duplikate in 5 Dateien entfernt (DailyReviewView, SprintReviewSheet, MacFocusView, MacReviewView, BlockPlanningView). macOS auf shared CategoryStat/CategoryBar umgestellt.
 
 ---
 

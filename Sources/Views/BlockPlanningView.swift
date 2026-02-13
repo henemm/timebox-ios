@@ -579,7 +579,7 @@ struct ExistingEventBlock: View {
     /// Get category color if event has a category
     private var categoryColor: Color? {
         guard let categoryString = event.category,
-              let category = CategoryConfig(rawValue: categoryString) else {
+              let category = TaskCategory(rawValue: categoryString) else {
             return nil
         }
         return category.color
@@ -930,7 +930,7 @@ struct EventCategorySheet: View {
     var body: some View {
         NavigationStack {
             List {
-                ForEach(CategoryConfig.allCases, id: \.self) { category in
+                ForEach(TaskCategory.allCases, id: \.self) { category in
                     Button {
                         onSelect(category.rawValue)
                         dismiss()
@@ -1001,7 +1001,7 @@ struct CalendarEventRow: View {
     /// Get category color if event has a category
     private var categoryColor: Color? {
         guard let categoryString = event.category,
-              let category = CategoryConfig(rawValue: categoryString) else {
+              let category = TaskCategory(rawValue: categoryString) else {
             return nil
         }
         return category.color
@@ -1294,7 +1294,7 @@ struct TimelineEventRow: View {
     /// Get category color if event has a category
     private var categoryColor: Color? {
         guard let categoryString = event.category,
-              let category = CategoryConfig(rawValue: categoryString) else {
+              let category = TaskCategory(rawValue: categoryString) else {
             return nil
         }
         return category.color

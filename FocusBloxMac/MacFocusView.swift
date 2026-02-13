@@ -700,10 +700,10 @@ struct MacSprintReviewSheet: View {
 
             // Stats row
             HStack(spacing: 32) {
-                MacStatItem(value: "\(completedTasks.count)", label: "Erledigt", color: .green)
-                MacStatItem(value: "\(incompleteTasks.count)", label: "Offen", color: incompleteTasks.isEmpty ? .secondary : .orange)
-                MacStatItem(value: "\(totalPlannedMinutes)m", label: "geplant", color: .blue)
-                MacStatItem(value: "\(totalActualMinutes)m", label: "gebraucht", color: .purple)
+                StatItem(value: "\(completedTasks.count)", label: "Erledigt", color: .green)
+                StatItem(value: "\(incompleteTasks.count)", label: "Offen", color: incompleteTasks.isEmpty ? .secondary : .orange)
+                StatItem(value: "\(totalPlannedMinutes)m", label: "geplant", color: .blue)
+                StatItem(value: "\(totalActualMinutes)m", label: "gebraucht", color: .purple)
             }
         }
     }
@@ -835,25 +835,6 @@ struct MacSprintReviewSheet: View {
         let formatter = DateFormatter()
         formatter.timeStyle = .short
         return "\(formatter.string(from: block.startDate)) - \(formatter.string(from: block.endDate))"
-    }
-}
-
-// MARK: - Mac Stat Item
-
-struct MacStatItem: View {
-    let value: String
-    let label: String
-    let color: Color
-
-    var body: some View {
-        VStack(spacing: 4) {
-            Text(value)
-                .font(.title2.weight(.bold))
-                .foregroundStyle(color)
-            Text(label)
-                .font(.caption)
-                .foregroundStyle(.secondary)
-        }
     }
 }
 
