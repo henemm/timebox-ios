@@ -81,12 +81,15 @@
 ---
 
 ### BACKLOG-012: Settings Load/Save Logik dupliziert
-**Status:** OFFEN
+**Status:** WON'T FIX (2026-02-13)
 **Prioritaet:** NIEDRIG
 **Dateien:** `MacSettingsView.swift`, `SettingsView.swift`
-**Problem:** loadCalendars/loadData und saveSettings/saveVisibleCalendars sind in beiden Settings-Views dupliziert.
-**Fix:** Shared Service in `Sources/Services/SettingsManager.swift`.
-**Scope:** ~80 LoC, 2 Dateien
+**Analyse:** Trotz aehnlicher Struktur sind die Funktionen NICHT identisch dupliziert:
+- iOS `loadCalendars()` ist synchron, macOS `loadData()` ist async mit Permission-Checks
+- macOS hat extra `requestCalendarAccess()`/`requestReminderAccess()` Methoden
+- Save-Trigger unterschiedlich (Button vs onChange), `.synchronize()` nur auf iOS
+- Extrahierbarer Teil (~20 LoC UserDefaults read/write) rechtfertigt keinen Shared Service
+**Fazit:** Echte Duplikation war in den Komponenten (BACKLOG-011), nicht in der Load/Save-Logik.
 
 ---
 
