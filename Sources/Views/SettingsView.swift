@@ -82,7 +82,7 @@ struct SettingsView: View {
                 // Section 2: Visible Calendars
                 Section {
                     ForEach(allCalendars, id: \.calendarIdentifier) { cal in
-                        Toggle(isOn: binding(for: cal.calendarIdentifier)) {
+                        Toggle(isOn: setMembershipBinding(for: cal.calendarIdentifier, in: $visibleCalendarIDs)) {
                             CalendarRow(calendar: cal)
                         }
                     }
@@ -108,7 +108,7 @@ struct SettingsView: View {
                 if remindersSyncEnabled && !allReminderLists.isEmpty {
                     Section {
                         ForEach(allReminderLists) { list in
-                            Toggle(isOn: reminderListBinding(for: list.id)) {
+                            Toggle(isOn: setMembershipBinding(for: list.id, in: $visibleReminderListIDs)) {
                                 ReminderListRow(list: list)
                             }
                             .accessibilityIdentifier("reminderList_\(list.title)")
@@ -135,31 +135,6 @@ struct SettingsView: View {
         }
     }
 
-    private func binding(for calendarID: String) -> Binding<Bool> {
-        Binding(
-            get: { visibleCalendarIDs.contains(calendarID) },
-            set: { isVisible in
-                if isVisible {
-                    visibleCalendarIDs.insert(calendarID)
-                } else {
-                    visibleCalendarIDs.remove(calendarID)
-                }
-            }
-        )
-    }
-
-    private func reminderListBinding(for listID: String) -> Binding<Bool> {
-        Binding(
-            get: { visibleReminderListIDs.contains(listID) },
-            set: { isVisible in
-                if isVisible {
-                    visibleReminderListIDs.insert(listID)
-                } else {
-                    visibleReminderListIDs.remove(listID)
-                }
-            }
-        )
-    }
 
     private func loadCalendars() {
         allCalendars = eventKitRepo.getAllCalendars()
@@ -188,38 +163,3 @@ struct SettingsView: View {
     }
 }
 
-// MARK: - Calendar Row
-
-struct CalendarRow: View {
-    let calendar: EKCalendar
-
-    var body: some View {
-        HStack(spacing: 8) {
-            Circle()
-                .fill(Color(cgColor: calendar.cgColor))
-                .frame(width: 12, height: 12)
-            Text(calendar.title)
-        }
-    }
-}
-
-// MARK: - Reminder List Row
-
-struct ReminderListRow: View {
-    let list: ReminderListInfo
-
-    var body: some View {
-        HStack(spacing: 8) {
-            if let hex = list.colorHex {
-                Circle()
-                    .fill(Color(hex: hex))
-                    .frame(width: 12, height: 12)
-            } else {
-                Circle()
-                    .fill(Color.gray)
-                    .frame(width: 12, height: 12)
-            }
-            Text(list.title)
-        }
-    }
-}

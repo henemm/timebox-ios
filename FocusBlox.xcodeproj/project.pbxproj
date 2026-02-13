@@ -59,6 +59,9 @@
 		DUEDT01BUILD000001 /* Date+DueDate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DUEDT01FILE0000001 /* Date+DueDate.swift */; };
 		DUEDT02BUILD000001 /* Date+DueDate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DUEDT01FILE0000001 /* Date+DueDate.swift */; };
 		DUEDT03BUILD000001 /* DueDateFormattingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DUEDT03FILE0000001 /* DueDateFormattingTests.swift */; };
+		SETCMP01BUILD00001 /* SettingsComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = SETCMP01FILE000001 /* SettingsComponents.swift */; };
+		SETCMP02BUILD00001 /* SettingsComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = SETCMP01FILE000001 /* SettingsComponents.swift */; };
+		SETCMP03BUILD00001 /* SettingsComponentsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = SETCMP03FILE000001 /* SettingsComponentsTests.swift */; };
 		APPGRP02BUILD0001 /* AppGroupSwiftDataTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = APPGRP02FILE00001 /* AppGroupSwiftDataTests.swift */; };
 		APPSET01BUILDFILE0001 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = APPSET01FILEREF00001 /* AppSettings.swift */; };
 		ATBE0001BUILD000001 /* AssignTabBlockEditUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ATBE0001FILEREF00001 /* AssignTabBlockEditUITests.swift */; };
@@ -396,6 +399,8 @@
 		TMDUT01FILE0000001 /* TaskMetadataUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskMetadataUITests.swift; sourceTree = "<group>"; };
 		DUEDT01FILE0000001 /* Date+DueDate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+DueDate.swift"; sourceTree = "<group>"; };
 		DUEDT03FILE0000001 /* DueDateFormattingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DueDateFormattingTests.swift; sourceTree = "<group>"; };
+		SETCMP01FILE000001 /* SettingsComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsComponents.swift; sourceTree = "<group>"; };
+		SETCMP03FILE000001 /* SettingsComponentsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsComponentsTests.swift; sourceTree = "<group>"; };
 		74598614EAF4B9965981C7CB /* FocusBlockTasksSheet.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = FocusBlockTasksSheet.swift; sourceTree = "<group>"; };
 		76296762878DC5D17EA4E12A /* TaskSourceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskSourceTests.swift; sourceTree = "<group>"; };
 		76E1CD1DD36A7476E82D9003 /* TbdTasksUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TbdTasksUITests.swift; sourceTree = "<group>"; };
@@ -922,6 +927,7 @@
 				A36E40124EBA31D7428EAA80 /* DailyReviewView.swift */,
 				RVWCMP01FILEREF001 /* ReviewComponents.swift */,
 				74598614EAF4B9965981C7CB /* FocusBlockTasksSheet.swift */,
+				SETCMP01GROUP00001 /* Components */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -939,6 +945,14 @@
 			children = (
 			);
 			path = Testing;
+			sourceTree = "<group>";
+		};
+		SETCMP01GROUP00001 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				SETCMP01FILE000001 /* SettingsComponents.swift */,
+			);
+			path = Components;
 			sourceTree = "<group>";
 		};
 		CLRHEX01GROUP00001 /* Extensions */ = {
@@ -997,6 +1011,7 @@
 				TSKCAT01FILE000001 /* TaskCategoryTests.swift */,
 				TMDUT01FILE0000001 /* TaskMetadataUITests.swift */,
 				DUEDT03FILE0000001 /* DueDateFormattingTests.swift */,
+				SETCMP03FILE000001 /* SettingsComponentsTests.swift */,
 				FBSNOT01FILE00001 /* FocusBlockStartNotificationTests.swift */,
 				8326129AA8A1069F1C4589BE /* Testing */,
 				8702D64FB57BA327C378D4F4 /* TbdTasksTests.swift */,
@@ -1540,6 +1555,7 @@
 				CLRHEX01BUILD00001 /* Color+Hex.swift in Sources */,
 				DUEDT01BUILD000001 /* Date+DueDate.swift in Sources */,
 				RVWCMP01BUILD00001 /* ReviewComponents.swift in Sources */,
+				SETCMP01BUILD00001 /* SettingsComponents.swift in Sources */,
 				FBACTSVC01BUILD00001 /* FocusBlockActionService.swift in Sources */,
 				LIVACT03BUILDFILE0001 /* LiveActivityManager.swift in Sources */,
 				53697A70444E5ECF3B760A1C /* SyncEngine.swift in Sources */,
@@ -1661,6 +1677,7 @@
 				TSKCAT01BUILD00001 /* TaskCategoryTests.swift in Sources */,
 				TMDUT01BUILD000001 /* TaskMetadataUITests.swift in Sources */,
 				DUEDT03BUILD000001 /* DueDateFormattingTests.swift in Sources */,
+				SETCMP03BUILD00001 /* SettingsComponentsTests.swift in Sources */,
 				87CA02C51045D666A48CBC84 /* TbdTasksTests.swift in Sources */,
 				FBSNOT01BUILD0001 /* FocusBlockStartNotificationTests.swift in Sources */,
 				QKEDIT02BUILD0001 /* QuickEditPickerTests.swift in Sources */,
@@ -1744,6 +1761,7 @@
 				CLRHEX01BUILD00002 /* Color+Hex.swift in Sources */,
 				DUEDT02BUILD000001 /* Date+DueDate.swift in Sources */,
 				RVWCMP01BUILD00002 /* ReviewComponents.swift in Sources */,
+				SETCMP02BUILD00001 /* SettingsComponents.swift in Sources */,
 				MAC001BUILD00000015 /* FocusBlockActionService.swift in Sources */,
 				MAC024BUILD00000001 /* EditFocusBlockSheet.swift in Sources */,
 				MAC024BUILD00000002 /* FocusBlockTasksSheet.swift in Sources */,

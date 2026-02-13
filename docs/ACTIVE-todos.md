@@ -74,12 +74,9 @@
 ---
 
 ### BACKLOG-011: Settings-Komponenten dupliziert (CalendarRow, ReminderListRow, Bindings)
-**Status:** OFFEN
+**Status:** ✅ ERLEDIGT (2026-02-13)
 **Prioritaet:** NIEDRIG
-**Dateien:** `MacSettingsView.swift`, `SettingsView.swift`
-**Problem:** CalendarRow/MacCalendarRow, ReminderListRow/MacReminderListRow und calendarBinding/reminderListBinding sind identisch in beiden Settings-Views.
-**Fix:** Shared Components in `Sources/Views/Components/` und generischer Set-Binding-Helper.
-**Scope:** ~108 LoC, 2 Dateien
+**Fix:** `CalendarRow`, `ReminderListRow` + `setMembershipBinding(for:in:)` in `Sources/Views/Components/SettingsComponents.swift` extrahiert. MacCalendarRow/MacReminderListRow + 2x Binding-Funktionen aus beiden Settings-Views entfernt. 8 Regressions-Tests in `SettingsComponentsTests.swift`.
 
 ---
 

@@ -118,7 +118,7 @@ struct MacSettingsView: View {
                     Picker("Focus Blocks speichern in", selection: $selectedCalendarID) {
                         Text("Standard-Kalender").tag("")
                         ForEach(writableCalendars, id: \.calendarIdentifier) { cal in
-                            MacCalendarRow(calendar: cal)
+                            CalendarRow(calendar: cal)
                                 .tag(cal.calendarIdentifier)
                         }
                     }
@@ -131,8 +131,8 @@ struct MacSettingsView: View {
 
                 Section {
                     ForEach(allCalendars, id: \.calendarIdentifier) { cal in
-                        Toggle(isOn: calendarBinding(for: cal.calendarIdentifier)) {
-                            MacCalendarRow(calendar: cal)
+                        Toggle(isOn: setMembershipBinding(for: cal.calendarIdentifier, in: $visibleCalendarIDs)) {
+                            CalendarRow(calendar: cal)
                         }
                     }
                 } header: {
@@ -179,8 +179,8 @@ struct MacSettingsView: View {
             if remindersSyncEnabled && hasReminderAccess && !allReminderLists.isEmpty {
                 Section {
                     ForEach(allReminderLists) { list in
-                        Toggle(isOn: reminderListBinding(for: list.id)) {
-                            MacReminderListRow(list: list)
+                        Toggle(isOn: setMembershipBinding(for: list.id, in: $visibleReminderListIDs)) {
+                            ReminderListRow(list: list)
                         }
                         .accessibilityIdentifier("reminderList_\(list.title)")
                     }
@@ -295,75 +295,11 @@ struct MacSettingsView: View {
         }
     }
 
-    // MARK: - Bindings
-
-    private func calendarBinding(for calendarID: String) -> Binding<Bool> {
-        Binding(
-            get: { visibleCalendarIDs.contains(calendarID) },
-            set: { isVisible in
-                if isVisible {
-                    visibleCalendarIDs.insert(calendarID)
-                } else {
-                    visibleCalendarIDs.remove(calendarID)
-                }
-            }
-        )
-    }
-
-    private func reminderListBinding(for listID: String) -> Binding<Bool> {
-        Binding(
-            get: { visibleReminderListIDs.contains(listID) },
-            set: { isVisible in
-                if isVisible {
-                    visibleReminderListIDs.insert(listID)
-                } else {
-                    visibleReminderListIDs.remove(listID)
-                }
-            }
-        )
-    }
-
     // MARK: - Save
 
     private func saveSettings() {
         UserDefaults.standard.set(Array(visibleCalendarIDs), forKey: "visibleCalendarIDs")
         UserDefaults.standard.set(Array(visibleReminderListIDs), forKey: "visibleReminderListIDs")
-    }
-}
-
-// MARK: - Calendar Row
-
-struct MacCalendarRow: View {
-    let calendar: EKCalendar
-
-    var body: some View {
-        HStack(spacing: 8) {
-            Circle()
-                .fill(Color(cgColor: calendar.cgColor))
-                .frame(width: 12, height: 12)
-            Text(calendar.title)
-        }
-    }
-}
-
-// MARK: - Reminder List Row
-
-struct MacReminderListRow: View {
-    let list: ReminderListInfo
-
-    var body: some View {
-        HStack(spacing: 8) {
-            if let hex = list.colorHex {
-                Circle()
-                    .fill(Color(hex: hex))
-                    .frame(width: 12, height: 12)
-            } else {
-                Circle()
-                    .fill(Color.gray)
-                    .frame(width: 12, height: 12)
-            }
-            Text(list.title)
-        }
     }
 }
 
