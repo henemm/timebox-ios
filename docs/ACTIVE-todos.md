@@ -41,12 +41,8 @@
 ---
 
 ### BACKLOG-006: Color Hex Extension dupliziert
-**Status:** OFFEN
-**Prioritaet:** NIEDRIG
-**Dateien:** `MacSettingsView.swift` (373-391), `SettingsView.swift` (214-232)
-**Problem:** Identische `Color.init(hex:)` Extension in zwei Dateien.
-**Fix:** Nach `Sources/Extensions/Color+Hex.swift` verschieben.
-**Scope:** ~20 LoC, 3 Dateien
+**Status:** ✅ ERLEDIGT (2026-02-13)
+**Fix:** `Color.init(hex:)` Extension nach `Sources/Extensions/Color+Hex.swift` extrahiert. Duplikate aus SettingsView + MacSettingsView entfernt.
 
 ---
 
