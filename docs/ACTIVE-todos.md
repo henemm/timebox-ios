@@ -29,12 +29,8 @@
 ---
 
 ### BACKLOG-004: Timer-Berechnungen dupliziert
-**Status:** OFFEN
-**Prioritaet:** MITTEL
-**Dateien:** `MacFocusView.swift` (525-549), `FocusLiveView.swift` (577-671)
-**Problem:** `calculateTaskProgress()`, `calculateRemainingTaskMinutes()` identisch in beiden Plattformen.
-**Fix:** `TimerCalculator` Utility in `Sources/Services/` extrahieren.
-**Scope:** ~60 LoC, 3 Dateien
+**Status:** ✅ ERLEDIGT (2026-02-13)
+**Fix:** `TimerCalculator` enum in `Sources/Services/` extrahiert. Beide Views delegieren jetzt an Shared-Logik.
 
 ---
 

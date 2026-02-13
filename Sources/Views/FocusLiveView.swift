@@ -618,17 +618,10 @@ struct FocusLiveView: View {
         }
     }
     private func calculateTaskProgress(task: PlanItem) -> Double {
-        guard let startTime = taskStartTime else { return 0 }
-        let elapsed = currentTime.timeIntervalSince(startTime)
-        let estimated = Double(task.effectiveDuration * 60)
-        return elapsed / estimated
+        TimerCalculator.taskProgress(startTime: taskStartTime, currentTime: currentTime, durationMinutes: task.effectiveDuration)
     }
     private func calculateRemainingTaskMinutes(task: PlanItem) -> Int {
-        guard let startTime = taskStartTime else { return task.effectiveDuration }
-        let elapsed = currentTime.timeIntervalSince(startTime)
-        let estimated = Double(task.effectiveDuration * 60)
-        let remaining = estimated - elapsed
-        return max(0, Int(remaining / 60))
+        TimerCalculator.remainingTaskMinutes(startTime: taskStartTime, currentTime: currentTime, durationMinutes: task.effectiveDuration)
     }
 
     /// Unerledigte Tasks nach Sprint Review zurueck in Next Up

@@ -489,18 +489,11 @@ struct MacFocusView: View {
     }
 
     private func calculateTaskProgress(task: LocalTask) -> Double {
-        guard let startTime = taskStartTime, let duration = task.estimatedDuration else { return 0 }
-        let elapsed = currentTime.timeIntervalSince(startTime)
-        let estimated = Double(duration * 60)
-        return elapsed / estimated
+        TimerCalculator.taskProgress(startTime: taskStartTime, currentTime: currentTime, durationMinutes: task.estimatedDuration ?? 15)
     }
 
     private func calculateRemainingTaskMinutes(task: LocalTask) -> Int {
-        guard let startTime = taskStartTime else { return task.estimatedDuration ?? 15 }
-        let elapsed = currentTime.timeIntervalSince(startTime)
-        let estimated = Double((task.estimatedDuration ?? 15) * 60)
-        let remaining = estimated - elapsed
-        return max(0, Int(remaining / 60))
+        TimerCalculator.remainingTaskMinutes(startTime: taskStartTime, currentTime: currentTime, durationMinutes: task.estimatedDuration ?? 15)
     }
 
     private func timeRangeText(block: FocusBlock) -> String {
