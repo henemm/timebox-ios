@@ -132,7 +132,7 @@ struct MacFocusView: View {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(block.title)
                         .font(.title2.weight(.semibold))
-                    Text(timeRangeText(block: block))
+                    Text(block.timeRangeText)
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                 }
@@ -494,12 +494,6 @@ struct MacFocusView: View {
 
     private func calculateRemainingTaskMinutes(task: LocalTask) -> Int {
         TimerCalculator.remainingTaskMinutes(startTime: taskStartTime, currentTime: currentTime, durationMinutes: task.estimatedDuration ?? 15)
-    }
-
-    private func timeRangeText(block: FocusBlock) -> String {
-        let formatter = DateFormatter()
-        formatter.timeStyle = .short
-        return "\(formatter.string(from: block.startDate)) - \(formatter.string(from: block.endDate))"
     }
 
     private func checkBlockEnd() {

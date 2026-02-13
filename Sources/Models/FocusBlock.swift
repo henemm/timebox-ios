@@ -56,6 +56,17 @@ struct FocusBlock: Identifiable, Sendable {
     }
 }
 
+// MARK: - Formatting
+
+extension FocusBlock {
+    /// Formatted time range string, e.g. "09:00 - 10:30"
+    var timeRangeText: String {
+        let formatter = DateFormatter()
+        formatter.timeStyle = .short
+        return "\(formatter.string(from: startDate)) - \(formatter.string(from: endDate))"
+    }
+}
+
 // MARK: - Date Normalization
 
 extension FocusBlock {

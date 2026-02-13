@@ -34,13 +34,9 @@
 
 ---
 
-### BACKLOG-005: Date-Formatter dupliziert (5x)
-**Status:** OFFEN
-**Prioritaet:** NIEDRIG
-**Dateien:** `MacFocusView.swift`, `MacPlanningView.swift`, `MacReviewView.swift`, `DailyReviewView.swift`, `FocusLiveView.swift`
-**Problem:** `timeRangeText()` wird in 5 Dateien identisch implementiert.
-**Fix:** `FocusBlock` Extension mit computed property `timeRangeText`.
-**Scope:** ~15 LoC, 5 Dateien
+### BACKLOG-005: Date-Formatter dupliziert (4x)
+**Status:** ✅ ERLEDIGT (2026-02-13)
+**Fix:** `timeRangeText` als computed property auf `FocusBlock` Extension. 4 private Duplikate entfernt.
 
 ---
 

@@ -510,7 +510,7 @@ struct DailyReviewView: View {
                     Text(block.title)
                         .font(.headline)
 
-                    Text(timeRangeText(for: block))
+                    Text(block.timeRangeText)
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
@@ -556,11 +556,6 @@ struct DailyReviewView: View {
         return formatter.string(from: Date())
     }
 
-    private func timeRangeText(for block: FocusBlock) -> String {
-        let formatter = DateFormatter()
-        formatter.timeStyle = .short
-        return "\(formatter.string(from: block.startDate)) - \(formatter.string(from: block.endDate))"
-    }
 
     private func loadData() async {
         isLoading = true

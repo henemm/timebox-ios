@@ -252,7 +252,7 @@ struct FocusLiveView: View {
                     .font(.caption2)
                     .foregroundStyle(liveActivityStarted ? .blue : .secondary)
                     .accessibilityIdentifier("liveActivityStatus")
-                Text(timeRangeText(block: block))
+                Text(block.timeRangeText)
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
@@ -543,11 +543,6 @@ struct FocusLiveView: View {
     private func calculateRemainingMinutes(block: FocusBlock) -> Int {
         let remaining = block.endDate.timeIntervalSince(currentTime)
         return max(0, Int(remaining / 60))
-    }
-    private func timeRangeText(block: FocusBlock) -> String {
-        let formatter = DateFormatter()
-        formatter.timeStyle = .short
-        return "\(formatter.string(from: block.startDate)) - \(formatter.string(from: block.endDate))"
     }
     private func checkBlockEnd() {
         guard let block = activeBlock else { return }
