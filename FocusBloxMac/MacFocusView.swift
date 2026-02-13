@@ -20,6 +20,7 @@ struct MacFocusView: View {
     @State private var errorMessage: String?
     @State private var showSprintReview = false
     @State private var reviewDismissed = false
+    @State private var warningPlayed = false
 
     // Timer state
     @State private var currentTime = Date()
@@ -556,8 +557,16 @@ struct MacFocusView: View {
 
     private func checkBlockEnd() {
         guard let block = activeBlock else { return }
+        let progress = calculateProgress(block: block)
+        let warningThreshold = AppSettings.shared.warningTiming.percentComplete
+        if progress >= warningThreshold && !warningPlayed && !block.isPast {
+            SoundService.playWarning()
+            warningPlayed = true
+        }
         if block.isPast && !showSprintReview && !reviewDismissed {
+            SoundService.playEndGong()
             showSprintReview = true
+            warningPlayed = false
         }
     }
 

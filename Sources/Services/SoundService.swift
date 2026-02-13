@@ -1,5 +1,10 @@
 import AudioToolbox
+#if canImport(UIKit)
 import UIKit
+#endif
+#if canImport(AppKit)
+import AppKit
+#endif
 
 /// Service for playing audio feedback sounds
 @MainActor
@@ -8,8 +13,11 @@ enum SoundService {
     /// Only plays if sound is enabled in AppSettings
     static func playEndGong() {
         guard AppSettings.shared.soundEnabled else { return }
-        // System sound ID 1007 = "Tink" (short, pleasant)
+        #if os(macOS)
+        NSSound.beep()
+        #else
         AudioServicesPlaySystemSound(1007)
+        #endif
     }
 
     /// Plays warning sound and haptic before block ends
@@ -17,10 +25,12 @@ enum SoundService {
     static func playWarning() {
         guard AppSettings.shared.soundEnabled else { return }
         guard AppSettings.shared.warningEnabled else { return }
-        // System sound ID 1005 = "Alarm" (different from end gong)
+        #if os(macOS)
+        NSSound.beep()
+        #else
         AudioServicesPlaySystemSound(1005)
-        // Haptic feedback
         let generator = UINotificationFeedbackGenerator()
         generator.notificationOccurred(.warning)
+        #endif
     }
 }

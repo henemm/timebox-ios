@@ -20,6 +20,76 @@
 
 ## 🔴 OFFEN
 
+### BACKLOG-001: Task Complete/Skip Logik dupliziert (iOS + macOS)
+**Status:** OFFEN
+**Prioritaet:** HOCH (Bug-Risiko)
+**Dateien:** `MacFocusView.swift` (441-521), `FocusLiveView.swift` (479-576)
+**Problem:** `markTaskComplete()` und `skipTask()` identisch in beiden Plattformen implementiert. Bug in einer Version wird nicht automatisch in der anderen gefixt.
+**Fix:** `FocusBlockActionService` in `Sources/Services/` extrahieren, beide Plattformen nutzen denselben Service.
+**Scope:** ~80 LoC, 3 Dateien
+
+---
+
+### BACKLOG-002: EventKitRepository Injection (macOS)
+**Status:** OFFEN
+**Prioritaet:** HOCH (Testbarkeit)
+**Dateien:** `MacFocusView.swift:29`, `MacPlanningView.swift:33`, `MacReviewView.swift:21`, `MacSettingsView.swift:31`
+**Problem:** macOS erstellt `EventKitRepository()` direkt statt `@Environment` Injection wie iOS. Macht macOS-Views untestbar.
+**Fix:** `@Environment(\.eventKitRepository)` Pattern analog iOS anwenden.
+**Scope:** ~20 LoC, 4 Dateien
+
+---
+
+### BACKLOG-003: defaultTaskDuration synct nicht
+**Status:** OFFEN
+**Prioritaet:** MITTEL
+**Dateien:** `MacSettingsView.swift`, `AppSettings.swift`, `SettingsView.swift`
+**Problem:** macOS hat `@AppStorage("defaultTaskDuration")` aber iOS nicht. Wert synct nie zwischen Plattformen.
+**Fix:** Property in `AppSettings` aufnehmen, iOS Settings ergaenzen.
+**Scope:** ~50 LoC, 3 Dateien
+
+---
+
+### BACKLOG-004: Timer-Berechnungen dupliziert
+**Status:** OFFEN
+**Prioritaet:** MITTEL
+**Dateien:** `MacFocusView.swift` (525-549), `FocusLiveView.swift` (577-671)
+**Problem:** `calculateTaskProgress()`, `calculateRemainingTaskMinutes()` identisch in beiden Plattformen.
+**Fix:** `TimerCalculator` Utility in `Sources/Services/` extrahieren.
+**Scope:** ~60 LoC, 3 Dateien
+
+---
+
+### BACKLOG-005: Date-Formatter dupliziert (5x)
+**Status:** OFFEN
+**Prioritaet:** NIEDRIG
+**Dateien:** `MacFocusView.swift`, `MacPlanningView.swift`, `MacReviewView.swift`, `DailyReviewView.swift`, `FocusLiveView.swift`
+**Problem:** `timeRangeText()` wird in 5 Dateien identisch implementiert.
+**Fix:** `FocusBlock` Extension mit computed property `timeRangeText`.
+**Scope:** ~15 LoC, 5 Dateien
+
+---
+
+### BACKLOG-006: Color Hex Extension dupliziert
+**Status:** OFFEN
+**Prioritaet:** NIEDRIG
+**Dateien:** `MacSettingsView.swift` (373-391), `SettingsView.swift` (214-232)
+**Problem:** Identische `Color.init(hex:)` Extension in zwei Dateien.
+**Fix:** Nach `Sources/Extensions/Color+Hex.swift` verschieben.
+**Scope:** ~20 LoC, 3 Dateien
+
+---
+
+### BACKLOG-007: Review-Komponenten dupliziert (StatItem, CategoryBar, AccuracyPill)
+**Status:** OFFEN
+**Prioritaet:** NIEDRIG
+**Dateien:** `MacReviewView.swift`, `DailyReviewView.swift`
+**Problem:** `MacStatItem`/`StatItem`, `MacCategoryStat`/`CategoryStat`, `MacCategoryBar`/`CategoryBar` und `accuracyPill`/`macAccuracyPill` sind identische Komponenten mit unterschiedlichen Namen.
+**Fix:** Unified Components in `Sources/Views/Components/` erstellen.
+**Scope:** ~80 LoC, 3 Dateien
+
+---
+
 ### Bug 22: Edit-Button in Backlog Toolbar ohne Funktion
 **Status:** OFFEN
 **Gemeldet:** 2026-02-02
@@ -45,6 +115,14 @@
 ---
 
 ## ✅ Kuerzlich erledigt
+
+### Bug 47: Vorwarnung-Settings ohne Auswirkung (macOS)
+**Status:** ✅ ERLEDIGT (2026-02-12)
+**Fix 1:** `MacFocusView.checkBlockEnd()` nutzt jetzt `AppSettings.shared.warningTiming` + `SoundService.playWarning()` (analog iOS)
+**Fix 2:** `MacSettingsView` Picker nutzt jetzt `WarningTiming` Enum statt hardcodierter Werte
+**Fix 3:** `SoundService` plattformkompatibel gemacht (`#if os(macOS)` / `NSSound.beep()`)
+**Fix 4:** `SoundService.swift` zum macOS-Target hinzugefuegt
+**Guideline:** Cross-Platform Code-Sharing Regel in CLAUDE.md aufgenommen
 
 ### Bug 35: Quick Capture - Spotlight + CC Button
 **Status:** ✅ ERLEDIGT (2026-02-12)

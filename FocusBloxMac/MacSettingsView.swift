@@ -215,10 +215,9 @@ struct MacSettingsView: View {
 
                 if warningEnabled {
                     Picker("Zeitpunkt", selection: $warningTimingRaw) {
-                        Text("5 min vor Ende").tag(95)
-                        Text("Bei 90%").tag(90)
-                        Text("Bei 80%").tag(80)
-                        Text("Bei 75%").tag(75)
+                        ForEach(WarningTiming.allCases, id: \.rawValue) { timing in
+                            Text(timing.label).tag(timing.rawValue)
+                        }
                     }
                     .accessibilityIdentifier("warningTimingPicker")
                 }
