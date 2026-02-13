@@ -99,6 +99,7 @@
 		CALCATUI01BUILD0001 /* CalendarCategoryUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CALCATUI01FILE00001 /* CalendarCategoryUITests.swift */; };
 		CALCATUT01BUILD0001 /* CalendarEventCategoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CALCATUT01FILE0001 /* CalendarEventCategoryTests.swift */; };
 		CATCFGUT01BUILD0001 /* CategoryConfigTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CATCFGUT01FILE0001 /* CategoryConfigTests.swift */; };
+		TSKCAT01BUILD00001 /* TaskCategoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = TSKCAT01FILE000001 /* TaskCategoryTests.swift */; };
 		CATEG001BUILDFILE0001 /* CategoriesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CATEG001FILEREF00001 /* CategoriesTests.swift */; };
 		CATUI001BUILDFILE0001 /* CategoriesUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CATUI001FILEREF00001 /* CategoriesUITests.swift */; };
 		CC3848FFA2D898F1A3FDFC27 /* TaskSourceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76296762878DC5D17EA4E12A /* TaskSourceTests.swift */; };
@@ -442,6 +443,7 @@
 		CALCATUI01FILE00001 /* CalendarCategoryUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarCategoryUITests.swift; sourceTree = "<group>"; };
 		CALCATUT01FILE0001 /* CalendarEventCategoryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarEventCategoryTests.swift; sourceTree = "<group>"; };
 		CATCFGUT01FILE0001 /* CategoryConfigTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryConfigTests.swift; sourceTree = "<group>"; };
+		TSKCAT01FILE000001 /* TaskCategoryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskCategoryTests.swift; sourceTree = "<group>"; };
 		CATEG001FILEREF00001 /* CategoriesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoriesTests.swift; sourceTree = "<group>"; };
 		CATUI001FILEREF00001 /* CategoriesUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoriesUITests.swift; sourceTree = "<group>"; };
 		D5F22CE94E29A523114817BF /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -980,6 +982,7 @@
 				PERMREQ02FILE0001 /* PermissionRequestTests.swift */,
 				CALCATUT01FILE0001 /* CalendarEventCategoryTests.swift */,
 				CATCFGUT01FILE0001 /* CategoryConfigTests.swift */,
+				TSKCAT01FILE000001 /* TaskCategoryTests.swift */,
 				FBSNOT01FILE00001 /* FocusBlockStartNotificationTests.swift */,
 				8326129AA8A1069F1C4589BE /* Testing */,
 				8702D64FB57BA327C378D4F4 /* TbdTasksTests.swift */,
@@ -1639,6 +1642,7 @@
 				PERMREQ02BUILD0001 /* PermissionRequestTests.swift in Sources */,
 				CALCATUT01BUILD0001 /* CalendarEventCategoryTests.swift in Sources */,
 				CATCFGUT01BUILD0001 /* CategoryConfigTests.swift in Sources */,
+				TSKCAT01BUILD00001 /* TaskCategoryTests.swift in Sources */,
 				87CA02C51045D666A48CBC84 /* TbdTasksTests.swift in Sources */,
 				FBSNOT01BUILD0001 /* FocusBlockStartNotificationTests.swift in Sources */,
 				QKEDIT02BUILD0001 /* QuickEditPickerTests.swift in Sources */,

@@ -119,25 +119,11 @@ struct QuickCaptureSnippetView: View {
     }
 
     private var categoryIcon: String {
-        switch state.taskType {
-        case "income": return "dollarsign.circle"
-        case "maintenance": return "wrench"
-        case "recharge": return "heart"
-        case "learning": return "book"
-        case "giving_back": return "hand.raised"
-        default: return "folder"
-        }
+        TaskCategory(rawValue: state.taskType)?.icon ?? "folder"
     }
 
     private var categoryColor: Color {
-        switch state.taskType {
-        case "income": return .green
-        case "maintenance": return .blue
-        case "recharge": return .pink
-        case "learning": return .purple
-        case "giving_back": return .orange
-        default: return .gray
-        }
+        TaskCategory(rawValue: state.taskType)?.color ?? .gray
     }
 
     // MARK: - Duration Button

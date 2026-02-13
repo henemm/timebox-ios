@@ -38,4 +38,14 @@ enum TaskCategory: String, CaseIterable {
         case .social: .pink
         }
     }
+
+    var localizedName: String {
+        switch self {
+        case .income: "Geld"
+        case .essentials: "Pflege"
+        case .selfCare: "Energie"
+        case .learn: "Lernen"
+        case .social: "Geben"
+        }
+    }
 }

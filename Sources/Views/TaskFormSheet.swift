@@ -327,14 +327,7 @@ struct TaskFormSheet: View {
     // MARK: - Category Color Helper
 
     private func categoryColor(for type: String) -> Color {
-        switch type {
-        case "income": return .green
-        case "maintenance": return .orange
-        case "recharge": return .cyan
-        case "learning": return .purple
-        case "giving_back": return .pink
-        default: return .gray
-        }
+        TaskCategory(rawValue: type)?.color ?? .gray
     }
 
     // MARK: - Glass Card Section Helper

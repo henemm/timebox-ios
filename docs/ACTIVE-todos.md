@@ -52,6 +52,53 @@
 
 ---
 
+### BACKLOG-008: Hardcoded Category-Switches statt TaskCategory enum
+**Status:** ✅ ERLEDIGT (2026-02-13)
+**Prioritaet:** HOCH
+**Fix:** TaskCategory um `.localizedName` (deutsch) erweitert. 3 Dateien auf Enum-Delegation umgestellt: `TaskFormSheet.swift`, `QuickCaptureSnippetView.swift` (3 Icons + 3 Farben korrigiert), `MacBacklogRow.swift` CategoryBadge (2 Icons korrigiert). 7 Regressions-Tests in `TaskCategoryTests.swift`.
+
+---
+
+### BACKLOG-009: Importance/Urgency Badge-Logik dupliziert
+**Status:** OFFEN
+**Prioritaet:** MITTEL
+**Dateien:** `MacBacklogRow.swift`, `BacklogRow.swift`, `QuickCaptureView.swift`, `QuickCaptureSnippetView.swift`, `TaskFormSheet.swift`
+**Problem:** `importanceSFSymbol`/`importanceColor` und `urgencyIcon`/`urgencyColor` sind in 4-5 Dateien identisch hardcoded.
+**Fix:** Shared Helper in `Sources/Helpers/TaskMetadataUI.swift` erstellen.
+**Scope:** ~135 LoC, 5 Dateien
+
+---
+
+### BACKLOG-010: Due Date Formatting dupliziert (3x)
+**Status:** OFFEN
+**Prioritaet:** MITTEL
+**Dateien:** `MacBacklogRow.swift`, `BacklogRow.swift`, `TaskDetailSheet.swift`
+**Problem:** `dueDateText(_:)` und `isDueToday(_:)` sind 3x identisch implementiert (Heute/Morgen/Wochentag/Datum).
+**Fix:** Extension auf `Date` in `Sources/Extensions/Date+Formatting.swift`.
+**Scope:** ~75 LoC, 3 Dateien
+
+---
+
+### BACKLOG-011: Settings-Komponenten dupliziert (CalendarRow, ReminderListRow, Bindings)
+**Status:** OFFEN
+**Prioritaet:** NIEDRIG
+**Dateien:** `MacSettingsView.swift`, `SettingsView.swift`
+**Problem:** CalendarRow/MacCalendarRow, ReminderListRow/MacReminderListRow und calendarBinding/reminderListBinding sind identisch in beiden Settings-Views.
+**Fix:** Shared Components in `Sources/Views/Components/` und generischer Set-Binding-Helper.
+**Scope:** ~108 LoC, 2 Dateien
+
+---
+
+### BACKLOG-012: Settings Load/Save Logik dupliziert
+**Status:** OFFEN
+**Prioritaet:** NIEDRIG
+**Dateien:** `MacSettingsView.swift`, `SettingsView.swift`
+**Problem:** loadCalendars/loadData und saveSettings/saveVisibleCalendars sind in beiden Settings-Views dupliziert.
+**Fix:** Shared Service in `Sources/Services/SettingsManager.swift`.
+**Scope:** ~80 LoC, 2 Dateien
+
+---
+
 ### Bug 22: Edit-Button in Backlog Toolbar ohne Funktion
 **Status:** OFFEN
 **Gemeldet:** 2026-02-02

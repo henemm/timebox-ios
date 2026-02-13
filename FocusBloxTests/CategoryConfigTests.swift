@@ -1,23 +1,23 @@
 import XCTest
 @testable import FocusBlox
 
-/// Unit Tests for CategoryConfig - Phase 2: "unbekannt" category
-final class CategoryConfigTests: XCTestCase {
+/// Unit Tests for TaskCategory - Phase 2: "unbekannt" category (future feature)
+final class TaskCategoryUnknownTests: XCTestCase {
 
     // MARK: - "unbekannt" Category Tests
 
     /// Test that "unknown" category exists
     func testUnknownCategoryExists() {
         // EXPECTED TO FAIL: unknown case doesn't exist yet
-        let unknown = CategoryConfig(rawValue: "unknown")
-        XCTAssertNotNil(unknown, "CategoryConfig should have 'unknown' case")
+        let unknown = TaskCategory(rawValue: "unknown")
+        XCTAssertNotNil(unknown, "TaskCategory should have 'unknown' case")
     }
 
     /// Test "unknown" category has correct display name
     func testUnknownCategoryDisplayName() {
         // EXPECTED TO FAIL: unknown case doesn't exist yet
-        guard let unknown = CategoryConfig(rawValue: "unknown") else {
-            XCTFail("CategoryConfig.unknown should exist")
+        guard let unknown = TaskCategory(rawValue: "unknown") else {
+            XCTFail("TaskCategory.unknown should exist")
             return
         }
         XCTAssertEqual(unknown.displayName, "Unbekannt", "Display name should be 'Unbekannt'")
@@ -25,8 +25,8 @@ final class CategoryConfigTests: XCTestCase {
 
     /// Test "unknown" category has an icon
     func testUnknownCategoryIcon() {
-        guard let unknown = CategoryConfig(rawValue: "unknown") else {
-            XCTFail("CategoryConfig.unknown should exist")
+        guard let unknown = TaskCategory(rawValue: "unknown") else {
+            XCTFail("TaskCategory.unknown should exist")
             return
         }
         XCTAssertFalse(unknown.icon.isEmpty, "Unknown category should have an icon")
@@ -34,8 +34,8 @@ final class CategoryConfigTests: XCTestCase {
 
     /// Test "unknown" category has a color
     func testUnknownCategoryColor() {
-        guard let unknown = CategoryConfig(rawValue: "unknown") else {
-            XCTFail("CategoryConfig.unknown should exist")
+        guard let unknown = TaskCategory(rawValue: "unknown") else {
+            XCTFail("TaskCategory.unknown should exist")
             return
         }
         // Color should be gray/secondary for unknown
@@ -45,17 +45,17 @@ final class CategoryConfigTests: XCTestCase {
     /// Test all cases count (should be 6 with unknown)
     func testAllCasesCount() {
         // EXPECTED TO FAIL: Currently 5 cases, should be 6
-        XCTAssertEqual(CategoryConfig.allCases.count, 6, "Should have 6 categories including 'unknown'")
+        XCTAssertEqual(TaskCategory.allCases.count, 6, "Should have 6 categories including 'unknown'")
     }
 
     // MARK: - Existing Categories Still Work
 
     /// Verify existing categories still work correctly
     func testExistingCategoriesStillWork() {
-        XCTAssertNotNil(CategoryConfig(rawValue: "income"))
-        XCTAssertNotNil(CategoryConfig(rawValue: "maintenance"))
-        XCTAssertNotNil(CategoryConfig(rawValue: "recharge"))
-        XCTAssertNotNil(CategoryConfig(rawValue: "learning"))
-        XCTAssertNotNil(CategoryConfig(rawValue: "giving_back"))
+        XCTAssertNotNil(TaskCategory(rawValue: "income"))
+        XCTAssertNotNil(TaskCategory(rawValue: "maintenance"))
+        XCTAssertNotNil(TaskCategory(rawValue: "recharge"))
+        XCTAssertNotNil(TaskCategory(rawValue: "learning"))
+        XCTAssertNotNil(TaskCategory(rawValue: "giving_back"))
     }
 }

@@ -344,36 +344,15 @@ struct CategoryBadge: View {
     }
 
     private var color: Color {
-        switch taskType {
-        case "income": return .green
-        case "maintenance": return .orange
-        case "recharge": return .cyan
-        case "learning": return .purple
-        case "giving_back": return .pink
-        default: return .gray
-        }
+        TaskCategory(rawValue: taskType)?.color ?? .gray
     }
 
     private var icon: String {
-        switch taskType {
-        case "income": return "dollarsign.circle"
-        case "maintenance": return "wrench.and.screwdriver.fill"
-        case "recharge": return "battery.100"
-        case "learning": return "book"
-        case "giving_back": return "gift"
-        default: return "questionmark.circle"
-        }
+        TaskCategory(rawValue: taskType)?.icon ?? "questionmark.circle"
     }
 
     private var label: String {
-        switch taskType {
-        case "income": return "Geld"
-        case "maintenance": return "Pflege"
-        case "recharge": return "Energie"
-        case "learning": return "Lernen"
-        case "giving_back": return "Geben"
-        default: return "Typ"
-        }
+        TaskCategory(rawValue: taskType)?.localizedName ?? "Typ"
     }
 }
 
