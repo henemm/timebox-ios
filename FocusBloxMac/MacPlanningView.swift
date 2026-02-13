@@ -30,7 +30,7 @@ struct MacPlanningView: View {
     @State private var eventToCategories: CalendarEvent?
 
     // EventKit repository for real calendar access
-    private let eventKitRepo = EventKitRepository()
+    @Environment(\.eventKitRepository) private var eventKitRepo
 
     // Focus blocks extracted from calendar events
     private var focusBlocks: [FocusBlock] {

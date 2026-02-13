@@ -28,7 +28,7 @@ struct MacSettingsView: View {
     @State private var hasCalendarAccess = false
     @State private var hasReminderAccess = false
 
-    private let eventKitRepo = EventKitRepository()
+    @Environment(\.eventKitRepository) private var eventKitRepo
 
     var body: some View {
         TabView {

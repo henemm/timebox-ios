@@ -20,6 +20,9 @@ struct FocusBloxMacApp: App {
     /// SyncedSettings fuer iCloud KV Store Sync zwischen Geraeten
     private let syncedSettings = SyncedSettings()
 
+    /// Shared EventKitRepository fuer alle Views (BACKLOG-002)
+    private let eventKitRepository: any EventKitRepositoryProtocol = EventKitRepository()
+
     init() {
         // CRITICAL: Set activation policy to regular app (not accessory/background)
         // This ensures the app can receive keyboard and mouse events
@@ -55,6 +58,7 @@ struct FocusBloxMacApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environment(\.eventKitRepository, eventKitRepository)
                 .sheet(isPresented: $showShortcuts) {
                     KeyboardShortcutsView()
                 }
@@ -128,6 +132,7 @@ struct FocusBloxMacApp: App {
         // Settings window (Cmd+,)
         Settings {
             MacSettingsView()
+                .environment(\.eventKitRepository, eventKitRepository)
         }
     }
 

@@ -18,7 +18,7 @@ struct MacReviewView: View {
     @State private var selectedView: ReviewScope = .today
     @State private var calendarEvents: [CalendarEvent] = []
     @State private var blocks: [FocusBlock] = []
-    private let eventKitRepo = EventKitRepository()
+    @Environment(\.eventKitRepository) private var eventKitRepo
     private let statsCalculator = ReviewStatsCalculator()
 
     enum ReviewScope: String, CaseIterable {

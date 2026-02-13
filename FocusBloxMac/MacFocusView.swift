@@ -27,7 +27,7 @@ struct MacFocusView: View {
     @State private var taskStartTime: Date?
     @State private var lastTaskID: String?
 
-    private let eventKitRepo = EventKitRepository()
+    @Environment(\.eventKitRepository) private var eventKitRepo
     private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
     var body: some View {
@@ -604,7 +604,7 @@ struct MacSprintReviewSheet: View {
     let onDismiss: () -> Void
 
     @Environment(\.dismiss) private var dismiss
-    private let eventKitRepo = EventKitRepository()
+    @Environment(\.eventKitRepository) private var eventKitRepo
 
     // Local state for interactive editing
     @State private var localCompletedIDs: Set<String> = []
