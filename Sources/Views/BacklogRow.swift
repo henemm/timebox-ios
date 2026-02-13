@@ -157,10 +157,10 @@ struct BacklogRow: View {
             if let dueDate = item.dueDate {
                 HStack(spacing: 2) {
                     Image(systemName: "calendar")
-                    Text(dueDateText(dueDate))
+                    Text(dueDate.dueDateText())
                 }
                 .font(.caption2)
-                .foregroundStyle(isDueToday(dueDate) ? .red : .secondary)
+                .foregroundStyle(dueDate.isDueToday ? .red : .secondary)
                 .fixedSize()
             }
         }
@@ -338,29 +338,4 @@ struct BacklogRow: View {
         .accessibilityLabel(isDurationSet ? "Dauer: \(item.effectiveDuration) Minuten" : "Dauer nicht gesetzt")
     }
 
-    // MARK: - Helper Functions
-
-    private func dueDateText(_ date: Date) -> String {
-        let calendar = Calendar.current
-        if calendar.isDateInToday(date) {
-            return "Heute"
-        } else if calendar.isDateInTomorrow(date) {
-            return "Morgen"
-        } else if calendar.isDate(date, equalTo: Date(), toGranularity: .weekOfYear) {
-            let formatter = DateFormatter()
-            formatter.dateFormat = "EEE"
-            formatter.locale = Locale(identifier: "de_DE")
-            return formatter.string(from: date)
-        } else {
-            let formatter = DateFormatter()
-            formatter.dateStyle = .short
-            formatter.timeStyle = .none
-            formatter.locale = Locale(identifier: "de_DE")
-            return formatter.string(from: date)
-        }
-    }
-
-    private func isDueToday(_ date: Date) -> Bool {
-        Calendar.current.isDateInToday(date)
-    }
 }

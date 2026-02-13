@@ -270,37 +270,14 @@ struct MacBacklogRow: View {
     private func dueDateBadge(_ date: Date) -> some View {
         HStack(spacing: 3) {
             Image(systemName: "calendar")
-            Text(dueDateText(date))
+            Text(date.dueDateText())
                 .lineLimit(1)
         }
         .font(.caption2)
-        .foregroundStyle(isDueToday(date) ? .red : .secondary)
+        .foregroundStyle(date.isDueToday ? .red : .secondary)
         .fixedSize()
     }
 
-    private func dueDateText(_ date: Date) -> String {
-        let calendar = Calendar.current
-        if calendar.isDateInToday(date) {
-            return "Heute"
-        } else if calendar.isDateInTomorrow(date) {
-            return "Morgen"
-        } else if calendar.isDate(date, equalTo: Date(), toGranularity: .weekOfYear) {
-            let formatter = DateFormatter()
-            formatter.dateFormat = "EEE"
-            formatter.locale = Locale(identifier: "de_DE")
-            return formatter.string(from: date)
-        } else {
-            let formatter = DateFormatter()
-            formatter.dateStyle = .short
-            formatter.timeStyle = .none
-            formatter.locale = Locale(identifier: "de_DE")
-            return formatter.string(from: date)
-        }
-    }
-
-    private func isDueToday(_ date: Date) -> Bool {
-        Calendar.current.isDateInToday(date)
-    }
 }
 
 // MARK: - Category Badge (standalone for reuse in other views)

@@ -67,12 +67,9 @@
 ---
 
 ### BACKLOG-010: Due Date Formatting dupliziert (3x)
-**Status:** OFFEN
+**Status:** ✅ ERLEDIGT (2026-02-13)
 **Prioritaet:** MITTEL
-**Dateien:** `MacBacklogRow.swift`, `BacklogRow.swift`, `TaskDetailSheet.swift`
-**Problem:** `dueDateText(_:)` und `isDueToday(_:)` sind 3x identisch implementiert (Heute/Morgen/Wochentag/Datum).
-**Fix:** Extension auf `Date` in `Sources/Extensions/Date+Formatting.swift`.
-**Scope:** ~75 LoC, 3 Dateien
+**Fix:** `Date.dueDateText(style:)` + `Date.isDueToday` Extension in `Sources/Extensions/Date+DueDate.swift`. Compact-Style (EEE/.short) fuer BacklogRow/MacBacklogRow, Full-Style (EEEE/.medium) fuer TaskDetailSheet. 3 private Duplikate entfernt. 12 Regressions-Tests (vorher + nachher GREEN) in `DueDateFormattingTests.swift`.
 
 ---
 
