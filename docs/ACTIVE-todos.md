@@ -20,26 +20,6 @@
 
 ## 🔴 OFFEN
 
-### BACKLOG-001: Task Complete/Skip Logik dupliziert (iOS + macOS)
-**Status:** OFFEN
-**Prioritaet:** HOCH (Bug-Risiko)
-**Dateien:** `MacFocusView.swift` (441-521), `FocusLiveView.swift` (479-576)
-**Problem:** `markTaskComplete()` und `skipTask()` identisch in beiden Plattformen implementiert. Bug in einer Version wird nicht automatisch in der anderen gefixt.
-**Fix:** `FocusBlockActionService` in `Sources/Services/` extrahieren, beide Plattformen nutzen denselben Service.
-**Scope:** ~80 LoC, 3 Dateien
-
----
-
-### BACKLOG-002: EventKitRepository Injection (macOS)
-**Status:** OFFEN
-**Prioritaet:** HOCH (Testbarkeit)
-**Dateien:** `MacFocusView.swift:29`, `MacPlanningView.swift:33`, `MacReviewView.swift:21`, `MacSettingsView.swift:31`
-**Problem:** macOS erstellt `EventKitRepository()` direkt statt `@Environment` Injection wie iOS. Macht macOS-Views untestbar.
-**Fix:** `@Environment(\.eventKitRepository)` Pattern analog iOS anwenden.
-**Scope:** ~20 LoC, 4 Dateien
-
----
-
 ### BACKLOG-003: defaultTaskDuration synct nicht
 **Status:** OFFEN
 **Prioritaet:** MITTEL
@@ -115,6 +95,16 @@
 ---
 
 ## ✅ Kuerzlich erledigt
+
+### BACKLOG-001: Task Complete/Skip Logik in Shared Service extrahiert
+**Status:** ✅ ERLEDIGT (2026-02-13)
+**Fix:** `FocusBlockActionService` in `Sources/Services/` extrahiert. Beide Plattformen nutzen jetzt denselben Service fuer `markTaskComplete()` und `skipTask()`.
+**Commit:** `fb4b76a`
+
+### BACKLOG-002: EventKitRepository Injection (macOS)
+**Status:** ✅ ERLEDIGT (2026-02-13)
+**Fix:** Alle macOS Views nutzen jetzt `@Environment(\.eventKitRepository)` statt direkter Instanziierung. Shared Instanz wird in `FocusBloxMacApp` erstellt und injiziert.
+**Commit:** `2487aa8`
 
 ### Bug 47: Vorwarnung-Settings ohne Auswirkung (macOS)
 **Status:** ✅ ERLEDIGT (2026-02-12)
