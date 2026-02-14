@@ -25,7 +25,7 @@
 | # | Item | Prio | Tokens | Dateien | LoC |
 |---|------|------|--------|---------|-----|
 | Bug 52 | Tasks unsichtbar nach Next Up entfernen | ✅ ERLEDIGT | ~5k | 5 | ~6 |
-| Bug 48 | Erweiterte Attribute geloescht | KRITISCH | ~80-120k | 5-6 | ~150 |
+| Bug 48 | Erweiterte Attribute geloescht | ✅ ERLEDIGT | ~80-120k | 9 | ~35 |
 | Bug 50 | Kalender-Events mit Gaesten | HOCH | ~40-60k | 4 | ~80 |
 | Bug 51 | Backlog-Sortierung iOS vs macOS | MITTEL | ~15-20k | 2 | ~4 |
 | Bug 49 | Matrix View Layout + Gesten | MITTEL | ~25-35k | 2 | ~45 |
@@ -65,13 +65,12 @@
 ---
 
 ### Bug 48: Erweiterte Attribute werden wiederholt geloescht (iOS + macOS)
-**Status:** SPEC READY
-**Prioritaet:** KRITISCH (Datenverlust, wiederkehrender Bug)
-**Geschaetzter Aufwand:** ~80-120k Tokens
-**Gemeldet:** 2026-02-13
-**Analysiert:** 2026-02-13
-**Spec:** [`docs/specs/bugfixes/bug-48-extended-attributes-deleted.md`](../specs/bugfixes/bug-48-extended-attributes-deleted.md)
-**Vorgeschichte:** Bug 32 (Race Condition) und Bug 18 (Reminders-Attribute) waren als gefixt markiert - Problem tritt erneut auf.
+**Status:** ✅ ERLEDIGT (2026-02-14)
+**Commits:** `27522e8` (RC1+RC2), `16749b7` (RC3+Bug 53)
+**Fix RC1:** SyncEngine.updateTask() - optionale Felder nur bei nicht-nil setzen (if let guards)
+**Fix RC2:** TaskFormSheet/EditTaskSheet/TaskDetailSheet/BacklogView - Int? statt TaskPriority, .medium Fallback entfernt
+**Fix RC3:** macOS Quick Capture auf LocalTaskSource.createTask() umgestellt
+**Bug 53:** TaskInspector.durationChip fehlendes modelContext.save() ergaenzt
 
 **Symptom:** Wichtigkeit, Dringlichkeit und andere erweiterte Attribute werden geloescht wenn ein Task bearbeitet wird, obwohl diese Felder NICHT geaendert werden sollten.
 
