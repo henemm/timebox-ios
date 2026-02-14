@@ -483,10 +483,13 @@ struct ContentView: View {
 
     private func addTask() {
         guard !newTaskTitle.isEmpty else { return }
-        let task = LocalTask(title: newTaskTitle)
-        modelContext.insert(task)
-        try? modelContext.save()
+        let title = newTaskTitle
         newTaskTitle = ""
+
+        Task {
+            let taskSource = LocalTaskSource(modelContext: modelContext)
+            _ = try? await taskSource.createTask(title: title, taskType: "")
+        }
     }
 
     private func deleteTasks(at offsets: IndexSet) {

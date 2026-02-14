@@ -179,10 +179,14 @@ struct MenuBarView: View {
 
     private func addTask() {
         guard !newTaskTitle.isEmpty else { return }
-        let task = LocalTask(title: newTaskTitle)
-        modelContext.insert(task)
+        let title = newTaskTitle
         newTaskTitle = ""
         isAddingTask = false
+
+        Task {
+            let taskSource = LocalTaskSource(modelContext: modelContext)
+            _ = try? await taskSource.createTask(title: title, taskType: "")
+        }
     }
 
     private func toggleComplete(_ task: LocalTask) {

@@ -263,6 +263,7 @@ struct TaskInspector: View {
 
         return Button {
             task.estimatedDuration = minutes
+            try? modelContext.save()
         } label: {
             Text("\(minutes)m")
                 .font(.caption)

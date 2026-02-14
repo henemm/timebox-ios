@@ -171,12 +171,14 @@ struct QuickCaptureView: View {
 
     private func addTask() {
         guard !taskTitle.isEmpty else { return }
-
-        let task = LocalTask(title: taskTitle)
-        modelContext.insert(task)
-
+        let title = taskTitle
         taskTitle = ""
         onDismiss()
+
+        Task {
+            let taskSource = LocalTaskSource(modelContext: modelContext)
+            _ = try? await taskSource.createTask(title: title, taskType: "")
+        }
     }
 }
 
