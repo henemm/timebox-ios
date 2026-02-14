@@ -14,6 +14,7 @@ struct FocusBloxApp: App {
     @State private var showQuickCapture = false
     @State private var quickCaptureTitle = ""
     @State private var permissionRequested = false
+    @State private var syncMonitor = CloudKitSyncMonitor()
 
     private static let appGroupID = "group.com.henning.focusblox"
 
@@ -41,18 +42,18 @@ struct FocusBloxApp: App {
                 cloudKitDatabase: .none
             )
         } else if FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: appGroupID) != nil {
-            print("[CloudKit] iOS: App Group verfuegbar, CloudKit .automatic")
+            print("[CloudKit] iOS: App Group verfuegbar, CloudKit .private(iCloud.com.henning.focusblox)")
             modelConfiguration = ModelConfiguration(
                 schema: schema,
                 groupContainer: .identifier(appGroupID),
-                cloudKitDatabase: .automatic
+                cloudKitDatabase: .private("iCloud.com.henning.focusblox")
             )
         } else {
-            print("[CloudKit] iOS: App Group NICHT verfuegbar, CloudKit .automatic ohne Group Container")
+            print("[CloudKit] iOS: App Group NICHT verfuegbar, CloudKit .private(iCloud.com.henning.focusblox) ohne Group Container")
             modelConfiguration = ModelConfiguration(
                 schema: schema,
                 isStoredInMemoryOnly: false,
-                cloudKitDatabase: .automatic
+                cloudKitDatabase: .private("iCloud.com.henning.focusblox")
             )
         }
 
@@ -213,6 +214,7 @@ struct FocusBloxApp: App {
             ZStack {
                 ContentView()
                     .environment(\.eventKitRepository, eventKitRepository)
+                    .environment(syncMonitor)
 
                 // Hidden indicator for UI testing that permission was requested
                 if permissionRequested {
@@ -222,6 +224,7 @@ struct FocusBloxApp: App {
                 }
             }
             .onAppear {
+                syncMonitor.startRemoteChangeMonitoring(container: sharedModelContainer)
                 resetUserDefaultsIfNeeded()
                 // Dedup cleanup for Bug 34 (Reminders duplicates after CloudKit activation)
                 // Runs every launch - idempotent and fast (no-op if no reminders tasks exist)
@@ -242,6 +245,7 @@ struct FocusBloxApp: App {
             }
             .onChange(of: scenePhase) { _, newPhase in
                 if newPhase == .active {
+                    syncMonitor.triggerSync()
                     checkCCQuickCaptureTrigger()
                     syncedSettings.pushToCloud()
                 }
@@ -363,13 +367,13 @@ struct FocusBloxApp: App {
         }
     }
 
-    /// Bug 38: Force CloudKit to sync ALL fields by touching every task once.
-    /// When new optional fields are added to LocalTask, CloudKit may not push them
-    /// until the record is explicitly modified. This one-time migration ensures
-    /// all extended attributes (importance, urgency, duration, etc.) are synced.
+    /// Bug 38 V2: Force CloudKit to sync fields by touching only NON-NIL attributes.
+    /// V1 touched ALL fields (including nil), which gave nil values fresh timestamps.
+    /// CloudKit's last-writer-wins then preferred nil over real values from other platforms.
+    /// V2 only touches fields with actual values, so real data always wins over nil.
     @discardableResult
     static func forceCloudKitFieldSync(in context: ModelContext) -> Int {
-        let key = "cloudKitFieldSyncV1"
+        let key = "cloudKitFieldSyncV2"
         guard !UserDefaults.standard.bool(forKey: key) else { return 0 }
 
         do {
@@ -379,26 +383,28 @@ struct FocusBloxApp: App {
                 return 0
             }
 
+            var touchedFields = 0
             for task in allTasks {
-                // Touch extended attributes to mark record as dirty for CloudKit
-                task.importance = task.importance
-                task.urgency = task.urgency
-                task.estimatedDuration = task.estimatedDuration
-                task.dueDate = task.dueDate
-                task.taskDescription = task.taskDescription
-                task.recurrencePattern = task.recurrencePattern
-                task.recurrenceWeekdays = task.recurrenceWeekdays
-                task.recurrenceMonthDay = task.recurrenceMonthDay
-                task.tags = task.tags
-                task.taskType = task.taskType
+                // Only touch fields with actual values - nil fields keep old timestamps
+                // so real values from other platforms win CloudKit conflict resolution
+                if task.importance != nil { task.importance = task.importance; touchedFields += 1 }
+                if task.urgency != nil { task.urgency = task.urgency; touchedFields += 1 }
+                if task.estimatedDuration != nil { task.estimatedDuration = task.estimatedDuration; touchedFields += 1 }
+                if task.dueDate != nil { task.dueDate = task.dueDate; touchedFields += 1 }
+                if task.taskDescription != nil { task.taskDescription = task.taskDescription; touchedFields += 1 }
+                if task.recurrencePattern != nil { task.recurrencePattern = task.recurrencePattern; touchedFields += 1 }
+                if task.recurrenceWeekdays != nil { task.recurrenceWeekdays = task.recurrenceWeekdays; touchedFields += 1 }
+                if task.recurrenceMonthDay != nil { task.recurrenceMonthDay = task.recurrenceMonthDay; touchedFields += 1 }
+                if !task.tags.isEmpty { task.tags = task.tags; touchedFields += 1 }
+                if !task.taskType.isEmpty { task.taskType = task.taskType; touchedFields += 1 }
             }
 
             try context.save()
             UserDefaults.standard.set(true, forKey: key)
-            print("[CloudKit] Field sync migration: \(allTasks.count) tasks touched")
+            print("[CloudKit] V2 field sync: \(allTasks.count) tasks, \(touchedFields) non-nil fields touched")
             return allTasks.count
         } catch {
-            print("[CloudKit] Field sync migration failed: \(error)")
+            print("[CloudKit] V2 field sync failed: \(error)")
             return -1
         }
     }

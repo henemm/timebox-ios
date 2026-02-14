@@ -168,10 +168,12 @@ struct TaskInspector: View {
                     HStack(spacing: 12) {
                         statusChip("Erledigt", "checkmark.circle.fill", task.isCompleted, .green) {
                             task.isCompleted.toggle()
+                            try? modelContext.save()
                         }
 
                         statusChip("Next Up", "arrow.up.circle.fill", task.isNextUp, .blue) {
                             task.isNextUp.toggle()
+                            try? modelContext.save()
                         }
                     }
                 }
@@ -288,6 +290,7 @@ struct TaskInspector: View {
 
         return Button {
             task.taskType = id
+            try? modelContext.save()
         } label: {
             VStack(spacing: 4) {
                 Image(systemName: icon)

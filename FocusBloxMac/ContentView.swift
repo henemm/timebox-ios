@@ -51,10 +51,13 @@ struct ContentView: View {
     @State private var sharedDate = Date()
     @State private var highlightedBlockID: String?
 
-    // Sync state
+    // Sync state (Reminders)
     @State private var isSyncing = false
     @State private var syncError: String?
     @State private var lastSyncDate: Date?
+
+    // CloudKit sync monitor
+    @Environment(CloudKitSyncMonitor.self) private var cloudKitMonitor
 
     // Quick Add
     @State private var newTaskTitle = ""
@@ -346,27 +349,36 @@ struct ContentView: View {
         .navigationTitle(filterTitle)
         .toolbar {
             ToolbarItem {
-                // Sync status indicator
-                if isSyncing {
-                    ProgressView()
-                        .scaleEffect(0.7)
-                        .accessibilityIdentifier("syncStatusIndicator")
-                } else {
-                    Image(systemName: "checkmark.icloud")
-                        .foregroundStyle(.green)
-                        .accessibilityIdentifier("syncStatusIndicator")
+                // CloudKit sync status indicator
+                Group {
+                    if cloudKitMonitor.isSyncing || isSyncing {
+                        ProgressView()
+                            .scaleEffect(0.7)
+                    } else if cloudKitMonitor.hasSyncError {
+                        Image(systemName: "exclamationmark.icloud")
+                            .foregroundStyle(.red)
+                            .help(cloudKitMonitor.errorMessage ?? "Sync-Fehler")
+                    } else {
+                        Image(systemName: "checkmark.icloud")
+                            .foregroundStyle(.green)
+                            .help(cloudKitMonitor.lastSuccessfulSync.map {
+                                "Letzter Sync: \($0.formatted(date: .omitted, time: .shortened))"
+                            } ?? "CloudKit verbunden")
+                    }
                 }
+                .accessibilityIdentifier("syncStatusIndicator")
             }
 
             ToolbarItem {
                 Button {
+                    cloudKitMonitor.triggerSync()
                     Task { await syncWithReminders() }
                 } label: {
                     Image(systemName: "arrow.triangle.2.circlepath")
                 }
                 .disabled(isSyncing)
-                .accessibilityIdentifier("syncRemindersButton")
-                .help("Mit Apple Erinnerungen synchronisieren")
+                .accessibilityIdentifier("syncButton")
+                .help("CloudKit & Erinnerungen synchronisieren")
             }
 
             ToolbarItem {

@@ -49,6 +49,7 @@ struct BacklogView: View {
     // MARK: - Properties
     @Environment(\.modelContext) private var modelContext
     @Environment(\.eventKitRepository) private var eventKitRepo
+    @Environment(CloudKitSyncMonitor.self) private var cloudKitMonitor
     @AppStorage("backlogViewMode") private var selectedMode: ViewMode = .list
     @AppStorage("remindersSyncEnabled") private var remindersSyncEnabled: Bool = false
     @State private var planItems: [PlanItem] = []
@@ -294,12 +295,20 @@ struct BacklogView: View {
         .task(id: remindersSyncEnabled) {
             await loadTasks()
         }
+        .onChange(of: cloudKitMonitor.remoteChangeCount) { oldVal, newVal in
+            print("[CloudKit Debug] remoteChange onChange FIRED: \(oldVal) -> \(newVal)")
+            Task {
+                try? await Task.sleep(for: .milliseconds(200))
+                await refreshLocalTasks()
+            }
+        }
         .refreshable {
             await loadTasks()
         }
     }
 
     private func loadTasks() async {
+        cloudKitMonitor.triggerSync()
         isLoading = true
         errorMessage = nil
 
@@ -340,11 +349,19 @@ struct BacklogView: View {
     /// Refresh tasks from local database only - no loading indicator, no Reminders import.
     /// Use this for Quick Edits to preserve scroll position and avoid overwriting local changes.
     private func refreshLocalTasks() async {
+        print("[CloudKit Debug] refreshLocalTasks() START - current planItems: \(planItems.count)")
         do {
+            // Force context merge with persistent store before fetch.
+            // Without this, modelContext returns cached/stale data after CloudKit import.
+            // This is the same mechanism that makes Pull-to-Refresh work (via triggerSync -> save).
+            try modelContext.save()
+
             let taskSource = LocalTaskSource(modelContext: modelContext)
             let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
             planItems = try await syncEngine.sync()
+            print("[CloudKit Debug] refreshLocalTasks() DONE - new planItems: \(planItems.count)")
         } catch {
+            print("[CloudKit Debug] refreshLocalTasks() ERROR: \(error)")
             errorMessage = error.localizedDescription
         }
     }

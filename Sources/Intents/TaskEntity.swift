@@ -11,7 +11,7 @@ enum SharedModelContainer {
         let config = ModelConfiguration(
             schema: schema,
             groupContainer: .identifier("group.com.henning.focusblox"),
-            cloudKitDatabase: .automatic
+            cloudKitDatabase: .private("iCloud.com.henning.focusblox")
         )
         return try ModelContainer(for: schema, configurations: [config])
     }

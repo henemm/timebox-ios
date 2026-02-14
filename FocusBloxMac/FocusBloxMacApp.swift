@@ -15,6 +15,7 @@ struct FocusBloxMacApp: App {
     let container: ModelContainer
     @State private var quickCapture = QuickCaptureController.shared
     @State private var showShortcuts = false
+    @State private var syncMonitor = CloudKitSyncMonitor()
     @FocusedValue(\.taskActions) private var taskActions
 
     /// SyncedSettings fuer iCloud KV Store Sync zwischen Geraeten
@@ -59,10 +60,12 @@ struct FocusBloxMacApp: App {
         WindowGroup {
             ContentView()
                 .environment(\.eventKitRepository, eventKitRepository)
+                .environment(syncMonitor)
                 .sheet(isPresented: $showShortcuts) {
                     KeyboardShortcutsView()
                 }
                 .onAppear {
+                    syncMonitor.startRemoteChangeMonitoring(container: container)
                     // Ensure window can receive keyboard/mouse events
                     DispatchQueue.main.async {
                         NSApplication.shared.activate(ignoringOtherApps: true)
@@ -169,31 +172,29 @@ enum MacModelContainer {
 
         let config: ModelConfiguration
         if appGroupURL != nil {
-            print("[CloudKit] macOS: App Group verfuegbar, CloudKit .automatic")
+            print("[CloudKit] macOS: App Group verfuegbar, CloudKit .private(iCloud.com.henning.focusblox)")
             config = ModelConfiguration(
                 schema: schema,
                 groupContainer: .identifier(appGroupID),
-                cloudKitDatabase: .automatic
+                cloudKitDatabase: .private("iCloud.com.henning.focusblox")
             )
         } else {
-            print("[CloudKit] macOS: App Group NICHT verfuegbar, CloudKit .automatic ohne Group Container")
+            print("[CloudKit] macOS: App Group NICHT verfuegbar, CloudKit .private(iCloud.com.henning.focusblox) ohne Group Container")
             config = ModelConfiguration(
                 schema: schema,
                 isStoredInMemoryOnly: false,
-                cloudKitDatabase: .automatic
+                cloudKitDatabase: .private("iCloud.com.henning.focusblox")
             )
         }
 
         return try ModelContainer(for: schema, configurations: [config])
     }
 
-    /// Bug 38: Force CloudKit to sync ALL fields by touching every task once.
-    /// When new optional fields are added to LocalTask, CloudKit may not push them
-    /// until the record is explicitly modified. This one-time migration ensures
-    /// all extended attributes (importance, urgency, duration, etc.) are synced.
+    /// Bug 38 V2: Only touch NON-NIL fields to avoid CloudKit conflicts.
+    /// V1 gave nil values fresh timestamps, causing them to win over real values.
     @discardableResult
     static func forceCloudKitFieldSync(in context: ModelContext) -> Int {
-        let key = "cloudKitFieldSyncV1"
+        let key = "cloudKitFieldSyncV2"
         guard !UserDefaults.standard.bool(forKey: key) else { return 0 }
 
         do {
@@ -203,26 +204,26 @@ enum MacModelContainer {
                 return 0
             }
 
+            var touchedFields = 0
             for task in allTasks {
-                // Touch extended attributes to mark record as dirty for CloudKit
-                task.importance = task.importance
-                task.urgency = task.urgency
-                task.estimatedDuration = task.estimatedDuration
-                task.dueDate = task.dueDate
-                task.taskDescription = task.taskDescription
-                task.recurrencePattern = task.recurrencePattern
-                task.recurrenceWeekdays = task.recurrenceWeekdays
-                task.recurrenceMonthDay = task.recurrenceMonthDay
-                task.tags = task.tags
-                task.taskType = task.taskType
+                if task.importance != nil { task.importance = task.importance; touchedFields += 1 }
+                if task.urgency != nil { task.urgency = task.urgency; touchedFields += 1 }
+                if task.estimatedDuration != nil { task.estimatedDuration = task.estimatedDuration; touchedFields += 1 }
+                if task.dueDate != nil { task.dueDate = task.dueDate; touchedFields += 1 }
+                if task.taskDescription != nil { task.taskDescription = task.taskDescription; touchedFields += 1 }
+                if task.recurrencePattern != nil { task.recurrencePattern = task.recurrencePattern; touchedFields += 1 }
+                if task.recurrenceWeekdays != nil { task.recurrenceWeekdays = task.recurrenceWeekdays; touchedFields += 1 }
+                if task.recurrenceMonthDay != nil { task.recurrenceMonthDay = task.recurrenceMonthDay; touchedFields += 1 }
+                if !task.tags.isEmpty { task.tags = task.tags; touchedFields += 1 }
+                if !task.taskType.isEmpty { task.taskType = task.taskType; touchedFields += 1 }
             }
 
             try context.save()
             UserDefaults.standard.set(true, forKey: key)
-            print("[CloudKit] macOS Field sync migration: \(allTasks.count) tasks touched")
+            print("[CloudKit] macOS V2 field sync: \(allTasks.count) tasks, \(touchedFields) non-nil fields touched")
             return allTasks.count
         } catch {
-            print("[CloudKit] macOS Field sync migration failed: \(error)")
+            print("[CloudKit] macOS V2 field sync failed: \(error)")
             return -1
         }
     }
