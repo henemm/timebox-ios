@@ -677,6 +677,7 @@ struct FocusLiveView: View {
         for taskID in incompleteTasks {
             if let task = localTasks.first(where: { $0.id == taskID }) {
                 task.isNextUp = true
+                task.assignedFocusBlockID = nil
             }
         }
         try? modelContext.save()

@@ -48,6 +48,7 @@ enum FocusBlockActionService {
            let localTask = localTasks.first(where: { $0.id == taskID }) {
             localTask.isCompleted = true
             localTask.completedAt = Date()
+            localTask.assignedFocusBlockID = nil  // Bug 52: Clear block assignment on complete
             try? modelContext.save()
         }
 

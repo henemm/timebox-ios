@@ -51,6 +51,7 @@ final class SyncEngine {
             task.nextUpSortOrder = Int.max  // Add to end
         } else if !isNextUp {
             task.nextUpSortOrder = nil  // Clear when removing
+            task.assignedFocusBlockID = nil  // Bug 52: Clear stale block assignment
         }
         try modelContext.save()
     }

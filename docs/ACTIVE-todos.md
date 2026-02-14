@@ -20,6 +20,157 @@
 
 ## 🔴 OFFEN
 
+### Aufwand-Uebersicht (geschaetzte Tokens)
+
+| # | Item | Prio | Tokens | Dateien | LoC |
+|---|------|------|--------|---------|-----|
+| Bug 52 | Tasks unsichtbar nach Next Up entfernen | ✅ ERLEDIGT | ~5k | 5 | ~6 |
+| Bug 48 | Erweiterte Attribute geloescht | KRITISCH | ~80-120k | 5-6 | ~150 |
+| Bug 50 | Kalender-Events mit Gaesten | HOCH | ~40-60k | 4 | ~80 |
+| Bug 51 | Backlog-Sortierung iOS vs macOS | MITTEL | ~15-20k | 2 | ~4 |
+| Bug 49 | Matrix View Layout + Gesten | MITTEL | ~25-35k | 2 | ~45 |
+| Bug 22 | Edit-Button ohne Funktion | MITTEL | ~30-50k | 1-2 | ~40 |
+| Feature | MenuBar FocusBlock Status | HOCH | ~50-70k | 2 | ~120 |
+| Feature | QuickAdd Next Up Checkbox | MITTEL | ~20-30k | 3 | ~30 |
+| MAC-026 | Enhanced Quick Capture (macOS) | P2 | ~80-120k | 4 | ~200 |
+| MAC-020 | Drag & Drop Planung (macOS) | P2 | ~100-150k | 3-4 | ~250 |
+| MAC-021 | Review Dashboard (macOS) | P2 | ~120-180k | 4-5 | ~300 |
+| MAC-022 | Spotlight Integration (macOS) | P2 | ~15-25k | 1-2 | ~30 |
+| MAC-030 | Shortcuts.app (macOS) | P3 | ~60-80k | 2-3 | ~150 |
+| MAC-031 | Focus Mode Integration (macOS) | P3 | ~50-70k | 2-3 | ~100 |
+| MAC-032 | NC Widget (macOS) | P3 | ~80-120k | neues Target | ~200 |
+| Feature | Report: Tasks ausserhalb Sprints | MITTEL | ~20-30k | 1-2 | ~40 |
+
+> **Dies ist das EINZIGE Backlog.** macOS-Features (MAC-xxx) stehen hier mit Verweis auf ihre Specs in `docs/specs/macos/`. Kein zweites Backlog.
+
+**Token-Logik:** Context laden + Analyse + TDD RED (Tests schreiben) + Implementation (GREEN) + Validation. Externe Dependencies und neue Targets erhoehen den Aufwand deutlich.
+
+**Guenstigste Quick Wins:** MAC-022 (~15k), QuickAdd Next Up (~20k), Bug 49 (~25k)
+**Teuerste Items:** MAC-021 Review Dashboard (~180k), MAC-020 Drag & Drop (~150k)
+
+---
+
+### Bug 52: Tasks verschwinden aus iOS Backlog nach Entfernen aus Next Up
+**Status:** ✅ ERLEDIGT (2026-02-14)
+**Prioritaet:** KRITISCH (Datenverlust - Tasks unsichtbar)
+**Gemeldet:** 2026-02-14
+**Platform:** iOS (macOS nicht betroffen wegen anderem Filter)
+
+**Symptom:** Tasks die aus Next Up entfernt werden, erscheinen unter iOS nicht im Backlog. Unter macOS sichtbar.
+
+**Root Cause:** `assignedFocusBlockID` wird nie aufgeraeumt wenn Tasks aus FocusBlocks zurueckkehren oder aus Next Up entfernt werden. iOS Backlog-Filter prueft `assignedFocusBlockID == nil`, macOS nicht.
+
+**Fix:** `assignedFocusBlockID = nil` an 4 Stellen hinzugefuegt + einmalige Datenbereinigung beim App-Start.
+
+---
+
+### Bug 48: Erweiterte Attribute werden wiederholt geloescht (iOS + macOS)
+**Status:** SPEC READY
+**Prioritaet:** KRITISCH (Datenverlust, wiederkehrender Bug)
+**Geschaetzter Aufwand:** ~80-120k Tokens
+**Gemeldet:** 2026-02-13
+**Analysiert:** 2026-02-13
+**Spec:** [`docs/specs/bugfixes/bug-48-extended-attributes-deleted.md`](../specs/bugfixes/bug-48-extended-attributes-deleted.md)
+**Vorgeschichte:** Bug 32 (Race Condition) und Bug 18 (Reminders-Attribute) waren als gefixt markiert - Problem tritt erneut auf.
+
+**Symptom:** Wichtigkeit, Dringlichkeit und andere erweiterte Attribute werden geloescht wenn ein Task bearbeitet wird, obwohl diese Felder NICHT geaendert werden sollten.
+
+**Root Cause:**
+- **Location:** `Sources/Services/SyncEngine.swift:72+75`
+- **Problem:** `updateTask()` unterscheidet NICHT zwischen "Wert auf nil setzen" und "Wert nicht aendern"
+- **Code:** `task.importance = importance` und `task.urgency = urgency` ueberschreiben IMMER, auch wenn nil
+- **Trigger:** Wenn Caller `nil` fuer ein optionales Feld uebergibt (weil nicht geaendert), wird existierender Wert GELOESCHT
+
+**Callsites (BacklogView.swift):**
+- Zeile 459-469: `saveTitleEdit()` - User aendert nur Titel, uebergibt `task.importance` (kann bereits nil sein!)
+- Zeile 391-395: `updateTask()` - Full Edit Dialog uebergibt Parameter-Werte (koennen nil sein)
+- Zeile 407, 421, 434: `updateImportance()`, `updateUrgency()`, `updateCategory()` - gleiche Logik
+
+**Expected vs Actual:**
+- **Expected:** `updateTask(urgency: nil)` = "Feld nicht aendern"
+- **Actual:** `updateTask(urgency: nil)` = "Feld auf nil setzen (loeschen)"
+
+**Test Plan:**
+1. Task mit Importance=3, Urgency="urgent" erstellen
+2. Inline-Titel aendern (Quick Edit) → Expected: Attribute bleiben / Actual: Geloescht
+3. Full-Edit nur Due Date aendern → Expected: Attribute bleiben / Actual: Geloescht
+4. Category via Picker aendern → Expected: Attribute bleiben / Actual: Geloescht
+
+**Fix-Strategie:**
+- Option A: Optional-Felder nur setzen wenn nicht-nil (preserve-Logik in SyncEngine)
+- Option B: Separate Update-Methoden fuer einzelne Felder (granularer)
+- Option C: Explicitly pass "keep current value" flag oder sentinel value
+
+**ZUSAETZLICH: VERDACHT 4 (macOS direktes SwiftData-Writing) - BESTAETIGT**
+
+**3x GEFUNDEN: Direktes `LocalTask(title:)` ohne erweiterte Attribute**
+
+**KRITISCH 1: QuickCapturePanel.swift:175-176**
+```swift
+let task = LocalTask(title: taskTitle)
+modelContext.insert(task)
+```
+- Quick Capture (⌘⇧Space) erstellt Tasks OHNE importance/urgency/duration
+- KEIN Service genutzt - direktes SwiftData-Insert
+- Betroffene Attribute: importance/urgency/estimatedDuration/taskType = nil/empty
+
+**KRITISCH 2: MenuBarView.swift:182-183**
+```swift
+let task = LocalTask(title: newTaskTitle)
+modelContext.insert(task)
+```
+- Menu Bar "Task hinzufuegen" verwendet dieselbe Minimal-Initialisierung
+
+**KRITISCH 3: ContentView.swift:486-488**
+```swift
+let task = LocalTask(title: newTaskTitle)
+modelContext.insert(task)
+try? modelContext.save()
+```
+- macOS ContentView "Quick Add" Funktion (3x identisches Anti-Pattern)
+
+**UNTERSCHIED iOS vs macOS:**
+- iOS: TaskFormSheet.swift:368 nutzt `LocalTaskSource.createTask()` Service
+  - Uebergibt ALLE Parameter: importance, urgency, duration, taskType, tags, etc.
+- macOS: 3x direktes `LocalTask(title:)` Init (nur Titel)
+- **macOS nutzt NICHT die Shared Services aus `Sources/`**
+
+**KONSEQUENZ:**
+- macOS Quick Capture Tasks haben IMMER leere erweiterte Attribute
+- User muss nachtraeglich in TaskInspector alle Felder ausfuellen
+- Bei CloudKit-Sync: Leere Attribute ueberschreiben Werte von anderen Geraeten
+
+**TaskInspector auf macOS: KORREKT**
+- TaskInspector.swift nutzt `@Bindable var task` - editiert existierende Tasks
+- Zeilen 213, 239: `task.importance =` / `task.urgency =` mit `modelContext.save()`
+- Attribute werden korrekt persistiert
+
+**Geschaetzter Aufwand:** MITTEL (~100-150 LoC, 5-6 Dateien - SyncEngine + 3x macOS Views)
+
+---
+
+### Bug 50: Kalender-Events mit Gaesten funktionieren nicht (iOS + macOS)
+**Status:** SPEC READY
+**Prioritaet:** HOCH (wiederkehrender Bug, frueherer Teilfix unvollstaendig)
+**Geschaetzter Aufwand:** ~40-60k Tokens
+**Gemeldet:** 2026-02-13
+**Vorgeschichte:** Commit `4a5eafe` (2026-02-12) hat nur Kategorie-Zuweisung per iCloud KV Store Fallback gefixed
+**Spec:** [`docs/specs/bugs/bug-50-calendar-events-with-guests.md`](../specs/bugs/bug-50-calendar-events-with-guests.md)
+
+**Symptom:** Events mit Gaesten lassen sich nicht verschieben (Drag & Drop scheitert), keine visuelle Unterscheidung von read-only Events.
+
+**Root Cause:** `CalendarEvent` Model kennt keinen Read-Only Status. Events mit Attendees sind in EventKit schreibgeschuetzt, aber die App behandelt alle Events als editierbar.
+
+**Betroffene Stellen:**
+- `CalendarEvent.swift:13-21` - Model fehlt `hasAttendees`/`isReadOnly`
+- `EventKitRepository.swift:221-238` - `moveCalendarEvent()` hat kein Error-Handling fuer read-only
+- `EventBlock.swift:48` - `.draggable()` auf ALLEN Events (auch read-only)
+- `MacTimelineView.swift:96-107` - Gleiche Problematik auf macOS
+
+**Fix:** Model erweitern, Drag nur fuer editierbare Events, spezifische Fehlermeldungen, Schloss-Icon fuer read-only Events.
+
+---
+
 ### BACKLOG-003: defaultTaskDuration synct nicht
 **Status:** ✅ ERLEDIGT (2026-02-13)
 **Prioritaet:** MITTEL
@@ -93,8 +244,106 @@
 
 ---
 
+### Feature: MenuBar FocusBlock Status (macOS)
+**Status:** SPEC READY
+**Prioritaet:** HOCH
+**Geschaetzter Aufwand:** ~50-70k Tokens
+**Spec:** `openspec/changes/menubar-focusblock-status/proposal.md`
+**Dateien:** `MenuBarView.swift`, `FocusBloxMacApp.swift`
+**Problem:** Auf macOS gibt es kein Aequivalent zur iOS Live Activity. Der Nutzer muss das Hauptfenster oeffnen, um den FocusBlock-Status zu sehen.
+**Loesung:** Menu Bar Label zeigt Restzeit (mm:ss), Popover bekommt Focus Section mit aktuellem Task, Timer, Fortschritt und Complete/Skip Buttons.
+**Scope:** ~120 LoC, 2 Dateien
+
+---
+
+### Feature: Wiederkehrende Tasks - Darstellung + Instanz-Logik (iOS + macOS)
+**Status:** OFFEN - ANALYSE FERTIG
+**Prioritaet:** HOCH
+**Analysiert:** 2026-02-13
+**Context:** [`docs/context/bug-48-extended-attributes-deleted.md`](../context/bug-48-extended-attributes-deleted.md)
+
+**Problem:** Recurrence-Pattern wird gespeichert, aber nirgends aktiv genutzt. Keine Instanz-Generierung, keine Filterung nach Faelligkeit, kein visuelles Feedback, keine Instanz-vs-Serie-Logik bei Complete/Delete.
+
+**Geplante Phasen:**
+1. Template/Instanz-Modell + Visueller Indikator + Completion-Logik (~200 LoC)
+2. Backlog-Filterung (faellig vs. nicht-faellig) + eigener Bereich (~150 LoC)
+3. Delete-Logik (Instanz vs. Serie) + Confirmation Dialog (~150 LoC)
+
+**Betroffene Bereiche:** LocalTask Model, SyncEngine, BacklogView, BacklogRow, macOS Views
+
+---
+
+### Feature: QuickAdd "Next Up" Checkbox (iOS + macOS)
+**Status:** SPEC READY
+**Prioritaet:** MITTEL
+**Geschaetzter Aufwand:** ~20-30k Tokens
+**Spec:** `openspec/changes/quickadd-nextup-checkbox/proposal.md`
+**Dateien:** `QuickCaptureView.swift`, `QuickCapturePanel.swift`, `MenuBarView.swift`
+**Problem:** Tasks koennen beim Quick-Add nicht direkt als "Next Up" markiert werden - Umweg ueber Backlog noetig.
+**Loesung:** Toggle-Button in allen 3 Quick-Add-Flows (iOS + 2x macOS). ~30 LoC netto.
+
+---
+
+### Feature: Report zeigt Tasks ausserhalb von Sprints (iOS + macOS)
+**Status:** OFFEN
+**Prioritaet:** MITTEL
+**Geschaetzter Aufwand:** ~20-30k Tokens
+**Gemeldet:** 2026-02-14
+**Dateien:** `DailyReviewView.swift` (+ macOS-Aequivalent falls vorhanden)
+
+**Problem:** Tasks, die ausserhalb eines aktiven FocusBlocks abgehakt werden (z.B. im Backlog), erscheinen nicht im Tagesreport. Der Report zeigt nur Tasks, deren ID in `block.completedTaskIDs` steht.
+
+**Gewuenschtes Verhalten:** Alle am Tag erledigten Tasks sollen im Report sichtbar sein - auch solche, die ohne laufenden Sprint abgehakt wurden.
+
+**Loesung:** Eigene Sektion im Report, z.B. "Ausserhalb von Sprints erledigt". Filtert `allTasks` nach `isCompleted == true` UND `completedAt` am aktuellen Tag, ABER Task-ID NICHT in irgendeinem `block.completedTaskIDs` des Tages enthalten.
+
+**Scope:** ~40 LoC, 1-2 Dateien
+
+---
+
+### Bug 51: Backlog-Liste sortiert unterschiedlich auf iOS und macOS
+**Status:** SPEC READY
+**Prioritaet:** MITTEL
+**Geschaetzter Aufwand:** ~15-20k Tokens
+**Gemeldet:** 2026-02-13
+**Analysiert:** 2026-02-13
+**Spec:** [`docs/specs/bugs/bug-51-backlog-list-sorting.md`](../specs/bugs/bug-51-backlog-list-sorting.md)
+
+**Symptom:** Backlog "Liste" zeigt auf iOS aelteste Tasks oben, auf macOS neueste oben. Gewuenscht: Neueste oben auf beiden Plattformen.
+
+**Root Cause:**
+- **iOS:** `LocalTaskSource.swift:38` sortiert nach `sortOrder` aufsteigend (aelteste oben)
+- **iOS:** `SyncEngine.swift:18` sortiert nochmal nach `rank` aufsteigend
+- **macOS:** `ContentView.swift:36` sortiert nach `createdAt` absteigend (neueste oben, korrekt)
+- Plattformen nutzen komplett unterschiedliche Sortierlogik (verschiedene Felder + Richtung)
+
+**Fix:** iOS-Sortierung auf `createdAt` absteigend umstellen (wie macOS). 2 Dateien, ~4 LoC.
+
+---
+
+### Bug 49: Matrix View - Swipe-Gesten + Layout zu breit (iOS)
+**Status:** SPEC READY
+**Prioritaet:** MITTEL
+**Geschaetzter Aufwand:** ~25-35k Tokens
+**Gemeldet:** 2026-02-13
+**Spec:** [`docs/specs/bugs/bug-49-matrix-view-layout-gestures.md`](../specs/bugs/bug-49-matrix-view-layout-gestures.md)
+**Dateien:** `BacklogView.swift`, `BacklogRow.swift`
+
+**Problem 1:** Swipe-Gesten (Next Up, Bearbeiten, Loeschen) funktionieren nicht in der Matrix-Ansicht.
+- **Root Cause:** `.swipeActions()` ist List-only Modifier. Matrix nutzt ScrollView/VStack.
+- **Fix:** `.contextMenu` auf BacklogRow in QuadrantCards (Long-Press statt Swipe).
+
+**Problem 2:** View zu breit - Inhalt geht ueber Bildschirmrand hinaus.
+- **Root Cause:** Metadata-Badges in BacklogRow haben alle `.fixedSize()`. Bei vielen Badges ueberlaeuft die HStack.
+- **Fix:** `.fixedSize()` von komprimierbaren Badges entfernen + `.clipped()` als Sicherheitsnetz.
+
+**Geschaetzter Aufwand:** ~45 LoC, 2 Dateien
+
+---
+
 ### Bug 22: Edit-Button in Backlog Toolbar ohne Funktion
 **Status:** OFFEN
+**Geschaetzter Aufwand:** ~30-50k Tokens
 **Gemeldet:** 2026-02-02
 **Platform:** iOS
 **Location:** `Sources/Views/BacklogView.swift:218`

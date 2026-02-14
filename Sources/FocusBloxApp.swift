@@ -225,6 +225,7 @@ struct FocusBloxApp: App {
                 // Runs every launch - idempotent and fast (no-op if no reminders tasks exist)
                 if !ProcessInfo.processInfo.arguments.contains("-UITesting") {
                     Self.cleanupRemindersDuplicates(in: sharedModelContainer.mainContext)
+                    Self.cleanupOrphanedBlockAssignments(in: sharedModelContainer.mainContext)
                 }
                 // Request calendar/reminders permission on app launch (Bug 8 fix)
                 requestPermissionsOnLaunch()
@@ -337,6 +338,26 @@ struct FocusBloxApp: App {
         if !task.taskType.isEmpty { score += 1 }
         if !task.tags.isEmpty { score += 1 }
         return score
+    }
+
+    /// Bug 52: Clear orphaned assignedFocusBlockID on tasks that are not in Next Up and not completed.
+    /// These tasks are invisible in the iOS backlog because the filter checks assignedFocusBlockID == nil.
+    @discardableResult
+    static func cleanupOrphanedBlockAssignments(in context: ModelContext) -> Int {
+        do {
+            let allTasks = try context.fetch(FetchDescriptor<LocalTask>())
+            let orphaned = allTasks.filter {
+                $0.assignedFocusBlockID != nil && !$0.isNextUp && !$0.isCompleted
+            }
+            guard !orphaned.isEmpty else { return 0 }
+            for task in orphaned {
+                task.assignedFocusBlockID = nil
+            }
+            try context.save()
+            return orphaned.count
+        } catch {
+            return -1
+        }
     }
 
     /// Reset UserDefaults for UI test isolation
