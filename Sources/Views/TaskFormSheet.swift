@@ -22,7 +22,7 @@ struct TaskFormSheet: View {
     }
 
     let mode: Mode
-    let onSave: ((String, TaskPriority, Int?, [String], String?, String, Date?, String?, String, [Int]?, Int?) -> Void)?
+    let onSave: ((String, Int?, Int?, [String], String?, String, Date?, String?, String, [Int]?, Int?) -> Void)?
     let onDelete: (() -> Void)?
     var onCreateComplete: (() -> Void)?
 
@@ -56,7 +56,7 @@ struct TaskFormSheet: View {
 
     /// Edit mode initializer
     init(task: PlanItem,
-         onSave: @escaping (String, TaskPriority, Int?, [String], String?, String, Date?, String?, String, [Int]?, Int?) -> Void,
+         onSave: @escaping (String, Int?, Int?, [String], String?, String, Date?, String?, String, [Int]?, Int?) -> Void,
          onDelete: @escaping () -> Void) {
         self.mode = .edit(task)
         self.onSave = onSave
@@ -355,8 +355,6 @@ struct TaskFormSheet: View {
 
         let finalDueDate: Date? = hasDueDate ? dueDate : nil
         let finalDescription: String? = taskDescription.isEmpty ? nil : taskDescription
-        let taskPriority: TaskPriority = priority.flatMap { TaskPriority(rawValue: $0) } ?? .medium
-
         switch mode {
         case .create:
             // Prepare recurrence data
@@ -396,7 +394,7 @@ struct TaskFormSheet: View {
 
             onSave?(
                 title.trimmingCharacters(in: .whitespaces),
-                taskPriority,
+                priority,
                 duration,
                 tags,
                 urgency,

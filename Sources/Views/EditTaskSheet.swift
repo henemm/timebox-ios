@@ -3,7 +3,7 @@ import SwiftData
 
 struct EditTaskSheet: View {
     let task: PlanItem
-    let onSave: (String, TaskPriority, Int, [String], String?, String, Date?, String?) -> Void
+    let onSave: (String, Int?, Int?, [String], String?, String, Date?, String?) -> Void
     let onDelete: () -> Void
 
     @State private var title: String
@@ -25,7 +25,7 @@ struct EditTaskSheet: View {
 
     private let taskTypeOptions = TaskCategory.allCases.map { ($0.rawValue, $0.displayName) }
 
-    init(task: PlanItem, onSave: @escaping (String, TaskPriority, Int, [String], String?, String, Date?, String?) -> Void, onDelete: @escaping () -> Void) {
+    init(task: PlanItem, onSave: @escaping (String, Int?, Int?, [String], String?, String, Date?, String?) -> Void, onDelete: @escaping () -> Void) {
         self.task = task
         self.onSave = onSave
         self.onDelete = onDelete
@@ -135,7 +135,7 @@ struct EditTaskSheet: View {
 
         onSave(
             title,
-            priority,
+            priority.rawValue,
             duration,
             tags,
             urgency,

@@ -70,16 +70,17 @@ final class SyncEngine {
             return
         }
         task.title = title
-        task.importance = importance
-        task.estimatedDuration = duration
         task.tags = tags
-        task.urgency = urgency
         task.taskType = taskType
         task.dueDate = dueDate
         task.taskDescription = description
-        task.recurrencePattern = recurrencePattern ?? "none"
-        task.recurrenceWeekdays = recurrenceWeekdays
-        task.recurrenceMonthDay = recurrenceMonthDay
+        // Optional fields: nil = keep existing value (Bug 48 fix)
+        if let importance { task.importance = importance }
+        if let duration { task.estimatedDuration = duration }
+        if let urgency { task.urgency = urgency }
+        if let recurrencePattern { task.recurrencePattern = recurrencePattern }
+        if let recurrenceWeekdays { task.recurrenceWeekdays = recurrenceWeekdays }
+        if let recurrenceMonthDay { task.recurrenceMonthDay = recurrenceMonthDay }
         try modelContext.save()
     }
 
