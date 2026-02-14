@@ -68,6 +68,8 @@ struct FocusBloxMacApp: App {
                         NSApplication.shared.activate(ignoringOtherApps: true)
                         NSApplication.shared.windows.first?.makeKeyAndOrderFront(nil)
                     }
+                    // Bug 38: Force CloudKit to sync all extended attribute fields
+                    MacModelContainer.forceCloudKitFieldSync(in: container.mainContext)
                 }
                 .onOpenURL { url in
                     handleURL(url)
@@ -167,19 +169,61 @@ enum MacModelContainer {
 
         let config: ModelConfiguration
         if appGroupURL != nil {
+            print("[CloudKit] macOS: App Group verfuegbar, CloudKit .automatic")
             config = ModelConfiguration(
                 schema: schema,
                 groupContainer: .identifier(appGroupID),
                 cloudKitDatabase: .automatic
             )
         } else {
+            print("[CloudKit] macOS: App Group NICHT verfuegbar, CloudKit .automatic ohne Group Container")
             config = ModelConfiguration(
                 schema: schema,
                 isStoredInMemoryOnly: false,
-                cloudKitDatabase: .none
+                cloudKitDatabase: .automatic
             )
         }
 
         return try ModelContainer(for: schema, configurations: [config])
+    }
+
+    /// Bug 38: Force CloudKit to sync ALL fields by touching every task once.
+    /// When new optional fields are added to LocalTask, CloudKit may not push them
+    /// until the record is explicitly modified. This one-time migration ensures
+    /// all extended attributes (importance, urgency, duration, etc.) are synced.
+    @discardableResult
+    static func forceCloudKitFieldSync(in context: ModelContext) -> Int {
+        let key = "cloudKitFieldSyncV1"
+        guard !UserDefaults.standard.bool(forKey: key) else { return 0 }
+
+        do {
+            let allTasks = try context.fetch(FetchDescriptor<LocalTask>())
+            guard !allTasks.isEmpty else {
+                UserDefaults.standard.set(true, forKey: key)
+                return 0
+            }
+
+            for task in allTasks {
+                // Touch extended attributes to mark record as dirty for CloudKit
+                task.importance = task.importance
+                task.urgency = task.urgency
+                task.estimatedDuration = task.estimatedDuration
+                task.dueDate = task.dueDate
+                task.taskDescription = task.taskDescription
+                task.recurrencePattern = task.recurrencePattern
+                task.recurrenceWeekdays = task.recurrenceWeekdays
+                task.recurrenceMonthDay = task.recurrenceMonthDay
+                task.tags = task.tags
+                task.taskType = task.taskType
+            }
+
+            try context.save()
+            UserDefaults.standard.set(true, forKey: key)
+            print("[CloudKit] macOS Field sync migration: \(allTasks.count) tasks touched")
+            return allTasks.count
+        } catch {
+            print("[CloudKit] macOS Field sync migration failed: \(error)")
+            return -1
+        }
     }
 }

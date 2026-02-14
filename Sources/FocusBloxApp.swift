@@ -41,16 +41,18 @@ struct FocusBloxApp: App {
                 cloudKitDatabase: .none
             )
         } else if FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: appGroupID) != nil {
+            print("[CloudKit] iOS: App Group verfuegbar, CloudKit .automatic")
             modelConfiguration = ModelConfiguration(
                 schema: schema,
                 groupContainer: .identifier(appGroupID),
                 cloudKitDatabase: .automatic
             )
         } else {
+            print("[CloudKit] iOS: App Group NICHT verfuegbar, CloudKit .automatic ohne Group Container")
             modelConfiguration = ModelConfiguration(
                 schema: schema,
                 isStoredInMemoryOnly: false,
-                cloudKitDatabase: .none
+                cloudKitDatabase: .automatic
             )
         }
 
@@ -226,6 +228,7 @@ struct FocusBloxApp: App {
                 if !ProcessInfo.processInfo.arguments.contains("-UITesting") {
                     Self.cleanupRemindersDuplicates(in: sharedModelContainer.mainContext)
                     Self.cleanupOrphanedBlockAssignments(in: sharedModelContainer.mainContext)
+                    Self.forceCloudKitFieldSync(in: sharedModelContainer.mainContext)
                 }
                 // Request calendar/reminders permission on app launch (Bug 8 fix)
                 requestPermissionsOnLaunch()
@@ -356,6 +359,46 @@ struct FocusBloxApp: App {
             try context.save()
             return orphaned.count
         } catch {
+            return -1
+        }
+    }
+
+    /// Bug 38: Force CloudKit to sync ALL fields by touching every task once.
+    /// When new optional fields are added to LocalTask, CloudKit may not push them
+    /// until the record is explicitly modified. This one-time migration ensures
+    /// all extended attributes (importance, urgency, duration, etc.) are synced.
+    @discardableResult
+    static func forceCloudKitFieldSync(in context: ModelContext) -> Int {
+        let key = "cloudKitFieldSyncV1"
+        guard !UserDefaults.standard.bool(forKey: key) else { return 0 }
+
+        do {
+            let allTasks = try context.fetch(FetchDescriptor<LocalTask>())
+            guard !allTasks.isEmpty else {
+                UserDefaults.standard.set(true, forKey: key)
+                return 0
+            }
+
+            for task in allTasks {
+                // Touch extended attributes to mark record as dirty for CloudKit
+                task.importance = task.importance
+                task.urgency = task.urgency
+                task.estimatedDuration = task.estimatedDuration
+                task.dueDate = task.dueDate
+                task.taskDescription = task.taskDescription
+                task.recurrencePattern = task.recurrencePattern
+                task.recurrenceWeekdays = task.recurrenceWeekdays
+                task.recurrenceMonthDay = task.recurrenceMonthDay
+                task.tags = task.tags
+                task.taskType = task.taskType
+            }
+
+            try context.save()
+            UserDefaults.standard.set(true, forKey: key)
+            print("[CloudKit] Field sync migration: \(allTasks.count) tasks touched")
+            return allTasks.count
+        } catch {
+            print("[CloudKit] Field sync migration failed: \(error)")
             return -1
         }
     }

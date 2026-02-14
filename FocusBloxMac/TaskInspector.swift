@@ -107,6 +107,7 @@ struct TaskInspector: View {
 
                             Button {
                                 task.dueDate = nil
+                                try? modelContext.save()
                             } label: {
                                 Image(systemName: "xmark.circle.fill")
                                     .foregroundStyle(.secondary)
@@ -115,6 +116,7 @@ struct TaskInspector: View {
                         } else {
                             Button("+ Datum setzen") {
                                 task.dueDate = Date()
+                                try? modelContext.save()
                             }
                             .buttonStyle(.plain)
                             .foregroundStyle(.blue)
