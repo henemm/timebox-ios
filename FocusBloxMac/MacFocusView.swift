@@ -507,6 +507,7 @@ struct MacFocusView: View {
         let taskDurations = tasks.map { (id: $0.id, durationMinutes: $0.estimatedDuration ?? 15) }
         let plannedEnd = TimerCalculator.plannedTaskEndDate(
             blockStartDate: block.startDate,
+            blockEndDate: block.endDate,
             taskDurations: taskDurations,
             currentTaskID: task.id
         )
@@ -524,6 +525,7 @@ struct MacFocusView: View {
         let taskDurations = tasks.map { (id: $0.id, durationMinutes: $0.estimatedDuration ?? 15) }
         let plannedEnd = TimerCalculator.plannedTaskEndDate(
             blockStartDate: block.startDate,
+            blockEndDate: block.endDate,
             taskDurations: taskDurations,
             currentTaskID: task.id
         )
@@ -543,9 +545,28 @@ struct MacFocusView: View {
             warningPlayed = true
         }
         if block.isPast && !showSprintReview && !reviewDismissed {
+            // Bug 55C: Save current task's time before showing sprint review
+            if let startTime = taskStartTime {
+                let tasks = tasksForBlock(block)
+                let remainingTasks = tasks.filter { !block.completedTaskIDs.contains($0.id) }
+                if let currentTask = remainingTasks.first {
+                    let secondsSpent = Int(Date().timeIntervalSince(startTime))
+                    var updatedTaskTimes = block.taskTimes
+                    updatedTaskTimes[currentTask.id] = (updatedTaskTimes[currentTask.id] ?? 0) + secondsSpent
+                    try? eventKitRepo.updateFocusBlock(
+                        eventID: block.id,
+                        taskIDs: block.taskIDs,
+                        completedTaskIDs: block.completedTaskIDs,
+                        taskTimes: updatedTaskTimes
+                    )
+                }
+                taskStartTime = nil
+            }
             SoundService.playEndGong()
             showSprintReview = true
             warningPlayed = false
+            // Reload to get fresh taskTimes for Sprint Review
+            Task { await loadData() }
         }
     }
 

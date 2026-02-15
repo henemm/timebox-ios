@@ -159,6 +159,8 @@ struct FocusLiveView: View {
                 liveActivityStarted = true
                 // Immediately update with task-level end date
                 updateLiveActivity(for: block)
+                // Bug 55B: Update end notification with actual task counts
+                rescheduleEndNotification(for: block)
             } catch {
                 // Live Activity couldn't be started - not critical
                 liveActivityStarted = false
@@ -169,15 +171,16 @@ struct FocusLiveView: View {
         let tasks = tasksForBlock(block)
         let remainingTasks = tasks.filter { !block.completedTaskIDs.contains($0.id) }
         let currentTask = remainingTasks.first
-        // Task-Ende: blockStart + kumulative Dauern bis inkl. aktuellem Task
+        // Task-Ende: blockStart + kumulative Dauern bis inkl. aktuellem Task, geclampt auf Block-Ende
         var taskEnd: Date?
         if let current = currentTask {
-            var cumulativeMinutes = 0
-            for task in tasks {
-                cumulativeMinutes += task.effectiveDuration
-                if task.id == current.id { break }
-            }
-            taskEnd = block.startDate.addingTimeInterval(Double(cumulativeMinutes * 60))
+            let taskDurations = tasks.map { (id: $0.id, durationMinutes: $0.effectiveDuration) }
+            taskEnd = TimerCalculator.plannedTaskEndDate(
+                blockStartDate: block.startDate,
+                blockEndDate: block.endDate,
+                taskDurations: taskDurations,
+                currentTaskID: current.id
+            )
         }
         liveActivityManager.updateActivity(
             currentTask: currentTask?.title,
@@ -513,6 +516,7 @@ struct FocusLiveView: View {
                 await loadData()
                 if let updatedBlock = activeBlock {
                     updateLiveActivity(for: updatedBlock)
+                    rescheduleEndNotification(for: updatedBlock)
                 }
             } catch {
                 errorMessage = "Task konnte nicht als erledigt markiert werden."
@@ -538,6 +542,7 @@ struct FocusLiveView: View {
                 await loadData()
                 if let updatedBlock = activeBlock {
                     updateLiveActivity(for: updatedBlock)
+                    rescheduleEndNotification(for: updatedBlock)
                 }
             } catch {
                 errorMessage = "Task konnte nicht übersprungen werden."
@@ -564,13 +569,43 @@ struct FocusLiveView: View {
         }
         // If block just ended, play sound and show sprint review
         if block.isPast && !showSprintReview && !reviewDismissed {
+            // Bug 55C: Save current task's time before showing sprint review
+            if let startTime = taskStartTime {
+                let tasks = tasksForBlock(block)
+                let remainingTasks = tasks.filter { !block.completedTaskIDs.contains($0.id) }
+                if let currentTask = remainingTasks.first {
+                    let secondsSpent = Int(Date().timeIntervalSince(startTime))
+                    var updatedTaskTimes = block.taskTimes
+                    updatedTaskTimes[currentTask.id] = (updatedTaskTimes[currentTask.id] ?? 0) + secondsSpent
+                    try? eventKitRepo.updateFocusBlock(
+                        eventID: block.id,
+                        taskIDs: block.taskIDs,
+                        completedTaskIDs: block.completedTaskIDs,
+                        taskTimes: updatedTaskTimes
+                    )
+                }
+                taskStartTime = nil
+            }
             SoundService.playEndGong()
             showSprintReview = true
             warningPlayed = false  // Reset for next block
             // End Live Activity
             liveActivityManager.endActivity()
             liveActivityStarted = false
+            // Reload to get fresh taskTimes for Sprint Review
+            Task { await loadData() }
         }
+    }
+    /// Bug 55B: Re-schedule end notification with current completed/total counts
+    private func rescheduleEndNotification(for block: FocusBlock) {
+        NotificationService.cancelFocusBlockNotification(blockID: block.id)
+        NotificationService.scheduleFocusBlockEndNotification(
+            blockID: block.id,
+            blockTitle: block.title,
+            endDate: block.endDate,
+            completedCount: block.completedTaskIDs.count,
+            totalCount: block.taskIDs.count
+        )
     }
     /// Check if current task is overdue and play reminder every 2 minutes
     private func checkTaskOverdue() {
@@ -615,6 +650,7 @@ struct FocusLiveView: View {
                     let taskDurations = tasks.map { (id: $0.id, durationMinutes: $0.effectiveDuration) }
                     let plannedEnd = TimerCalculator.plannedTaskEndDate(
                         blockStartDate: block.startDate,
+                        blockEndDate: block.endDate,
                         taskDurations: taskDurations,
                         currentTaskID: taskID
                     )
@@ -639,6 +675,7 @@ struct FocusLiveView: View {
         let taskDurations = tasks.map { (id: $0.id, durationMinutes: $0.effectiveDuration) }
         let plannedEnd = TimerCalculator.plannedTaskEndDate(
             blockStartDate: block.startDate,
+            blockEndDate: block.endDate,
             taskDurations: taskDurations,
             currentTaskID: task.id
         )
@@ -655,6 +692,7 @@ struct FocusLiveView: View {
         let taskDurations = tasks.map { (id: $0.id, durationMinutes: $0.effectiveDuration) }
         let plannedEnd = TimerCalculator.plannedTaskEndDate(
             blockStartDate: block.startDate,
+            blockEndDate: block.endDate,
             taskDurations: taskDurations,
             currentTaskID: task.id
         )

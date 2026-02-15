@@ -301,7 +301,9 @@ struct SprintReviewSheet: View {
     }
 
     private var totalDuration: Int {
-        tasks.reduce(0) { $0 + $1.effectiveDuration }
+        let taskSum = tasks.reduce(0) { $0 + $1.effectiveDuration }
+        let blockMinutes = Int(block.endDate.timeIntervalSince(block.startDate) / 60)
+        return min(taskSum, blockMinutes)
     }
 
     private func moveIncompleteTasks() {

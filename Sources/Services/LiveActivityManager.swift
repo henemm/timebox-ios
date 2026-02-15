@@ -21,6 +21,11 @@ final class LiveActivityManager: Sendable {
         // End any existing activity first
         endActivity()
 
+        // Bug 55E: Await-end ALL orphaned activities to prevent duplicates
+        for orphan in Activity<FocusBlockActivityAttributes>.activities {
+            await orphan.end(nil, dismissalPolicy: .immediate)
+        }
+
         print("🚀 [LiveActivity] START: areActivitiesEnabled=\(ActivityAuthorizationInfo().areActivitiesEnabled), block=\(block.title)")
 
         guard isSupported else {
