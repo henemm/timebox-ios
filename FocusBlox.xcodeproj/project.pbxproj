@@ -202,6 +202,7 @@
 		SPRNTRV01BUILD0001 /* SprintReviewUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = SPRNTRV01FILE00001 /* SprintReviewUITests.swift */; };
 		SYNSET01BUILD0001 /* SyncedSettingsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = SYNSET01FILE00001 /* SyncedSettingsTests.swift */; };
 		CKSM01BUILD00001 /* CloudKitSyncMonitorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CKSM01FILE000001 /* CloudKitSyncMonitorTests.swift */; };
+		BUG50RO01BUILD001 /* CalendarEventReadOnlyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BUG50RO01FILE0001 /* CalendarEventReadOnlyTests.swift */; };
 		CKSM02BUILD00001 /* CloudKitSyncMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = CKSM02FILE000001 /* CloudKitSyncMonitor.swift */; };
 		CKSM02BUILD00002 /* CloudKitSyncMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = CKSM02FILE000001 /* CloudKitSyncMonitor.swift */; };
 		SYNSET02BUILD0001 /* SyncedSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = SYNSET02FILE00001 /* SyncedSettings.swift */; };
@@ -533,6 +534,7 @@
 		SPRNTRV01FILE00001 /* SprintReviewUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SprintReviewUITests.swift; sourceTree = "<group>"; };
 		SYNSET01FILE00001 /* SyncedSettingsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncedSettingsTests.swift; sourceTree = "<group>"; };
 		CKSM01FILE000001 /* CloudKitSyncMonitorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitSyncMonitorTests.swift; sourceTree = "<group>"; };
+		BUG50RO01FILE0001 /* CalendarEventReadOnlyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarEventReadOnlyTests.swift; sourceTree = "<group>"; };
 		CKSM02FILE000001 /* CloudKitSyncMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitSyncMonitor.swift; sourceTree = "<group>"; };
 		SYNSET02FILE00001 /* SyncedSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncedSettings.swift; sourceTree = "<group>"; };
 		TAGINP01FILEREF0001 /* TagInputView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagInputView.swift; sourceTree = "<group>"; };
@@ -1031,6 +1033,7 @@
 				SYNSET01FILE00001 /* SyncedSettingsTests.swift */,
 				BUG39LC01FILE00001 /* FocusBlockLifecycleTests.swift */,
 				CKSM01FILE000001 /* CloudKitSyncMonitorTests.swift */,
+				BUG50RO01FILE0001 /* CalendarEventReadOnlyTests.swift */,
 			);
 			path = FocusBloxTests;
 			sourceTree = "<group>";
@@ -1700,6 +1703,7 @@
 				SYNSET01BUILD0001 /* SyncedSettingsTests.swift in Sources */,
 				BUG39LC01BUILD0001 /* FocusBlockLifecycleTests.swift in Sources */,
 				CKSM01BUILD00001 /* CloudKitSyncMonitorTests.swift in Sources */,
+				BUG50RO01BUILD001 /* CalendarEventReadOnlyTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

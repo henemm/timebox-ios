@@ -9,6 +9,8 @@ struct CalendarEvent: Identifiable, Sendable {
     let isAllDay: Bool
     let calendarColor: String?
     let notes: String?
+    let hasAttendees: Bool
+    let isReadOnly: Bool
 
     init(from event: EKEvent) {
         self.id = event.eventIdentifier ?? UUID().uuidString
@@ -18,10 +20,12 @@ struct CalendarEvent: Identifiable, Sendable {
         self.isAllDay = event.isAllDay
         self.calendarColor = event.calendar?.cgColor?.components?.description
         self.notes = event.notes
+        self.hasAttendees = event.hasAttendees
+        self.isReadOnly = event.hasAttendees || !(event.calendar?.allowsContentModifications ?? true)
     }
 
     // For testing
-    init(id: String, title: String, startDate: Date, endDate: Date, isAllDay: Bool, calendarColor: String?, notes: String?) {
+    init(id: String, title: String, startDate: Date, endDate: Date, isAllDay: Bool, calendarColor: String?, notes: String?, hasAttendees: Bool = false) {
         self.id = id
         self.title = title
         self.startDate = startDate
@@ -29,6 +33,8 @@ struct CalendarEvent: Identifiable, Sendable {
         self.isAllDay = isAllDay
         self.calendarColor = calendarColor
         self.notes = notes
+        self.hasAttendees = hasAttendees
+        self.isReadOnly = hasAttendees
     }
 
     var durationMinutes: Int {

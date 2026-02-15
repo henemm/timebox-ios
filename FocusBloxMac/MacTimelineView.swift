@@ -418,6 +418,14 @@ struct EventBlockView: View {
             RoundedRectangle(cornerRadius: 4)
                 .strokeBorder(eventColor.opacity(0.8), lineWidth: 0.5)
         )
+        .overlay(alignment: .topTrailing) {
+            if event.isReadOnly {
+                Image(systemName: "lock.fill")
+                    .font(.system(size: 9))
+                    .foregroundStyle(.white.opacity(0.7))
+                    .padding(4)
+            }
+        }
         .contentShape(Rectangle())
         .onTapGesture {
             onTap?()

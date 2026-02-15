@@ -41,11 +41,21 @@ struct EventBlock: View {
             .padding(.leading, 55)
             .padding(.trailing, 8)
             .offset(y: yOffset)
+            .overlay(alignment: .topTrailing) {
+                if event.isReadOnly {
+                    Image(systemName: "lock.fill")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                        .padding(4)
+                }
+            }
             .contentShape(Rectangle())
             .onTapGesture {
                 onTap?()
             }
-            .draggable(CalendarEventTransfer(from: event))
+            .if(!event.isReadOnly) { view in
+                view.draggable(CalendarEventTransfer(from: event))
+            }
     }
 
     private var categoryConfig: TaskCategory? {

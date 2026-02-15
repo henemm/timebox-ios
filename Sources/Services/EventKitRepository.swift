@@ -226,6 +226,11 @@ final class EventKitRepository: EventKitRepositoryProtocol, @unchecked Sendable 
             return // Silent fail if event not found
         }
 
+        // Events with attendees or from read-only calendars can't be moved
+        if event.hasAttendees || !(event.calendar?.allowsContentModifications ?? true) {
+            throw EventKitError.eventReadOnly
+        }
+
         let newEndDate = Calendar.current.date(
             byAdding: .minute,
             value: duration,
@@ -385,6 +390,7 @@ enum EventKitError: Error, LocalizedError {
     case notAuthorized
     case fetchFailed
     case saveFailed
+    case eventReadOnly
 
     var errorDescription: String? {
         switch self {
@@ -394,6 +400,8 @@ enum EventKitError: Error, LocalizedError {
             return "Erinnerungen konnten nicht geladen werden."
         case .saveFailed:
             return "Kalendereintrag konnte nicht gespeichert werden."
+        case .eventReadOnly:
+            return "Termine mit Gaesten koennen nicht verschoben werden."
         }
     }
 }
