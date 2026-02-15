@@ -250,8 +250,10 @@ final class EventKitRepository: EventKitRepositoryProtocol, @unchecked Sendable 
             return // Silent fail if event not found
         }
 
-        // Try saving to EKEvent notes first
-        do {
+        let isReadOnly = event.hasAttendees || !(event.calendar?.allowsContentModifications ?? true)
+
+        if !isReadOnly {
+            // Editable event: save to notes
             var notes = event.notes ?? ""
             var lines = notes.components(separatedBy: "\n")
             lines.removeAll { $0.hasPrefix("category:") }
@@ -259,9 +261,10 @@ final class EventKitRepository: EventKitRepositoryProtocol, @unchecked Sendable 
                 lines.append("category:\(category)")
             }
             event.notes = lines.filter { !$0.isEmpty }.joined(separator: "\n")
-            try eventStore.save(event, span: .thisEvent)
-        } catch {
-            // Fallback for read-only events (e.g. with attendees): save to iCloud KV Store
+            let span: EKSpan = event.hasRecurrenceRules ? .futureEvents : .thisEvent
+            try eventStore.save(event, span: span)
+        } else {
+            // Read-only event (attendees or read-only calendar): iCloud KV Store
             let store = NSUbiquitousKeyValueStore.default
             if let category = category, !category.isEmpty {
                 store.set(category, forKey: "eventCat_\(eventID)")

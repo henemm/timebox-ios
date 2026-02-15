@@ -20,6 +20,76 @@
 
 ## 🔴 OFFEN
 
+### Bug 54: Wiederkehrende iCloud Termine - Kategorie-Zuordnung fehlgeschlagen
+**Status:** ERLEDIGT (2026-02-15)
+**Prioritaet:** MITTEL
+**Gemeldet:** 2026-02-15
+**Platform:** iOS + macOS (betrifft alle Plattformen)
+
+**Symptom:** Ein wiederkehrender iCloud-Termin laesst sich keine Kategorie zuordnen. Normale (einmalige) iCloud-Termine funktionieren.
+
+**Location:**
+- `Sources/Services/EventKitRepository.swift:245-275` - `updateEventCategory()`
+- `Sources/Models/CalendarEvent.swift:16` - `init(from:)` verwendet `eventIdentifier`
+
+**Problem:**
+- User tippt auf wiederkehrenden Termin, waehlt Kategorie
+- Kategorie wird gespeichert (keine Fehlermeldung)
+- ABER: Am naechsten Tag hat dieselbe Terminserie KEINE Kategorie mehr
+
+**Root Cause:** EventKit verhält sich bei wiederkehrenden Events anders als bei normalen Events:
+
+1. **eventIdentifier bei wiederkehrenden Events:**
+   - MASTER Event: Hat eine ID
+   - Jede OCCURRENCE (taegliche Instanz): Hat UNTERSCHIEDLICHE eventIdentifier
+   - Heute 15.02.: `eventID_ABC123`
+   - Morgen 16.02.: `eventID_XYZ789` (anderer Identifier!)
+
+2. **Aktueller Code (Zeile 264):**
+   ```swift
+   try eventStore.save(event, span: .thisEvent)
+   ```
+   - `.thisEvent` speichert NUR diese EINE Occurrence
+   - Notes mit Kategorie werden nur fuer 15.02. gespeichert
+   - 16.02. Occurrence hat andere ID → andere Notes → keine Kategorie
+
+3. **CalendarEvent.init (Zeile 16):**
+   ```swift
+   self.id = event.eventIdentifier ?? UUID().uuidString
+   ```
+   - Verwendet occurrence-spezifische ID (nicht stabil ueber Zeit)
+
+**Expected vs Actual:**
+- **Expected:** Kategorie gilt fuer ALLE Occurrences (taegliche Wiederholungen)
+- **Actual:** Kategorie gilt NUR fuer EINE Occurrence (heute)
+
+**Warum normale Events funktionieren:**
+- Einmalige Events: eventIdentifier ist stabil, aendert sich nie
+- Wiederkehrende Events: eventIdentifier wechselt bei jeder Occurrence
+
+**Loesung:** Bei wiederkehrenden Events `.futureEvents` statt `.thisEvent` verwenden:
+```swift
+let span: EKSpan = event.hasRecurrenceRules ? .futureEvents : .thisEvent
+try eventStore.save(event, span: span)
+```
+
+**Alternative (falls .futureEvents Probleme macht):**
+- `calendarItemIdentifier` verwenden (stabil fuer alle Occurrences)
+- ODER: iCloud Key-Value Store fuer alle wiederkehrenden Events (wie bei read-only)
+
+**Test Plan:**
+1. Wiederkehrenden Termin erstellen (taeglich, naechste 7 Tage)
+2. Heute auf Termin tippen → Kategorie "income" zuordnen
+3. EXPECTED: Morgen zeigt Termin AUCH "income" Badge
+4. ACTUAL (Bug): Morgen zeigt Termin KEIN Badge
+
+**Geschaetzter Aufwand:** KLEIN (~15-20k Tokens, 2-3 Dateien, ~15 LoC)
+- EventKitRepository.swift: hasRecurrenceRules pruefen + span anpassen
+- CalendarEvent.swift: evtl. `isRecurring` Property hinzufuegen
+- Tests: Unit Test + UI Test fuer wiederkehrende Events
+
+---
+
 ### Aufwand-Uebersicht (geschaetzte Tokens)
 
 | # | Item | Prio | Tokens | Dateien | LoC |
@@ -411,10 +481,12 @@ try? modelContext.save()
 **Commit:** `149ab4e`
 
 ### Bug 38: Cross-Platform Sync
-**Status:** ✅ ERLEDIGT (2026-02-12)
-**Fix 1:** FocusBlocks aus ALLEN Kalendern laden (nicht nur sichtbare)
-**Fix 2:** SyncedSettings mit iCloud Key-Value Store
-**Commit:** `49f5f9c`
+**Status:** ✅ ERLEDIGT (2026-02-14)
+**Fix 1:** FocusBlocks aus ALLEN Kalendern laden (nicht nur sichtbare) - `49f5f9c`
+**Fix 2:** SyncedSettings mit iCloud Key-Value Store - `49f5f9c`
+**Fix 3:** CloudKitSyncMonitor + Feld-Migration (V2 nur non-nil) - `165a2b1`
+**Fix 4:** Race Condition: `modelContext.save()` vor Fetch + 200ms Delay nach RemoteChange - `5946410`
+**Root Cause Fix 4:** `eventChangedNotification` feuert bevor Daten im ModelContext verfuegbar. `save()` erzwingt Context-Merge.
 
 ### Bug 34: Duplikate nach CloudKit-Aktivierung
 **Status:** ✅ ERLEDIGT (2026-02-11)
