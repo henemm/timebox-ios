@@ -228,6 +228,8 @@
 		WARNUI01BUILDFILE0001 /* WarningSettingsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = WARNUI01FILEREF00001 /* WarningSettingsUITests.swift */; };
 		RECRSVC02BUILD001 /* RecurrenceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = RECRSVC02FILE0001 /* RecurrenceService.swift */; };
 		RECRSVC02BUILD002 /* RecurrenceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = RECRSVC02FILE0001 /* RecurrenceService.swift */; };
+		RVWOS01BUILD0001 /* ReviewOutsideSprintTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = RVWOS01FILE00001 /* ReviewOutsideSprintTests.swift */; };
+		RVWCT01BUILD0001 /* ReviewCompletedTasksUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = RVWCT01FILE00001 /* ReviewCompletedTasksUITests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -563,6 +565,8 @@
 		WARNTIM01FILEREF0001 /* WarningTiming.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WarningTiming.swift; sourceTree = "<group>"; };
 		WARNUI01FILEREF00001 /* WarningSettingsUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WarningSettingsUITests.swift; sourceTree = "<group>"; };
 		RECRSVC02FILE0001 /* RecurrenceService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecurrenceService.swift; sourceTree = "<group>"; };
+		RVWOS01FILE00001 /* ReviewOutsideSprintTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewOutsideSprintTests.swift; sourceTree = "<group>"; };
+		RVWCT01FILE00001 /* ReviewCompletedTasksUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewCompletedTasksUITests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -737,6 +741,7 @@
 				6010F2B272B933C827183F0A /* RemindersQuickEditUITests.swift */,
 				999425519C2EA7E01EFD2490 /* BacklogSwipeActionsUITests.swift */,
 				RECRBDG01FILE00001 /* RecurrenceBadgeUITests.swift */,
+				RVWCT01FILE00001 /* ReviewCompletedTasksUITests.swift */,
 			);
 			path = FocusBloxUITests;
 			sourceTree = "<group>";
@@ -936,6 +941,7 @@
 				BUG50RO01FILE0001 /* CalendarEventReadOnlyTests.swift */,
 				CATBDG01FILE00001 /* CategoryIconBadgeTests.swift */,
 				RECRSVC01FILE00001 /* RecurrenceServiceTests.swift */,
+				RVWOS01FILE00001 /* ReviewOutsideSprintTests.swift */,
 			);
 			path = FocusBloxTests;
 			sourceTree = "<group>";
@@ -1581,6 +1587,7 @@
 				1D22359BADEDFEF0CE024E7B /* RemindersQuickEditUITests.swift in Sources */,
 				6FCF2913C09B03CD3681047E /* BacklogSwipeActionsUITests.swift in Sources */,
 				RECRBDG01BUILD0001 /* RecurrenceBadgeUITests.swift in Sources */,
+				RVWCT01BUILD0001 /* ReviewCompletedTasksUITests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1631,6 +1638,7 @@
 				BUG50RO01BUILD001 /* CalendarEventReadOnlyTests.swift in Sources */,
 				CATBDG01BUILD0001 /* CategoryIconBadgeTests.swift in Sources */,
 				RECRSVC01BUILD0001 /* RecurrenceServiceTests.swift in Sources */,
+				RVWOS01BUILD0001 /* ReviewOutsideSprintTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

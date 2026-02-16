@@ -1,0 +1,5 @@
+Unit Test RED - ReviewOutsideSprintTests
+Test Suite 'ReviewOutsideSprintTests' passed at 2026-02-16
+     Executed 4 tests, with 0 failures (0 unexpected) in 0.534 seconds
+All 4 unit tests PASSED - filter logic is self-contained in test helper.
+Tests verify: todayCompleted filter, yesterday exclusion, incomplete exclusion, block exclusion.

@@ -504,6 +504,14 @@ struct FocusBloxApp: App {
         context.insert(fbTask2)
         context.insert(fbTask3)
 
+        // Completed task outside any FocusBlock (for Review tab testing)
+        let completedOutsideBlock = LocalTask(title: "Erledigte Backlog-Aufgabe", importance: 2, estimatedDuration: 20, urgency: "not_urgent")
+        completedOutsideBlock.isNextUp = false
+        completedOutsideBlock.isCompleted = true
+        completedOutsideBlock.completedAt = Date()
+        completedOutsideBlock.taskType = "shallow_work"
+        context.insert(completedOutsideBlock)
+
         try? context.save()
     }
 }

@@ -1,0 +1,4 @@
+UI Test RED - ReviewCompletedTasksUITests
+Test case 'ReviewCompletedTasksUITests.testOutsideSprintSectionVisible()' failed on simulator (25.041 seconds)
+XCTAssertTrue failed - 'Ohne Sprint erledigt' section does not exist yet
+** TEST FAILED **

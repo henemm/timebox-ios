@@ -48,9 +48,45 @@ struct DailyReviewView: View {
         }
     }
 
+    /// All tasks completed today (Block + Backlog)
+    private var todayCompletedTasks: [PlanItem] {
+        let calendar = Calendar.current
+        let startOfToday = calendar.startOfDay(for: Date())
+        return allTasks.filter { task in
+            guard task.isCompleted, let completedAt = task.completedAt else { return false }
+            return completedAt >= startOfToday
+        }
+    }
+
+    /// All tasks completed this week
+    private var weekCompletedTasks: [PlanItem] {
+        let calendar = Calendar.current
+        guard let weekInterval = calendar.dateInterval(of: .weekOfYear, for: Date()) else { return [] }
+        return allTasks.filter { task in
+            guard task.isCompleted, let completedAt = task.completedAt else { return false }
+            return completedAt >= weekInterval.start && completedAt < weekInterval.end
+        }
+    }
+
+    /// Tasks completed today but NOT in any block
+    private var todayOutsideSprintTasks: [PlanItem] {
+        let blockCompletedIDs = Set(todayBlocks.flatMap { $0.completedTaskIDs })
+        return todayCompletedTasks.filter { !blockCompletedIDs.contains($0.id) }
+    }
+
     /// Category statistics for daily view (tasks + calendar events)
     private var dailyCategoryStats: [CategoryStat] {
-        computeCategoryStats(blocks: todayBlocks, events: todayCalendarEvents)
+        var taskStats: [String: Int] = [:]
+        for task in todayCompletedTasks {
+            taskStats[task.taskType, default: 0] += task.effectiveDuration
+        }
+        let combined = statsCalculator.computeCategoryMinutes(
+            taskMinutesByCategory: taskStats, calendarEvents: todayCalendarEvents
+        )
+        return TaskCategory.allCases.compactMap { config in
+            guard let minutes = combined[config.rawValue], minutes > 0 else { return nil }
+            return CategoryStat(config: config, minutes: minutes)
+        }.sorted { $0.minutes > $1.minutes }
     }
 
     /// Total minutes for daily category stats
@@ -60,31 +96,15 @@ struct DailyReviewView: View {
 
     /// Category statistics for weekly view (tasks + calendar events)
     private var categoryStats: [CategoryStat] {
-        computeCategoryStats(blocks: weekBlocks, events: calendarEvents)
-    }
-
-    /// Shared computation for category stats from blocks and events
-    private func computeCategoryStats(blocks: [FocusBlock], events: [CalendarEvent]) -> [CategoryStat] {
         var taskStats: [String: Int] = [:]
-
-        // Get all completed task IDs from blocks
-        let completedIDs = Set(blocks.flatMap { $0.completedTaskIDs })
-
-        // Calculate total minutes per category from tasks
-        for task in allTasks where completedIDs.contains(task.id) {
-            let category = task.taskType
-            taskStats[category, default: 0] += task.effectiveDuration
+        for task in weekCompletedTasks {
+            taskStats[task.taskType, default: 0] += task.effectiveDuration
         }
-
-        // Combine task stats with calendar event stats
-        let combinedStats = statsCalculator.computeCategoryMinutes(
-            taskMinutesByCategory: taskStats,
-            calendarEvents: events
+        let combined = statsCalculator.computeCategoryMinutes(
+            taskMinutesByCategory: taskStats, calendarEvents: calendarEvents
         )
-
-        // Convert to CategoryStat array sorted by minutes
         return TaskCategory.allCases.compactMap { config in
-            guard let minutes = combinedStats[config.rawValue], minutes > 0 else { return nil }
+            guard let minutes = combined[config.rawValue], minutes > 0 else { return nil }
             return CategoryStat(config: config, minutes: minutes)
         }.sorted { $0.minutes > $1.minutes }
     }
@@ -94,9 +114,9 @@ struct DailyReviewView: View {
         categoryStats.reduce(0) { $0 + $1.minutes }
     }
 
-    /// Weekly completion stats
+    /// Weekly completion stats (all completed tasks, not just block-based)
     private var weeklyTotalCompleted: Int {
-        weekBlocks.reduce(0) { $0 + $1.completedTaskIDs.count }
+        weekCompletedTasks.count
     }
 
     private var weeklyTotalPlanned: Int {
@@ -109,7 +129,7 @@ struct DailyReviewView: View {
     }
 
     private var totalCompleted: Int {
-        todayBlocks.reduce(0) { $0 + $1.completedTaskIDs.count }
+        todayCompletedTasks.count
     }
 
     private var totalPlanned: Int {
@@ -143,7 +163,7 @@ struct DailyReviewView: View {
                     } else {
                         switch reviewMode {
                         case .today:
-                            if todayBlocks.isEmpty {
+                            if todayBlocks.isEmpty && todayCompletedTasks.isEmpty {
                                 emptyState
                             } else {
                                 VStack(spacing: 24) {
@@ -151,6 +171,9 @@ struct DailyReviewView: View {
                                     dailyCategoryStatsSection
                                     planningAccuracySection(blocks: todayBlocks)
                                     blocksSection
+                                    if !todayOutsideSprintTasks.isEmpty {
+                                        outsideSprintSection
+                                    }
                                 }
                                 .padding(.horizontal)
                             }
@@ -523,6 +546,35 @@ struct DailyReviewView: View {
         )
     }
 
+    // MARK: - Outside Sprint Section
+
+    private var outsideSprintSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Text("Ohne Sprint erledigt")
+                    .font(.headline)
+                Spacer()
+                Text("\(todayOutsideSprintTasks.count)")
+                    .font(.headline)
+                    .foregroundStyle(.green)
+            }
+            VStack(spacing: 8) {
+                ForEach(todayOutsideSprintTasks) { task in
+                    ReviewTaskRow(task: task, isCompleted: true)
+                }
+            }
+        }
+        .padding()
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(.background)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .strokeBorder(.secondary.opacity(0.2), lineWidth: 1)
+        )
+    }
+
     // MARK: - Helper Functions
 
     private var todayDateString: String {
@@ -536,13 +588,21 @@ struct DailyReviewView: View {
     private func loadData() async {
         isLoading = true
 
+        // Load tasks from SwiftData (independent of calendar access)
         do {
-            // Load focus blocks and calendar events for the week
+            let descriptor = FetchDescriptor<LocalTask>()
+            let localTasks = try modelContext.fetch(descriptor)
+            allTasks = localTasks.map { PlanItem(localTask: $0) }
+        } catch {
+            allTasks = []
+        }
+
+        // Load focus blocks and calendar events for the week
+        do {
             var allBlocks: [FocusBlock] = []
             var allEvents: [CalendarEvent] = []
             let calendar = Calendar.current
             if let weekInterval = calendar.dateInterval(of: .weekOfYear, for: Date()) {
-                // Load blocks and events for each day of the week
                 var currentDate = weekInterval.start
                 while currentDate < weekInterval.end {
                     let dayBlocks = try eventKitRepo.fetchFocusBlocks(for: currentDate)
@@ -554,15 +614,8 @@ struct DailyReviewView: View {
             }
             blocks = allBlocks
             calendarEvents = allEvents
-
-            // Load ALL tasks (including completed) via FetchDescriptor
-            let descriptor = FetchDescriptor<LocalTask>()
-            let localTasks = try modelContext.fetch(descriptor)
-            allTasks = localTasks.map { PlanItem(localTask: $0) }
         } catch {
-            // Silently fail - UI will show empty state
             blocks = []
-            allTasks = []
             calendarEvents = []
         }
 

@@ -158,7 +158,7 @@ struct DayReviewContent: View {
     var statsCalculator: ReviewStatsCalculator = ReviewStatsCalculator()
 
     private var totalCompleted: Int {
-        blocks.reduce(0) { $0 + $1.completedTaskIDs.count }
+        completedTasks.count
     }
 
     private var totalPlanned: Int {
@@ -168,6 +168,12 @@ struct DayReviewContent: View {
     private var completionPercentage: Int {
         guard totalPlanned > 0 else { return 0 }
         return Int((Double(totalCompleted) / Double(totalPlanned)) * 100)
+    }
+
+    /// Tasks completed today but NOT in any block
+    private var outsideSprintTasks: [LocalTask] {
+        let blockCompletedIDs = Set(blocks.flatMap { $0.completedTaskIDs })
+        return completedTasks.filter { !blockCompletedIDs.contains($0.id) }
     }
 
     private var dayCategoryStats: [CategoryStat] {
@@ -220,9 +226,55 @@ struct DayReviewContent: View {
                     if !blocks.isEmpty {
                         blocksSection
                     }
+
+                    // Tasks completed outside blocks
+                    if !outsideSprintTasks.isEmpty {
+                        outsideSprintSection
+                    }
                 }
                 .padding(.vertical)
             }
+        }
+    }
+
+    // MARK: - Outside Sprint Section
+
+    private var outsideSprintSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Text("Ohne Sprint erledigt")
+                    .font(.headline)
+                Spacer()
+                Text("\(outsideSprintTasks.count)")
+                    .font(.headline)
+                    .foregroundStyle(.green)
+            }
+            .padding(.horizontal)
+
+            VStack(spacing: 6) {
+                ForEach(outsideSprintTasks, id: \.uuid) { task in
+                    HStack(spacing: 8) {
+                        Image(systemName: "checkmark.circle.fill")
+                            .foregroundStyle(.green)
+                            .font(.subheadline)
+                        Text(task.title)
+                            .font(.subheadline)
+                            .strikethrough(true, color: .secondary)
+                        Spacer()
+                        if let category = TaskCategory(rawValue: task.taskType) {
+                            Image(systemName: category.icon)
+                                .font(.caption)
+                                .foregroundStyle(category.color)
+                        }
+                        if let duration = task.estimatedDuration {
+                            Text("\(duration) min")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                }
+            }
+            .padding(.horizontal)
         }
     }
 
@@ -373,7 +425,7 @@ struct WeekReviewContent: View {
     var statsCalculator: ReviewStatsCalculator = ReviewStatsCalculator()
 
     private var totalCompleted: Int {
-        blocks.reduce(0) { $0 + $1.completedTaskIDs.count }
+        completedTasks.count
     }
 
     private var totalPlanned: Int {
