@@ -139,14 +139,12 @@ struct BacklogRow: View {
                         .font(.caption2)
                         .lineLimit(1)
                         .foregroundStyle(.secondary)
-                        .fixedSize()
                 }
 
                 if item.tags.count > 2 {
                     Text("+\(item.tags.count - 2)")
                         .font(.caption2)
                         .foregroundStyle(.secondary)
-                        .fixedSize()
                 }
             }
 
@@ -161,9 +159,10 @@ struct BacklogRow: View {
                 }
                 .font(.caption2)
                 .foregroundStyle(dueDate.isDueToday ? .red : .secondary)
-                .fixedSize()
+                .lineLimit(1)
             }
         }
+        .clipped()
     }
 
     // MARK: - Importance Badge (tappable, cycles 1 → 2 → 3 → 1)
@@ -280,7 +279,6 @@ struct BacklogRow: View {
             )
         }
         .buttonStyle(.plain)
-        .fixedSize()
         .accessibilityIdentifier("categoryBadge_\(item.id)")
         .accessibilityLabel("Kategorie: \(categoryLabel)")
     }

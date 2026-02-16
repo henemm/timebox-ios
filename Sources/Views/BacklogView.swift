@@ -1021,6 +1021,31 @@ struct QuadrantCard: View {
                         onTitleSave: onTitleSave.map { callback in { newTitle in callback(task, newTitle) } }
                     )
                     .padding(.horizontal, 8)
+                    .contextMenu {
+                        Button {
+                            onAddToNextUp(task)
+                        } label: {
+                            Label("Next Up", systemImage: "arrow.up.circle.fill")
+                        }
+
+                        if let editCallback = onEditTap {
+                            Button {
+                                editCallback(task)
+                            } label: {
+                                Label("Bearbeiten", systemImage: "pencil")
+                            }
+                        }
+
+                        Divider()
+
+                        if let deleteCallback = onDeleteTap {
+                            Button(role: .destructive) {
+                                deleteCallback(task)
+                            } label: {
+                                Label("Löschen", systemImage: "trash")
+                            }
+                        }
+                    }
                 }
 
                 if tasks.count > 5 {
