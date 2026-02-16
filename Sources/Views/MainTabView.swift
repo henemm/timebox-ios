@@ -10,12 +10,12 @@ struct MainTabView: View {
 
             BlockPlanningView()
                 .tabItem {
-                    Label("Blöcke", systemImage: "rectangle.split.3x1")
+                    Label("Blöcke", systemImage: "calendar")
                 }
 
             TaskAssignmentView()
                 .tabItem {
-                    Label("Zuordnen", systemImage: "arrow.up.and.down.text.horizontal")
+                    Label("Zuordnen", systemImage: "arrow.up.arrow.down")
                 }
 
             FocusLiveView()
@@ -25,8 +25,9 @@ struct MainTabView: View {
 
             DailyReviewView()
                 .tabItem {
-                    Label("Rückblick", systemImage: "clock.arrow.circlepath")
+                    Label("Rückblick", systemImage: "chart.bar")
                 }
         }
+        .accessibilityIdentifier("mainTabView_unified")
     }
 }

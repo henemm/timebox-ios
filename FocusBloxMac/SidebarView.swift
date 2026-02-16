@@ -17,7 +17,7 @@ enum MainSection: String, Hashable, CaseIterable {
 
     var icon: String {
         switch self {
-        case .backlog: return "tray.full"
+        case .backlog: return "list.bullet"
         case .planning: return "calendar"
         case .assign: return "arrow.up.arrow.down"
         case .focus: return "target"
