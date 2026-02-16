@@ -132,6 +132,23 @@ struct BacklogRow: View {
             // 3. Category Badge
             categoryBadge
 
+            // 3b. Recurrence Badge (only if recurring)
+            if let pattern = item.recurrencePattern, pattern != "none" {
+                HStack(spacing: 4) {
+                    Image(systemName: "arrow.triangle.2.circlepath")
+                    Text(RecurrencePattern(rawValue: pattern)?.displayName ?? pattern)
+                        .lineLimit(1)
+                }
+                .font(.caption2)
+                .foregroundStyle(.purple)
+                .padding(.horizontal, 6)
+                .padding(.vertical, 4)
+                .background(
+                    RoundedRectangle(cornerRadius: 6)
+                        .fill(.purple.opacity(0.2))
+                )
+            }
+
             // 4. Tags (max 2, dann "+N") - plain text, no chips
             if !item.tags.isEmpty {
                 ForEach(item.tags.prefix(2), id: \.self) { tag in

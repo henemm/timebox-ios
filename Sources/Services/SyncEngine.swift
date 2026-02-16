@@ -101,6 +101,12 @@ final class SyncEngine {
         // Clear assignment when completing
         task.assignedFocusBlockID = nil
         task.isNextUp = false
+
+        // Generate next instance for recurring tasks
+        if task.recurrencePattern != "none" {
+            RecurrenceService.createNextInstance(from: task, in: modelContext)
+        }
+
         try modelContext.save()
     }
 

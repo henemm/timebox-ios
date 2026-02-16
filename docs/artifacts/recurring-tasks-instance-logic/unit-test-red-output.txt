@@ -1,0 +1,7 @@
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/RecurrenceServiceTests.swift:13:22: error: cannot find 'RecurrenceService' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/RecurrenceServiceTests.swift:23:22: error: cannot find 'RecurrenceService' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/RecurrenceServiceTests.swift:32:22: error: cannot find 'RecurrenceService' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/RecurrenceServiceTests.swift:40:22: error: cannot find 'RecurrenceService' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/RecurrenceServiceTests.swift:49:22: error: cannot find 'RecurrenceService' in scope
+---
+BUILD FAILED: cannot find 'RecurrenceService' in scope - 10+ compilation errors

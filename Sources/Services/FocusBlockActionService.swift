@@ -49,6 +49,12 @@ enum FocusBlockActionService {
             localTask.isCompleted = true
             localTask.completedAt = Date()
             localTask.assignedFocusBlockID = nil  // Bug 52: Clear block assignment on complete
+
+            // Generate next instance for recurring tasks
+            if localTask.recurrencePattern != "none" {
+                RecurrenceService.createNextInstance(from: localTask, in: modelContext)
+            }
+
             try? modelContext.save()
         }
 
