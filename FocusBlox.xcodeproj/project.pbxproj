@@ -94,6 +94,7 @@
 		BUG14DUR01BUILD000001 /* FocusBlockDurationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BUG14DUR01FILEREF0001 /* FocusBlockDurationTests.swift */; };
 		BUG34DDP01BUILD000001 /* DedupCleanupTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BUG34DDP01FILEREF0001 /* DedupCleanupTests.swift */; };
 		BUG35QCI01BUILD000001 /* QuickCaptureIntentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BUG35QCI01FILEREF0001 /* QuickCaptureIntentTests.swift */; };
+		QCNEXTUP02BUILD00001 /* QuickAddNextUpTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = QCNEXTUP02FILE000001 /* QuickAddNextUpTests.swift */; };
 		BUG35SNP01BUILD0001 /* CreateTaskSnippetIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = BUG35SNP01FILEREF01 /* CreateTaskSnippetIntent.swift */; };
 		BUG35SNP02BUILD0001 /* QuickCaptureState.swift in Sources */ = {isa = PBXBuildFile; fileRef = BUG35SNP02FILEREF01 /* QuickCaptureState.swift */; };
 		BUG35SNP03BUILD0001 /* QuickCaptureSnippetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BUG35SNP03FILEREF01 /* QuickCaptureSnippetView.swift */; };
@@ -124,6 +125,8 @@
 		DE5811F4F48BE79B9EB7C818 /* PlanningViewUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C40AFBB545C0FA15517B9CE4 /* PlanningViewUITests.swift */; };
 		DSGNSYS01BUILD0001 /* DesignSystemTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DSGNSYS01FILE00001 /* DesignSystemTests.swift */; };
 		DSGNSYS02BUILD0001 /* DesignSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = DSGNSYS02FILE00001 /* DesignSystem.swift */; };
+		CATBDG02BUILD0001 /* CategoryIconBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = CATBDG02FILE00001 /* CategoryIconBadge.swift */; };
+		CATBDG02BUILD0002 /* CategoryIconBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = CATBDG02FILE00001 /* CategoryIconBadge.swift */; };
 		DYNISLD01BUILD0001 /* DynamicIslandUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DYNISLD01FILE00001 /* DynamicIslandUITests.swift */; };
 		E6DF69A28B0DB868B330DADD /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5F22CE94E29A523114817BF /* ContentView.swift */; };
 		E907CB03C20C1B55A48C4B1B /* BacklogRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92133F2683BB9B90566D7646 /* BacklogRow.swift */; };
@@ -177,6 +180,7 @@
 		PERMREQ02BUILD0001 /* PermissionRequestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = PERMREQ02FILE0001 /* PermissionRequestTests.swift */; };
 		PULLREF01BUILD0001 /* PullToRefreshUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = PULLREF01FILE00001 /* PullToRefreshUITests.swift */; };
 		QCAP001BUILDFILE00001 /* QuickCaptureUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = QCAP001FILEREF000001 /* QuickCaptureUITests.swift */; };
+		QCNEXTUP01BUILD00001 /* QuickCaptureNextUpUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = QCNEXTUP01FILE000001 /* QuickCaptureNextUpUITests.swift */; };
 		QCVIEW001BUILDFILE00001 /* QuickCaptureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = QCVIEW001FILEREF00001 /* QuickCaptureView.swift */; };
 		QKEDIT01BUILD0001 /* QuickEditBacklogUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = QKEDIT01FILE00001 /* QuickEditBacklogUITests.swift */; };
 		QKEDIT02BUILD0001 /* QuickEditPickerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = QKEDIT02FILE00001 /* QuickEditPickerTests.swift */; };
@@ -203,6 +207,7 @@
 		SYNSET01BUILD0001 /* SyncedSettingsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = SYNSET01FILE00001 /* SyncedSettingsTests.swift */; };
 		CKSM01BUILD00001 /* CloudKitSyncMonitorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CKSM01FILE000001 /* CloudKitSyncMonitorTests.swift */; };
 		BUG50RO01BUILD001 /* CalendarEventReadOnlyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BUG50RO01FILE0001 /* CalendarEventReadOnlyTests.swift */; };
+		CATBDG01BUILD0001 /* CategoryIconBadgeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CATBDG01FILE00001 /* CategoryIconBadgeTests.swift */; };
 		CKSM02BUILD00001 /* CloudKitSyncMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = CKSM02FILE000001 /* CloudKitSyncMonitor.swift */; };
 		CKSM02BUILD00002 /* CloudKitSyncMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = CKSM02FILE000001 /* CloudKitSyncMonitor.swift */; };
 		SYNSET02BUILD0001 /* SyncedSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = SYNSET02FILE00001 /* SyncedSettings.swift */; };
@@ -475,6 +480,7 @@
 		DFD460F955B924EB6F6C5B94 /* TaskFormTbdUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TaskFormTbdUITests.swift; sourceTree = "<group>"; };
 		DSGNSYS01FILE00001 /* DesignSystemTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignSystemTests.swift; sourceTree = "<group>"; };
 		DSGNSYS02FILE00001 /* DesignSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignSystem.swift; sourceTree = "<group>"; };
+		CATBDG02FILE00001 /* CategoryIconBadge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryIconBadge.swift; sourceTree = "<group>"; };
 		DYNISLD01FILE00001 /* DynamicIslandUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DynamicIslandUITests.swift; sourceTree = "<group>"; };
 		E1F3228806B919AB0836326F /* ReminderData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReminderData.swift; sourceTree = "<group>"; };
 		E6D939B402B46840351D9475 /* EventKitRepositoryProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventKitRepositoryProtocol.swift; sourceTree = "<group>"; };
@@ -507,6 +513,8 @@
 		PERMREQ02FILE0001 /* PermissionRequestTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionRequestTests.swift; sourceTree = "<group>"; };
 		PULLREF01FILE00001 /* PullToRefreshUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PullToRefreshUITests.swift; sourceTree = "<group>"; };
 		QCAP001FILEREF000001 /* QuickCaptureUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickCaptureUITests.swift; sourceTree = "<group>"; };
+		QCNEXTUP01FILE000001 /* QuickCaptureNextUpUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickCaptureNextUpUITests.swift; sourceTree = "<group>"; };
+		QCNEXTUP02FILE000001 /* QuickAddNextUpTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickAddNextUpTests.swift; sourceTree = "<group>"; };
 		QCVIEW001FILEREF00001 /* QuickCaptureView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickCaptureView.swift; sourceTree = "<group>"; };
 		QKEDIT01FILE00001 /* QuickEditBacklogUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickEditBacklogUITests.swift; sourceTree = "<group>"; };
 		QKEDIT02FILE00001 /* QuickEditPickerTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = QuickEditPickerTests.swift; sourceTree = "<group>"; };
@@ -535,6 +543,7 @@
 		SYNSET01FILE00001 /* SyncedSettingsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncedSettingsTests.swift; sourceTree = "<group>"; };
 		CKSM01FILE000001 /* CloudKitSyncMonitorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitSyncMonitorTests.swift; sourceTree = "<group>"; };
 		BUG50RO01FILE0001 /* CalendarEventReadOnlyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarEventReadOnlyTests.swift; sourceTree = "<group>"; };
+		CATBDG01FILE00001 /* CategoryIconBadgeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryIconBadgeTests.swift; sourceTree = "<group>"; };
 		CKSM02FILE000001 /* CloudKitSyncMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitSyncMonitor.swift; sourceTree = "<group>"; };
 		SYNSET02FILE00001 /* SyncedSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncedSettings.swift; sourceTree = "<group>"; };
 		TAGINP01FILEREF0001 /* TagInputView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagInputView.swift; sourceTree = "<group>"; };
@@ -787,6 +796,7 @@
 				TAUX001FILEREF000001 /* TaskAssignmentUITests.swift */,
 				FBREORD01FILE00001 /* FocusBlockReorderUITests.swift */,
 				QCAP001FILEREF000001 /* QuickCaptureUITests.swift */,
+				QCNEXTUP01FILE000001 /* QuickCaptureNextUpUITests.swift */,
 				B9C8001C9F5CBCA0AC28B19A /* UXImprovementsUITests.swift */,
 				SCROLL001FILEREF00001 /* ScrollingUITests.swift */,
 				SNDUI001FILEREF00001 /* SoundSettingsUITests.swift */,
@@ -909,6 +919,7 @@
 				9B35F02DA57C64E51F6EC483 /* NextUpSection.swift */,
 				86453EFF3FD7231E39EC5E4D /* BacklogView.swift */,
 				DSGNSYS02FILE00001 /* DesignSystem.swift */,
+				CATBDG02FILE00001 /* CategoryIconBadge.swift */,
 				20D808247CA55763ACF23BC5 /* BlockPlanningView.swift */,
 				D5F22CE94E29A523114817BF /* ContentView.swift */,
 				FDD319A3F7DEE05F6A8885FC /* DurationBadge.swift */,
@@ -1002,6 +1013,7 @@
 				BUG14DUR01FILEREF0001 /* FocusBlockDurationTests.swift */,
 				BUG34DDP01FILEREF0001 /* DedupCleanupTests.swift */,
 				BUG35QCI01FILEREF0001 /* QuickCaptureIntentTests.swift */,
+				QCNEXTUP02FILE000001 /* QuickAddNextUpTests.swift */,
 				BUG36DIAG01FILEREF001 /* CCQuickTaskDiagTests.swift */,
 				64C281ADBE9DA2AC381CB747 /* LocalTaskSourceTests.swift */,
 				01F676CC7EA20C97ACDD9D18 /* LocalTaskTests.swift */,
@@ -1034,6 +1046,7 @@
 				BUG39LC01FILE00001 /* FocusBlockLifecycleTests.swift */,
 				CKSM01FILE000001 /* CloudKitSyncMonitorTests.swift */,
 				BUG50RO01FILE0001 /* CalendarEventReadOnlyTests.swift */,
+				CATBDG01FILE00001 /* CategoryIconBadgeTests.swift */,
 			);
 			path = FocusBloxTests;
 			sourceTree = "<group>";
@@ -1525,6 +1538,7 @@
 				58649A426A8AF17A4944DBCF /* NextUpSection.swift in Sources */,
 				402B599EB1486BA1E69EF4FF /* BacklogView.swift in Sources */,
 				DSGNSYS02BUILD0001 /* DesignSystem.swift in Sources */,
+				CATBDG02BUILD0001 /* CategoryIconBadge.swift in Sources */,
 				83C779D1EFB193A3B7A2E5AD /* BlockPlanningView.swift in Sources */,
 				D4D7EAC3019BD5B643DC70F8 /* CalendarEvent.swift in Sources */,
 				B9D12D9BF22325ADDE757862 /* CalendarEventTransfer.swift in Sources */,
@@ -1621,6 +1635,7 @@
 				TAUX001BUILDFILE00001 /* TaskAssignmentUITests.swift in Sources */,
 				FBREORD01BUILD0001 /* FocusBlockReorderUITests.swift in Sources */,
 				QCAP001BUILDFILE00001 /* QuickCaptureUITests.swift in Sources */,
+				QCNEXTUP01BUILD00001 /* QuickCaptureNextUpUITests.swift in Sources */,
 				4BE1E3D56F11189BF6AA8459 /* UXImprovementsUITests.swift in Sources */,
 				SCROLL001BUILDFILE0001 /* ScrollingUITests.swift in Sources */,
 				SNDUI001BUILDFILE0001 /* SoundSettingsUITests.swift in Sources */,
@@ -1670,6 +1685,7 @@
 				BUG14DUR01BUILD000001 /* FocusBlockDurationTests.swift in Sources */,
 				BUG34DDP01BUILD000001 /* DedupCleanupTests.swift in Sources */,
 				BUG35QCI01BUILD000001 /* QuickCaptureIntentTests.swift in Sources */,
+				QCNEXTUP02BUILD00001 /* QuickAddNextUpTests.swift in Sources */,
 				BUG36DIAG01BUILD00001 /* CCQuickTaskDiagTests.swift in Sources */,
 				B59D2883B998A9D4A297ED2C /* LocalTaskSourceTests.swift in Sources */,
 				6B6843B1FA16372D73DF9402 /* LocalTaskTests.swift in Sources */,
@@ -1704,6 +1720,7 @@
 				BUG39LC01BUILD0001 /* FocusBlockLifecycleTests.swift in Sources */,
 				CKSM01BUILD00001 /* CloudKitSyncMonitorTests.swift in Sources */,
 				BUG50RO01BUILD001 /* CalendarEventReadOnlyTests.swift in Sources */,
+				CATBDG01BUILD0001 /* CategoryIconBadgeTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1756,6 +1773,7 @@
 			files = (
 				B7DFC0952F2E9646009C2881 /* LocalTask.swift in Sources */,
 				TASKCAT01BUILD00001 /* TaskCategory.swift in Sources */,
+				CATBDG02BUILD0002 /* CategoryIconBadge.swift in Sources */,
 				RVWSTAT02BUILD00001 /* ReviewStatsCalculator.swift in Sources */,
 				TAGINP02BUILD000001 /* TagInputView.swift in Sources */,
 				B7DFC0962F2E965E009C2881 /* TaskSource.swift in Sources */,

@@ -128,6 +128,7 @@ final class QuickCaptureController {
 struct QuickCaptureView: View {
     @Environment(\.modelContext) private var modelContext
     @State private var taskTitle = ""
+    @State private var isNextUp = false
     @FocusState private var isFocused: Bool
     let onDismiss: () -> Void
 
@@ -147,6 +148,14 @@ struct QuickCaptureView: View {
                 .onExitCommand {
                     onDismiss()
                 }
+
+            Button(action: { isNextUp.toggle() }) {
+                Image(systemName: isNextUp ? "arrow.up.circle.fill" : "arrow.up.circle")
+                    .foregroundStyle(isNextUp ? .blue : .secondary)
+            }
+            .buttonStyle(.borderless)
+            .help("Next Up")
+            .accessibilityIdentifier("qc_nextUpButton")
 
             if !taskTitle.isEmpty {
                 Button(action: addTask) {
@@ -172,12 +181,19 @@ struct QuickCaptureView: View {
     private func addTask() {
         guard !taskTitle.isEmpty else { return }
         let title = taskTitle
+        let shouldMarkNextUp = isNextUp
         taskTitle = ""
+        isNextUp = false
         onDismiss()
 
         Task {
             let taskSource = LocalTaskSource(modelContext: modelContext)
-            _ = try? await taskSource.createTask(title: title, taskType: "")
+            let task = try? await taskSource.createTask(title: title, taskType: "")
+            if shouldMarkNextUp, let task {
+                task.isNextUp = true
+                task.nextUpSortOrder = Int.max
+                try? modelContext.save()
+            }
         }
     }
 }

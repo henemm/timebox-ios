@@ -19,6 +19,7 @@ struct QuickCaptureView: View {
     @State private var urgency: String? = nil  // nil → not_urgent → urgent → nil
     @State private var taskType: String = "maintenance"
     @State private var estimatedDuration: Int? = nil
+    @State private var isNextUp = false
 
     // Sheet states
     @State private var showCategoryPicker = false
@@ -109,6 +110,9 @@ struct QuickCaptureView: View {
 
             // Duration button (opens sheet)
             durationButton
+
+            // Next Up toggle
+            nextUpButton
 
             Spacer()
         }
@@ -260,6 +264,27 @@ struct QuickCaptureView: View {
         .accessibilityLabel(estimatedDuration != nil ? "Dauer: \(estimatedDuration!) Minuten" : "Dauer nicht gesetzt")
     }
 
+    // MARK: - Next Up Button
+
+    private var nextUpButton: some View {
+        Button {
+            isNextUp.toggle()
+        } label: {
+            Image(systemName: isNextUp ? "arrow.up.circle.fill" : "arrow.up.circle")
+                .font(.system(size: 16))
+                .foregroundStyle(isNextUp ? .blue : .gray)
+                .frame(width: 40, height: 40)
+                .background(
+                    RoundedRectangle(cornerRadius: 10)
+                        .fill((isNextUp ? Color.blue : Color.gray).opacity(0.2))
+                )
+        }
+        .buttonStyle(.plain)
+        .accessibilityIdentifier("qc_nextUpButton")
+        .accessibilityLabel(isNextUp ? "Next Up aktiv" : "Next Up")
+        .sensoryFeedback(.impact(weight: .light), trigger: isNextUp)
+    }
+
     // MARK: - Save Task
 
     private func saveTask() {
@@ -267,11 +292,12 @@ struct QuickCaptureView: View {
         guard !trimmedTitle.isEmpty else { return }
 
         isSaving = true
+        let shouldMarkNextUp = isNextUp
 
         Task {
             do {
                 let taskSource = LocalTaskSource(modelContext: modelContext)
-                _ = try await taskSource.createTask(
+                let task = try await taskSource.createTask(
                     title: trimmedTitle,
                     importance: importance,
                     estimatedDuration: estimatedDuration,
@@ -279,8 +305,15 @@ struct QuickCaptureView: View {
                     taskType: taskType
                 )
 
+                if shouldMarkNextUp {
+                    task.isNextUp = true
+                    task.nextUpSortOrder = Int.max
+                    try? modelContext.save()
+                }
+
                 await MainActor.run {
                     showSuccess = true
+                    isNextUp = false
                 }
 
                 // Auto-dismiss after short success animation

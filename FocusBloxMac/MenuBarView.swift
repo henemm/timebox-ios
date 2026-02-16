@@ -23,6 +23,7 @@ struct MenuBarView: View {
 
     @State private var newTaskTitle = ""
     @State private var isAddingTask = false
+    @State private var isNextUp = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -79,6 +80,15 @@ struct MenuBarView: View {
                         .onSubmit {
                             addTask()
                         }
+
+                    Button(action: { isNextUp.toggle() }) {
+                        Image(systemName: isNextUp ? "arrow.up.circle.fill" : "arrow.up.circle")
+                            .foregroundStyle(isNextUp ? .blue : .secondary)
+                    }
+                    .buttonStyle(.borderless)
+                    .help("Next Up")
+                    .accessibilityIdentifier("qc_nextUpButton")
+
                     Button(action: addTask) {
                         Image(systemName: "plus.circle.fill")
                     }
@@ -180,12 +190,19 @@ struct MenuBarView: View {
     private func addTask() {
         guard !newTaskTitle.isEmpty else { return }
         let title = newTaskTitle
+        let shouldMarkNextUp = isNextUp
         newTaskTitle = ""
         isAddingTask = false
+        isNextUp = false
 
         Task {
             let taskSource = LocalTaskSource(modelContext: modelContext)
-            _ = try? await taskSource.createTask(title: title, taskType: "")
+            let task = try? await taskSource.createTask(title: title, taskType: "")
+            if shouldMarkNextUp, let task {
+                task.isNextUp = true
+                task.nextUpSortOrder = Int.max
+                try? modelContext.save()
+            }
         }
     }
 

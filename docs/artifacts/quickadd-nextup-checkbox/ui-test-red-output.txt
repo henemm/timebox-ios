@@ -1,0 +1,14 @@
+** TEST FAILED **
+
+Testing started
+Test suite 'QuickCaptureNextUpUITests' started on 'Clone 1 of FocusBlox - FocusBloxUITests-Runner (78754)'
+Test case 'QuickCaptureNextUpUITests.testNextUpToggleExists()' failed on 'Clone 1 of FocusBlox - FocusBloxUITests-Runner (78754)' (17.882 seconds)
+Test case 'QuickCaptureNextUpUITests.testNextUpToggleIsHittable()' failed on 'Clone 1 of FocusBlox - FocusBloxUITests-Runner (78754)' (12.124 seconds)
+Test case 'QuickCaptureNextUpUITests.testNextUpToggleTap()' failed on 'Clone 1 of FocusBlox - FocusBloxUITests-Runner (78754)' (14.579 seconds)
+Test case 'QuickCaptureNextUpUITests.testSaveTaskWithNextUpToggle()' failed on 'Clone 1 of FocusBlox - FocusBloxUITests-Runner (78754)' (32.351 seconds)
+
+All 4 UI tests FAILED - qc_nextUpButton does not exist yet.
+Unit tests (3): ALL PASSED - model already supports isNextUp properties.
+
+Run date: 2026-02-16 11:43-11:47
+Simulator: 6364A54B-5048-4346-899E-FFB67E630D53 (FocusBlox)

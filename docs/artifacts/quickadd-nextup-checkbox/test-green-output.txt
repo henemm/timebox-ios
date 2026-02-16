@@ -1,0 +1,18 @@
+** TEST SUCCEEDED **
+
+=== Unit Tests (QuickAddNextUpTests) ===
+Test suite 'QuickAddNextUpTests' started on 'Clone 1 of FocusBlox - FocusBlox (83384)'
+Test case 'QuickAddNextUpTests.test_createTask_defaultIsNextUp_false()' passed (0.045 seconds)
+Test case 'QuickAddNextUpTests.test_nextUpTask_appearsInNextUpQuery()' passed (0.044 seconds)
+Test case 'QuickAddNextUpTests.test_setNextUpAfterCreation_setsProperties()' passed (0.039 seconds)
+
+=== UI Tests (QuickCaptureNextUpUITests) ===
+Test suite 'QuickCaptureNextUpUITests' started on 'Clone 1 of FocusBlox - FocusBloxUITests-Runner (83734)'
+Test case 'QuickCaptureNextUpUITests.testNextUpToggleExists()' passed (15.596 seconds)
+Test case 'QuickCaptureNextUpUITests.testNextUpToggleIsHittable()' passed (11.408 seconds)
+Test case 'QuickCaptureNextUpUITests.testNextUpToggleTap()' passed (11.537 seconds)
+Test case 'QuickCaptureNextUpUITests.testSaveTaskWithNextUpToggle()' passed (20.246 seconds)
+
+Total: 7/7 tests PASSED
+Run date: 2026-02-16 12:25-12:27
+Simulator: 6364A54B-5048-4346-899E-FFB67E630D53 (FocusBlox)
