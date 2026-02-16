@@ -222,6 +222,14 @@ def main():
         # Don't block, just output reminder
         print("Note: UI changes detected. Consider adding screenshot artifacts.", file=sys.stderr)
 
+    # Clean up override token after successful commit gate pass
+    token_path = Path(__file__).parent.parent / "user_override_token.json"
+    if token_path.exists():
+        try:
+            token_path.unlink()
+        except OSError:
+            pass
+
     sys.exit(0)
 
 

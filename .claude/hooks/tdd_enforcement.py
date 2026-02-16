@@ -375,13 +375,27 @@ def check_tdd_requirements(file_path: str) -> tuple[bool, str]:
 
 
 def check_user_override() -> bool:
-    """Check if user has granted manual override in workflow state."""
-    workflow = get_active_workflow()
-    if not workflow:
+    """Check if user has granted override via token file (not workflow state)."""
+    token_path = Path(__file__).parent.parent / "user_override_token.json"
+    if not token_path.exists():
         return False
-    if workflow.get("user_override", False):
-        return True
-    return False
+    try:
+        import json as _json
+        from datetime import datetime as _dt, timedelta as _td
+        token = _json.loads(token_path.read_text())
+        # Check TTL (1 hour)
+        created = token.get("created", "")
+        if created:
+            created_dt = _dt.fromisoformat(created)
+            if _dt.now() - created_dt > _td(hours=1):
+                token_path.unlink(missing_ok=True)
+                return False
+        # Check workflow match
+        state = load_state()
+        active_name = state.get("active_workflow", "")
+        return token.get("workflow") == active_name
+    except (json.JSONDecodeError, KeyError, ValueError, OSError):
+        return False
 
 
 def main():

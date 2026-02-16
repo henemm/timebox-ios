@@ -15,6 +15,11 @@
         "hooks": [
           {
             "type": "command",
+            "command": "python3 /Users/hem/Developer/my-daily-sprints/.claude/hooks/override_token_guard.py",
+            "timeout": 5
+          },
+          {
+            "type": "command",
             "command": "python3 /Users/hem/Developer/my-daily-sprints/.claude/hooks/docs_location_guard.py",
             "timeout": 5
           },
@@ -85,6 +90,11 @@
         "hooks": [
           {
             "type": "command",
+            "command": "python3 /Users/hem/Developer/my-daily-sprints/.claude/hooks/override_token_bash_guard.py",
+            "timeout": 5
+          },
+          {
+            "type": "command",
             "command": "python3 /Users/hem/Developer/my-daily-sprints/.claude/hooks/pre_commit_gate.py",
             "timeout": 5
           },
@@ -113,6 +123,11 @@
           {
             "type": "command",
             "command": "python3 /Users/hem/Developer/my-daily-sprints/.claude/hooks/workflow_state_updater.py",
+            "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "python3 /Users/hem/Developer/my-daily-sprints/.claude/hooks/override_token_listener.py",
             "timeout": 5
           }
         ]
