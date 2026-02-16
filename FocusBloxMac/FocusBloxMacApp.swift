@@ -129,6 +129,7 @@ struct FocusBloxMacApp: App {
         MenuBarExtra {
             MenuBarView()
                 .modelContainer(container)
+                .environment(\.eventKitRepository, eventKitRepository)
         } label: {
             Label("FocusBlox", systemImage: "cube.fill")
         }

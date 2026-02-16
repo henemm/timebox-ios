@@ -7,6 +7,18 @@
 
 import SwiftUI
 import SwiftData
+import Combine
+
+/// Timer formatting for Menu Bar label and popover
+enum MenuBarTimerFormatter {
+    /// Format seconds as mm:ss (e.g. 863 -> "14:23")
+    static func format(seconds: Int) -> String {
+        let clamped = max(0, seconds)
+        let minutes = clamped / 60
+        let secs = clamped % 60
+        return "\(minutes):\(String(format: "%02d", secs))"
+    }
+}
 
 /// Menu Bar popover content showing current focus state and quick actions
 struct MenuBarView: View {
@@ -18,15 +30,35 @@ struct MenuBarView: View {
            sort: \LocalTask.createdAt, order: .reverse)
     private var backlogTasks: [LocalTask]
 
+    @Query private var allTasks: [LocalTask]
+
     @Environment(\.modelContext) private var modelContext
     @Environment(\.openWindow) private var openWindow
+    @Environment(\.eventKitRepository) private var eventKitRepo
 
+    // Existing state
     @State private var newTaskTitle = ""
     @State private var isAddingTask = false
     @State private var isNextUp = false
 
+    // FocusBlock state
+    @State private var activeBlock: FocusBlock?
+    @State private var currentTime = Date()
+    @State private var taskStartTime: Date?
+    @State private var lastTaskID: String?
+
+    // Timer: 1s when active block, 60s polling otherwise
+    private let activeTimer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+    private let pollingTimer = Timer.publish(every: 60, on: .main, in: .common).autoconnect()
+
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
+            // Focus Section (NEW - above header)
+            focusSection
+                .accessibilityIdentifier("menubar_focusSection")
+
+            Divider()
+
             // Header
             header
 
@@ -52,6 +84,146 @@ struct MenuBarView: View {
         }
         .padding()
         .frame(width: 300)
+        .onAppear { loadFocusBlock() }
+        .onReceive(activeTimer) { time in
+            guard activeBlock != nil else { return }
+            currentTime = time
+        }
+        .onReceive(pollingTimer) { _ in
+            guard activeBlock == nil else { return }
+            loadFocusBlock()
+        }
+    }
+
+    // MARK: - Focus Section
+
+    @ViewBuilder
+    private var focusSection: some View {
+        if let block = activeBlock {
+            activeFocusSection(block: block)
+        } else {
+            idleFocusSection
+        }
+    }
+
+    private var idleFocusSection: some View {
+        HStack(spacing: 6) {
+            Image(systemName: "moon.zzz")
+                .foregroundStyle(.secondary)
+            Text("Kein aktiver Focus Block")
+                .font(.callout)
+                .foregroundStyle(.secondary)
+                .accessibilityIdentifier("menubar_idleIndicator")
+        }
+    }
+
+    private func activeFocusSection(block: FocusBlock) -> some View {
+        let tasks = tasksForBlock(block)
+        let remainingTasks = tasks.filter { !block.completedTaskIDs.contains($0.id) }
+        let currentTask = remainingTasks.first
+        let completedCount = block.completedTaskIDs.count
+        let totalCount = block.taskIDs.count
+        let blockProgress = min(1.0, currentTime.timeIntervalSince(block.startDate) / block.endDate.timeIntervalSince(block.startDate))
+
+        return VStack(alignment: .leading, spacing: 8) {
+            // Block name + remaining time
+            HStack {
+                Circle()
+                    .fill(.green)
+                    .frame(width: 8, height: 8)
+                Text(block.title)
+                    .font(.callout.weight(.semibold))
+                    .lineLimit(1)
+                    .accessibilityIdentifier("menubar_blockName")
+                Spacer()
+                Text(blockRemainingText(block: block))
+                    .font(.caption.monospacedDigit())
+                    .foregroundStyle(.secondary)
+            }
+
+            // Progress bar + task count
+            HStack(spacing: 8) {
+                ProgressView(value: max(0, blockProgress))
+                    .accessibilityIdentifier("menubar_blockProgress")
+                Text("\(completedCount)/\(totalCount) Tasks")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                    .accessibilityIdentifier("menubar_taskCount")
+            }
+
+            // Current task
+            if let task = currentTask {
+                currentTaskRow(task: task, block: block)
+            }
+        }
+    }
+
+    private func currentTaskRow(task: LocalTask, block: FocusBlock) -> some View {
+        // Track task start
+        let _ = trackTaskStartIfNeeded(taskID: task.id)
+
+        let taskDurations = tasksForBlock(block).map { (id: $0.id, durationMinutes: $0.estimatedDuration ?? 15) }
+        let plannedEnd = TimerCalculator.plannedTaskEndDate(
+            blockStartDate: block.startDate,
+            blockEndDate: block.endDate,
+            taskDurations: taskDurations,
+            currentTaskID: task.id
+        )
+        let remainingSec = TimerCalculator.remainingSeconds(until: plannedEnd, now: currentTime)
+
+        return VStack(alignment: .leading, spacing: 6) {
+            HStack(spacing: 6) {
+                Image(systemName: "play.fill")
+                    .font(.caption2)
+                    .foregroundStyle(.blue)
+                Text(task.title)
+                    .font(.callout)
+                    .lineLimit(1)
+                    .accessibilityIdentifier("menubar_currentTaskName")
+                Spacer()
+                Text(MenuBarTimerFormatter.format(seconds: remainingSec))
+                    .font(.callout.monospacedDigit().weight(.medium))
+                    .foregroundStyle(remainingSec < 60 ? .red : .primary)
+                    .accessibilityIdentifier("menubar_taskTimer")
+            }
+
+            if let duration = task.estimatedDuration {
+                Text("\(duration) min geschaetzt")
+                    .font(.caption2)
+                    .foregroundStyle(.tertiary)
+            }
+
+            // Action buttons
+            HStack(spacing: 8) {
+                Button {
+                    markTaskComplete(taskID: task.id, block: block)
+                } label: {
+                    Label("Erledigt", systemImage: "checkmark.circle.fill")
+                        .font(.caption)
+                }
+                .buttonStyle(.borderless)
+                .foregroundStyle(.green)
+                .accessibilityIdentifier("menubar_completeTask")
+
+                Button {
+                    skipTask(taskID: task.id, block: block)
+                } label: {
+                    Label("Weiter", systemImage: "forward.fill")
+                        .font(.caption)
+                }
+                .buttonStyle(.borderless)
+                .foregroundStyle(.orange)
+                .accessibilityIdentifier("menubar_skipTask")
+
+                Spacer()
+            }
+        }
+    }
+
+    private func blockRemainingText(block: FocusBlock) -> String {
+        let remaining = block.endDate.timeIntervalSince(currentTime)
+        let seconds = max(0, Int(remaining))
+        return MenuBarTimerFormatter.format(seconds: seconds)
     }
 
     // MARK: - Header
@@ -185,6 +357,32 @@ struct MenuBarView: View {
         .font(.caption)
     }
 
+    // MARK: - Data Loading
+
+    private func loadFocusBlock() {
+        Task {
+            let hasAccess = try? await eventKitRepo.requestAccess()
+            guard hasAccess == true else { return }
+            let blocks = try? eventKitRepo.fetchFocusBlocks(for: Date())
+            activeBlock = blocks?.first { $0.isActive }
+        }
+    }
+
+    // MARK: - Task Helpers
+
+    private func tasksForBlock(_ block: FocusBlock) -> [LocalTask] {
+        block.taskIDs.compactMap { taskID in
+            allTasks.first { $0.id == taskID }
+        }
+    }
+
+    private func trackTaskStartIfNeeded(taskID: String) {
+        if lastTaskID != taskID {
+            lastTaskID = taskID
+            taskStartTime = Date()
+        }
+    }
+
     // MARK: - Actions
 
     private func addTask() {
@@ -208,6 +406,33 @@ struct MenuBarView: View {
 
     private func toggleComplete(_ task: LocalTask) {
         task.isCompleted.toggle()
+    }
+
+    private func markTaskComplete(taskID: String, block: FocusBlock) {
+        Task {
+            _ = try? FocusBlockActionService.completeTask(
+                taskID: taskID,
+                block: block,
+                taskStartTime: taskStartTime,
+                eventKitRepo: eventKitRepo,
+                modelContext: modelContext
+            )
+            taskStartTime = nil
+            loadFocusBlock()
+        }
+    }
+
+    private func skipTask(taskID: String, block: FocusBlock) {
+        Task {
+            _ = try? FocusBlockActionService.skipTask(
+                taskID: taskID,
+                block: block,
+                taskStartTime: taskStartTime,
+                eventKitRepo: eventKitRepo
+            )
+            taskStartTime = nil
+            loadFocusBlock()
+        }
     }
 }
 

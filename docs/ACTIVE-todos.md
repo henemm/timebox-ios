@@ -96,7 +96,7 @@ try eventStore.save(event, span: span)
 |---|------|------|--------|---------|-----|
 | Bug 52 | Tasks unsichtbar nach Next Up entfernen | ✅ ERLEDIGT | ~5k | 5 | ~6 |
 | Bug 48 | Erweiterte Attribute geloescht | ✅ ERLEDIGT | ~80-120k | 9 | ~35 |
-| Bug 50 | Kalender-Events mit Gaesten | HOCH | ~40-60k | 4 | ~80 |
+| Bug 50 | Kalender-Events mit Gaesten | ✅ ERLEDIGT | ~40-60k | 4 | ~80 |
 | Bug 51 | Backlog-Sortierung iOS vs macOS | MITTEL | ~15-20k | 2 | ~4 |
 | Bug 49 | Matrix View Layout + Gesten | MITTEL | ~25-35k | 2 | ~45 |
 | Bug 22 | Edit-Button ohne Funktion | MITTEL | ~30-50k | 1-2 | ~40 |
@@ -222,24 +222,11 @@ try? modelContext.save()
 ---
 
 ### Bug 50: Kalender-Events mit Gaesten funktionieren nicht (iOS + macOS)
-**Status:** SPEC READY
-**Prioritaet:** HOCH (wiederkehrender Bug, frueherer Teilfix unvollstaendig)
-**Geschaetzter Aufwand:** ~40-60k Tokens
+**Status:** ✅ ERLEDIGT (2026-02-16)
+**Prioritaet:** HOCH
 **Gemeldet:** 2026-02-13
-**Vorgeschichte:** Commit `4a5eafe` (2026-02-12) hat nur Kategorie-Zuweisung per iCloud KV Store Fallback gefixed
-**Spec:** [`docs/specs/bugs/bug-50-calendar-events-with-guests.md`](../specs/bugs/bug-50-calendar-events-with-guests.md)
 
-**Symptom:** Events mit Gaesten lassen sich nicht verschieben (Drag & Drop scheitert), keine visuelle Unterscheidung von read-only Events.
-
-**Root Cause:** `CalendarEvent` Model kennt keinen Read-Only Status. Events mit Attendees sind in EventKit schreibgeschuetzt, aber die App behandelt alle Events als editierbar.
-
-**Betroffene Stellen:**
-- `CalendarEvent.swift:13-21` - Model fehlt `hasAttendees`/`isReadOnly`
-- `EventKitRepository.swift:221-238` - `moveCalendarEvent()` hat kein Error-Handling fuer read-only
-- `EventBlock.swift:48` - `.draggable()` auf ALLEN Events (auch read-only)
-- `MacTimelineView.swift:96-107` - Gleiche Problematik auf macOS
-
-**Fix:** Model erweitern, Drag nur fuer editierbare Events, spezifische Fehlermeldungen, Schloss-Icon fuer read-only Events.
+**Fix:** CalendarEvent Model um `hasAttendees`/`isReadOnly` erweitert, Drag & Drop nur fuer editierbare Events (`.if(!event.isReadOnly)`), `moveCalendarEvent()` wirft `EventKitError.eventReadOnly`, Schloss-Icon auf iOS + macOS.
 
 ---
 

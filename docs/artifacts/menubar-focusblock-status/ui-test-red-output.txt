@@ -1,0 +1,45 @@
+Test Suite 'Selected tests' started at 2026-02-16 13:21:13.724.
+Test Suite 'FocusBloxMacUITests.xctest' started at 2026-02-16 13:21:13.724.
+Test Suite 'MenuBarFocusBlockUITests' started at 2026-02-16 13:21:13.724.
+Test Case '-[FocusBloxMacUITests.MenuBarFocusBlockUITests testMenuBarBlockNameLabel]' started.
+/Users/hem/Developer/my-daily-sprints/FocusBloxMacUITests/MenuBarFocusBlockUITests.swift:30: error: -[FocusBloxMacUITests.MenuBarFocusBlockUITests testMenuBarBlockNameLabel] : Failed to terminate henemm.FocusBloxMac:67274: Failed to terminate henemm.FocusBloxMac:0
+Test Case '-[FocusBloxMacUITests.MenuBarFocusBlockUITests testMenuBarBlockNameLabel]' failed (60.572 seconds).
+Test Case '-[FocusBloxMacUITests.MenuBarFocusBlockUITests testMenuBarCompleteButton]' started.
+/Users/hem/Developer/my-daily-sprints/FocusBloxMacUITests/MenuBarFocusBlockUITests.swift:184: error: -[FocusBloxMacUITests.MenuBarFocusBlockUITests testMenuBarCompleteButton] : failed - Menu bar status item should exist
+Test Case '-[FocusBloxMacUITests.MenuBarFocusBlockUITests testMenuBarCompleteButton]' failed (9.187 seconds).
+Test Case '-[FocusBloxMacUITests.MenuBarFocusBlockUITests testMenuBarCurrentTaskName]' started.
+/Users/hem/Developer/my-daily-sprints/FocusBloxMacUITests/MenuBarFocusBlockUITests.swift:162: error: -[FocusBloxMacUITests.MenuBarFocusBlockUITests testMenuBarCurrentTaskName] : failed - Menu bar status item should exist
+Test Case '-[FocusBloxMacUITests.MenuBarFocusBlockUITests testMenuBarCurrentTaskName]' failed (9.052 seconds).
+Test Case '-[FocusBloxMacUITests.MenuBarFocusBlockUITests testMenuBarFocusSectionExists]' started.
+/Users/hem/Developer/my-daily-sprints/FocusBloxMacUITests/MenuBarFocusBlockUITests.swift:50: error: -[FocusBloxMacUITests.MenuBarFocusBlockUITests testMenuBarFocusSectionExists] : failed - Menu bar status item 'FocusBlox' should exist
+Test Case '-[FocusBloxMacUITests.MenuBarFocusBlockUITests testMenuBarFocusSectionExists]' failed (9.234 seconds).
+Test Case '-[FocusBloxMacUITests.MenuBarFocusBlockUITests testMenuBarIdleStateIndicator]' started.
+/Users/hem/Developer/my-daily-sprints/FocusBloxMacUITests/MenuBarFocusBlockUITests.swift:74: error: -[FocusBloxMacUITests.MenuBarFocusBlockUITests testMenuBarIdleStateIndicator] : failed - Menu bar status item should exist
+Test Case '-[FocusBloxMacUITests.MenuBarFocusBlockUITests testMenuBarIdleStateIndicator]' failed (9.069 seconds).
+Test Case '-[FocusBloxMacUITests.MenuBarFocusBlockUITests testMenuBarProgressBar]' started.
+/Users/hem/Developer/my-daily-sprints/FocusBloxMacUITests/MenuBarFocusBlockUITests.swift:140: error: -[FocusBloxMacUITests.MenuBarFocusBlockUITests testMenuBarProgressBar] : failed - Menu bar status item should exist
+Test Case '-[FocusBloxMacUITests.MenuBarFocusBlockUITests testMenuBarProgressBar]' failed (9.082 seconds).
+Test Case '-[FocusBloxMacUITests.MenuBarFocusBlockUITests testMenuBarSkipButton]' started.
+/Users/hem/Developer/my-daily-sprints/FocusBloxMacUITests/MenuBarFocusBlockUITests.swift:206: error: -[FocusBloxMacUITests.MenuBarFocusBlockUITests testMenuBarSkipButton] : failed - Menu bar status item should exist
+Test Case '-[FocusBloxMacUITests.MenuBarFocusBlockUITests testMenuBarSkipButton]' failed (9.109 seconds).
+Test Case '-[FocusBloxMacUITests.MenuBarFocusBlockUITests testMenuBarTaskCountLabel]' started.
+/Users/hem/Developer/my-daily-sprints/FocusBloxMacUITests/MenuBarFocusBlockUITests.swift:228: error: -[FocusBloxMacUITests.MenuBarFocusBlockUITests testMenuBarTaskCountLabel] : failed - Menu bar status item should exist
+Test Case '-[FocusBloxMacUITests.MenuBarFocusBlockUITests testMenuBarTaskCountLabel]' failed (9.271 seconds).
+Test Case '-[FocusBloxMacUITests.MenuBarFocusBlockUITests testMenuBarTimerLabel]' started.
+/Users/hem/Developer/my-daily-sprints/FocusBloxMacUITests/MenuBarFocusBlockUITests.swift:118: error: -[FocusBloxMacUITests.MenuBarFocusBlockUITests testMenuBarTimerLabel] : failed - Menu bar status item should exist
+Test Case '-[FocusBloxMacUITests.MenuBarFocusBlockUITests testMenuBarTimerLabel]' failed (9.788 seconds).
+Test Suite 'MenuBarFocusBlockUITests' failed at 2026-02-16 13:23:28.092.
+	 Executed 9 tests, with 9 failures (0 unexpected) in 134.363 (134.368) seconds
+Test Suite 'FocusBloxMacUITests.xctest' failed at 2026-02-16 13:23:28.093.
+	 Executed 9 tests, with 9 failures (0 unexpected) in 134.363 (134.369) seconds
+Test Suite 'Selected tests' failed at 2026-02-16 13:23:28.093.
+	 Executed 9 tests, with 9 failures (0 unexpected) in 134.363 (134.370) seconds
+Test case 'MenuBarFocusBlockUITests.testMenuBarBlockNameLabel()' failed on 'My Mac - FocusBloxMacUITests-Runner (90166)' (60.572 seconds)
+Test case 'MenuBarFocusBlockUITests.testMenuBarCompleteButton()' failed on 'My Mac - FocusBloxMacUITests-Runner (90166)' (9.187 seconds)
+Test case 'MenuBarFocusBlockUITests.testMenuBarCurrentTaskName()' failed on 'My Mac - FocusBloxMacUITests-Runner (90166)' (9.052 seconds)
+Test case 'MenuBarFocusBlockUITests.testMenuBarFocusSectionExists()' failed on 'My Mac - FocusBloxMacUITests-Runner (90166)' (9.234 seconds)
+Test case 'MenuBarFocusBlockUITests.testMenuBarIdleStateIndicator()' failed on 'My Mac - FocusBloxMacUITests-Runner (90166)' (9.069 seconds)
+Test case 'MenuBarFocusBlockUITests.testMenuBarProgressBar()' failed on 'My Mac - FocusBloxMacUITests-Runner (90166)' (9.082 seconds)
+Test case 'MenuBarFocusBlockUITests.testMenuBarSkipButton()' failed on 'My Mac - FocusBloxMacUITests-Runner (90166)' (9.109 seconds)
+Test case 'MenuBarFocusBlockUITests.testMenuBarTaskCountLabel()' failed on 'My Mac - FocusBloxMacUITests-Runner (90166)' (9.271 seconds)
+Test case 'MenuBarFocusBlockUITests.testMenuBarTimerLabel()' failed on 'My Mac - FocusBloxMacUITests-Runner (90166)' (9.788 seconds)
