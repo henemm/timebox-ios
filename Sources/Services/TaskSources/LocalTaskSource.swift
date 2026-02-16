@@ -35,7 +35,7 @@ final class LocalTaskSource: @preconcurrency TaskSource, @preconcurrency TaskSou
         var descriptor = FetchDescriptor<LocalTask>(
             predicate: #Predicate { !$0.isCompleted }
         )
-        descriptor.sortBy = [SortDescriptor(\.sortOrder)]
+        descriptor.sortBy = [SortDescriptor(\.createdAt, order: .reverse)]
         return try modelContext.fetch(descriptor)
     }
 

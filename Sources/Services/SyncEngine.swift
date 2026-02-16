@@ -15,7 +15,7 @@ final class SyncEngine {
     func sync() async throws -> [PlanItem] {
         let tasks = try await taskSource.fetchIncompleteTasks()
         return tasks.map { PlanItem(localTask: $0) }
-                    .sorted { $0.rank < $1.rank }
+                    .sorted { $0.rank > $1.rank }
     }
 
     func syncCompletedTasks(days: Int) async throws -> [PlanItem] {

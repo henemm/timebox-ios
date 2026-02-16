@@ -100,6 +100,9 @@ try eventStore.save(event, span: span)
 | Bug 51 | Backlog-Sortierung iOS vs macOS | MITTEL | ~15-20k | 2 | ~4 |
 | Bug 49 | Matrix View Layout + Gesten | MITTEL | ~25-35k | 2 | ~45 |
 | Bug 22 | Edit-Button ohne Funktion | MITTEL | ~30-50k | 1-2 | ~40 |
+| Feature | Next Up Long Press Preview (iOS) | MITTEL | ~10-15k | 1 | ~50 |
+| Feature | Einheitliche Navigation Labels+Icons | MITTEL | ~10k | 3 | ~8 |
+| Feature | Generische Suche (iOS+macOS) | MITTEL | ~15-20k | 2-3 | ~25 |
 | Feature | MenuBar FocusBlock Status | HOCH | ~50-70k | 2 | ~120 |
 | Feature | QuickAdd Next Up Checkbox | MITTEL | ~20-30k | 3 | ~30 |
 | MAC-026 | Enhanced Quick Capture (macOS) | P2 | ~80-120k | 4 | ~200 |
@@ -371,7 +374,7 @@ try? modelContext.save()
 ---
 
 ### Bug 51: Backlog-Liste sortiert unterschiedlich auf iOS und macOS
-**Status:** SPEC READY
+**Status:** ✅ ERLEDIGT (2026-02-15)
 **Prioritaet:** MITTEL
 **Geschaetzter Aufwand:** ~15-20k Tokens
 **Gemeldet:** 2026-02-13
@@ -436,6 +439,22 @@ try? modelContext.save()
 ---
 
 ## ✅ Kuerzlich erledigt
+
+### Bug 55: FocusBlox-Session zeigt falsche Timer, Notifications und Sprint Review
+**Status:** ✅ ERLEDIGT (2026-02-15)
+**Commit:** `0de32f1`
+**Platform:** iOS + macOS
+
+**5 Sub-Bugs gefixed:**
+- **55A:** Timer/Live Activity Countdown ueberschritt Block-Ende (TimerCalculator clamp auf blockEndDate)
+- **55B:** End-Notification zeigte "0/0 Tasks erledigt" (Notification bei Task-Complete/Skip neu planen)
+- **55C:** Sprint Review zeigte "0m gebraucht" (Task-Zeit in checkBlockEnd() speichern vor Review)
+- **55D:** Sprint Review zeigte "120m geplant" statt Block-Dauer (min(taskSum, blockMinutes))
+- **55E:** Doppelte Live Activities nach Block-Ende (Orphan-Cleanup in startActivity())
+
+**Betroffene Dateien:** TimerCalculator.swift, FocusLiveView.swift, MacFocusView.swift, SprintReviewSheet.swift, LiveActivityManager.swift
+
+---
 
 ### BACKLOG-001: Task Complete/Skip Logik in Shared Service extrahiert
 **Status:** ✅ ERLEDIGT (2026-02-13)
