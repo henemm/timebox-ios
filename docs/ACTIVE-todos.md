@@ -42,14 +42,15 @@
 | 17 | ITB-C: OrganizeMyDay Intent | MITTEL | XL | ~100-150k | 4-5 | ~250 |
 | 18 | ITB-D: Enhanced Liquid Glass (aktive Blocks) | NIEDRIG | S | ~20-30k | 2 | ~40 |
 | 19 | ITB-E: Share Extension / Transferable | MITTEL | L | ~80-120k | 3-4 + Target | ~200 |
-| 20 | ITB-F: CaptureContextIntent | RESEARCH | XL | unbekannt | unbekannt | unbekannt |
+| 20 | ITB-F: CaptureContextIntent (Siri On-Screen) | WARTEND | M | ~40-60k | 3-4 | ~80 |
 | 21 | ITB-G: Proaktive System-Vorschlaege | RESEARCH | XL | unbekannt | unbekannt | unbekannt |
 
 **Komplexitaet:** XS = halbe Stunde | S = 1 Session | M = 2-3 Sessions | L = halber Tag | XL = ganzer Tag+
 
 **Guenstigste Quick Wins:** #1 Symbole (~10k), #2 Wischgesten (~15k), #3 Long Press (~15k)
 **Teuerste Items:** #17 OrganizeMyDay (~150k), #13 Drag & Drop (~150k), #14 NC Widget (~120k)
-**RESEARCH Items:** #20 ITB-F und #21 ITB-G - API-Verifizierung noetig vor Planung
+**WARTEND (Apple-Abhaengigkeit):** #20 ITB-F — Developer-APIs verfuegbar, wartet auf Siri On-Screen Awareness (iOS 26.5/27)
+**RESEARCH Items:** #21 ITB-G - API-Verifizierung noetig vor Planung
 
 > **Dies ist das EINZIGE Backlog.** macOS-Features (MAC-xxx) stehen hier mit Verweis auf ihre Specs in `docs/specs/macos/`. Kein zweites Backlog.
 
@@ -93,7 +94,7 @@
 3. ITB-E (Share Extension) - unabhaengig von AI
 4. ~~ITB-B (AI Scoring)~~ ERLEDIGT - Kern-Feature, Graceful Degradation
 5. ITB-C (OrganizeMyDay) - braucht A+B
-6. ITB-F (Context Capture) - RESEARCH: API-Verifizierung zuerst
+6. ITB-F (Context Capture) - WARTEND: Developer-APIs da, Siri On-Screen Awareness fehlt (iOS 26.5/27)
 7. ITB-G (Proaktive Vorschlaege) - RESEARCH: API-Verifizierung zuerst
 
 **Prinzip:** AI ergaenzt manuelles Scoring - schlaegt vor, User bestaetigt/ueberschreibt. Features unsichtbar auf Nicht-AI-Geraeten (Graceful Degradation).
@@ -383,20 +384,35 @@ Backlog-Filter "Wiederkehrend". iOS + macOS.
 
 ---
 
-### ITB-F: CaptureContextIntent - RESEARCH
-**Status:** OFFEN (RESEARCH - API-Verifizierung noetig)
-**Prioritaet:** RESEARCH
-**Komplexitaet:** XL (unbekannt)
-**Abhaengigkeiten:** ITB-B + API-Verifizierung
+### ITB-F: CaptureContextIntent — Siri On-Screen Awareness
+**Status:** WARTEND (Developer-APIs verfuegbar, Siri-Seite noch nicht ausgeliefert)
+**Prioritaet:** MITTEL
+**Komplexitaet:** M (~40-60k Tokens)
+**Abhaengigkeiten:** ITB-A (FocusBlockEntity), Siri On-Screen Awareness (iOS 26.5 oder 27)
 
-**Zu verifizieren BEVOR Planung beginnt:**
-- `IntentParameter(requestValue: .context)` - existiert diese API?
-- `ForegroundContinuableIntent` - verfuegbar in iOS 26?
-**Wenn API existiert:**
-- Context-Extraktion via Apple Intelligence
-- Automatische Task-Erstellung aus aktuellem Bildschirminhalt
-- "Erstelle Task aus dem was ich gerade sehe"
-**Status:** Keine Implementierung ohne API-Verifizierung. Zuerst Research.
+**Research-Ergebnis (2026-02-17):**
+
+API-Verifizierung abgeschlossen. Ergebnisse:
+- `IntentParameter(requestValue: .context)` — **gibt es NICHT** in dieser Form
+- `ForegroundContinuableIntent` — existiert (seit iOS 17), bringt App nur in Vordergrund, kein Screen-Zugriff
+- `NSUserActivity` + `appEntityIdentifier` + SwiftUI `.userActivity(_:element:_:)` — **verfuegbar seit iOS 18.2**
+- `AssistantSchema` erweitert in iOS 26, aber kein Produktivitaets/Task-Domain
+
+**Realisierter Ansatz (statt eigenem Screen-Reader):**
+Siri liest den Screen-Inhalt anderer Apps (wenn diese ihn exponieren). User sagt "Erstelle Task daraus in FocusBlox". Siri ruft FocusBlox-Intent mit Kontext auf.
+
+**FocusBlox-seitige Vorbereitung (jetzt umsetzbar):**
+1. `TaskEntity` via `NSUserActivity` + `appEntityIdentifier` exponieren
+2. `CreateTaskFromContextIntent` mit optionalem Kontext-Parameter
+3. FocusBlox-Views mit `.userActivity()` Modifier ausstatten
+
+**Wartet auf Apple:**
+- Siri On-Screen Awareness war fuer iOS 26.4 geplant
+- Laut Bloomberg (Feb 2026) verschoben auf iOS 26.5 (Mai) oder iOS 27 (September)
+- Apple bestaetigte am 12.02.2026: "still coming in 2026"
+
+**Context-Dokument:** `docs/context/ITB-F-CaptureContextIntent.md`
+**Scope:** ~80 LoC, 3-4 Dateien (TaskEntity-Erweiterung, neuer Intent, NSUserActivity-Integration)
 
 ---
 
