@@ -28,7 +28,7 @@
 | 3 | NextUp Long Press Vorschau | NIEDRIG | XS | ~15-20k | 1-2 | ~30 |
 | 4 | Generische Suche (iOS+macOS) | MITTEL | S | ~15-20k | 2-3 | ~25 |
 | 5 | MAC-022 Spotlight Integration | P2 | S | ~15-25k | 1-2 | ~30 |
-| 6 | Recurring Tasks Phase 1B/2 | MITTEL | M | ~40-60k | 3-4 | ~80 |
+| 6 | ~~Recurring Tasks Phase 1B/2 (inkl. Sichtbarkeit + Edit/Delete Dialog)~~ | ERLEDIGT | M-L | ~60-100k | 5-6 | ~200 |
 | 7 | Kalender-App Deep Link (iOS+macOS) | MITTEL | M | ~40-50k | 3-4 | ~100 |
 | 8 | Push Notifications bei Frist | HOCH | M | ~60-80k | 4-5 | ~200 |
 | 9 | MAC-031 Focus Mode Integration | P3 | M | ~50-70k | 2-3 | ~100 |
@@ -82,7 +82,9 @@
 - MAC-032 NC Widget
 
 ### Bundle F: Recurring Tasks vervollstaendigen
-- Phase 1B/2 (macOS Badge, Siri, Delete-Dialog, Filter)
+- ~~Phase 1B/2 (macOS Badge, Siri, Delete-Dialog, Filter)~~ ERLEDIGT
+- Dedup-Logik (gleichzeitiges Completion auf 2 Geraeten)
+- Quick-Edit Recurrence-Params Fix
 
 ### Bundle G: Intelligent Task Blox (Apple Intelligence + System-Integration)
 **Empfohlene Reihenfolge:**
@@ -256,41 +258,16 @@
 ---
 
 ### Feature: Wiederkehrende Tasks Phase 1B/2
-**Status:** OFFEN
-**Prioritaet:** MITTEL
-**Komplexitaet:** M-L (~60-100k Tokens)
+**Status:** ERLEDIGT (2026-02-17)
+**Commits:** `2c4f92b` (Ticket 1), `cd46645` (Ticket 2), `9fb5e21` (Ticket 3)
 
-**Basis:** Phase 1A erledigt (Commit `2767a92` - RecurrenceService, SyncEngine-Integration, Badge)
-**Bestehende Docs:** `docs/specs/features/recurring-tasks-phase1a.md`, `docs/context/recurring-tasks-instance-logic.md`
+Umgesetzt: recurrenceGroupID + Sichtbarkeitsfilter, Delete-Dialog "Nur diese/Ganze Serie",
+Edit-Dialog "Nur diese/Ganze Serie", macOS Integration (Badge, Completion, Dialoge),
+Backlog-Filter "Wiederkehrend". iOS + macOS.
 
-**Noch offen:**
-
-**A) Backlog-Sichtbarkeit (NEU):**
-- Wiederkehrende Tasks sollen **nur im Backlog erscheinen wenn sie faellig/aktiv sind**
-- Vergangene und zukuenftige Instanzen ausblenden
-- Aktuell: Alle Instanzen bleiben sichtbar → Backlog wird mit erledigten Wiederholungen ueberflutet
-
-**B) Loeschen -- "Nur diese / Ganze Serie" Dialog:**
-- Wenn User einen Task aus wiederkehrender Serie loescht: Auswahl anbieten
-- "Nur diese Instanz" → loescht nur diese eine
-- "Ganze Serie" → stoppt Wiederholung (recurrencePattern = "none"), loescht alle offenen Instanzen
-- Betrifft: BacklogView Swipe-Delete, macOS TaskInspector, ggf. Quick Actions
-
-**C) Bearbeiten -- "Nur diese / Ganze Serie" Dialog:**
-- Wenn User Titel, Dauer, Kategorie etc. einer wiederkehrenden Task aendert: Was passiert?
-- Option 1: Aenderung gilt nur fuer DIESE Instanz (zukuenftige bleiben wie Vorlage)
-- Option 2: Aenderung gilt fuer ALLE zukuenftigen Instanzen
-- Vorbild: Apple Kalender ("Dieses Ereignis" / "Alle kuenftigen Ereignisse")
-- **Achtung:** Quick-Edit-Funktionen uebergeben recurrence-Params aktuell NICHT (Bug 48 Restwirkung)
-
-**D) macOS Integration:**
-- MacBacklogRow Badge + TaskInspector Toggle
-- Siri CompleteTaskIntent
-
-**E) Backlog-Filter:**
-- Filter: recurring vs. einmalig
-
-**Scope:** ~150-200 LoC, 5-6 Dateien (groesser als urspruenglich geschaetzt wegen A+C)
+**Verbleibende Folge-Tickets (separater Scope):**
+- Dedup-Logik: Gleichzeitiges Completion auf 2 Geraeten kann doppelte Instanzen erzeugen
+- Quick-Edit Recurrence-Params: Quick-Edit-Funktionen uebergeben recurrence-Params nicht (Bug 48 Restwirkung)
 
 ---
 
@@ -469,6 +446,14 @@
 ---
 
 ## ✅ Kuerzlich erledigt
+
+### Bug 58: MenuBarExtra Icon erscheint nicht in macOS Menuleiste
+**Status:** ERLEDIGT (2026-02-17)
+**Dateien:** `FocusBloxMac/FocusBloxMacApp.swift`
+**Root Cause:** Hidden Bar (und aehnliche Menu-Bar-Manager) platzieren neue NSStatusItems in eine unsichtbare "always hidden"-Tier. SwiftUI MenuBarExtra bietet keine Kontrolle ueber `autosaveName` oder Position-Persistenz, daher landet das Icon immer hinter allen Separatoren.
+**Loesung:** SwiftUI `MenuBarExtra` durch manuellen `MenuBarController` (NSStatusItem + NSPopover) ersetzt. `autosaveName` fuer Position-Persistenz + Pre-set der Preferred Position auf 300 (sichtbarer Bereich) beim ersten Start. `setActivationPolicy(.regular)` in init() beibehalten (kritisch fuer Keyboard/Mouse-Events).
+
+---
 
 ### Feature: Report zeigt Tasks ausserhalb von Sprints (iOS + macOS)
 **Status:** ERLEDIGT (2026-02-16)

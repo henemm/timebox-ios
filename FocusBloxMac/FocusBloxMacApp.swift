@@ -10,6 +10,65 @@ import SwiftData
 import CoreSpotlight
 import AppKit
 
+// MARK: - Menu Bar Controller
+
+/// Manages the menu bar status item with autosaveName for position persistence.
+/// Replaces SwiftUI MenuBarExtra to prevent Hidden Bar (and similar tools)
+/// from permanently hiding the icon in an unreachable tier (Bug 58).
+final class MenuBarController: NSObject {
+    static let shared = MenuBarController()
+
+    private var statusItem: NSStatusItem?
+    private var popover: NSPopover?
+
+    private static let autosaveName = "com.focusblox.menubar"
+    private static let positionKey = "NSStatusItem Preferred Position \(autosaveName)"
+
+    func setup(container: ModelContainer, eventKitRepository: any EventKitRepositoryProtocol) {
+        // Pre-set visible position on first launch so menu bar managers
+        // (e.g. Hidden Bar) don't hide the icon in an unreachable tier.
+        if UserDefaults.standard.object(forKey: Self.positionKey) == nil {
+            UserDefaults.standard.set(300.0, forKey: Self.positionKey)
+        }
+
+        let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
+        item.autosaveName = Self.autosaveName
+
+        if let button = item.button {
+            button.image = NSImage(
+                systemSymbolName: "cube.fill",
+                accessibilityDescription: "FocusBlox"
+            )
+            button.action = #selector(togglePopover)
+            button.target = self
+        }
+
+        let pop = NSPopover()
+        pop.contentSize = NSSize(width: 300, height: 450)
+        pop.behavior = .transient
+        pop.contentViewController = NSHostingController(
+            rootView: MenuBarView()
+                .modelContainer(container)
+                .environment(\.eventKitRepository, eventKitRepository)
+        )
+
+        self.statusItem = item
+        self.popover = pop
+    }
+
+    @objc private func togglePopover() {
+        guard let popover, let button = statusItem?.button else { return }
+        if popover.isShown {
+            popover.performClose(nil)
+        } else {
+            popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
+            popover.contentViewController?.view.window?.makeKey()
+        }
+    }
+}
+
+// MARK: - App
+
 @main
 struct FocusBloxMacApp: App {
     let container: ModelContainer
@@ -25,6 +84,9 @@ struct FocusBloxMacApp: App {
     private let eventKitRepository: any EventKitRepositoryProtocol = EventKitRepository()
 
     init() {
+        // CRITICAL: Required for the app to receive keyboard and mouse events
+        NSApplication.shared.setActivationPolicy(.regular)
+
         do {
             container = try MacModelContainer.create()
             QuickCaptureController.shared.setup(with: container)
@@ -69,6 +131,11 @@ struct FocusBloxMacApp: App {
                     }
                     // Bug 38: Force CloudKit to sync all extended attribute fields
                     MacModelContainer.forceCloudKitFieldSync(in: container.mainContext)
+                    // Bug 58: Menu bar icon (after app is fully initialized)
+                    MenuBarController.shared.setup(
+                        container: container,
+                        eventKitRepository: eventKitRepository
+                    )
                 }
                 .onOpenURL { url in
                     handleURL(url)
@@ -121,15 +188,6 @@ struct FocusBloxMacApp: App {
                 .keyboardShortcut("/", modifiers: [.command, .shift])
             }
         }
-
-        MenuBarExtra {
-            MenuBarView()
-                .modelContainer(container)
-                .environment(\.eventKitRepository, eventKitRepository)
-        } label: {
-            Label("FocusBlox", systemImage: "cube.fill")
-        }
-        .menuBarExtraStyle(.window)
 
         // Settings window (Cmd+,)
         Settings {
