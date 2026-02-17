@@ -1,111 +1,73 @@
 # Context: Watch Voice Capture
 
 ## Request Summary
-Vollständige watchOS App mit Voice Capture: Button-Tap → Spracheingabe → Task landet im Backlog als TBD.
+watchOS App mit Voice Capture: Button-Tap → Spracheingabe → Task landet im Backlog als TBD.
+Alle UI-Bausteine existieren bereits, muessen nur verdrahtet und der ModelContainer konfiguriert werden.
 
-## Aktueller Stand
+## Vorhandener Code (Watch App)
 
-### Vorhandene Infrastruktur
-- **iOS App:** SwiftUI + SwiftData
-- **Datenmodell:** `LocalTask` in SwiftData
-- **App Groups:** `group.com.henning.focusblox` (für Widgets)
-- **Keine watchOS-Unterstützung**
+| File | Status | Relevance |
+|------|--------|-----------|
+| `FocusBloxWatch Watch App/ContentView.swift` | **Placeholder** ("Hello world") | Muss komplett ersetzt werden |
+| `FocusBloxWatch Watch App/FocusBloxWatchApp.swift` | **Minimal** (kein ModelContainer) | ModelContainer + CloudKit Setup fehlt |
+| `FocusBloxWatch Watch App/VoiceInputSheet.swift` | **Fertig** | TextField mit Auto-Focus fuer Dictation, OK/Abbrechen |
+| `FocusBloxWatch Watch App/ConfirmationView.swift` | **Fertig** | Checkmark + Haptic + Auto-Dismiss nach 2s |
+| `FocusBloxWatch Watch App/WatchLocalTask.swift` | **Veraltet** | Fehlen: aiScore, aiEnergyLevel, assignedFocusBlockID, completedAt, rescheduleCount |
+| `FocusBloxWatch Watch App.entitlements` | **Leer** | App Group Array ist LEER — muss `group.com.henning.focusblox` enthalten |
 
-### Relevante Dateien
-| Datei | Relevanz |
-|-------|----------|
-| `Sources/Models/LocalTask.swift` | Task-Modell, muss für Watch zugänglich sein |
-| `Sources/FocusBloxApp.swift` | App-Initialisierung, SharedModelContainer |
-| `FocusBloxCore/` | Shared Framework (bereits vorhanden) |
-| `Sources/Views/QuickCaptureView.swift` | Referenz für minimale Task-Erstellung |
+## Bestehende Spec
+- `docs/specs/features/watch-voice-capture.md` — vollstaendige Spec (Draft, 2026-01-31)
+- Enthalt Architektur, UI-Design, Code-Beispiele, Akzeptanzkriterien
 
-## Technische Anforderungen
+## Kritische Probleme
 
-### 1. watchOS Target
-- Neues Target: `FocusBloxWatch`
-- Minimum Deployment: watchOS 11.0 (passend zu iOS 26)
-- Standalone Watch App (nicht WatchKit Extension)
+### 1. WatchLocalTask ist out-of-sync mit iOS LocalTask
+Watch-Version fehlen 5 Felder die iOS hat:
+- `assignedFocusBlockID: String?`
+- `rescheduleCount: Int` (default 0)
+- `completedAt: Date?`
+- `aiScore: Int?`
+- `aiEnergyLevel: String?`
 
-### 2. Daten-Synchronisation
-**Option A: WatchConnectivity**
-- Direkte Message-Übertragung iPhone ↔ Watch
-- Komplexer, aber zuverlässig
-- Benötigt: `WCSession` auf beiden Seiten
+Ausserdem: `recurrenceWeekdays` ist `[Int]` auf Watch vs `[Int]?` auf iOS — Typ-Mismatch!
 
-**Option B: App Groups + SwiftData** (Empfohlen)
-- Shared Container für SwiftData
-- Watch schreibt direkt in geteilte DB
-- iPhone sieht Tasks automatisch
-- Einfacher, weniger Code
+**Risiko:** Wenn Watch und iOS unterschiedliche SwiftData-Schemas verwenden, koennte CloudKit-Sync fehlschlagen oder Daten verlieren.
 
-### 3. Voice Input
-- SwiftUI: `TextField` mit `.textInputAutocapitalization(.sentences)`
-- Dictation: Automatisch verfügbar auf Watch
-- Kein manuelles Speech Recognition nötig
+### 2. Entitlements leer
+App Group Array in Entitlements ist leer — ohne `group.com.henning.focusblox` kann die Watch nicht auf den geteilten Container zugreifen.
 
-### 4. UI (Minimal)
-- Ein Button "Task hinzufügen"
-- TextField für Spracheingabe (Watch-Dictation)
-- Bestätigung: "Task gespeichert"
-- Optional: Liste der letzten 3 Tasks
-
-## Abhängigkeiten
-
-### Upstream (was wir nutzen)
-- SwiftData
-- App Groups
-- watchOS SDK
-
-### Downstream (was uns nutzt)
-- Keine (Watch ist Consumer)
-
-## Risiken & Überlegungen
-
-1. **SwiftData auf watchOS:** Unterstützt seit watchOS 10, sollte funktionieren
-2. **App Group Sync:** Beide Apps müssen gleiche App Group nutzen
-3. **Dictation-Qualität:** Von Apple kontrolliert, nicht beeinflussbar
-4. **Speicher:** Watch hat limitierten Speicher, nur IDs speichern?
+### 3. Kein ModelContainer
+FocusBloxWatchApp hat keinen ModelContainer — ohne ihn keine SwiftData-Persistenz.
 
 ## Bestehende Patterns
 
-### Task-Erstellung (QuickCaptureView)
-```swift
-let task = LocalTask(
-    title: title,
-    importance: nil,  // TBD
-    estimatedDuration: nil,  // TBD
-    urgency: nil  // TBD
-)
-task.isNextUp = false
-context.insert(task)
+### iOS ModelContainer Setup (FocusBloxApp.swift)
+```
+Schema: [LocalTask.self, TaskMetadata.self]
+App Group: group.com.henning.focusblox
+CloudKit: .private("iCloud.com.henning.focusblox")
 ```
 
-### Shared Container (FocusBloxApp)
-```swift
-let container = try SharedModelContainer.create()
-// Nutzt App Group: group.com.henning.focusblox
-```
+### macOS ModelContainer Setup (FocusBloxMacApp.swift)
+Identisch mit iOS — gleiches Schema, gleiche App Group, gleicher CloudKit-Container.
 
-## Empfohlene Architektur
+### FocusBloxCore Framework
+Existiert, enthaelt aber nur LiveActivity-Attributes. NICHT der richtige Ort fuer SharedModelContainer (watchOS braucht kein LiveActivity).
 
-```
-FocusBloxWatch/
-├── FocusBloxWatchApp.swift     # @main App
-├── ContentView.swift            # Hauptansicht
-├── VoiceCaptureView.swift       # Spracheingabe
-└── WatchTaskService.swift       # SwiftData Zugriff
-```
+## Dependencies
+- **Upstream:** SwiftData, CloudKit, App Group Entitlement
+- **Downstream:** iOS Backlog (sieht Watch-Tasks via CloudKit Sync)
 
-Geteilter Code über `FocusBloxCore`:
-- `LocalTask` Model
-- `SharedModelContainer`
+## Zu aendernde Dateien (geschaetzt)
+1. `WatchLocalTask.swift` — Felder synchronisieren mit iOS LocalTask
+2. `FocusBloxWatchApp.swift` — ModelContainer + CloudKit Setup
+3. `ContentView.swift` — Placeholder ersetzen mit Task-Capture UI
+4. `FocusBloxWatch Watch App.entitlements` — App Group hinzufuegen
 
-## Nächste Schritte
-
-1. `/analyse` - Detaillierte technische Analyse
-2. `/write-spec` - Spec schreiben
-3. watchOS Target in Xcode erstellen
-4. TDD RED → Implementation
+## Risiken
+- watchOS Simulator unterstuetzt keine Dictation — nur manuelles Tippen testbar
+- CloudKit-Sync zwischen Watch und iPhone benoetigt echtes Device-Paar zum Verifizieren
+- Schema-Migration wenn WatchLocalTask Felder hinzukommen
 
 ---
-*Context erstellt: 2026-01-31*
+*Context aktualisiert: 2026-02-17*

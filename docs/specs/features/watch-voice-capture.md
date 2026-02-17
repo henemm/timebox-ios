@@ -1,169 +1,154 @@
-# Spec: Watch Voice Capture
+---
+entity_id: watch-voice-capture
+type: feature
+created: 2026-01-31
+updated: 2026-02-17
+status: draft
+version: "2.0"
+tags: [watchos, voice-capture, quick-capture, tbd]
+---
 
-> Status: Draft
-> Erstellt: 2026-01-31
-> Story: `docs/project/stories/quick-capture.md`
+# Watch Voice Capture
 
-## Zusammenfassung
+## Approval
 
-watchOS App mit Voice Capture: Button-Tap → Spracheingabe → Task landet im Backlog als TBD.
+- [ ] Approved
+
+## Purpose
+
+watchOS App mit Voice Capture: Button-Tap auf der Apple Watch oeffnet Spracheingabe, Task landet im Backlog als TBD. Sync zu iPhone/Mac via CloudKit.
 
 ## User Story
 
-**When** ich unterwegs bin und mir ein Gedanke einfällt,
+**When** ich unterwegs bin und mir ein Gedanke einfaellt,
 **I want to** ihn per Sprache auf meiner Watch festhalten (1 Tap + Sprache),
-**So that** ich ihn nicht vergesse und später am iPhone Details ergänzen kann.
+**So that** ich ihn nicht vergesse und spaeter am iPhone Details ergaenzen kann.
 
 ## Anforderungen
 
 ### Funktional
 
-1. **Watch App starten** → Hauptbildschirm mit "Task hinzufügen" Button
-2. **Button tippen** → TextField erscheint mit aktiver Dictation
-3. **Sprache eingeben** → Text wird transkribiert
-4. **Bestätigen** → Task wird gespeichert, Bestätigung angezeigt
-5. **Task erscheint im iPhone Backlog** als TBD (ohne Wichtigkeit/Dringlichkeit/Dauer)
+1. Watch App starten → Hauptbildschirm mit "Task hinzufuegen" Button
+2. Button tippen → TextField erscheint mit aktiver Dictation
+3. Sprache eingeben → Text wird transkribiert
+4. Bestaetigen → Task wird gespeichert, Bestaetigung angezeigt
+5. Task erscheint im iPhone/Mac Backlog als TBD (ohne Wichtigkeit/Dringlichkeit/Dauer)
 
 ### Nicht-Funktional
 
 - Max 2 Taps bis zur Eingabe
-- Dictation-Latenz < 2 Sekunden
-- Offline-fähig (speichert lokal, synct wenn verbunden)
+- Offline-faehig (speichert lokal, synct wenn verbunden via CloudKit)
+- Haptic Feedback bei Speicherung (bereits in ConfirmationView)
 
-## Technische Architektur
+## Source
 
-### Projektstruktur
+### Zu aendernde Dateien
 
-```
-FocusBlox.xcodeproj
-├── FocusBlox (iOS App)
-├── FocusBloxWatch (watchOS App)    ← NEU
-│   ├── FocusBloxWatchApp.swift
-│   ├── ContentView.swift
-│   └── Info.plist
-├── FocusBloxCore (Shared Framework)
-│   ├── LocalTask.swift             ← bereits vorhanden
-│   ├── TaskMetadata.swift          ← bereits vorhanden
-│   └── SharedModelContainer.swift  ← NEU (extrahieren)
-└── FocusBloxWidgets (Widget Extension)
-```
+| Datei | Aenderung | Beschreibung |
+|-------|-----------|-------------|
+| `FocusBloxWatch Watch App/WatchLocalTask.swift` | MODIFY | 5 fehlende Felder + 2 Typ-Korrekturen |
+| `FocusBloxWatch Watch App/FocusBloxWatchApp.swift` | MODIFY | ModelContainer mit App Group + CloudKit |
+| `FocusBloxWatch Watch App/ContentView.swift` | MODIFY | Placeholder → Task-Capture UI |
+| `FocusBloxWatch Watch App/FocusBloxWatch Watch App.entitlements` | MODIFY | App Group eintragen |
 
-### Daten-Synchronisation
+### Nicht zu aendern (bereits fertig)
 
-**Methode:** Shared App Group mit SwiftData
+| Datei | Status |
+|-------|--------|
+| `VoiceInputSheet.swift` | Fertig — TextField + Auto-Focus + OK/Abbrechen |
+| `ConfirmationView.swift` | Fertig — Checkmark + Haptic + Auto-Dismiss 2s |
+
+## Dependencies
+
+| Entity | Type | Purpose |
+|--------|------|---------|
+| `Sources/Models/LocalTask.swift` | Reference | Schema-Vorlage fuer WatchLocalTask |
+| `Sources/Models/TaskMetadata.swift` | Reference | Muss im Watch-Schema enthalten sein |
+| `Sources/FocusBloxApp.swift` | Reference | ModelContainer-Pattern (App Group + CloudKit) |
+| App Group `group.com.henning.focusblox` | Entitlement | Geteilter Container fuer Sync |
+| CloudKit `iCloud.com.henning.focusblox` | Entitlement | Private DB fuer Cross-Device Sync |
+
+## Implementation Details
+
+### 1. WatchLocalTask.swift — Schema synchronisieren
+
+Fehlende Felder hinzufuegen (identisch mit iOS `LocalTask`):
 
 ```swift
-// Beide Apps nutzen denselben Container:
-let container = try SharedModelContainer.create()
-// → group.com.henning.focusblox
+// Fehlende Felder (mit CloudKit-kompatiblen Defaults):
+var assignedFocusBlockID: String?    // nil = nicht zugewiesen
+var rescheduleCount: Int = 0         // Default 0
+var completedAt: Date?               // nil = nicht erledigt
+var aiScore: Int?                    // nil = nicht gescored
+var aiEnergyLevel: String?           // nil = nicht gescored
 ```
 
-Die Watch schreibt direkt in die geteilte SwiftData-Datenbank. Das iPhone sieht die Tasks automatisch beim nächsten Öffnen.
+Typ-Korrekturen:
+```swift
+// VORHER (Watch):
+var recurrencePattern: String?       // Optional
+var recurrenceWeekdays: [Int]        // Non-optional
 
-### Watch App Entitlement
-
-```xml
-<!-- FocusBloxWatch.entitlements -->
-<key>com.apple.security.application-groups</key>
-<array>
-    <string>group.com.henning.focusblox</string>
-</array>
+// NACHHER (identisch mit iOS):
+var recurrencePattern: String = "none"  // Required mit Default
+var recurrenceWeekdays: [Int]?          // Optional
 ```
 
-## UI Design
+Default-Korrektur:
+```swift
+// VORHER:
+var taskType: String = "maintenance"
 
-### Hauptbildschirm (ContentView)
-
-```
-┌─────────────────────┐
-│                     │
-│    FocusBlox        │
-│    ──────────       │
-│                     │
-│  ┌───────────────┐  │
-│  │  + Task       │  │
-│  │  hinzufügen   │  │
-│  └───────────────┘  │
-│                     │
-│  Letzte Tasks:      │
-│  • Meeting vorbe... │
-│  • Einkaufen        │
-│                     │
-└─────────────────────┘
+// NACHHER (identisch mit iOS):
+var taskType: String = ""
 ```
 
-### Eingabe-Sheet
-
-```
-┌─────────────────────┐
-│                     │
-│  Neuer Task         │
-│  ──────────────     │
-│                     │
-│  ┌───────────────┐  │
-│  │ 🎤 Dictation  │  │
-│  │               │  │
-│  └───────────────┘  │
-│                     │
-│  [Abbrechen] [OK]   │
-│                     │
-└─────────────────────┘
-```
-
-### Bestätigung
-
-```
-┌─────────────────────┐
-│                     │
-│        ✓            │
-│                     │
-│   Task gespeichert  │
-│                     │
-│  (auto-dismiss 2s)  │
-│                     │
-└─────────────────────┘
-```
-
-## Implementation
-
-### 1. Xcode Target erstellen
-
-```bash
-# In Xcode:
-File → New → Target → watchOS → App
-Name: FocusBloxWatch
-Bundle ID: com.henning.focusblox.watchkitapp
-Deployment: watchOS 11.0
-```
-
-### 2. FocusBloxWatchApp.swift
+### 2. FocusBloxWatchApp.swift — ModelContainer Setup
 
 ```swift
 import SwiftUI
 import SwiftData
 
 @main
-struct FocusBloxWatchApp: App {
-    let container: ModelContainer
+struct FocusBloxWatch_Watch_AppApp: App {
+    var sharedModelContainer: ModelContainer = {
+        let schema = Schema([LocalTask.self, TaskMetadata.self])
+        let appGroupID = "group.com.henning.focusblox"
 
-    init() {
-        do {
-            container = try SharedModelContainer.create()
-        } catch {
-            fatalError("Failed to create ModelContainer: \(error)")
+        let config: ModelConfiguration
+        if FileManager.default.containerURL(
+            forSecurityApplicationGroupIdentifier: appGroupID
+        ) != nil {
+            config = ModelConfiguration(
+                schema: schema,
+                groupContainer: .identifier(appGroupID),
+                cloudKitDatabase: .private("iCloud.com.henning.focusblox")
+            )
+        } else {
+            config = ModelConfiguration(
+                schema: schema,
+                isStoredInMemoryOnly: false,
+                cloudKitDatabase: .private("iCloud.com.henning.focusblox")
+            )
         }
-    }
+
+        do {
+            return try ModelContainer(for: schema, configurations: [config])
+        } catch {
+            fatalError("ModelContainer init failed: \(error)")
+        }
+    }()
 
     var body: some Scene {
         WindowGroup {
             ContentView()
         }
-        .modelContainer(container)
+        .modelContainer(sharedModelContainer)
     }
 }
 ```
 
-### 3. ContentView.swift
+### 3. ContentView.swift — Task-Capture UI
 
 ```swift
 import SwiftUI
@@ -171,8 +156,11 @@ import SwiftData
 
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
-    @Query(sort: \LocalTask.createdAt, order: .reverse)
-    private var recentTasks: [LocalTask]
+    @Query(
+        filter: #Predicate<LocalTask> { !$0.isCompleted },
+        sort: \LocalTask.createdAt,
+        order: .reverse
+    ) private var recentTasks: [LocalTask]
 
     @State private var showingInput = false
     @State private var showingConfirmation = false
@@ -183,14 +171,14 @@ struct ContentView: View {
                 Button {
                     showingInput = true
                 } label: {
-                    Label("Task hinzufügen", systemImage: "plus.circle.fill")
+                    Label("Task hinzufuegen", systemImage: "plus.circle.fill")
                 }
-                .buttonStyle(.borderedProminent)
                 .listRowBackground(Color.clear)
+                .accessibilityIdentifier("addTaskButton")
 
                 if !recentTasks.isEmpty {
                     Section("Letzte Tasks") {
-                        ForEach(recentTasks.prefix(3)) { task in
+                        ForEach(recentTasks.prefix(5)) { task in
                             Text(task.title)
                                 .lineLimit(1)
                         }
@@ -199,12 +187,10 @@ struct ContentView: View {
             }
             .navigationTitle("FocusBlox")
             .sheet(isPresented: $showingInput) {
-                VoiceInputSheet(
-                    onSave: { title in
-                        saveTask(title: title)
-                        showingConfirmation = true
-                    }
-                )
+                VoiceInputSheet { title in
+                    saveTask(title: title)
+                    showingConfirmation = true
+                }
             }
             .sheet(isPresented: $showingConfirmation) {
                 ConfirmationView()
@@ -213,177 +199,161 @@ struct ContentView: View {
     }
 
     private func saveTask(title: String) {
-        let task = LocalTask(
-            title: title,
-            importance: nil,
-            estimatedDuration: nil,
-            urgency: nil
-        )
-        task.isNextUp = false
+        let task = LocalTask(title: title)
+        // Alle optionalen Felder bleiben nil = TBD
         modelContext.insert(task)
         try? modelContext.save()
     }
 }
 ```
 
-### 4. VoiceInputSheet.swift
+### 4. Entitlements — App Group
 
-```swift
-import SwiftUI
-
-struct VoiceInputSheet: View {
-    @Environment(\.dismiss) private var dismiss
-    @State private var taskTitle = ""
-    @FocusState private var isFocused: Bool
-
-    let onSave: (String) -> Void
-
-    var body: some View {
-        NavigationStack {
-            VStack {
-                TextField("Was möchtest du tun?", text: $taskTitle)
-                    .textFieldStyle(.plain)
-                    .focused($isFocused)
-                    .padding()
-            }
-            .navigationTitle("Neuer Task")
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Abbrechen") {
-                        dismiss()
-                    }
-                }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("OK") {
-                        if !taskTitle.isEmpty {
-                            onSave(taskTitle)
-                            dismiss()
-                        }
-                    }
-                    .disabled(taskTitle.isEmpty)
-                }
-            }
-            .onAppear {
-                isFocused = true
-            }
-        }
-    }
-}
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>com.apple.security.application-groups</key>
+    <array>
+        <string>group.com.henning.focusblox</string>
+    </array>
+</dict>
+</plist>
 ```
 
-### 5. ConfirmationView.swift
+### 5. TaskMetadata fuer Watch
+
+Watch braucht `TaskMetadata` im Schema (sonst CloudKit-Sync-Fehler). Die Watch App benutzt TaskMetadata nicht aktiv, aber das Schema muss identisch sein.
+
+Eine Kopie von `Sources/Models/TaskMetadata.swift` muss ins Watch-Target:
 
 ```swift
-import SwiftUI
-
-struct ConfirmationView: View {
-    @Environment(\.dismiss) private var dismiss
-
-    var body: some View {
-        VStack(spacing: 16) {
-            Image(systemName: "checkmark.circle.fill")
-                .font(.system(size: 50))
-                .foregroundStyle(.green)
-
-            Text("Task gespeichert")
-                .font(.headline)
-        }
-        .onAppear {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                dismiss()
-            }
-        }
-    }
-}
-```
-
-## Shared Code Extraktion
-
-`SharedModelContainer` muss in `FocusBloxCore` verschoben werden:
-
-```swift
-// FocusBloxCore/SharedModelContainer.swift
+import Foundation
 import SwiftData
 
-public enum SharedModelContainer {
-    private static let appGroupID = "group.com.henning.focusblox"
-
-    public static func create() throws -> ModelContainer {
-        // ... (bestehende Implementation)
-    }
+@Model
+final class TaskMetadata {
+    var reminderID: String = ""
+    var sortOrder: Int = 0
+    var manualDuration: Int?
 }
 ```
+
+## Expected Behavior
+
+- **Input:** User tippt "Task hinzufuegen" Button → spricht Task-Titel ein
+- **Output:** Task in SwiftData gespeichert mit nur `title` (alles andere nil/default = TBD)
+- **Side effects:**
+  - CloudKit synct Task zu iPhone/Mac innerhalb weniger Sekunden
+  - Task erscheint im iOS/macOS Backlog als TBD (italic, tbd-Badge)
+  - Haptic Feedback auf Watch bei Speicherung
+
+## Scope
+
+- **Dateien:** 4 MODIFY + 1 CREATE (TaskMetadata-Kopie)
+- **LoC netto:** ~60-80
+- **Komplexitaet:** S (1 Session)
 
 ## Tests
 
-### Unit Tests (FocusBloxTests)
+### Unit Tests (Watch Target)
 
 ```swift
-// SharedModelContainerTests.swift
-func testWatchCanAccessSharedContainer() throws {
-    let container = try SharedModelContainer.create()
-    let context = ModelContext(container)
+// WatchTaskCreationTests.swift
+func test_createTask_savesWithTBDDefaults() {
+    let task = LocalTask(title: "Test Task")
+    XCTAssertEqual(task.title, "Test Task")
+    XCTAssertNil(task.importance)      // TBD
+    XCTAssertNil(task.urgency)         // TBD
+    XCTAssertNil(task.estimatedDuration) // TBD
+    XCTAssertFalse(task.isNextUp)
+    XCTAssertFalse(task.isCompleted)
+    XCTAssertEqual(task.sourceSystem, "local")
+}
 
-    // Simulate Watch creating a task
-    let task = LocalTask(title: "Watch Task", importance: nil, estimatedDuration: nil, urgency: nil)
-    context.insert(task)
-    try context.save()
-
-    // Verify task exists
-    let descriptor = FetchDescriptor<LocalTask>()
-    let tasks = try context.fetch(descriptor)
-    XCTAssertTrue(tasks.contains { $0.title == "Watch Task" })
+func test_watchLocalTask_hasAllIOSFields() {
+    let task = LocalTask(title: "Schema Test")
+    // Neue Felder muessen existieren
+    XCTAssertNil(task.assignedFocusBlockID)
+    XCTAssertEqual(task.rescheduleCount, 0)
+    XCTAssertNil(task.completedAt)
+    XCTAssertNil(task.aiScore)
+    XCTAssertNil(task.aiEnergyLevel)
+    // Typ-Korrekturen
+    XCTAssertNil(task.recurrenceWeekdays)  // Optional, nicht []
+    XCTAssertEqual(task.recurrencePattern, "none")  // Required, nicht nil
+    XCTAssertEqual(task.taskType, "")  // Leer, nicht "maintenance"
 }
 ```
 
-### UI Tests (FocusBloxWatchUITests)
+### UI Tests (Watch Target)
 
 ```swift
 // WatchVoiceCaptureUITests.swift
-func testAddTaskButtonExists() throws {
+func test_addTaskButton_exists() {
     let app = XCUIApplication()
     app.launch()
-
-    let addButton = app.buttons["Task hinzufügen"]
-    XCTAssertTrue(addButton.waitForExistence(timeout: 5))
+    XCTAssertTrue(app.buttons["addTaskButton"].waitForExistence(timeout: 5))
 }
 
-func testTaskInputSheetAppears() throws {
+func test_addTaskButton_opensInputSheet() {
     let app = XCUIApplication()
     app.launch()
+    app.buttons["addTaskButton"].tap()
+    XCTAssertTrue(app.textFields["taskTitleField"].waitForExistence(timeout: 3))
+}
 
-    app.buttons["Task hinzufügen"].tap()
+func test_saveTask_showsConfirmation() {
+    let app = XCUIApplication()
+    app.launch()
+    app.buttons["addTaskButton"].tap()
+    let textField = app.textFields["taskTitleField"]
+    textField.tap()
+    textField.typeText("Test Task von Watch")
+    app.buttons["saveButton"].tap()
+    XCTAssertTrue(app.staticTexts["Task gespeichert"].waitForExistence(timeout: 3))
+}
 
-    let textField = app.textFields.firstMatch
-    XCTAssertTrue(textField.waitForExistence(timeout: 3))
+func test_savedTask_appearsInList() {
+    let app = XCUIApplication()
+    app.launch()
+    app.buttons["addTaskButton"].tap()
+    let textField = app.textFields["taskTitleField"]
+    textField.tap()
+    textField.typeText("Mein Watch Task")
+    app.buttons["saveButton"].tap()
+    // Warten bis Confirmation verschwindet
+    sleep(3)
+    // Task sollte in der Liste erscheinen
+    XCTAssertTrue(app.staticTexts["Mein Watch Task"].waitForExistence(timeout: 5))
 }
 ```
 
-## Akzeptanzkriterien
+## Known Limitations
 
-- [ ] watchOS Target erstellt und baut
-- [ ] Watch App startet auf Simulator
-- [ ] "Task hinzufügen" Button sichtbar
-- [ ] Tippen öffnet Eingabe-Sheet
-- [ ] TextField akzeptiert Text (Dictation funktioniert auf echtem Device)
-- [ ] Task wird in SharedModelContainer gespeichert
-- [ ] Task erscheint im iPhone Backlog nach App-Öffnung
-- [ ] Bestätigungs-Animation nach Speichern
+- watchOS Simulator unterstuetzt keine Dictation — nur manuelles Tippen testbar
+- CloudKit-Sync zwischen Watch und iPhone benoetigt echtes Device-Paar zum Verifizieren
+- WatchLocalTask ist eine Kopie von iOS LocalTask (technische Schuld) — langfristig Shared Package
+- Watch zeigt nur Titel der letzten Tasks, keine Details (bewusste UX-Entscheidung fuer kleines Display)
 
-## Offene Fragen
+## Offene Fragen (geklaert)
 
-1. **Watch Complications:** Später hinzufügen?
-2. **Haptic Feedback:** Bei erfolgreicher Speicherung?
-3. **Offline-Indikator:** Anzeigen wenn nicht verbunden?
+1. **Haptic Feedback** → Bereits in ConfirmationView implementiert (WKInterfaceDevice.current().play(.success))
+2. **Watch Complications** → Out of Scope, spaeter
+3. **Offline-Indikator** → Out of Scope, CloudKit handhabt das transparent
 
 ## Risiken
 
 | Risiko | Wahrscheinlichkeit | Impact | Mitigation |
 |--------|-------------------|--------|------------|
-| SwiftData-Konflikt zwischen Geräten | Niedrig | Mittel | Keine gleichzeitigen Writes |
-| Dictation funktioniert nicht im Simulator | Sicher | Niedrig | Echtes Device für Tests |
-| App Group nicht korrekt konfiguriert | Mittel | Hoch | Entitlements prüfen |
+| Schema-Mismatch Watch/iOS | Hoch (aktuell!) | Hoch | WatchLocalTask synchronisieren (dieses Ticket) |
+| Dictation nicht im Simulator | Sicher | Niedrig | TextField-Input fuer Tests, Dictation auf echtem Device |
+| App Group nicht konfiguriert | Hoch (aktuell!) | Hoch | Entitlements korrigieren (dieses Ticket) |
+| CloudKit-Sync Latenz | Niedrig | Niedrig | Akzeptabel fuer Capture-Usecase |
 
----
+## Changelog
 
-*Spec Version 1.0 - 2026-01-31*
+- 2026-01-31: Initial spec created (v1.0)
+- 2026-02-17: Aktualisiert nach Analyse — WatchLocalTask Schema-Sync, fehlende Felder dokumentiert, TaskMetadata-Kopie ergaenzt, Tests konkretisiert (v2.0)

@@ -437,6 +437,20 @@ Siri liest den Screen-Inhalt anderer Apps (wenn diese ihn exponieren). User sagt
 
 ## ✅ Kuerzlich erledigt
 
+### Feature: Watch Voice Capture — Button → Spracheingabe → Task im Backlog
+**Status:** ERLEDIGT (2026-02-17)
+**Dateien:** `WatchLocalTask.swift`, `WatchTaskMetadata.swift` (neu), `FocusBloxWatchApp.swift`, `ContentView.swift` (Watch), `Entitlements`
+**Spec:** `docs/specs/features/watch-voice-capture.md` (v2.0)
+**Loesung:**
+- WatchLocalTask Schema mit iOS synchronisiert (5 fehlende Felder + 3 Typ-/Default-Korrekturen)
+- TaskMetadata-Kopie fuer CloudKit Schema-Paritaet
+- ModelContainer mit App Group + CloudKit (resilient mit Fallback)
+- ContentView: "Task hinzufuegen" Button → VoiceInputSheet → ConfirmationView → Task in Liste
+- Entitlements: App Group `group.com.henning.focusblox` eingetragen
+**Tests:** 9 Unit Tests (Schema-Paritaet, TBD-Defaults) + 2 UI Tests (Button, Sheet) GREEN
+
+---
+
 ### ITB-B: AI Task Scoring mit Foundation Models
 **Status:** ERLEDIGT (2026-02-17)
 **Dateien:** `LocalTask.swift`, `PlanItem.swift`, `AITaskScoringService.swift` (neu), `AppSettings.swift`, `BacklogView.swift`, `BacklogRow.swift`, `CreateTaskView.swift`, `SettingsView.swift`, `MacSettingsView.swift`
