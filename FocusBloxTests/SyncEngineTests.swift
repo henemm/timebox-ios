@@ -95,6 +95,59 @@ final class SyncEngineTests: XCTestCase {
 
     // MARK: - updateSortOrder Tests
 
+    // MARK: - deleteRecurringSeries Tests (Ticket 2)
+
+    /// Deleting a single recurring instance keeps other series members
+    func test_deleteSingleInstance_keepsOthers() throws {
+        let context = container.mainContext
+        let groupID = "series-abc"
+
+        let task1 = LocalTask(title: "Instance 1", recurrencePattern: "daily", recurrenceGroupID: groupID)
+        let task2 = LocalTask(title: "Instance 2", recurrencePattern: "daily", recurrenceGroupID: groupID)
+        let task3 = LocalTask(title: "Instance 3", recurrencePattern: "daily", recurrenceGroupID: groupID)
+        context.insert(task1)
+        context.insert(task2)
+        context.insert(task3)
+        try context.save()
+
+        // Delete only task2 (single instance)
+        try syncEngine.deleteTask(itemID: task2.id)
+
+        let remaining = try context.fetch(FetchDescriptor<LocalTask>())
+        XCTAssertEqual(remaining.count, 2, "Only one instance should be deleted")
+        XCTAssertTrue(remaining.contains(where: { $0.title == "Instance 1" }))
+        XCTAssertTrue(remaining.contains(where: { $0.title == "Instance 3" }))
+    }
+
+    /// Deleting entire series removes all open instances but keeps completed ones
+    func test_deleteRecurringSeries_deletesAllOpen() throws {
+        let context = container.mainContext
+        let groupID = "series-xyz"
+
+        let open1 = LocalTask(title: "Open 1", recurrencePattern: "daily", recurrenceGroupID: groupID)
+        let open2 = LocalTask(title: "Open 2", recurrencePattern: "daily", recurrenceGroupID: groupID)
+        let completed = LocalTask(title: "Completed", recurrencePattern: "daily", recurrenceGroupID: groupID)
+        completed.isCompleted = true
+        completed.completedAt = Date()
+
+        let unrelated = LocalTask(title: "Unrelated", recurrencePattern: "daily", recurrenceGroupID: "other-group")
+
+        context.insert(open1)
+        context.insert(open2)
+        context.insert(completed)
+        context.insert(unrelated)
+        try context.save()
+
+        try syncEngine.deleteRecurringSeries(groupID: groupID)
+
+        let remaining = try context.fetch(FetchDescriptor<LocalTask>())
+        XCTAssertEqual(remaining.count, 2, "Only completed + unrelated should remain")
+        XCTAssertTrue(remaining.contains(where: { $0.title == "Completed" }), "Completed instances stay")
+        XCTAssertTrue(remaining.contains(where: { $0.title == "Unrelated" }), "Unrelated tasks stay")
+    }
+
+    // MARK: - updateSortOrder Tests
+
     func test_updateSortOrder_updatesTasksSortOrder() async throws {
         let context = container.mainContext
         let task1 = LocalTask(title: "Task 1", importance: 0)

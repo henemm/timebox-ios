@@ -66,6 +66,7 @@ struct BacklogView: View {
     @State private var completeFeedback = false
     @State private var taskToEdit: PlanItem?
     @State private var completedTasks: [PlanItem] = []
+    @State private var taskToDeleteRecurring: PlanItem?
 
     // MARK: - Next Up Tasks
     private var nextUpTasks: [PlanItem] {
@@ -291,6 +292,30 @@ struct BacklogView: View {
                     }
                 )
             }
+            .confirmationDialog(
+                "Wiederkehrende Aufgabe löschen",
+                isPresented: Binding(
+                    get: { taskToDeleteRecurring != nil },
+                    set: { if !$0 { taskToDeleteRecurring = nil } }
+                ),
+                titleVisibility: .visible
+            ) {
+                Button("Nur diese Aufgabe", role: .destructive) {
+                    if let task = taskToDeleteRecurring {
+                        deleteSingleTask(task)
+                        taskToDeleteRecurring = nil
+                    }
+                }
+                Button("Alle offenen dieser Serie", role: .destructive) {
+                    if let task = taskToDeleteRecurring {
+                        deleteRecurringSeries(task)
+                        taskToDeleteRecurring = nil
+                    }
+                }
+                Button("Abbrechen", role: .cancel) {
+                    taskToDeleteRecurring = nil
+                }
+            }
         }
         .task(id: remindersSyncEnabled) {
             await loadTasks()
@@ -456,6 +481,18 @@ struct BacklogView: View {
     }
 
     private func deleteTask(_ task: PlanItem) {
+        // Recurring task? Show confirmation dialog
+        if let pattern = task.recurrencePattern,
+           pattern != "none",
+           task.recurrenceGroupID != nil {
+            taskToDeleteRecurring = task
+            return
+        }
+
+        deleteSingleTask(task)
+    }
+
+    private func deleteSingleTask(_ task: PlanItem) {
         do {
             let taskSource = LocalTaskSource(modelContext: modelContext)
             let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
@@ -466,6 +503,21 @@ struct BacklogView: View {
             }
         } catch {
             errorMessage = "Task konnte nicht gelöscht werden."
+        }
+    }
+
+    private func deleteRecurringSeries(_ task: PlanItem) {
+        guard let groupID = task.recurrenceGroupID else { return }
+        do {
+            let taskSource = LocalTaskSource(modelContext: modelContext)
+            let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
+            try syncEngine.deleteRecurringSeries(groupID: groupID)
+
+            Task {
+                await loadTasks()
+            }
+        } catch {
+            errorMessage = "Serie konnte nicht gelöscht werden."
         }
     }
 

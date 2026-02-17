@@ -62,6 +62,9 @@ struct ContentView: View {
     // Quick Add
     @State private var newTaskTitle = ""
 
+    // Recurring delete dialog
+    @State private var taskToDeleteRecurring: LocalTask?
+
     // Computed properties for sidebar badges
     private var tbdCount: Int {
         tasks.filter { $0.isTbd && !$0.isCompleted }.count
@@ -390,6 +393,30 @@ struct ContentView: View {
             // Sync on appear if enabled
             await syncWithReminders()
         }
+        .confirmationDialog(
+            "Wiederkehrende Aufgabe löschen",
+            isPresented: Binding(
+                get: { taskToDeleteRecurring != nil },
+                set: { if !$0 { taskToDeleteRecurring = nil } }
+            ),
+            titleVisibility: .visible
+        ) {
+            Button("Nur diese Aufgabe", role: .destructive) {
+                if let task = taskToDeleteRecurring {
+                    deleteSingleTask(task)
+                    taskToDeleteRecurring = nil
+                }
+            }
+            Button("Alle offenen dieser Serie", role: .destructive) {
+                if let task = taskToDeleteRecurring {
+                    deleteRecurringSeries(task)
+                    taskToDeleteRecurring = nil
+                }
+            }
+            Button("Abbrechen", role: .cancel) {
+                taskToDeleteRecurring = nil
+            }
+        }
     }
 
     private var filterTitle: String {
@@ -515,9 +542,39 @@ struct ContentView: View {
     }
 
     private func deleteTasksByIds(_ ids: Set<UUID>) {
+        // Single task with recurring pattern? Show confirmation dialog
+        if ids.count == 1,
+           let taskId = ids.first,
+           let task = tasks.first(where: { $0.uuid == taskId }),
+           task.recurrencePattern != "none",
+           task.recurrenceGroupID != nil {
+            taskToDeleteRecurring = task
+            return
+        }
+
         for id in ids {
             if let task = tasks.first(where: { $0.uuid == id }) {
                 modelContext.delete(task)
+            }
+        }
+        try? modelContext.save()
+        selectedTasks.removeAll()
+    }
+
+    private func deleteSingleTask(_ task: LocalTask) {
+        modelContext.delete(task)
+        try? modelContext.save()
+        selectedTasks.removeAll()
+    }
+
+    private func deleteRecurringSeries(_ task: LocalTask) {
+        guard let groupID = task.recurrenceGroupID else { return }
+        let descriptor = FetchDescriptor<LocalTask>(
+            predicate: #Predicate { $0.recurrenceGroupID == groupID && !$0.isCompleted }
+        )
+        if let seriesTasks = try? modelContext.fetch(descriptor) {
+            for t in seriesTasks {
+                modelContext.delete(t)
             }
         }
         try? modelContext.save()

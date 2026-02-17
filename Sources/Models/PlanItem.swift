@@ -23,6 +23,7 @@ struct PlanItem: Identifiable, Sendable {
     let recurrencePattern: String?
     let recurrenceWeekdays: [Int]?
     let recurrenceMonthDay: Int?
+    let recurrenceGroupID: String?
 
     // Next Up staging
     let isNextUp: Bool
@@ -83,6 +84,7 @@ struct PlanItem: Identifiable, Sendable {
         self.recurrencePattern = nil
         self.recurrenceWeekdays = nil
         self.recurrenceMonthDay = nil
+        self.recurrenceGroupID = nil
     }
 
     init(localTask: LocalTask) {
@@ -118,6 +120,7 @@ struct PlanItem: Identifiable, Sendable {
         self.recurrencePattern = localTask.recurrencePattern
         self.recurrenceWeekdays = localTask.recurrenceWeekdays
         self.recurrenceMonthDay = localTask.recurrenceMonthDay
+        self.recurrenceGroupID = localTask.recurrenceGroupID
     }
 
     private static func resolveDuration(manual: Int?, title: String?) -> (Int, DurationSource) {
