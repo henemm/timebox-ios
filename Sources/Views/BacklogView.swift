@@ -197,6 +197,12 @@ struct BacklogView: View {
                                 if let item = planItems.first(where: { $0.id == taskID }) {
                                     updateNextUp(for: item, isNextUp: false)
                                 }
+                            },
+                            onEditTask: { task in
+                                taskToEditDirectly = task
+                            },
+                            onDeleteTask: { task in
+                                deleteTask(task)
                             }
                         )
 
@@ -222,12 +228,6 @@ struct BacklogView: View {
             }
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    if selectedMode == .list {
-                        EditButton()
-                    }
-                }
-
                 ToolbarItemGroup(placement: .topBarTrailing) {
                     viewModeSwitcher
 

@@ -1,0 +1,9 @@
+TEST FAILED - NextUpSwipeActionsUITests
+
+Test case 'NextUpSwipeActionsUITests.testNextUpNoLeadingSwipe()' failed (17.541 seconds)
+Test case 'NextUpSwipeActionsUITests.testNextUpSwipeDeleteExists()' failed (13.230 seconds)  
+Test case 'NextUpSwipeActionsUITests.testNextUpSwipeEditExists()' failed (14.395 seconds)
+
+All 3 tests FAILED as expected - NextUp rows don't have swipe actions yet.
+- nextUpRow identifier doesn't exist (no cells matching 'nextUpRow')
+- No trailing swipe actions on NextUp tasks

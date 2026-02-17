@@ -1,0 +1,7 @@
+TEST FAILED - NextUpSwipeActionsTests (Build Error)
+
+Error: Extra arguments at positions #3, #4 in call
+File: FocusBloxTests/NextUpSwipeActionsTests.swift
+
+NextUpSection does not accept onEditTask/onDeleteTask callbacks yet.
+Build failed, test could not run.

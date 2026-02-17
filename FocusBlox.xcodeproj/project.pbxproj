@@ -230,8 +230,10 @@
 		RECRSVC02BUILD002 /* RecurrenceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = RECRSVC02FILE0001 /* RecurrenceService.swift */; };
 		RVWOS01BUILD0001 /* ReviewOutsideSprintTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = RVWOS01FILE00001 /* ReviewOutsideSprintTests.swift */; };
 		UNIFTAB01UTBLD01 /* UnifiedTabSymbolsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = UNIFTAB01UTREF01 /* UnifiedTabSymbolsTests.swift */; };
+		NXSWIPE01UTBLD01 /* NextUpSwipeActionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = NXSWIPE01UTREF01 /* NextUpSwipeActionsTests.swift */; };
 		RVWCT01BUILD0001 /* ReviewCompletedTasksUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = RVWCT01FILE00001 /* ReviewCompletedTasksUITests.swift */; };
 		UNIFTAB01UIBLD01 /* UnifiedTabSymbolsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = UNIFTAB01UIREF01 /* UnifiedTabSymbolsUITests.swift */; };
+		NXSWIPE01UIBLD01 /* NextUpSwipeActionsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = NXSWIPE01UIREF01 /* NextUpSwipeActionsUITests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -569,8 +571,10 @@
 		RECRSVC02FILE0001 /* RecurrenceService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecurrenceService.swift; sourceTree = "<group>"; };
 		RVWOS01FILE00001 /* ReviewOutsideSprintTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewOutsideSprintTests.swift; sourceTree = "<group>"; };
 		UNIFTAB01UTREF01 /* UnifiedTabSymbolsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnifiedTabSymbolsTests.swift; sourceTree = "<group>"; };
+		NXSWIPE01UTREF01 /* NextUpSwipeActionsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NextUpSwipeActionsTests.swift; sourceTree = "<group>"; };
 		RVWCT01FILE00001 /* ReviewCompletedTasksUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewCompletedTasksUITests.swift; sourceTree = "<group>"; };
 		UNIFTAB01UIREF01 /* UnifiedTabSymbolsUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnifiedTabSymbolsUITests.swift; sourceTree = "<group>"; };
+		NXSWIPE01UIREF01 /* NextUpSwipeActionsUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NextUpSwipeActionsUITests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -747,6 +751,7 @@
 				RECRBDG01FILE00001 /* RecurrenceBadgeUITests.swift */,
 				RVWCT01FILE00001 /* ReviewCompletedTasksUITests.swift */,
 				UNIFTAB01UIREF01 /* UnifiedTabSymbolsUITests.swift */,
+				NXSWIPE01UIREF01 /* NextUpSwipeActionsUITests.swift */,
 			);
 			path = FocusBloxUITests;
 			sourceTree = "<group>";
@@ -948,6 +953,7 @@
 				RECRSVC01FILE00001 /* RecurrenceServiceTests.swift */,
 				RVWOS01FILE00001 /* ReviewOutsideSprintTests.swift */,
 				UNIFTAB01UTREF01 /* UnifiedTabSymbolsTests.swift */,
+				NXSWIPE01UTREF01 /* NextUpSwipeActionsTests.swift */,
 			);
 			path = FocusBloxTests;
 			sourceTree = "<group>";
@@ -1595,6 +1601,7 @@
 				RECRBDG01BUILD0001 /* RecurrenceBadgeUITests.swift in Sources */,
 				RVWCT01BUILD0001 /* ReviewCompletedTasksUITests.swift in Sources */,
 				UNIFTAB01UIBLD01 /* UnifiedTabSymbolsUITests.swift in Sources */,
+				NXSWIPE01UIBLD01 /* NextUpSwipeActionsUITests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1647,6 +1654,7 @@
 				RECRSVC01BUILD0001 /* RecurrenceServiceTests.swift in Sources */,
 				RVWOS01BUILD0001 /* ReviewOutsideSprintTests.swift in Sources */,
 				UNIFTAB01UTBLD01 /* UnifiedTabSymbolsTests.swift in Sources */,
+				NXSWIPE01UTBLD01 /* NextUpSwipeActionsTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

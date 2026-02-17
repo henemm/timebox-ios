@@ -5,6 +5,8 @@ import SwiftUI
 struct NextUpSection: View {
     let tasks: [PlanItem]
     let onRemoveFromNextUp: (String) -> Void
+    var onEditTask: ((PlanItem) -> Void)?
+    var onDeleteTask: ((PlanItem) -> Void)?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -34,15 +36,34 @@ struct NextUpSection: View {
                     .frame(maxWidth: .infinity, alignment: .center)
                     .padding(.vertical, 12)
             } else {
-                // Task list (vertical)
-                VStack(spacing: 6) {
+                // Task list with swipe actions
+                List {
                     ForEach(tasks) { task in
                         NextUpRow(task: task) {
                             onRemoveFromNextUp(task.id)
                         }
+                        .accessibilityIdentifier("nextUpRow")
+                        .listRowInsets(EdgeInsets(top: 3, leading: 10, bottom: 3, trailing: 10))
+                        .listRowBackground(Color.clear)
+                        .listRowSeparator(.hidden)
+                        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                            Button(role: .destructive) {
+                                onDeleteTask?(task)
+                            } label: {
+                                Label("Löschen", systemImage: "trash")
+                            }
+                            Button {
+                                onEditTask?(task)
+                            } label: {
+                                Label("Bearbeiten", systemImage: "pencil")
+                            }
+                            .tint(.blue)
+                        }
                     }
                 }
-                .padding(.horizontal)
+                .listStyle(.plain)
+                .frame(height: CGFloat(tasks.count) * 50)
+                .scrollDisabled(true)
             }
         }
         .padding(.vertical, 12)
