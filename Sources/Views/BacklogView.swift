@@ -283,8 +283,8 @@ struct BacklogView: View {
             .sheet(item: $taskToEdit) { task in
                 TaskDetailSheet(
                     task: task,
-                    onSave: { title, priority, duration, tags, urgency, taskType, dueDate, description in
-                        updateTask(task, title: title, priority: priority, duration: duration, tags: tags, urgency: urgency, taskType: taskType, dueDate: dueDate, description: description)
+                    onSave: { title, priority, duration, tags, urgency, taskType, dueDate, description, recurrencePattern, recurrenceWeekdays, recurrenceMonthDay in
+                        updateTask(task, title: title, priority: priority, duration: duration, tags: tags, urgency: urgency, taskType: taskType, dueDate: dueDate, description: description, recurrencePattern: recurrencePattern, recurrenceWeekdays: recurrenceWeekdays, recurrenceMonthDay: recurrenceMonthDay)
                     },
                     onDelete: {
                         deleteTask(task)

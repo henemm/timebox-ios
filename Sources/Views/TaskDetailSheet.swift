@@ -2,7 +2,7 @@ import SwiftUI
 
 struct TaskDetailSheet: View {
     let task: PlanItem
-    let onSave: (String, Int?, Int?, [String], String?, String, Date?, String?) -> Void
+    let onSave: (String, Int?, Int?, [String], String?, String, Date?, String?, String, [Int]?, Int?) -> Void
     let onDelete: () -> Void
 
     @State private var showEditSheet = false
@@ -83,10 +83,10 @@ struct TaskDetailSheet: View {
                 }
             }
             .sheet(isPresented: $showEditSheet) {
-                EditTaskSheet(
+                TaskFormSheet(
                     task: task,
-                    onSave: { title, priority, duration, tags, urgency, taskType, dueDate, description in
-                        onSave(title, priority, duration, tags, urgency, taskType, dueDate, description)
+                    onSave: { title, priority, duration, tags, urgency, taskType, dueDate, description, recurrencePattern, recurrenceWeekdays, recurrenceMonthDay in
+                        onSave(title, priority, duration, tags, urgency, taskType, dueDate, description, recurrencePattern, recurrenceWeekdays, recurrenceMonthDay)
                         dismiss()
                     },
                     onDelete: {

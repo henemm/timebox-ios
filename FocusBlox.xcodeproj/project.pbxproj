@@ -57,7 +57,6 @@
 		APPSET01BUILDFILE0001 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = APPSET01FILEREF00001 /* AppSettings.swift */; };
 		ATBE0001BUILD000001 /* AssignTabBlockEditUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ATBE0001FILEREF00001 /* AssignTabBlockEditUITests.swift */; };
 		ATTV0001BUILD000001 /* AssignTabTaskVisibilityUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ATTV0001FILEREF00001 /* AssignTabTaskVisibilityUITests.swift */; };
-		B09A2CF15546B73F96EE0797 /* EditTaskSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03C849D4340F5E92CA1D754E /* EditTaskSheet.swift */; };
 		B2607FE51C4B30E5069AA807 /* EventKitRepositoryEnvironment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F276F67582A827E523D8ED6 /* EventKitRepositoryEnvironment.swift */; };
 		B46449CB5D5E8C093E07C2D9 /* DurationPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = F91103B45CFB1388E6B12F3C /* DurationPicker.swift */; };
 		B5253CB93F49550930B0AF7C /* FocusBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0B1EE7295AF0AD91CA0027A /* FocusBlock.swift */; };
@@ -223,6 +222,7 @@
 		TSKCAT01BUILD00001 /* TaskCategoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = TSKCAT01FILE000001 /* TaskCategoryTests.swift */; };
 		TSKDTL01BUILDFILE0001 /* TaskDetailSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = TSKDTL01FILEREF00001 /* TaskDetailSheet.swift */; };
 		TSKDTUI1BUILDFILE001 /* TaskDetailUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = TSKDTUI1FILEREF0001 /* TaskDetailUITests.swift */; };
+		BUG56UITEST0BUILDFIL /* Bug56MetadataPreserveUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BUG56UITEST0FILEREF1 /* Bug56MetadataPreserveUITests.swift */; };
 		WARN001BUILDFILE00001 /* WarningTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = WARN001FILEREF000001 /* WarningTests.swift */; };
 		WARNTIM01BUILDFILE001 /* WarningTiming.swift in Sources */ = {isa = PBXBuildFile; fileRef = WARNTIM01FILEREF0001 /* WarningTiming.swift */; };
 		WARNUI01BUILDFILE0001 /* WarningSettingsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = WARNUI01FILEREF00001 /* WarningSettingsUITests.swift */; };
@@ -379,7 +379,6 @@
 
 /* Begin PBXFileReference section */
 		01F676CC7EA20C97ACDD9D18 /* LocalTaskTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalTaskTests.swift; sourceTree = "<group>"; };
-		03C849D4340F5E92CA1D754E /* EditTaskSheet.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = EditTaskSheet.swift; sourceTree = "<group>"; };
 		04068491AA7CD2368A273C00 /* CreateTaskView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateTaskView.swift; sourceTree = "<group>"; };
 		0461CA6D7F62F83512E8AD05 /* TaskAssignmentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskAssignmentView.swift; sourceTree = "<group>"; };
 		0A9FDDCD2C501D3A6679FA58 /* FocusBlox.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FocusBlox.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -565,6 +564,7 @@
 		TSKCAT01FILE000001 /* TaskCategoryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskCategoryTests.swift; sourceTree = "<group>"; };
 		TSKDTL01FILEREF00001 /* TaskDetailSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskDetailSheet.swift; sourceTree = "<group>"; };
 		TSKDTUI1FILEREF0001 /* TaskDetailUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskDetailUITests.swift; sourceTree = "<group>"; };
+		BUG56UITEST0FILEREF1 /* Bug56MetadataPreserveUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bug56MetadataPreserveUITests.swift; sourceTree = "<group>"; };
 		WARN001FILEREF000001 /* WarningTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WarningTests.swift; sourceTree = "<group>"; };
 		WARNTIM01FILEREF0001 /* WarningTiming.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WarningTiming.swift; sourceTree = "<group>"; };
 		WARNUI01FILEREF00001 /* WarningSettingsUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WarningSettingsUITests.swift; sourceTree = "<group>"; };
@@ -752,7 +752,8 @@
 				RVWCT01FILE00001 /* ReviewCompletedTasksUITests.swift */,
 				UNIFTAB01UIREF01 /* UnifiedTabSymbolsUITests.swift */,
 				NXSWIPE01UIREF01 /* NextUpSwipeActionsUITests.swift */,
-			);
+			
+				BUG56UITEST0FILEREF1 /* Bug56MetadataPreserveUITests.swift */,);
 			path = FocusBloxUITests;
 			sourceTree = "<group>";
 		};
@@ -862,7 +863,6 @@
 				C945F5092F6FFB66C11FD4C2 /* TimelineView.swift */,
 				1544E675DCE060D409E484D8 /* TaskCreation */,
 				515D3A83205F8E00941BD4D0 /* EditFocusBlockSheet.swift */,
-				03C849D4340F5E92CA1D754E /* EditTaskSheet.swift */,
 				TASKFORM01FILEREF01 /* TaskFormSheet.swift */,
 				TSKDTL01FILEREF00001 /* TaskDetailSheet.swift */,
 				A36E40124EBA31D7428EAA80 /* DailyReviewView.swift */,
@@ -1521,7 +1521,6 @@
 				88FB3AEEAE86741E5EA6AC42 /* FocusBloxApp.swift in Sources */,
 				1B489799D0D38661913FCC34 /* TimelineView.swift in Sources */,
 				36C24ECAE1DAEC6AC61E16E8 /* EditFocusBlockSheet.swift in Sources */,
-				B09A2CF15546B73F96EE0797 /* EditTaskSheet.swift in Sources */,
 				TASKFORM01BUILD0001 /* TaskFormSheet.swift in Sources */,
 				TSKDTL01BUILDFILE0001 /* TaskDetailSheet.swift in Sources */,
 				1800BB7020E3D6044A62475A /* DailyReviewView.swift in Sources */,
@@ -1571,6 +1570,7 @@
 				LIVACT01BUILDFILE0001 /* LiveActivityUITests.swift in Sources */,
 				DAILYR01BUILDFILE0001 /* DailyReviewUITests.swift in Sources */,
 				TSKDTUI1BUILDFILE001 /* TaskDetailUITests.swift in Sources */,
+				BUG56UITEST0BUILDFIL /* Bug56MetadataPreserveUITests.swift in Sources */,
 				REMSYNC1BUILDFILE001 /* RemindersSyncUITests.swift in Sources */,
 				REMSYNC4BUILDFILE001 /* RemindersSyncE2ETests.swift in Sources */,
 				REMLIST1BUILDFILE001 /* ReminderListsUITests.swift in Sources */,
