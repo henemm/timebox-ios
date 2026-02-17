@@ -114,22 +114,19 @@ final class RemindersSyncService {
     }
 
     private func updateTask(_ task: LocalTask, from reminder: ReminderData) {
-        // Update Apple-synced fields
-        task.title = reminder.title
-        task.isCompleted = reminder.isCompleted
-        task.dueDate = reminder.dueDate
-        task.taskDescription = reminder.notes
+        // Bug 57 Fix A: Only write when value actually changed.
+        // Unconditional writes mark SwiftData object as dirty,
+        // causing CloudKit to sync ALL fields (including nil extended attributes).
+        if task.title != reminder.title { task.title = reminder.title }
+        if task.isCompleted != reminder.isCompleted { task.isCompleted = reminder.isCompleted }
+        if task.dueDate != reminder.dueDate { task.dueDate = reminder.dueDate }
+        if task.taskDescription != reminder.notes { task.taskDescription = reminder.notes }
 
-        // Importance: Preserve local value if set, otherwise use Apple's priority
-        // This allows users to override Apple's priority locally
+        // Importance: Only set if user hasn't set it locally
         let appleImportance = mapReminderPriority(reminder.priority)
         if task.importance == nil {
-            // User hasn't set importance locally → use Apple's value
             task.importance = appleImportance
         }
-        // If task.importance is already set, keep it (user's local override)
-
-        // Local-only fields (tags, urgency, taskType, isNextUp) are preserved
     }
 
     /// Convert EKReminder priority to FocusBlox importance
@@ -162,9 +159,10 @@ final class RemindersSyncService {
             guard let externalID = task.externalID else { continue }
 
             if !currentReminderIDs.contains(externalID) {
-                // Reminder was deleted or hidden - remove from backlog
-                // Will be re-imported if list is re-enabled
-                modelContext.delete(task)
+                // Bug 57 Fix C: Soft-delete instead of hard-delete.
+                // Decouple from Reminders but preserve task and all attributes.
+                task.sourceSystem = "local"
+                task.externalID = nil
             }
         }
     }

@@ -1,0 +1,34 @@
+Bug57AttributeProtectionTests - TDD RED Output
+================================================
+
+Build FAILED with compilation errors:
+
+FocusBloxTests/Bug57AttributeProtectionTests.swift:164:14: error: value of type 'LocalTask' has no member 'safeSetImportance'
+        task.safeSetImportance(nil)
+             ^~~~~~~~~~~~~~~~~
+
+FocusBloxTests/Bug57AttributeProtectionTests.swift:176:14: error: value of type 'LocalTask' has no member 'safeSetImportance'
+        task.safeSetImportance(2)
+             ^~~~~~~~~~~~~~~~~
+
+FocusBloxTests/Bug57AttributeProtectionTests.swift:188:14: error: value of type 'LocalTask' has no member 'safeSetImportance'
+        task.safeSetImportance(1)
+             ^~~~~~~~~~~~~~~~~
+
+FocusBloxTests/Bug57AttributeProtectionTests.swift:200:14: error: value of type 'LocalTask' has no member 'safeSetUrgency'
+        task.safeSetUrgency(nil)
+             ^~~~~~~~~~~~~~~
+
+FocusBloxTests/Bug57AttributeProtectionTests.swift:213:14: error: value of type 'LocalTask' has no member 'safeSetDuration'
+        task.safeSetDuration(nil)
+             ^~~~~~~~~~~~~~~~
+
+FocusBloxTests/Bug57AttributeProtectionTests.swift:225:14: error: value of type 'LocalTask' has no member 'safeSetTaskType'
+        task.safeSetTaskType("")
+             ^~~~~~~~~~~~~~~~
+
+** BUILD FAILED **
+
+Tests: 9 defined, 0 executed (compilation failed)
+Expected RED state: Safe-setter methods not yet implemented on LocalTask.
+Runtime tests (soft-delete, conditional writes) would also fail as RemindersSyncService still does hard-delete and unconditional writes.

@@ -22,6 +22,7 @@
 
 | # | Item | Prio | Kompl. | Tokens | Dateien | LoC |
 |---|------|------|--------|--------|---------|-----|
+| 0 | Settings UX: Build-Info + Vorwarnungs-Labels | NIEDRIG | XS | ~10-15k | 3-4 | ~30 |
 | 1 | Einheitliche Symbole Tab-Bar/Sidebar | NIEDRIG | XS | ~10-15k | 2-3 | ~20 |
 | 2 | NextUp Wischgesten (Edit+Delete) | MITTEL | XS | ~15-20k | 1 | ~20 |
 | 3 | NextUp Long Press Vorschau | NIEDRIG | XS | ~15-20k | 1-2 | ~30 |
@@ -57,6 +58,7 @@
 ## Bundles (thematische Gruppierung)
 
 ### Bundle A: Quick Wins (XS, eine Session)
+- Settings UX: Build-Info + Vorwarnungs-Labels
 - Einheitliche Symbole Tab-Bar/Sidebar
 - NextUp Wischgesten (Edit+Delete)
 - NextUp Long Press Vorschau
@@ -98,6 +100,24 @@
 
 ## 🔴 OFFEN
 
+### Bug 57: Apple Reminders - Erweiterte Attribute gehen verloren bei macOS+iOS Parallelbetrieb
+**Status:** IN ARBEIT
+**Prioritaet:** KRITISCH (Datenverlust)
+**Entdeckt:** 2026-02-17
+**Spec:** `docs/specs/bugfixes/bug-57-reminders-attribute-loss.md`
+
+- **Location:** `Sources/Services/RemindersSyncService.swift` - `updateTask(_:from:)` Zeile 116-133
+- **Symptom:** User setzt Attribute (Urgency, Importance, Duration, Category) auf iOS. Nach einiger Zeit sind alle Attribute wieder "?" (TBD). Betrifft Tasks aus Apple Reminders.
+- **Root Cause (3 Probleme):**
+  1. **macOS Sync ueberschreibt via CloudKit:** macOS `updateTask(_:from:)` schreibt title/dueDate/etc. bedingungslos auf LocalTask. SwiftData markiert gesamtes Objekt als dirty. CloudKit synct ALLE Felder (inkl. nil-Werte fuer urgency/importance/duration) zurueck zu iOS → Attribute ueberschrieben.
+  2. **Instabile Reminder-IDs:** `ReminderData.swift:14` nutzt `calendarItemIdentifier` (Apple: "not guaranteed stable across syncs"). Bei ID-Aenderung: alter Task geloescht, neuer ohne Attribute erstellt.
+  3. **Aggressives handleDeletedReminders:** `RemindersSyncService.swift:158-170` loescht Tasks sofort wenn Reminder-ID nicht im Fetch. Kein Soft-Delete, kein Grace Period.
+- **Expected:** Einmal gesetzte erweiterte Attribute bleiben dauerhaft erhalten, unabhaengig davon welches Geraet den Reminders-Sync ausfuehrt.
+- **Fix:** (A) Nur schreiben wenn Wert sich wirklich geaendert hat, (B) `calendarItemExternalIdentifier` nutzen, (C) handleDeletedReminders weniger aggressiv.
+- **Test:** Attribute auf iOS setzen → macOS Sync ausloesen → Attribute muessen auf iOS erhalten bleiben.
+
+---
+
 ### Bug 56: Erweiterte Attribute (Wichtigkeit/Dringlichkeit) via CloudKit ueberschrieben (Bug 48 Regression)
 **Status:** OFFEN
 **Prioritaet:** KRITISCH (Datenverlust)
@@ -109,6 +129,29 @@
 - **Root Cause:** Commit `165a2b1` einfuehrte V1 von `forceCloudKitFieldSync()` mit unbedingten Feldzuweisungen. V2 (Commit `5946410`) korrigierte das fuer NEUE Geraete - aber auf Geraeten wo V1 bereits gelaufen ist, kann der Schaden schon eingetreten sein.
 - **Sekundaerer Befund:** `EditTaskSheet.swift` hat `@State private var priority: TaskPriority` (NON-optional). TBD-Tasks (importance=nil) werden in `.low` (1) umgewandelt wenn EditTaskSheet gespeichert wird. Dies ist eine unvollstaendige Bug-48-RC2-Behebung - jedoch pre-existing und durch den aktuellen Report moeglicherweise nicht ausgeloest.
 - **Test:** Task mit Wichtigkeit=Hoch auf Geraet A erstellen. App auf Geraet B mit frischen Daten starten. Pruefen ob Wichtigkeit nach CloudKit-Sync noch Hoch ist.
+
+---
+
+### Feature: Settings UX - Build-Info dynamisch + Vorwarnungs-Labels klarer (iOS + macOS)
+**Status:** OFFEN
+**Prioritaet:** NIEDRIG
+**Komplexitaet:** XS (~10-15k Tokens)
+
+**2 Probleme in den Settings (macOS + iOS):**
+
+1. **Version/Build statisch:** macOS Settings zeigen "Version 1.0 / Build 1" -- nutzlose statische Werte. Soll dynamisch Version + Git-Commit-Hash anzeigen, damit klar ist welcher Build laeuft.
+   - `BuildInfo.swift` (Shared) als Helper
+   - Build Phase Script injiziert Git-Hash in Info.plist
+   - Anzeige: "Version 1.0 (abc1234)" auf **beiden Plattformen**
+
+2. **Vorwarnungs-Labels unklar:** Picker zeigt "Knapp / Standard / Frueh" -- nicht intuitiv verstaendlich.
+   - "Knapp" → **"Kurz vorher"** (10% vor Block-Ende)
+   - "Standard" bleibt
+   - "Frueh" → **"Weit vorher"** (30% vor Block-Ende)
+   - Aenderung nur in `WarningTiming.swift` (Shared Enum) -- wirkt automatisch auf iOS + macOS
+
+**Betroffene Dateien:** `WarningTiming.swift`, `BuildInfo.swift` (neu), `MacSettingsView.swift`, `SettingsView.swift`, beide Info.plist
+**Scope:** ~30 LoC, 3-4 Dateien (+1 Build Script)
 
 ---
 
@@ -215,15 +258,39 @@
 ### Feature: Wiederkehrende Tasks Phase 1B/2
 **Status:** OFFEN
 **Prioritaet:** MITTEL
-**Komplexitaet:** M (~40-60k Tokens)
+**Komplexitaet:** M-L (~60-100k Tokens)
 
 **Basis:** Phase 1A erledigt (Commit `2767a92` - RecurrenceService, SyncEngine-Integration, Badge)
+**Bestehende Docs:** `docs/specs/features/recurring-tasks-phase1a.md`, `docs/context/recurring-tasks-instance-logic.md`
+
 **Noch offen:**
-- macOS MacBacklogRow Badge + TaskInspector Toggle
+
+**A) Backlog-Sichtbarkeit (NEU):**
+- Wiederkehrende Tasks sollen **nur im Backlog erscheinen wenn sie faellig/aktiv sind**
+- Vergangene und zukuenftige Instanzen ausblenden
+- Aktuell: Alle Instanzen bleiben sichtbar → Backlog wird mit erledigten Wiederholungen ueberflutet
+
+**B) Loeschen -- "Nur diese / Ganze Serie" Dialog:**
+- Wenn User einen Task aus wiederkehrender Serie loescht: Auswahl anbieten
+- "Nur diese Instanz" → loescht nur diese eine
+- "Ganze Serie" → stoppt Wiederholung (recurrencePattern = "none"), loescht alle offenen Instanzen
+- Betrifft: BacklogView Swipe-Delete, macOS TaskInspector, ggf. Quick Actions
+
+**C) Bearbeiten -- "Nur diese / Ganze Serie" Dialog:**
+- Wenn User Titel, Dauer, Kategorie etc. einer wiederkehrenden Task aendert: Was passiert?
+- Option 1: Aenderung gilt nur fuer DIESE Instanz (zukuenftige bleiben wie Vorlage)
+- Option 2: Aenderung gilt fuer ALLE zukuenftigen Instanzen
+- Vorbild: Apple Kalender ("Dieses Ereignis" / "Alle kuenftigen Ereignisse")
+- **Achtung:** Quick-Edit-Funktionen uebergeben recurrence-Params aktuell NICHT (Bug 48 Restwirkung)
+
+**D) macOS Integration:**
+- MacBacklogRow Badge + TaskInspector Toggle
 - Siri CompleteTaskIntent
-- Delete-Dialog "Nur diese/Ganze Serie"
-- Backlog-Filter (recurring vs. einmalig)
-**Scope:** ~80 LoC, 3-4 Dateien
+
+**E) Backlog-Filter:**
+- Filter: recurring vs. einmalig
+
+**Scope:** ~150-200 LoC, 5-6 Dateien (groesser als urspruenglich geschaetzt wegen A+C)
 
 ---
 
