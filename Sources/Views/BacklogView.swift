@@ -11,6 +11,7 @@ struct BacklogView: View {
         case dueDate = "Fälligkeit"
         case tbd = "TBD"
         case completed = "Erledigt"
+        case recurring = "Wiederkehrend"
 
         var id: String { rawValue }
 
@@ -23,6 +24,7 @@ struct BacklogView: View {
             case .dueDate: return "calendar"
             case .tbd: return "questionmark.circle"
             case .completed: return "checkmark.circle"
+            case .recurring: return "arrow.triangle.2.circlepath"
             }
         }
 
@@ -42,6 +44,8 @@ struct BacklogView: View {
                 return ("Keine unvollständigen Tasks", "Alle Tasks haben Wichtigkeit, Dringlichkeit und Dauer.")
             case .completed:
                 return ("Keine erledigten Tasks", "Erledigte Tasks der letzten 7 Tage erscheinen hier.")
+            case .recurring:
+                return ("Keine wiederkehrenden Tasks", "Erstelle wiederkehrende Tasks mit einem Wiederholungsmuster.")
             }
         }
     }
@@ -67,6 +71,8 @@ struct BacklogView: View {
     @State private var taskToEdit: PlanItem?
     @State private var completedTasks: [PlanItem] = []
     @State private var taskToDeleteRecurring: PlanItem?
+    @State private var taskToEditRecurring: PlanItem?
+    @State private var editSeriesMode: Bool = false
 
     // MARK: - Next Up Tasks
     private var nextUpTasks: [PlanItem] {
@@ -93,6 +99,11 @@ struct BacklogView: View {
 
     private var eliminateTasks: [PlanItem] {
         planItems.filter { $0.urgency == "not_urgent" && ($0.importance ?? 0) < 3 && !$0.isTbd && !$0.isCompleted && !$0.isNextUp }
+    }
+
+    // MARK: - Recurring Tasks
+    private var recurringTasks: [PlanItem] {
+        planItems.filter { ($0.recurrencePattern ?? "none") != "none" && !$0.isCompleted && !$0.isNextUp }
     }
 
     // MARK: - TBD Tasks (unvollständig)
@@ -223,6 +234,8 @@ struct BacklogView: View {
                             tbdView
                         case .completed:
                             completedView
+                        case .recurring:
+                            recurringView
                         }
                     }
                 }
@@ -267,7 +280,12 @@ struct BacklogView: View {
                 TaskFormSheet(
                     task: task,
                     onSave: { title, priority, duration, tags, urgency, taskType, dueDate, description, recurrencePattern, recurrenceWeekdays, recurrenceMonthDay in
-                        updateTask(task, title: title, priority: priority, duration: duration, tags: tags, urgency: urgency, taskType: taskType, dueDate: dueDate, description: description, recurrencePattern: recurrencePattern, recurrenceWeekdays: recurrenceWeekdays, recurrenceMonthDay: recurrenceMonthDay)
+                        if editSeriesMode {
+                            updateRecurringSeries(task, title: title, priority: priority, duration: duration, tags: tags, urgency: urgency, taskType: taskType, dueDate: dueDate, description: description)
+                            editSeriesMode = false
+                        } else {
+                            updateTask(task, title: title, priority: priority, duration: duration, tags: tags, urgency: urgency, taskType: taskType, dueDate: dueDate, description: description, recurrencePattern: recurrencePattern, recurrenceWeekdays: recurrenceWeekdays, recurrenceMonthDay: recurrenceMonthDay)
+                        }
                     },
                     onDelete: {
                         deleteTask(task)
@@ -314,6 +332,32 @@ struct BacklogView: View {
                 }
                 Button("Abbrechen", role: .cancel) {
                     taskToDeleteRecurring = nil
+                }
+            }
+            .confirmationDialog(
+                "Wiederkehrende Aufgabe bearbeiten",
+                isPresented: Binding(
+                    get: { taskToEditRecurring != nil },
+                    set: { if !$0 { taskToEditRecurring = nil } }
+                ),
+                titleVisibility: .visible
+            ) {
+                Button("Nur diese Aufgabe") {
+                    if let task = taskToEditRecurring {
+                        editSeriesMode = false
+                        taskToEditDirectly = task
+                        taskToEditRecurring = nil
+                    }
+                }
+                Button("Alle offenen dieser Serie") {
+                    if let task = taskToEditRecurring {
+                        editSeriesMode = true
+                        taskToEditDirectly = task
+                        taskToEditRecurring = nil
+                    }
+                }
+                Button("Abbrechen", role: .cancel) {
+                    taskToEditRecurring = nil
                 }
             }
         }
@@ -518,6 +562,32 @@ struct BacklogView: View {
             }
         } catch {
             errorMessage = "Serie konnte nicht gelöscht werden."
+        }
+    }
+
+    private func handleEditTap(_ task: PlanItem) {
+        // Recurring task? Show confirmation dialog
+        if let pattern = task.recurrencePattern,
+           pattern != "none",
+           task.recurrenceGroupID != nil {
+            taskToEditRecurring = task
+            return
+        }
+        taskToEditDirectly = task
+    }
+
+    private func updateRecurringSeries(_ task: PlanItem, title: String, priority: Int?, duration: Int?, tags: [String], urgency: String?, taskType: String, dueDate: Date?, description: String?) {
+        guard let groupID = task.recurrenceGroupID else { return }
+        do {
+            let taskSource = LocalTaskSource(modelContext: modelContext)
+            let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
+            try syncEngine.updateRecurringSeries(groupID: groupID, title: title, importance: priority, duration: duration, tags: tags, urgency: urgency, taskType: taskType, dueDate: dueDate, description: description)
+
+            Task {
+                await loadTasks()
+            }
+        } catch {
+            errorMessage = "Serie konnte nicht aktualisiert werden."
         }
     }
 
@@ -863,6 +933,32 @@ struct BacklogView: View {
                         onUrgencyToggle: { newUrgency in updateUrgency(for: item, urgency: newUrgency) },
                         onCategoryTap: { selectedItemForCategory = item },
                         onEditTap: { taskToEditDirectly = item },
+                        onDeleteTap: { deleteTask(item) }
+                    )
+                }
+            }
+            .padding(.horizontal, 16)
+        }
+        .refreshable {
+            await loadTasks()
+        }
+    }
+
+    // MARK: - Recurring View (wiederkehrende Tasks)
+    private var recurringView: some View {
+        ScrollView {
+            LazyVStack(spacing: 8) {
+                ForEach(recurringTasks) { item in
+                    BacklogRow(
+                        item: item,
+                        onComplete: { completeTask(item) },
+                        onDurationTap: { selectedItemForDuration = item },
+                        onAddToNextUp: { updateNextUp(for: item, isNextUp: true) },
+                        onTap: { taskToEdit = item },
+                        onImportanceCycle: { newImportance in updateImportance(for: item, importance: newImportance) },
+                        onUrgencyToggle: { newUrgency in updateUrgency(for: item, urgency: newUrgency) },
+                        onCategoryTap: { selectedItemForCategory = item },
+                        onEditTap: { handleEditTap(item) },
                         onDeleteTap: { deleteTask(item) }
                     )
                 }

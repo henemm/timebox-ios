@@ -92,6 +92,26 @@ final class SyncEngine {
         try modelContext.save()
     }
 
+    /// Updates all OPEN (incomplete) tasks in a recurring series.
+    /// Completed instances are preserved unchanged.
+    func updateRecurringSeries(groupID: String, title: String?, importance: Int?, duration: Int?, tags: [String]?, urgency: String?, taskType: String?, dueDate: Date?, description: String?) throws {
+        let descriptor = FetchDescriptor<LocalTask>(
+            predicate: #Predicate { $0.recurrenceGroupID == groupID && !$0.isCompleted }
+        )
+        let tasks = try modelContext.fetch(descriptor)
+        for task in tasks {
+            if let title { task.title = title }
+            if let importance { task.importance = importance }
+            if let duration { task.estimatedDuration = duration }
+            if let tags { task.tags = tags }
+            if let urgency { task.urgency = urgency }
+            if let taskType { task.taskType = taskType }
+            if let dueDate { task.dueDate = dueDate }
+            if let description { task.taskDescription = description }
+        }
+        try modelContext.save()
+    }
+
     /// Deletes all OPEN (incomplete) tasks in a recurring series.
     /// Completed instances are preserved for history.
     func deleteRecurringSeries(groupID: String) throws {

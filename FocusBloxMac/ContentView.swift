@@ -62,8 +62,10 @@ struct ContentView: View {
     // Quick Add
     @State private var newTaskTitle = ""
 
-    // Recurring delete dialog
+    // Recurring dialogs
     @State private var taskToDeleteRecurring: LocalTask?
+    @State private var taskToEditRecurring: LocalTask?
+    @State private var editSeriesMode: Bool = false
 
     // Computed properties for sidebar badges
     private var tbdCount: Int {
@@ -339,6 +341,18 @@ struct ContentView: View {
                         removeFromNextUp(selection)
                     }
 
+                    // Show "Serie bearbeiten" for single recurring task
+                    if selection.count == 1,
+                       let taskId = selection.first,
+                       let task = tasks.first(where: { $0.uuid == taskId }),
+                       task.recurrencePattern != "none",
+                       task.recurrenceGroupID != nil {
+                        Divider()
+                        Button("Serie bearbeiten...") {
+                            taskToEditRecurring = task
+                        }
+                    }
+
                     Divider()
 
                     Button("Löschen", role: .destructive) {
@@ -417,6 +431,32 @@ struct ContentView: View {
                 taskToDeleteRecurring = nil
             }
         }
+        .confirmationDialog(
+            "Wiederkehrende Aufgabe bearbeiten",
+            isPresented: Binding(
+                get: { taskToEditRecurring != nil },
+                set: { if !$0 { taskToEditRecurring = nil } }
+            ),
+            titleVisibility: .visible
+        ) {
+            Button("Nur diese Aufgabe") {
+                if let task = taskToEditRecurring {
+                    editSeriesMode = false
+                    selectedTasks = [task.uuid]
+                    taskToEditRecurring = nil
+                }
+            }
+            Button("Alle offenen dieser Serie") {
+                if let task = taskToEditRecurring {
+                    editSeriesMode = true
+                    selectedTasks = [task.uuid]
+                    taskToEditRecurring = nil
+                }
+            }
+            Button("Abbrechen", role: .cancel) {
+                taskToEditRecurring = nil
+            }
+        }
     }
 
     private var filterTitle: String {
@@ -452,9 +492,26 @@ struct ContentView: View {
             )
         } else if let task = selectedTask {
             // Single task inspector
-            TaskInspector(task: task) {
-                modelContext.delete(task)
-                selectedTasks.removeAll()
+            VStack(spacing: 0) {
+                if editSeriesMode && task.recurrenceGroupID != nil {
+                    HStack {
+                        Image(systemName: "arrow.triangle.2.circlepath")
+                        Text("Serie wird bearbeitet")
+                            .font(.caption.weight(.medium))
+                        Spacer()
+                        Button("Auf Serie anwenden") {
+                            updateRecurringSeries(task)
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .controlSize(.small)
+                    }
+                    .padding(8)
+                    .background(.purple.opacity(0.1))
+                }
+                TaskInspector(task: task) {
+                    modelContext.delete(task)
+                    selectedTasks.removeAll()
+                }
             }
         } else {
             // Empty state
@@ -588,6 +645,26 @@ struct ContentView: View {
             }
         }
         try? modelContext.save()
+    }
+
+    private func updateRecurringSeries(_ task: LocalTask) {
+        guard let groupID = task.recurrenceGroupID else { return }
+        let descriptor = FetchDescriptor<LocalTask>(
+            predicate: #Predicate { $0.recurrenceGroupID == groupID && !$0.isCompleted }
+        )
+        if let seriesTasks = try? modelContext.fetch(descriptor) {
+            for t in seriesTasks where t.uuid != task.uuid {
+                t.title = task.title
+                t.importance = task.importance
+                t.estimatedDuration = task.estimatedDuration
+                t.tags = task.tags
+                t.urgency = task.urgency
+                t.taskType = task.taskType
+                t.taskDescription = task.taskDescription
+            }
+        }
+        try? modelContext.save()
+        editSeriesMode = false
     }
 
     private func setCategory(_ category: String, for ids: Set<UUID>) {

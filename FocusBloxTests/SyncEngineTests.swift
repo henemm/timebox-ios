@@ -146,6 +146,63 @@ final class SyncEngineTests: XCTestCase {
         XCTAssertTrue(remaining.contains(where: { $0.title == "Unrelated" }), "Unrelated tasks stay")
     }
 
+    // MARK: - updateRecurringSeries Tests (Ticket 3)
+
+    /// Editing a single instance keeps other series members unchanged
+    func test_editSingleInstance_keepsOthers() throws {
+        let context = container.mainContext
+        let groupID = "series-edit"
+
+        let task1 = LocalTask(title: "Original 1", recurrencePattern: "daily", recurrenceGroupID: groupID)
+        let task2 = LocalTask(title: "Original 2", recurrencePattern: "daily", recurrenceGroupID: groupID)
+        context.insert(task1)
+        context.insert(task2)
+        try context.save()
+
+        // Edit only task1 (single instance)
+        try syncEngine.updateTask(itemID: task1.id, title: "Edited 1", importance: nil, duration: nil, tags: [], urgency: nil, taskType: "", dueDate: nil, description: nil)
+
+        let all = try context.fetch(FetchDescriptor<LocalTask>())
+        let edited = all.first(where: { $0.title == "Edited 1" })
+        let unchanged = all.first(where: { $0.title == "Original 2" })
+        XCTAssertNotNil(edited, "Edited task should exist")
+        XCTAssertNotNil(unchanged, "Other instance should be unchanged")
+    }
+
+    /// Editing entire series updates all open instances
+    func test_editSeries_updatesAllOpen() throws {
+        let context = container.mainContext
+        let groupID = "series-edit-all"
+
+        let open1 = LocalTask(title: "Old Title", recurrencePattern: "daily", recurrenceGroupID: groupID)
+        let open2 = LocalTask(title: "Old Title", recurrencePattern: "daily", recurrenceGroupID: groupID)
+        let completed = LocalTask(title: "Old Title", recurrencePattern: "daily", recurrenceGroupID: groupID)
+        completed.isCompleted = true
+        completed.completedAt = Date()
+
+        context.insert(open1)
+        context.insert(open2)
+        context.insert(completed)
+        try context.save()
+
+        try syncEngine.updateRecurringSeries(groupID: groupID, title: "New Title", importance: 3, duration: 45, tags: ["updated"], urgency: "urgent", taskType: "deep_work", dueDate: nil, description: "Updated desc")
+
+        let all = try context.fetch(FetchDescriptor<LocalTask>())
+        let openTasks = all.filter { !$0.isCompleted }
+        let completedTask = all.first(where: { $0.isCompleted })
+
+        // All open tasks should be updated
+        for task in openTasks {
+            XCTAssertEqual(task.title, "New Title")
+            XCTAssertEqual(task.importance, 3)
+            XCTAssertEqual(task.estimatedDuration, 45)
+            XCTAssertEqual(task.taskType, "deep_work")
+        }
+
+        // Completed task should be unchanged
+        XCTAssertEqual(completedTask?.title, "Old Title", "Completed instance should stay unchanged")
+    }
+
     // MARK: - updateSortOrder Tests
 
     func test_updateSortOrder_updatesTasksSortOrder() async throws {
