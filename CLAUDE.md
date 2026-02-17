@@ -27,6 +27,10 @@ Dies gilt für: iOS, iPadOS, macOS, watchOS, tvOS, visionOS, Xcode
 - **SwiftUI 7** - Neue APIs und Performance-Verbesserungen
 - Deployment auf iOS 26+ Geräten
 
+## Design-Leitbild
+
+Minimalistisch, wenige Farben, iOS-nativ ohne Custom-Widgets. Moeglichst nah am aktuellen Design-Paradigma von Apple (Liquid Glass).
+
 ## Cross-Platform Code-Sharing (iOS + macOS)
 
 **Architektur-Regel:**
@@ -143,7 +147,7 @@ All entities/components need specs before implementation:
 ## Testing
 
 **Designated Test Simulator:**
-- Identifier: `548B4A2F-FDFF-4F9E-8335-1A7A7B98E492`
+- Identifier: `6364A54B-5048-4346-899E-FFB67E630D53`
 - Name: "FocusBlox"
 
 All automated tests (Unit Tests, UI Tests) must run on this specific simulator.
@@ -151,7 +155,7 @@ All automated tests (Unit Tests, UI Tests) must run on this specific simulator.
 Example command:
 ```bash
 xcodebuild test -project FocusBlox.xcodeproj -scheme FocusBlox \
-  -destination 'id=548B4A2F-FDFF-4F9E-8335-1A7A7B98E492'
+  -destination 'id=6364A54B-5048-4346-899E-FFB67E630D53'
 ```
 
 ## Learnings & Gotchas
