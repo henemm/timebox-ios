@@ -25,10 +25,6 @@ struct FocusBloxMacApp: App {
     private let eventKitRepository: any EventKitRepositoryProtocol = EventKitRepository()
 
     init() {
-        // CRITICAL: Set activation policy to regular app (not accessory/background)
-        // This ensures the app can receive keyboard and mouse events
-        NSApplication.shared.setActivationPolicy(.regular)
-
         do {
             container = try MacModelContainer.create()
             QuickCaptureController.shared.setup(with: container)
