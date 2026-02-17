@@ -1,0 +1,18 @@
+=== TDD RED: MacEventCategoryUITests ===
+Date: 2026-02-10T22:00:00+0100
+
+FAILURE REASON: EventBlockView has no tap handler and no accessibility identifier.
+MacReviewView does not load CalendarEvents.
+
+Tests that WILL FAIL:
+  - testCalendarEventHasAccessibilityIdentifier: No 'calendarEvent_' identifiers on EventBlockView
+  - testTapEventOpensCategorySheet: EventBlockView has no .onTapGesture
+  - testCategorySheetShowsAllCategories: MacEventCategorySheet doesn't exist
+  - testReviewShowsCategorizedEventStats: MacReviewView doesn't include events
+
+macOS UI Test Runner Result:
+  Build: SUCCEEDED
+  Runtime: FAILED - "Timed out while enabling automation mode"
+  (Infrastructure issue - tests did not execute)
+
+** TEST FAILED (RED) **

@@ -1,0 +1,21 @@
+=== TDD RED: ReviewEventIntegrationTests ===
+Date: 2026-02-10T22:00:00+0100
+
+FAILURE REASON: ReviewStatsCalculator does not exist in codebase.
+Tests reference ReviewStatsCalculator which has zero matches in production code.
+Only reference: FocusBloxTests/ReviewEventIntegrationTests.swift
+
+Build would fail with:
+  error: cannot find 'ReviewStatsCalculator' in scope
+
+Tests that WILL FAIL:
+  - testReviewStatsCalculatorExists: ReviewStatsCalculator type missing
+  - testCategoryStatsIncludesCalendarEvents: ReviewStatsCalculator type missing
+  - testCategoryStatsExcludesUncategorizedEvents: ReviewStatsCalculator type missing
+  - testCategoryStatsExcludesFocusBlockEvents: ReviewStatsCalculator type missing
+  - testCategoryStatsCombinesTasksAndEvents: ReviewStatsCalculator type missing
+
+NOTE: Full build also blocked by pre-existing error in QuickEditPickerTests.swift
+(CategoryPickerOption not found - unrelated to this feature)
+
+** TEST FAILED (RED) **

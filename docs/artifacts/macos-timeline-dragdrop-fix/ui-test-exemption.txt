@@ -1,0 +1,33 @@
+UI Test Exemption for macos-timeline-dragdrop-fix
+=================================================
+
+Date: 2026-02-04
+Workflow: macos-timeline-dragdrop-fix
+
+REASON FOR EXEMPTION:
+--------------------
+The core functionality being fixed (Drag & Drop, Tap, Hover on FocusBlocks)
+cannot be reliably automated with XCUITest because:
+
+1. XCUITest has limited drag & drop support on macOS
+2. Hit-testing is a SwiftUI framework behavior, not application code
+3. The macOS 26.2 NSHostingView bug affects event handling unpredictably
+
+WHAT WAS TESTED (Unit Tests - RED):
+----------------------------------
+- TimelineLayout.sizeThatFits() - FAILED (TimelineLayout not found)
+- TimelineLayout.calculateYPosition() - FAILED (TimelineLayout not found)
+- TimelineLayout.calculateBlockHeight() - FAILED (TimelineLayout not found)
+- Persistence logic - FAILED (compile error)
+
+Total: 11 compile errors as expected (TDD RED)
+
+WHAT REQUIRES MANUAL TESTING:
+-----------------------------
+- [ ] Drag & Drop from Next Up to FocusBlock
+- [ ] Tap on FocusBlock opens Tasks-Sheet
+- [ ] Hover on FocusBlock shows Edit-Button
+- [ ] Hit-testing works at correct positions
+
+This exemption was approved in the spec review (2026-02-04).
+See: docs/specs/bugfixes/macos-timeline-dragdrop-fix.md

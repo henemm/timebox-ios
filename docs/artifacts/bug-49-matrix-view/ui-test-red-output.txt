@@ -1,0 +1,15 @@
+
+CopySwiftLibs /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-iphonesimulator/FocusBloxUITests-Runner.app/PlugIns/FocusBloxUITests.xctest (in target 'FocusBloxUITests' from project 'FocusBlox')
+    cd /Users/hem/Developer/my-daily-sprints
+    builtin-swiftStdLibTool --copy --verbose --sign - --scan-executable /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-iphonesimulator/FocusBloxUITests-Runner.app/PlugIns/FocusBloxUITests.xctest/FocusBloxUITests --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-iphonesimulator/FocusBloxUITests-Runner.app/PlugIns/FocusBloxUITests.xctest/Frameworks --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-iphonesimulator/FocusBloxUITests-Runner.app/PlugIns/FocusBloxUITests.xctest/PlugIns --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-iphonesimulator/FocusBloxUITests-Runner.app/PlugIns/FocusBloxUITests.xctest/SystemExtensions --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-iphonesimulator/FocusBloxUITests-Runner.app/PlugIns/FocusBloxUITests.xctest/Extensions --platform iphonesimulator --toolchain /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain --destination /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-iphonesimulator/FocusBloxUITests-Runner.app/PlugIns/FocusBloxUITests.xctest/Frameworks --strip-bitcode --scan-executable /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib/libXCTestSwiftSupport.dylib --strip-bitcode-tool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/bitcode_strip --emit-dependency-info /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/SwiftStdLibToolInputDependencies.dep --filter-for-swift-os
+
+2026-02-16 15:13:47.124 xcodebuild[98410:8303421] [MT] IDETestOperationsObserverDebug: 45.946 elapsed -- Testing started completed.
+2026-02-16 15:13:47.124 xcodebuild[98410:8303421] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2026-02-16 15:13:47.124 xcodebuild[98410:8303421] [MT] IDETestOperationsObserverDebug: 45.946 sec, +45.946 sec -- end
+
+Test session results, code coverage, and logs:
+	/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Logs/Test/Test-FocusBlox-2026.02.16_15-12-57-+0100.xcresult
+
+** TEST SUCCEEDED **
+
+Testing started
