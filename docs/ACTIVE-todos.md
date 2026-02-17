@@ -611,6 +611,13 @@ Backlog-Filter "Wiederkehrend". iOS + macOS.
 
 ## Tooling
 
+### Pre-Commit Gate: ACTIVE-todos.md Pflicht
+**Status:** ERLEDIGT (2026-02-17)
+**Datei:** `.claude/hooks/pre_commit_gate.py`
+**Regel:** Jeder `git commit` wird blockiert wenn `docs/ACTIVE-todos.md` nicht in den staged files ist. Laeuft immer, unabhaengig vom Test-Gate.
+
+---
+
 ### Workflow-System: Parallele Workflows
 **Status:** ERLEDIGT (2026-02-11)
 **Fix:** Dateibasierte Workflow-Aufloesung in `workflow_gate.py`

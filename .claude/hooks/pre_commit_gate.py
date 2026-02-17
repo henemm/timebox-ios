@@ -183,19 +183,51 @@ def check_for_ui_changes(config: dict) -> bool:
         return False
 
 
+def check_todos_staged() -> tuple[bool, str]:
+    """Check if docs/ACTIVE-todos.md is in the staged files."""
+    project_root = get_project_root()
+    try:
+        result = subprocess.run(
+            ["git", "diff", "--cached", "--name-only"],
+            cwd=project_root,
+            capture_output=True,
+            text=True,
+        )
+        staged_files = result.stdout.strip().split("\n")
+        if "docs/ACTIVE-todos.md" in staged_files:
+            return True, ""
+        return False, "docs/ACTIVE-todos.md ist NICHT in den staged files."
+    except Exception as e:
+        return True, f"Could not check staged files: {e}"
+
+
 def main():
     config = get_pre_commit_config()
-
-    # Check if enabled
-    if not config["enabled"]:
-        sys.exit(0)
-
     tool_input = get_tool_input()
 
     if not is_git_commit(tool_input, config):
         sys.exit(0)
 
-    # Run tests
+    # ALWAYS check ACTIVE-todos.md (independent of test config)
+    todos_ok, todos_msg = check_todos_staged()
+    if not todos_ok:
+        print("=" * 70, file=sys.stderr)
+        print("BLOCKED - ACTIVE-todos.md nicht aktualisiert", file=sys.stderr)
+        print("=" * 70, file=sys.stderr)
+        print(file=sys.stderr)
+        print(todos_msg, file=sys.stderr)
+        print(file=sys.stderr)
+        print("HARTE REGEL: Vor jedem Commit docs/ACTIVE-todos.md", file=sys.stderr)
+        print("aktualisieren (Status, Beschreibung, Commit-Hash).", file=sys.stderr)
+        print(file=sys.stderr)
+        print("Erst updaten, dann committen.", file=sys.stderr)
+        print("=" * 70, file=sys.stderr)
+        sys.exit(2)
+
+    # Run tests (only if test gate enabled)
+    if not config["enabled"]:
+        sys.exit(0)
+
     success, output = run_tests(config)
 
     if not success:
