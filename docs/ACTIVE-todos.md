@@ -38,7 +38,7 @@
 | 13 | MAC-020 Drag & Drop Planung | P2 | XL | ~100-150k | 3-4 | ~250 |
 | 14 | MAC-032 NC Widget | P3 | XL | ~80-120k | neues Target | ~200 |
 | 15 | ITB-A: FocusBlockEntity (AppEntity) | MITTEL | S | ~30-40k | 2 | ~60 |
-| 16 | ITB-B: AI Task Scoring (Foundation Models) | MITTEL | L | ~80-120k | 3-4 | ~200 |
+| 16 | ~~ITB-B: AI Task Scoring (Foundation Models)~~ | ERLEDIGT | L | ~80-120k | 9 | ~214 |
 | 17 | ITB-C: OrganizeMyDay Intent | MITTEL | XL | ~100-150k | 4-5 | ~250 |
 | 18 | ITB-D: Enhanced Liquid Glass (aktive Blocks) | NIEDRIG | S | ~20-30k | 2 | ~40 |
 | 19 | ITB-E: Share Extension / Transferable | MITTEL | L | ~80-120k | 3-4 + Target | ~200 |
@@ -91,7 +91,7 @@
 1. ITB-D (Liquid Glass) - Quick Win, unabhaengig
 2. ITB-A (FocusBlockEntity) - Grundlage fuer Intents
 3. ITB-E (Share Extension) - unabhaengig von AI
-4. ITB-B (AI Scoring) - Kern-Feature, Graceful Degradation
+4. ~~ITB-B (AI Scoring)~~ ERLEDIGT - Kern-Feature, Graceful Degradation
 5. ITB-C (OrganizeMyDay) - braucht A+B
 6. ITB-F (Context Capture) - RESEARCH: API-Verifizierung zuerst
 7. ITB-G (Proaktive Vorschlaege) - RESEARCH: API-Verifizierung zuerst
@@ -312,21 +312,24 @@ Backlog-Filter "Wiederkehrend". iOS + macOS.
 ---
 
 ### ITB-B: AI Task Scoring (Foundation Models)
-**Status:** OFFEN
+**Status:** ERLEDIGT (2026-02-17)
 **Prioritaet:** MITTEL
 **Komplexitaet:** L (~80-120k Tokens)
-**Abhaengigkeiten:** Keine (aber Graceful Degradation PFLICHT)
+**Abhaengigkeiten:** Keine (Graceful Degradation implementiert)
 
-**Problem:** Task-Priorisierung ist rein manuell. Nutzer muessen Wichtigkeit/Dringlichkeit selbst bewerten.
-**Gewuenschtes Verhalten:**
-- `AITaskScoringService` mit `LanguageModelSession` (Apple Intelligence)
-- `InstructionsBuilder` als "Produktivitaets-Coach" Persona
-- Kognitives Scoring: High/Low Energy Bewertung pro Task
-- Deadline-Bewertung und Priorisierungs-Vorschlaege
-- **AI schlaegt Werte VOR, manuell hat Vorrang**
-- **Feature komplett unsichtbar ohne Apple Intelligence** (Graceful Degradation)
-- Settings Toggle zum Aktivieren/Deaktivieren
-**Scope:** ~200 LoC, 3-4 Dateien (Service, UI-Integration, Settings Toggle)
+**Implementiert:**
+- `AITaskScoringService` mit `LanguageModelSession` (Apple Intelligence Foundation Models)
+- `@Generable` Structured Output (`TaskScore`: score, energyLevel, suggestedImportance, suggestedUrgent)
+- `InstructionsBuilder` als "Produktivitaets-Coach" Persona (deutsch)
+- Felder `aiScore` (Int?) + `aiEnergyLevel` (String?) auf `LocalTask` + `PlanItem`
+- Neue BacklogView "KI-Empfehlung" (nach Score sortiert, nur sichtbar mit Apple Intelligence)
+- AI Score Badge in BacklogRow (lila, wand.and.stars Icon)
+- Auto-Scoring nach Task-Erstellung in CreateTaskView
+- Settings Toggle "KI Task-Scoring" (iOS + macOS, nur sichtbar mit Apple Intelligence)
+- **AI schlaegt Werte VOR, manuell hat Vorrang** (nil-Check auf importance/urgency)
+- **Feature komplett unsichtbar ohne Apple Intelligence** (`#if canImport(FoundationModels)`)
+**Dateien:** `LocalTask.swift`, `PlanItem.swift`, `AITaskScoringService.swift` (neu), `AppSettings.swift`, `BacklogView.swift`, `BacklogRow.swift`, `CreateTaskView.swift`, `SettingsView.swift`, `MacSettingsView.swift`
+**Tests:** 10 Unit Tests + 3 UI Tests GREEN
 
 ---
 
@@ -416,6 +419,13 @@ Backlog-Filter "Wiederkehrend". iOS + macOS.
 ---
 
 ## ✅ Kuerzlich erledigt
+
+### ITB-B: AI Task Scoring mit Foundation Models
+**Status:** ERLEDIGT (2026-02-17)
+**Dateien:** `LocalTask.swift`, `PlanItem.swift`, `AITaskScoringService.swift` (neu), `AppSettings.swift`, `BacklogView.swift`, `BacklogRow.swift`, `CreateTaskView.swift`, `SettingsView.swift`, `MacSettingsView.swift`
+**Loesung:** Apple Intelligence Integration via FoundationModels Framework. Structured Output (`@Generable TaskScore`) fuer AI-basierte Task-Bewertung. Neue ViewMode "KI-Empfehlung" im Backlog, Score-Badge, Settings Toggle. Feature komplett unsichtbar ohne Apple Intelligence (Graceful Degradation via `#if canImport`). 10 Unit Tests + 3 UI Tests.
+
+---
 
 ### Bug 57: Apple Reminders - Erweiterte Attribute gehen verloren bei macOS+iOS Parallelbetrieb
 **Status:** ERLEDIGT (2026-02-17)

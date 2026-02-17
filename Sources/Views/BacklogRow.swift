@@ -168,7 +168,18 @@ struct BacklogRow: View {
             // 5. Duration Badge
             durationBadge
 
-            // 6. Due Date Badge
+            // 6. AI Score Badge (only when scored)
+            if item.hasAIScoring {
+                HStack(spacing: 2) {
+                    Image(systemName: "wand.and.stars")
+                    Text("\(item.aiScore ?? 0)")
+                }
+                .font(.caption2)
+                .foregroundStyle(.purple.opacity(0.7))
+                .accessibilityIdentifier("aiScoreBadge_\(item.id)")
+            }
+
+            // 7. Due Date Badge
             if let dueDate = item.dueDate {
                 HStack(spacing: 2) {
                     Image(systemName: "calendar")

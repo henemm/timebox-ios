@@ -9,6 +9,7 @@ struct SettingsView: View {
     @AppStorage("warningTiming") private var warningTimingRaw: Int = WarningTiming.standard.rawValue
     @AppStorage("remindersSyncEnabled") private var remindersSyncEnabled: Bool = false
     @AppStorage("defaultTaskDuration") private var defaultTaskDuration: Int = 15
+    @AppStorage("aiScoringEnabled") private var aiScoringEnabled: Bool = false
     @Environment(\.eventKitRepository) private var eventKitRepo
     @State private var visibleCalendarIDs: Set<String> = []
     @State private var visibleReminderListIDs: Set<String> = []
@@ -62,6 +63,18 @@ struct SettingsView: View {
                     .accessibilityIdentifier("defaultDurationPicker")
                 } header: {
                     Text("Tasks")
+                }
+
+                // Section: Apple Intelligence (only visible when available)
+                if AITaskScoringService.isAvailable {
+                    Section {
+                        Toggle("KI Task-Scoring", isOn: $aiScoringEnabled)
+                            .accessibilityIdentifier("aiScoringToggle")
+                    } header: {
+                        Text("Apple Intelligence")
+                    } footer: {
+                        Text("Bewertet und sortiert Tasks automatisch nach Priorität und Energie-Level.")
+                    }
                 }
 
                 // Section 1: Target Calendar

@@ -25,6 +25,13 @@ struct PlanItem: Identifiable, Sendable {
     let recurrenceMonthDay: Int?
     let recurrenceGroupID: String?
 
+    // AI Task Scoring
+    let aiScore: Int?
+    let aiEnergyLevel: String?
+
+    /// Whether this task has been scored by AI
+    var hasAIScoring: Bool { aiScore != nil }
+
     // Next Up staging
     let isNextUp: Bool
 
@@ -69,6 +76,10 @@ struct PlanItem: Identifiable, Sendable {
         self.effectiveDuration = duration
         self.durationSource = source
 
+        // AI scoring (not available for Reminders)
+        self.aiScore = nil
+        self.aiEnergyLevel = nil
+
         // Enhanced fields (defaults for Reminders integration)
         self.tags = []
         self.taskType = ""  // Empty = TBD (not set)
@@ -104,6 +115,10 @@ struct PlanItem: Identifiable, Sendable {
         )
         self.effectiveDuration = duration
         self.durationSource = source
+
+        // AI scoring from LocalTask
+        self.aiScore = localTask.aiScore
+        self.aiEnergyLevel = localTask.aiEnergyLevel
 
         // Enhanced fields from LocalTask
         self.tags = localTask.tags

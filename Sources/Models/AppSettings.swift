@@ -29,4 +29,9 @@ final class AppSettings: ObservableObject {
 
     /// Default duration for new tasks in minutes
     @AppStorage("defaultTaskDuration") var defaultTaskDuration: Int = 15
+
+    // MARK: - AI Task Scoring (Apple Intelligence)
+
+    /// Whether AI-powered task scoring is enabled
+    @AppStorage("aiScoringEnabled") var aiScoringEnabled: Bool = false
 }

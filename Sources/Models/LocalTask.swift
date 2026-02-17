@@ -70,6 +70,19 @@ final class LocalTask {
     /// Timestamp when task was completed (for "completed in last 7 days" filter)
     var completedAt: Date?
 
+    // MARK: - AI Task Scoring (Apple Intelligence)
+
+    /// AI-generated composite score (0-100, higher = more important/urgent)
+    /// nil = not yet scored or AI unavailable
+    var aiScore: Int?
+
+    /// AI-assessed cognitive energy level ("high" = deep focus, "low" = routine)
+    /// nil = not yet scored or AI unavailable
+    var aiEnergyLevel: String?
+
+    /// Whether this task has been scored by AI
+    var hasAIScoring: Bool { aiScore != nil }
+
     /// External system identifier for sync (e.g., Notion page ID)
     var externalID: String?
 

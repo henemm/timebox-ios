@@ -12,6 +12,7 @@ struct BacklogView: View {
         case tbd = "TBD"
         case completed = "Erledigt"
         case recurring = "Wiederkehrend"
+        case aiRecommended = "KI-Empfehlung"
 
         var id: String { rawValue }
 
@@ -25,6 +26,7 @@ struct BacklogView: View {
             case .tbd: return "questionmark.circle"
             case .completed: return "checkmark.circle"
             case .recurring: return "arrow.triangle.2.circlepath"
+            case .aiRecommended: return "wand.and.stars"
             }
         }
 
@@ -46,6 +48,8 @@ struct BacklogView: View {
                 return ("Keine erledigten Tasks", "Erledigte Tasks der letzten 7 Tage erscheinen hier.")
             case .recurring:
                 return ("Keine wiederkehrenden Tasks", "Erstelle wiederkehrende Tasks mit einem Wiederholungsmuster.")
+            case .aiRecommended:
+                return ("Keine bewerteten Tasks", "Aktiviere KI Task-Scoring in den Einstellungen.")
             }
         }
     }
@@ -236,6 +240,8 @@ struct BacklogView: View {
                             completedView
                         case .recurring:
                             recurringView
+                        case .aiRecommended:
+                            aiRecommendedView
                         }
                     }
                 }
@@ -631,9 +637,19 @@ struct BacklogView: View {
     }
 
     // MARK: - View Mode Switcher (Swift Liquid Glass)
+    /// ViewModes filtered by availability (hides AI mode when unavailable)
+    private var availableViewModes: [ViewMode] {
+        ViewMode.allCases.filter { mode in
+            if mode == .aiRecommended {
+                return AITaskScoringService.isAvailable
+            }
+            return true
+        }
+    }
+
     private var viewModeSwitcher: some View {
         Menu {
-            ForEach(ViewMode.allCases) { mode in
+            ForEach(availableViewModes) { mode in
                 Button {
                     withAnimation(.smooth) {
                         selectedMode = mode
@@ -994,6 +1010,58 @@ struct BacklogView: View {
                 .padding(.horizontal, 16)
             }
         }
+        .refreshable {
+            await loadTasks()
+        }
+    }
+
+    // MARK: - AI Recommended View (sorted by AI score descending)
+    private var aiRecommendedView: some View {
+        let scored = backlogTasks
+            .sorted { ($0.aiScore ?? 0) > ($1.aiScore ?? 0) }
+        return List {
+            ForEach(scored) { item in
+                BacklogRow(
+                    item: item,
+                    onComplete: { completeTask(item) },
+                    onDurationTap: { selectedItemForDuration = item },
+                    onAddToNextUp: { updateNextUp(for: item, isNextUp: true) },
+                    onImportanceCycle: { newImportance in updateImportance(for: item, importance: newImportance) },
+                    onUrgencyToggle: { newUrgency in updateUrgency(for: item, urgency: newUrgency) },
+                    onCategoryTap: { selectedItemForCategory = item },
+                    onEditTap: { taskToEditDirectly = item },
+                    onDeleteTap: { deleteTask(item) },
+                    onTitleSave: { newTitle in
+                        saveTitleEdit(for: item, title: newTitle)
+                    }
+                )
+                .listRowSeparator(.hidden)
+                .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
+                .swipeActions(edge: .trailing) {
+                    Button {
+                        updateNextUp(for: item, isNextUp: true)
+                    } label: {
+                        Label("Next Up", systemImage: "arrow.up.circle.fill")
+                    }
+                    .tint(.blue)
+                }
+                .swipeActions(edge: .leading) {
+                    Button {
+                        taskToEditDirectly = item
+                    } label: {
+                        Label("Bearbeiten", systemImage: "pencil")
+                    }
+                    .tint(.orange)
+
+                    Button(role: .destructive) {
+                        deleteTask(item)
+                    } label: {
+                        Label("Löschen", systemImage: "trash")
+                    }
+                }
+            }
+        }
+        .listStyle(.plain)
         .refreshable {
             await loadTasks()
         }

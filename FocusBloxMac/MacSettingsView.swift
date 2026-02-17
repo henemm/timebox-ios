@@ -17,6 +17,7 @@ struct MacSettingsView: View {
     @AppStorage("warningTiming") private var warningTimingRaw: Int = 80
     @AppStorage("remindersSyncEnabled") private var remindersSyncEnabled: Bool = true
     @AppStorage("defaultTaskDuration") private var defaultTaskDuration: Int = 15
+    @AppStorage("aiScoringEnabled") private var aiScoringEnabled: Bool = false
 
     // MARK: - State
 
@@ -79,6 +80,18 @@ struct MacSettingsView: View {
                 .accessibilityIdentifier("defaultDurationPicker")
             } header: {
                 Text("Tasks")
+            }
+
+            // Apple Intelligence (only visible when available)
+            if AITaskScoringService.isAvailable {
+                Section {
+                    Toggle("KI Task-Scoring", isOn: $aiScoringEnabled)
+                        .accessibilityIdentifier("aiScoringToggle")
+                } header: {
+                    Text("Apple Intelligence")
+                } footer: {
+                    Text("Bewertet und sortiert Tasks automatisch nach Priorität und Energie-Level.")
+                }
             }
 
             Section {

@@ -222,7 +222,7 @@ struct CreateTaskView: View {
                 let weekdays: [Int]? = recurrencePattern.requiresWeekdays ? Array(selectedWeekdays).sorted() : nil
                 let monthDay: Int? = recurrencePattern.requiresMonthDay ? self.monthDay : nil
 
-                _ = try await taskSource.createTask(
+                let newTask = try await taskSource.createTask(
                     title: title.trimmingCharacters(in: .whitespaces),
                     tags: tags,
                     dueDate: hasDueDate ? dueDate : nil,
@@ -235,6 +235,10 @@ struct CreateTaskView: View {
                     recurrenceMonthDay: monthDay,
                     description: taskDescription.isEmpty ? nil : taskDescription
                 )
+
+                // Score new task with AI if available
+                let scoring = AITaskScoringService(modelContext: modelContext)
+                await scoring.scoreNewTask(newTask)
 
                 await MainActor.run {
                     onSave?()
