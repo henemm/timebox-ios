@@ -67,6 +67,24 @@ enum RecurrenceService {
             completedTask.recurrenceGroupID = groupID
         }
 
+        // Dedup: check if an open instance for this series already exists with the same due date
+        if let newDueDate {
+            let cal = Calendar.current
+            let targetDay = cal.startOfDay(for: newDueDate)
+            let descriptor = FetchDescriptor<LocalTask>(
+                predicate: #Predicate<LocalTask> {
+                    $0.recurrenceGroupID == groupID && !$0.isCompleted
+                }
+            )
+            if let openSiblings = try? modelContext.fetch(descriptor),
+               openSiblings.contains(where: { task in
+                   guard let due = task.dueDate else { return false }
+                   return cal.startOfDay(for: due) == targetDay
+               }) {
+                return nil  // Duplicate - already have an open instance for this date
+            }
+        }
+
         let instance = LocalTask(
             title: completedTask.title,
             importance: completedTask.importance,

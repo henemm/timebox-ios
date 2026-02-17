@@ -197,6 +197,58 @@ final class RecurrenceServiceTests: XCTestCase {
         XCTAssertEqual(original.recurrenceGroupID, instance!.recurrenceGroupID, "Both should share the same GroupID")
     }
 
+    // MARK: - Dedup Tests
+
+    /// When two tasks from the same series are completed concurrently (e.g. offline on 2 devices),
+    /// createNextInstance should NOT create a duplicate open instance for the same due date.
+    @MainActor
+    func testCreateNextInstance_dedup_preventsDuplicateForSameDueDate() throws {
+        let container = try ModelContainer(for: LocalTask.self, configurations: .init(isStoredInMemoryOnly: true))
+        let context = container.mainContext
+
+        let groupID = "dedup-test-group"
+        let baseDueDate = makeDate(2026, 2, 17) // Monday
+
+        // Simulate: two daily tasks from the same series, both with same dueDate (completed concurrently)
+        let task1 = LocalTask(
+            title: "Daily Standup",
+            dueDate: baseDueDate,
+            recurrencePattern: "daily",
+            recurrenceGroupID: groupID
+        )
+        task1.isCompleted = true
+        task1.completedAt = Date()
+
+        let task2 = LocalTask(
+            title: "Daily Standup",
+            dueDate: baseDueDate,
+            recurrencePattern: "daily",
+            recurrenceGroupID: groupID
+        )
+        task2.isCompleted = true
+        task2.completedAt = Date()
+
+        context.insert(task1)
+        context.insert(task2)
+        try context.save()
+
+        // First completion creates next instance (Feb 18) - should succeed
+        let instance1 = RecurrenceService.createNextInstance(from: task1, in: context)
+        XCTAssertNotNil(instance1, "First instance should be created")
+        try context.save()
+
+        // Second completion tries to create same next instance (Feb 18) - should be DEDUPLICATED
+        let instance2 = RecurrenceService.createNextInstance(from: task2, in: context)
+        XCTAssertNil(instance2, "Duplicate instance should NOT be created")
+
+        // Verify: only ONE open instance for Feb 18
+        let descriptor = FetchDescriptor<LocalTask>(
+            predicate: #Predicate<LocalTask> { $0.recurrenceGroupID == groupID && !$0.isCompleted }
+        )
+        let openTasks = try context.fetch(descriptor)
+        XCTAssertEqual(openTasks.count, 1, "There should be exactly one open instance, got \(openTasks.count)")
+    }
+
     // MARK: - Sichtbarkeit / Fetch Filter Tests (Ticket 1)
 
     /// Recurring tasks with future dueDate should be hidden from backlog
