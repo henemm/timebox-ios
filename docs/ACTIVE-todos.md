@@ -102,36 +102,6 @@
 
 ## 🔴 OFFEN
 
-### Bug 57: Apple Reminders - Erweiterte Attribute gehen verloren bei macOS+iOS Parallelbetrieb
-**Status:** IN ARBEIT
-**Prioritaet:** KRITISCH (Datenverlust)
-**Entdeckt:** 2026-02-17
-**Spec:** `docs/specs/bugfixes/bug-57-reminders-attribute-loss.md`
-
-- **Location:** `Sources/Services/RemindersSyncService.swift` - `updateTask(_:from:)` Zeile 116-133
-- **Symptom:** User setzt Attribute (Urgency, Importance, Duration, Category) auf iOS. Nach einiger Zeit sind alle Attribute wieder "?" (TBD). Betrifft Tasks aus Apple Reminders.
-- **Root Cause (3 Probleme):**
-  1. **macOS Sync ueberschreibt via CloudKit:** macOS `updateTask(_:from:)` schreibt title/dueDate/etc. bedingungslos auf LocalTask. SwiftData markiert gesamtes Objekt als dirty. CloudKit synct ALLE Felder (inkl. nil-Werte fuer urgency/importance/duration) zurueck zu iOS → Attribute ueberschrieben.
-  2. **Instabile Reminder-IDs:** `ReminderData.swift:14` nutzt `calendarItemIdentifier` (Apple: "not guaranteed stable across syncs"). Bei ID-Aenderung: alter Task geloescht, neuer ohne Attribute erstellt.
-  3. **Aggressives handleDeletedReminders:** `RemindersSyncService.swift:158-170` loescht Tasks sofort wenn Reminder-ID nicht im Fetch. Kein Soft-Delete, kein Grace Period.
-- **Expected:** Einmal gesetzte erweiterte Attribute bleiben dauerhaft erhalten, unabhaengig davon welches Geraet den Reminders-Sync ausfuehrt.
-- **Fix:** (A) Nur schreiben wenn Wert sich wirklich geaendert hat, (B) `calendarItemExternalIdentifier` nutzen, (C) handleDeletedReminders weniger aggressiv.
-- **Test:** Attribute auf iOS setzen → macOS Sync ausloesen → Attribute muessen auf iOS erhalten bleiben.
-
----
-
-### Bug 56: Erweiterte Attribute (Wichtigkeit/Dringlichkeit) via CloudKit ueberschrieben (Bug 48 Regression)
-**Status:** OFFEN
-**Prioritaet:** KRITISCH (Datenverlust)
-**Entdeckt:** 2026-02-17
-
-- **Location:** `Sources/FocusBloxApp.swift` - `forceCloudKitFieldSync()` V1, Commit `165a2b1`
-- **Problem:** `forceCloudKitFieldSync` V1 setzt ALLE Felder bedingungslos (`task.importance = task.importance`). Bei Tasks mit nil-Feldern gibt dies nil einen frischen CloudKit-Timestamp. CloudKit last-writer-wins ueberschreibt dann echte Werte anderer Geraete mit nil.
-- **Expected:** Nur Felder mit echten Werten bekommen frische Timestamps. Nil-Felder bleiben unveraendert (kein Update, kein neuer Timestamp).
-- **Root Cause:** Commit `165a2b1` einfuehrte V1 von `forceCloudKitFieldSync()` mit unbedingten Feldzuweisungen. V2 (Commit `5946410`) korrigierte das fuer NEUE Geraete - aber auf Geraeten wo V1 bereits gelaufen ist, kann der Schaden schon eingetreten sein.
-- **Sekundaerer Befund:** `EditTaskSheet.swift` hat `@State private var priority: TaskPriority` (NON-optional). TBD-Tasks (importance=nil) werden in `.low` (1) umgewandelt wenn EditTaskSheet gespeichert wird. Dies ist eine unvollstaendige Bug-48-RC2-Behebung - jedoch pre-existing und durch den aktuellen Report moeglicherweise nicht ausgeloest.
-- **Test:** Task mit Wichtigkeit=Hoch auf Geraet A erstellen. App auf Geraet B mit frischen Daten starten. Pruefen ob Wichtigkeit nach CloudKit-Sync noch Hoch ist.
-
 ---
 
 ### Feature: Settings UX - Build-Info dynamisch + Vorwarnungs-Labels klarer (iOS + macOS)
@@ -446,6 +416,22 @@ Backlog-Filter "Wiederkehrend". iOS + macOS.
 ---
 
 ## ✅ Kuerzlich erledigt
+
+### Bug 57: Apple Reminders - Erweiterte Attribute gehen verloren bei macOS+iOS Parallelbetrieb
+**Status:** ERLEDIGT (2026-02-17)
+**Commit:** `1cbca2f`
+**Dateien:** `Sources/Services/RemindersSyncService.swift`
+**Loesung:** Attribut-Schutz bei Reminders-Sync — nur schreiben wenn Wert sich wirklich geaendert hat.
+
+---
+
+### Bug 56: Erweiterte Attribute via CloudKit ueberschrieben (Bug 48 Regression)
+**Status:** ERLEDIGT (2026-02-17)
+**Commit:** `f9eda30`
+**Dateien:** `EditTaskSheet` geloescht, `TaskFormSheet` fuer Edits eingefuehrt
+**Loesung:** EditTaskSheet durch TaskFormSheet ersetzt, das optionale Attribute korrekt handhabt (nil bleibt nil).
+
+---
 
 ### Bug 58: MenuBarExtra Icon erscheint nicht in macOS Menuleiste
 **Status:** ERLEDIGT (2026-02-17)
