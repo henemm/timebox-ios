@@ -1,13 +1,12 @@
-# macOS Spec Backlog
+# macOS Spec-Sammlung
 
 > Erstellt: 2026-01-31
 > Basis: `docs/project/stories/timebox-macos.md`
-> Status: In Progress
-> Letzte Aktualisierung: 2026-01-31
+> Letzte Aktualisierung: 2026-02-13
 
-## Übersicht
+**ACHTUNG:** Dies ist KEINE eigenstaendige Aufgabenliste. Das zentrale Backlog mit Prioritaeten und Aufwandsschaetzungen ist **`docs/ACTIVE-todos.md`** - dort stehen ALLE offenen Items (iOS + macOS).
 
-Dieses Backlog enthält alle Specs für die macOS App, abgeleitet aus der User Story.
+Diese Datei ist eine **Spec-Referenz** fuer macOS-spezifische Features mit technischen Details.
 
 **Architektur-Entscheidung:** Native SwiftUI macOS App mit Shared Core (Models, Services).
 
@@ -174,6 +173,7 @@ Dieses Backlog enthält alle Specs für die macOS App, abgeleitet aus der User S
 
 ### MAC-020: Drag & Drop Planung
 **Status:** Not Started
+**Geschätzter Aufwand:** ~100-150k Tokens
 **Beschreibung:** Intuitive Drag & Drop Interaktion für Planung.
 
 **Scope:**
@@ -189,6 +189,7 @@ Dieses Backlog enthält alle Specs für die macOS App, abgeleitet aus der User S
 
 ### MAC-021: Review Dashboard
 **Status:** Not Started
+**Geschätzter Aufwand:** ~120-180k Tokens
 **Beschreibung:** Statistik-Übersicht für Tages-/Wochen-Review.
 
 **Scope:**
@@ -209,7 +210,8 @@ Dieses Backlog enthält alle Specs für die macOS App, abgeleitet aus der User S
 ---
 
 ### MAC-022: Spotlight Integration
-**Status:** Not Started
+**Status:** Partially Done (CoreSpotlight-Aktion vorhanden, Intents vorhanden)
+**Geschätzter Aufwand:** ~15-25k Tokens
 **Beschreibung:** Aufgaben über macOS Spotlight erfassen.
 
 **Scope:**
@@ -222,10 +224,37 @@ Dieses Backlog enthält alle Specs für die macOS App, abgeleitet aus der User S
 
 ---
 
+### MAC-026: Enhanced Quick Capture
+**Status:** Not Started
+**Geschätzter Aufwand:** ~80-120k Tokens
+**Spec:** `docs/specs/macos/MAC-026-quick-capture-enhanced.md`
+**Beschreibung:** Quick Capture Panel aufwerten: Metadata-Felder (Importance, Urgency, Kategorie, Dauer), Liquid Glass Styling, verbesserten Hotkey ohne Accessibility Permission, erweitertes URL Scheme.
+
+**Scope:**
+- Metadata-Eingabe im Floating Panel (Feature-Paritaet mit iOS)
+- Liquid Glass Styling (macOS 26)
+- Migration auf KeyboardShortcuts Library (kein Accessibility Permission)
+- URL Scheme mit Parametern (`focusblox://add?title=X&duration=25`)
+
+**Akzeptanzkriterien:**
+- [ ] Alle 4 Metadata-Felder im Panel (Importance, Urgency, Kategorie, Dauer)
+- [ ] Shared Code aus Sources/ genutzt (keine Duplikation)
+- [ ] Hotkey funktioniert ohne Accessibility Permission
+- [ ] User kann Hotkey in Settings aendern
+- [ ] URL Scheme akzeptiert Parameter
+- [ ] Liquid Glass Styling
+- [ ] Keyboard-Navigation (Tab, Return, Escape)
+
+**Abhängigkeiten:** MAC-011
+**Geschätzte Komplexität:** M
+
+---
+
 ## P3: Could Have
 
 ### MAC-030: Shortcuts.app Integration
 **Status:** Not Started
+**Geschätzter Aufwand:** ~60-80k Tokens
 **Beschreibung:** App Intents für Automationen.
 
 **Scope:**
@@ -241,6 +270,7 @@ Dieses Backlog enthält alle Specs für die macOS App, abgeleitet aus der User S
 
 ### MAC-031: Focus Mode Integration
 **Status:** Not Started
+**Geschätzter Aufwand:** ~50-70k Tokens
 **Beschreibung:** Timer startet automatisch Focus Mode.
 
 **Scope:**
@@ -256,6 +286,7 @@ Dieses Backlog enthält alle Specs für die macOS App, abgeleitet aus der User S
 
 ### MAC-032: Notification Center Widget
 **Status:** Not Started
+**Geschätzter Aufwand:** ~80-120k Tokens
 **Beschreibung:** Widget im Notification Center.
 
 **Scope:**

@@ -98,6 +98,20 @@
 
 ## 🔴 OFFEN
 
+### Bug 56: Erweiterte Attribute (Wichtigkeit/Dringlichkeit) via CloudKit ueberschrieben (Bug 48 Regression)
+**Status:** OFFEN
+**Prioritaet:** KRITISCH (Datenverlust)
+**Entdeckt:** 2026-02-17
+
+- **Location:** `Sources/FocusBloxApp.swift` - `forceCloudKitFieldSync()` V1, Commit `165a2b1`
+- **Problem:** `forceCloudKitFieldSync` V1 setzt ALLE Felder bedingungslos (`task.importance = task.importance`). Bei Tasks mit nil-Feldern gibt dies nil einen frischen CloudKit-Timestamp. CloudKit last-writer-wins ueberschreibt dann echte Werte anderer Geraete mit nil.
+- **Expected:** Nur Felder mit echten Werten bekommen frische Timestamps. Nil-Felder bleiben unveraendert (kein Update, kein neuer Timestamp).
+- **Root Cause:** Commit `165a2b1` einfuehrte V1 von `forceCloudKitFieldSync()` mit unbedingten Feldzuweisungen. V2 (Commit `5946410`) korrigierte das fuer NEUE Geraete - aber auf Geraeten wo V1 bereits gelaufen ist, kann der Schaden schon eingetreten sein.
+- **Sekundaerer Befund:** `EditTaskSheet.swift` hat `@State private var priority: TaskPriority` (NON-optional). TBD-Tasks (importance=nil) werden in `.low` (1) umgewandelt wenn EditTaskSheet gespeichert wird. Dies ist eine unvollstaendige Bug-48-RC2-Behebung - jedoch pre-existing und durch den aktuellen Report moeglicherweise nicht ausgeloest.
+- **Test:** Task mit Wichtigkeit=Hoch auf Geraet A erstellen. App auf Geraet B mit frischen Daten starten. Pruefen ob Wichtigkeit nach CloudKit-Sync noch Hoch ist.
+
+---
+
 ### Feature: Einheitliche Symbole Tab-Bar/Sidebar (iOS + macOS)
 **Status:** OFFEN
 **Prioritaet:** NIEDRIG
