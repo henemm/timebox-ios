@@ -149,7 +149,112 @@ final class RecurrenceServiceTests: XCTestCase {
         XCTAssertNil(instance, "Should not create instance for non-recurring task")
     }
 
-    // MARK: - Helpers
+    // MARK: - recurrenceGroupID Tests (Ticket 1)
+
+    /// GroupID should be copied from completed task to new instance
+    @MainActor
+    func testRecurrenceGroupID_copiedOnNewInstance() throws {
+        let container = try ModelContainer(for: LocalTask.self, configurations: .init(isStoredInMemoryOnly: true))
+        let context = container.mainContext
+
+        let original = LocalTask(
+            title: "Daily Standup",
+            dueDate: makeDate(2026, 2, 17),
+            recurrencePattern: "daily"
+        )
+        original.recurrenceGroupID = "group-abc-123"
+        context.insert(original)
+        try context.save()
+
+        let instance = RecurrenceService.createNextInstance(from: original, in: context)
+
+        XCTAssertNotNil(instance)
+        XCTAssertEqual(instance!.recurrenceGroupID, "group-abc-123", "GroupID must be copied to new instance")
+    }
+
+    /// When completed task has no GroupID (legacy), a new one should be generated for both
+    @MainActor
+    func testRecurrenceGroupID_generatedWhenNil() throws {
+        let container = try ModelContainer(for: LocalTask.self, configurations: .init(isStoredInMemoryOnly: true))
+        let context = container.mainContext
+
+        let original = LocalTask(
+            title: "Legacy Recurring",
+            dueDate: makeDate(2026, 2, 17),
+            recurrencePattern: "weekly"
+        )
+        // No recurrenceGroupID set (legacy task)
+        XCTAssertNil(original.recurrenceGroupID)
+        context.insert(original)
+        try context.save()
+
+        let instance = RecurrenceService.createNextInstance(from: original, in: context)
+
+        XCTAssertNotNil(instance)
+        // Both should now have a GroupID
+        XCTAssertNotNil(original.recurrenceGroupID, "Original should get a GroupID retroactively")
+        XCTAssertNotNil(instance!.recurrenceGroupID, "New instance should get a GroupID")
+        XCTAssertEqual(original.recurrenceGroupID, instance!.recurrenceGroupID, "Both should share the same GroupID")
+    }
+
+    // MARK: - Sichtbarkeit / Fetch Filter Tests (Ticket 1)
+
+    /// Recurring tasks with future dueDate should be hidden from backlog
+    @MainActor
+    func testFetchIncompleteTasks_hidesForwardDatedRecurring() async throws {
+        let container = try ModelContainer(for: LocalTask.self, configurations: .init(isStoredInMemoryOnly: true))
+        let context = container.mainContext
+        let taskSource = LocalTaskSource(modelContext: context)
+
+        // Task due tomorrow (recurring) - should be HIDDEN
+        let futureRecurring = LocalTask(
+            title: "Future Recurring",
+            dueDate: Calendar.current.date(byAdding: .day, value: 1, to: Date())!,
+            recurrencePattern: "daily"
+        )
+        context.insert(futureRecurring)
+
+        // Task due today (recurring) - should be VISIBLE
+        let todayRecurring = LocalTask(
+            title: "Today Recurring",
+            dueDate: Calendar.current.startOfDay(for: Date()),
+            recurrencePattern: "daily"
+        )
+        context.insert(todayRecurring)
+
+        // Normal task (no recurrence) - should always be VISIBLE
+        let normalTask = LocalTask(title: "Normal Task")
+        context.insert(normalTask)
+
+        try context.save()
+
+        let tasks = try await taskSource.fetchIncompleteTasks()
+
+        let titles = tasks.map(\.title)
+        XCTAssertTrue(titles.contains("Today Recurring"), "Today's recurring task should be visible")
+        XCTAssertTrue(titles.contains("Normal Task"), "Normal tasks should always be visible")
+        XCTAssertFalse(titles.contains("Future Recurring"), "Future recurring tasks should be hidden")
+    }
+
+    /// Recurring tasks without dueDate should remain visible
+    @MainActor
+    func testFetchIncompleteTasks_showsRecurringWithoutDueDate() async throws {
+        let container = try ModelContainer(for: LocalTask.self, configurations: .init(isStoredInMemoryOnly: true))
+        let context = container.mainContext
+        let taskSource = LocalTaskSource(modelContext: context)
+
+        let noDueDateRecurring = LocalTask(
+            title: "No DueDate Recurring",
+            recurrencePattern: "weekly"
+        )
+        context.insert(noDueDateRecurring)
+        try context.save()
+
+        let tasks = try await taskSource.fetchIncompleteTasks()
+        let titles = tasks.map(\.title)
+        XCTAssertTrue(titles.contains("No DueDate Recurring"), "Recurring without dueDate should be visible")
+    }
+
 
     private var calendar: Calendar { Calendar.current }
 

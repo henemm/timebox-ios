@@ -58,6 +58,15 @@ enum RecurrenceService {
             from: baseDate
         )
 
+        // Lazy migration: generate GroupID if nil (legacy task)
+        let groupID: String
+        if let existingGroupID = completedTask.recurrenceGroupID {
+            groupID = existingGroupID
+        } else {
+            groupID = UUID().uuidString
+            completedTask.recurrenceGroupID = groupID
+        }
+
         let instance = LocalTask(
             title: completedTask.title,
             importance: completedTask.importance,
@@ -69,6 +78,7 @@ enum RecurrenceService {
             recurrencePattern: completedTask.recurrencePattern,
             recurrenceWeekdays: completedTask.recurrenceWeekdays,
             recurrenceMonthDay: completedTask.recurrenceMonthDay,
+            recurrenceGroupID: groupID,
             taskDescription: completedTask.taskDescription
         )
 

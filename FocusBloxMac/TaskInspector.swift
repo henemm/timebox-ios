@@ -168,6 +168,17 @@ struct TaskInspector: View {
                     HStack(spacing: 12) {
                         statusChip("Erledigt", "checkmark.circle.fill", task.isCompleted, .green) {
                             task.isCompleted.toggle()
+                            if task.isCompleted {
+                                task.completedAt = Date()
+                                task.assignedFocusBlockID = nil
+                                task.isNextUp = false
+                                // Generate next instance for recurring tasks
+                                if task.recurrencePattern != "none" {
+                                    RecurrenceService.createNextInstance(from: task, in: modelContext)
+                                }
+                            } else {
+                                task.completedAt = nil
+                            }
                             try? modelContext.save()
                         }
 

@@ -75,7 +75,26 @@ struct MacBacklogRow: View {
             // 3. Category Badge (tappable)
             categoryBadge
 
-            // 4. Tags (max 2, dann "+N") - plain text, iOS-aligned
+            // 4. Recurrence Badge (only if recurring, iOS-aligned)
+            if task.recurrencePattern != "none" {
+                HStack(spacing: 3) {
+                    Image(systemName: "arrow.triangle.2.circlepath")
+                    Text(recurrenceDisplayName(task.recurrencePattern))
+                        .lineLimit(1)
+                }
+                .font(.caption2)
+                .foregroundStyle(.purple)
+                .padding(.horizontal, 5)
+                .padding(.vertical, 3)
+                .background(
+                    RoundedRectangle(cornerRadius: 5)
+                        .fill(.purple.opacity(0.2))
+                )
+                .fixedSize()
+                .accessibilityIdentifier("recurrenceBadge_\(task.id)")
+            }
+
+            // 5. Tags (max 2, dann "+N") - plain text, iOS-aligned
             if !task.tags.isEmpty {
                 ForEach(Array(task.tags.prefix(2).enumerated()), id: \.offset) { index, tag in
                     Text("#\(tag)")
@@ -263,6 +282,18 @@ struct MacBacklogRow: View {
         .menuStyle(.borderlessButton)
         .fixedSize()
         .accessibilityIdentifier("durationBadge_\(task.id)")
+    }
+
+    // MARK: - Recurrence Display Name
+
+    private func recurrenceDisplayName(_ pattern: String) -> String {
+        switch pattern {
+        case "daily": "Täglich"
+        case "weekly": "Wöchentlich"
+        case "biweekly": "Zweiwöchentlich"
+        case "monthly": "Monatlich"
+        default: pattern
+        }
     }
 
     // MARK: - Due Date Badge

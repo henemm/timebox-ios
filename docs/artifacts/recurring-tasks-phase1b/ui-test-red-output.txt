@@ -1,0 +1,22 @@
+TDD RED - UI Tests (recurring-tasks-phase1b, Ticket 1)
+Date: 2026-02-17T11:35:00+0100
+Simulator: FocusBlox (6364A54B-5048-4346-899E-FFB67E630D53)
+
+Test File: FocusBloxUITests/RecurringVisibilityUITests.swift
+Test: RecurringVisibilityUITests/testRecurringVisibilityFilterActive
+Status: FAIL (build failed - recurrenceGroupID not found on LocalTask)
+
+Build Errors:
+RecurrenceServiceTests.swift:165: error: value of type 'LocalTask' has no member 'recurrenceGroupID'
+RecurrenceServiceTests.swift:172: error: value of type 'LocalTask' has no member 'recurrenceGroupID'
+RecurrenceServiceTests.swift:187: error: value of type 'LocalTask' has no member 'recurrenceGroupID'
+RecurrenceServiceTests.swift:195: error: value of type 'LocalTask' has no member 'recurrenceGroupID'
+RecurrenceServiceTests.swift:196: error: value of type 'LocalTask' has no member 'recurrenceGroupID'
+RecurrenceServiceTests.swift:197: error: value of type 'LocalTask' has no member 'recurrenceGroupID'
+
+UI Test Assertion (will fail at runtime once build succeeds):
+  "Ticket 1: Recurring tasks should have a series group indicator (recurrenceGroupID)"
+  - Element 'recurrenceSeriesGroup' does not exist yet
+
+Testing cancelled because the build failed.
+** TEST FAILED **

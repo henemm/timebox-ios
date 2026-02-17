@@ -1,0 +1,25 @@
+TDD RED - Unit Tests (recurring-tasks-phase1b, Ticket 1)
+Date: 2026-02-17T10:45:00+0100
+Simulator: FocusBlox (6364A54B-5048-4346-899E-FFB67E630D53)
+
+Test: RecurrenceServiceTests/testRecurrenceGroupID_copiedOnNewInstance
+Status: FAIL (LocalTask has no member 'recurrenceGroupID')
+
+Test: RecurrenceServiceTests/testRecurrenceGroupID_generatedWhenNil
+Status: FAIL (LocalTask has no member 'recurrenceGroupID')
+
+Test: RecurrenceServiceTests/testFetchIncompleteTasks_hidesForwardDatedRecurring
+Status: FAIL (compilation error - recurrenceGroupID not found)
+
+Test: RecurrenceServiceTests/testFetchIncompleteTasks_showsRecurringWithoutDueDate
+Status: FAIL (compilation error - recurrenceGroupID not found)
+
+Errors:
+RecurrenceServiceTests.swift:165: error: value of type 'LocalTask' has no member 'recurrenceGroupID'
+RecurrenceServiceTests.swift:172: error: value of type 'LocalTask' has no member 'recurrenceGroupID'
+RecurrenceServiceTests.swift:187: error: value of type 'LocalTask' has no member 'recurrenceGroupID'
+RecurrenceServiceTests.swift:195: error: value of type 'LocalTask' has no member 'recurrenceGroupID'
+RecurrenceServiceTests.swift:196: error: value of type 'LocalTask' has no member 'recurrenceGroupID'
+RecurrenceServiceTests.swift:197: error: value of type 'LocalTask' has no member 'recurrenceGroupID'
+
+** TEST FAILED **

@@ -47,6 +47,11 @@ final class LocalTask {
     /// Day of month for monthly recurrence (1-31, or 32=last day)
     var recurrenceMonthDay: Int?
 
+    /// Groups recurring task instances into a series (UUID string).
+    /// All instances of the same recurring task share the same groupID.
+    /// nil for non-recurring or legacy tasks (gets assigned on next completion).
+    var recurrenceGroupID: String?
+
     /// Long-form description/notes for the task
     var taskDescription: String?
 
@@ -89,6 +94,7 @@ final class LocalTask {
         recurrencePattern: String = "none",
         recurrenceWeekdays: [Int]? = nil,
         recurrenceMonthDay: Int? = nil,
+        recurrenceGroupID: String? = nil,
         taskDescription: String? = nil,
         externalID: String? = nil,
         sourceSystem: String = "local",
@@ -108,6 +114,7 @@ final class LocalTask {
         self.recurrencePattern = recurrencePattern
         self.recurrenceWeekdays = recurrenceWeekdays
         self.recurrenceMonthDay = recurrenceMonthDay
+        self.recurrenceGroupID = recurrenceGroupID
         self.taskDescription = taskDescription
         self.externalID = externalID
         self.sourceSystem = sourceSystem
