@@ -328,7 +328,8 @@ Backlog-Filter "Wiederkehrend". iOS + macOS.
 - Settings Toggle "KI Task-Scoring" (iOS + macOS, nur sichtbar mit Apple Intelligence)
 - **AI schlaegt Werte VOR, manuell hat Vorrang** (nil-Check auf importance/urgency)
 - **Feature komplett unsichtbar ohne Apple Intelligence** (`#if canImport(FoundationModels)`)
-**Dateien:** `LocalTask.swift`, `PlanItem.swift`, `AITaskScoringService.swift` (neu), `AppSettings.swift`, `BacklogView.swift`, `BacklogRow.swift`, `CreateTaskView.swift`, `SettingsView.swift`, `MacSettingsView.swift`
+- **Cross-Platform:** iOS (BacklogView, BacklogRow) + macOS (SidebarView, MacBacklogRow, ContentView) gleichwertig implementiert
+**Dateien:** `LocalTask.swift`, `PlanItem.swift`, `AITaskScoringService.swift` (neu), `AppSettings.swift`, `BacklogView.swift`, `BacklogRow.swift`, `CreateTaskView.swift`, `SettingsView.swift`, `MacSettingsView.swift`, `SidebarView.swift`, `MacBacklogRow.swift`, `ContentView.swift` (macOS)
 **Tests:** 10 Unit Tests + 3 UI Tests GREEN
 
 ---

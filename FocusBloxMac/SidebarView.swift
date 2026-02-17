@@ -35,6 +35,7 @@ enum SidebarFilter: Hashable {
     case overdue
     case upcoming
     case completed
+    case aiRecommended
 }
 
 /// Sidebar view showing only filters (navigation moved to toolbar)
@@ -116,6 +117,16 @@ struct SidebarView: View {
                 .contentShape(Rectangle())
                 .onTapGesture { selectedFilter = .completed }
                 .listRowBackground(selectedFilter == .completed ? Color.accentColor.opacity(0.15) : Color.clear)
+
+                // AI Recommended (only when Apple Intelligence is available)
+                if AITaskScoringService.isAvailable {
+                    Label("KI-Empfehlung", systemImage: "wand.and.stars")
+                        .accessibilityIdentifier("sidebarFilter_aiRecommended")
+                        .tag(SidebarFilter.aiRecommended)
+                        .contentShape(Rectangle())
+                        .onTapGesture { selectedFilter = .aiRecommended }
+                        .listRowBackground(selectedFilter == .aiRecommended ? Color.accentColor.opacity(0.15) : Color.clear)
+                }
             }
 
             Section("Kategorien") {
@@ -166,6 +177,7 @@ struct SidebarView: View {
         case .overdue: return "overdue"
         case .upcoming: return "upcoming"
         case .completed: return "completed"
+        case .aiRecommended: return "aiRecommended"
         case .category(let id): return id
         }
     }

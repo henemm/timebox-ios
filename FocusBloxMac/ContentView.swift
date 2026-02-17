@@ -123,6 +123,9 @@ struct ContentView: View {
             }
         case .completed:
             return tasks.filter { $0.isCompleted }
+        case .aiRecommended:
+            return tasks.filter { !$0.isCompleted }
+                .sorted { ($0.aiScore ?? 0) > ($1.aiScore ?? 0) }
         }
     }
 
@@ -242,6 +245,9 @@ struct ContentView: View {
             }
         case .completed:
             return tasks.filter { $0.isCompleted }
+        case .aiRecommended:
+            return tasks.filter { !$0.isCompleted && !$0.isNextUp }
+                .sorted { ($0.aiScore ?? 0) > ($1.aiScore ?? 0) }
         }
     }
 
@@ -468,6 +474,7 @@ struct ContentView: View {
         case .overdue: return "Überfällig"
         case .upcoming: return "Bald fällig"
         case .completed: return "Erledigt"
+        case .aiRecommended: return "KI-Empfehlung"
         }
     }
 
@@ -584,7 +591,10 @@ struct ContentView: View {
 
         Task {
             let taskSource = LocalTaskSource(modelContext: modelContext)
-            _ = try? await taskSource.createTask(title: title, taskType: "")
+            if let newTask = try? await taskSource.createTask(title: title, taskType: "") {
+                let scoring = AITaskScoringService(modelContext: modelContext)
+                await scoring.scoreNewTask(newTask)
+            }
         }
     }
 
