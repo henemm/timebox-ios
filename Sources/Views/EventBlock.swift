@@ -21,15 +21,9 @@ struct EventBlock: View {
             .fill(categoryConfig?.color.opacity(0.3) ?? .blue.opacity(0.3))
             .overlay(
                 VStack(alignment: .leading, spacing: 2) {
-                    HStack(spacing: 4) {
-                        if let config = categoryConfig {
-                            Image(systemName: config.icon)
-                                .font(.caption2.weight(.semibold))
-                        }
-                        Text(event.title)
-                            .font(.caption.weight(.medium))
-                            .lineLimit(1)
-                    }
+                    Text(event.title)
+                        .font(.caption.weight(.medium))
+                        .lineLimit(1)
                     Text(timeRangeText)
                         .font(.caption2)
                         .foregroundStyle(.secondary)
@@ -42,12 +36,17 @@ struct EventBlock: View {
             .padding(.trailing, 8)
             .offset(y: yOffset)
             .overlay(alignment: .topTrailing) {
-                if event.isReadOnly {
-                    Image(systemName: "lock.fill")
-                        .font(.caption2)
-                        .foregroundStyle(.secondary)
-                        .padding(4)
+                HStack(spacing: 3) {
+                    if event.isReadOnly {
+                        Image(systemName: "lock.fill")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                    }
+                    if let config = categoryConfig {
+                        CategoryIconBadge(category: config)
+                    }
                 }
+                .padding(4)
             }
             .contentShape(Rectangle())
             .onTapGesture {

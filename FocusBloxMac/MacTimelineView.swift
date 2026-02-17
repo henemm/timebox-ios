@@ -388,17 +388,10 @@ struct EventBlockView: View {
             }
 
             VStack(alignment: .leading, spacing: 2) {
-                HStack(spacing: 4) {
-                    if let category = event.category,
-                       let config = TaskCategory(rawValue: category) {
-                        Image(systemName: config.icon)
-                            .font(.system(size: 10, weight: .bold))
-                    }
-                    Text(displayTitle)
-                        .font(.system(size: 11, weight: .semibold))
-                        .lineLimit(2)
-                }
-                .foregroundStyle(.white)
+                Text(displayTitle)
+                    .font(.system(size: 11, weight: .semibold))
+                    .lineLimit(2)
+                    .foregroundStyle(.white)
 
                 Text(timeRange)
                     .font(.system(size: 10))
@@ -419,12 +412,18 @@ struct EventBlockView: View {
                 .strokeBorder(eventColor.opacity(0.8), lineWidth: 0.5)
         )
         .overlay(alignment: .topTrailing) {
-            if event.isReadOnly {
-                Image(systemName: "lock.fill")
-                    .font(.system(size: 9))
-                    .foregroundStyle(.white.opacity(0.7))
-                    .padding(4)
+            HStack(spacing: 3) {
+                if event.isReadOnly {
+                    Image(systemName: "lock.fill")
+                        .font(.system(size: 9))
+                        .foregroundStyle(.white.opacity(0.7))
+                }
+                if let category = event.category,
+                   let config = TaskCategory(rawValue: category) {
+                    CategoryIconBadge(category: config)
+                }
             }
+            .padding(4)
         }
         .contentShape(Rectangle())
         .onTapGesture {

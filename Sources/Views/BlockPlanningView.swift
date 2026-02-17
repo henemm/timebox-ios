@@ -1045,10 +1045,10 @@ struct CalendarEventRow: View {
 
                 Spacer()
 
-                // Tap hint
-                Image(systemName: "tag")
-                    .foregroundStyle(.secondary)
-                    .font(.caption)
+                if let categoryString = event.category,
+                   let config = TaskCategory(rawValue: categoryString) {
+                    CategoryIconBadge(category: config)
+                }
             }
             .padding(.vertical, 8)
             .padding(.horizontal, 12)
@@ -1336,9 +1336,10 @@ struct TimelineEventRow: View {
 
             Spacer()
 
-            Image(systemName: "tag")
-                .foregroundStyle(.tertiary)
-                .font(.caption)
+            if let categoryString = event.category,
+               let config = TaskCategory(rawValue: categoryString) {
+                CategoryIconBadge(category: config)
+            }
         }
         .padding(.vertical, 6)
         .padding(.horizontal, categoryColor == nil ? 12 : 8)
