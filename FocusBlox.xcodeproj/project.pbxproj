@@ -133,6 +133,8 @@
 		BUG59BUILD000001 /* Bug59CompletedRemindersTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BUG59FILE0000001 /* Bug59CompletedRemindersTests.swift */; };
 		DUEDN01BUILD000001 /* DueDateNotificationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DUEDN01FILE0000001 /* DueDateNotificationTests.swift */; };
 		DUEDN02BUILD000001 /* DueDateNotificationUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DUEDN02FILE0000001 /* DueDateNotificationUITests.swift */; };
+		BSRCH01BUILD00001 /* BacklogSearchUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BSRCH01FILE000001 /* BacklogSearchUITests.swift */; };
+		NOTIF02BUILD000001 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 350DD1256F45268992636DEA /* NotificationService.swift */; };
 		DYNISLD01BUILD0001 /* DynamicIslandUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DYNISLD01FILE00001 /* DynamicIslandUITests.swift */; };
 		E6DF69A28B0DB868B330DADD /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5F22CE94E29A523114817BF /* ContentView.swift */; };
 		E907CB03C20C1B55A48C4B1B /* BacklogRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92133F2683BB9B90566D7646 /* BacklogRow.swift */; };
@@ -504,6 +506,7 @@
 		BUG59FILE0000001 /* Bug59CompletedRemindersTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bug59CompletedRemindersTests.swift; sourceTree = "<group>"; };
 		DUEDN01FILE0000001 /* DueDateNotificationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DueDateNotificationTests.swift; sourceTree = "<group>"; };
 		DUEDN02FILE0000001 /* DueDateNotificationUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DueDateNotificationUITests.swift; sourceTree = "<group>"; };
+		BSRCH01FILE000001 /* BacklogSearchUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BacklogSearchUITests.swift; sourceTree = "<group>"; };
 		DYNISLD01FILE00001 /* DynamicIslandUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DynamicIslandUITests.swift; sourceTree = "<group>"; };
 		E1F3228806B919AB0836326F /* ReminderData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReminderData.swift; sourceTree = "<group>"; };
 		E6D939B402B46840351D9475 /* EventKitRepositoryProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventKitRepositoryProtocol.swift; sourceTree = "<group>"; };
@@ -870,6 +873,7 @@
 				NXSWIPE01UIREF01 /* NextUpSwipeActionsUITests.swift */,
 				AISCORE01UIFILE001 /* AITaskScoringUITests.swift */,
 				DUEDN02FILE0000001 /* DueDateNotificationUITests.swift */,
+				BSRCH01FILE000001 /* BacklogSearchUITests.swift */,
 			);
 			path = FocusBloxUITests;
 			sourceTree = "<group>";
@@ -1726,6 +1730,7 @@
 				UNIFTAB01UIBLD01 /* UnifiedTabSymbolsUITests.swift in Sources */,
 				NXSWIPE01UIBLD01 /* NextUpSwipeActionsUITests.swift in Sources */,
 				DUEDN02BUILD000001 /* DueDateNotificationUITests.swift in Sources */,
+				BSRCH01BUILD00001 /* BacklogSearchUITests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1863,6 +1868,7 @@
 				MAC001BUILD00000015 /* FocusBlockActionService.swift in Sources */,
 				RECRSVC02BUILD002 /* RecurrenceService.swift in Sources */,
 				AITASKSCOR0BUILD002 /* AITaskScoringService.swift in Sources */,
+				NOTIF02BUILD000001 /* NotificationService.swift in Sources */,
 				MAC024BUILD00000001 /* EditFocusBlockSheet.swift in Sources */,
 				MAC024BUILD00000002 /* FocusBlockTasksSheet.swift in Sources */,
 				109CE59305D35DA0570AB33E /* GapFinder.swift in Sources */,

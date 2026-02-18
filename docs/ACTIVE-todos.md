@@ -167,6 +167,7 @@
 - Beide unabhaengig ein/ausschaltbar in Settings (iOS + macOS)
 - Hybrid-Scheduling: Einzeln bei Create/Edit/Delete + Batch bei App-Foreground
 - 7/7 Unit Tests GREEN, 2/2 UI Tests GREEN
+- **Nachfix (2026-02-18):** NotificationService.swift fehlte im macOS-Target (Build-Fehler)
 **Dateien:** NotificationService, AppSettings, SettingsView, MacSettingsView, FocusBloxApp, FocusBloxMacApp, CreateTaskView, TaskFormSheet, BacklogView
 
 ---
