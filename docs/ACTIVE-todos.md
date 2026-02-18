@@ -141,7 +141,8 @@
   2. `handleDeletedReminders` nutzt ALLE Reminder-IDs (nicht nur sichtbare Listen)
   3. externalID und sourceSystem werden NIE geloescht — nur `isCompleted=true`
 - **Analyse:** `docs/artifacts/bug-60-attribute-loss/analysis.md` (5 Agenten parallel, 5 Hypothesen)
-- **Tests:** 6 Unit Tests (Bug60AttributeRecoveryTests) + 24 verwandte Sync-Tests alle GREEN.
+- **Tests:** 6 Unit Tests (Bug60AttributeRecoveryTests) + 18 verwandte Sync-Tests alle GREEN.
+- **Cleanup:** Dead-Code Safe-Setter (safeSetImportance etc.) und 6 zugehoerige Tests entfernt.
 
 ---
 

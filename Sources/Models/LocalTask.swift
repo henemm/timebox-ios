@@ -135,35 +135,6 @@ final class LocalTask {
     }
 }
 
-// MARK: - Safe Setters (Bug 57: Prevent nil-overwrite of extended attributes)
-
-extension LocalTask {
-    /// Sets importance only if new value is non-nil or current value is nil.
-    /// Prevents accidental deletion by sync/CloudKit.
-    func safeSetImportance(_ value: Int?) {
-        guard value != nil || importance == nil else { return }
-        importance = value
-    }
-
-    /// Sets urgency only if new value is non-nil or current value is nil.
-    func safeSetUrgency(_ value: String?) {
-        guard value != nil || urgency == nil else { return }
-        urgency = value
-    }
-
-    /// Sets estimatedDuration only if new value is non-nil or current value is nil.
-    func safeSetDuration(_ value: Int?) {
-        guard value != nil || estimatedDuration == nil else { return }
-        estimatedDuration = value
-    }
-
-    /// Sets taskType only if new value is non-empty or current value is empty.
-    func safeSetTaskType(_ value: String) {
-        guard !value.isEmpty || taskType.isEmpty else { return }
-        taskType = value
-    }
-}
-
 // MARK: - TaskSourceData Conformance
 
 extension LocalTask: TaskSourceData {
