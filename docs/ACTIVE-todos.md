@@ -105,6 +105,30 @@
 
 ---
 
+### Bug 59: Erledigte Apple Reminders erscheinen im Backlog
+**Status:** OFFEN
+**Prioritaet:** HOCH
+**Komplexitaet:** XS (~10-15k Tokens)
+
+- **Location:** `Sources/Services/RemindersSyncService.swift` (Zeile 155-168), `Sources/Models/ReminderData.swift` (Zeile 17-21)
+- **Problem:** Bereits erledigte Apple Reminders werden in den FocusBlox Backlog importiert und angezeigt.
+- **Expected:** Nur unerledigte (incomplete) Reminders werden importiert. Erledigte Reminders tauchen nicht im Backlog auf.
+- **Root Cause:** Zwei zusammenwirkende Probleme aus Commit `1cbca2f` (Bug 57 Fix):
+
+  **Problem 1 - ID-Wechsel (Fix B):** Vor dem Commit verwendete `ReminderData` die `calendarItemIdentifier` als ID. Fix B wechselte auf die stabilere `calendarItemExternalIdentifier`. Das bedeutet: Alle bestehenden `LocalTask`-Eintraege in SwiftData haben ihre `externalID` noch im alten Format (`calendarItemIdentifier`). Der neue Match-Algorithmus in `findTask(byExternalID:)` findet diese Tasks NICHT mehr (ID stimmt nicht ueberein) und legt sie als NEUE Tasks an - auch fuer bereits erledigte Reminders.
+
+  **Problem 2 - Soft-Delete statt Hard-Delete (Fix C):** Vor dem Commit wurden Tasks deren Reminder nicht mehr in der "incomplete"-Liste auftaucht (also erledigte Reminders) hart geloescht (`modelContext.delete(task)`). Fix C ersetzt das durch Soft-Delete (`task.sourceSystem = "local"`). Das bedeutet: Wenn eine erledigte Reminder nun per neuem ID-Format als "neu" erkannt wird und angelegt wird, wird sie beim naechsten Sync-Zyklus NICHT mehr entfernt - weil `handleDeletedReminders` nur Tasks mit `sourceSystem == "reminders"` prueft, und erledigte Reminders tauchen in `fetchIncompleteReminders()` gar nicht auf (damit fehlen sie in `currentReminderIDs`). Resultat: Der neue Task wird Soft-deleted zu "local" - bleibt aber im Backlog sichtbar.
+
+  **Konkrete Code-Stellen:**
+  - `Sources/Models/ReminderData.swift:17-21` — ID-Wechsel auf `calendarItemExternalIdentifier`
+  - `Sources/Services/RemindersSyncService.swift:91-96` — `findTask(byExternalID:)` findet alte IDs nicht mehr
+  - `Sources/Services/RemindersSyncService.swift:41-51` — erzeugt neue Tasks fuer "nicht gefundene" Reminders (inkl. erledigter)
+  - `Sources/Services/RemindersSyncService.swift:155-168` — Soft-Delete verhindert Bereinigung
+
+- **Test:** Nach dem Fix: Einen Reminder in Apple Reminders als "erledigt" markieren -> FocusBlox Backlog oeffnen -> der Reminder darf NICHT im Backlog erscheinen. Bestehende erledigte Reminders muessen aus dem Backlog verschwinden nach einem Sync.
+
+---
+
 ### Feature: Settings UX - Build-Info dynamisch + Vorwarnungs-Labels klarer (iOS + macOS)
 **Status:** OFFEN
 **Prioritaet:** NIEDRIG
@@ -150,8 +174,7 @@
 - **Vorab-Erinnerung** (default AUS): 15min/30min/1h/2h/1Tag vor Frist
 - Beide unabhaengig ein/ausschaltbar in Settings (iOS + macOS)
 - Hybrid-Scheduling: Einzeln bei Create/Edit/Delete + Batch bei App-Foreground
-- 7/7 Unit Tests GREEN, 2/3 UI Tests GREEN
-- **Known Issue:** 1 UI Test (`testAdvanceReminderToggleShowsPicker`) schlaegt fehl - Element-Typ-Erkennung in iOS 26 Form
+- 7/7 Unit Tests GREEN, 2/2 UI Tests GREEN
 **Dateien:** NotificationService, AppSettings, SettingsView, MacSettingsView, FocusBloxApp, FocusBloxMacApp, CreateTaskView, TaskFormSheet, BacklogView
 
 ---

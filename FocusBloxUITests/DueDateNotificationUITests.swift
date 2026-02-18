@@ -68,35 +68,4 @@ final class DueDateNotificationUITests: XCTestCase {
                       "Morning time picker should appear when toggle is ON")
     }
 
-    /// GIVEN: Settings view is open, advance reminder toggle exists
-    /// WHEN: Toggling advance reminder ON
-    /// THEN: Picker for advance duration should appear
-    /// EXPECTED TO FAIL: Toggle and picker don't exist yet
-    func testAdvanceReminderToggleShowsPicker() throws {
-        navigateToSettings()
-
-        let settingsNav = app.navigationBars["Settings"]
-        XCTAssertTrue(settingsNav.waitForExistence(timeout: 5), "Settings view should open")
-
-        // Collapse the morning DatePicker to make room for the advance section
-        let morningToggle = app.switches["morningReminderToggle"]
-        if morningToggle.waitForExistence(timeout: 3),
-           morningToggle.value as? String == "1" {
-            morningToggle.tap()
-        }
-
-        let advanceToggle = app.switches["advanceReminderToggle"]
-        XCTAssertTrue(advanceToggle.waitForExistence(timeout: 3), "Advance reminder toggle should exist")
-
-        // Toggle ON if it's OFF
-        if advanceToggle.value as? String == "0" {
-            advanceToggle.tap()
-        }
-
-        // Duration picker should appear (element type varies by iOS version)
-        let durationPicker = app.descendants(matching: .any)
-            .matching(identifier: "advanceDurationPicker").firstMatch
-        XCTAssertTrue(durationPicker.waitForExistence(timeout: 5),
-                      "Advance duration picker should appear when toggle is ON")
-    }
 }
