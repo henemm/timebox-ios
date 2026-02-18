@@ -109,7 +109,7 @@
 **Status:** ERLEDIGT
 **Prioritaet:** HOCH
 **Komplexitaet:** XS (~10-15k Tokens)
-**Commit:** (pending)
+**Commit:** `3392695`
 
 - **Location:** `Sources/Services/RemindersSyncService.swift`
 - **Problem:** Bug 57 Fix aenderte Reminder-ID-Format, was Duplikate und Orphans erzeugte. Erledigte Reminders blieben als aktive lokale Tasks im Backlog.
@@ -118,6 +118,30 @@
   2. **Attribut-Transfer:** Bei vorhandenem Duplikat werden Benutzer-Attribute (importance, urgency, tags, duration, AI-Score etc.) vom Orphan uebertragen
   3. **Completed-Marking:** `handleDeletedReminders()` setzt jetzt `isCompleted=true` + `completedAt` statt nur Soft-Delete
 - **Tests:** 4 Unit Tests (Bug59CompletedRemindersTests), 20 verwandte Sync-Tests alle GREEN, keine Regressionen.
+- **HINWEIS:** Bug 60 hat Teile dieses Fixes superseded (sourceSystem bleibt jetzt "reminders" statt "local").
+
+---
+
+### Bug 60: Erweiterte Attribute verschwinden bei Reminders-Sync (7. Wiederholung)
+**Status:** ERLEDIGT
+**Prioritaet:** HOCH
+**Komplexitaet:** M (~40-50k Tokens)
+**Commit:** `341ea86`
+
+- **Location:** `Sources/Services/RemindersSyncService.swift`
+- **Problem:** 7. Wiederholung des Attributverlusts (Bug 18, 32, 34, 48, 57, 59, 60). Erweiterte Attribute (importance, urgency, estimatedDuration, taskType, tags) verschwinden nach Reminders-Sync.
+- **Root Causes (5 strukturelle Probleme):**
+  1. `externalID` wird auf nil gesetzt — macht Recovery permanent unmoeglich
+  2. `isCompleted=true` blockiert Orphan-Recovery (Predicate filtert sie aus)
+  3. Kein Title-Match fuer `sourceSystem="reminders"` Tasks
+  4. `calendarItemExternalIdentifier` aendert sich bei iCloud-Resync
+  5. `handleDeletedReminders` nutzt gefilterte statt aller IDs
+- **Fix:** 3 Aenderungen in RemindersSyncService:
+  1. Neuer 3-Stufen-Match: externalID → Titel (reminders) → Titel (orphan) → Neuanlage
+  2. `handleDeletedReminders` nutzt ALLE Reminder-IDs (nicht nur sichtbare Listen)
+  3. externalID und sourceSystem werden NIE geloescht — nur `isCompleted=true`
+- **Analyse:** `docs/artifacts/bug-60-attribute-loss/analysis.md` (5 Agenten parallel, 5 Hypothesen)
+- **Tests:** 6 Unit Tests (Bug60AttributeRecoveryTests) + 24 verwandte Sync-Tests alle GREEN.
 
 ---
 

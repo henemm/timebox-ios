@@ -106,12 +106,15 @@ final class RemindersSyncServiceTests: XCTestCase {
 
         _ = try await syncService.importFromReminders()
 
-        // The task should have been deleted
+        // Bug 60 Fix: Task is soft-deleted (marked completed), not removed.
+        // externalID and sourceSystem stay intact for recovery.
         let descriptor = FetchDescriptor<LocalTask>(
             predicate: #Predicate { $0.externalID == "deleted-reminder-id" }
         )
         let remainingTasks = try modelContext.fetch(descriptor)
-        XCTAssertEqual(remainingTasks.count, 0, "Task should be deleted when reminder is hidden/deleted")
+        XCTAssertEqual(remainingTasks.count, 1, "Task must NOT be hard-deleted")
+        XCTAssertTrue(remainingTasks.first?.isCompleted ?? false, "Task must be marked as completed")
+        XCTAssertEqual(remainingTasks.first?.sourceSystem, "reminders", "sourceSystem stays reminders")
     }
 
     /// GIVEN: Reminders in visible and hidden lists

@@ -47,6 +47,12 @@ final class RemindersSyncService {
                 }
                 updateTask(existingTask, from: reminder)
                 importedTasks.append(existingTask)
+            } else if let reminderTask = try findReminderTask(byTitle: reminder.title) {
+                // Bug 60 Fix: ID changed but task found by title (sourceSystem="reminders").
+                // Update externalID to new value, preserve all attributes.
+                reminderTask.externalID = reminder.id
+                updateTask(reminderTask, from: reminder)
+                importedTasks.append(reminderTask)
             } else if let orphan = try findOrphanedTask(byTitle: reminder.title) {
                 // Bug 59 Fix: Restore orphaned task (preserves all user attributes)
                 orphan.sourceSystem = "reminders"
@@ -61,8 +67,9 @@ final class RemindersSyncService {
             }
         }
 
-        // Handle deleted/hidden reminders: set sourceSystem to "local"
-        try handleDeletedReminders(currentReminderIDs: Set(reminders.map(\.id)))
+        // Bug 60 Fix: Use ALL reminder IDs (not just visible-list filtered ones)
+        // so tasks from hidden lists are NOT wrongly marked as deleted.
+        try handleDeletedReminders(currentReminderIDs: Set(allReminders.map(\.id)))
 
         try modelContext.save()
         return importedTasks
@@ -162,6 +169,16 @@ final class RemindersSyncService {
         }
     }
 
+    /// Bug 60 Fix: Find existing reminders-sourced task by title.
+    /// Handles the case where calendarItemExternalIdentifier changed (Root Cause 4).
+    /// Also finds completed tasks so they can be reactivated (Root Cause 2).
+    private func findReminderTask(byTitle title: String) throws -> LocalTask? {
+        let descriptor = FetchDescriptor<LocalTask>(
+            predicate: #Predicate { $0.sourceSystem == "reminders" && $0.title == title }
+        )
+        return try modelContext.fetch(descriptor).first
+    }
+
     /// Bug 59 Fix: Find orphaned task by title match.
     /// Orphans are tasks soft-deleted by Bug 57 (sourceSystem="local", externalID=nil).
     private func findOrphanedTask(byTitle title: String) throws -> LocalTask? {
@@ -195,11 +212,10 @@ final class RemindersSyncService {
             guard let externalID = task.externalID else { continue }
 
             if !currentReminderIDs.contains(externalID) {
-                // Bug 57 Fix C: Soft-delete instead of hard-delete.
-                // Decouple from Reminders but preserve task and all attributes.
-                task.sourceSystem = "local"
-                task.externalID = nil
-                // Bug 59 Fix: Mark as completed (reminder was completed in Apple Reminders)
+                // Bug 60 Fix: Keep externalID and sourceSystem for future recovery.
+                // NEVER nil externalID — it makes recovery permanently impossible.
+                // NEVER change sourceSystem — it breaks title-based matching.
+                // Only mark as completed (reminder was completed/deleted in Apple Reminders).
                 task.isCompleted = true
                 task.completedAt = Date()
             }

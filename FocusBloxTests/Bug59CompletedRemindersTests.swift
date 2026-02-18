@@ -143,7 +143,8 @@ final class Bug59CompletedRemindersTests: XCTestCase {
         let remaining = all.first!
         XCTAssertTrue(remaining.isCompleted, "Task muss als erledigt markiert werden")
         XCTAssertNotNil(remaining.completedAt, "completedAt muss gesetzt werden")
-        XCTAssertEqual(remaining.sourceSystem, "local", "sourceSystem auf 'local' setzen")
+        // Bug 60 Fix: sourceSystem stays "reminders" (not "local") to enable recovery
+        XCTAssertEqual(remaining.sourceSystem, "reminders", "sourceSystem bleibt 'reminders' fuer Recovery")
         XCTAssertEqual(remaining.importance, 1, "Attribute muessen erhalten bleiben")
     }
 

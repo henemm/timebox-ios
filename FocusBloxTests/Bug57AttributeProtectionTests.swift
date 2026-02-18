@@ -50,8 +50,9 @@ final class Bug57AttributeProtectionTests: XCTestCase {
 
         // SOLL: Task existiert noch (Soft-Delete)
         XCTAssertEqual(remaining.count, 1, "Task darf NICHT geloescht werden bei fehlendem Reminder")
-        XCTAssertEqual(remaining.first?.sourceSystem, "local", "sourceSystem muss auf 'local' gesetzt werden")
-        XCTAssertNil(remaining.first?.externalID, "externalID muss nil sein nach Soft-Delete")
+        // Bug 60 Fix: sourceSystem and externalID stay intact for recovery
+        XCTAssertEqual(remaining.first?.sourceSystem, "reminders", "sourceSystem bleibt 'reminders' fuer Recovery")
+        XCTAssertEqual(remaining.first?.externalID, "reminder-abc", "externalID bleibt erhalten fuer Recovery")
     }
 
     /// GIVEN: Soft-deleted Task (ehemals Reminder)

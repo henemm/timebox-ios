@@ -1,0 +1,31 @@
+Test Case '-[FocusBloxTests.Bug60AttributeRecoveryTests testCompletedTaskReactivatedWhenReminderReappears]' started.
+Test Case '-[FocusBloxTests.Bug60AttributeRecoveryTests testCompletedTaskReactivatedWhenReminderReappears]' passed (0.063 seconds).
+Test Case '-[FocusBloxTests.Bug60AttributeRecoveryTests testDeletedReminderKeepsExternalID]' started.
+[CloudKit Sync] Setup FAILED: The operation couldn’t be completed. (Cocoa error 134400.)
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/Bug60AttributeRecoveryTests.swift:103: error: -[FocusBloxTests.Bug60AttributeRecoveryTests testDeletedReminderKeepsExternalID] : XCTAssertEqual failed: ("local") is not equal to ("reminders") - sourceSystem darf NICHT auf 'local' gesetzt werden
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/Bug60AttributeRecoveryTests.swift:104: error: -[FocusBloxTests.Bug60AttributeRecoveryTests testDeletedReminderKeepsExternalID] : XCTAssertEqual failed: ("nil") is not equal to ("Optional("reminder-to-complete")") - externalID darf NICHT auf nil gesetzt werden
+Test Case '-[FocusBloxTests.Bug60AttributeRecoveryTests testDeletedReminderKeepsExternalID]' failed (0.240 seconds).
+Test Case '-[FocusBloxTests.Bug60AttributeRecoveryTests testHiddenListTaskNotDeleted]' started.
+[CloudKit Sync] Setup FAILED: The operation couldn’t be completed. (Cocoa error 134400.)
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/Bug60AttributeRecoveryTests.swift:236: error: -[FocusBloxTests.Bug60AttributeRecoveryTests testHiddenListTaskNotDeleted] : XCTAssertEqual failed: ("Optional("local")") is not equal to ("Optional("reminders")") - sourceSystem darf nicht geaendert werden
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/Bug60AttributeRecoveryTests.swift:237: error: -[FocusBloxTests.Bug60AttributeRecoveryTests testHiddenListTaskNotDeleted] : XCTAssertEqual failed: ("nil") is not equal to ("Optional("hidden-reminder")") - externalID darf nicht geloescht werden
+Test Case '-[FocusBloxTests.Bug60AttributeRecoveryTests testHiddenListTaskNotDeleted]' failed (0.041 seconds).
+Test Case '-[FocusBloxTests.Bug60AttributeRecoveryTests testIDChangeAndCompletedTaskRecovery]' started.
+[CloudKit Sync] Setup FAILED: The operation couldn’t be completed. (Cocoa error 134400.)
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/Bug60AttributeRecoveryTests.swift:180: error: -[FocusBloxTests.Bug60AttributeRecoveryTests testIDChangeAndCompletedTaskRecovery] : XCTAssertEqual failed: ("2") is not equal to ("1") - Kein Duplikat — Task per Titel wiedererkannt trotz neuer ID + completed
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/Bug60AttributeRecoveryTests.swift:182: error: -[FocusBloxTests.Bug60AttributeRecoveryTests testIDChangeAndCompletedTaskRecovery] : XCTAssertEqual failed: ("nil") is not equal to ("Optional("new-steuer-id")") - externalID auf neue ID aktualisiert
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/Bug60AttributeRecoveryTests.swift:183: error: -[FocusBloxTests.Bug60AttributeRecoveryTests testIDChangeAndCompletedTaskRecovery] : XCTAssertFalse failed - Task reaktiviert
+Test Case '-[FocusBloxTests.Bug60AttributeRecoveryTests testIDChangeAndCompletedTaskRecovery]' failed (0.038 seconds).
+Test Case '-[FocusBloxTests.Bug60AttributeRecoveryTests testIDChangePreservesAttributes]' started.
+[CloudKit Sync] Setup FAILED: The operation couldn’t be completed. (Cocoa error 134400.)
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/Bug60AttributeRecoveryTests.swift:62: error: -[FocusBloxTests.Bug60AttributeRecoveryTests testIDChangePreservesAttributes] : XCTAssertEqual failed: ("2") is not equal to ("1") - Kein Duplikat — Task per Titel wiedererkannt
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/Bug60AttributeRecoveryTests.swift:65: error: -[FocusBloxTests.Bug60AttributeRecoveryTests testIDChangePreservesAttributes] : XCTAssertEqual failed: ("nil") is not equal to ("Optional("new-external-id")") - externalID muss auf neue ID aktualisiert werden
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/Bug60AttributeRecoveryTests.swift:66: error: -[FocusBloxTests.Bug60AttributeRecoveryTests testIDChangePreservesAttributes] : XCTAssertEqual failed: ("local") is not equal to ("reminders") - sourceSystem muss reminders bleiben
+Test Case '-[FocusBloxTests.Bug60AttributeRecoveryTests testIDChangePreservesAttributes]' failed (0.034 seconds).
+Test Case '-[FocusBloxTests.Bug60AttributeRecoveryTests testNormalSyncPreservesAttributes]' started.
+[CloudKit Sync] Setup FAILED: The operation couldn’t be completed. (Cocoa error 134400.)
+Test Case '-[FocusBloxTests.Bug60AttributeRecoveryTests testNormalSyncPreservesAttributes]' passed (0.029 seconds).
+Test Suite 'Bug60AttributeRecoveryTests' failed at 2026-02-18 19:42:01.359.
+Test Suite 'FocusBloxTests.xctest' failed at 2026-02-18 19:42:01.359.
+Test Suite 'Selected tests' failed at 2026-02-18 19:42:01.359.
+** TEST FAILED **
