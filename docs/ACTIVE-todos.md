@@ -437,6 +437,13 @@ Siri liest den Screen-Inhalt anderer Apps (wenn diese ihn exponieren). User sagt
 
 ## ✅ Kuerzlich erledigt
 
+### Fix: Watch App Icon fehlte in Companion App
+**Status:** ERLEDIGT (2026-02-18)
+**Dateien:** `FocusBloxWatch Watch App/Assets.xcassets/AppIcon.appiconset/AppIcon.png` (neu), `Contents.json`
+**Loesung:** iOS App-Icon (1024x1024) in Watch-Assets kopiert und Contents.json referenziert.
+
+---
+
 ### Feature: Watch Voice Capture — Button → Spracheingabe → Task im Backlog
 **Status:** ERLEDIGT (2026-02-17)
 **Dateien:** `WatchLocalTask.swift`, `WatchTaskMetadata.swift` (neu), `FocusBloxWatchApp.swift`, `ContentView.swift` (Watch), `Entitlements`
