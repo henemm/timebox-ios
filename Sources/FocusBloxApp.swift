@@ -248,6 +248,7 @@ struct FocusBloxApp: App {
                     syncMonitor.triggerSync()
                     checkCCQuickCaptureTrigger()
                     syncedSettings.pushToCloud()
+                    rescheduleDueDateNotifications()
                 }
             }
             .onOpenURL { url in
@@ -280,6 +281,20 @@ struct FocusBloxApp: App {
             await MainActor.run {
                 permissionRequested = true
             }
+        }
+    }
+
+    /// Batch reschedule due date notifications for all tasks with due dates.
+    private func rescheduleDueDateNotifications() {
+        let context = sharedModelContainer.mainContext
+        do {
+            let allTasks = try context.fetch(FetchDescriptor<LocalTask>())
+            let tasksWithDueDate = allTasks
+                .filter { $0.dueDate != nil && !$0.isCompleted }
+                .map { (id: $0.id, title: $0.title, dueDate: $0.dueDate!) }
+            NotificationService.rescheduleAllDueDateNotifications(tasks: tasksWithDueDate)
+        } catch {
+            print("Failed to fetch tasks for due date notifications: \(error)")
         }
     }
 

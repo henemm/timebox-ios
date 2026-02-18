@@ -364,7 +364,7 @@ struct TaskFormSheet: View {
             Task {
                 do {
                     let taskSource = LocalTaskSource(modelContext: modelContext)
-                    _ = try await taskSource.createTask(
+                    let newTask = try await taskSource.createTask(
                         title: title.trimmingCharacters(in: .whitespaces),
                         tags: tags,
                         dueDate: finalDueDate,
@@ -377,6 +377,15 @@ struct TaskFormSheet: View {
                         recurrenceMonthDay: monthDayValue,
                         description: finalDescription
                     )
+
+                    // Schedule due date notifications
+                    if let taskDueDate = newTask.dueDate {
+                        NotificationService.scheduleDueDateNotifications(
+                            taskID: newTask.id,
+                            title: newTask.title,
+                            dueDate: taskDueDate
+                        )
+                    }
 
                     await MainActor.run {
                         onCreateComplete?()

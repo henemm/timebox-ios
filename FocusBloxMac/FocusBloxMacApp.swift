@@ -136,6 +136,11 @@ struct FocusBloxMacApp: App {
                         container: container,
                         eventKitRepository: eventKitRepository
                     )
+                    // Request notification permission + schedule due date notifications
+                    Task {
+                        _ = await NotificationService.requestPermission()
+                        rescheduleDueDateNotifications()
+                    }
                 }
                 .onOpenURL { url in
                     handleURL(url)
@@ -193,6 +198,19 @@ struct FocusBloxMacApp: App {
         Settings {
             MacSettingsView()
                 .environment(\.eventKitRepository, eventKitRepository)
+        }
+    }
+
+    private func rescheduleDueDateNotifications() {
+        let context = container.mainContext
+        do {
+            let allTasks = try context.fetch(FetchDescriptor<LocalTask>())
+            let tasksWithDueDate = allTasks
+                .filter { $0.dueDate != nil && !$0.isCompleted }
+                .map { (id: $0.id, title: $0.title, dueDate: $0.dueDate!) }
+            NotificationService.rescheduleAllDueDateNotifications(tasks: tasksWithDueDate)
+        } catch {
+            print("Failed to fetch tasks for due date notifications: \(error)")
         }
     }
 

@@ -130,6 +130,8 @@
 		DUEDT01BUILD000001 /* Date+DueDate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DUEDT01FILE0000001 /* Date+DueDate.swift */; };
 		DUEDT02BUILD000001 /* Date+DueDate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DUEDT01FILE0000001 /* Date+DueDate.swift */; };
 		DUEDT03BUILD000001 /* DueDateFormattingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DUEDT03FILE0000001 /* DueDateFormattingTests.swift */; };
+		DUEDN01BUILD000001 /* DueDateNotificationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DUEDN01FILE0000001 /* DueDateNotificationTests.swift */; };
+		DUEDN02BUILD000001 /* DueDateNotificationUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DUEDN02FILE0000001 /* DueDateNotificationUITests.swift */; };
 		DYNISLD01BUILD0001 /* DynamicIslandUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DYNISLD01FILE00001 /* DynamicIslandUITests.swift */; };
 		E6DF69A28B0DB868B330DADD /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5F22CE94E29A523114817BF /* ContentView.swift */; };
 		E907CB03C20C1B55A48C4B1B /* BacklogRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92133F2683BB9B90566D7646 /* BacklogRow.swift */; };
@@ -498,6 +500,8 @@
 		DSGNSYS02FILE00001 /* DesignSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignSystem.swift; sourceTree = "<group>"; };
 		DUEDT01FILE0000001 /* Date+DueDate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+DueDate.swift"; sourceTree = "<group>"; };
 		DUEDT03FILE0000001 /* DueDateFormattingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DueDateFormattingTests.swift; sourceTree = "<group>"; };
+		DUEDN01FILE0000001 /* DueDateNotificationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DueDateNotificationTests.swift; sourceTree = "<group>"; };
+		DUEDN02FILE0000001 /* DueDateNotificationUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DueDateNotificationUITests.swift; sourceTree = "<group>"; };
 		DYNISLD01FILE00001 /* DynamicIslandUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DynamicIslandUITests.swift; sourceTree = "<group>"; };
 		E1F3228806B919AB0836326F /* ReminderData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReminderData.swift; sourceTree = "<group>"; };
 		E6D939B402B46840351D9475 /* EventKitRepositoryProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventKitRepositoryProtocol.swift; sourceTree = "<group>"; };
@@ -863,6 +867,7 @@
 				UNIFTAB01UIREF01 /* UnifiedTabSymbolsUITests.swift */,
 				NXSWIPE01UIREF01 /* NextUpSwipeActionsUITests.swift */,
 				AISCORE01UIFILE001 /* AITaskScoringUITests.swift */,
+				DUEDN02FILE0000001 /* DueDateNotificationUITests.swift */,
 			);
 			path = FocusBloxUITests;
 			sourceTree = "<group>";
@@ -1066,6 +1071,7 @@
 				NXSWIPE01UTREF01 /* NextUpSwipeActionsTests.swift */,
 				4892A30CF9F39EBF000CC684 /* Bug57AttributeProtectionTests.swift */,
 				AISCORE01FILE00001 /* AITaskScoringServiceTests.swift */,
+				DUEDN01FILE0000001 /* DueDateNotificationTests.swift */,
 			);
 			path = FocusBloxTests;
 			sourceTree = "<group>";
@@ -1716,6 +1722,7 @@
 				RVWCT01BUILD0001 /* ReviewCompletedTasksUITests.swift in Sources */,
 				UNIFTAB01UIBLD01 /* UnifiedTabSymbolsUITests.swift in Sources */,
 				NXSWIPE01UIBLD01 /* NextUpSwipeActionsUITests.swift in Sources */,
+				DUEDN02BUILD000001 /* DueDateNotificationUITests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1771,6 +1778,7 @@
 				NXSWIPE01UTBLD01 /* NextUpSwipeActionsTests.swift in Sources */,
 				D3D1B820231CD738194C6187 /* Bug57AttributeProtectionTests.swift in Sources */,
 				AISCORE01BUILD0001 /* AITaskScoringServiceTests.swift in Sources */,
+				DUEDN01BUILD000001 /* DueDateNotificationTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -240,6 +240,15 @@ struct CreateTaskView: View {
                 let scoring = AITaskScoringService(modelContext: modelContext)
                 await scoring.scoreNewTask(newTask)
 
+                // Schedule due date notifications
+                if let taskDueDate = newTask.dueDate {
+                    NotificationService.scheduleDueDateNotifications(
+                        taskID: newTask.id,
+                        title: newTask.title,
+                        dueDate: taskDueDate
+                    )
+                }
+
                 await MainActor.run {
                     onSave?()
                     dismiss()

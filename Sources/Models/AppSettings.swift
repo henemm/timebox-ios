@@ -30,6 +30,23 @@ final class AppSettings: ObservableObject {
     /// Default duration for new tasks in minutes
     @AppStorage("defaultTaskDuration") var defaultTaskDuration: Int = 15
 
+    // MARK: - Due Date Notifications
+
+    /// Whether morning reminder on due date day is enabled
+    @AppStorage("dueDateMorningReminderEnabled") var dueDateMorningReminderEnabled: Bool = true
+
+    /// Hour for morning reminder (0-23)
+    @AppStorage("dueDateMorningReminderHour") var dueDateMorningReminderHour: Int = 9
+
+    /// Minute for morning reminder (0-59)
+    @AppStorage("dueDateMorningReminderMinute") var dueDateMorningReminderMinute: Int = 0
+
+    /// Whether advance reminder before due date is enabled
+    @AppStorage("dueDateAdvanceReminderEnabled") var dueDateAdvanceReminderEnabled: Bool = false
+
+    /// Minutes before due date for advance reminder
+    @AppStorage("dueDateAdvanceReminderMinutes") var dueDateAdvanceReminderMinutes: Int = 60
+
     // MARK: - AI Task Scoring (Apple Intelligence)
 
     /// Whether AI-powered task scoring is enabled

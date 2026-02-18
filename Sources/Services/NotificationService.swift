@@ -205,6 +205,141 @@ enum NotificationService {
         )
     }
 
+    // MARK: - Due Date Notifications
+
+    private static let dueDateMorningPrefix = "due-date-morning-"
+    private static let dueDateAdvancePrefix = "due-date-advance-"
+
+    /// Build a morning reminder request for the due date day (testable).
+    /// Returns nil if dueDate is past, morning time is after dueDate, or fire date is past.
+    static func buildDueDateMorningRequest(
+        taskID: String,
+        title: String,
+        dueDate: Date,
+        morningHour: Int,
+        morningMinute: Int,
+        now: Date = Date()
+    ) -> UNNotificationRequest? {
+        guard dueDate > now else { return nil }
+
+        let cal = Calendar.current
+        var comps = cal.dateComponents([.year, .month, .day], from: dueDate)
+        comps.hour = morningHour
+        comps.minute = morningMinute
+        comps.second = 0
+        guard let fireDate = cal.date(from: comps) else { return nil }
+
+        // Morning time must be before dueDate and in the future
+        guard fireDate < dueDate, fireDate > now else { return nil }
+
+        let content = UNMutableNotificationContent()
+        content.title = "Heute fällig"
+        content.body = "\(title) — pack ihn in einen Sprint"
+        content.sound = .default
+
+        let triggerComps = cal.dateComponents([.year, .month, .day, .hour, .minute], from: fireDate)
+        let trigger = UNCalendarNotificationTrigger(dateMatching: triggerComps, repeats: false)
+
+        return UNNotificationRequest(
+            identifier: "\(dueDateMorningPrefix)\(taskID)",
+            content: content,
+            trigger: trigger
+        )
+    }
+
+    /// Build an advance reminder request before the due date (testable).
+    /// Returns nil if dueDate is past or fire date would be in the past.
+    static func buildDueDateAdvanceRequest(
+        taskID: String,
+        title: String,
+        dueDate: Date,
+        advanceMinutes: Int,
+        now: Date = Date()
+    ) -> UNNotificationRequest? {
+        guard dueDate > now else { return nil }
+
+        let fireDate = dueDate.addingTimeInterval(-Double(advanceMinutes * 60))
+        guard fireDate > now else { return nil }
+
+        let timeInterval = fireDate.timeIntervalSince(now)
+
+        let content = UNMutableNotificationContent()
+        content.title = title
+        content.body = "\(title) ist in \(Self.formattedAdvanceDuration(advanceMinutes)) fällig"
+        content.sound = .default
+
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: timeInterval, repeats: false)
+
+        return UNNotificationRequest(
+            identifier: "\(dueDateAdvancePrefix)\(taskID)",
+            content: content,
+            trigger: trigger
+        )
+    }
+
+    /// Schedule both due date notifications for a task (reads settings).
+    static func scheduleDueDateNotifications(taskID: String, title: String, dueDate: Date) {
+        let settings = AppSettings.shared
+        let center = UNUserNotificationCenter.current()
+
+        if settings.dueDateMorningReminderEnabled {
+            if let req = buildDueDateMorningRequest(
+                taskID: taskID, title: title, dueDate: dueDate,
+                morningHour: settings.dueDateMorningReminderHour,
+                morningMinute: settings.dueDateMorningReminderMinute
+            ) { center.add(req) }
+        }
+
+        if settings.dueDateAdvanceReminderEnabled {
+            if let req = buildDueDateAdvanceRequest(
+                taskID: taskID, title: title, dueDate: dueDate,
+                advanceMinutes: settings.dueDateAdvanceReminderMinutes
+            ) { center.add(req) }
+        }
+    }
+
+    /// Cancel both pending due date notifications for a task.
+    static func cancelDueDateNotifications(taskID: String) {
+        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [
+            "\(dueDateMorningPrefix)\(taskID)",
+            "\(dueDateAdvancePrefix)\(taskID)"
+        ])
+    }
+
+    /// Batch: cancel all due date notifications and reschedule for up to 25 nearest tasks.
+    static func rescheduleAllDueDateNotifications(
+        tasks: [(id: String, title: String, dueDate: Date)]
+    ) {
+        let center = UNUserNotificationCenter.current()
+        center.getPendingNotificationRequests { requests in
+            let ids = requests.map(\.identifier)
+                .filter { $0.hasPrefix(dueDateMorningPrefix) || $0.hasPrefix(dueDateAdvancePrefix) }
+            center.removePendingNotificationRequests(withIdentifiers: ids)
+
+            let now = Date()
+            let sorted = tasks
+                .filter { $0.dueDate > now }
+                .sorted { $0.dueDate < $1.dueDate }
+                .prefix(25)
+
+            Task { @MainActor in
+                for task in sorted {
+                    scheduleDueDateNotifications(taskID: task.id, title: task.title, dueDate: task.dueDate)
+                }
+            }
+        }
+    }
+
+    /// Format advance minutes as human-readable duration.
+    private static func formattedAdvanceDuration(_ minutes: Int) -> String {
+        switch minutes {
+        case 1440: return "1 Tag"
+        case 120: return "2 Stunden"
+        case 60: return "1 Stunde"
+        default: return "\(minutes) Min"
+        }
+    }
+
     // MARK: - Cancel All
 
     /// Cancel all task notifications

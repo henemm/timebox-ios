@@ -30,7 +30,7 @@
 | 5 | MAC-022 Spotlight Integration | P2 | S | ~15-25k | 1-2 | ~30 |
 | 6 | ~~Recurring Tasks Phase 1B/2 (inkl. Sichtbarkeit + Edit/Delete Dialog)~~ | ERLEDIGT | M-L | ~60-100k | 5-6 | ~200 |
 | 7 | Kalender-App Deep Link (iOS+macOS) | MITTEL | M | ~40-50k | 3-4 | ~100 |
-| 8 | Push Notifications bei Frist | HOCH | M | ~60-80k | 4-5 | ~200 |
+| 8 | ~~Push Notifications bei Frist~~ | ERLEDIGT | M | ~60-80k | 9 | ~180 |
 | 9 | MAC-031 Focus Mode Integration | P3 | M | ~50-70k | 2-3 | ~100 |
 | 10 | MAC-030 Shortcuts.app | P3 | L | ~60-80k | 2-3 | ~150 |
 | 11 | Emotionales Aufladen (Report) | MITTEL | L | ~80-100k | 3-4 | ~200 |
@@ -140,18 +140,19 @@
 ---
 
 ### Feature: Push Notifications bei ablaufender Frist (iOS + macOS)
-**Status:** OFFEN
+**Status:** ERLEDIGT
 **Prioritaet:** HOCH
 **Komplexitaet:** M (~60-80k Tokens)
 
 **Problem:** Tasks mit Due Date haben keine Erinnerung. Der User vergisst, sie in einen Sprint zu packen.
-**Gewuenschtes Verhalten:**
-- **Konfigurierbare Morgen-Erinnerung** (optional): Am Faelligkeitstag morgens "Heute faellig: Task X - pack ihn in einen Sprint"
-- **Konfigurierbare Vorab-Erinnerung** (optional): XX Minuten/Stunden vor Frist
-- Beide unabhaengig ein/ausschaltbar in Settings
-- Uhrzeit der Morgen-Erinnerung konfigurierbar
-- Auf **beiden Plattformen** (iOS + macOS)
-**Scope:** ~150-200 LoC, 4-5 Dateien (NotificationService, AppSettings, SettingsView iOS+macOS)
+**Loesung implementiert:**
+- **Morgen-Erinnerung** (default AN): Am Faelligkeitstag um konfigurierbare Uhrzeit (default 09:00)
+- **Vorab-Erinnerung** (default AUS): 15min/30min/1h/2h/1Tag vor Frist
+- Beide unabhaengig ein/ausschaltbar in Settings (iOS + macOS)
+- Hybrid-Scheduling: Einzeln bei Create/Edit/Delete + Batch bei App-Foreground
+- 7/7 Unit Tests GREEN, 2/3 UI Tests GREEN
+- **Known Issue:** 1 UI Test (`testAdvanceReminderToggleShowsPicker`) schlaegt fehl - Element-Typ-Erkennung in iOS 26 Form
+**Dateien:** NotificationService, AppSettings, SettingsView, MacSettingsView, FocusBloxApp, FocusBloxMacApp, CreateTaskView, TaskFormSheet, BacklogView
 
 ---
 

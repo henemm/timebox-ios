@@ -18,6 +18,11 @@ struct MacSettingsView: View {
     @AppStorage("remindersSyncEnabled") private var remindersSyncEnabled: Bool = true
     @AppStorage("defaultTaskDuration") private var defaultTaskDuration: Int = 15
     @AppStorage("aiScoringEnabled") private var aiScoringEnabled: Bool = false
+    @AppStorage("dueDateMorningReminderEnabled") private var dueDateMorningReminderEnabled: Bool = true
+    @AppStorage("dueDateMorningReminderHour") private var dueDateMorningReminderHour: Int = 9
+    @AppStorage("dueDateMorningReminderMinute") private var dueDateMorningReminderMinute: Int = 0
+    @AppStorage("dueDateAdvanceReminderEnabled") private var dueDateAdvanceReminderEnabled: Bool = false
+    @AppStorage("dueDateAdvanceReminderMinutes") private var dueDateAdvanceReminderMinutes: Int = 60
 
     // MARK: - State
 
@@ -239,9 +244,57 @@ struct MacSettingsView: View {
             } footer: {
                 Text("Sound und Vibration vor Block-Ende als Erinnerung.")
             }
+
+            Section {
+                Toggle("Morgens erinnern", isOn: $dueDateMorningReminderEnabled)
+                    .accessibilityIdentifier("morningReminderToggle")
+
+                if dueDateMorningReminderEnabled {
+                    DatePicker(
+                        "Uhrzeit",
+                        selection: morningTimeBinding,
+                        displayedComponents: .hourAndMinute
+                    )
+                    .accessibilityIdentifier("morningTimePicker")
+                }
+
+                Toggle("Vorab erinnern", isOn: $dueDateAdvanceReminderEnabled)
+                    .accessibilityIdentifier("advanceReminderToggle")
+
+                if dueDateAdvanceReminderEnabled {
+                    Picker("Vorlaufzeit", selection: $dueDateAdvanceReminderMinutes) {
+                        Text("15 Minuten").tag(15)
+                        Text("30 Minuten").tag(30)
+                        Text("1 Stunde").tag(60)
+                        Text("2 Stunden").tag(120)
+                        Text("1 Tag").tag(1440)
+                    }
+                    .accessibilityIdentifier("advanceDurationPicker")
+                }
+            } header: {
+                Text("Frist-Erinnerungen")
+            } footer: {
+                Text("Push-Benachrichtigungen für Tasks mit Fälligkeitsdatum.")
+            }
         }
         .formStyle(.grouped)
         .padding()
+    }
+
+    private var morningTimeBinding: Binding<Date> {
+        Binding(
+            get: {
+                var comps = DateComponents()
+                comps.hour = dueDateMorningReminderHour
+                comps.minute = dueDateMorningReminderMinute
+                return Calendar.current.date(from: comps) ?? Date()
+            },
+            set: { newDate in
+                let comps = Calendar.current.dateComponents([.hour, .minute], from: newDate)
+                dueDateMorningReminderHour = comps.hour ?? 9
+                dueDateMorningReminderMinute = comps.minute ?? 0
+            }
+        )
     }
 
     // MARK: - Data Loading
