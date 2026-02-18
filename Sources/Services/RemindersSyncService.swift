@@ -40,9 +40,19 @@ final class RemindersSyncService {
 
         for reminder in reminders {
             if let existingTask = try findTask(byExternalID: reminder.id) {
-                // Update existing task with Apple data (preserve local fields)
+                // Bug 59 Fix: Recover attributes from orphaned duplicate
+                if let orphan = try findOrphanedTask(byTitle: reminder.title) {
+                    transferAttributes(from: orphan, to: existingTask)
+                    modelContext.delete(orphan)
+                }
                 updateTask(existingTask, from: reminder)
                 importedTasks.append(existingTask)
+            } else if let orphan = try findOrphanedTask(byTitle: reminder.title) {
+                // Bug 59 Fix: Restore orphaned task (preserves all user attributes)
+                orphan.sourceSystem = "reminders"
+                orphan.externalID = reminder.id
+                updateTask(orphan, from: reminder)
+                importedTasks.append(orphan)
             } else {
                 // Create new LocalTask
                 let newTask = createTask(from: reminder)
@@ -152,6 +162,32 @@ final class RemindersSyncService {
         }
     }
 
+    /// Bug 59 Fix: Find orphaned task by title match.
+    /// Orphans are tasks soft-deleted by Bug 57 (sourceSystem="local", externalID=nil).
+    private func findOrphanedTask(byTitle title: String) throws -> LocalTask? {
+        let descriptor = FetchDescriptor<LocalTask>(
+            predicate: #Predicate { $0.sourceSystem == "local" && $0.externalID == nil && $0.title == title && $0.isCompleted == false }
+        )
+        return try modelContext.fetch(descriptor).first
+    }
+
+    /// Bug 59 Fix: Transfer user-entered attributes from orphan to existing task.
+    /// Only transfers values that the target task doesn't already have.
+    private func transferAttributes(from source: LocalTask, to target: LocalTask) {
+        if target.importance == nil, let imp = source.importance { target.importance = imp }
+        if target.urgency == nil { target.urgency = source.urgency }
+        if (target.taskType.isEmpty || target.taskType == "inbox"), !source.taskType.isEmpty, source.taskType != "inbox" { target.taskType = source.taskType }
+        if target.estimatedDuration == nil { target.estimatedDuration = source.estimatedDuration }
+        if target.tags.isEmpty, !source.tags.isEmpty { target.tags = source.tags }
+        if target.aiScore == nil { target.aiScore = source.aiScore }
+        if target.aiEnergyLevel == nil { target.aiEnergyLevel = source.aiEnergyLevel }
+        if target.taskDescription == nil { target.taskDescription = source.taskDescription }
+        if !target.isNextUp, source.isNextUp {
+            target.isNextUp = true
+            target.nextUpSortOrder = source.nextUpSortOrder
+        }
+    }
+
     private func handleDeletedReminders(currentReminderIDs: Set<String>) throws {
         let reminderTasks = try fetchReminderSourcedTasks()
 
@@ -163,6 +199,9 @@ final class RemindersSyncService {
                 // Decouple from Reminders but preserve task and all attributes.
                 task.sourceSystem = "local"
                 task.externalID = nil
+                // Bug 59 Fix: Mark as completed (reminder was completed in Apple Reminders)
+                task.isCompleted = true
+                task.completedAt = Date()
             }
         }
     }

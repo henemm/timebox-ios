@@ -130,6 +130,7 @@
 		DUEDT01BUILD000001 /* Date+DueDate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DUEDT01FILE0000001 /* Date+DueDate.swift */; };
 		DUEDT02BUILD000001 /* Date+DueDate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DUEDT01FILE0000001 /* Date+DueDate.swift */; };
 		DUEDT03BUILD000001 /* DueDateFormattingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DUEDT03FILE0000001 /* DueDateFormattingTests.swift */; };
+		BUG59BUILD000001 /* Bug59CompletedRemindersTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BUG59FILE0000001 /* Bug59CompletedRemindersTests.swift */; };
 		DUEDN01BUILD000001 /* DueDateNotificationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DUEDN01FILE0000001 /* DueDateNotificationTests.swift */; };
 		DUEDN02BUILD000001 /* DueDateNotificationUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DUEDN02FILE0000001 /* DueDateNotificationUITests.swift */; };
 		DYNISLD01BUILD0001 /* DynamicIslandUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DYNISLD01FILE00001 /* DynamicIslandUITests.swift */; };
@@ -500,6 +501,7 @@
 		DSGNSYS02FILE00001 /* DesignSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignSystem.swift; sourceTree = "<group>"; };
 		DUEDT01FILE0000001 /* Date+DueDate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+DueDate.swift"; sourceTree = "<group>"; };
 		DUEDT03FILE0000001 /* DueDateFormattingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DueDateFormattingTests.swift; sourceTree = "<group>"; };
+		BUG59FILE0000001 /* Bug59CompletedRemindersTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bug59CompletedRemindersTests.swift; sourceTree = "<group>"; };
 		DUEDN01FILE0000001 /* DueDateNotificationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DueDateNotificationTests.swift; sourceTree = "<group>"; };
 		DUEDN02FILE0000001 /* DueDateNotificationUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DueDateNotificationUITests.swift; sourceTree = "<group>"; };
 		DYNISLD01FILE00001 /* DynamicIslandUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DynamicIslandUITests.swift; sourceTree = "<group>"; };
@@ -1072,6 +1074,7 @@
 				4892A30CF9F39EBF000CC684 /* Bug57AttributeProtectionTests.swift */,
 				AISCORE01FILE00001 /* AITaskScoringServiceTests.swift */,
 				DUEDN01FILE0000001 /* DueDateNotificationTests.swift */,
+				BUG59FILE0000001 /* Bug59CompletedRemindersTests.swift */,
 			);
 			path = FocusBloxTests;
 			sourceTree = "<group>";
@@ -1779,6 +1782,7 @@
 				D3D1B820231CD738194C6187 /* Bug57AttributeProtectionTests.swift in Sources */,
 				AISCORE01BUILD0001 /* AITaskScoringServiceTests.swift in Sources */,
 				DUEDN01BUILD000001 /* DueDateNotificationTests.swift in Sources */,
+				BUG59BUILD000001 /* Bug59CompletedRemindersTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

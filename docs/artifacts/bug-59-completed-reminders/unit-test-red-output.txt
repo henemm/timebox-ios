@@ -1,0 +1,24 @@
+Bug 59 Unit Test RED Output
+============================
+Date: 2026-02-18T15:10:00+01:00
+Test Suite: Bug59CompletedRemindersTests
+
+Result: 3/4 FAILED (as expected - TDD RED)
+
+Failed Tests:
+- testOrphanRestoredWhenNoExistingTask: FAILED
+  Reason: findOrphanedTask(byTitle:) does not exist, orphan not recovered
+
+- testAttributeTransferFromOrphanToExisting: FAILED
+  Reason: transferAttributes(from:to:) does not exist, no attribute recovery
+
+- testDeletedReminderMarkedAsCompleted: FAILED
+  Reason: handleDeletedReminders() does not set isCompleted=true
+
+Passed Tests:
+- testNewReminderCreatesTaskNormally: PASSED
+  Reason: Basic import path works (no regression)
+
+Command: xcodebuild test -project FocusBlox.xcodeproj -scheme FocusBlox -destination 'id=6364A54B-5048-4346-899E-FFB67E630D53' -only-testing:"FocusBloxTests/Bug59CompletedRemindersTests"
+
+** TEST FAILED **
