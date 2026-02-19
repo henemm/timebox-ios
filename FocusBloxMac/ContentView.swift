@@ -51,10 +51,16 @@ struct ContentView: View {
     @State private var sharedDate = Date()
     @State private var highlightedBlockID: String?
 
-    // Sync state (Reminders)
+    // Reminders import
     @State private var isSyncing = false
-    @State private var syncError: String?
-    @State private var lastSyncDate: Date?
+    @State private var importStatusMessage: String?
+
+    private var remindersSyncEnabled: Bool {
+        UserDefaults.standard.bool(forKey: "remindersSyncEnabled")
+    }
+    private var remindersMarkCompleteOnImport: Bool {
+        UserDefaults.standard.bool(forKey: "remindersMarkCompleteOnImport")
+    }
 
     // CloudKit sync monitor
     @Environment(CloudKitSyncMonitor.self) private var cloudKitMonitor
@@ -433,13 +439,24 @@ struct ContentView: View {
             ToolbarItem {
                 Button {
                     cloudKitMonitor.triggerSync()
-                    Task { await syncWithReminders() }
                 } label: {
                     Image(systemName: "arrow.triangle.2.circlepath")
                 }
-                .disabled(isSyncing)
                 .accessibilityIdentifier("syncButton")
-                .help("CloudKit & Erinnerungen synchronisieren")
+                .help("CloudKit synchronisieren")
+            }
+
+            if remindersSyncEnabled {
+                ToolbarItem {
+                    Button {
+                        Task { await importFromReminders() }
+                    } label: {
+                        Image(systemName: "square.and.arrow.down")
+                    }
+                    .disabled(isSyncing)
+                    .accessibilityIdentifier("importRemindersButton")
+                    .help("Erinnerungen importieren")
+                }
             }
 
             ToolbarItem {
@@ -448,8 +465,7 @@ struct ContentView: View {
             }
         }
         .task {
-            // Sync on appear if enabled
-            await syncWithReminders()
+            cloudKitMonitor.triggerSync()
         }
         .confirmationDialog(
             "Wiederkehrende Aufgabe löschen",
@@ -581,44 +597,40 @@ struct ContentView: View {
 
     // MARK: - Sync Actions
 
-    private func syncWithReminders() async {
-        // Default to enabled if not set
-        if !UserDefaults.standard.bool(forKey: "remindersSyncEnabledSet") {
-            UserDefaults.standard.set(true, forKey: "remindersSyncEnabled")
-            UserDefaults.standard.set(true, forKey: "remindersSyncEnabledSet")
-        }
-
-        guard UserDefaults.standard.bool(forKey: "remindersSyncEnabled") else { return }
-
-        // Throttle: max once per 60 seconds to prevent race conditions with unsaved edits
-        if let lastSync = lastSyncDate, Date().timeIntervalSince(lastSync) < 60 {
-            return
-        }
-
+    private func importFromReminders() async {
         isSyncing = true
-        syncError = nil
 
         do {
-            // Request access if needed
             let hasAccess = try await eventKitRepo.requestReminderAccess()
             guard hasAccess else {
-                syncError = "Kein Zugriff auf Erinnerungen"
+                importStatusMessage = "Kein Zugriff auf Erinnerungen"
                 isSyncing = false
                 return
             }
 
-            // Import from Reminders
-            let syncService = RemindersSyncService(
+            let importService = RemindersImportService(
                 eventKitRepo: eventKitRepo,
                 modelContext: modelContext
             )
-            _ = try await syncService.importFromReminders()
-            lastSyncDate = Date()
+            let result = try await importService.importAll(
+                markCompleteInReminders: remindersMarkCompleteOnImport
+            )
+
+            if result.imported.isEmpty && result.skippedDuplicates == 0 {
+                importStatusMessage = "Keine neuen Erinnerungen"
+            } else if result.imported.isEmpty {
+                importStatusMessage = "\(result.skippedDuplicates) bereits vorhanden"
+            } else {
+                importStatusMessage = "\(result.imported.count) importiert"
+            }
         } catch {
-            syncError = error.localizedDescription
+            importStatusMessage = "Import fehlgeschlagen"
         }
 
         isSyncing = false
+
+        try? await Task.sleep(for: .seconds(2))
+        importStatusMessage = nil
     }
 
     // MARK: - Task Actions

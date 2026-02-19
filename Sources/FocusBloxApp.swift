@@ -226,9 +226,10 @@ struct FocusBloxApp: App {
             .onAppear {
                 syncMonitor.startRemoteChangeMonitoring(container: sharedModelContainer)
                 resetUserDefaultsIfNeeded()
-                // Dedup cleanup for Bug 34 (Reminders duplicates after CloudKit activation)
-                // Runs every launch - idempotent and fast (no-op if no reminders tasks exist)
+                // Migrate reminders-sourced tasks to local (one-time, idempotent)
+                // Then run existing dedup cleanup
                 if !ProcessInfo.processInfo.arguments.contains("-UITesting") {
+                    RemindersImportService.migrateRemindersToLocal(in: sharedModelContainer.mainContext)
                     Self.cleanupRemindersDuplicates(in: sharedModelContainer.mainContext)
                     Self.cleanupOrphanedBlockAssignments(in: sharedModelContainer.mainContext)
                     Self.forceCloudKitFieldSync(in: sharedModelContainer.mainContext)

@@ -16,6 +16,7 @@ struct MacSettingsView: View {
     @AppStorage("warningEnabled") private var warningEnabled: Bool = true
     @AppStorage("warningTiming") private var warningTimingRaw: Int = 80
     @AppStorage("remindersSyncEnabled") private var remindersSyncEnabled: Bool = true
+    @AppStorage("remindersMarkCompleteOnImport") private var remindersMarkCompleteOnImport: Bool = true
     @AppStorage("defaultTaskDuration") private var defaultTaskDuration: Int = 15
     @AppStorage("aiScoringEnabled") private var aiScoringEnabled: Bool = false
     @AppStorage("dueDateMorningReminderEnabled") private var dueDateMorningReminderEnabled: Bool = true
@@ -172,12 +173,17 @@ struct MacSettingsView: View {
     private var remindersTab: some View {
         Form {
             Section {
-                Toggle("Mit Apple Erinnerungen synchronisieren", isOn: $remindersSyncEnabled)
+                Toggle("Erinnerungen importieren", isOn: $remindersSyncEnabled)
                     .accessibilityIdentifier("remindersSyncToggle")
+
+                if remindersSyncEnabled {
+                    Toggle("Nach Import abhaken", isOn: $remindersMarkCompleteOnImport)
+                        .accessibilityIdentifier("remindersMarkCompleteToggle")
+                }
             } header: {
-                Text("Synchronisation")
+                Text("Import")
             } footer: {
-                Text("Tasks aus Apple Erinnerungen werden automatisch in den Backlog importiert.")
+                Text("Ermöglicht manuellen Import von Apple Erinnerungen als lokale Tasks. Importierte Erinnerungen können optional in Apple Erinnerungen als erledigt markiert werden.")
             }
 
             if !hasReminderAccess && remindersSyncEnabled {

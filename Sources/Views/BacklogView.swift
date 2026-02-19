@@ -60,9 +60,11 @@ struct BacklogView: View {
     @Environment(CloudKitSyncMonitor.self) private var cloudKitMonitor
     @AppStorage("backlogViewMode") private var selectedMode: ViewMode = .list
     @AppStorage("remindersSyncEnabled") private var remindersSyncEnabled: Bool = false
+    @AppStorage("remindersMarkCompleteOnImport") private var remindersMarkCompleteOnImport: Bool = true
     @State private var planItems: [PlanItem] = []
     @State private var errorMessage: String?
     @State private var isLoading = false
+    @State private var importStatusMessage: String?
     @State private var reorderTrigger = false
     @State private var selectedItemForDuration: PlanItem?
     @State private var selectedItemForImportance: PlanItem?
@@ -251,6 +253,15 @@ struct BacklogView: View {
                 ToolbarItemGroup(placement: .topBarTrailing) {
                     viewModeSwitcher
 
+                    if remindersSyncEnabled {
+                        Button {
+                            Task { await importFromReminders() }
+                        } label: {
+                            Image(systemName: "square.and.arrow.down")
+                        }
+                        .accessibilityIdentifier("importRemindersButton")
+                    }
+
                     Button {
                         showCreateTask = true
                     } label: {
@@ -260,6 +271,18 @@ struct BacklogView: View {
                 }
             }
             .withSettingsToolbar()
+            .overlay(alignment: .bottom) {
+                if let message = importStatusMessage {
+                    Text(message)
+                        .font(.subheadline.weight(.medium))
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 8)
+                        .background(.ultraThinMaterial, in: Capsule())
+                        .padding(.bottom, 16)
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
+                        .animation(.spring(), value: importStatusMessage)
+                }
+            }
             .sensoryFeedback(.impact(weight: .medium), trigger: reorderTrigger)
             .sensoryFeedback(.success, trigger: durationFeedback)
             .sensoryFeedback(.success, trigger: nextUpFeedback)
@@ -387,38 +410,51 @@ struct BacklogView: View {
         isLoading = true
         errorMessage = nil
 
-        // Read directly from UserDefaults to ensure we get the latest value
-        // (@AppStorage may not update when view is not active in tab/modal scenarios)
-        let syncEnabled = UserDefaults.standard.bool(forKey: "remindersSyncEnabled")
-
         do {
-            // 1. Wenn Sync aktiviert UND CloudKit nicht aktiv: Reminders importieren
-            // Bei aktivem CloudKit synct macOS die Reminders-Daten via iCloud.
-            // Direkter Reminders-Import auf iOS wuerde Duplikate erzeugen (Bug 34).
-            let isCloudKitActive = FileManager.default.containerURL(
-                forSecurityApplicationGroupIdentifier: "group.com.henning.focusblox"
-            ) != nil && !ProcessInfo.processInfo.arguments.contains("-UITesting")
-
-            if syncEnabled && !isCloudKitActive {
-                let syncService = RemindersSyncService(
-                    eventKitRepo: eventKitRepo,
-                    modelContext: modelContext
-                )
-                _ = try await syncService.importFromReminders()
-            }
-
-            // 2. Alle lokalen Tasks laden (inkl. importierter Reminders)
             let taskSource = LocalTaskSource(modelContext: modelContext)
             let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
             planItems = try await syncEngine.sync()
-
-            // 3. Erledigte Tasks der letzten 7 Tage laden
             completedTasks = try await syncEngine.syncCompletedTasks(days: 7)
         } catch {
             errorMessage = error.localizedDescription
         }
 
         isLoading = false
+    }
+
+    private func importFromReminders() async {
+        do {
+            let hasAccess = try await eventKitRepo.requestReminderAccess()
+            guard hasAccess else {
+                importStatusMessage = "Kein Zugriff auf Erinnerungen"
+                return
+            }
+
+            let importService = RemindersImportService(
+                eventKitRepo: eventKitRepo,
+                modelContext: modelContext
+            )
+            let result = try await importService.importAll(
+                markCompleteInReminders: remindersMarkCompleteOnImport
+            )
+
+            if result.imported.isEmpty && result.skippedDuplicates == 0 {
+                importStatusMessage = "Keine neuen Erinnerungen"
+            } else if result.imported.isEmpty {
+                importStatusMessage = "\(result.skippedDuplicates) bereits vorhanden"
+            } else {
+                importStatusMessage = "\(result.imported.count) importiert"
+            }
+
+            // Reload to show imported tasks
+            await loadTasks()
+        } catch {
+            importStatusMessage = "Import fehlgeschlagen"
+        }
+
+        // Auto-dismiss after 2 seconds
+        try? await Task.sleep(for: .seconds(2))
+        importStatusMessage = nil
     }
 
     /// Refresh tasks from local database only - no loading indicator, no Reminders import.

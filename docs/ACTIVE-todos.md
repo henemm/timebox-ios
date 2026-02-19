@@ -106,6 +106,25 @@
 
 ---
 
+### Refactoring: Reminders Import-Only (statt bidirektionalem Sync)
+**Status:** IN ARBEIT
+**Prioritaet:** HOCH
+**Komplexitaet:** M (~40-60k Tokens)
+
+- **Problem:** Bidirektionaler Reminders-Sync hat 7 Bugs verursacht (18, 32, 34, 48, 57, 59, 60). Export-Code war toter Code. Auf iOS lief Import bei CloudKit-aktiven Geraeten nie.
+- **Loesung:** Komplett-Umbau auf Import-Only:
+  - Neuer `RemindersImportService` (Import-Only, kein Export, kein Auto-Sync)
+  - Import-Button in iOS Backlog + macOS Toolbar (statt automatischem Sync)
+  - Nach erfolgreichem Import optional Reminders in Apple Erinnerungen abhaken
+  - Migration bestehender "reminders"-Tasks zu "local" beim App-Start
+  - PlanningView markReminderComplete entfernt (kein Rueckkanal)
+  - Settings-Texte angepasst ("Importieren" statt "Synchronisieren")
+- **Commit 1:** Funktionale Aenderung (RemindersImportService, UI, Migration) — DONE
+- **Commit 2:** Alter RemindersSyncService + Bug-Tests loeschen, neue Tests — AUSSTEHEND
+- **Dateien:** `RemindersImportService.swift` (neu), `BacklogView.swift`, `ContentView.swift` (macOS), `SettingsView.swift`, `MacSettingsView.swift`, `FocusBloxApp.swift`, `PlanningView.swift`
+
+---
+
 ### Bug 59: Erledigte Apple Reminders erscheinen im Backlog
 **Status:** ERLEDIGT
 **Prioritaet:** HOCH

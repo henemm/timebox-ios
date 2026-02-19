@@ -172,6 +172,7 @@
 		MAC001BUILD00000011 /* LocalTaskSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 999C0690FA25D74051BA1C6F /* LocalTaskSource.swift */; };
 		MAC001BUILD00000012 /* EventKitRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4451B46B76517090C636FA94 /* EventKitRepository.swift */; };
 		MAC001BUILD00000013 /* RemindersSyncService.swift in Sources */ = {isa = PBXBuildFile; fileRef = REMSYNC3FILEREF0001 /* RemindersSyncService.swift */; };
+		REMIMPORT_BUILD_MAC /* RemindersImportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = REMIMPORT_FILEREF01 /* RemindersImportService.swift */; };
 		MAC001BUILD00000014 /* SoundService.swift in Sources */ = {isa = PBXBuildFile; fileRef = SNDSVC02FILEREF00001 /* SoundService.swift */; };
 		MAC001BUILD00000015 /* FocusBlockActionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBACTSVC01FILEREF001 /* FocusBlockActionService.swift */; };
 		MAC024BUILD00000001 /* EditFocusBlockSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 515D3A83205F8E00941BD4D0 /* EditFocusBlockSheet.swift */; };
@@ -202,6 +203,7 @@
 		REMSYNC1BUILDFILE001 /* RemindersSyncUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = REMSYNC1FILEREF0001 /* RemindersSyncUITests.swift */; };
 		REMSYNC2BUILDFILE001 /* RemindersSyncServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = REMSYNC2FILEREF0001 /* RemindersSyncServiceTests.swift */; };
 		REMSYNC3BUILDFILE001 /* RemindersSyncService.swift in Sources */ = {isa = PBXBuildFile; fileRef = REMSYNC3FILEREF0001 /* RemindersSyncService.swift */; };
+		REMIMPORT_BUILD_IOS /* RemindersImportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = REMIMPORT_FILEREF01 /* RemindersImportService.swift */; };
 		REMSYNC4BUILDFILE001 /* RemindersSyncE2ETests.swift in Sources */ = {isa = PBXBuildFile; fileRef = REMSYNC4FILEREF0001 /* RemindersSyncE2ETests.swift */; };
 		REVCATUI01BUILD0001 /* ReviewCategoryUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = REVCATUI01FILE0001 /* ReviewCategoryUITests.swift */; };
 		RVWCMP01BUILD00001 /* ReviewComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = RVWCMP01FILEREF001 /* ReviewComponents.swift */; };
@@ -564,6 +566,7 @@
 		REMSYNC1FILEREF0001 /* RemindersSyncUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemindersSyncUITests.swift; sourceTree = "<group>"; };
 		REMSYNC2FILEREF0001 /* RemindersSyncServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemindersSyncServiceTests.swift; sourceTree = "<group>"; };
 		REMSYNC3FILEREF0001 /* RemindersSyncService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemindersSyncService.swift; sourceTree = "<group>"; };
+		REMIMPORT_FILEREF01 /* RemindersImportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemindersImportService.swift; sourceTree = "<group>"; };
 		REMSYNC4FILEREF0001 /* RemindersSyncE2ETests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemindersSyncE2ETests.swift; sourceTree = "<group>"; };
 		REVCATUI01FILE0001 /* ReviewCategoryUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewCategoryUITests.swift; sourceTree = "<group>"; };
 		RVWCMP01FILEREF001 /* ReviewComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewComponents.swift; sourceTree = "<group>"; };
@@ -1020,6 +1023,7 @@
 				4451B46B76517090C636FA94 /* EventKitRepository.swift */,
 				LIVACT03FILEREF00001 /* LiveActivityManager.swift */,
 				REMSYNC3FILEREF0001 /* RemindersSyncService.swift */,
+				REMIMPORT_FILEREF01 /* RemindersImportService.swift */,
 				SNDSVC02FILEREF00001 /* SoundService.swift */,
 				TMRCALC01FILEREF001 /* TimerCalculator.swift */,
 				FBACTSVC01FILEREF001 /* FocusBlockActionService.swift */,
@@ -1551,6 +1555,7 @@
 				53697A70444E5ECF3B760A1C /* SyncEngine.swift in Sources */,
 				CKSM02BUILD00001 /* CloudKitSyncMonitor.swift in Sources */,
 				REMSYNC3BUILDFILE001 /* RemindersSyncService.swift in Sources */,
+				REMIMPORT_BUILD_IOS /* RemindersImportService.swift in Sources */,
 				RECRSVC02BUILD001 /* RecurrenceService.swift in Sources */,
 				AITASKSCOR0BUILD001 /* AITaskScoringService.swift in Sources */,
 				TPSCORING0BUILD001 /* TaskPriorityScoringService.swift in Sources */,
@@ -1774,6 +1779,7 @@
 				MAC001BUILD00000011 /* LocalTaskSource.swift in Sources */,
 				MAC001BUILD00000012 /* EventKitRepository.swift in Sources */,
 				MAC001BUILD00000013 /* RemindersSyncService.swift in Sources */,
+				REMIMPORT_BUILD_MAC /* RemindersImportService.swift in Sources */,
 				MAC001BUILD00000014 /* SoundService.swift in Sources */,
 				TMRCALC01BUILD00002 /* TimerCalculator.swift in Sources */,
 				CLRHEX01BUILD00002 /* Color+Hex.swift in Sources */,

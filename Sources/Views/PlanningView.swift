@@ -148,9 +148,6 @@ struct PlanningView: View {
                     reminderID: transfer.id
                 )
 
-                // Mark reminder as complete
-                try eventKitRepo.markReminderComplete(reminderID: transfer.id)
-
                 // Reload data to show new event
                 await loadData()
                 scheduleFeedback.toggle()

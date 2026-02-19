@@ -8,6 +8,7 @@ struct SettingsView: View {
     @AppStorage("warningEnabled") private var warningEnabled: Bool = true
     @AppStorage("warningTiming") private var warningTimingRaw: Int = WarningTiming.standard.rawValue
     @AppStorage("remindersSyncEnabled") private var remindersSyncEnabled: Bool = false
+    @AppStorage("remindersMarkCompleteOnImport") private var remindersMarkCompleteOnImport: Bool = true
     @AppStorage("defaultTaskDuration") private var defaultTaskDuration: Int = 15
     @AppStorage("aiScoringEnabled") private var aiScoringEnabled: Bool = false
     @AppStorage("dueDateMorningReminderEnabled") private var dueDateMorningReminderEnabled: Bool = true
@@ -147,16 +148,23 @@ struct SettingsView: View {
                     Text("Nur ausgewählte Kalender werden in der Timeline angezeigt.")
                 }
 
-                // Section 3: Apple Reminders Sync
+                // Section 3: Apple Reminders Import
                 Section {
                     Toggle(isOn: $remindersSyncEnabled) {
-                        Text("Mit Erinnerungen synchronisieren")
+                        Text("Erinnerungen importieren")
                     }
                     .accessibilityIdentifier("remindersSyncToggle")
+
+                    if remindersSyncEnabled {
+                        Toggle(isOn: $remindersMarkCompleteOnImport) {
+                            Text("Nach Import abhaken")
+                        }
+                        .accessibilityIdentifier("remindersMarkCompleteToggle")
+                    }
                 } header: {
                     Text("Apple Erinnerungen")
                 } footer: {
-                    Text("Tasks aus Apple Erinnerungen werden in den Backlog importiert.")
+                    Text("Ermöglicht manuellen Import von Apple Erinnerungen als lokale Tasks. Importierte Erinnerungen können optional in Apple Erinnerungen als erledigt markiert werden.")
                 }
 
                 // Section 4: Visible Reminder Lists (only shown when sync enabled)
