@@ -123,6 +123,7 @@
 - **Commit 2:** Alter RemindersSyncService + 5 Bug-Tests geloescht, 12 neue RemindersImportServiceTests, MockEventKitRepository erweitert
 - **Dateien:** `RemindersImportService.swift` (neu), `BacklogView.swift`, `ContentView.swift` (macOS), `SettingsView.swift`, `MacSettingsView.swift`, `FocusBloxApp.swift`, `PlanningView.swift`
 - **Tests:** 12 Unit Tests (Import, Duplikate, Filter, Priority, Mark-Complete, Migration) alle GREEN
+- **Nachfix:** `ReminderData.id` nutzte `calendarItemExternalIdentifier` statt `calendarItemIdentifier` — `markReminderComplete()` konnte Erinnerungen nicht finden (silent fail). Gefixt: `id = calendarItemIdentifier`.
 
 ---
 

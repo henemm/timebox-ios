@@ -11,14 +11,10 @@ struct ReminderData: Identifiable, Sendable {
     let calendarIdentifier: String?  // Which reminder list this belongs to
 
     init(from reminder: EKReminder) {
-        // Bug 57 Fix B: Use stable external identifier for cross-device sync.
-        // calendarItemIdentifier is NOT stable across syncs.
-        // Fallback to calendarItemIdentifier if external ID is nil/empty (new unsynced reminders).
-        if let externalID = reminder.calendarItemExternalIdentifier, !externalID.isEmpty {
-            self.id = externalID
-        } else {
-            self.id = reminder.calendarItemIdentifier
-        }
+        // Use calendarItemIdentifier — this is the ID that EventKit's
+        // calendarItem(withIdentifier:) accepts for markReminderComplete().
+        // calendarItemExternalIdentifier was used for bidirectional sync (removed).
+        self.id = reminder.calendarItemIdentifier
         self.title = reminder.title ?? "Untitled"
         self.isCompleted = reminder.isCompleted
         self.priority = reminder.priority
