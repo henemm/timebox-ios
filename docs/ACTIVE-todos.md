@@ -124,7 +124,8 @@
 - **Dateien:** `RemindersImportService.swift` (neu), `BacklogView.swift`, `ContentView.swift` (macOS), `SettingsView.swift`, `MacSettingsView.swift`, `FocusBloxApp.swift`, `PlanningView.swift`
 - **Tests:** 14 Unit Tests (Import, Duplikate, Filter, Priority, Mark-Complete, Migration, Failure-Reporting) alle GREEN
 - **Nachfix 1:** `ReminderData.id` nutzte `calendarItemExternalIdentifier` statt `calendarItemIdentifier` — `markReminderComplete()` konnte Erinnerungen nicht finden (silent fail). Gefixt: `id = calendarItemIdentifier`.
-- **Nachfix 2:** `ImportResult` meldet jetzt `markedComplete` + `markCompleteFailures`. Feedback-Text zeigt alle Ergebnisse (importiert, bereits vorhanden, Abhaken fehlgeschlagen). `withAnimation` fuer sichtbare Overlay-Transition. 3s statt 2s Anzeigedauer.
+- **Nachfix 2:** `ImportResult` meldet jetzt `markedComplete` + `markCompleteFailures`. Feedback-Text zeigt alle Ergebnisse (importiert, bereits vorhanden, Abhaken fehlgeschlagen).
+- **Nachfix 3:** macOS Import-Button war unsichtbar + kein Feedback. Root Cause: `UserDefaults.standard.bool()` statt `@AppStorage` (Default `false` statt `true`). Fix: `@AppStorage`, `os.Logger` fuer Debugging, `.alert()` statt Overlay (macOS Best Practice). `markReminderComplete()` wirft jetzt statt silent return.
 
 ---
 

@@ -8,6 +8,9 @@
 import SwiftUI
 import SwiftData
 import AppKit
+import os
+
+private let logger = Logger(subsystem: "com.henning.focusblox", category: "RemindersImport")
 
 // MARK: - Focused Values for Keyboard Commands
 
@@ -55,12 +58,8 @@ struct ContentView: View {
     @State private var isSyncing = false
     @State private var importStatusMessage: String?
 
-    private var remindersSyncEnabled: Bool {
-        UserDefaults.standard.bool(forKey: "remindersSyncEnabled")
-    }
-    private var remindersMarkCompleteOnImport: Bool {
-        UserDefaults.standard.bool(forKey: "remindersMarkCompleteOnImport")
-    }
+    @AppStorage("remindersSyncEnabled") private var remindersSyncEnabled: Bool = true
+    @AppStorage("remindersMarkCompleteOnImport") private var remindersMarkCompleteOnImport: Bool = true
 
     // CloudKit sync monitor
     @Environment(CloudKitSyncMonitor.self) private var cloudKitMonitor
@@ -197,6 +196,14 @@ struct ContentView: View {
             } else {
                 EmptyView()
             }
+        }
+        .alert("Erinnerungen importiert", isPresented: Binding(
+            get: { importStatusMessage != nil },
+            set: { if !$0 { importStatusMessage = nil } }
+        )) {
+            Button("OK") { importStatusMessage = nil }
+        } message: {
+            Text(importStatusMessage ?? "")
         }
         .frame(minWidth: 1000, minHeight: 600)
         .toolbar(id: "mainNavigation") {
@@ -598,12 +605,14 @@ struct ContentView: View {
     // MARK: - Sync Actions
 
     private func importFromReminders() async {
+        logger.info("Started")
         isSyncing = true
 
         do {
             let hasAccess = try await eventKitRepo.requestReminderAccess()
             guard hasAccess else {
-                withAnimation { importStatusMessage = "Kein Zugriff auf Erinnerungen" }
+                logger.warning("No access — user denied Reminders permission")
+                importStatusMessage = "Kein Zugriff auf Erinnerungen"
                 isSyncing = false
                 return
             }
@@ -616,18 +625,15 @@ struct ContentView: View {
                 markCompleteInReminders: remindersMarkCompleteOnImport
             )
 
-            withAnimation {
-                importStatusMessage = importFeedbackMessage(from: result)
-            }
+            logger.info("Done — \(result.imported.count) imported, \(result.skippedDuplicates) skipped, \(result.markedComplete) marked complete, \(result.markCompleteFailures) mark-complete failures")
+
+            importStatusMessage = importFeedbackMessage(from: result)
         } catch {
-            withAnimation { importStatusMessage = "Import fehlgeschlagen" }
+            logger.error("Failed: \(error.localizedDescription)")
+            importStatusMessage = "Import fehlgeschlagen: \(error.localizedDescription)"
         }
 
         isSyncing = false
-
-        // Auto-dismiss after 3 seconds
-        try? await Task.sleep(for: .seconds(3))
-        withAnimation { importStatusMessage = nil }
     }
 
     private func importFeedbackMessage(from result: RemindersImportService.ImportResult) -> String {

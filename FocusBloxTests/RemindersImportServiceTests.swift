@@ -288,9 +288,8 @@ final class RemindersImportServiceTests: XCTestCase {
         let result = try await sut.importAll(markCompleteInReminders: true)
 
         // Then: ImportResult must report the failure count.
-        // BUG: ImportResult has no markCompleteFailures field.
-        // The user sees "1 importiert" but the reminder stays open in Apple Reminders.
         XCTAssertEqual(result.imported.count, 1)
         XCTAssertEqual(result.markCompleteFailures, 1)
     }
+
 }

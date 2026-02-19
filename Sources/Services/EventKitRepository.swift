@@ -140,7 +140,7 @@ final class EventKitRepository: EventKitRepositoryProtocol, @unchecked Sendable 
             throw EventKitError.notAuthorized
         }
         guard let reminder = eventStore.calendarItem(withIdentifier: reminderID) as? EKReminder else {
-            return // Silent fail if reminder not found
+            throw EventKitError.reminderNotFound
         }
         reminder.isCompleted = true
         reminder.completionDate = Date()
@@ -394,6 +394,7 @@ enum EventKitError: Error, LocalizedError {
     case fetchFailed
     case saveFailed
     case eventReadOnly
+    case reminderNotFound
 
     var errorDescription: String? {
         switch self {
@@ -405,6 +406,8 @@ enum EventKitError: Error, LocalizedError {
             return "Kalendereintrag konnte nicht gespeichert werden."
         case .eventReadOnly:
             return "Termine mit Gaesten koennen nicht verschoben werden."
+        case .reminderNotFound:
+            return "Erinnerung nicht gefunden."
         }
     }
 }
