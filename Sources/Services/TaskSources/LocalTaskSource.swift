@@ -38,18 +38,8 @@ final class LocalTaskSource: @preconcurrency TaskSource, @preconcurrency TaskSou
         descriptor.sortBy = [SortDescriptor(\.createdAt, order: .reverse)]
         let allIncomplete = try modelContext.fetch(descriptor)
 
-        // Hide recurring tasks with future dueDate (after end of today)
-        let startOfTomorrow = Calendar.current.startOfDay(
-            for: Calendar.current.date(byAdding: .day, value: 1, to: Date()) ?? Date()
-        )
-        return allIncomplete.filter { task in
-            // Non-recurring tasks: always visible
-            guard task.recurrencePattern != "none" else { return true }
-            // Recurring without dueDate: always visible
-            guard let dueDate = task.dueDate else { return true }
-            // Recurring with dueDate: only visible if due today or earlier
-            return dueDate < startOfTomorrow
-        }
+        // Hide recurring tasks with future dueDate (uses shared filter on LocalTask)
+        return allIncomplete.filter { $0.isVisibleInBacklog }
     }
 
     func fetchCompletedTasks(withinDays days: Int) async throws -> [LocalTask] {

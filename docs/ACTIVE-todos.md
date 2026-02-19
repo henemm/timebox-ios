@@ -84,7 +84,8 @@
 
 ### Bundle F: Recurring Tasks vervollstaendigen
 - ~~Phase 1B/2 (macOS Badge, Siri, Delete-Dialog, Filter)~~ ERLEDIGT
-- Dedup-Logik (gleichzeitiges Completion auf 2 Geraeten)
+- ~~Dedup-Logik (gleichzeitiges Completion auf 2 Geraeten)~~ ERLEDIGT
+- ~~macOS-Divergenz: Zukunfts-Filter + Wiederkehrend-Sidebar~~ ERLEDIGT
 - Quick-Edit Recurrence-Params Fix
 
 ### Bundle G: Intelligent Task Blox (Apple Intelligence + System-Integration)

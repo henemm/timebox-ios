@@ -52,6 +52,18 @@ final class LocalTask {
     /// nil for non-recurring or legacy tasks (gets assigned on next completion).
     var recurrenceGroupID: String?
 
+    /// Whether this task should be visible in the backlog.
+    /// Hides future-dated recurring task instances (due tomorrow or later).
+    /// Non-recurring tasks and recurring tasks without dueDate are always visible.
+    var isVisibleInBacklog: Bool {
+        guard recurrencePattern != "none" else { return true }
+        guard let dueDate = dueDate else { return true }
+        let startOfTomorrow = Calendar.current.startOfDay(
+            for: Calendar.current.date(byAdding: .day, value: 1, to: Date()) ?? Date()
+        )
+        return dueDate < startOfTomorrow
+    }
+
     /// Long-form description/notes for the task
     var taskDescription: String?
 

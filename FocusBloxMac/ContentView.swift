@@ -67,19 +67,24 @@ struct ContentView: View {
     @State private var taskToEditRecurring: LocalTask?
     @State private var editSeriesMode: Bool = false
 
+    // Base filter: exclude future-dated recurring tasks (same logic as iOS LocalTaskSource)
+    private var visibleTasks: [LocalTask] {
+        tasks.filter { !$0.isCompleted && $0.isVisibleInBacklog }
+    }
+
     // Computed properties for sidebar badges
     private var tbdCount: Int {
-        tasks.filter { $0.isTbd && !$0.isCompleted }.count
+        visibleTasks.filter { $0.isTbd }.count
     }
 
     private var nextUpCount: Int {
-        tasks.filter { $0.isNextUp && !$0.isCompleted }.count
+        visibleTasks.filter { $0.isNextUp }.count
     }
 
     private var overdueCount: Int {
         let now = Date()
-        return tasks.filter { task in
-            guard !task.isCompleted, let dueDate = task.dueDate else { return false }
+        return visibleTasks.filter { task in
+            guard let dueDate = task.dueDate else { return false }
             return dueDate < now
         }.count
     }
@@ -87,8 +92,8 @@ struct ContentView: View {
     private var upcomingCount: Int {
         let now = Date()
         let weekFromNow = Calendar.current.date(byAdding: .day, value: 7, to: now) ?? now
-        return tasks.filter { task in
-            guard !task.isCompleted, let dueDate = task.dueDate else { return false }
+        return visibleTasks.filter { task in
+            guard let dueDate = task.dueDate else { return false }
             return dueDate >= now && dueDate <= weekFromNow
         }.count
     }
@@ -97,34 +102,40 @@ struct ContentView: View {
         tasks.filter { $0.isCompleted }.count
     }
 
+    private var recurringCount: Int {
+        visibleTasks.filter { $0.recurrencePattern != "none" }.count
+    }
+
     // Filtered tasks based on sidebar selection
     private var filteredTasks: [LocalTask] {
         switch selectedFilter {
         case .all:
-            return tasks.filter { !$0.isCompleted }
+            return visibleTasks
         case .category(let category):
-            return tasks.filter { !$0.isCompleted && $0.taskType == category }
+            return visibleTasks.filter { $0.taskType == category }
         case .nextUp:
-            return tasks.filter { !$0.isCompleted && $0.isNextUp }
+            return visibleTasks.filter { $0.isNextUp }
         case .tbd:
-            return tasks.filter { !$0.isCompleted && $0.isTbd }
+            return visibleTasks.filter { $0.isTbd }
         case .overdue:
             let now = Date()
-            return tasks.filter { task in
-                guard !task.isCompleted, let dueDate = task.dueDate else { return false }
+            return visibleTasks.filter { task in
+                guard let dueDate = task.dueDate else { return false }
                 return dueDate < now
             }
         case .upcoming:
             let now = Date()
             let weekFromNow = Calendar.current.date(byAdding: .day, value: 7, to: now) ?? now
-            return tasks.filter { task in
-                guard !task.isCompleted, let dueDate = task.dueDate else { return false }
+            return visibleTasks.filter { task in
+                guard let dueDate = task.dueDate else { return false }
                 return dueDate >= now && dueDate <= weekFromNow
             }
         case .completed:
             return tasks.filter { $0.isCompleted }
+        case .recurring:
+            return visibleTasks.filter { $0.recurrencePattern != "none" }
         case .smartPriority:
-            return tasks.filter { !$0.isCompleted }
+            return visibleTasks
                 .sorted {
                     TaskPriorityScoringService.calculateScore(
                         importance: $0.importance, urgency: $0.urgency, dueDate: $0.dueDate,
@@ -158,7 +169,8 @@ struct ContentView: View {
                     nextUpCount: nextUpCount,
                     overdueCount: overdueCount,
                     upcomingCount: upcomingCount,
-                    completedCount: completedCount
+                    completedCount: completedCount,
+                    recurringCount: recurringCount
                 )
             } else {
                 // Empty sidebar for other sections
@@ -235,30 +247,32 @@ struct ContentView: View {
     private var regularFilteredTasks: [LocalTask] {
         switch selectedFilter {
         case .all:
-            return tasks.filter { !$0.isCompleted && !$0.isNextUp }
+            return visibleTasks.filter { !$0.isNextUp }
         case .category(let category):
-            return tasks.filter { !$0.isCompleted && !$0.isNextUp && $0.taskType == category }
+            return visibleTasks.filter { !$0.isNextUp && $0.taskType == category }
         case .nextUp:
             return []  // Next Up section handles this
         case .tbd:
-            return tasks.filter { !$0.isCompleted && !$0.isNextUp && $0.isTbd }
+            return visibleTasks.filter { !$0.isNextUp && $0.isTbd }
         case .overdue:
             let now = Date()
-            return tasks.filter { task in
-                guard !task.isCompleted && !task.isNextUp, let dueDate = task.dueDate else { return false }
+            return visibleTasks.filter { task in
+                guard !task.isNextUp, let dueDate = task.dueDate else { return false }
                 return dueDate < now
             }
         case .upcoming:
             let now = Date()
             let weekFromNow = Calendar.current.date(byAdding: .day, value: 7, to: now) ?? now
-            return tasks.filter { task in
-                guard !task.isCompleted && !task.isNextUp, let dueDate = task.dueDate else { return false }
+            return visibleTasks.filter { task in
+                guard !task.isNextUp, let dueDate = task.dueDate else { return false }
                 return dueDate >= now && dueDate <= weekFromNow
             }
         case .completed:
             return tasks.filter { $0.isCompleted }
+        case .recurring:
+            return visibleTasks.filter { !$0.isNextUp && $0.recurrencePattern != "none" }
         case .smartPriority:
-            return tasks.filter { !$0.isCompleted && !$0.isNextUp }
+            return visibleTasks.filter { !$0.isNextUp }
                 .sorted {
                     TaskPriorityScoringService.calculateScore(
                         importance: $0.importance, urgency: $0.urgency, dueDate: $0.dueDate,
@@ -498,6 +512,7 @@ struct ContentView: View {
         case .overdue: return "Überfällig"
         case .upcoming: return "Bald fällig"
         case .completed: return "Erledigt"
+        case .recurring: return "Wiederkehrend"
         case .smartPriority: return "Priorität"
         }
     }

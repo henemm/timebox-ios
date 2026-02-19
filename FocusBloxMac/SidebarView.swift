@@ -35,6 +35,7 @@ enum SidebarFilter: Hashable {
     case overdue
     case upcoming
     case completed
+    case recurring
     case smartPriority
 }
 
@@ -46,6 +47,7 @@ struct SidebarView: View {
     let overdueCount: Int
     let upcomingCount: Int
     let completedCount: Int
+    let recurringCount: Int
 
     var body: some View {
         List {
@@ -118,6 +120,19 @@ struct SidebarView: View {
                 .onTapGesture { selectedFilter = .completed }
                 .listRowBackground(selectedFilter == .completed ? Color.accentColor.opacity(0.15) : Color.clear)
 
+                HStack {
+                    Label("Wiederkehrend", systemImage: "arrow.triangle.2.circlepath")
+                        .accessibilityIdentifier("sidebarFilter_recurring")
+                    Spacer()
+                    if recurringCount > 0 {
+                        badgeView(count: recurringCount, color: .purple)
+                    }
+                }
+                .tag(SidebarFilter.recurring)
+                .contentShape(Rectangle())
+                .onTapGesture { selectedFilter = .recurring }
+                .listRowBackground(selectedFilter == .recurring ? Color.accentColor.opacity(0.15) : Color.clear)
+
                 // Smart Priority (always available — deterministic scoring)
                 Label("Priorität", systemImage: "chart.bar.fill")
                     .accessibilityIdentifier("sidebarFilter_smartPriority")
@@ -175,6 +190,7 @@ struct SidebarView: View {
         case .overdue: return "overdue"
         case .upcoming: return "upcoming"
         case .completed: return "completed"
+        case .recurring: return "recurring"
         case .smartPriority: return "smartPriority"
         case .category(let id): return id
         }
@@ -188,7 +204,8 @@ struct SidebarView: View {
         nextUpCount: 5,
         overdueCount: 2,
         upcomingCount: 4,
-        completedCount: 10
+        completedCount: 10,
+        recurringCount: 3
     )
     .frame(width: 220)
 }
