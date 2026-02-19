@@ -704,10 +704,10 @@ Siri liest den Screen-Inhalt anderer Apps (wenn diese ihn exponieren). User sagt
 
 ## Tooling
 
-### Behavior Inventory in /tdd-red
+### Test-Qualitaet: Erst verstehen, dann testen
 **Status:** ERLEDIGT (2026-02-19)
-**Dateien:** `.claude/commands/04-tdd-red.md`, `.claude/hooks/workflow_state_multi.py`, `.claude/hooks/tdd_enforcement.py`, `.claude/commands/10-bug.md`
-**Aenderung:** `/tdd-red` um Behavior Inventory erweitert — VOR dem Schreiben von Tests muss ein strukturiertes Inventory mit Mutations-Check erstellt werden. Verhindert Tautologie-Tests. Unit Tests sind jetzt PFLICHT bei Business-Logik (nicht mehr "optional"). `tdd_enforcement.py` blockiert Implementation ohne Inventory.
+**Dateien:** `.claude/commands/04-tdd-red.md`, `.claude/commands/10-bug.md`
+**Aenderung:** `/tdd-red` um Kernfrage erweitert: "Welche Zeile bricht diesen Test?" Kein Test ohne Antwort. Unit Tests PFLICHT bei Business-Logik. Kein Buerokratie-Overhead — Verstaendnis statt Formulare.
 
 ---
 

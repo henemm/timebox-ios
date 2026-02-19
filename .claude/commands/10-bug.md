@@ -105,10 +105,10 @@ Nach Freigabe — normaler TDD-Zyklus:
 python3 .claude/hooks/workflow_state_multi.py phase phase5_tdd_red
 ```
 
-Nutze `/tdd-red` — das **Behavior Inventory** wird aus der Analyse abgeleitet:
-- **Root Cause** → primaeres Behavior + Regressions-Test
-- **Blast Radius** → zusaetzliche Behaviors fuer betroffene Flows
-- Die Buggy-Zeile selbst ist die Mutation fuer den Regressions-Test
+Nutze `/tdd-red` — leite Tests aus der Analyse ab:
+- **Root Cause** → Regressions-Test (Input der den Bug ausloest → korrektes Ergebnis)
+- **Blast Radius** → Tests fuer betroffene Flows
+- Fuer jeden Test: "Welche Zeile bricht diesen Test?" — wenn nicht beantwortbar, Test streichen
 
 ## Schritt 9: Dokumentation
 - `docs/ACTIVE-todos.md` aktualisieren
