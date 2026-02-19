@@ -271,17 +271,13 @@ struct BacklogView: View {
                 }
             }
             .withSettingsToolbar()
-            .overlay(alignment: .bottom) {
-                if let message = importStatusMessage {
-                    Text(message)
-                        .font(.subheadline.weight(.medium))
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 8)
-                        .background(.ultraThinMaterial, in: Capsule())
-                        .padding(.bottom, 16)
-                        .transition(.move(edge: .bottom).combined(with: .opacity))
-                        .animation(.spring(), value: importStatusMessage)
-                }
+            .alert("Erinnerungen importiert", isPresented: Binding(
+                get: { importStatusMessage != nil },
+                set: { if !$0 { importStatusMessage = nil } }
+            )) {
+                Button("OK") { importStatusMessage = nil }
+            } message: {
+                Text(importStatusMessage ?? "")
             }
             .sensoryFeedback(.impact(weight: .medium), trigger: reorderTrigger)
             .sensoryFeedback(.success, trigger: durationFeedback)
@@ -426,7 +422,7 @@ struct BacklogView: View {
         do {
             let hasAccess = try await eventKitRepo.requestReminderAccess()
             guard hasAccess else {
-                withAnimation { importStatusMessage = "Kein Zugriff auf Erinnerungen" }
+                importStatusMessage = "Kein Zugriff auf Erinnerungen"
                 return
             }
 
@@ -438,19 +434,13 @@ struct BacklogView: View {
                 markCompleteInReminders: remindersMarkCompleteOnImport
             )
 
-            withAnimation {
-                importStatusMessage = importFeedbackMessage(from: result)
-            }
+            importStatusMessage = importFeedbackMessage(from: result)
 
             // Reload to show imported tasks
             await loadTasks()
         } catch {
-            withAnimation { importStatusMessage = "Import fehlgeschlagen" }
+            importStatusMessage = "Import fehlgeschlagen"
         }
-
-        // Auto-dismiss after 3 seconds
-        try? await Task.sleep(for: .seconds(3))
-        withAnimation { importStatusMessage = nil }
     }
 
     private func importFeedbackMessage(from result: RemindersImportService.ImportResult) -> String {
