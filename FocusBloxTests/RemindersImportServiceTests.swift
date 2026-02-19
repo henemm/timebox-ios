@@ -259,4 +259,38 @@ final class RemindersImportServiceTests: XCTestCase {
         XCTAssertEqual(result.imported.count, 0)
         XCTAssertEqual(result.skippedDuplicates, 0)
     }
+
+    // MARK: - Mark Complete Failure Reporting
+
+    func test_importAll_reportsMarkCompleteSuccess() async throws {
+        // Given: One reminder to import, markComplete enabled
+        mockRepo.mockReminders = [
+            ReminderData(id: "r1", title: "New task")
+        ]
+
+        // When
+        let result = try await sut.importAll(markCompleteInReminders: true)
+
+        // Then: ImportResult must report how many reminders were successfully marked complete.
+        // BUG: ImportResult has no such field — mark-complete failures are silently swallowed.
+        // The caller (BacklogView) cannot show meaningful feedback.
+        XCTAssertEqual(result.markedComplete, 1)
+    }
+
+    func test_importAll_reportsMarkCompleteFailures() async throws {
+        // Given: One reminder, but markReminderComplete will throw
+        mockRepo.mockReminders = [
+            ReminderData(id: "r1", title: "New task")
+        ]
+        mockRepo.markCompleteError = EventKitError.notAuthorized
+
+        // When: Import with markComplete — should NOT throw (import succeeded)
+        let result = try await sut.importAll(markCompleteInReminders: true)
+
+        // Then: ImportResult must report the failure count.
+        // BUG: ImportResult has no markCompleteFailures field.
+        // The user sees "1 importiert" but the reminder stays open in Apple Reminders.
+        XCTAssertEqual(result.imported.count, 1)
+        XCTAssertEqual(result.markCompleteFailures, 1)
+    }
 }

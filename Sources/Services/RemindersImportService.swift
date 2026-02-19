@@ -12,6 +12,8 @@ final class RemindersImportService {
     struct ImportResult {
         let imported: [LocalTask]
         let skippedDuplicates: Int
+        let markedComplete: Int
+        let markCompleteFailures: Int
     }
 
     init(eventKitRepo: EventKitRepositoryProtocol, modelContext: ModelContext) {
@@ -68,17 +70,27 @@ final class RemindersImportService {
 
         // After successful persist: optionally mark all reminders as completed.
         // Both imported AND skipped reminders get marked — skipped ones are already in FocusBlox.
+        var markedComplete = 0
+        var markCompleteFailures = 0
+
         if markCompleteInReminders {
             for reminder in reminders {
                 do {
                     try eventKitRepo.markReminderComplete(reminderID: reminder.id)
+                    markedComplete += 1
                 } catch {
-                    print("[RemindersImport] Failed to mark reminder as complete: \(error)")
+                    markCompleteFailures += 1
+                    print("[RemindersImport] Failed to mark reminder '\(reminder.title)' as complete: \(error)")
                 }
             }
         }
 
-        return ImportResult(imported: imported, skippedDuplicates: skippedDuplicates)
+        return ImportResult(
+            imported: imported,
+            skippedDuplicates: skippedDuplicates,
+            markedComplete: markedComplete,
+            markCompleteFailures: markCompleteFailures
+        )
     }
 
     /// Convert EKReminder priority to FocusBlox importance.

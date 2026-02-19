@@ -23,6 +23,7 @@ final class MockEventKitRepository: EventKitRepositoryProtocol, @unchecked Senda
     var markReminderCompleteCalled = false
     var lastCompletedReminderID: String?
     var completedReminderIDs: [String] = []
+    var markCompleteError: Error?
 
     var markReminderIncompleteCalled = false
     var lastIncompletedReminderID: String?
@@ -94,6 +95,9 @@ final class MockEventKitRepository: EventKitRepositoryProtocol, @unchecked Senda
     func markReminderComplete(reminderID: String) throws {
         guard mockReminderAuthStatus == .fullAccess else {
             throw EventKitError.notAuthorized
+        }
+        if let error = markCompleteError {
+            throw error
         }
         markReminderCompleteCalled = true
         lastCompletedReminderID = reminderID

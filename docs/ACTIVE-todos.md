@@ -122,8 +122,9 @@
 - **Commit 1:** `d5812b9` Funktionale Aenderung (RemindersImportService, UI, Migration)
 - **Commit 2:** Alter RemindersSyncService + 5 Bug-Tests geloescht, 12 neue RemindersImportServiceTests, MockEventKitRepository erweitert
 - **Dateien:** `RemindersImportService.swift` (neu), `BacklogView.swift`, `ContentView.swift` (macOS), `SettingsView.swift`, `MacSettingsView.swift`, `FocusBloxApp.swift`, `PlanningView.swift`
-- **Tests:** 12 Unit Tests (Import, Duplikate, Filter, Priority, Mark-Complete, Migration) alle GREEN
-- **Nachfix:** `ReminderData.id` nutzte `calendarItemExternalIdentifier` statt `calendarItemIdentifier` — `markReminderComplete()` konnte Erinnerungen nicht finden (silent fail). Gefixt: `id = calendarItemIdentifier`.
+- **Tests:** 14 Unit Tests (Import, Duplikate, Filter, Priority, Mark-Complete, Migration, Failure-Reporting) alle GREEN
+- **Nachfix 1:** `ReminderData.id` nutzte `calendarItemExternalIdentifier` statt `calendarItemIdentifier` — `markReminderComplete()` konnte Erinnerungen nicht finden (silent fail). Gefixt: `id = calendarItemIdentifier`.
+- **Nachfix 2:** `ImportResult` meldet jetzt `markedComplete` + `markCompleteFailures`. Feedback-Text zeigt alle Ergebnisse (importiert, bereits vorhanden, Abhaken fehlgeschlagen). `withAnimation` fuer sichtbare Overlay-Transition. 3s statt 2s Anzeigedauer.
 
 ---
 

@@ -426,7 +426,7 @@ struct BacklogView: View {
         do {
             let hasAccess = try await eventKitRepo.requestReminderAccess()
             guard hasAccess else {
-                importStatusMessage = "Kein Zugriff auf Erinnerungen"
+                withAnimation { importStatusMessage = "Kein Zugriff auf Erinnerungen" }
                 return
             }
 
@@ -438,23 +438,38 @@ struct BacklogView: View {
                 markCompleteInReminders: remindersMarkCompleteOnImport
             )
 
-            if result.imported.isEmpty && result.skippedDuplicates == 0 {
-                importStatusMessage = "Keine neuen Erinnerungen"
-            } else if result.imported.isEmpty {
-                importStatusMessage = "\(result.skippedDuplicates) bereits vorhanden"
-            } else {
-                importStatusMessage = "\(result.imported.count) importiert"
+            withAnimation {
+                importStatusMessage = importFeedbackMessage(from: result)
             }
 
             // Reload to show imported tasks
             await loadTasks()
         } catch {
-            importStatusMessage = "Import fehlgeschlagen"
+            withAnimation { importStatusMessage = "Import fehlgeschlagen" }
         }
 
-        // Auto-dismiss after 2 seconds
-        try? await Task.sleep(for: .seconds(2))
-        importStatusMessage = nil
+        // Auto-dismiss after 3 seconds
+        try? await Task.sleep(for: .seconds(3))
+        withAnimation { importStatusMessage = nil }
+    }
+
+    private func importFeedbackMessage(from result: RemindersImportService.ImportResult) -> String {
+        var parts: [String] = []
+
+        if !result.imported.isEmpty {
+            parts.append("\(result.imported.count) importiert")
+        }
+        if result.skippedDuplicates > 0 {
+            parts.append("\(result.skippedDuplicates) bereits vorhanden")
+        }
+        if result.markCompleteFailures > 0 {
+            parts.append("\(result.markCompleteFailures)x Abhaken fehlgeschlagen")
+        }
+
+        if parts.isEmpty {
+            return "Keine neuen Erinnerungen"
+        }
+        return parts.joined(separator: ", ")
     }
 
     /// Refresh tasks from local database only - no loading indicator, no Reminders import.
