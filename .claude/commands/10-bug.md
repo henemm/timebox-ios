@@ -4,6 +4,47 @@
 
 ---
 
+## GRUNDANNAHME: ICH LIEGE FALSCH
+
+Gehe bei JEDEM Schritt davon aus, dass deine Annahme falsch ist.
+Nicht als Checkliste, sondern als Denkweise:
+
+- Wenn du **ueberzeugt bist** die Ursache zu kennen → du brauchst TROTZDEM Beweis (Logging, Reproduktion)
+- Wenn du denkst Debugging sei unnoetig → **genau dann ist es noetig**, weil deine Ueberzeugung unbegründet ist
+- Wenn dein Fix "offensichtlich richtig" aussieht → pruefe ob er ueberhaupt aufgerufen wird (Dead Code ist dein Muster)
+- Wenn du nur eine Plattform pruefst → **die andere ist wahrscheinlich auch betroffen**
+
+**Konsequenz:** Jede Hypothese muss BEWIESEN werden bevor sie zum Fix wird.
+Beweisen = Logging einbauen, ausfuehren, Output lesen. Nicht: "Code lesen und fuer plausibel halten."
+
+---
+
+## Schritt 0: TRIAGE — 3 Fragen BEVOR irgendetwas passiert
+
+1. **Welche Plattform?** (iOS, macOS, oder beide?)
+2. **Welcher Screen/View?** (Was siehst du gerade?)
+3. **Was genau getan, was genau gesehen?**
+
+**Kein naechster Schritt ohne Antworten.** Kostet 30 Sekunden, spart Stunden.
+
+> Negativbeispiel: Bug Feedback-Overlay — 200k+ Tokens verbrannt weil nie gefragt wurde ob iOS oder macOS.
+
+---
+
+## Schritt 0.5: EXISTENZ-CHECK — Gibt es das Feature ueberhaupt?
+
+**Annahme: Das Feature wurde nie implementiert.**
+
+1. `git log --oneline | grep -i [feature]`
+2. `Grep` nach UI-Elementen (.searchable, Button-Identifier, etc.)
+3. ACTIVE-todos.md — steht es noch als OFFEN?
+
+Wenn nie implementiert → **kein Bug**. Henning informieren, `/implement` vorschlagen.
+
+> Negativbeispiel: "Suche nicht sichtbar" — war nie gebaut worden, nur Spec existierte.
+
+---
+
 ## STRUKTURELLER ZWANG: Tasks + Agenten
 
 **Dieses Skill erzwingt gruendliche Analyse durch PARALLELE Agenten.**
@@ -76,7 +117,19 @@ Liste JEDE moegliche Ursache auf die aus den Agenten-Ergebnissen hervorgeht.
 Erst NACH dem Auflisten aller Hypothesen die wahrscheinlichste(n) waehlen.
 **Mit Begruendung warum die anderen weniger wahrscheinlich sind.**
 
-### 5d. Blast Radius
+### 5d. WIE BEWEISE ICH DASS ICH RECHT HABE?
+
+**Annahme: Deine Top-Hypothese ist falsch.**
+
+Fuer die wahrscheinlichste Ursache beschreiben:
+- **Welches Logging/Debugging wuerde die Hypothese BESTAETIGEN?** (z.B. "Wenn ich an Zeile X einen Logger setze, muesste Y im Output stehen")
+- **Welches Logging wuerde die Hypothese WIDERLEGEN?** (z.B. "Wenn stattdessen Z im Output steht, ist meine Hypothese falsch")
+- **Auf welcher Plattform muss ich pruefen?** (iOS? macOS? beide?)
+
+Diesen Debugging-Plan Henning zeigen. Wenn Henning den Fix direkt will, kann er das Debugging ueberspringen.
+Aber **DU** darfst es nicht ueberspringen nur weil du ueberzeugt bist.
+
+### 5e. Blast Radius
 - Welche anderen Features/Flows koennten betroffen sein?
 - Gibt es aehnliche Patterns die das gleiche Problem haben?
 
@@ -92,11 +145,17 @@ Zeige Henning:
 
 ## Schritt 7: Fix vorschlagen (NICHT implementieren!)
 
+**Annahme: Dein Fix adressiert nicht die echte Ursache. Oder er ist Dead Code.**
+
 Erst nach OK:
 1. Fix-Ansatz beschreiben (Dateien, Aenderungen)
 2. Erklaeren WARUM dieser Fix ALLE identifizierten Ursachen adressiert (nicht nur eine)
 3. Erklaeren WARUM dieser Fix keine neuen Probleme verursacht
-4. **Warte erneut auf Freigabe**
+4. **Call-Site benennen:** Wo wird der neue/geaenderte Code AUFGERUFEN? (Datei+Zeile)
+   - Wenn keine Call-Site benennbar → **Fix ist Dead Code. Ueberarbeiten.**
+5. **Plattform-Check:** Muss der Fix auf iOS UND macOS angewendet werden?
+   - Bekannte Divergenz: BacklogView (iOS) vs. ContentView (macOS) — oft BEIDE betroffen
+6. **Warte erneut auf Freigabe**
 
 ## Schritt 8: TDD RED + Implementierung
 
@@ -109,6 +168,19 @@ Nutze `/tdd-red` — leite Tests aus der Analyse ab:
 - **Root Cause** → Regressions-Test (Input der den Bug ausloest → korrektes Ergebnis)
 - **Blast Radius** → Tests fuer betroffene Flows
 - Fuer jeden Test: "Welche Zeile bricht diesen Test?" — wenn nicht beantwortbar, Test streichen
+
+### Nach Implementation: 4 Verifikationen (ALLE PFLICHT)
+
+**Annahme: Dein Fix ist falsch, Dead Code, oder nur auf einer Plattform.**
+
+| # | Check | Annahme die widerlegt werden muss |
+|---|-------|----------------------------------|
+| 1 | `xcodebuild build` (BEIDE Plattformen) | Code kompiliert nicht |
+| 2 | `xcodebuild test` ausfuehren | Tests laufen nicht durch |
+| 3 | `Grep` nach neuer Funktion → mind. 1 Aufrufer | Neuer Code ist Dead Code |
+| 4 | Beide Plattformen (iOS + macOS Views) geaendert? | Fix nur auf einer Plattform |
+
+Wenn ein Check scheitert → Fix ueberarbeiten, NICHT committen.
 
 ## Schritt 9: Dokumentation
 - `docs/ACTIVE-todos.md` aktualisieren
@@ -124,6 +196,21 @@ Nutze `/tdd-red` — leite Tests aus der Analyse ab:
 - **"Ich hab die Root Cause nach 5 Minuten"** — bei komplexen Bugs nie
 - **"Bitte manuell testen"** — UI Tests sind PFLICHT
 - **Bisherige Fixes ignorieren** — Wiederholungs-Check ist Task 1
+
+### Ueberzeugtheits-Anti-Patterns (NEU)
+
+| Was ich denke | Was ich stattdessen tun muss | Historisches Beispiel |
+|--------------|------------------------------|----------------------|
+| "Ich weiss die Ursache, Logging ist unnoetig" | Logging GERADE DANN einbauen — Ueberzeugung ist kein Beweis | Import-Button: War "offensichtlich" ein Code-Problem, war ein Default-Wert |
+| "Der Fix ist offensichtlich richtig" | Call-Site pruefen — wird er aufgerufen? | Bug 57: 10 Tests gruen, 0 Aufrufe = Dead Code |
+| "Das ist ein iOS-Bug" | BEIDE Plattformen pruefen | Feedback-Overlay: macOS hatte das UI-Element gar nicht |
+| "Das Feature ist kaputt" | Existiert es ueberhaupt? | Suche: War nie implementiert, nur Spec existierte |
+| "Ein Versuch noch, dann klappts" | Nach 2 Versuchen: Ansatz wechseln oder Henning fragen | Screenshot-Gate: 4 Workaround-Versuche statt 1x fragen |
+
+### Eskalations-Regel
+
+**Max 2 Versuche** fuer denselben Ansatz. Danach: Ansatz wechseln ODER Henning fragen.
+NIEMALS 5+ Versuche am selben Problem ohne Fortschritt.
 
 ---
 

@@ -127,6 +127,7 @@
 - **Nachfix 2:** `ImportResult` meldet jetzt `markedComplete` + `markCompleteFailures`. Feedback-Text zeigt alle Ergebnisse (importiert, bereits vorhanden, Abhaken fehlgeschlagen).
 - **Nachfix 3:** macOS Import-Button war unsichtbar + kein Feedback. Root Cause: `UserDefaults.standard.bool()` statt `@AppStorage` (Default `false` statt `true`). Fix: `@AppStorage`, `os.Logger` fuer Debugging, `.alert()` statt Overlay (macOS Best Practice). `markReminderComplete()` wirft jetzt statt silent return.
 - **Nachfix 4:** iOS Import-Feedback war zu schnell (3s Overlay, kaum sichtbar). Fix: `.alert()` mit OK-Button statt Overlay + Auto-Dismiss — konsistent mit macOS.
+- **Workflow-Verbesserung:** `/10-bug` um "Ich liege falsch"-Grundannahme erweitert: Triage, Existenz-Check, Hypothesen-Beweis durch Logging, Post-Fix-Verifikation.
 
 ---
 
