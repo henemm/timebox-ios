@@ -12,7 +12,7 @@ struct BacklogView: View {
         case tbd = "TBD"
         case completed = "Erledigt"
         case recurring = "Wiederkehrend"
-        case aiRecommended = "KI-Empfehlung"
+        case smartPriority = "Priorität"
 
         var id: String { rawValue }
 
@@ -26,7 +26,7 @@ struct BacklogView: View {
             case .tbd: return "questionmark.circle"
             case .completed: return "checkmark.circle"
             case .recurring: return "arrow.triangle.2.circlepath"
-            case .aiRecommended: return "wand.and.stars"
+            case .smartPriority: return "chart.bar.fill"
             }
         }
 
@@ -48,8 +48,8 @@ struct BacklogView: View {
                 return ("Keine erledigten Tasks", "Erledigte Tasks der letzten 7 Tage erscheinen hier.")
             case .recurring:
                 return ("Keine wiederkehrenden Tasks", "Erstelle wiederkehrende Tasks mit einem Wiederholungsmuster.")
-            case .aiRecommended:
-                return ("Keine bewerteten Tasks", "Aktiviere KI Task-Scoring in den Einstellungen.")
+            case .smartPriority:
+                return ("Keine Tasks", "Erstelle Tasks, um die Prioritäts-Sortierung zu sehen.")
             }
         }
     }
@@ -240,8 +240,8 @@ struct BacklogView: View {
                             completedView
                         case .recurring:
                             recurringView
-                        case .aiRecommended:
-                            aiRecommendedView
+                        case .smartPriority:
+                            smartPriorityView
                         }
                     }
                 }
@@ -646,14 +646,9 @@ struct BacklogView: View {
     }
 
     // MARK: - View Mode Switcher (Swift Liquid Glass)
-    /// ViewModes filtered by availability (hides AI mode when unavailable)
+    /// All view modes (smartPriority always available — deterministic scoring)
     private var availableViewModes: [ViewMode] {
-        ViewMode.allCases.filter { mode in
-            if mode == .aiRecommended {
-                return AITaskScoringService.isAvailable
-            }
-            return true
-        }
+        ViewMode.allCases
     }
 
     private var viewModeSwitcher: some View {
@@ -1024,55 +1019,66 @@ struct BacklogView: View {
         }
     }
 
-    // MARK: - AI Recommended View (sorted by AI score descending)
-    private var aiRecommendedView: some View {
-        let scored = backlogTasks
-            .sorted { ($0.aiScore ?? 0) > ($1.aiScore ?? 0) }
-        return List {
-            ForEach(scored) { item in
-                BacklogRow(
-                    item: item,
-                    onComplete: { completeTask(item) },
-                    onDurationTap: { selectedItemForDuration = item },
-                    onAddToNextUp: { updateNextUp(for: item, isNextUp: true) },
-                    onImportanceCycle: { newImportance in updateImportance(for: item, importance: newImportance) },
-                    onUrgencyToggle: { newUrgency in updateUrgency(for: item, urgency: newUrgency) },
-                    onCategoryTap: { selectedItemForCategory = item },
-                    onEditTap: { taskToEditDirectly = item },
-                    onDeleteTap: { deleteTask(item) },
-                    onTitleSave: { newTitle in
-                        saveTitleEdit(for: item, title: newTitle)
-                    }
-                )
-                .listRowSeparator(.hidden)
-                .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
-                .swipeActions(edge: .trailing) {
-                    Button {
-                        updateNextUp(for: item, isNextUp: true)
-                    } label: {
-                        Label("Next Up", systemImage: "arrow.up.circle.fill")
-                    }
-                    .tint(.blue)
-                }
-                .swipeActions(edge: .leading) {
-                    Button {
-                        taskToEditDirectly = item
-                    } label: {
-                        Label("Bearbeiten", systemImage: "pencil")
-                    }
-                    .tint(.orange)
+    // MARK: - Smart Priority View (sorted by priority score, grouped by tier)
+    private var smartPriorityView: some View {
+        ScrollView {
+            LazyVStack(spacing: 16) {
+                ForEach(TaskPriorityScoringService.PriorityTier.allCases, id: \.self) { tier in
+                    let tierTasks = backlogTasks
+                        .filter { $0.priorityTier == tier }
+                        .sorted { $0.priorityScore > $1.priorityScore }
+                    if !tierTasks.isEmpty {
+                        VStack(alignment: .leading, spacing: 8) {
+                            HStack {
+                                Text(tier.label)
+                                    .font(.headline)
+                                    .foregroundStyle(tierColor(tier))
+                                Spacer()
+                                Text("\(tierTasks.count)")
+                                    .font(.caption)
+                                    .foregroundStyle(tierColor(tier))
+                                    .padding(.horizontal, 6)
+                                    .padding(.vertical, 2)
+                                    .background(tierColor(tier).opacity(0.2))
+                                    .clipShape(Capsule())
+                            }
+                            .padding(.horizontal, 16)
 
-                    Button(role: .destructive) {
-                        deleteTask(item)
-                    } label: {
-                        Label("Löschen", systemImage: "trash")
+                            LazyVStack(spacing: 8) {
+                                ForEach(tierTasks) { item in
+                                    BacklogRow(
+                                        item: item,
+                                        onComplete: { completeTask(item) },
+                                        onDurationTap: { selectedItemForDuration = item },
+                                        onAddToNextUp: { updateNextUp(for: item, isNextUp: true) },
+                                        onImportanceCycle: { newImportance in updateImportance(for: item, importance: newImportance) },
+                                        onUrgencyToggle: { newUrgency in updateUrgency(for: item, urgency: newUrgency) },
+                                        onCategoryTap: { selectedItemForCategory = item },
+                                        onEditTap: { taskToEditDirectly = item },
+                                        onDeleteTap: { deleteTask(item) },
+                                        onTitleSave: { newTitle in
+                                            saveTitleEdit(for: item, title: newTitle)
+                                        }
+                                    )
+                                }
+                            }
+                            .padding(.horizontal, 16)
+                        }
                     }
                 }
             }
         }
-        .listStyle(.plain)
         .refreshable {
             await loadTasks()
+        }
+    }
+
+    private func tierColor(_ tier: TaskPriorityScoringService.PriorityTier) -> Color {
+        switch tier {
+        case .doNow: return .red
+        case .planSoon: return .orange
+        case .eventually: return .yellow
+        case .someday: return .gray
         }
     }
 

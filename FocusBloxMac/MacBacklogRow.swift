@@ -117,17 +117,8 @@ struct MacBacklogRow: View {
             // 5. Duration Badge
             durationBadge
 
-            // 6. AI Score Badge (only when scored)
-            if task.hasAIScoring {
-                HStack(spacing: 2) {
-                    Image(systemName: "wand.and.stars")
-                    Text("\(task.aiScore ?? 0)")
-                }
-                .font(.caption2)
-                .foregroundStyle(.purple.opacity(0.7))
-                .fixedSize()
-                .accessibilityIdentifier("aiScoreBadge_\(task.id)")
-            }
+            // 6. Priority Score Badge
+            priorityScoreBadge
 
             // 7. Due Date Badge
             if let dueDate = task.dueDate {
@@ -251,6 +242,38 @@ struct MacBacklogRow: View {
 
     private var categoryLabel: String {
         TaskCategory(rawValue: task.taskType)?.displayName ?? "Typ"
+    }
+
+    // MARK: - Priority Score Badge
+
+    private var priorityScoreBadge: some View {
+        let score = TaskPriorityScoringService.calculateScore(
+            importance: task.importance, urgency: task.urgency, dueDate: task.dueDate,
+            createdAt: task.createdAt, rescheduleCount: task.rescheduleCount,
+            estimatedDuration: task.estimatedDuration, taskType: task.taskType,
+            isNextUp: task.isNextUp
+        )
+        let tier = TaskPriorityScoringService.PriorityTier.from(score: score)
+        let color: Color = switch tier {
+        case .doNow: .red
+        case .planSoon: .orange
+        case .eventually: .yellow
+        case .someday: .gray
+        }
+        return HStack(spacing: 2) {
+            Image(systemName: "chart.bar.fill")
+            Text("\(score)")
+        }
+        .font(.caption2)
+        .foregroundStyle(color)
+        .padding(.horizontal, 5)
+        .padding(.vertical, 3)
+        .background(
+            RoundedRectangle(cornerRadius: 5)
+                .fill(color.opacity(0.2))
+        )
+        .fixedSize()
+        .accessibilityIdentifier("priorityScoreBadge_\(task.id)")
     }
 
     // MARK: - Duration Badge (macOS Menu Picker)

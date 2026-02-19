@@ -25,12 +25,12 @@ struct PlanItem: Identifiable, Sendable {
     let recurrenceMonthDay: Int?
     let recurrenceGroupID: String?
 
-    // AI Task Scoring
+    // AI Task Scoring (legacy fields — kept for migration, not used in UI)
     let aiScore: Int?
     let aiEnergyLevel: String?
 
-    /// Whether this task has been scored by AI
-    var hasAIScoring: Bool { aiScore != nil }
+    // Creation date (for neglect scoring)
+    let createdAt: Date
 
     // Next Up staging
     let isNextUp: Bool
@@ -50,6 +50,25 @@ struct PlanItem: Identifiable, Sendable {
     /// Task is incomplete (missing importance, urgency, or duration)
     var isTbd: Bool {
         importance == nil || urgency == nil || estimatedDuration == nil
+    }
+
+    /// Deterministic priority score (0-100), computed on-the-fly
+    var priorityScore: Int {
+        TaskPriorityScoringService.calculateScore(
+            importance: importance,
+            urgency: urgency,
+            dueDate: dueDate,
+            createdAt: createdAt,
+            rescheduleCount: rescheduleCount,
+            estimatedDuration: estimatedDuration,
+            taskType: taskType,
+            isNextUp: isNextUp
+        )
+    }
+
+    /// Priority tier derived from score
+    var priorityTier: TaskPriorityScoringService.PriorityTier {
+        TaskPriorityScoringService.PriorityTier.from(score: priorityScore)
     }
 
     /// Backwards compatibility for priority-based code
@@ -79,6 +98,9 @@ struct PlanItem: Identifiable, Sendable {
         // AI scoring (not available for Reminders)
         self.aiScore = nil
         self.aiEnergyLevel = nil
+
+        // Creation date (Reminders don't expose createdAt, use now)
+        self.createdAt = Date()
 
         // Enhanced fields (defaults for Reminders integration)
         self.tags = []
@@ -119,6 +141,9 @@ struct PlanItem: Identifiable, Sendable {
         // AI scoring from LocalTask
         self.aiScore = localTask.aiScore
         self.aiEnergyLevel = localTask.aiEnergyLevel
+
+        // Creation date
+        self.createdAt = localTask.createdAt
 
         // Enhanced fields from LocalTask
         self.tags = localTask.tags

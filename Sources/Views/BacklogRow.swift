@@ -168,16 +168,8 @@ struct BacklogRow: View {
             // 5. Duration Badge
             durationBadge
 
-            // 6. AI Score Badge (only when scored)
-            if item.hasAIScoring {
-                HStack(spacing: 2) {
-                    Image(systemName: "wand.and.stars")
-                    Text("\(item.aiScore ?? 0)")
-                }
-                .font(.caption2)
-                .foregroundStyle(.purple.opacity(0.7))
-                .accessibilityIdentifier("aiScoreBadge_\(item.id)")
-            }
+            // 6. Priority Score Badge
+            priorityScoreBadge
 
             // 7. Due Date Badge
             if let dueDate = item.dueDate {
@@ -321,6 +313,32 @@ struct BacklogRow: View {
 
     private var categoryLabel: String {
         TaskCategory(rawValue: item.taskType)?.displayName ?? item.taskType.capitalized
+    }
+
+    // MARK: - Priority Score Badge
+
+    private var priorityScoreBadge: some View {
+        let score = item.priorityScore
+        let tier = item.priorityTier
+        let color: Color = switch tier {
+        case .doNow: .red
+        case .planSoon: .orange
+        case .eventually: .yellow
+        case .someday: .gray
+        }
+        return HStack(spacing: 2) {
+            Image(systemName: "chart.bar.fill")
+            Text("\(score)")
+        }
+        .font(.caption2)
+        .foregroundStyle(color)
+        .padding(.horizontal, 6)
+        .padding(.vertical, 3)
+        .background(
+            RoundedRectangle(cornerRadius: 6)
+                .fill(color.opacity(0.2))
+        )
+        .accessibilityIdentifier("priorityScoreBadge_\(item.id)")
     }
 
     // MARK: - Duration Badge

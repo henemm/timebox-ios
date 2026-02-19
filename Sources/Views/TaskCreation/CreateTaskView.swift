@@ -236,9 +236,9 @@ struct CreateTaskView: View {
                     description: taskDescription.isEmpty ? nil : taskDescription
                 )
 
-                // Score new task with AI if available
-                let scoring = AITaskScoringService(modelContext: modelContext)
-                await scoring.scoreNewTask(newTask)
+                // Enrich new task with AI if available
+                let enrichment = SmartTaskEnrichmentService(modelContext: modelContext)
+                await enrichment.enrichTask(newTask)
 
                 // Schedule due date notifications
                 if let taskDueDate = newTask.dueDate {

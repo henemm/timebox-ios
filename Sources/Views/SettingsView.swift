@@ -108,14 +108,14 @@ struct SettingsView: View {
                 }
 
                 // Section: Apple Intelligence (only visible when available)
-                if AITaskScoringService.isAvailable {
+                if SmartTaskEnrichmentService.isAvailable {
                     Section {
-                        Toggle("KI Task-Scoring", isOn: $aiScoringEnabled)
+                        Toggle("KI Task-Enrichment", isOn: $aiScoringEnabled)
                             .accessibilityIdentifier("aiScoringToggle")
                     } header: {
                         Text("Apple Intelligence")
                     } footer: {
-                        Text("Bewertet und sortiert Tasks automatisch nach Priorität und Energie-Level.")
+                        Text("Ergänzt fehlende Task-Attribute (Wichtigkeit, Dringlichkeit, Kategorie) automatisch aus dem Titel.")
                     }
                 }
 

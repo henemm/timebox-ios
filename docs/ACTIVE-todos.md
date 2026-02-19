@@ -38,7 +38,7 @@
 | 13 | MAC-020 Drag & Drop Planung | P2 | XL | ~100-150k | 3-4 | ~250 |
 | 14 | MAC-032 NC Widget | P3 | XL | ~80-120k | neues Target | ~200 |
 | 15 | ITB-A: FocusBlockEntity (AppEntity) | MITTEL | S | ~30-40k | 2 | ~60 |
-| 16 | ~~ITB-B: AI Task Scoring (Foundation Models)~~ | ERLEDIGT | L | ~80-120k | 9 | ~214 |
+| 16 | ~~ITB-B: Smart Priority (AI-Enrichment + Hybrid-Scoring)~~ | ERLEDIGT | L | ~80-120k | 12 | ~250 |
 | 17 | ITB-C: OrganizeMyDay Intent | MITTEL | XL | ~100-150k | 4-5 | ~250 |
 | 18 | ITB-D: Enhanced Liquid Glass (aktive Blocks) | NIEDRIG | S | ~20-30k | 2 | ~40 |
 | 19 | ITB-E: Share Extension / Transferable | MITTEL | L | ~80-120k | 3-4 + Target | ~200 |
@@ -92,7 +92,7 @@
 1. ITB-D (Liquid Glass) - Quick Win, unabhaengig
 2. ITB-A (FocusBlockEntity) - Grundlage fuer Intents
 3. ITB-E (Share Extension) - unabhaengig von AI
-4. ~~ITB-B (AI Scoring)~~ ERLEDIGT - Kern-Feature, Graceful Degradation
+4. ~~ITB-B (Smart Priority)~~ ERLEDIGT - AI-Enrichment + deterministischer Score
 5. ITB-C (OrganizeMyDay) - braucht A+B
 6. ITB-F (Context Capture) - WARTEND: Developer-APIs da, Siri On-Screen Awareness fehlt (iOS 26.5/27)
 7. ITB-G (Proaktive Vorschlaege) - RESEARCH: API-Verifizierung zuerst
@@ -354,25 +354,26 @@ Backlog-Filter "Wiederkehrend". iOS + macOS.
 
 ---
 
-### ITB-B: AI Task Scoring (Foundation Models)
-**Status:** ERLEDIGT (2026-02-17)
+### ITB-B: Smart Priority — AI-Enrichment + Hybrid-Scoring
+**Status:** ERLEDIGT (2026-02-19, Refactoring von AI Task Scoring)
 **Prioritaet:** MITTEL
 **Komplexitaet:** L (~80-120k Tokens)
 **Abhaengigkeiten:** Keine (Graceful Degradation implementiert)
 
-**Implementiert:**
-- `AITaskScoringService` mit `LanguageModelSession` (Apple Intelligence Foundation Models)
-- `@Generable` Structured Output (`TaskScore`: score, energyLevel, suggestedImportance, suggestedUrgent)
-- `InstructionsBuilder` als "Produktivitaets-Coach" Persona (deutsch)
-- Felder `aiScore` (Int?) + `aiEnergyLevel` (String?) auf `LocalTask` + `PlanItem`
-- Neue BacklogView "KI-Empfehlung" (nach Score sortiert, nur sichtbar mit Apple Intelligence)
-- AI Score Badge in BacklogRow (lila, wand.and.stars Icon)
-- Auto-Scoring nach Task-Erstellung in CreateTaskView
-- Settings Toggle "KI Task-Scoring" (iOS + macOS, nur sichtbar mit Apple Intelligence)
-- **AI schlaegt Werte VOR, manuell hat Vorrang** (nil-Check auf importance/urgency)
-- **Feature komplett unsichtbar ohne Apple Intelligence** (`#if canImport(FoundationModels)`)
-- **Cross-Platform:** iOS (BacklogView, BacklogRow) + macOS (SidebarView, MacBacklogRow, ContentView) gleichwertig implementiert
-**Dateien:** `LocalTask.swift`, `PlanItem.swift`, `AITaskScoringService.swift` (neu), `AppSettings.swift`, `BacklogView.swift`, `BacklogRow.swift`, `CreateTaskView.swift`, `SettingsView.swift`, `MacSettingsView.swift`, `SidebarView.swift`, `MacBacklogRow.swift`, `ContentView.swift` (macOS)
+**Implementiert (2-Schicht-System):**
+- **Schicht 1: SmartTaskEnrichmentService** — Ersetzt opakes AI-Scoring durch strukturiertes Enrichment
+  - `@Generable TaskEnrichment` (suggestedImportance, suggestedUrgent, suggestedTaskType, suggestedEnergyLevel)
+  - Fuellt nur nil/leere Felder — User-Werte werden NIEMALS ueberschrieben
+  - Nutzt `contentTagging`-Adapter statt generischem LLM-Prompt
+- **Schicht 2: TaskPriorityScoringService** — Deterministischer 0-100 Score (on-the-fly)
+  - Formel: eisenhower(50) + deadline(25) + neglect(15) + completeness(5) + nextUp(5)
+  - Gleiche Daten = gleiches Ergebnis, aendert sich wenn Deadline naeher rueckt
+- **UI:** ViewMode "Prioritaet" (statt "KI-Empfehlung"), chart.bar.fill Icon, IMMER sichtbar (nicht AI-gated)
+  - Tier-Sektionen: Sofort erledigen (rot, 60-100), Bald einplanen (orange, 35-59), Bei Gelegenheit (gelb, 10-34), Irgendwann (grau, 0-9)
+  - Farbiges Prioritaets-Badge mit Score-Zahl in BacklogRow (statt lila AI-Badge)
+- **Settings:** "KI Task-Enrichment" Toggle (nur sichtbar mit Apple Intelligence)
+- **Cross-Platform:** iOS + macOS gleichwertig implementiert
+**Dateien:** `SmartTaskEnrichmentService.swift` (neu), `TaskPriorityScoringService.swift` (neu), `PlanItem.swift`, `BacklogView.swift`, `BacklogRow.swift`, `CreateTaskView.swift`, `SettingsView.swift`, `MacSettingsView.swift`, `SidebarView.swift`, `MacBacklogRow.swift`, `ContentView.swift` (macOS)
 **Tests:** 10 Unit Tests + 3 UI Tests GREEN
 
 ---
@@ -500,10 +501,10 @@ Siri liest den Screen-Inhalt anderer Apps (wenn diese ihn exponieren). User sagt
 
 ---
 
-### ITB-B: AI Task Scoring mit Foundation Models
-**Status:** ERLEDIGT (2026-02-17)
-**Dateien:** `LocalTask.swift`, `PlanItem.swift`, `AITaskScoringService.swift` (neu), `AppSettings.swift`, `BacklogView.swift`, `BacklogRow.swift`, `CreateTaskView.swift`, `SettingsView.swift`, `MacSettingsView.swift`
-**Loesung:** Apple Intelligence Integration via FoundationModels Framework. Structured Output (`@Generable TaskScore`) fuer AI-basierte Task-Bewertung. Neue ViewMode "KI-Empfehlung" im Backlog, Score-Badge, Settings Toggle. Feature komplett unsichtbar ohne Apple Intelligence (Graceful Degradation via `#if canImport`). 10 Unit Tests + 3 UI Tests.
+### ITB-B: Smart Priority — AI-Enrichment + Hybrid-Scoring
+**Status:** ERLEDIGT (2026-02-19, Refactoring)
+**Dateien:** `SmartTaskEnrichmentService.swift` (neu), `TaskPriorityScoringService.swift` (neu), `PlanItem.swift`, `BacklogView.swift`, `BacklogRow.swift`, `CreateTaskView.swift`, `SettingsView.swift`, `MacSettingsView.swift`, `SidebarView.swift`, `MacBacklogRow.swift`, `ContentView.swift` (macOS)
+**Loesung:** Opakes AI-Scoring durch 2-Schicht-System ersetzt: (1) SmartTaskEnrichmentService fuellt fehlende Attribute via FoundationModels, (2) TaskPriorityScoringService berechnet deterministischen 0-100 Score. ViewMode "Prioritaet" immer sichtbar (nicht AI-gated), Tier-Sektionen (Sofort/Bald/Gelegenheit/Irgendwann). iOS + macOS gleichwertig.
 
 ---
 
