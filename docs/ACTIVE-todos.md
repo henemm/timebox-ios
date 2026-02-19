@@ -259,6 +259,22 @@
 
 ---
 
+### Feature: Batch-Enrichment fuer bestehende Tasks
+**Status:** OFFEN
+**Prioritaet:** MITTEL
+**Komplexitaet:** XS (~10-15k Tokens)
+**Abhaengigkeit:** ITB-B (Smart Priority)
+
+**Problem:** Bestehende Tasks (vor Smart Priority erstellt) haben leere Felder (importance, urgency, taskType). Dadurch Score = 0 im Eisenhower-Anteil, Sortierung nutzlos.
+**Gewuenschtes Verhalten:**
+- Beim App-Start (oder wenn Setting aktiviert wird) alle Tasks mit leeren Attributen finden
+- `SmartTaskEnrichmentService.enrichTask()` auf jeden davon ausfuehren
+- Nur einmal pro Task (Flag oder Check auf bereits gefuellte Felder reicht)
+- Nur wenn Apple Intelligence verfuegbar UND Setting aktiviert
+**Scope:** ~20-30 LoC, 1-2 Dateien (FocusBloxApp/FocusBloxMacApp + ggf. SmartTaskEnrichmentService)
+
+---
+
 ### Feature: Generische Suche (iOS + macOS)
 **Status:** OFFEN
 **Prioritaet:** MITTEL
@@ -687,6 +703,13 @@ Siri liest den Screen-Inhalt anderer Apps (wenn diese ihn exponieren). User sagt
 ---
 
 ## Tooling
+
+### Behavior Inventory in /tdd-red
+**Status:** ERLEDIGT (2026-02-19)
+**Dateien:** `.claude/commands/04-tdd-red.md`, `.claude/hooks/workflow_state_multi.py`, `.claude/hooks/tdd_enforcement.py`, `.claude/commands/10-bug.md`
+**Aenderung:** `/tdd-red` um Behavior Inventory erweitert — VOR dem Schreiben von Tests muss ein strukturiertes Inventory mit Mutations-Check erstellt werden. Verhindert Tautologie-Tests. Unit Tests sind jetzt PFLICHT bei Business-Logik (nicht mehr "optional"). `tdd_enforcement.py` blockiert Implementation ohne Inventory.
+
+---
 
 ### Pre-Commit Gate: ACTIVE-todos.md Pflicht
 **Status:** ERLEDIGT (2026-02-17)

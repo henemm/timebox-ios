@@ -61,6 +61,7 @@ VALID_ARTIFACT_TYPES = [
     "ui_test_output",   # UI test output (NEW!)
     "video",
     "audio",
+    "behavior_inventory",  # Behavior Inventory document
 ]
 
 # Types that count as UNIT test artifacts
@@ -162,9 +163,69 @@ def validate_artifact(artifact: dict) -> tuple[bool, str]:
 def validate_red_phase(workflow: dict) -> tuple[bool, str]:
     """
     Validate that TDD RED phase is properly completed.
-    Requires BOTH unit test AND UI test artifacts.
+    Requires Behavior Inventory + BOTH unit test AND UI test artifacts.
     Returns (valid, reason).
     """
+    # Behavior Inventory must exist before tests count
+    if not workflow.get("behavior_inventory_done"):
+        return False, """
++======================================================================+
+|  BEHAVIOR INVENTORY FEHLT!                                           |
++======================================================================+
+|  Bevor du Tests schreibst, musst du verstehen WAS du testest.        |
+|                                                                      |
+|  Erstelle docs/artifacts/[workflow]/behavior-inventory.md mit:       |
+|  1. Jede public Funktion und ihre Behaviors (Input -> Output)        |
+|  2. Pro Behavior eine MUTATION (welche Zeile bricht den Test?)       |
+|  3. Tautologie-Checkliste abgehakt                                   |
+|                                                                      |
+|  Nutze /tdd-red fuer den vollstaendigen Ablauf.                      |
++======================================================================+
+"""
+
+    inventory_path = workflow.get("behavior_inventory_path")
+    if not inventory_path or not os.path.exists(inventory_path):
+        return False, f"""
++======================================================================+
+|  BEHAVIOR INVENTORY NICHT GEFUNDEN!                                  |
++======================================================================+
+|  Pfad: {str(inventory_path or 'nicht gesetzt')[:50]}
+|                                                                      |
+|  Das Inventory muss als Datei existieren.                            |
+|  Setze behavior_inventory_path auf den korrekten Pfad.               |
++======================================================================+
+"""
+
+    # Validate inventory has minimum content
+    try:
+        with open(inventory_path) as f:
+            inventory_content = f.read()
+        if "| Mutation" not in inventory_content and "Mutation" not in inventory_content:
+            return False, """
++======================================================================+
+|  BEHAVIOR INVENTORY HAT KEINE MUTATIONS-SPALTE!                      |
++======================================================================+
+|  Jedes Behavior braucht eine konkrete Mutation:                      |
+|  "Welche EINE Zeile muesste ich aendern damit dieser Test bricht?"   |
+|                                                                      |
+|  Ohne Mutation ist der Test potenziell wertlos (Tautologie).         |
++======================================================================+
+"""
+        # Check for minimum number of behaviors (table rows with |)
+        table_rows = [l for l in inventory_content.split("\n")
+                      if l.strip().startswith("|") and not l.strip().startswith("| #") and not l.strip().startswith("|---")]
+        if len(table_rows) < 2:
+            return False, """
++======================================================================+
+|  BEHAVIOR INVENTORY HAT ZU WENIGE BEHAVIORS!                         |
++======================================================================+
+|  Mindestens 2 Behaviors (Normalfall + Grenzfall) sind noetig.        |
+|  Pure Functions brauchen mindestens 2 Behaviors pro Funktion.        |
++======================================================================+
+"""
+    except (IOError, OSError) as e:
+        return False, f"Behavior Inventory kann nicht gelesen werden: {e}"
+
     artifacts = workflow.get("test_artifacts", [])
 
     # Filter to RED phase artifacts

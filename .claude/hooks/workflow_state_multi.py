@@ -212,6 +212,9 @@ def create_workflow(name: str) -> dict:
         "context_file": None,
         "test_artifacts": [],
         "affected_files": [],
+        # Behavior Inventory (v2.3) - must exist before writing tests
+        "behavior_inventory_done": False,
+        "behavior_inventory_path": None,
         # Separate RED/GREEN tracking for UNIT tests (v2.0)
         "red_test_done": False,
         "red_test_result": None,  # Description of the failing test
