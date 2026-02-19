@@ -107,7 +107,7 @@
 ---
 
 ### Refactoring: Reminders Import-Only (statt bidirektionalem Sync)
-**Status:** IN ARBEIT
+**Status:** ERLEDIGT
 **Prioritaet:** HOCH
 **Komplexitaet:** M (~40-60k Tokens)
 
@@ -119,9 +119,10 @@
   - Migration bestehender "reminders"-Tasks zu "local" beim App-Start
   - PlanningView markReminderComplete entfernt (kein Rueckkanal)
   - Settings-Texte angepasst ("Importieren" statt "Synchronisieren")
-- **Commit 1:** Funktionale Aenderung (RemindersImportService, UI, Migration) — DONE
-- **Commit 2:** Alter RemindersSyncService + Bug-Tests loeschen, neue Tests — AUSSTEHEND
+- **Commit 1:** `d5812b9` Funktionale Aenderung (RemindersImportService, UI, Migration)
+- **Commit 2:** Alter RemindersSyncService + 5 Bug-Tests geloescht, 12 neue RemindersImportServiceTests, MockEventKitRepository erweitert
 - **Dateien:** `RemindersImportService.swift` (neu), `BacklogView.swift`, `ContentView.swift` (macOS), `SettingsView.swift`, `MacSettingsView.swift`, `FocusBloxApp.swift`, `PlanningView.swift`
+- **Tests:** 12 Unit Tests (Import, Duplikate, Filter, Priority, Mark-Complete, Migration) alle GREEN
 
 ---
 

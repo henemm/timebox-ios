@@ -22,6 +22,7 @@ final class MockEventKitRepository: EventKitRepositoryProtocol, @unchecked Senda
 
     var markReminderCompleteCalled = false
     var lastCompletedReminderID: String?
+    var completedReminderIDs: [String] = []
 
     var markReminderIncompleteCalled = false
     var lastIncompletedReminderID: String?
@@ -96,6 +97,7 @@ final class MockEventKitRepository: EventKitRepositoryProtocol, @unchecked Senda
         }
         markReminderCompleteCalled = true
         lastCompletedReminderID = reminderID
+        completedReminderIDs.append(reminderID)
     }
 
     func markReminderIncomplete(reminderID: String) throws {

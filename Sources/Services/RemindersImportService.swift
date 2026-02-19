@@ -4,7 +4,6 @@ import SwiftData
 /// Import-only service for Apple Reminders.
 /// One-way: Reminders → FocusBlox. No write-back, no auto-sync.
 /// After successful import, optionally marks reminders as completed in Apple Reminders.
-@Observable
 @MainActor
 final class RemindersImportService {
     private let eventKitRepo: EventKitRepositoryProtocol
