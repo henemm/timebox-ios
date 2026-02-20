@@ -141,7 +141,7 @@ All entities/components need specs before implementation:
 **IMPORTANT: Read these before starting work!**
 
 - **User Story:** `docs/project/stories/timebox-core.md`
-- **Roadmap:** `docs/ACTIVE-roadmap.md` ← **SINGLE SOURCE OF TRUTH**
+- **Backlog & Roadmap:** `docs/ACTIVE-todos.md` ← **SINGLE SOURCE OF TRUTH**
 - **Gap-Analyse:** `docs/context/user-story-gap-analysis.md`
 
 ## Testing

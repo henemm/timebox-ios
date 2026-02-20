@@ -47,7 +47,7 @@
 
 **Komplexitaet:** XS = halbe Stunde | S = 1 Session | M = 2-3 Sessions | L = halber Tag | XL = ganzer Tag+
 
-**Guenstigster Quick Win:** #4 Generische Suche (~15-20k)
+**Guenstigster Quick Win:** #4 Generische Suche (~15-20k), Shake to Undo (XS)
 **Teuerste Items:** #17 OrganizeMyDay (~150k), #13 Drag & Drop (~150k), #14 NC Widget (~120k)
 **WARTEND (Apple-Abhaengigkeit):** #20 ITB-F — Developer-APIs verfuegbar, wartet auf Siri On-Screen Awareness (iOS 26.5/27)
 **RESEARCH Items:** #21 ITB-G - API-Verifizierung noetig vor Planung
@@ -62,7 +62,7 @@
 - ~~Settings UX: Build-Info + Vorwarnungs-Labels~~ ERLEDIGT
 - ~~Einheitliche Symbole Tab-Bar/Sidebar~~ ERLEDIGT (Symbole bereits identisch)
 - ~~NextUp Wischgesten (Edit+Delete)~~ ERLEDIGT (iOS alle Views + macOS Trackpad-Swipe)
-- NextUp Long Press Vorschau
+- ~~NextUp Long Press Vorschau~~ ERLEDIGT
 
 ### Bundle B: Backlog & Suche
 - Generische Suche (iOS+macOS)
@@ -247,13 +247,11 @@
 ---
 
 ### Feature: iOS NextUp Long Press Vorschau
-**Status:** OFFEN
-**Prioritaet:** NIEDRIG
-**Komplexitaet:** XS (~15-20k Tokens)
+**Status:** ERLEDIGT (2026-02-20)
+**Commit:** `0359fd2`
 
-**Problem:** In der NextUp-Liste kann man keine Task-Details sehen ohne den Task zu oeffnen.
-**Gewuenschtes Verhalten:** Long Press auf einen NextUp-Task zeigt eine **reine Vorschau** mit allen Details (Kategorie, Dauer, Beschreibung, Tags, Frist). Keine Aktionen im Preview.
-**Scope:** ~30 LoC, 1-2 Dateien
+**Implementiert:** Long Press auf NextUp-Task zeigt TaskPreviewView mit allen Details (Kategorie, Dauer, Beschreibung, Tags, Frist).
+**Dateien:** NextUpSection.swift, TaskPreviewView.swift (neu), TaskAssignmentView.swift
 
 ---
 
@@ -379,6 +377,26 @@ Context Menu bleibt zusaetzlich erhalten.
 **Gewuenschtes Verhalten:** 2-zeiliges Layout fuer Attribute, sodass alle Badges vollstaendig sichtbar sind.
 
 **Betroffene Dateien:** Sources/Views/Components/BacklogRow.swift
+
+---
+
+### Feature: Control Center Inline-Eingabe (iOS 26+)
+**Status:** OFFEN
+**Prioritaet:** NIEDRIG
+**Komplexitaet:** M
+
+**Problem:** Task-Eingabe erfordert App-Wechsel.
+**Gewuenschtes Verhalten:** Interaktives Control Center Widget mit Textfeld fuer direkte Task-Eingabe.
+
+---
+
+### Feature: Shake to Undo — Zurueck zu Backlog (iOS)
+**Status:** OFFEN
+**Prioritaet:** NIEDRIG
+**Komplexitaet:** XS
+
+**Problem:** Versehentlich zu Next Up hinzugefuegt, kein einfacher Weg zurueck.
+**Gewuenschtes Verhalten:** Shake-Geste macht letzte Next-Up-Zuweisung rueckgaengig.
 
 ---
 
