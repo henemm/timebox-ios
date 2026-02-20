@@ -371,6 +371,11 @@ Backlog-Filter "Wiederkehrend". iOS + macOS.
 Gefixt: listView, recurringView, categoryView, durationView, dueDateView, tbdView, completedView, smartPriorityView.
 eisenhowerMatrixView nutzt Context Menu (Long Press) wegen Grid-Layout.
 
+**macOS Swipe-Actions:** Trackpad-Swipe auf ContentView List hinzugefuegt.
+Next Up Section: Links-Swipe = "Entfernen" (orange), Rechts-Swipe = Bearbeiten + Loeschen.
+Regular Section: Links-Swipe = Next Up Toggle (gruen/orange), Rechts-Swipe = Bearbeiten + Loeschen.
+Context Menu bleibt zusaetzlich erhalten.
+
 **Tests:** 71 Unit Tests GREEN (30 RecurrenceService, 25 RecurrencePattern, 16 SyncEngine).
 
 **Dateien:** RecurrencePattern.swift, RecurrenceService.swift, LocalTask.swift, PlanItem.swift, SyncEngine.swift, TaskFormSheet.swift, CreateTaskView.swift, TaskDetailSheet.swift, BacklogView.swift, TaskInspector.swift, ContentView.swift, LocalTaskSource.swift, TaskSource.swift

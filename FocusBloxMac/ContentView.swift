@@ -339,6 +339,28 @@ struct ContentView: View {
                         ForEach(nextUpTasks, id: \.uuid) { task in
                             makeBacklogRow(task: task)
                                 .tag(task.uuid)
+                                .swipeActions(edge: .leading, allowsFullSwipe: true) {
+                                    Button {
+                                        removeFromNextUp([task.uuid])
+                                    } label: {
+                                        Label("Entfernen", systemImage: "arrow.down.circle.fill")
+                                    }
+                                    .tint(.orange)
+                                }
+                                .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                                    Button(role: .destructive) {
+                                        deleteTasksByIds([task.uuid])
+                                    } label: {
+                                        Label("Löschen", systemImage: "trash")
+                                    }
+
+                                    Button {
+                                        selectedTasks = [task.uuid]
+                                    } label: {
+                                        Label("Bearbeiten", systemImage: "pencil")
+                                    }
+                                    .tint(.blue)
+                                }
                         }
                         .onMove { from, to in
                             moveNextUpTasks(from: from, to: to)
@@ -363,11 +385,39 @@ struct ContentView: View {
                     ForEach(selectedFilter == .nextUp ? nextUpTasks : regularFilteredTasks, id: \.uuid) { task in
                         makeBacklogRow(task: task)
                             .tag(task.uuid)
+                            .swipeActions(edge: .leading, allowsFullSwipe: true) {
+                                Button {
+                                    if task.isNextUp {
+                                        removeFromNextUp([task.uuid])
+                                    } else {
+                                        addToNextUp([task.uuid])
+                                    }
+                                } label: {
+                                    Label(
+                                        task.isNextUp ? "Entfernen" : "Next Up",
+                                        systemImage: task.isNextUp ? "arrow.down.circle.fill" : "arrow.up.circle.fill"
+                                    )
+                                }
+                                .tint(task.isNextUp ? .orange : .green)
+                            }
+                            .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                                Button(role: .destructive) {
+                                    deleteTasksByIds([task.uuid])
+                                } label: {
+                                    Label("Löschen", systemImage: "trash")
+                                }
+
+                                Button {
+                                    selectedTasks = [task.uuid]
+                                } label: {
+                                    Label("Bearbeiten", systemImage: "pencil")
+                                }
+                                .tint(.blue)
+                            }
                     }
                     .onMove { from, to in
                         moveRegularTasks(from: from, to: to)
                     }
-                    .onDelete(perform: deleteTasks)
                 } header: {
                     if showNextUpSection {
                         Text("Backlog")
