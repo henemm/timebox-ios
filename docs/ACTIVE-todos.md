@@ -188,6 +188,22 @@
 
 ---
 
+### Bug: "Wiederkehrend"-Filter zeigt nur sichtbare Tasks statt ALLER recurring Tasks
+**Status:** ERLEDIGT
+**Prioritaet:** HOCH
+**Komplexitaet:** S (~15k Tokens)
+
+- **Problem:** Der "Wiederkehrend"-Filter in der Sidebar (iOS + macOS) zeigte nur recurring Tasks die `isVisibleInBacklog == true` waren. Future-dated Tasks (z.B. Fahrradkette am 15.03, Zehnagel am 01.03) wurden versteckt — obwohl User sie im Wiederkehrend-Filter sehen muessen um die Serie zu verwalten.
+- **Root Cause:** macOS `recurringCount` + `filteredTasks` nutzten `visibleTasks` (filtert via `isVisibleInBacklog`). iOS `recurringTasks` nutzte `planItems` die bereits durch `LocalTaskSource.fetchIncompleteTasks()` → `isVisibleInBacklog` gefiltert waren.
+- **Fix:**
+  - macOS: `recurringCount`, `filteredTasks .recurring`, `regularFilteredTasks .recurring` nutzen jetzt `tasks.filter { !$0.isCompleted && ... }` statt `visibleTasks.filter`
+  - iOS: Neue Methode `LocalTaskSource.fetchIncompleteRecurringTasks()` (ohne `isVisibleInBacklog`), `SyncEngine.syncRecurringTasks()`, `BacklogView.allRecurringItems` State Property
+- **Dateien:** `LocalTaskSource.swift`, `SyncEngine.swift`, `BacklogView.swift`, `ContentView.swift`
+- **Tests:** 2 neue Unit Tests (fetchIncompleteRecurringTasks) GREEN
+- **Beide Plattformen:** iOS + macOS Build SUCCEEDED
+
+---
+
 ### Feature: Settings UX - Build-Info dynamisch + Vorwarnungs-Labels klarer (iOS + macOS)
 **Status:** OFFEN
 **Prioritaet:** NIEDRIG

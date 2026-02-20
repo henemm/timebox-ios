@@ -42,6 +42,16 @@ final class LocalTaskSource: @preconcurrency TaskSource, @preconcurrency TaskSou
         return allIncomplete.filter { $0.isVisibleInBacklog }
     }
 
+    /// Fetch ALL incomplete recurring tasks, ignoring isVisibleInBacklog.
+    /// Used by the "Wiederkehrend" filter to show all recurring tasks including future-dated ones.
+    func fetchIncompleteRecurringTasks() async throws -> [LocalTask] {
+        var descriptor = FetchDescriptor<LocalTask>(
+            predicate: #Predicate { !$0.isCompleted && $0.recurrencePattern != "none" }
+        )
+        descriptor.sortBy = [SortDescriptor(\.createdAt, order: .reverse)]
+        return try modelContext.fetch(descriptor)
+    }
+
     func fetchCompletedTasks(withinDays days: Int) async throws -> [LocalTask] {
         // Einfaches Predicate - komplexe Date-Logik verursacht SwiftDataError
         var descriptor = FetchDescriptor<LocalTask>(

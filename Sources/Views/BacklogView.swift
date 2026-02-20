@@ -62,6 +62,7 @@ struct BacklogView: View {
     @AppStorage("remindersSyncEnabled") private var remindersSyncEnabled: Bool = false
     @AppStorage("remindersMarkCompleteOnImport") private var remindersMarkCompleteOnImport: Bool = true
     @State private var planItems: [PlanItem] = []
+    @State private var allRecurringItems: [PlanItem] = []
     @State private var errorMessage: String?
     @State private var isLoading = false
     @State private var importStatusMessage: String?
@@ -107,9 +108,9 @@ struct BacklogView: View {
         planItems.filter { $0.urgency == "not_urgent" && ($0.importance ?? 0) < 3 && !$0.isTbd && !$0.isCompleted && !$0.isNextUp }
     }
 
-    // MARK: - Recurring Tasks
+    // MARK: - Recurring Tasks (all incomplete, ignoring isVisibleInBacklog)
     private var recurringTasks: [PlanItem] {
-        planItems.filter { ($0.recurrencePattern ?? "none") != "none" && !$0.isCompleted && !$0.isNextUp }
+        allRecurringItems.filter { !$0.isCompleted && !$0.isNextUp }
     }
 
     // MARK: - TBD Tasks (unvollständig)
@@ -410,6 +411,7 @@ struct BacklogView: View {
             let taskSource = LocalTaskSource(modelContext: modelContext)
             let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
             planItems = try await syncEngine.sync()
+            allRecurringItems = try await syncEngine.syncRecurringTasks()
             completedTasks = try await syncEngine.syncCompletedTasks(days: 7)
         } catch {
             errorMessage = error.localizedDescription
@@ -478,6 +480,7 @@ struct BacklogView: View {
             let taskSource = LocalTaskSource(modelContext: modelContext)
             let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
             planItems = try await syncEngine.sync()
+            allRecurringItems = try await syncEngine.syncRecurringTasks()
             print("[CloudKit Debug] refreshLocalTasks() DONE - new planItems: \(planItems.count)")
         } catch {
             print("[CloudKit Debug] refreshLocalTasks() ERROR: \(error)")

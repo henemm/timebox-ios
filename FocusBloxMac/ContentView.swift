@@ -108,7 +108,7 @@ struct ContentView: View {
     }
 
     private var recurringCount: Int {
-        visibleTasks.filter { $0.recurrencePattern != "none" }.count
+        tasks.filter { !$0.isCompleted && $0.recurrencePattern != "none" }.count
     }
 
     // Filtered tasks based on sidebar selection
@@ -138,7 +138,7 @@ struct ContentView: View {
         case .completed:
             return tasks.filter { $0.isCompleted }
         case .recurring:
-            return visibleTasks.filter { $0.recurrencePattern != "none" }
+            return tasks.filter { !$0.isCompleted && $0.recurrencePattern != "none" }
         case .smartPriority:
             return visibleTasks
                 .sorted {
@@ -283,7 +283,7 @@ struct ContentView: View {
         case .completed:
             return tasks.filter { $0.isCompleted }
         case .recurring:
-            return visibleTasks.filter { !$0.isNextUp && $0.recurrencePattern != "none" }
+            return tasks.filter { !$0.isCompleted && !$0.isNextUp && $0.recurrencePattern != "none" }
         case .smartPriority:
             return visibleTasks.filter { !$0.isNextUp }
                 .sorted {

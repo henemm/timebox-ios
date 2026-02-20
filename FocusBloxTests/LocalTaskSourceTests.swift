@@ -190,6 +190,65 @@ final class LocalTaskSourceTests: XCTestCase {
         XCTAssertEqual(tasks.count, 0)
     }
 
+    // MARK: - Fetch Recurring Tasks (all, ignoring isVisibleInBacklog)
+
+    /// Verhalten: fetchIncompleteRecurringTasks() liefert ALLE incomplete recurring Tasks,
+    /// auch wenn dueDate in der Zukunft liegt (die von fetchIncompleteTasks() versteckt werden).
+    /// Bricht wenn: LocalTaskSource.fetchIncompleteRecurringTasks() nicht implementiert oder
+    /// faelschlicherweise isVisibleInBacklog filtert.
+    func test_fetchIncompleteRecurringTasks_includesFutureDated() async throws {
+        let context = container.mainContext
+        let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: Date())!
+        let nextWeek = Calendar.current.date(byAdding: .day, value: 7, to: Date())!
+
+        // Task 1: recurring, dueDate = tomorrow → isVisibleInBacklog = false, but should be in result
+        let task1 = LocalTask(title: "Weekly Future", importance: 1, dueDate: nextWeek, recurrencePattern: "weekly")
+        // Task 2: recurring, dueDate = today → isVisibleInBacklog = true, should be in result
+        let task2 = LocalTask(title: "Daily Today", importance: 1, dueDate: Date(), recurrencePattern: "daily")
+        // Task 3: NOT recurring → should NOT be in result
+        let task3 = LocalTask(title: "Normal Task", importance: 1)
+        // Task 4: recurring but completed → should NOT be in result
+        let task4 = LocalTask(title: "Done Recurring", importance: 1, dueDate: tomorrow, recurrencePattern: "weekly")
+        task4.isCompleted = true
+
+        context.insert(task1)
+        context.insert(task2)
+        context.insert(task3)
+        context.insert(task4)
+        try context.save()
+
+        // Verify: fetchIncompleteTasks hides future-dated task1
+        let visibleTasks = try await source.fetchIncompleteTasks()
+        XCTAssertFalse(visibleTasks.contains(where: { $0.title == "Weekly Future" }),
+            "fetchIncompleteTasks should hide future-dated recurring task")
+
+        // Act: fetchIncompleteRecurringTasks should include ALL
+        let recurringTasks = try await source.fetchIncompleteRecurringTasks()
+
+        // Assert
+        XCTAssertEqual(recurringTasks.count, 2, "Should return both incomplete recurring tasks")
+        XCTAssertTrue(recurringTasks.contains(where: { $0.title == "Weekly Future" }),
+            "Must include future-dated recurring task")
+        XCTAssertTrue(recurringTasks.contains(where: { $0.title == "Daily Today" }),
+            "Must include today-dated recurring task")
+        XCTAssertFalse(recurringTasks.contains(where: { $0.title == "Normal Task" }),
+            "Must NOT include non-recurring task")
+        XCTAssertFalse(recurringTasks.contains(where: { $0.title == "Done Recurring" }),
+            "Must NOT include completed recurring task")
+    }
+
+    /// Verhalten: fetchIncompleteRecurringTasks() liefert leeres Array wenn keine recurring Tasks existieren.
+    /// Bricht wenn: Methode wirft Error oder crashed bei leerer DB.
+    func test_fetchIncompleteRecurringTasks_emptyWhenNoRecurring() async throws {
+        let context = container.mainContext
+        let task = LocalTask(title: "Normal", importance: 1)
+        context.insert(task)
+        try context.save()
+
+        let recurringTasks = try await source.fetchIncompleteRecurringTasks()
+        XCTAssertTrue(recurringTasks.isEmpty, "Should return empty array when no recurring tasks exist")
+    }
+
     // MARK: - Error Handling
 
     func test_markComplete_withInvalidID_doesNotCrash() async throws {

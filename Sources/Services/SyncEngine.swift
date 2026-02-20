@@ -18,6 +18,13 @@ final class SyncEngine {
                     .sorted { $0.rank > $1.rank }
     }
 
+    /// Fetch all incomplete recurring tasks (ignoring isVisibleInBacklog).
+    /// Used by "Wiederkehrend" filter to show future-dated recurring tasks.
+    func syncRecurringTasks() async throws -> [PlanItem] {
+        let tasks = try await taskSource.fetchIncompleteRecurringTasks()
+        return tasks.map { PlanItem(localTask: $0) }
+    }
+
     func syncCompletedTasks(days: Int) async throws -> [PlanItem] {
         let tasks = try await taskSource.fetchCompletedTasks(withinDays: days)
         return tasks.map { PlanItem(localTask: $0) }
