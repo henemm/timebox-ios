@@ -88,6 +88,8 @@
 		BDEDB5DE393186FC2D0BFF58 /* DurationEditingUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF402517A33C6BA497EFE1AC /* DurationEditingUITests.swift */; };
 		BFEDE0F6D0C383A49101B8D2 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F364C9B1BB1D787792360427 /* SettingsView.swift */; };
 		BSRCH01BUILD00001 /* BacklogSearchUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BSRCH01FILE000001 /* BacklogSearchUITests.swift */; };
+		LVCLN01BUILD00001 /* ListViewsCleanupTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = LVCLN01FILE000001 /* ListViewsCleanupTests.swift */; };
+		LVCLN01UIBUILD001 /* ListViewsCleanupUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = LVCLN01UIFILE0001 /* ListViewsCleanupUITests.swift */; };
 		BUG14DUR01BUILD000001 /* FocusBlockDurationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BUG14DUR01FILEREF0001 /* FocusBlockDurationTests.swift */; };
 		BUG34DDP01BUILD000001 /* DedupCleanupTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BUG34DDP01FILEREF0001 /* DedupCleanupTests.swift */; };
 		REMIMP01BUILD000001 /* RemindersImportServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = REMIMP01FILEREF0001 /* RemindersImportServiceTests.swift */; };
@@ -482,6 +484,8 @@
 		B9C8001C9F5CBCA0AC28B19A /* UXImprovementsUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = UXImprovementsUITests.swift; sourceTree = "<group>"; };
 		BCFB47E31C1D91935DCB9374 /* DebugLogReaderTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugLogReaderTest.swift; sourceTree = "<group>"; };
 		BSRCH01FILE000001 /* BacklogSearchUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BacklogSearchUITests.swift; sourceTree = "<group>"; };
+		LVCLN01FILE000001 /* ListViewsCleanupTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListViewsCleanupTests.swift; sourceTree = "<group>"; };
+		LVCLN01UIFILE0001 /* ListViewsCleanupUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListViewsCleanupUITests.swift; sourceTree = "<group>"; };
 		BUG14DUR01FILEREF0001 /* FocusBlockDurationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusBlockDurationTests.swift; sourceTree = "<group>"; };
 		BUG34DDP01FILEREF0001 /* DedupCleanupTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DedupCleanupTests.swift; sourceTree = "<group>"; };
 		REMIMP01FILEREF0001 /* RemindersImportServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemindersImportServiceTests.swift; sourceTree = "<group>"; };
@@ -792,6 +796,7 @@
 				AISCORE01UIFILE001 /* AITaskScoringUITests.swift */,
 				DUEDN02FILE0000001 /* DueDateNotificationUITests.swift */,
 				BSRCH01FILE000001 /* BacklogSearchUITests.swift */,
+				LVCLN01UIFILE0001 /* ListViewsCleanupUITests.swift */,
 			);
 			path = FocusBloxUITests;
 			sourceTree = "<group>";
@@ -999,6 +1004,7 @@
 				NXSWIPE01UTREF01 /* NextUpSwipeActionsTests.swift */,
 				AISCORE01FILE00001 /* AITaskScoringServiceTests.swift */,
 				DUEDN01FILE0000001 /* DueDateNotificationTests.swift */,
+				LVCLN01FILE000001 /* ListViewsCleanupTests.swift */,
 			);
 			path = FocusBloxTests;
 			sourceTree = "<group>";
@@ -1664,6 +1670,7 @@
 				NXLP01UIBLD0001 /* NextUpLongPressUITests.swift in Sources */,
 				DUEDN02BUILD000001 /* DueDateNotificationUITests.swift in Sources */,
 				BSRCH01BUILD00001 /* BacklogSearchUITests.swift in Sources */,
+				LVCLN01UIBUILD001 /* ListViewsCleanupUITests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1720,6 +1727,7 @@
 				NXSWIPE01UTBLD01 /* NextUpSwipeActionsTests.swift in Sources */,
 				AISCORE01BUILD0001 /* AITaskScoringServiceTests.swift in Sources */,
 				DUEDN01BUILD000001 /* DueDateNotificationTests.swift in Sources */,
+				LVCLN01BUILD00001 /* ListViewsCleanupTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

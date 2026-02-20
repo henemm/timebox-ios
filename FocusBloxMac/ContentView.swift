@@ -47,7 +47,7 @@ struct ContentView: View {
     // Navigation state
     @State private var columnVisibility: NavigationSplitViewVisibility = .all
     @State private var selectedSection: MainSection = .backlog
-    @State private var selectedFilter: SidebarFilter = .all
+    @State private var selectedFilter: SidebarFilter = .priority
     @State private var selectedTasks: Set<UUID> = []
 
     // Shared state between Planen and Zuweisen tabs
@@ -91,28 +91,11 @@ struct ContentView: View {
     }
 
     // Computed properties for sidebar badges
-    private var tbdCount: Int {
-        visibleTasks.filter { $0.isTbd }.count
-    }
-
-    private var nextUpCount: Int {
-        visibleTasks.filter { $0.isNextUp }.count
-    }
-
     private var overdueCount: Int {
-        let now = Date()
+        let startOfToday = Calendar.current.startOfDay(for: Date())
         return visibleTasks.filter { task in
             guard let dueDate = task.dueDate else { return false }
-            return dueDate < now
-        }.count
-    }
-
-    private var upcomingCount: Int {
-        let now = Date()
-        let weekFromNow = Calendar.current.date(byAdding: .day, value: 7, to: now) ?? now
-        return visibleTasks.filter { task in
-            guard let dueDate = task.dueDate else { return false }
-            return dueDate >= now && dueDate <= weekFromNow
+            return dueDate < startOfToday
         }.count
     }
 
@@ -128,32 +111,7 @@ struct ContentView: View {
     private var filteredTasks: [LocalTask] {
         let base: [LocalTask]
         switch selectedFilter {
-        case .all:
-            base = visibleTasks
-        case .category(let category):
-            base = visibleTasks.filter { $0.taskType == category }
-        case .nextUp:
-            base = visibleTasks.filter { $0.isNextUp }
-        case .tbd:
-            base = visibleTasks.filter { $0.isTbd }
-        case .overdue:
-            let now = Date()
-            base = visibleTasks.filter { task in
-                guard let dueDate = task.dueDate else { return false }
-                return dueDate < now
-            }
-        case .upcoming:
-            let now = Date()
-            let weekFromNow = Calendar.current.date(byAdding: .day, value: 7, to: now) ?? now
-            base = visibleTasks.filter { task in
-                guard let dueDate = task.dueDate else { return false }
-                return dueDate >= now && dueDate <= weekFromNow
-            }
-        case .completed:
-            base = tasks.filter { $0.isCompleted }
-        case .recurring:
-            base = tasks.filter { !$0.isCompleted && $0.recurrencePattern != "none" }
-        case .smartPriority:
+        case .priority:
             base = visibleTasks
                 .sorted {
                     TaskPriorityScoringService.calculateScore(
@@ -168,6 +126,23 @@ struct ContentView: View {
                         isNextUp: $1.isNextUp
                     )
                 }
+        case .recent:
+            base = visibleTasks
+                .sorted { a, b in
+                    let aDate = max(a.createdAt, a.modifiedAt ?? .distantPast)
+                    let bDate = max(b.createdAt, b.modifiedAt ?? .distantPast)
+                    return aDate > bDate
+                }
+        case .overdue:
+            let startOfToday = Calendar.current.startOfDay(for: Date())
+            base = visibleTasks.filter { task in
+                guard let dueDate = task.dueDate else { return false }
+                return dueDate < startOfToday
+            }.sorted { ($0.dueDate ?? .distantFuture) < ($1.dueDate ?? .distantFuture) }
+        case .completed:
+            base = tasks.filter { $0.isCompleted }
+        case .recurring:
+            base = tasks.filter { !$0.isCompleted && $0.recurrencePattern != "none" }
         }
         return searchText.isEmpty ? base : base.filter { matchesSearch($0) }
     }
@@ -185,10 +160,7 @@ struct ContentView: View {
             if selectedSection == .backlog {
                 SidebarView(
                     selectedFilter: $selectedFilter,
-                    tbdCount: tbdCount,
-                    nextUpCount: nextUpCount,
                     overdueCount: overdueCount,
-                    upcomingCount: upcomingCount,
                     completedCount: completedCount,
                     recurringCount: recurringCount
                 )
@@ -276,32 +248,7 @@ struct ContentView: View {
     private var regularFilteredTasks: [LocalTask] {
         let base: [LocalTask]
         switch selectedFilter {
-        case .all:
-            base = visibleTasks.filter { !$0.isNextUp }
-        case .category(let category):
-            base = visibleTasks.filter { !$0.isNextUp && $0.taskType == category }
-        case .nextUp:
-            base = []  // Next Up section handles this
-        case .tbd:
-            base = visibleTasks.filter { !$0.isNextUp && $0.isTbd }
-        case .overdue:
-            let now = Date()
-            base = visibleTasks.filter { task in
-                guard !task.isNextUp, let dueDate = task.dueDate else { return false }
-                return dueDate < now
-            }
-        case .upcoming:
-            let now = Date()
-            let weekFromNow = Calendar.current.date(byAdding: .day, value: 7, to: now) ?? now
-            base = visibleTasks.filter { task in
-                guard !task.isNextUp, let dueDate = task.dueDate else { return false }
-                return dueDate >= now && dueDate <= weekFromNow
-            }
-        case .completed:
-            base = tasks.filter { $0.isCompleted }
-        case .recurring:
-            base = tasks.filter { !$0.isCompleted && !$0.isNextUp && $0.recurrencePattern != "none" }
-        case .smartPriority:
+        case .priority:
             base = visibleTasks.filter { !$0.isNextUp }
                 .sorted {
                     TaskPriorityScoringService.calculateScore(
@@ -316,13 +263,30 @@ struct ContentView: View {
                         isNextUp: $1.isNextUp
                     )
                 }
+        case .recent:
+            base = visibleTasks.filter { !$0.isNextUp }
+                .sorted { a, b in
+                    let aDate = max(a.createdAt, a.modifiedAt ?? .distantPast)
+                    let bDate = max(b.createdAt, b.modifiedAt ?? .distantPast)
+                    return aDate > bDate
+                }
+        case .overdue:
+            let startOfToday = Calendar.current.startOfDay(for: Date())
+            base = visibleTasks.filter { task in
+                guard !task.isNextUp, let dueDate = task.dueDate else { return false }
+                return dueDate < startOfToday
+            }.sorted { ($0.dueDate ?? .distantFuture) < ($1.dueDate ?? .distantFuture) }
+        case .completed:
+            base = tasks.filter { $0.isCompleted }
+        case .recurring:
+            base = tasks.filter { !$0.isCompleted && !$0.isNextUp && $0.recurrencePattern != "none" }
         }
         return searchText.isEmpty ? base : base.filter { matchesSearch($0) }
     }
 
-    // Show Next Up section only in "All" filter
+    // Show Next Up section in all views except Completed
     private var showNextUpSection: Bool {
-        selectedFilter == .all && !nextUpTasks.isEmpty
+        selectedFilter != .completed && !nextUpTasks.isEmpty
     }
 
     private var backlogView: some View {
@@ -400,7 +364,7 @@ struct ContentView: View {
 
                 // MARK: Regular Tasks Section
                 Section {
-                    ForEach(selectedFilter == .nextUp ? nextUpTasks : regularFilteredTasks, id: \.uuid) { task in
+                    ForEach(regularFilteredTasks, id: \.uuid) { task in
                         makeBacklogRow(task: task)
                             .tag(task.uuid)
                             .swipeActions(edge: .leading, allowsFullSwipe: true) {
@@ -596,20 +560,12 @@ struct ContentView: View {
 
     private var filterTitle: String {
         switch selectedFilter {
-        case .all: return "Alle Tasks"
-        case .category(let cat): return categoryName(cat)
-        case .nextUp: return "Next Up"
-        case .tbd: return "TBD"
+        case .priority: return "Priorität"
+        case .recent: return "Zuletzt"
         case .overdue: return "Überfällig"
-        case .upcoming: return "Bald fällig"
         case .completed: return "Erledigt"
         case .recurring: return "Wiederkehrend"
-        case .smartPriority: return "Priorität"
         }
-    }
-
-    private func categoryName(_ category: String) -> String {
-        TaskCategory(rawValue: category)?.displayName ?? category
     }
 
     // MARK: - Inspector View
@@ -743,7 +699,7 @@ struct ContentView: View {
     }
 
     private func deleteTasks(at offsets: IndexSet) {
-        let tasksToDelete = selectedFilter == .nextUp ? nextUpTasks : regularFilteredTasks
+        let tasksToDelete = regularFilteredTasks
         for index in offsets {
             if index < tasksToDelete.count {
                 modelContext.delete(tasksToDelete[index])

@@ -27,6 +27,7 @@
 | 2 | ~~NextUp Wischgesten (Edit+Delete)~~ | ERLEDIGT | XS | ~15-20k | 3 | ~80 |
 | 3 | ~~NextUp Long Press Vorschau~~ | ERLEDIGT | XS | ~15-20k | 3 | ~120 |
 | 4 | ~~Generische Suche (iOS+macOS)~~ | ERLEDIGT | S | ~15-20k | 2-3 | ~25 |
+| 4b | ~~List-Views Cleanup (ViewModes 9→5)~~ | ERLEDIGT | M | ~50-70k | 6 | ~-270 |
 | 5 | MAC-022 Spotlight Integration | P2 | S | ~15-25k | 1-2 | ~30 |
 | 6 | ~~Recurring Tasks Phase 1B/2 (inkl. Sichtbarkeit + Edit/Delete Dialog)~~ | ERLEDIGT | M-L | ~60-100k | 5-6 | ~200 |
 | 7 | Kalender-App Deep Link (iOS+macOS) | MITTEL | M | ~40-50k | 3-4 | ~100 |
@@ -105,6 +106,27 @@
 ---
 
 ## 🔴 OFFEN
+
+---
+
+### List-Views Cleanup: ViewModes von 9 auf 5 reduzieren
+**Status:** ERLEDIGT
+**Prioritaet:** MITTEL
+**Komplexitaet:** M
+
+- **Problem:** 9 ViewModes im Backlog (Liste, Eisenhower Matrix, Kategorie, Dauer, Faelligkeit, TBD, Wiederkehrend, Erledigt, Prioritaet) — zu viele, verwirrend, teilweise redundant.
+- **Loesung:** Reduziert auf 5 ViewModes (gleich auf iOS + macOS):
+  1. **Prioritaet** (Standard) — mit Ueberfaellig-Section oben + 4 Priority-Tiers
+  2. **Zuletzt** — sortiert nach max(createdAt, modifiedAt)
+  3. **Ueberfaellig** — nur Tasks mit dueDate < heute
+  4. **Wiederkehrend** — wiederkehrende Tasks
+  5. **Erledigt** — letzte 7 Tage
+- **Next Up:** Als eigene Section in allen Views ausser Erledigt (statt separatem Overlay)
+- **Neues Feld:** `modifiedAt: Date?` auf LocalTask + PlanItem, wird bei Updates automatisch gesetzt
+- **Geloeschter Code:** smartPriorityView, QuadrantCard, localizedCategory Extension, 6 alte View-Funktionen
+- **macOS:** SidebarFilter Enum + SidebarView + ContentView identisch angepasst (5 Filter statt 9)
+- **Dateien:** `BacklogView.swift`, `LocalTask.swift`, `PlanItem.swift`, `SyncEngine.swift`, `SidebarView.swift` (macOS), `ContentView.swift` (macOS)
+- **Tests:** 7 Unit Tests + 6 UI Tests, alle GREEN
 
 ---
 

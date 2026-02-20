@@ -4,52 +4,36 @@ import SwiftData
 struct BacklogView: View {
     // MARK: - ViewMode Definition
     enum ViewMode: String, CaseIterable, Identifiable {
-        case list = "Liste"
-        case eisenhowerMatrix = "Matrix"
-        case category = "Kategorie"
-        case duration = "Dauer"
-        case dueDate = "Fälligkeit"
-        case tbd = "TBD"
-        case completed = "Erledigt"
+        case priority = "Priorität"
+        case recent = "Zuletzt"
+        case overdue = "Überfällig"
         case recurring = "Wiederkehrend"
-        case smartPriority = "Priorität"
+        case completed = "Erledigt"
 
         var id: String { rawValue }
 
         var icon: String {
             switch self {
-            case .list: return "list.bullet"
-            case .eisenhowerMatrix: return "square.grid.2x2"
-            case .category: return "folder"
-            case .duration: return "clock"
-            case .dueDate: return "calendar"
-            case .tbd: return "questionmark.circle"
+            case .priority: return "chart.bar.fill"
+            case .recent: return "clock.arrow.circlepath"
+            case .overdue: return "exclamationmark.circle"
             case .completed: return "checkmark.circle"
             case .recurring: return "arrow.triangle.2.circlepath"
-            case .smartPriority: return "chart.bar.fill"
             }
         }
 
         var emptyStateMessage: (title: String, description: String) {
             switch self {
-            case .list:
+            case .priority:
                 return ("Keine Tasks", "Tippe auf + um einen neuen Task zu erstellen.")
-            case .eisenhowerMatrix:
-                return ("Keine Tasks für Matrix", "Setze Wichtigkeit und Dringlichkeit für deine Tasks.")
-            case .category:
-                return ("Keine Tasks in Kategorien", "Erstelle Tasks und weise ihnen Kategorien zu.")
-            case .duration:
-                return ("Keine Tasks mit Dauer", "Setze geschätzte Dauern für deine Tasks.")
-            case .dueDate:
-                return ("Keine Tasks mit Fälligkeitsdatum", "Setze Fälligkeitsdaten für deine Tasks.")
-            case .tbd:
-                return ("Keine unvollständigen Tasks", "Alle Tasks haben Wichtigkeit, Dringlichkeit und Dauer.")
+            case .recent:
+                return ("Keine Tasks", "Tippe auf + um einen neuen Task zu erstellen.")
+            case .overdue:
+                return ("Keine überfälligen Tasks", "Alle Tasks sind im Zeitplan.")
             case .completed:
                 return ("Keine erledigten Tasks", "Erledigte Tasks der letzten 7 Tage erscheinen hier.")
             case .recurring:
                 return ("Keine wiederkehrenden Tasks", "Erstelle wiederkehrende Tasks mit einem Wiederholungsmuster.")
-            case .smartPriority:
-                return ("Keine Tasks", "Erstelle Tasks, um die Prioritäts-Sortierung zu sehen.")
             }
         }
     }
@@ -58,7 +42,7 @@ struct BacklogView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.eventKitRepository) private var eventKitRepo
     @Environment(CloudKitSyncMonitor.self) private var cloudKitMonitor
-    @AppStorage("backlogViewMode") private var selectedMode: ViewMode = .list
+    @AppStorage("backlogViewMode") private var selectedMode: ViewMode = .priority
     @AppStorage("remindersSyncEnabled") private var remindersSyncEnabled: Bool = false
     @AppStorage("remindersMarkCompleteOnImport") private var remindersMarkCompleteOnImport: Bool = true
     @State private var planItems: [PlanItem] = []
@@ -103,101 +87,27 @@ struct BacklogView: View {
         planItems.filter { !$0.isCompleted && !$0.isNextUp && $0.assignedFocusBlockID == nil && matchesSearch($0) }
     }
 
-    // MARK: - Eisenhower Matrix Filters (nur vollständige Tasks, keine TBDs)
-    private var doFirstTasks: [PlanItem] {
-        planItems.filter { $0.urgency == "urgent" && $0.importance == 3 && !$0.isTbd && !$0.isCompleted && !$0.isNextUp && matchesSearch($0) }
-    }
-
-    private var scheduleTasks: [PlanItem] {
-        planItems.filter { $0.urgency == "not_urgent" && $0.importance == 3 && !$0.isTbd && !$0.isCompleted && !$0.isNextUp && matchesSearch($0) }
-    }
-
-    private var delegateTasks: [PlanItem] {
-        planItems.filter { $0.urgency == "urgent" && ($0.importance ?? 0) < 3 && !$0.isTbd && !$0.isCompleted && !$0.isNextUp && matchesSearch($0) }
-    }
-
-    private var eliminateTasks: [PlanItem] {
-        planItems.filter { $0.urgency == "not_urgent" && ($0.importance ?? 0) < 3 && !$0.isTbd && !$0.isCompleted && !$0.isNextUp && matchesSearch($0) }
-    }
-
     // MARK: - Recurring Tasks (all incomplete, ignoring isVisibleInBacklog)
     private var recurringTasks: [PlanItem] {
         allRecurringItems.filter { !$0.isCompleted && !$0.isNextUp && matchesSearch($0) }
     }
 
-    // MARK: - TBD Tasks (unvollständig)
-    private var tbdTasks: [PlanItem] {
-        planItems.filter { $0.isTbd && !$0.isCompleted && !$0.isNextUp && matchesSearch($0) }
+    // MARK: - Overdue Tasks (dueDate < today)
+    private var overdueTasks: [PlanItem] {
+        let startOfToday = Calendar.current.startOfDay(for: Date())
+        return backlogTasks.filter { item in
+            guard let due = item.dueDate else { return false }
+            return due < startOfToday
+        }.sorted { ($0.dueDate ?? .distantFuture) < ($1.dueDate ?? .distantFuture) }
     }
 
-    private var tbdCount: Int {
-        tbdTasks.count
-    }
-
-    // MARK: - Category Grouping
-    private var tasksByCategory: [(category: String, tasks: [PlanItem])] {
-        let categories = ["deep_work", "shallow_work", "meetings", "maintenance", "creative", "strategic"]
-        return categories.compactMap { category in
-            let filtered = planItems.filter { $0.taskType == category && !$0.isCompleted && !$0.isNextUp && matchesSearch($0) }
-            guard !filtered.isEmpty else { return nil }
-            return (category: category.localizedCategory, tasks: filtered)
+    // MARK: - Recent Tasks (sorted by most recent date)
+    private var recentTasks: [PlanItem] {
+        backlogTasks.sorted { a, b in
+            let aDate = max(a.createdAt, a.modifiedAt ?? .distantPast)
+            let bDate = max(b.createdAt, b.modifiedAt ?? .distantPast)
+            return aDate > bDate
         }
-    }
-
-    // MARK: - Duration Grouping
-    private var tasksByDuration: [(bucket: String, tasks: [PlanItem])] {
-        let buckets: [(String, ClosedRange<Int>)] = [
-            ("< 15 Min", 0...14),
-            ("15-30 Min", 15...29),
-            ("30-60 Min", 30...59),
-            ("> 60 Min", 60...999)
-        ]
-        return buckets.compactMap { (label, range) in
-            let filtered = planItems.filter {
-                !$0.isCompleted && !$0.isNextUp && range.contains($0.effectiveDuration) && matchesSearch($0)
-            }
-            guard !filtered.isEmpty else { return nil }
-            return (bucket: label, tasks: filtered)
-        }
-    }
-
-    // MARK: - Due Date Grouping
-    private var tasksByDueDate: [(section: String, tasks: [PlanItem])] {
-        let calendar = Calendar.current
-        let today = Date()
-
-        var grouped: [(String, [PlanItem])] = []
-
-        let todayTasks = planItems.filter {
-            guard let due = $0.dueDate, !$0.isCompleted, !$0.isNextUp else { return false }
-            return calendar.isDateInToday(due) && matchesSearch($0)
-        }
-        if !todayTasks.isEmpty { grouped.append(("Heute", todayTasks)) }
-
-        let tomorrowTasks = planItems.filter {
-            guard let due = $0.dueDate, !$0.isCompleted, !$0.isNextUp else { return false }
-            return calendar.isDateInTomorrow(due) && matchesSearch($0)
-        }
-        if !tomorrowTasks.isEmpty { grouped.append(("Morgen", tomorrowTasks)) }
-
-        let weekTasks = planItems.filter {
-            guard let due = $0.dueDate, !$0.isCompleted, !$0.isNextUp else { return false }
-            return calendar.isDate(due, equalTo: today, toGranularity: .weekOfYear) &&
-                   !calendar.isDateInToday(due) && !calendar.isDateInTomorrow(due) && matchesSearch($0)
-        }
-        if !weekTasks.isEmpty { grouped.append(("Diese Woche", weekTasks)) }
-
-        let laterTasks = planItems.filter {
-            guard let due = $0.dueDate, !$0.isCompleted, !$0.isNextUp else { return false }
-            guard let nextWeek = calendar.date(byAdding: .weekOfYear, value: 1, to: today) else { return false }
-            return due > nextWeek && matchesSearch($0)
-        }
-        if !laterTasks.isEmpty { grouped.append(("Später", laterTasks)) }
-
-        let noDueDateTasks = planItems.filter { $0.dueDate == nil && !$0.isCompleted && !$0.isNextUp && matchesSearch($0) }
-        if !noDueDateTasks.isEmpty { grouped.append(("Ohne Fälligkeitsdatum", noDueDateTasks)) }
-
-        return grouped
     }
 
     // MARK: - Body
@@ -220,44 +130,17 @@ struct BacklogView: View {
                         description: Text(emptyState.description)
                     )
                 } else {
-                    VStack(spacing: 16) {
-                        // Next Up Section
-                        NextUpSection(
-                            tasks: nextUpTasks,
-                            onRemoveFromNextUp: { taskID in
-                                if let item = planItems.first(where: { $0.id == taskID }) {
-                                    updateNextUp(for: item, isNextUp: false)
-                                }
-                            },
-                            onEditTask: { task in
-                                taskToEditDirectly = task
-                            },
-                            onDeleteTask: { task in
-                                deleteTask(task)
-                            }
-                        )
-
-                        // Main content based on view mode
-                        switch selectedMode {
-                        case .list:
-                            listView
-                        case .eisenhowerMatrix:
-                            eisenhowerMatrixView
-                        case .category:
-                            categoryView
-                        case .duration:
-                            durationView
-                        case .dueDate:
-                            dueDateView
-                        case .tbd:
-                            tbdView
-                        case .completed:
-                            completedView
-                        case .recurring:
-                            recurringView
-                        case .smartPriority:
-                            smartPriorityView
-                        }
+                    switch selectedMode {
+                    case .priority:
+                        priorityView
+                    case .recent:
+                        recentView
+                    case .overdue:
+                        overdueView
+                    case .recurring:
+                        recurringView
+                    case .completed:
+                        completedView
                     }
                 }
             }
@@ -705,39 +588,23 @@ struct BacklogView: View {
         }
     }
 
-    // MARK: - View Mode Switcher (Swift Liquid Glass)
-    /// All view modes (smartPriority always available — deterministic scoring)
-    private var availableViewModes: [ViewMode] {
-        ViewMode.allCases
-    }
-
+    // MARK: - View Mode Switcher
     private var viewModeSwitcher: some View {
         Menu {
-            ForEach(availableViewModes) { mode in
+            ForEach(ViewMode.allCases) { mode in
                 Button {
                     withAnimation(.smooth) {
                         selectedMode = mode
                     }
                 } label: {
-                    // TBD zeigt Badge mit Anzahl
-                    if mode == .tbd && tbdCount > 0 {
-                        Label("\(mode.rawValue) (\(tbdCount))", systemImage: mode.icon)
-                    } else {
-                        Label(mode.rawValue, systemImage: mode.icon)
-                    }
+                    Label(mode.rawValue, systemImage: mode.icon)
                 }
             }
         } label: {
             HStack(spacing: 4) {
                 Image(systemName: selectedMode.icon)
-                // TBD im Toggle zeigt Badge
-                if selectedMode == .tbd && tbdCount > 0 {
-                    Text("\(selectedMode.rawValue) (\(tbdCount))")
-                        .font(.headline)
-                } else {
-                    Text(selectedMode.rawValue)
-                        .font(.headline)
-                }
+                Text(selectedMode.rawValue)
+                    .font(.headline)
                 Image(systemName: "chevron.down")
                     .font(.caption)
             }
@@ -755,352 +622,226 @@ struct BacklogView: View {
         .accessibilityIdentifier("viewModeSwitcher")
     }
 
-    // MARK: - List View
-    // Using List for swipe actions support (swipe right = Next Up, swipe left = Edit)
-    private var listView: some View {
-        List {
-            ForEach(backlogTasks) { item in
-                BacklogRow(
-                    item: item,
-                    onComplete: { completeTask(item) },
-                    onDurationTap: { selectedItemForDuration = item },
-                    onAddToNextUp: { updateNextUp(for: item, isNextUp: true) },
-                    onImportanceCycle: { newImportance in updateImportance(for: item, importance: newImportance) },
-                    onUrgencyToggle: { newUrgency in updateUrgency(for: item, urgency: newUrgency) },
-                    onCategoryTap: { selectedItemForCategory = item },
-                    onEditTap: { taskToEditDirectly = item },
-                    onDeleteTap: { deleteTask(item) },
-                    onTitleSave: { newTitle in
-                        saveTitleEdit(for: item, title: newTitle)
+    // MARK: - Next Up Section (inline in List)
+    @ViewBuilder
+    private var nextUpListSection: some View {
+        if !nextUpTasks.isEmpty {
+            Section {
+                ForEach(nextUpTasks) { item in
+                    BacklogRow(
+                        item: item,
+                        onComplete: { completeTask(item) },
+                        onDurationTap: { selectedItemForDuration = item },
+                        onAddToNextUp: { updateNextUp(for: item, isNextUp: false) },
+                        onImportanceCycle: { newImportance in updateImportance(for: item, importance: newImportance) },
+                        onUrgencyToggle: { newUrgency in updateUrgency(for: item, urgency: newUrgency) },
+                        onCategoryTap: { selectedItemForCategory = item },
+                        onEditTap: { taskToEditDirectly = item },
+                        onDeleteTap: { deleteTask(item) },
+                        onTitleSave: { newTitle in saveTitleEdit(for: item, title: newTitle) }
+                    )
+                    .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
+                    .listRowBackground(Color.clear)
+                    .listRowSeparator(.hidden)
+                    .swipeActions(edge: .leading, allowsFullSwipe: true) {
+                        Button {
+                            updateNextUp(for: item, isNextUp: false)
+                        } label: {
+                            Label("Entfernen", systemImage: "arrow.down.circle.fill")
+                        }
+                        .tint(.orange)
                     }
+                    .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                        Button(role: .destructive) {
+                            deleteTask(item)
+                        } label: {
+                            Label("Löschen", systemImage: "trash")
+                        }
+                        Button {
+                            taskToEditDirectly = item
+                        } label: {
+                            Label("Bearbeiten", systemImage: "pencil")
+                        }
+                        .tint(.blue)
+                    }
+                }
+            } header: {
+                HStack {
+                    Label("Next Up", systemImage: "arrow.up.circle.fill")
+                        .font(.headline)
+                        .foregroundStyle(.green)
+                    Spacer()
+                    Text("\(nextUpTasks.count)")
+                        .font(.caption)
+                        .foregroundStyle(.green)
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 2)
+                        .background(Color.green.opacity(0.2))
+                        .clipShape(Capsule())
+                }
+            }
+        }
+    }
+
+    // MARK: - Backlog Row with Swipe Actions (shared helper)
+    @ViewBuilder
+    private func backlogRowWithSwipe(_ item: PlanItem) -> some View {
+        BacklogRow(
+            item: item,
+            onComplete: { completeTask(item) },
+            onDurationTap: { selectedItemForDuration = item },
+            onAddToNextUp: { updateNextUp(for: item, isNextUp: true) },
+            onImportanceCycle: { newImportance in updateImportance(for: item, importance: newImportance) },
+            onUrgencyToggle: { newUrgency in updateUrgency(for: item, urgency: newUrgency) },
+            onCategoryTap: { selectedItemForCategory = item },
+            onEditTap: { handleEditTap(item) },
+            onDeleteTap: { deleteTask(item) },
+            onTitleSave: { newTitle in saveTitleEdit(for: item, title: newTitle) }
+        )
+        .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
+        .listRowBackground(Color.clear)
+        .listRowSeparator(.hidden)
+        .swipeActions(edge: .leading, allowsFullSwipe: true) {
+            Button {
+                updateNextUp(for: item, isNextUp: true)
+            } label: {
+                Label("Next Up", systemImage: "arrow.up.circle.fill")
+            }
+            .tint(.green)
+        }
+        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+            Button(role: .destructive) {
+                deleteTask(item)
+            } label: {
+                Label("Löschen", systemImage: "trash")
+            }
+            Button {
+                handleEditTap(item)
+            } label: {
+                Label("Bearbeiten", systemImage: "pencil")
+            }
+            .tint(.blue)
+        }
+    }
+
+    // MARK: - Priority View (with overdue section at top)
+    private var priorityView: some View {
+        List {
+            nextUpListSection
+
+            // Overdue tasks at top
+            if !overdueTasks.isEmpty {
+                Section {
+                    ForEach(overdueTasks) { item in
+                        backlogRowWithSwipe(item)
+                    }
+                } header: {
+                    HStack {
+                        Text("Überfällig")
+                            .font(.headline)
+                            .foregroundStyle(.red)
+                        Spacer()
+                        Text("\(overdueTasks.count)")
+                            .font(.caption)
+                            .foregroundStyle(.red)
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 2)
+                            .background(Color.red.opacity(0.2))
+                            .clipShape(Capsule())
+                    }
+                }
+            }
+
+            // Priority tiers
+            ForEach(TaskPriorityScoringService.PriorityTier.allCases, id: \.self) { tier in
+                let tierTasks = backlogTasks
+                    .filter { task in task.priorityTier == tier && !overdueTasks.contains(where: { $0.id == task.id }) }
+                    .sorted { $0.priorityScore > $1.priorityScore }
+                if !tierTasks.isEmpty {
+                    Section {
+                        ForEach(tierTasks) { item in
+                            backlogRowWithSwipe(item)
+                        }
+                    } header: {
+                        HStack {
+                            Text(tier.label)
+                                .font(.headline)
+                                .foregroundStyle(tierColor(tier))
+                            Spacer()
+                            Text("\(tierTasks.count)")
+                                .font(.caption)
+                                .foregroundStyle(tierColor(tier))
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 2)
+                                .background(tierColor(tier).opacity(0.2))
+                                .clipShape(Capsule())
+                        }
+                    }
+                }
+            }
+        }
+        .listStyle(.plain)
+        .scrollContentBackground(.hidden)
+        .refreshable {
+            await loadTasks()
+        }
+    }
+
+    // MARK: - Recent View (sorted by most recent date)
+    private var recentView: some View {
+        List {
+            nextUpListSection
+
+            Section {
+                ForEach(recentTasks) { item in
+                    backlogRowWithSwipe(item)
+                }
+            } header: {
+                Text("Zuletzt bearbeitet")
+                    .font(.headline)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .listStyle(.plain)
+        .scrollContentBackground(.hidden)
+        .refreshable {
+            await loadTasks()
+        }
+    }
+
+    // MARK: - Overdue View (only overdue tasks)
+    private var overdueView: some View {
+        List {
+            nextUpListSection
+
+            if overdueTasks.isEmpty {
+                ContentUnavailableView(
+                    "Keine überfälligen Tasks",
+                    systemImage: "checkmark.circle",
+                    description: Text("Alle Tasks sind im Zeitplan.")
                 )
-                .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
+                .listRowInsets(EdgeInsets())
                 .listRowBackground(Color.clear)
                 .listRowSeparator(.hidden)
-                .swipeActions(edge: .leading, allowsFullSwipe: true) {
-                    Button {
-                        updateNextUp(for: item, isNextUp: true)
-                    } label: {
-                        Label("Next Up", systemImage: "arrow.up.circle.fill")
-                    }
-                    .tint(.green)
-                }
-                .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                    Button(role: .destructive) {
-                        deleteTask(item)
-                    } label: {
-                        Label("Löschen", systemImage: "trash")
-                    }
-
-                    Button {
-                        taskToEditDirectly = item
-                    } label: {
-                        Label("Bearbeiten", systemImage: "pencil")
-                    }
-                    .tint(.blue)
-                }
-            }
-        }
-        .listStyle(.plain)
-        .scrollContentBackground(.hidden)
-        .refreshable {
-            await loadTasks()
-        }
-    }
-
-    // MARK: - Eisenhower Matrix View
-    private var eisenhowerMatrixView: some View {
-        ScrollView {
-            VStack(spacing: 16) {
-                QuadrantCard(
-                    title: "Do First",
-                    subtitle: "Dringend + Wichtig",
-                    color: .red,
-                    icon: "exclamationmark.3",
-                    tasks: doFirstTasks,
-                    onDurationTap: { item in selectedItemForDuration = item },
-                    onAddToNextUp: { item in updateNextUp(for: item, isNextUp: true) },
-                    onComplete: { item in completeTask(item) },
-                    onImportanceCycle: { item, newImportance in updateImportance(for: item, importance: newImportance) },
-                    onUrgencyToggle: { item, newUrgency in updateUrgency(for: item, urgency: newUrgency) },
-                    onCategoryTap: { item in selectedItemForCategory = item },
-                    onEditTap: { item in taskToEditDirectly = item },
-                    onDeleteTap: { item in deleteTask(item) },
-                    onTitleSave: { item, newTitle in saveTitleEdit(for: item, title: newTitle) }
-                )
-
-                QuadrantCard(
-                    title: "Schedule",
-                    subtitle: "Nicht dringend + Wichtig",
-                    color: .yellow,
-                    icon: "calendar",
-                    tasks: scheduleTasks,
-                    onDurationTap: { item in selectedItemForDuration = item },
-                    onAddToNextUp: { item in updateNextUp(for: item, isNextUp: true) },
-                    onComplete: { item in completeTask(item) },
-                    onImportanceCycle: { item, newImportance in updateImportance(for: item, importance: newImportance) },
-                    onUrgencyToggle: { item, newUrgency in updateUrgency(for: item, urgency: newUrgency) },
-                    onCategoryTap: { item in selectedItemForCategory = item },
-                    onEditTap: { item in taskToEditDirectly = item },
-                    onDeleteTap: { item in deleteTask(item) },
-                    onTitleSave: { item, newTitle in saveTitleEdit(for: item, title: newTitle) }
-                )
-
-                QuadrantCard(
-                    title: "Delegate",
-                    subtitle: "Dringend + Weniger wichtig",
-                    color: .orange,
-                    icon: "person.2",
-                    tasks: delegateTasks,
-                    onDurationTap: { item in selectedItemForDuration = item },
-                    onAddToNextUp: { item in updateNextUp(for: item, isNextUp: true) },
-                    onComplete: { item in completeTask(item) },
-                    onImportanceCycle: { item, newImportance in updateImportance(for: item, importance: newImportance) },
-                    onUrgencyToggle: { item, newUrgency in updateUrgency(for: item, urgency: newUrgency) },
-                    onCategoryTap: { item in selectedItemForCategory = item },
-                    onEditTap: { item in taskToEditDirectly = item },
-                    onDeleteTap: { item in deleteTask(item) },
-                    onTitleSave: { item, newTitle in saveTitleEdit(for: item, title: newTitle) }
-                )
-
-                QuadrantCard(
-                    title: "Eliminate",
-                    subtitle: "Nicht dringend + Weniger wichtig",
-                    color: .green,
-                    icon: "trash",
-                    tasks: eliminateTasks,
-                    onDurationTap: { item in selectedItemForDuration = item },
-                    onAddToNextUp: { item in updateNextUp(for: item, isNextUp: true) },
-                    onComplete: { item in completeTask(item) },
-                    onImportanceCycle: { item, newImportance in updateImportance(for: item, importance: newImportance) },
-                    onUrgencyToggle: { item, newUrgency in updateUrgency(for: item, urgency: newUrgency) },
-                    onCategoryTap: { item in selectedItemForCategory = item },
-                    onEditTap: { item in taskToEditDirectly = item },
-                    onDeleteTap: { item in deleteTask(item) },
-                    onTitleSave: { item, newTitle in saveTitleEdit(for: item, title: newTitle) }
-                )
-            }
-            .padding()
-        }
-        .refreshable {
-            await loadTasks()
-        }
-    }
-
-    // MARK: - Category View
-    private var categoryView: some View {
-        List {
-            ForEach(tasksByCategory, id: \.category) { group in
+            } else {
                 Section {
-                    ForEach(group.tasks) { item in
-                        BacklogRow(
-                            item: item,
-                            onComplete: { completeTask(item) },
-                            onDurationTap: { selectedItemForDuration = item },
-                            onAddToNextUp: { updateNextUp(for: item, isNextUp: true) },
-                            onTap: { taskToEdit = item },
-                            onImportanceCycle: { newImportance in updateImportance(for: item, importance: newImportance) },
-                            onUrgencyToggle: { newUrgency in updateUrgency(for: item, urgency: newUrgency) },
-                            onCategoryTap: { selectedItemForCategory = item },
-                            onEditTap: { taskToEditDirectly = item },
-                            onDeleteTap: { deleteTask(item) }
-                        )
-                        .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
-                        .listRowBackground(Color.clear)
-                        .listRowSeparator(.hidden)
-                        .swipeActions(edge: .leading, allowsFullSwipe: true) {
-                            Button {
-                                updateNextUp(for: item, isNextUp: true)
-                            } label: {
-                                Label("Next Up", systemImage: "arrow.up.circle.fill")
-                            }
-                            .tint(.green)
-                        }
-                        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                            Button(role: .destructive) {
-                                deleteTask(item)
-                            } label: {
-                                Label("Löschen", systemImage: "trash")
-                            }
-
-                            Button {
-                                taskToEditDirectly = item
-                            } label: {
-                                Label("Bearbeiten", systemImage: "pencil")
-                            }
-                            .tint(.blue)
-                        }
+                    ForEach(overdueTasks) { item in
+                        backlogRowWithSwipe(item)
                     }
                 } header: {
-                    Text(group.category)
-                        .font(.headline)
-                        .foregroundStyle(.secondary)
-                }
-            }
-        }
-        .listStyle(.plain)
-        .scrollContentBackground(.hidden)
-        .refreshable {
-            await loadTasks()
-        }
-    }
-
-    // MARK: - Duration View
-    private var durationView: some View {
-        List {
-            ForEach(tasksByDuration, id: \.bucket) { group in
-                Section {
-                    ForEach(group.tasks) { item in
-                        BacklogRow(
-                            item: item,
-                            onComplete: { completeTask(item) },
-                            onDurationTap: { selectedItemForDuration = item },
-                            onAddToNextUp: { updateNextUp(for: item, isNextUp: true) },
-                            onTap: { taskToEdit = item },
-                            onImportanceCycle: { newImportance in updateImportance(for: item, importance: newImportance) },
-                            onUrgencyToggle: { newUrgency in updateUrgency(for: item, urgency: newUrgency) },
-                            onCategoryTap: { selectedItemForCategory = item },
-                            onEditTap: { taskToEditDirectly = item },
-                            onDeleteTap: { deleteTask(item) }
-                        )
-                        .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
-                        .listRowBackground(Color.clear)
-                        .listRowSeparator(.hidden)
-                        .swipeActions(edge: .leading, allowsFullSwipe: true) {
-                            Button {
-                                updateNextUp(for: item, isNextUp: true)
-                            } label: {
-                                Label("Next Up", systemImage: "arrow.up.circle.fill")
-                            }
-                            .tint(.green)
-                        }
-                        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                            Button(role: .destructive) {
-                                deleteTask(item)
-                            } label: {
-                                Label("Löschen", systemImage: "trash")
-                            }
-
-                            Button {
-                                taskToEditDirectly = item
-                            } label: {
-                                Label("Bearbeiten", systemImage: "pencil")
-                            }
-                            .tint(.blue)
-                        }
+                    HStack {
+                        Text("Überfällig")
+                            .font(.headline)
+                            .foregroundStyle(.red)
+                        Spacer()
+                        Text("\(overdueTasks.count)")
+                            .font(.caption)
+                            .foregroundStyle(.red)
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 2)
+                            .background(Color.red.opacity(0.2))
+                            .clipShape(Capsule())
                     }
-                } header: {
-                    Text(group.bucket)
-                        .font(.headline)
-                        .foregroundStyle(.secondary)
-                }
-            }
-        }
-        .listStyle(.plain)
-        .scrollContentBackground(.hidden)
-        .refreshable {
-            await loadTasks()
-        }
-    }
-
-    // MARK: - Due Date View
-    private var dueDateView: some View {
-        List {
-            ForEach(tasksByDueDate, id: \.section) { group in
-                Section {
-                    ForEach(group.tasks) { item in
-                        BacklogRow(
-                            item: item,
-                            onComplete: { completeTask(item) },
-                            onDurationTap: { selectedItemForDuration = item },
-                            onAddToNextUp: { updateNextUp(for: item, isNextUp: true) },
-                            onTap: { taskToEdit = item },
-                            onImportanceCycle: { newImportance in updateImportance(for: item, importance: newImportance) },
-                            onUrgencyToggle: { newUrgency in updateUrgency(for: item, urgency: newUrgency) },
-                            onCategoryTap: { selectedItemForCategory = item },
-                            onEditTap: { taskToEditDirectly = item },
-                            onDeleteTap: { deleteTask(item) }
-                        )
-                        .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
-                        .listRowBackground(Color.clear)
-                        .listRowSeparator(.hidden)
-                        .swipeActions(edge: .leading, allowsFullSwipe: true) {
-                            Button {
-                                updateNextUp(for: item, isNextUp: true)
-                            } label: {
-                                Label("Next Up", systemImage: "arrow.up.circle.fill")
-                            }
-                            .tint(.green)
-                        }
-                        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                            Button(role: .destructive) {
-                                deleteTask(item)
-                            } label: {
-                                Label("Löschen", systemImage: "trash")
-                            }
-
-                            Button {
-                                taskToEditDirectly = item
-                            } label: {
-                                Label("Bearbeiten", systemImage: "pencil")
-                            }
-                            .tint(.blue)
-                        }
-                    }
-                } header: {
-                    Text(group.section)
-                        .font(.headline)
-                        .foregroundStyle(.secondary)
-                }
-            }
-        }
-        .listStyle(.plain)
-        .scrollContentBackground(.hidden)
-        .refreshable {
-            await loadTasks()
-        }
-    }
-
-    // MARK: - TBD View (unvollständige Tasks)
-    private var tbdView: some View {
-        List {
-            ForEach(tbdTasks) { item in
-                BacklogRow(
-                    item: item,
-                    onComplete: { completeTask(item) },
-                    onDurationTap: { selectedItemForDuration = item },
-                    onAddToNextUp: { updateNextUp(for: item, isNextUp: true) },
-                    onTap: { taskToEdit = item },
-                    onImportanceCycle: { newImportance in updateImportance(for: item, importance: newImportance) },
-                    onUrgencyToggle: { newUrgency in updateUrgency(for: item, urgency: newUrgency) },
-                    onCategoryTap: { selectedItemForCategory = item },
-                    onEditTap: { taskToEditDirectly = item },
-                    onDeleteTap: { deleteTask(item) }
-                )
-                .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
-                .listRowBackground(Color.clear)
-                .listRowSeparator(.hidden)
-                .swipeActions(edge: .leading, allowsFullSwipe: true) {
-                    Button {
-                        updateNextUp(for: item, isNextUp: true)
-                    } label: {
-                        Label("Next Up", systemImage: "arrow.up.circle.fill")
-                    }
-                    .tint(.green)
-                }
-                .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                    Button(role: .destructive) {
-                        deleteTask(item)
-                    } label: {
-                        Label("Löschen", systemImage: "trash")
-                    }
-
-                    Button {
-                        taskToEditDirectly = item
-                    } label: {
-                        Label("Bearbeiten", systemImage: "pencil")
-                    }
-                    .tint(.blue)
                 }
             }
         }
@@ -1114,6 +855,8 @@ struct BacklogView: View {
     // MARK: - Recurring View (wiederkehrende Tasks)
     private var recurringView: some View {
         List {
+            nextUpListSection
+
             ForEach(recurringTasks) { item in
                 BacklogRow(
                     item: item,
@@ -1200,81 +943,6 @@ struct BacklogView: View {
                             deleteTask(item)
                         } label: {
                             Label("Löschen", systemImage: "trash")
-                        }
-                    }
-                }
-            }
-        }
-        .listStyle(.plain)
-        .scrollContentBackground(.hidden)
-        .refreshable {
-            await loadTasks()
-        }
-    }
-
-    // MARK: - Smart Priority View (sorted by priority score, grouped by tier)
-    private var smartPriorityView: some View {
-        List {
-            ForEach(TaskPriorityScoringService.PriorityTier.allCases, id: \.self) { tier in
-                let tierTasks = backlogTasks
-                    .filter { $0.priorityTier == tier }
-                    .sorted { $0.priorityScore > $1.priorityScore }
-                if !tierTasks.isEmpty {
-                    Section {
-                        ForEach(tierTasks) { item in
-                            BacklogRow(
-                                item: item,
-                                onComplete: { completeTask(item) },
-                                onDurationTap: { selectedItemForDuration = item },
-                                onAddToNextUp: { updateNextUp(for: item, isNextUp: true) },
-                                onImportanceCycle: { newImportance in updateImportance(for: item, importance: newImportance) },
-                                onUrgencyToggle: { newUrgency in updateUrgency(for: item, urgency: newUrgency) },
-                                onCategoryTap: { selectedItemForCategory = item },
-                                onEditTap: { taskToEditDirectly = item },
-                                onDeleteTap: { deleteTask(item) },
-                                onTitleSave: { newTitle in
-                                    saveTitleEdit(for: item, title: newTitle)
-                                }
-                            )
-                            .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
-                            .listRowBackground(Color.clear)
-                            .listRowSeparator(.hidden)
-                            .swipeActions(edge: .leading, allowsFullSwipe: true) {
-                                Button {
-                                    updateNextUp(for: item, isNextUp: true)
-                                } label: {
-                                    Label("Next Up", systemImage: "arrow.up.circle.fill")
-                                }
-                                .tint(.green)
-                            }
-                            .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                                Button(role: .destructive) {
-                                    deleteTask(item)
-                                } label: {
-                                    Label("Löschen", systemImage: "trash")
-                                }
-
-                                Button {
-                                    taskToEditDirectly = item
-                                } label: {
-                                    Label("Bearbeiten", systemImage: "pencil")
-                                }
-                                .tint(.blue)
-                            }
-                        }
-                    } header: {
-                        HStack {
-                            Text(tier.label)
-                                .font(.headline)
-                                .foregroundStyle(tierColor(tier))
-                            Spacer()
-                            Text("\(tierTasks.count)")
-                                .font(.caption)
-                                .foregroundStyle(tierColor(tier))
-                                .padding(.horizontal, 6)
-                                .padding(.vertical, 2)
-                                .background(tierColor(tier).opacity(0.2))
-                                .clipShape(Capsule())
                         }
                     }
                 }
@@ -1386,129 +1054,3 @@ struct CompletedTaskRow: View {
     }
 }
 
-// MARK: - String Extension for Category Localization
-private extension String {
-    var localizedCategory: String {
-        switch self {
-        case "deep_work": return "Deep Work"
-        case "shallow_work": return "Shallow Work"
-        case "meetings": return "Meetings"
-        case "maintenance": return "Maintenance"
-        case "creative": return "Creative"
-        case "strategic": return "Strategic"
-        case "income": return "Geld verdienen"
-        case "recharge": return "Energie aufladen"
-        case "learning": return "Lernen"
-        case "giving_back": return "Weitergeben"
-        default: return self.capitalized
-        }
-    }
-}
-
-// MARK: - Quadrant Card
-
-struct QuadrantCard: View {
-    let title: String
-    let subtitle: String
-    let color: Color
-    let icon: String
-    let tasks: [PlanItem]
-    let onDurationTap: (PlanItem) -> Void
-    let onAddToNextUp: (PlanItem) -> Void
-    var onComplete: ((PlanItem) -> Void)?
-    var onImportanceCycle: ((PlanItem, Int) -> Void)?
-    var onUrgencyToggle: ((PlanItem, String?) -> Void)?
-    var onCategoryTap: ((PlanItem) -> Void)?
-    var onEditTap: ((PlanItem) -> Void)?
-    var onDeleteTap: ((PlanItem) -> Void)?
-    var onTitleSave: ((PlanItem, String) -> Void)?
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack(spacing: 8) {
-                Image(systemName: icon)
-                    .font(.title3)
-                    .foregroundStyle(color)
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(title)
-                        .font(.headline)
-                        .foregroundStyle(color)
-                    Text(subtitle)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-                Spacer()
-                Text("\(tasks.count)")
-                    .font(.title2.bold())
-                    .foregroundStyle(color)
-            }
-            .padding(.horizontal)
-            .padding(.top, 12)
-
-            if tasks.isEmpty {
-                Text("Keine Tasks")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .frame(maxWidth: .infinity, alignment: .center)
-                    .padding(.vertical, 20)
-            } else {
-                ForEach(tasks.prefix(5)) { task in
-                    BacklogRow(
-                        item: task,
-                        onComplete: onComplete.map { callback in { callback(task) } },
-                        onDurationTap: { onDurationTap(task) },
-                        onAddToNextUp: { onAddToNextUp(task) },
-                        onImportanceCycle: onImportanceCycle.map { callback in { newImportance in callback(task, newImportance) } },
-                        onUrgencyToggle: onUrgencyToggle.map { callback in { newUrgency in callback(task, newUrgency) } },
-                        onCategoryTap: onCategoryTap.map { callback in { callback(task) } },
-                        onEditTap: onEditTap.map { callback in { callback(task) } },
-                        onDeleteTap: onDeleteTap.map { callback in { callback(task) } },
-                        onTitleSave: onTitleSave.map { callback in { newTitle in callback(task, newTitle) } }
-                    )
-                    .padding(.horizontal, 8)
-                    .contextMenu {
-                        Button {
-                            onAddToNextUp(task)
-                        } label: {
-                            Label("Next Up", systemImage: "arrow.up.circle.fill")
-                        }
-
-                        if let editCallback = onEditTap {
-                            Button {
-                                editCallback(task)
-                            } label: {
-                                Label("Bearbeiten", systemImage: "pencil")
-                            }
-                        }
-
-                        Divider()
-
-                        if let deleteCallback = onDeleteTap {
-                            Button(role: .destructive) {
-                                deleteCallback(task)
-                            } label: {
-                                Label("Löschen", systemImage: "trash")
-                            }
-                        }
-                    }
-                }
-
-                if tasks.count > 5 {
-                    Text("+ \(tasks.count - 5) weitere")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .padding(.horizontal)
-                        .padding(.bottom, 8)
-                }
-            }
-        }
-        .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(color.opacity(0.05))
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: 12)
-                .stroke(color.opacity(0.3), lineWidth: 2)
-        )
-    }
-}

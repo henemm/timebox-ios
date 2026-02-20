@@ -89,6 +89,7 @@ final class SyncEngine {
         if let recurrenceWeekdays { task.recurrenceWeekdays = recurrenceWeekdays }
         if let recurrenceMonthDay { task.recurrenceMonthDay = recurrenceMonthDay }
         if let recurrenceInterval { task.recurrenceInterval = recurrenceInterval }
+        task.modifiedAt = Date()
         try modelContext.save()
     }
 
@@ -120,6 +121,7 @@ final class SyncEngine {
             if let recurrenceWeekdays { task.recurrenceWeekdays = recurrenceWeekdays }
             if let recurrenceMonthDay { task.recurrenceMonthDay = recurrenceMonthDay }
             if let recurrenceInterval { task.recurrenceInterval = recurrenceInterval }
+            task.modifiedAt = Date()
         }
         try modelContext.save()
     }

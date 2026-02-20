@@ -26,63 +26,31 @@ enum MainSection: String, Hashable, CaseIterable {
     }
 }
 
-/// Sidebar filter options for the backlog
+/// Sidebar filter options for the backlog (matches iOS ViewMode)
 enum SidebarFilter: Hashable {
-    case all
-    case category(String)
-    case nextUp
-    case tbd
+    case priority
+    case recent
     case overdue
-    case upcoming
-    case completed
     case recurring
-    case smartPriority
+    case completed
 }
 
 /// Sidebar view showing only filters (navigation moved to toolbar)
+/// Matches iOS BacklogView.ViewMode: Priorität, Zuletzt, Überfällig, Wiederkehrend, Erledigt
 struct SidebarView: View {
     @Binding var selectedFilter: SidebarFilter
-    let tbdCount: Int
-    let nextUpCount: Int
     let overdueCount: Int
-    let upcomingCount: Int
     let completedCount: Int
     let recurringCount: Int
 
     var body: some View {
         List {
-            // MARK: - Backlog Filters
-            Section("Filter") {
-                filterRow(label: "Alle Tasks", icon: "tray.full", filter: .all)
+            Section("Ansicht") {
+                filterRow(label: "Priorität", icon: "chart.bar.fill", filter: .priority)
+                filterRow(label: "Zuletzt", icon: "clock.arrow.circlepath", filter: .recent)
 
                 HStack {
-                    Label("Next Up", systemImage: "arrow.up.circle.fill")
-                        .accessibilityIdentifier("sidebarFilter_nextUp")
-                    Spacer()
-                    if nextUpCount > 0 {
-                        badgeView(count: nextUpCount, color: .blue)
-                    }
-                }
-                .tag(SidebarFilter.nextUp)
-                .contentShape(Rectangle())
-                .onTapGesture { selectedFilter = .nextUp }
-                .listRowBackground(selectedFilter == .nextUp ? Color.accentColor.opacity(0.15) : Color.clear)
-
-                HStack {
-                    Label("TBD", systemImage: "questionmark.circle")
-                        .accessibilityIdentifier("sidebarFilter_tbd")
-                    Spacer()
-                    if tbdCount > 0 {
-                        badgeView(count: tbdCount, color: .orange)
-                    }
-                }
-                .tag(SidebarFilter.tbd)
-                .contentShape(Rectangle())
-                .onTapGesture { selectedFilter = .tbd }
-                .listRowBackground(selectedFilter == .tbd ? Color.accentColor.opacity(0.15) : Color.clear)
-
-                HStack {
-                    Label("Überfällig", systemImage: "exclamationmark.circle.fill")
+                    Label("Überfällig", systemImage: "exclamationmark.circle")
                         .accessibilityIdentifier("sidebarFilter_overdue")
                     Spacer()
                     if overdueCount > 0 {
@@ -93,32 +61,6 @@ struct SidebarView: View {
                 .contentShape(Rectangle())
                 .onTapGesture { selectedFilter = .overdue }
                 .listRowBackground(selectedFilter == .overdue ? Color.accentColor.opacity(0.15) : Color.clear)
-
-                HStack {
-                    Label("Bald fällig", systemImage: "clock.fill")
-                        .accessibilityIdentifier("sidebarFilter_upcoming")
-                    Spacer()
-                    if upcomingCount > 0 {
-                        badgeView(count: upcomingCount, color: .yellow)
-                    }
-                }
-                .tag(SidebarFilter.upcoming)
-                .contentShape(Rectangle())
-                .onTapGesture { selectedFilter = .upcoming }
-                .listRowBackground(selectedFilter == .upcoming ? Color.accentColor.opacity(0.15) : Color.clear)
-
-                HStack {
-                    Label("Erledigt", systemImage: "checkmark.circle.fill")
-                        .accessibilityIdentifier("sidebarFilter_completed")
-                    Spacer()
-                    if completedCount > 0 {
-                        badgeView(count: completedCount, color: .green)
-                    }
-                }
-                .tag(SidebarFilter.completed)
-                .contentShape(Rectangle())
-                .onTapGesture { selectedFilter = .completed }
-                .listRowBackground(selectedFilter == .completed ? Color.accentColor.opacity(0.15) : Color.clear)
 
                 HStack {
                     Label("Wiederkehrend", systemImage: "arrow.triangle.2.circlepath")
@@ -133,25 +75,22 @@ struct SidebarView: View {
                 .onTapGesture { selectedFilter = .recurring }
                 .listRowBackground(selectedFilter == .recurring ? Color.accentColor.opacity(0.15) : Color.clear)
 
-                // Smart Priority (always available — deterministic scoring)
-                Label("Priorität", systemImage: "chart.bar.fill")
-                    .accessibilityIdentifier("sidebarFilter_smartPriority")
-                    .tag(SidebarFilter.smartPriority)
-                    .contentShape(Rectangle())
-                    .onTapGesture { selectedFilter = .smartPriority }
-                    .listRowBackground(selectedFilter == .smartPriority ? Color.accentColor.opacity(0.15) : Color.clear)
-            }
-
-            Section("Kategorien") {
-                categoryRow("income", "Geld verdienen", "dollarsign.circle")
-                categoryRow("maintenance", "Pflege", "wrench.and.screwdriver.fill")
-                categoryRow("recharge", "Energie", "battery.100")
-                categoryRow("learning", "Lernen", "book")
-                categoryRow("giving_back", "Weitergeben", "gift")
+                HStack {
+                    Label("Erledigt", systemImage: "checkmark.circle")
+                        .accessibilityIdentifier("sidebarFilter_completed")
+                    Spacer()
+                    if completedCount > 0 {
+                        badgeView(count: completedCount, color: .green)
+                    }
+                }
+                .tag(SidebarFilter.completed)
+                .contentShape(Rectangle())
+                .onTapGesture { selectedFilter = .completed }
+                .listRowBackground(selectedFilter == .completed ? Color.accentColor.opacity(0.15) : Color.clear)
             }
         }
         .listStyle(.sidebar)
-        .navigationTitle("Filter")
+        .navigationTitle("Ansicht")
     }
 
     @ViewBuilder
@@ -173,37 +112,21 @@ struct SidebarView: View {
             .listRowBackground(selectedFilter == filter ? Color.accentColor.opacity(0.15) : Color.clear)
     }
 
-    private func categoryRow(_ id: String, _ label: String, _ icon: String) -> some View {
-        Label(label, systemImage: icon)
-            .accessibilityIdentifier("sidebarCategory_\(id)")
-            .tag(SidebarFilter.category(id))
-            .contentShape(Rectangle())
-            .onTapGesture { selectedFilter = .category(id) }
-            .listRowBackground(selectedFilter == .category(id) ? Color.accentColor.opacity(0.15) : Color.clear)
-    }
-
     private func filterIdentifier(_ filter: SidebarFilter) -> String {
         switch filter {
-        case .all: return "all"
-        case .nextUp: return "nextUp"
-        case .tbd: return "tbd"
+        case .priority: return "priority"
+        case .recent: return "recent"
         case .overdue: return "overdue"
-        case .upcoming: return "upcoming"
         case .completed: return "completed"
         case .recurring: return "recurring"
-        case .smartPriority: return "smartPriority"
-        case .category(let id): return id
         }
     }
 }
 
 #Preview {
     SidebarView(
-        selectedFilter: .constant(.all),
-        tbdCount: 3,
-        nextUpCount: 5,
+        selectedFilter: .constant(.priority),
         overdueCount: 2,
-        upcomingCount: 4,
         completedCount: 10,
         recurringCount: 3
     )

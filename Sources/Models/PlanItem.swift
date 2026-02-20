@@ -48,6 +48,9 @@ struct PlanItem: Identifiable, Sendable {
     /// Number of times this task was rescheduled
     let rescheduleCount: Int
 
+    /// Timestamp when task was last modified (for "Zuletzt" sort)
+    let modifiedAt: Date?
+
     /// Task is incomplete (missing importance, urgency, or duration)
     var isTbd: Bool {
         importance == nil || urgency == nil || estimatedDuration == nil
@@ -120,6 +123,8 @@ struct PlanItem: Identifiable, Sendable {
         self.recurrenceMonthDay = nil
         self.recurrenceInterval = nil
         self.recurrenceGroupID = nil
+
+        self.modifiedAt = nil
     }
 
     init(localTask: LocalTask) {
@@ -164,6 +169,8 @@ struct PlanItem: Identifiable, Sendable {
         self.recurrenceMonthDay = localTask.recurrenceMonthDay
         self.recurrenceInterval = localTask.recurrenceInterval
         self.recurrenceGroupID = localTask.recurrenceGroupID
+
+        self.modifiedAt = localTask.modifiedAt
     }
 
     private static func resolveDuration(manual: Int?, title: String?) -> (Int, DurationSource) {

@@ -86,6 +86,9 @@ final class LocalTask {
     /// Timestamp when task was completed (for "completed in last 7 days" filter)
     var completedAt: Date?
 
+    /// Timestamp when task was last modified (for "Zuletzt" sort)
+    var modifiedAt: Date?
+
     // MARK: - AI Task Scoring (Apple Intelligence)
 
     /// AI-generated composite score (0-100, higher = more important/urgent)
