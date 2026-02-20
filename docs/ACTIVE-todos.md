@@ -306,19 +306,19 @@
 
 ---
 
-### Feature: Batch-Enrichment fuer bestehende Tasks
+### Feature: AI-Enrichment Default AN + Batch-Enrichment
 **Status:** ERLEDIGT (2026-02-20)
 **Prioritaet:** MITTEL
-**Komplexitaet:** XS (~10-15k Tokens)
+**Komplexitaet:** XS
 **Abhaengigkeit:** ITB-B (Smart Priority)
 
-**Problem:** Bestehende Tasks (vor Smart Priority erstellt) haben leere Felder (importance, urgency, taskType). Dadurch Score = 0 im Eisenhower-Anteil, Sortierung nutzlos.
-**Gewuenschtes Verhalten:**
-- Beim App-Start (oder wenn Setting aktiviert wird) alle Tasks mit leeren Attributen finden
-- `SmartTaskEnrichmentService.enrichTask()` auf jeden davon ausfuehren
-- Nur einmal pro Task (Flag oder Check auf bereits gefuellte Felder reicht)
-- Nur wenn Apple Intelligence verfuegbar UND Setting aktiviert
-**Scope:** ~20-30 LoC, 1-2 Dateien (FocusBloxApp/FocusBloxMacApp + ggf. SmartTaskEnrichmentService)
+**Umsetzung:**
+- AI-Enrichment Toggle Default von AUS auf AN geaendert (AppSettings + SettingsView)
+- `enrichAllTbdTasks()` Batch-Methode in SmartTaskEnrichmentService
+- "Bestehende Tasks analysieren" Button in Settings (iOS + macOS)
+- macOS Settings Scene `.modelContainer` Fix (fehlte, Context war leer)
+- `UserDefaults.standard.bool` durch `AppSettings.shared.aiScoringEnabled` ersetzt (Default-Konsistenz)
+**Dateien:** AppSettings.swift, SettingsView.swift, MacSettingsView.swift, SmartTaskEnrichmentService.swift, FocusBloxMacApp.swift, AITaskScoringServiceTests.swift
 
 ---
 

@@ -198,8 +198,8 @@ struct FocusBloxMacApp: App {
         Settings {
             MacSettingsView()
                 .environment(\.eventKitRepository, eventKitRepository)
-                .modelContainer(container)
         }
+        .modelContainer(container)
     }
 
     private func rescheduleDueDateNotifications() {
