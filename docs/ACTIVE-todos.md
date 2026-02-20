@@ -23,8 +23,8 @@
 | # | Item | Prio | Kompl. | Tokens | Dateien | LoC |
 |---|------|------|--------|--------|---------|-----|
 | 0 | ~~Settings UX: Build-Info + Vorwarnungs-Labels~~ | ERLEDIGT | XS | ~10-15k | 5 | ~50 |
-| 1 | Einheitliche Symbole Tab-Bar/Sidebar | NIEDRIG | XS | ~10-15k | 2-3 | ~20 |
-| 2 | NextUp Wischgesten (Edit+Delete) | MITTEL | XS | ~15-20k | 1 | ~20 |
+| 1 | ~~Einheitliche Symbole Tab-Bar/Sidebar~~ | ERLEDIGT | XS | — | — | — |
+| 2 | ~~NextUp Wischgesten (Edit+Delete)~~ | ERLEDIGT | XS | ~15-20k | 3 | ~80 |
 | 3 | NextUp Long Press Vorschau | NIEDRIG | XS | ~15-20k | 1-2 | ~30 |
 | 4 | Generische Suche (iOS+macOS) | MITTEL | S | ~15-20k | 2-3 | ~25 |
 | 5 | MAC-022 Spotlight Integration | P2 | S | ~15-25k | 1-2 | ~30 |
@@ -47,7 +47,7 @@
 
 **Komplexitaet:** XS = halbe Stunde | S = 1 Session | M = 2-3 Sessions | L = halber Tag | XL = ganzer Tag+
 
-**Guenstigste Quick Wins:** #1 Symbole (~10k), #2 Wischgesten (~15k), #3 Long Press (~15k)
+**Guenstigster Quick Win:** #3 Long Press (~15k)
 **Teuerste Items:** #17 OrganizeMyDay (~150k), #13 Drag & Drop (~150k), #14 NC Widget (~120k)
 **WARTEND (Apple-Abhaengigkeit):** #20 ITB-F — Developer-APIs verfuegbar, wartet auf Siri On-Screen Awareness (iOS 26.5/27)
 **RESEARCH Items:** #21 ITB-G - API-Verifizierung noetig vor Planung
@@ -60,8 +60,8 @@
 
 ### Bundle A: Quick Wins (XS, eine Session)
 - ~~Settings UX: Build-Info + Vorwarnungs-Labels~~ ERLEDIGT
-- Einheitliche Symbole Tab-Bar/Sidebar
-- NextUp Wischgesten (Edit+Delete)
+- ~~Einheitliche Symbole Tab-Bar/Sidebar~~ ERLEDIGT (Symbole bereits identisch)
+- ~~NextUp Wischgesten (Edit+Delete)~~ ERLEDIGT (iOS alle Views + macOS Trackpad-Swipe)
 - NextUp Long Press Vorschau
 
 ### Bundle B: Backlog & Suche
@@ -222,13 +222,10 @@
 ---
 
 ### Feature: Einheitliche Symbole Tab-Bar/Sidebar (iOS + macOS)
-**Status:** OFFEN
+**Status:** ERLEDIGT
 **Prioritaet:** NIEDRIG
-**Komplexitaet:** XS (~10-15k Tokens)
 
-**Problem:** iOS Tab-Bar und macOS Sidebar nutzen unterschiedliche SF Symbols fuer die gleichen Bereiche.
-**Gewuenschtes Verhalten:** Beide Plattformen sollen die gleichen SF Symbols verwenden - neue einheitliche Auswahl.
-**Scope:** ~20 LoC, 2-3 Dateien (ContentView iOS + macOS)
+**Ergebnis:** Pruefung ergab: Symbole sind bereits identisch (list.bullet, calendar, arrow.up.arrow.down, target, chart.bar). Kein Code-Aenderung noetig.
 
 ---
 
@@ -260,16 +257,14 @@
 
 ---
 
-### Feature: iOS NextUp Wischgesten (Edit + Delete)
-**Status:** OFFEN
-**Prioritaet:** MITTEL
-**Komplexitaet:** XS (~15-20k Tokens)
+### Feature: Wischgesten fuer alle Views (iOS + macOS)
+**Status:** ERLEDIGT
+**Commits:** `7286f98` (iOS alle Views), `484fec3` (macOS Trackpad-Swipe)
 
-**Problem:** NextUp-Tasks koennen nicht per Swipe bearbeitet oder geloescht werden - nur im Backlog.
-**Gewuenschtes Verhalten:** Gleiche Wischgesten wie im Backlog:
-- **Trailing (rechts-wisch):** Loeschen (rot, destructive) + Bearbeiten (blau)
-- **KEIN Leading-Swipe** (kein "Next Up" Toggle noetig, da bereits in NextUp)
-**Scope:** ~20 LoC, 1 Datei
+**Implementiert:**
+- iOS: Swipe-Actions in allen BacklogView-Ansichten (list, category, duration, dueDate, tbd, completed, recurring, smartPriority)
+- macOS: Trackpad-Swipe in ContentView (Next Up + Regular Sections)
+- Leading: Next Up Toggle (gruen/orange), Trailing: Edit (blau) + Delete (rot)
 
 ---
 
