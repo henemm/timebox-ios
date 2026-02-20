@@ -133,11 +133,11 @@ struct MacSettingsView: View {
 
             Section {
                 LabeledContent("Version") {
-                    Text(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0")
+                    Text(BuildInfo.versionDisplay)
                 }
 
                 LabeledContent("Build") {
-                    Text(Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "1")
+                    Text(BuildInfo.build)
                 }
             } header: {
                 Text("Info")

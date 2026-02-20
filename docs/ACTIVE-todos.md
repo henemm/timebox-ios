@@ -22,7 +22,7 @@
 
 | # | Item | Prio | Kompl. | Tokens | Dateien | LoC |
 |---|------|------|--------|--------|---------|-----|
-| 0 | Settings UX: Build-Info + Vorwarnungs-Labels | NIEDRIG | XS | ~10-15k | 3-4 | ~30 |
+| 0 | ~~Settings UX: Build-Info + Vorwarnungs-Labels~~ | ERLEDIGT | XS | ~10-15k | 5 | ~50 |
 | 1 | Einheitliche Symbole Tab-Bar/Sidebar | NIEDRIG | XS | ~10-15k | 2-3 | ~20 |
 | 2 | NextUp Wischgesten (Edit+Delete) | MITTEL | XS | ~15-20k | 1 | ~20 |
 | 3 | NextUp Long Press Vorschau | NIEDRIG | XS | ~15-20k | 1-2 | ~30 |
@@ -59,7 +59,7 @@
 ## Bundles (thematische Gruppierung)
 
 ### Bundle A: Quick Wins (XS, eine Session)
-- Settings UX: Build-Info + Vorwarnungs-Labels
+- ~~Settings UX: Build-Info + Vorwarnungs-Labels~~ ERLEDIGT
 - Einheitliche Symbole Tab-Bar/Sidebar
 - NextUp Wischgesten (Edit+Delete)
 - NextUp Long Press Vorschau
@@ -207,25 +207,17 @@
 ---
 
 ### Feature: Settings UX - Build-Info dynamisch + Vorwarnungs-Labels klarer (iOS + macOS)
-**Status:** OFFEN
+**Status:** ERLEDIGT
 **Prioritaet:** NIEDRIG
-**Komplexitaet:** XS (~10-15k Tokens)
+**Komplexitaet:** XS
 
-**2 Probleme in den Settings (macOS + iOS):**
+**Implementiert:**
+1. **Version/Build dynamisch:** Shared `BuildInfo.swift` Helper liest Version + Build + Git-Commit-Hash. Build Phase Script ("Inject Git Hash") schreibt `git-hash.txt` ins App-Bundle bei jedem Build. Anzeige: "Version 1.0 (abc1234)" auf **beiden Plattformen**.
+2. **Vorwarnungs-Labels:** "Knapp" → "Kurz vorher", "Frueh" → "Weit vorher" in `WarningTiming.swift`.
+3. **iOS Info-Section:** SettingsView hatte gar keine Version/Build-Anzeige — hinzugefuegt.
 
-1. **Version/Build statisch:** macOS Settings zeigen "Version 1.0 / Build 1" -- nutzlose statische Werte. Soll dynamisch Version + Git-Commit-Hash anzeigen, damit klar ist welcher Build laeuft.
-   - `BuildInfo.swift` (Shared) als Helper
-   - Build Phase Script injiziert Git-Hash in Info.plist
-   - Anzeige: "Version 1.0 (abc1234)" auf **beiden Plattformen**
-
-2. **Vorwarnungs-Labels unklar:** Picker zeigt "Knapp / Standard / Frueh" -- nicht intuitiv verstaendlich.
-   - "Knapp" → **"Kurz vorher"** (10% vor Block-Ende)
-   - "Standard" bleibt
-   - "Frueh" → **"Weit vorher"** (30% vor Block-Ende)
-   - Aenderung nur in `WarningTiming.swift` (Shared Enum) -- wirkt automatisch auf iOS + macOS
-
-**Betroffene Dateien:** `WarningTiming.swift`, `BuildInfo.swift` (neu), `MacSettingsView.swift`, `SettingsView.swift`, beide Info.plist
-**Scope:** ~30 LoC, 3-4 Dateien (+1 Build Script)
+**Dateien:** `WarningTiming.swift`, `BuildInfo.swift` (neu), `MacSettingsView.swift`, `SettingsView.swift`, `project.pbxproj` (Build Phase Scripts)
+**Tests:** 5/5 WarningTests GREEN
 
 ---
 

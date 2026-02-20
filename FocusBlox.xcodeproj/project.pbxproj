@@ -52,6 +52,8 @@
 		A4A8AF1E9B1B715FE913F6F4 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 350DD1256F45268992636DEA /* NotificationService.swift */; };
 		AA657A3EBF3967B2DECE4314 /* CreateTaskView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04068491AA7CD2368A273C00 /* CreateTaskView.swift */; };
 		ADEEAB024BB9B2C40CD6313D /* DebugLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71582A64B51A62129A2409B7 /* DebugLogger.swift */; };
+		6E1EFBD1082035EBF5D1755B /* BuildInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4520CF15C46DC2B515637C5 /* BuildInfo.swift */; };
+		506459C891B27A9B4B9A1702 /* BuildInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4520CF15C46DC2B515637C5 /* BuildInfo.swift */; };
 		AISCORE01BUILD0001 /* AITaskScoringServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AISCORE01FILE00001 /* AITaskScoringServiceTests.swift */; };
 		AISCORE01UIBLD0001 /* AITaskScoringUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AISCORE01UIFILE001 /* AITaskScoringUITests.swift */; };
 		AITASKSCOR0BUILD001 /* AITaskScoringService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AITASKSCOR0FILE0001 /* AITaskScoringService.swift */; };
@@ -430,6 +432,7 @@
 		64C281ADBE9DA2AC381CB747 /* LocalTaskSourceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalTaskSourceTests.swift; sourceTree = "<group>"; };
 		710817B02FE720EDA21132FA /* FocusLiveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusLiveView.swift; sourceTree = "<group>"; };
 		71582A64B51A62129A2409B7 /* DebugLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugLogger.swift; sourceTree = "<group>"; };
+		C4520CF15C46DC2B515637C5 /* BuildInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BuildInfo.swift; sourceTree = "<group>"; };
 		74598614EAF4B9965981C7CB /* FocusBlockTasksSheet.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = FocusBlockTasksSheet.swift; sourceTree = "<group>"; };
 		76296762878DC5D17EA4E12A /* TaskSourceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskSourceTests.swift; sourceTree = "<group>"; };
 		76E1CD1DD36A7476E82D9003 /* TbdTasksUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TbdTasksUITests.swift; sourceTree = "<group>"; };
@@ -808,6 +811,7 @@
 			isa = PBXGroup;
 			children = (
 				71582A64B51A62129A2409B7 /* DebugLogger.swift */,
+				C4520CF15C46DC2B515637C5 /* BuildInfo.swift */,
 				3F276F67582A827E523D8ED6 /* EventKitRepositoryEnvironment.swift */,
 				TMDUI01FILE0000001 /* TaskMetadataUI.swift */,
 			);
@@ -1101,6 +1105,7 @@
 			buildPhases = (
 				2F0E2791A1F8F8F4C7109EED /* Sources */,
 				RESRC001BUILDPHASE001 /* Resources */,
+				C00FB7D86EE9DC863ED5D786 /* Inject Git Hash */,
 				B7A16CE72F1FE3BE00165284 /* Embed Foundation Extensions */,
 				B7A16D262F20FDD400165284 /* Frameworks */,
 				B7A16D3A2F2144A100165284 /* Embed Frameworks */,
@@ -1256,6 +1261,7 @@
 				B7DFC0692F2E8C60009C2881 /* Sources */,
 				B7DFC06A2F2E8C60009C2881 /* Frameworks */,
 				B7DFC06B2F2E8C60009C2881 /* Resources */,
+				8E072FC28A88AC15B0D8B9DA /* Inject Git Hash */,
 			);
 			buildRules = (
 			);
@@ -1509,6 +1515,7 @@
 				E6DF69A28B0DB868B330DADD /* ContentView.swift in Sources */,
 				AA657A3EBF3967B2DECE4314 /* CreateTaskView.swift in Sources */,
 				ADEEAB024BB9B2C40CD6313D /* DebugLogger.swift in Sources */,
+				6E1EFBD1082035EBF5D1755B /* BuildInfo.swift in Sources */,
 				22AA189C61A4045FE2B36B64 /* DurationBadge.swift in Sources */,
 				B46449CB5D5E8C093E07C2D9 /* DurationPicker.swift in Sources */,
 				QKEDIT03BUILD0001 /* ImportancePicker.swift in Sources */,
@@ -1770,6 +1777,7 @@
 				MAC001BUILD00000006 /* ReminderData.swift in Sources */,
 				MAC001BUILD00000007 /* ReminderListInfo.swift in Sources */,
 				MAC001BUILD00000008 /* WarningTiming.swift in Sources */,
+				506459C891B27A9B4B9A1702 /* BuildInfo.swift in Sources */,
 				MAC001BUILD00000009 /* EventKitRepositoryProtocol.swift in Sources */,
 				MAC001BUILD00000010 /* SyncEngine.swift in Sources */,
 				CKSM02BUILD00002 /* CloudKitSyncMonitor.swift in Sources */,
@@ -1813,6 +1821,47 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		C00FB7D86EE9DC863ED5D786 /* Inject Git Hash */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Inject Git Hash";
+			alwaysOutOfDate = 1;
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "GIT_HASH=$(git -C \"${PROJECT_DIR}\" rev-parse --short HEAD 2>/dev/null || echo \"dev\")\nprintf \"%s\" \"$GIT_HASH\" > \"${BUILT_PRODUCTS_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/git-hash.txt\"";
+		};
+		8E072FC28A88AC15B0D8B9DA /* Inject Git Hash */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Inject Git Hash";
+			alwaysOutOfDate = 1;
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "GIT_HASH=$(git -C \"${PROJECT_DIR}\" rev-parse --short HEAD 2>/dev/null || echo \"dev\")\nprintf \"%s\" \"$GIT_HASH\" > \"${BUILT_PRODUCTS_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/git-hash.txt\"";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXTargetDependency section */
 		346EDD6ABA03165F935829C4 /* PBXTargetDependency */ = {
@@ -2552,7 +2601,7 @@
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -2598,7 +2647,7 @@
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;

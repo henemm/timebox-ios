@@ -36,13 +36,11 @@ final class WarningTests: XCTestCase {
     // MARK: - WarningTiming Enum Tests
 
     /// Test: WarningTiming enum should have correct labels
-    /// GIVEN: WarningTiming enum exists
-    /// WHEN: Checking labels
-    /// THEN: Should be "Knapp", "Standard", "Früh"
+    /// Bricht wenn: WarningTiming.swift label Property geaendert wird
     func test_warningTiming_hasCorrectLabels() throws {
-        XCTAssertEqual(WarningTiming.short.label, "Knapp")
+        XCTAssertEqual(WarningTiming.short.label, "Kurz vorher")
         XCTAssertEqual(WarningTiming.standard.label, "Standard")
-        XCTAssertEqual(WarningTiming.early.label, "Früh")
+        XCTAssertEqual(WarningTiming.early.label, "Weit vorher")
     }
 
     /// Test: WarningTiming should have correct percentage values

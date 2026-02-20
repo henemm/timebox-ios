@@ -197,6 +197,19 @@ struct SettingsView: View {
                     Text("Ermöglicht manuellen Import von Apple Erinnerungen als lokale Tasks. Importierte Erinnerungen können optional in Apple Erinnerungen als erledigt markiert werden.")
                 }
 
+                // Section: Info
+                Section {
+                    LabeledContent("Version") {
+                        Text(BuildInfo.versionDisplay)
+                    }
+
+                    LabeledContent("Build") {
+                        Text(BuildInfo.build)
+                    }
+                } header: {
+                    Text("Info")
+                }
+
                 // Section 4: Visible Reminder Lists (only shown when sync enabled)
                 if remindersSyncEnabled && !allReminderLists.isEmpty {
                     Section {

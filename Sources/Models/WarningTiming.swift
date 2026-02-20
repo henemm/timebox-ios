@@ -8,9 +8,9 @@ enum WarningTiming: Int, CaseIterable {
 
     var label: String {
         switch self {
-        case .short: return "Knapp"
+        case .short: return "Kurz vorher"
         case .standard: return "Standard"
-        case .early: return "Früh"
+        case .early: return "Weit vorher"
         }
     }
 
