@@ -126,6 +126,9 @@ struct TaskInspector: View {
                 .padding()
                 .background(RoundedRectangle(cornerRadius: 10).fill(.quaternary))
 
+                // MARK: - Recurrence Section
+                recurrenceSection
+
                 // MARK: - Tags Section
                 VStack(alignment: .leading, spacing: 12) {
                     Text("Tags")
@@ -214,6 +217,84 @@ struct TaskInspector: View {
         } message: {
             Text("Diese Aktion kann nicht rückgängig gemacht werden.")
         }
+    }
+
+    // MARK: - Recurrence Section
+
+    private var recurrenceSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Wiederholung")
+                .font(.headline)
+                .foregroundStyle(.secondary)
+
+            Picker("Wiederholen", selection: recurrencePatternBinding) {
+                ForEach(RecurrencePattern.allCases) { pattern in
+                    Text(pattern.displayName).tag(pattern)
+                }
+            }
+            .accessibilityIdentifier("recurrencePicker")
+
+            if let pattern = RecurrencePattern(rawValue: task.recurrencePattern),
+               pattern.requiresWeekdays {
+                HStack(spacing: 6) {
+                    ForEach(Weekday.all) { weekday in
+                        WeekdayButton(
+                            weekday: weekday,
+                            selectedWeekdays: weekdaysBinding
+                        )
+                    }
+                }
+            }
+
+            if let pattern = RecurrencePattern(rawValue: task.recurrencePattern),
+               pattern.requiresMonthDay {
+                Picker("Tag im Monat", selection: monthDayBinding) {
+                    ForEach(1...31, id: \.self) { day in
+                        Text("\(day).").tag(day)
+                    }
+                    Text("Letzter Tag").tag(32)
+                }
+                .accessibilityIdentifier("monthDayPicker")
+            }
+        }
+        .padding()
+        .background(RoundedRectangle(cornerRadius: 10).fill(.quaternary))
+    }
+
+    private var recurrencePatternBinding: Binding<RecurrencePattern> {
+        Binding(
+            get: { RecurrencePattern(rawValue: task.recurrencePattern) ?? .none },
+            set: { newPattern in
+                task.recurrencePattern = newPattern.rawValue
+                if !newPattern.requiresWeekdays {
+                    task.recurrenceWeekdays = []
+                }
+                if !newPattern.requiresMonthDay {
+                    task.recurrenceMonthDay = nil
+                }
+                try? modelContext.save()
+            }
+        )
+    }
+
+    private var weekdaysBinding: Binding<Set<Int>> {
+        Binding(
+            get: { Set(task.recurrenceWeekdays ?? []) },
+            set: { newSet in
+                task.recurrenceWeekdays = Array(newSet).sorted()
+                try? modelContext.save()
+            }
+        )
+    }
+
+    private var monthDayBinding: Binding<Int> {
+        Binding(
+            get: { task.recurrenceMonthDay ?? 1 },
+            set: { newDay in
+                task.recurrenceMonthDay = newDay
+                try? modelContext.save()
+            }
+        )
     }
 
     // MARK: - Chip Views

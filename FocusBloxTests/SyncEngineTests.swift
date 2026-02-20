@@ -203,6 +203,90 @@ final class SyncEngineTests: XCTestCase {
         XCTAssertEqual(completedTask?.title, "Old Title", "Completed instance should stay unchanged")
     }
 
+    // MARK: - updateRecurringSeries Recurrence Propagation (Feature: recurrence-editing)
+
+    /// Series update should propagate recurrence pattern changes to all open tasks
+    func test_editSeries_shouldPropagateRecurrencePattern() throws {
+        let context = container.mainContext
+        let groupID = "series-recurrence-propagation"
+
+        let task1 = LocalTask(title: "Task", recurrencePattern: "daily", recurrenceGroupID: groupID)
+        let task2 = LocalTask(title: "Task", recurrencePattern: "daily", recurrenceGroupID: groupID)
+        context.insert(task1)
+        context.insert(task2)
+        try context.save()
+
+        // Update series recurrence to weekly with specific weekdays
+        try syncEngine.updateRecurringSeries(
+            groupID: groupID,
+            title: nil, importance: nil, duration: nil, tags: nil,
+            urgency: nil, taskType: nil, dueDate: nil, description: nil,
+            recurrencePattern: "weekly", recurrenceWeekdays: [1, 3, 5]
+        )
+
+        XCTAssertEqual(task1.recurrencePattern, "weekly",
+            "Series update should propagate recurrence pattern")
+        XCTAssertEqual(task2.recurrencePattern, "weekly",
+            "Series update should propagate recurrence pattern to all open tasks")
+        XCTAssertEqual(task1.recurrenceWeekdays, [1, 3, 5],
+            "Series update should propagate weekdays")
+        XCTAssertEqual(task2.recurrenceWeekdays, [1, 3, 5],
+            "Series update should propagate weekdays to all open tasks")
+    }
+
+    /// Series update should propagate recurrence month day to all open tasks
+    func test_editSeries_shouldPropagateRecurrenceMonthDay() throws {
+        let context = container.mainContext
+        let groupID = "series-monthday-propagation"
+
+        let task1 = LocalTask(title: "Monthly", recurrencePattern: "monthly", recurrenceGroupID: groupID)
+        task1.recurrenceMonthDay = 15
+        let task2 = LocalTask(title: "Monthly", recurrencePattern: "monthly", recurrenceGroupID: groupID)
+        task2.recurrenceMonthDay = 15
+        context.insert(task1)
+        context.insert(task2)
+        try context.save()
+
+        // Update series to last day of month
+        try syncEngine.updateRecurringSeries(
+            groupID: groupID,
+            title: nil, importance: nil, duration: nil, tags: nil,
+            urgency: nil, taskType: nil, dueDate: nil, description: nil,
+            recurrenceMonthDay: 32
+        )
+
+        XCTAssertEqual(task1.recurrenceMonthDay, 32,
+            "Series update should propagate month day")
+        XCTAssertEqual(task2.recurrenceMonthDay, 32,
+            "Series update should propagate month day to all open tasks")
+    }
+
+    /// Recurrence changes via series update should NOT affect completed tasks
+    func test_editSeries_recurrenceChange_shouldNotAffectCompleted() throws {
+        let context = container.mainContext
+        let groupID = "series-recurrence-completed"
+
+        let open1 = LocalTask(title: "Task", recurrencePattern: "daily", recurrenceGroupID: groupID)
+        let completed = LocalTask(title: "Task", recurrencePattern: "daily", recurrenceGroupID: groupID)
+        completed.isCompleted = true
+        completed.completedAt = Date()
+        context.insert(open1)
+        context.insert(completed)
+        try context.save()
+
+        // Change series to weekly
+        try syncEngine.updateRecurringSeries(
+            groupID: groupID,
+            title: nil, importance: nil, duration: nil, tags: nil,
+            urgency: nil, taskType: nil, dueDate: nil, description: nil,
+            recurrencePattern: "weekly", recurrenceWeekdays: [1, 5]
+        )
+
+        // Completed task should keep original recurrence
+        XCTAssertEqual(completed.recurrencePattern, "daily",
+            "Completed tasks should not be affected by series recurrence updates")
+    }
+
     // MARK: - updateSortOrder Tests
 
     func test_updateSortOrder_updatesTasksSortOrder() async throws {

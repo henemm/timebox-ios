@@ -86,7 +86,8 @@
 - ~~Phase 1B/2 (macOS Badge, Siri, Delete-Dialog, Filter)~~ ERLEDIGT
 - ~~Dedup-Logik (gleichzeitiges Completion auf 2 Geraeten)~~ ERLEDIGT
 - ~~macOS-Divergenz: Zukunfts-Filter + Wiederkehrend-Sidebar~~ ERLEDIGT
-- Quick-Edit Recurrence-Params Fix
+- ~~Quick-Edit Recurrence-Params Fix~~ ERLEDIGT
+- Recurrence-Editing Phase 2: Intervalle + Eigene (z.B. "Jeden 3. Tag")
 
 ### Bundle G: Intelligent Task Blox (Apple Intelligence + System-Integration)
 **Empfohlene Reihenfolge:**
@@ -354,7 +355,7 @@ Backlog-Filter "Wiederkehrend". iOS + macOS.
 
 **Verbleibende Folge-Tickets (separater Scope):**
 - Dedup-Logik: Gleichzeitiges Completion auf 2 Geraeten kann doppelte Instanzen erzeugen
-- Quick-Edit Recurrence-Params: Quick-Edit-Funktionen uebergeben recurrence-Params nicht (Bug 48 Restwirkung)
+- ~~Quick-Edit Recurrence-Params: Quick-Edit-Funktionen uebergeben recurrence-Params nicht (Bug 48 Restwirkung)~~ ERLEDIGT (recurrence params in updateRecurringSeries + call sites gefixt)
 
 ---
 

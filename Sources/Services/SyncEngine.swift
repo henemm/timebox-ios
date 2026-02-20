@@ -101,7 +101,7 @@ final class SyncEngine {
 
     /// Updates all OPEN (incomplete) tasks in a recurring series.
     /// Completed instances are preserved unchanged.
-    func updateRecurringSeries(groupID: String, title: String?, importance: Int?, duration: Int?, tags: [String]?, urgency: String?, taskType: String?, dueDate: Date?, description: String?) throws {
+    func updateRecurringSeries(groupID: String, title: String?, importance: Int?, duration: Int?, tags: [String]?, urgency: String?, taskType: String?, dueDate: Date?, description: String?, recurrencePattern: String? = nil, recurrenceWeekdays: [Int]? = nil, recurrenceMonthDay: Int? = nil) throws {
         let descriptor = FetchDescriptor<LocalTask>(
             predicate: #Predicate { $0.recurrenceGroupID == groupID && !$0.isCompleted }
         )
@@ -115,6 +115,9 @@ final class SyncEngine {
             if let taskType { task.taskType = taskType }
             if let dueDate { task.dueDate = dueDate }
             if let description { task.taskDescription = description }
+            if let recurrencePattern { task.recurrencePattern = recurrencePattern }
+            if let recurrenceWeekdays { task.recurrenceWeekdays = recurrenceWeekdays }
+            if let recurrenceMonthDay { task.recurrenceMonthDay = recurrenceMonthDay }
         }
         try modelContext.save()
     }

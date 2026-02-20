@@ -308,6 +308,108 @@ final class RecurrenceServiceTests: XCTestCase {
     }
 
 
+    // MARK: - nextDueDate Tests for NEW Patterns (Feature: recurrence-editing Phase 1)
+    // EXPECTED TO FAIL: New patterns not yet handled in RecurrenceService.nextDueDate()
+
+    /// weekdays pattern from Friday → next Monday
+    func testNextDueDate_weekdays_fromFriday() {
+        // 2026-02-20 is a Friday
+        let base = makeDate(2026, 2, 20)
+        let result = RecurrenceService.nextDueDate(pattern: "weekdays", weekdays: nil, monthDay: nil, from: base)
+        XCTAssertNotNil(result, "weekdays pattern should return a date, not nil")
+        if let result {
+            // Next weekday after Friday = Monday (Feb 23)
+            XCTAssertEqual(calendar.component(.day, from: result), 23)
+            XCTAssertEqual(calendar.component(.month, from: result), 2)
+        }
+    }
+
+    /// weekdays pattern from Wednesday → next Thursday
+    func testNextDueDate_weekdays_fromWednesday() {
+        // 2026-02-18 is a Wednesday
+        let base = makeDate(2026, 2, 18)
+        let result = RecurrenceService.nextDueDate(pattern: "weekdays", weekdays: nil, monthDay: nil, from: base)
+        XCTAssertNotNil(result, "weekdays pattern should return a date")
+        if let result {
+            // Next weekday after Wednesday = Thursday (Feb 19)
+            XCTAssertEqual(calendar.component(.day, from: result), 19)
+        }
+    }
+
+    /// weekends pattern from Saturday → next Sunday
+    func testNextDueDate_weekends_fromSaturday() {
+        // 2026-02-21 is a Saturday
+        let base = makeDate(2026, 2, 21)
+        let result = RecurrenceService.nextDueDate(pattern: "weekends", weekdays: nil, monthDay: nil, from: base)
+        XCTAssertNotNil(result, "weekends pattern should return a date, not nil")
+        if let result {
+            // Next weekend day after Saturday = Sunday (Feb 22)
+            XCTAssertEqual(calendar.component(.day, from: result), 22)
+        }
+    }
+
+    /// weekends pattern from Wednesday → next Saturday
+    func testNextDueDate_weekends_fromWednesday() {
+        // 2026-02-18 is a Wednesday
+        let base = makeDate(2026, 2, 18)
+        let result = RecurrenceService.nextDueDate(pattern: "weekends", weekdays: nil, monthDay: nil, from: base)
+        XCTAssertNotNil(result, "weekends pattern should return a date")
+        if let result {
+            // Next weekend day after Wednesday = Saturday (Feb 21)
+            XCTAssertEqual(calendar.component(.day, from: result), 21)
+        }
+    }
+
+    /// quarterly pattern → baseDate + 3 months
+    func testNextDueDate_quarterly() {
+        let base = makeDate(2026, 2, 16)
+        let result = RecurrenceService.nextDueDate(pattern: "quarterly", weekdays: nil, monthDay: nil, from: base)
+        XCTAssertNotNil(result, "quarterly pattern should return a date, not nil")
+        if let result {
+            // Feb 16 + 3 months = May 16
+            XCTAssertEqual(calendar.component(.month, from: result), 5)
+            XCTAssertEqual(calendar.component(.day, from: result), 16)
+        }
+    }
+
+    /// semiannually pattern → baseDate + 6 months
+    func testNextDueDate_semiannually() {
+        let base = makeDate(2026, 2, 16)
+        let result = RecurrenceService.nextDueDate(pattern: "semiannually", weekdays: nil, monthDay: nil, from: base)
+        XCTAssertNotNil(result, "semiannually pattern should return a date, not nil")
+        if let result {
+            // Feb 16 + 6 months = Aug 16
+            XCTAssertEqual(calendar.component(.month, from: result), 8)
+            XCTAssertEqual(calendar.component(.day, from: result), 16)
+        }
+    }
+
+    /// yearly pattern → baseDate + 1 year
+    func testNextDueDate_yearly() {
+        let base = makeDate(2026, 2, 16)
+        let result = RecurrenceService.nextDueDate(pattern: "yearly", weekdays: nil, monthDay: nil, from: base)
+        XCTAssertNotNil(result, "yearly pattern should return a date, not nil")
+        if let result {
+            // Feb 16 + 1 year = Feb 16, 2027
+            XCTAssertEqual(calendar.component(.year, from: result), 2027)
+            XCTAssertEqual(calendar.component(.month, from: result), 2)
+            XCTAssertEqual(calendar.component(.day, from: result), 16)
+        }
+    }
+
+    /// quarterly from end of month handles month-length differences
+    func testNextDueDate_quarterly_endOfMonth() {
+        // Jan 31 + 3 months = April 30 (April has 30 days)
+        let base = makeDate(2026, 1, 31)
+        let result = RecurrenceService.nextDueDate(pattern: "quarterly", weekdays: nil, monthDay: nil, from: base)
+        XCTAssertNotNil(result)
+        if let result {
+            XCTAssertEqual(calendar.component(.month, from: result), 4)
+            // April has 30 days, so 31 clamps to 30
+            XCTAssertTrue(calendar.component(.day, from: result) <= 30)
+        }
+    }
+
     private var calendar: Calendar { Calendar.current }
 
     private func makeDate(_ year: Int, _ month: Int, _ day: Int) -> Date {

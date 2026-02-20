@@ -747,6 +747,9 @@ struct ContentView: View {
                 t.urgency = task.urgency
                 t.taskType = task.taskType
                 t.taskDescription = task.taskDescription
+                t.recurrencePattern = task.recurrencePattern
+                t.recurrenceWeekdays = task.recurrenceWeekdays
+                t.recurrenceMonthDay = task.recurrenceMonthDay
             }
         }
         try? modelContext.save()

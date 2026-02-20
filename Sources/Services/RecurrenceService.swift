@@ -24,6 +24,14 @@ enum RecurrenceService {
         case "daily":
             return cal.date(byAdding: .day, value: 1, to: baseDate)
 
+        case "weekdays":
+            // Mon-Fri: implicit weekdays [1,2,3,4,5]
+            return nextWeekdayDate(from: baseDate, weekdays: [1, 2, 3, 4, 5], weeksToAdd: 0)
+
+        case "weekends":
+            // Sat-Sun: implicit weekdays [6,7]
+            return nextWeekdayDate(from: baseDate, weekdays: [6, 7], weeksToAdd: 0)
+
         case "weekly":
             return nextWeekdayDate(from: baseDate, weekdays: weekdays, weeksToAdd: 0)
                 ?? cal.date(byAdding: .day, value: 7, to: baseDate)
@@ -34,6 +42,15 @@ enum RecurrenceService {
 
         case "monthly":
             return nextMonthlyDate(from: baseDate, monthDay: monthDay)
+
+        case "quarterly":
+            return cal.date(byAdding: .month, value: 3, to: baseDate)
+
+        case "semiannually":
+            return cal.date(byAdding: .month, value: 6, to: baseDate)
+
+        case "yearly":
+            return cal.date(byAdding: .year, value: 1, to: baseDate)
 
         default:
             return nil

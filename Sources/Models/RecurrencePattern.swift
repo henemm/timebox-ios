@@ -4,9 +4,14 @@ import Foundation
 enum RecurrencePattern: String, CaseIterable, Identifiable {
     case none = "none"
     case daily = "daily"
+    case weekdays = "weekdays"
+    case weekends = "weekends"
     case weekly = "weekly"
     case biweekly = "biweekly"
     case monthly = "monthly"
+    case quarterly = "quarterly"
+    case semiannually = "semiannually"
+    case yearly = "yearly"
 
     var id: String { rawValue }
 
@@ -16,12 +21,22 @@ enum RecurrencePattern: String, CaseIterable, Identifiable {
             return "Nie"
         case .daily:
             return "Täglich"
+        case .weekdays:
+            return "An Wochentagen"
+        case .weekends:
+            return "An Wochenenden"
         case .weekly:
             return "Wöchentlich"
         case .biweekly:
-            return "Zweiwöchentlich"
+            return "Alle 2 Wochen"
         case .monthly:
             return "Monatlich"
+        case .quarterly:
+            return "Alle 3 Monate"
+        case .semiannually:
+            return "Alle 6 Monate"
+        case .yearly:
+            return "Jährlich"
         }
     }
 
