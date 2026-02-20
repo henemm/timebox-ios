@@ -9,6 +9,7 @@ struct ReminderData: Identifiable, Sendable {
     let dueDate: Date?
     let notes: String?
     let calendarIdentifier: String?  // Which reminder list this belongs to
+    let recurrencePattern: String    // "none", "daily", "weekly", "biweekly", "monthly"
 
     init(from reminder: EKReminder) {
         // Use calendarItemIdentifier — this is the ID that EventKit's
@@ -21,10 +22,11 @@ struct ReminderData: Identifiable, Sendable {
         self.dueDate = reminder.dueDateComponents?.date
         self.notes = reminder.notes
         self.calendarIdentifier = reminder.calendar?.calendarIdentifier
+        self.recurrencePattern = Self.mapRecurrenceRules(reminder.recurrenceRules)
     }
 
     // For testing
-    init(id: String, title: String, isCompleted: Bool = false, priority: Int = 0, dueDate: Date? = nil, notes: String? = nil, calendarIdentifier: String? = nil) {
+    init(id: String, title: String, isCompleted: Bool = false, priority: Int = 0, dueDate: Date? = nil, notes: String? = nil, calendarIdentifier: String? = nil, recurrencePattern: String = "none") {
         self.id = id
         self.title = title
         self.isCompleted = isCompleted
@@ -32,5 +34,22 @@ struct ReminderData: Identifiable, Sendable {
         self.dueDate = dueDate
         self.notes = notes
         self.calendarIdentifier = calendarIdentifier
+        self.recurrencePattern = recurrencePattern
+    }
+
+    /// Map EKRecurrenceRule to FocusBlox recurrencePattern string.
+    /// Internal for testability — called from init(from: EKReminder).
+    static func mapRecurrenceRules(_ rules: [EKRecurrenceRule]?) -> String {
+        guard let rule = rules?.first else { return "none" }
+        switch rule.frequency {
+        case .daily:
+            return "daily"
+        case .weekly:
+            return rule.interval == 2 ? "biweekly" : "weekly"
+        case .monthly:
+            return "monthly"
+        default:
+            return "none"
+        }
     }
 }

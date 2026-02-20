@@ -452,6 +452,9 @@ struct BacklogView: View {
         if result.skippedDuplicates > 0 {
             parts.append("\(result.skippedDuplicates) bereits vorhanden")
         }
+        if result.enrichedRecurrence > 0 {
+            parts.append("\(result.enrichedRecurrence) Wiederholungen erkannt")
+        }
         if result.markCompleteFailures > 0 {
             parts.append("\(result.markCompleteFailures)x Abhaken fehlgeschlagen")
         }

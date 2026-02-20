@@ -1,5 +1,6 @@
 import XCTest
 import SwiftData
+import EventKit
 @testable import FocusBlox
 
 @MainActor
@@ -258,6 +259,169 @@ final class RemindersImportServiceTests: XCTestCase {
         // Then
         XCTAssertEqual(result.imported.count, 0)
         XCTAssertEqual(result.skippedDuplicates, 0)
+    }
+
+    // MARK: - Recurrence Mapping (EKRecurrenceRule → recurrencePattern)
+
+    func test_mapRecurrenceRules_daily() {
+        // Given: A real EKRecurrenceRule with daily frequency
+        let rule = EKRecurrenceRule(
+            recurrenceWith: .daily,
+            interval: 1,
+            end: nil
+        )
+
+        // When
+        let result = ReminderData.mapRecurrenceRules([rule])
+
+        // Then
+        XCTAssertEqual(result, "daily")
+    }
+
+    func test_mapRecurrenceRules_weekly() {
+        let rule = EKRecurrenceRule(
+            recurrenceWith: .weekly,
+            interval: 1,
+            end: nil
+        )
+        XCTAssertEqual(ReminderData.mapRecurrenceRules([rule]), "weekly")
+    }
+
+    func test_mapRecurrenceRules_biweekly() {
+        // Given: Weekly with interval 2 = biweekly
+        let rule = EKRecurrenceRule(
+            recurrenceWith: .weekly,
+            interval: 2,
+            end: nil
+        )
+        XCTAssertEqual(ReminderData.mapRecurrenceRules([rule]), "biweekly")
+    }
+
+    func test_mapRecurrenceRules_monthly() {
+        let rule = EKRecurrenceRule(
+            recurrenceWith: .monthly,
+            interval: 1,
+            end: nil
+        )
+        XCTAssertEqual(ReminderData.mapRecurrenceRules([rule]), "monthly")
+    }
+
+    func test_mapRecurrenceRules_nilRules() {
+        XCTAssertEqual(ReminderData.mapRecurrenceRules(nil), "none")
+    }
+
+    func test_mapRecurrenceRules_emptyRules() {
+        XCTAssertEqual(ReminderData.mapRecurrenceRules([]), "none")
+    }
+
+    func test_mapRecurrenceRules_yearly_fallsBackToNone() {
+        // Yearly is not supported in FocusBlox → falls back to "none"
+        let rule = EKRecurrenceRule(
+            recurrenceWith: .yearly,
+            interval: 1,
+            end: nil
+        )
+        XCTAssertEqual(ReminderData.mapRecurrenceRules([rule]), "none")
+    }
+
+    // MARK: - Import Integration: Recurrence flows through to LocalTask
+
+    func test_importAll_recurringReminderCreatesFilteredTask() async throws {
+        // Given: A weekly reminder with future dueDate (the real use case)
+        let futureDate = Calendar.current.date(byAdding: .day, value: 7, to: Date())!
+        mockRepo.mockReminders = [
+            ReminderData(id: "r1", title: "Zehnagel", dueDate: futureDate, recurrencePattern: "weekly")
+        ]
+
+        // When
+        _ = try await sut.importAll()
+
+        // Then: Task exists with correct pattern AND is hidden by filter
+        let tasks = try modelContext.fetch(FetchDescriptor<LocalTask>())
+        XCTAssertEqual(tasks.count, 1)
+        XCTAssertEqual(tasks.first?.recurrencePattern, "weekly")
+        XCTAssertFalse(tasks.first!.isVisibleInBacklog, "Weekly task due next week must be hidden")
+    }
+
+    func test_importAll_nonRecurringReminderStaysVisible() async throws {
+        // Given: A non-recurring reminder (no recurrencePattern)
+        mockRepo.mockReminders = [
+            ReminderData(id: "r1", title: "Buy milk")
+        ]
+
+        // When
+        let result = try await sut.importAll()
+
+        // Then: recurrencePattern stays "none", task is visible
+        XCTAssertEqual(result.imported.first?.recurrencePattern, "none")
+    }
+
+    // MARK: - Recurrence Enrichment on Existing Tasks
+
+    func test_importAll_enrichesExistingTaskWithRecurrence() async throws {
+        // Given: An existing task imported previously WITHOUT recurrence
+        let futureDate = Calendar.current.date(byAdding: .day, value: 7, to: Date())!
+        let existing = LocalTask(title: "Zehnagel", dueDate: futureDate)
+        XCTAssertEqual(existing.recurrencePattern, "none")
+        modelContext.insert(existing)
+        try modelContext.save()
+
+        // The same reminder now comes in WITH recurrence info
+        mockRepo.mockReminders = [
+            ReminderData(id: "r1", title: "Zehnagel", dueDate: futureDate, recurrencePattern: "weekly")
+        ]
+
+        // When: Re-import
+        let result = try await sut.importAll()
+
+        // Then: Not imported as new (duplicate), but recurrencePattern updated
+        XCTAssertEqual(result.imported.count, 0)
+        XCTAssertEqual(result.skippedDuplicates, 1)
+        XCTAssertEqual(result.enrichedRecurrence, 1)
+
+        let tasks = try modelContext.fetch(FetchDescriptor<LocalTask>())
+        XCTAssertEqual(tasks.count, 1)
+        XCTAssertEqual(tasks.first?.recurrencePattern, "weekly")
+        XCTAssertFalse(tasks.first!.isVisibleInBacklog)
+    }
+
+    func test_importAll_doesNotOverwriteExistingRecurrence() async throws {
+        // Given: An existing task that ALREADY has recurrence set (e.g. user set it manually)
+        let existing = LocalTask(title: "Vitamins", recurrencePattern: "daily")
+        modelContext.insert(existing)
+        try modelContext.save()
+
+        // Reminder says "monthly" but task already has "daily"
+        mockRepo.mockReminders = [
+            ReminderData(id: "r1", title: "Vitamins", recurrencePattern: "monthly")
+        ]
+
+        // When
+        let result = try await sut.importAll()
+
+        // Then: Existing recurrence NOT overwritten
+        XCTAssertEqual(result.enrichedRecurrence, 0)
+        let tasks = try modelContext.fetch(FetchDescriptor<LocalTask>())
+        XCTAssertEqual(tasks.first?.recurrencePattern, "daily")
+    }
+
+    func test_importAll_doesNotEnrichWhenReminderNotRecurring() async throws {
+        // Given: Existing task without recurrence, reminder also not recurring
+        let existing = LocalTask(title: "Buy milk")
+        modelContext.insert(existing)
+        try modelContext.save()
+
+        mockRepo.mockReminders = [
+            ReminderData(id: "r1", title: "Buy milk")
+        ]
+
+        // When
+        let result = try await sut.importAll()
+
+        // Then: Nothing enriched
+        XCTAssertEqual(result.enrichedRecurrence, 0)
+        let tasks = try modelContext.fetch(FetchDescriptor<LocalTask>())
+        XCTAssertEqual(tasks.first?.recurrencePattern, "none")
     }
 
     // MARK: - Mark Complete Failure Reporting

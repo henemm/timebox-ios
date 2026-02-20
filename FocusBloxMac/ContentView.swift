@@ -625,7 +625,7 @@ struct ContentView: View {
                 markCompleteInReminders: remindersMarkCompleteOnImport
             )
 
-            logger.info("Done — \(result.imported.count) imported, \(result.skippedDuplicates) skipped, \(result.markedComplete) marked complete, \(result.markCompleteFailures) mark-complete failures")
+            logger.info("Done — \(result.imported.count) imported, \(result.skippedDuplicates) skipped, \(result.enrichedRecurrence) enriched, \(result.markedComplete) marked complete, \(result.markCompleteFailures) mark-complete failures")
 
             importStatusMessage = importFeedbackMessage(from: result)
         } catch {
@@ -644,6 +644,9 @@ struct ContentView: View {
         }
         if result.skippedDuplicates > 0 {
             parts.append("\(result.skippedDuplicates) bereits vorhanden")
+        }
+        if result.enrichedRecurrence > 0 {
+            parts.append("\(result.enrichedRecurrence) Wiederholungen erkannt")
         }
         if result.markCompleteFailures > 0 {
             parts.append("\(result.markCompleteFailures)x Abhaken fehlgeschlagen")

@@ -172,6 +172,22 @@
 
 ---
 
+### Bug: Recurring Tasks nach Import sichtbar trotz Enrichment
+**Status:** ERLEDIGT
+**Prioritaet:** HOCH
+**Komplexitaet:** S (~25k Tokens)
+
+- **Problem:** Wiederkehrende Apple Reminders (Fahrradkette, Zehnagel, Klavier spielen, 1 Blink lesen) wurden importiert, aber `recurrencePattern` blieb "none" in der DB. Dadurch griff `isVisibleInBacklog`-Filter nicht — Tasks erschienen in "Alle Tasks" statt nur bei Faelligkeit.
+- **Root Cause:** `RemindersImportService.importAll()` fetchte ALLE Tasks (inkl. 97 erledigte) fuer Duplikat-Erkennung. Erledigte recurring Tasks hatten korrektes `recurrencePattern` (vom RecurrenceService). `existingByTitle[title].first` fand die ERLEDIGTE zuerst → Enrichment-Bedingung `== "none"` war false → aktive Tasks wurden uebersprungen.
+- **Diagnostik-Beweis:** `hasChanges=false, changed=0` VOR save() → SwiftData hat nie eine Aenderung registriert. `VERIFY: 1 with recurrencePattern != 'none'` statt 5.
+- **Fix:** FetchDescriptor mit `#Predicate { !$0.isCompleted }` — nur incomplete Tasks fuer Duplikat-Detection + Enrichment.
+- **Nach Fix:** `hasChanges=true, changed=3`, `VERIFY: 5 with recurrencePattern != 'none'`. "Wiederkehrend" Sidebar zeigt 3 (vorher 1).
+- **Dateien:** `RemindersImportService.swift` (1 Zeile geaendert + Kommentar)
+- **Tests:** 26/26 RemindersImportServiceTests GREEN
+- **Learning:** Bei SwiftData-Fetches fuer Enrichment/Migration IMMER pruefen ob completed Tasks den Match verfaelschen.
+
+---
+
 ### Feature: Settings UX - Build-Info dynamisch + Vorwarnungs-Labels klarer (iOS + macOS)
 **Status:** OFFEN
 **Prioritaet:** NIEDRIG
