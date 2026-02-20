@@ -50,5 +50,5 @@ final class AppSettings: ObservableObject {
     // MARK: - AI Task Scoring (Apple Intelligence)
 
     /// Whether AI-powered task scoring is enabled
-    @AppStorage("aiScoringEnabled") var aiScoringEnabled: Bool = false
+    @AppStorage("aiScoringEnabled") var aiScoringEnabled: Bool = true
 }

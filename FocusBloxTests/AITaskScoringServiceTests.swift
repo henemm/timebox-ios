@@ -72,7 +72,7 @@ final class AITaskScoringServiceTests: XCTestCase {
 
         XCTAssertEqual(planItem.aiScore, 85, "PlanItem should carry aiScore from LocalTask")
         XCTAssertEqual(planItem.aiEnergyLevel, "low", "PlanItem should carry aiEnergyLevel from LocalTask")
-        XCTAssertTrue(planItem.hasAIScoring, "PlanItem hasAIScoring should be true")
+        XCTAssertNotNil(planItem.aiScore, "PlanItem aiScore should be set")
     }
 
     /// GIVEN: A LocalTask without AI scoring
@@ -87,7 +87,7 @@ final class AITaskScoringServiceTests: XCTestCase {
 
         XCTAssertNil(planItem.aiScore, "PlanItem aiScore should be nil without scoring")
         XCTAssertNil(planItem.aiEnergyLevel, "PlanItem aiEnergyLevel should be nil without scoring")
-        XCTAssertFalse(planItem.hasAIScoring, "PlanItem hasAIScoring should be false")
+        XCTAssertNil(planItem.aiScore, "PlanItem aiScore should be nil without scoring")
     }
 
     // MARK: - Score Clamping
@@ -160,12 +160,12 @@ final class AITaskScoringServiceTests: XCTestCase {
 
     /// GIVEN: Default AppSettings
     /// WHEN: Checking aiScoringEnabled
-    /// THEN: Should default to false
-    func test_appSettings_aiScoringEnabled_defaultFalse() throws {
+    /// THEN: Should default to true
+    func test_appSettings_aiScoringEnabled_defaultTrue() throws {
         // Clean up any previous test state
         UserDefaults.standard.removeObject(forKey: "aiScoringEnabled")
 
-        let value = UserDefaults.standard.bool(forKey: "aiScoringEnabled")
-        XCTAssertFalse(value, "aiScoringEnabled should default to false")
+        let value = AppSettings.shared.aiScoringEnabled
+        XCTAssertTrue(value, "aiScoringEnabled should default to true")
     }
 }

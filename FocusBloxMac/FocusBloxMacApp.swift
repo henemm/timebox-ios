@@ -198,6 +198,7 @@ struct FocusBloxMacApp: App {
         Settings {
             MacSettingsView()
                 .environment(\.eventKitRepository, eventKitRepository)
+                .modelContainer(container)
         }
     }
 

@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 import EventKit
 
 struct MacSettingsView: View {
@@ -18,7 +19,7 @@ struct MacSettingsView: View {
     @AppStorage("remindersSyncEnabled") private var remindersSyncEnabled: Bool = true
     @AppStorage("remindersMarkCompleteOnImport") private var remindersMarkCompleteOnImport: Bool = true
     @AppStorage("defaultTaskDuration") private var defaultTaskDuration: Int = 15
-    @AppStorage("aiScoringEnabled") private var aiScoringEnabled: Bool = false
+    @AppStorage("aiScoringEnabled") private var aiScoringEnabled: Bool = true
     @AppStorage("dueDateMorningReminderEnabled") private var dueDateMorningReminderEnabled: Bool = true
     @AppStorage("dueDateMorningReminderHour") private var dueDateMorningReminderHour: Int = 9
     @AppStorage("dueDateMorningReminderMinute") private var dueDateMorningReminderMinute: Int = 0
@@ -27,6 +28,9 @@ struct MacSettingsView: View {
 
     // MARK: - State
 
+    @Environment(\.modelContext) private var modelContext
+    @State private var isEnriching = false
+    @State private var enrichResult: Int?
     @State private var visibleCalendarIDs: Set<String> = []
     @State private var visibleReminderListIDs: Set<String> = []
     @State private var allCalendars: [EKCalendar] = []
@@ -93,6 +97,33 @@ struct MacSettingsView: View {
                 Section {
                     Toggle("KI Task-Enrichment", isOn: $aiScoringEnabled)
                         .accessibilityIdentifier("aiScoringToggle")
+
+                    if aiScoringEnabled {
+                        Button {
+                            Task {
+                                isEnriching = true
+                                enrichResult = nil
+                                let service = SmartTaskEnrichmentService(modelContext: modelContext)
+                                let count = await service.enrichAllTbdTasks()
+                                enrichResult = count
+                                isEnriching = false
+                            }
+                        } label: {
+                            HStack {
+                                Text("Bestehende Tasks analysieren")
+                                Spacer()
+                                if isEnriching {
+                                    ProgressView()
+                                        .controlSize(.small)
+                                } else if let result = enrichResult {
+                                    Text("\(result) aktualisiert")
+                                        .foregroundStyle(.secondary)
+                                }
+                            }
+                        }
+                        .disabled(isEnriching)
+                        .accessibilityIdentifier("batchEnrichButton")
+                    }
                 } header: {
                     Text("Apple Intelligence")
                 } footer: {

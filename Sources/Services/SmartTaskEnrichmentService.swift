@@ -57,7 +57,7 @@ final class SmartTaskEnrichmentService {
     /// Only fills nil/empty fields — user-set values are preserved.
     func enrichTask(_ task: LocalTask) async {
         guard Self.isAvailable else { return }
-        guard UserDefaults.standard.bool(forKey: "aiScoringEnabled") else { return }
+        guard AppSettings.shared.aiScoringEnabled else { return }
 
         #if canImport(FoundationModels)
         if #available(iOS 26.0, macOS 26.0, *) {
@@ -65,6 +65,48 @@ final class SmartTaskEnrichmentService {
         }
         #endif
     }
+
+    // MARK: - Batch Enrichment
+
+    /// Enrich all incomplete tasks that have missing attributes.
+    /// Returns the number of tasks enriched.
+    func enrichAllTbdTasks() async -> Int {
+        guard Self.isAvailable else { return 0 }
+
+        #if canImport(FoundationModels)
+        if #available(iOS 26.0, macOS 26.0, *) {
+            return await performBatchEnrichment()
+        }
+        #endif
+        return 0
+    }
+
+    #if canImport(FoundationModels)
+    @available(iOS 26.0, macOS 26.0, *)
+    private func performBatchEnrichment() async -> Int {
+        let predicate = #Predicate<LocalTask> { !$0.isCompleted }
+        let descriptor = FetchDescriptor<LocalTask>(predicate: predicate)
+
+        do {
+            let allTasks = try modelContext.fetch(descriptor)
+            let tasks = allTasks.filter { task in
+                task.importance == nil || task.urgency == nil || task.taskType.isEmpty || task.aiEnergyLevel == nil
+            }
+            var enrichedCount = 0
+
+            for task in tasks {
+                await performEnrichment(task)
+                enrichedCount += 1
+                try? await Task.sleep(for: .milliseconds(500))
+            }
+
+            return enrichedCount
+        } catch {
+            print("[SmartEnrichment] Batch fetch failed: \(error)")
+            return 0
+        }
+    }
+    #endif
 
     // MARK: - Private
 

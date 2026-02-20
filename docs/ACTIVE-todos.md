@@ -320,7 +320,7 @@
 ---
 
 ### Feature: Batch-Enrichment fuer bestehende Tasks
-**Status:** OFFEN
+**Status:** ERLEDIGT (2026-02-20)
 **Prioritaet:** MITTEL
 **Komplexitaet:** XS (~10-15k Tokens)
 **Abhaengigkeit:** ITB-B (Smart Priority)
