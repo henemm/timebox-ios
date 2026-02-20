@@ -98,6 +98,7 @@ final class MockTaskSource: TaskSource, TaskSourceWritable {
         recurrencePattern: String = "none",
         recurrenceWeekdays: [Int]? = nil,
         recurrenceMonthDay: Int? = nil,
+        recurrenceInterval: Int? = nil,
         description: String? = nil
     ) async throws -> MockTaskData {
         let task = MockTaskData(

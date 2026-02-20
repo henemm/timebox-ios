@@ -256,9 +256,85 @@ struct TaskInspector: View {
                 }
                 .accessibilityIdentifier("monthDayPicker")
             }
+
+            // Custom configuration: base frequency + interval
+            if let pattern = RecurrencePattern(rawValue: task.recurrencePattern),
+               pattern.requiresCustomConfig {
+                customRecurrenceConfig
+            }
+
+            // Show summary for custom pattern
+            if task.recurrencePattern == "custom",
+               let basePattern = customBasePattern {
+                Text(RecurrencePattern.customDisplayName(
+                    basePattern: basePattern,
+                    interval: task.recurrenceInterval ?? 1
+                ))
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            }
         }
         .padding()
         .background(RoundedRectangle(cornerRadius: 10).fill(.quaternary))
+    }
+
+    private var customRecurrenceConfig: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Picker("Frequenz", selection: customBasePatternBinding) {
+                ForEach(RecurrencePattern.customBaseFrequencies, id: \.pattern) { freq in
+                    Text(freq.label).tag(freq.pattern)
+                }
+            }
+
+            Stepper(
+                "Alle \(task.recurrenceInterval ?? 1)",
+                value: intervalBinding,
+                in: 1...99
+            )
+        }
+    }
+
+    private var customBasePattern: String? {
+        // For custom pattern, the base frequency is stored alongside.
+        // We use recurrenceWeekdays/monthDay context to infer, or default to "daily"
+        // For simplicity: store base pattern in the first element of weekdays array
+        // Actually, we need a dedicated field. Let's use a convention:
+        // custom pattern stores base in recurrenceMonthDay:
+        //   1001=daily, 1002=weekly, 1003=monthly, 1004=yearly
+        guard let code = task.recurrenceMonthDay else { return "daily" }
+        switch code {
+        case 1001: return "daily"
+        case 1002: return "weekly"
+        case 1003: return "monthly"
+        case 1004: return "yearly"
+        default: return "daily"
+        }
+    }
+
+    private var customBasePatternBinding: Binding<String> {
+        Binding(
+            get: { customBasePattern ?? "daily" },
+            set: { newBase in
+                switch newBase {
+                case "daily": task.recurrenceMonthDay = 1001
+                case "weekly": task.recurrenceMonthDay = 1002
+                case "monthly": task.recurrenceMonthDay = 1003
+                case "yearly": task.recurrenceMonthDay = 1004
+                default: task.recurrenceMonthDay = 1001
+                }
+                try? modelContext.save()
+            }
+        )
+    }
+
+    private var intervalBinding: Binding<Int> {
+        Binding(
+            get: { task.recurrenceInterval ?? 1 },
+            set: { newVal in
+                task.recurrenceInterval = newVal
+                try? modelContext.save()
+            }
+        )
     }
 
     private var recurrencePatternBinding: Binding<RecurrencePattern> {

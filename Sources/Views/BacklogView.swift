@@ -305,12 +305,12 @@ struct BacklogView: View {
             .sheet(item: $taskToEditDirectly) { task in
                 TaskFormSheet(
                     task: task,
-                    onSave: { title, priority, duration, tags, urgency, taskType, dueDate, description, recurrencePattern, recurrenceWeekdays, recurrenceMonthDay in
+                    onSave: { title, priority, duration, tags, urgency, taskType, dueDate, description, recurrencePattern, recurrenceWeekdays, recurrenceMonthDay, recurrenceInterval in
                         if editSeriesMode {
-                            updateRecurringSeries(task, title: title, priority: priority, duration: duration, tags: tags, urgency: urgency, taskType: taskType, dueDate: dueDate, description: description, recurrencePattern: recurrencePattern, recurrenceWeekdays: recurrenceWeekdays, recurrenceMonthDay: recurrenceMonthDay)
+                            updateRecurringSeries(task, title: title, priority: priority, duration: duration, tags: tags, urgency: urgency, taskType: taskType, dueDate: dueDate, description: description, recurrencePattern: recurrencePattern, recurrenceWeekdays: recurrenceWeekdays, recurrenceMonthDay: recurrenceMonthDay, recurrenceInterval: recurrenceInterval)
                             editSeriesMode = false
                         } else {
-                            updateTask(task, title: title, priority: priority, duration: duration, tags: tags, urgency: urgency, taskType: taskType, dueDate: dueDate, description: description, recurrencePattern: recurrencePattern, recurrenceWeekdays: recurrenceWeekdays, recurrenceMonthDay: recurrenceMonthDay)
+                            updateTask(task, title: title, priority: priority, duration: duration, tags: tags, urgency: urgency, taskType: taskType, dueDate: dueDate, description: description, recurrencePattern: recurrencePattern, recurrenceWeekdays: recurrenceWeekdays, recurrenceMonthDay: recurrenceMonthDay, recurrenceInterval: recurrenceInterval)
                         }
                     },
                     onDelete: {
@@ -328,8 +328,8 @@ struct BacklogView: View {
             .sheet(item: $taskToEdit) { task in
                 TaskDetailSheet(
                     task: task,
-                    onSave: { title, priority, duration, tags, urgency, taskType, dueDate, description, recurrencePattern, recurrenceWeekdays, recurrenceMonthDay in
-                        updateTask(task, title: title, priority: priority, duration: duration, tags: tags, urgency: urgency, taskType: taskType, dueDate: dueDate, description: description, recurrencePattern: recurrencePattern, recurrenceWeekdays: recurrenceWeekdays, recurrenceMonthDay: recurrenceMonthDay)
+                    onSave: { title, priority, duration, tags, urgency, taskType, dueDate, description, recurrencePattern, recurrenceWeekdays, recurrenceMonthDay, recurrenceInterval in
+                        updateTask(task, title: title, priority: priority, duration: duration, tags: tags, urgency: urgency, taskType: taskType, dueDate: dueDate, description: description, recurrencePattern: recurrencePattern, recurrenceWeekdays: recurrenceWeekdays, recurrenceMonthDay: recurrenceMonthDay, recurrenceInterval: recurrenceInterval)
                     },
                     onDelete: {
                         deleteTask(task)
@@ -527,11 +527,11 @@ struct BacklogView: View {
         }
     }
 
-    private func updateTask(_ task: PlanItem, title: String, priority: Int?, duration: Int?, tags: [String], urgency: String?, taskType: String, dueDate: Date?, description: String?, recurrencePattern: String? = nil, recurrenceWeekdays: [Int]? = nil, recurrenceMonthDay: Int? = nil) {
+    private func updateTask(_ task: PlanItem, title: String, priority: Int?, duration: Int?, tags: [String], urgency: String?, taskType: String, dueDate: Date?, description: String?, recurrencePattern: String? = nil, recurrenceWeekdays: [Int]? = nil, recurrenceMonthDay: Int? = nil, recurrenceInterval: Int? = nil) {
         do {
             let taskSource = LocalTaskSource(modelContext: modelContext)
             let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
-            try syncEngine.updateTask(itemID: task.id, title: title, importance: priority, duration: duration, tags: tags, urgency: urgency, taskType: taskType, dueDate: dueDate, description: description, recurrencePattern: recurrencePattern, recurrenceWeekdays: recurrenceWeekdays, recurrenceMonthDay: recurrenceMonthDay)
+            try syncEngine.updateTask(itemID: task.id, title: title, importance: priority, duration: duration, tags: tags, urgency: urgency, taskType: taskType, dueDate: dueDate, description: description, recurrencePattern: recurrencePattern, recurrenceWeekdays: recurrenceWeekdays, recurrenceMonthDay: recurrenceMonthDay, recurrenceInterval: recurrenceInterval)
 
             // Reschedule due date notifications
             NotificationService.cancelDueDateNotifications(taskID: task.id)
@@ -638,12 +638,12 @@ struct BacklogView: View {
         taskToEditDirectly = task
     }
 
-    private func updateRecurringSeries(_ task: PlanItem, title: String, priority: Int?, duration: Int?, tags: [String], urgency: String?, taskType: String, dueDate: Date?, description: String?, recurrencePattern: String? = nil, recurrenceWeekdays: [Int]? = nil, recurrenceMonthDay: Int? = nil) {
+    private func updateRecurringSeries(_ task: PlanItem, title: String, priority: Int?, duration: Int?, tags: [String], urgency: String?, taskType: String, dueDate: Date?, description: String?, recurrencePattern: String? = nil, recurrenceWeekdays: [Int]? = nil, recurrenceMonthDay: Int? = nil, recurrenceInterval: Int? = nil) {
         guard let groupID = task.recurrenceGroupID else { return }
         do {
             let taskSource = LocalTaskSource(modelContext: modelContext)
             let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
-            try syncEngine.updateRecurringSeries(groupID: groupID, title: title, importance: priority, duration: duration, tags: tags, urgency: urgency, taskType: taskType, dueDate: dueDate, description: description, recurrencePattern: recurrencePattern, recurrenceWeekdays: recurrenceWeekdays, recurrenceMonthDay: recurrenceMonthDay)
+            try syncEngine.updateRecurringSeries(groupID: groupID, title: title, importance: priority, duration: duration, tags: tags, urgency: urgency, taskType: taskType, dueDate: dueDate, description: description, recurrencePattern: recurrencePattern, recurrenceWeekdays: recurrenceWeekdays, recurrenceMonthDay: recurrenceMonthDay, recurrenceInterval: recurrenceInterval)
 
             Task {
                 await loadTasks()
@@ -1013,25 +1013,51 @@ struct BacklogView: View {
 
     // MARK: - Recurring View (wiederkehrende Tasks)
     private var recurringView: some View {
-        ScrollView {
-            LazyVStack(spacing: 8) {
-                ForEach(recurringTasks) { item in
-                    BacklogRow(
-                        item: item,
-                        onComplete: { completeTask(item) },
-                        onDurationTap: { selectedItemForDuration = item },
-                        onAddToNextUp: { updateNextUp(for: item, isNextUp: true) },
-                        onTap: { taskToEdit = item },
-                        onImportanceCycle: { newImportance in updateImportance(for: item, importance: newImportance) },
-                        onUrgencyToggle: { newUrgency in updateUrgency(for: item, urgency: newUrgency) },
-                        onCategoryTap: { selectedItemForCategory = item },
-                        onEditTap: { handleEditTap(item) },
-                        onDeleteTap: { deleteTask(item) }
-                    )
+        List {
+            ForEach(recurringTasks) { item in
+                BacklogRow(
+                    item: item,
+                    onComplete: { completeTask(item) },
+                    onDurationTap: { selectedItemForDuration = item },
+                    onAddToNextUp: { updateNextUp(for: item, isNextUp: true) },
+                    onImportanceCycle: { newImportance in updateImportance(for: item, importance: newImportance) },
+                    onUrgencyToggle: { newUrgency in updateUrgency(for: item, urgency: newUrgency) },
+                    onCategoryTap: { selectedItemForCategory = item },
+                    onEditTap: { handleEditTap(item) },
+                    onDeleteTap: { deleteTask(item) },
+                    onTitleSave: { newTitle in
+                        saveTitleEdit(for: item, title: newTitle)
+                    }
+                )
+                .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
+                .listRowBackground(Color.clear)
+                .listRowSeparator(.hidden)
+                .swipeActions(edge: .leading, allowsFullSwipe: true) {
+                    Button {
+                        updateNextUp(for: item, isNextUp: true)
+                    } label: {
+                        Label("Next Up", systemImage: "arrow.up.circle.fill")
+                    }
+                    .tint(.green)
+                }
+                .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                    Button(role: .destructive) {
+                        deleteTask(item)
+                    } label: {
+                        Label("Löschen", systemImage: "trash")
+                    }
+
+                    Button {
+                        taskToEditDirectly = item
+                    } label: {
+                        Label("Bearbeiten", systemImage: "pencil")
+                    }
+                    .tint(.blue)
                 }
             }
-            .padding(.horizontal, 16)
         }
+        .listStyle(.plain)
+        .scrollContentBackground(.hidden)
         .refreshable {
             await loadTasks()
         }

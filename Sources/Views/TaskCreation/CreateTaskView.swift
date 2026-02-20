@@ -21,6 +21,8 @@ struct CreateTaskView: View {
     @State private var recurrencePattern: RecurrencePattern = .none
     @State private var selectedWeekdays: Set<Int> = []
     @State private var monthDay: Int = 1
+    @State private var customBasePattern: String = "daily"
+    @State private var customInterval: Int = 1
     @State private var taskDescription: String = ""
 
     var onSave: (() -> Void)?
@@ -169,6 +171,26 @@ struct CreateTaskView: View {
                             Text("Letzter Tag").tag(32)
                         }
                     }
+
+                    // Inline expansion: Custom config (base frequency + interval)
+                    if recurrencePattern.requiresCustomConfig {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Picker("Frequenz", selection: $customBasePattern) {
+                                ForEach(RecurrencePattern.customBaseFrequencies, id: \.pattern) { freq in
+                                    Text(freq.label).tag(freq.pattern)
+                                }
+                            }
+
+                            Stepper("Alle \(customInterval)", value: $customInterval, in: 1...99)
+
+                            Text(RecurrencePattern.customDisplayName(
+                                basePattern: customBasePattern,
+                                interval: customInterval
+                            ))
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                        }
+                    }
                 } header: {
                     Text("Wiederholung")
                 }
@@ -220,7 +242,20 @@ struct CreateTaskView: View {
 
                 // Prepare recurrence data
                 let weekdays: [Int]? = recurrencePattern.requiresWeekdays ? Array(selectedWeekdays).sorted() : nil
-                let monthDay: Int? = recurrencePattern.requiresMonthDay ? self.monthDay : nil
+                let monthDayValue: Int?
+                if recurrencePattern.requiresCustomConfig {
+                    // Encode base frequency as code: 1001=daily, 1002=weekly, 1003=monthly, 1004=yearly
+                    switch customBasePattern {
+                    case "daily": monthDayValue = 1001
+                    case "weekly": monthDayValue = 1002
+                    case "monthly": monthDayValue = 1003
+                    case "yearly": monthDayValue = 1004
+                    default: monthDayValue = 1001
+                    }
+                } else {
+                    monthDayValue = recurrencePattern.requiresMonthDay ? self.monthDay : nil
+                }
+                let intervalValue: Int? = recurrencePattern.requiresCustomConfig ? customInterval : nil
 
                 let newTask = try await taskSource.createTask(
                     title: title.trimmingCharacters(in: .whitespaces),
@@ -232,7 +267,8 @@ struct CreateTaskView: View {
                     taskType: taskType,
                     recurrencePattern: recurrencePattern.rawValue,
                     recurrenceWeekdays: weekdays,
-                    recurrenceMonthDay: monthDay,
+                    recurrenceMonthDay: monthDayValue,
+                    recurrenceInterval: intervalValue,
                     description: taskDescription.isEmpty ? nil : taskDescription
                 )
 

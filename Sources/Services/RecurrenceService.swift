@@ -7,41 +7,42 @@ enum RecurrenceService {
 
     /// Calculates the next due date based on recurrence pattern.
     /// - Parameters:
-    ///   - pattern: Recurrence pattern string (none/daily/weekly/biweekly/monthly)
+    ///   - pattern: Recurrence pattern string (none/daily/weekly/biweekly/monthly/custom)
     ///   - weekdays: Selected weekdays for weekly/biweekly (1=Mon...7=Sun)
     ///   - monthDay: Day of month for monthly (1-31, 32=last day)
+    ///   - interval: Custom interval multiplier (nil or 1 = default). E.g. 3 = "every 3 days"
     ///   - baseDate: Starting date (typically the completed task's dueDate or today)
     /// - Returns: Next due date, or nil if pattern is "none"
     static func nextDueDate(
         pattern: String,
         weekdays: [Int]?,
         monthDay: Int?,
+        interval: Int? = nil,
         from baseDate: Date
     ) -> Date? {
         let cal = Calendar.current
+        let n = max(interval ?? 1, 1)
 
         switch pattern {
         case "daily":
-            return cal.date(byAdding: .day, value: 1, to: baseDate)
+            return cal.date(byAdding: .day, value: n, to: baseDate)
 
         case "weekdays":
-            // Mon-Fri: implicit weekdays [1,2,3,4,5]
             return nextWeekdayDate(from: baseDate, weekdays: [1, 2, 3, 4, 5], weeksToAdd: 0)
 
         case "weekends":
-            // Sat-Sun: implicit weekdays [6,7]
             return nextWeekdayDate(from: baseDate, weekdays: [6, 7], weeksToAdd: 0)
 
         case "weekly":
-            return nextWeekdayDate(from: baseDate, weekdays: weekdays, weeksToAdd: 0)
-                ?? cal.date(byAdding: .day, value: 7, to: baseDate)
+            return nextWeekdayDate(from: baseDate, weekdays: weekdays, weeksToAdd: n - 1)
+                ?? cal.date(byAdding: .day, value: 7 * n, to: baseDate)
 
         case "biweekly":
             return nextWeekdayDate(from: baseDate, weekdays: weekdays, weeksToAdd: 1)
                 ?? cal.date(byAdding: .day, value: 14, to: baseDate)
 
         case "monthly":
-            return nextMonthlyDate(from: baseDate, monthDay: monthDay)
+            return nextMonthlyDate(from: baseDate, monthDay: monthDay, monthsToAdd: n)
 
         case "quarterly":
             return cal.date(byAdding: .month, value: 3, to: baseDate)
@@ -50,7 +51,19 @@ enum RecurrenceService {
             return cal.date(byAdding: .month, value: 6, to: baseDate)
 
         case "yearly":
-            return cal.date(byAdding: .year, value: 1, to: baseDate)
+            return cal.date(byAdding: .year, value: n, to: baseDate)
+
+        case "custom":
+            // Custom pattern stores base frequency in monthDay: 1001=daily, 1002=weekly, 1003=monthly, 1004=yearly
+            let basePattern: String
+            switch monthDay {
+            case 1001: basePattern = "daily"
+            case 1002: basePattern = "weekly"
+            case 1003: basePattern = "monthly"
+            case 1004: basePattern = "yearly"
+            default: basePattern = "daily"
+            }
+            return nextDueDate(pattern: basePattern, weekdays: weekdays, monthDay: nil, interval: interval, from: baseDate)
 
         default:
             return nil
@@ -72,6 +85,7 @@ enum RecurrenceService {
             pattern: completedTask.recurrencePattern,
             weekdays: completedTask.recurrenceWeekdays,
             monthDay: completedTask.recurrenceMonthDay,
+            interval: completedTask.recurrenceInterval,
             from: baseDate
         )
 
@@ -113,6 +127,7 @@ enum RecurrenceService {
             recurrencePattern: completedTask.recurrencePattern,
             recurrenceWeekdays: completedTask.recurrenceWeekdays,
             recurrenceMonthDay: completedTask.recurrenceMonthDay,
+            recurrenceInterval: completedTask.recurrenceInterval,
             recurrenceGroupID: groupID,
             taskDescription: completedTask.taskDescription
         )
@@ -153,19 +168,12 @@ enum RecurrenceService {
     }
 
     /// Calculates the next monthly date.
-    private static func nextMonthlyDate(from baseDate: Date, monthDay: Int?) -> Date? {
+    private static func nextMonthlyDate(from baseDate: Date, monthDay: Int?, monthsToAdd: Int = 1) -> Date? {
         let cal = Calendar.current
-        var components = cal.dateComponents([.year, .month, .day, .hour, .minute], from: baseDate)
-
-        // Move to next month
-        if let month = components.month {
-            if month == 12 {
-                components.month = 1
-                components.year = (components.year ?? 2026) + 1
-            } else {
-                components.month = month + 1
-            }
+        guard let advancedDate = cal.date(byAdding: .month, value: monthsToAdd, to: baseDate) else {
+            return nil
         }
+        var components = cal.dateComponents([.year, .month, .day, .hour, .minute], from: advancedDate)
 
         if let day = monthDay {
             if day == 32 {

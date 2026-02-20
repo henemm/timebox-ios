@@ -410,6 +410,170 @@ final class RecurrenceServiceTests: XCTestCase {
         }
     }
 
+    // MARK: - Phase 2: Interval Support
+
+    /// nextDueDate with daily + interval 3 → baseDate + 3 days
+    /// Bricht wenn: `interval` Parameter in nextDueDate fehlt oder nicht multipliziert wird
+    func testNextDueDate_daily_interval3() {
+        let base = makeDate(2026, 2, 16)
+        let result = RecurrenceService.nextDueDate(
+            pattern: "daily", weekdays: nil, monthDay: nil,
+            interval: 3, from: base
+        )
+        XCTAssertNotNil(result)
+        let expected = makeDate(2026, 2, 19) // +3 Tage
+        XCTAssertEqual(calendar.component(.day, from: result!), 19)
+        XCTAssertEqual(calendar.component(.month, from: result!), 2)
+    }
+
+    /// nextDueDate with weekly + interval 2 = biweekly equivalent
+    /// Bricht wenn: weekly case ignoriert den interval Parameter
+    func testNextDueDate_weekly_interval2() {
+        let base = makeDate(2026, 2, 16) // Montag
+        let result = RecurrenceService.nextDueDate(
+            pattern: "weekly", weekdays: nil, monthDay: nil,
+            interval: 2, from: base
+        )
+        XCTAssertNotNil(result)
+        // weekly interval 2 ohne weekdays = +14 Tage
+        XCTAssertEqual(calendar.component(.day, from: result!), 2) // 2. März
+        XCTAssertEqual(calendar.component(.month, from: result!), 3)
+    }
+
+    /// nextDueDate with monthly + interval 3 = quarterly equivalent
+    /// Bricht wenn: monthly case ignoriert den interval Parameter
+    func testNextDueDate_monthly_interval3() {
+        let base = makeDate(2026, 2, 16)
+        let result = RecurrenceService.nextDueDate(
+            pattern: "monthly", weekdays: nil, monthDay: nil,
+            interval: 3, from: base
+        )
+        XCTAssertNotNil(result)
+        // monthly interval 3 = +3 Monate
+        XCTAssertEqual(calendar.component(.month, from: result!), 5)
+    }
+
+    /// nextDueDate with yearly + interval 2 → baseDate + 2 Jahre
+    /// Bricht wenn: yearly case ignoriert den interval Parameter
+    func testNextDueDate_yearly_interval2() {
+        let base = makeDate(2026, 2, 16)
+        let result = RecurrenceService.nextDueDate(
+            pattern: "yearly", weekdays: nil, monthDay: nil,
+            interval: 2, from: base
+        )
+        XCTAssertNotNil(result)
+        XCTAssertEqual(calendar.component(.year, from: result!), 2028)
+    }
+
+    /// Default interval (nil or 1) should behave exactly like before
+    /// Bricht wenn: nil-interval nicht als 1 behandelt wird
+    func testNextDueDate_daily_nilInterval_behavesAsDefault() {
+        let base = makeDate(2026, 2, 16)
+        let withNil = RecurrenceService.nextDueDate(
+            pattern: "daily", weekdays: nil, monthDay: nil,
+            interval: nil, from: base
+        )
+        let withOne = RecurrenceService.nextDueDate(
+            pattern: "daily", weekdays: nil, monthDay: nil,
+            interval: 1, from: base
+        )
+        let legacy = RecurrenceService.nextDueDate(
+            pattern: "daily", weekdays: nil, monthDay: nil,
+            from: base
+        )
+        XCTAssertEqual(withNil, withOne, "nil interval should equal interval 1")
+        XCTAssertEqual(withNil, legacy, "nil interval should match legacy (no interval param)")
+    }
+
+    /// createNextInstance should use task's recurrenceInterval
+    /// Bricht wenn: createNextInstance ignoriert recurrenceInterval auf LocalTask
+    @MainActor
+    func testCreateNextInstance_usesRecurrenceInterval() throws {
+        let container = try ModelContainer(for: LocalTask.self, configurations: .init(isStoredInMemoryOnly: true))
+        let context = container.mainContext
+
+        let original = LocalTask(
+            title: "Every 3 Days",
+            dueDate: makeDate(2026, 2, 16),
+            recurrencePattern: "daily"
+        )
+        original.recurrenceInterval = 3
+        context.insert(original)
+        try context.save()
+
+        let instance = RecurrenceService.createNextInstance(from: original, in: context)
+
+        XCTAssertNotNil(instance)
+        // Due date should be +3 days (Feb 19), not +1 day
+        XCTAssertEqual(calendar.component(.day, from: instance!.dueDate!), 19)
+        // Interval should be copied to new instance
+        XCTAssertEqual(instance!.recurrenceInterval, 3)
+    }
+
+    // MARK: - Custom Pattern Tests
+
+    /// custom pattern with daily base (monthDay=1001) + interval 3 → +3 days
+    /// Bricht wenn: "custom" case in nextDueDate nicht implementiert oder monthDay-Codes falsch
+    func testNextDueDate_custom_dailyBase_interval3() {
+        let base = makeDate(2026, 2, 16)
+        let result = RecurrenceService.nextDueDate(
+            pattern: "custom", weekdays: nil, monthDay: 1001,
+            interval: 3, from: base
+        )
+        XCTAssertNotNil(result)
+        XCTAssertEqual(calendar.component(.day, from: result!), 19)
+    }
+
+    /// custom pattern with weekly base (monthDay=1002) + interval 2 → +14 days
+    /// Bricht wenn: custom weekly resolution fehlschlaegt
+    func testNextDueDate_custom_weeklyBase_interval2() {
+        let base = makeDate(2026, 2, 16) // Sunday
+        let result = RecurrenceService.nextDueDate(
+            pattern: "custom", weekdays: nil, monthDay: 1002,
+            interval: 2, from: base
+        )
+        XCTAssertNotNil(result)
+        // Weekly with no weekdays and interval 2 → +14 days
+        XCTAssertEqual(calendar.component(.day, from: result!), 2)
+        XCTAssertEqual(calendar.component(.month, from: result!), 3)
+    }
+
+    /// custom pattern with monthly base (monthDay=1003) + interval 2 → +2 months
+    /// Bricht wenn: custom monthly resolution fehlschlaegt
+    func testNextDueDate_custom_monthlyBase_interval2() {
+        let base = makeDate(2026, 2, 16)
+        let result = RecurrenceService.nextDueDate(
+            pattern: "custom", weekdays: nil, monthDay: 1003,
+            interval: 2, from: base
+        )
+        XCTAssertNotNil(result)
+        XCTAssertEqual(calendar.component(.month, from: result!), 4)
+    }
+
+    /// custom pattern with yearly base (monthDay=1004) + interval 1 → +1 year
+    /// Bricht wenn: custom yearly resolution fehlschlaegt
+    func testNextDueDate_custom_yearlyBase_interval1() {
+        let base = makeDate(2026, 2, 16)
+        let result = RecurrenceService.nextDueDate(
+            pattern: "custom", weekdays: nil, monthDay: 1004,
+            interval: 1, from: base
+        )
+        XCTAssertNotNil(result)
+        XCTAssertEqual(calendar.component(.year, from: result!), 2027)
+    }
+
+    /// custom pattern with nil monthDay defaults to daily
+    /// Bricht wenn: nil-monthDay default case nicht "daily"
+    func testNextDueDate_custom_nilMonthDay_defaultsToDaily() {
+        let base = makeDate(2026, 2, 16)
+        let result = RecurrenceService.nextDueDate(
+            pattern: "custom", weekdays: nil, monthDay: nil,
+            interval: 5, from: base
+        )
+        XCTAssertNotNil(result)
+        XCTAssertEqual(calendar.component(.day, from: result!), 21)
+    }
+
     private var calendar: Calendar { Calendar.current }
 
     private func makeDate(_ year: Int, _ month: Int, _ day: Int) -> Date {

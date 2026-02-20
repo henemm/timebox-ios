@@ -23,6 +23,7 @@ struct PlanItem: Identifiable, Sendable {
     let recurrencePattern: String?
     let recurrenceWeekdays: [Int]?
     let recurrenceMonthDay: Int?
+    let recurrenceInterval: Int?
     let recurrenceGroupID: String?
 
     // AI Task Scoring (legacy fields — kept for migration, not used in UI)
@@ -117,6 +118,7 @@ struct PlanItem: Identifiable, Sendable {
         self.recurrencePattern = nil
         self.recurrenceWeekdays = nil
         self.recurrenceMonthDay = nil
+        self.recurrenceInterval = nil
         self.recurrenceGroupID = nil
     }
 
@@ -160,6 +162,7 @@ struct PlanItem: Identifiable, Sendable {
         self.recurrencePattern = localTask.recurrencePattern
         self.recurrenceWeekdays = localTask.recurrenceWeekdays
         self.recurrenceMonthDay = localTask.recurrenceMonthDay
+        self.recurrenceInterval = localTask.recurrenceInterval
         self.recurrenceGroupID = localTask.recurrenceGroupID
     }
 

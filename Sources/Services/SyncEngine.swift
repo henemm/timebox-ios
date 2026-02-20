@@ -72,7 +72,7 @@ final class SyncEngine {
         try modelContext.save()
     }
 
-    func updateTask(itemID: String, title: String, importance: Int?, duration: Int?, tags: [String], urgency: String?, taskType: String, dueDate: Date?, description: String?, recurrencePattern: String? = nil, recurrenceWeekdays: [Int]? = nil, recurrenceMonthDay: Int? = nil) throws {
+    func updateTask(itemID: String, title: String, importance: Int?, duration: Int?, tags: [String], urgency: String?, taskType: String, dueDate: Date?, description: String?, recurrencePattern: String? = nil, recurrenceWeekdays: [Int]? = nil, recurrenceMonthDay: Int? = nil, recurrenceInterval: Int? = nil) throws {
         guard let task = try findTask(byID: itemID) else {
             return
         }
@@ -88,6 +88,7 @@ final class SyncEngine {
         if let recurrencePattern { task.recurrencePattern = recurrencePattern }
         if let recurrenceWeekdays { task.recurrenceWeekdays = recurrenceWeekdays }
         if let recurrenceMonthDay { task.recurrenceMonthDay = recurrenceMonthDay }
+        if let recurrenceInterval { task.recurrenceInterval = recurrenceInterval }
         try modelContext.save()
     }
 
@@ -101,7 +102,7 @@ final class SyncEngine {
 
     /// Updates all OPEN (incomplete) tasks in a recurring series.
     /// Completed instances are preserved unchanged.
-    func updateRecurringSeries(groupID: String, title: String?, importance: Int?, duration: Int?, tags: [String]?, urgency: String?, taskType: String?, dueDate: Date?, description: String?, recurrencePattern: String? = nil, recurrenceWeekdays: [Int]? = nil, recurrenceMonthDay: Int? = nil) throws {
+    func updateRecurringSeries(groupID: String, title: String?, importance: Int?, duration: Int?, tags: [String]?, urgency: String?, taskType: String?, dueDate: Date?, description: String?, recurrencePattern: String? = nil, recurrenceWeekdays: [Int]? = nil, recurrenceMonthDay: Int? = nil, recurrenceInterval: Int? = nil) throws {
         let descriptor = FetchDescriptor<LocalTask>(
             predicate: #Predicate { $0.recurrenceGroupID == groupID && !$0.isCompleted }
         )
@@ -118,6 +119,7 @@ final class SyncEngine {
             if let recurrencePattern { task.recurrencePattern = recurrencePattern }
             if let recurrenceWeekdays { task.recurrenceWeekdays = recurrenceWeekdays }
             if let recurrenceMonthDay { task.recurrenceMonthDay = recurrenceMonthDay }
+            if let recurrenceInterval { task.recurrenceInterval = recurrenceInterval }
         }
         try modelContext.save()
     }

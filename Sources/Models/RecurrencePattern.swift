@@ -12,6 +12,7 @@ enum RecurrencePattern: String, CaseIterable, Identifiable {
     case quarterly = "quarterly"
     case semiannually = "semiannually"
     case yearly = "yearly"
+    case custom = "custom"
 
     var id: String { rawValue }
 
@@ -37,6 +38,8 @@ enum RecurrencePattern: String, CaseIterable, Identifiable {
             return "Alle 6 Monate"
         case .yearly:
             return "Jährlich"
+        case .custom:
+            return "Eigene"
         }
     }
 
@@ -48,5 +51,35 @@ enum RecurrencePattern: String, CaseIterable, Identifiable {
     /// Whether this pattern requires month day selection
     var requiresMonthDay: Bool {
         self == .monthly
+    }
+
+    /// Whether this pattern needs the custom configuration UI (base frequency + interval)
+    var requiresCustomConfig: Bool {
+        self == .custom
+    }
+
+    /// Base frequency options for custom pattern
+    static let customBaseFrequencies: [(pattern: String, label: String, unit: String, unitPlural: String)] = [
+        ("daily", "Täglich", "Tag", "Tage"),
+        ("weekly", "Wöchentlich", "Woche", "Wochen"),
+        ("monthly", "Monatlich", "Monat", "Monate"),
+        ("yearly", "Jährlich", "Jahr", "Jahre"),
+    ]
+
+    /// Display text for custom interval, e.g. "Alle 3 Tage", "Jeden Tag"
+    static func customDisplayName(basePattern: String, interval: Int) -> String {
+        guard let freq = customBaseFrequencies.first(where: { $0.pattern == basePattern }) else {
+            return "Eigene"
+        }
+        if interval == 1 {
+            switch basePattern {
+            case "daily": return "Jeden Tag"
+            case "weekly": return "Jede Woche"
+            case "monthly": return "Jeden Monat"
+            case "yearly": return "Jedes Jahr"
+            default: return freq.label
+            }
+        }
+        return "Alle \(interval) \(freq.unitPlural)"
     }
 }

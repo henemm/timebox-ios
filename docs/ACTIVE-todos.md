@@ -87,7 +87,8 @@
 - ~~Dedup-Logik (gleichzeitiges Completion auf 2 Geraeten)~~ ERLEDIGT
 - ~~macOS-Divergenz: Zukunfts-Filter + Wiederkehrend-Sidebar~~ ERLEDIGT
 - ~~Quick-Edit Recurrence-Params Fix~~ ERLEDIGT
-- Recurrence-Editing Phase 2: Intervalle + Eigene (z.B. "Jeden 3. Tag")
+- ~~Recurrence-Editing Phase 2: Intervalle + Eigene (z.B. "Jeden 3. Tag")~~ ERLEDIGT
+- Bug: Attribute-Badges in BacklogRow abgeschnitten (1-zeilig) — 2-zeiliges Layout noetig
 
 ### Bundle G: Intelligent Task Blox (Apple Intelligence + System-Integration)
 **Empfohlene Reihenfolge:**
@@ -356,6 +357,34 @@ Backlog-Filter "Wiederkehrend". iOS + macOS.
 **Verbleibende Folge-Tickets (separater Scope):**
 - Dedup-Logik: Gleichzeitiges Completion auf 2 Geraeten kann doppelte Instanzen erzeugen
 - ~~Quick-Edit Recurrence-Params: Quick-Edit-Funktionen uebergeben recurrence-Params nicht (Bug 48 Restwirkung)~~ ERLEDIGT (recurrence params in updateRecurringSeries + call sites gefixt)
+
+---
+
+### Feature: Recurrence-Editing (Phase 1 + Phase 2)
+**Status:** ERLEDIGT (2026-02-20)
+
+**Phase 1:** 5 neue Preset-Patterns (Wochentage, Wochenenden, Quartalsweise, Halbjaehrlich, Jaehrlich), Recurrence-Section in macOS TaskInspector, Series-Update-Datenfluss gefixt.
+
+**Phase 2:** "Eigene" (Custom) Pattern mit waehlbarer Basis-Frequenz (Taeglich/Woechentlich/Monatlich/Jaehrlich) + Intervall-Multiplikator (z.B. "Alle 3 Tage"). Neues Model-Feld `recurrenceInterval`. Custom UI in TaskFormSheet (iOS), TaskInspector (macOS), CreateTaskView (iOS). RecurrenceService behandelt "custom" Pattern durch Aufloesung zur Basis-Frequenz.
+
+**Fix:** recurringView nutzte ScrollView statt List — Swipe-Gesten (Edit/Delete/NextUp) fehlten.
+
+**Tests:** 71 Unit Tests GREEN (30 RecurrenceService, 25 RecurrencePattern, 16 SyncEngine).
+
+**Dateien:** RecurrencePattern.swift, RecurrenceService.swift, LocalTask.swift, PlanItem.swift, SyncEngine.swift, TaskFormSheet.swift, CreateTaskView.swift, TaskDetailSheet.swift, BacklogView.swift, TaskInspector.swift, ContentView.swift, LocalTaskSource.swift, TaskSource.swift
+
+---
+
+### Bug: BacklogRow Attribute-Badges abgeschnitten
+**Status:** OFFEN
+**Prioritaet:** MITTEL
+**Plattform:** iOS
+
+**Problem:** Die Attribute-Badges (Wichtigkeit, Flamme, Kategorie, Wiederholung, Dauer, Score, Datum) werden in einer einzelnen Zeile dargestellt und am rechten Rand abgeschnitten. Insbesondere bei laengeren Werten (z.B. "Taeglich", Score "31") wird Text mit "..." abgekuerzt.
+
+**Gewuenschtes Verhalten:** 2-zeiliges Layout fuer Attribute, sodass alle Badges vollstaendig sichtbar sind.
+
+**Betroffene Dateien:** Sources/Views/Components/BacklogRow.swift
 
 ---
 

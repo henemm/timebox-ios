@@ -750,6 +750,7 @@ struct ContentView: View {
                 t.recurrencePattern = task.recurrencePattern
                 t.recurrenceWeekdays = task.recurrenceWeekdays
                 t.recurrenceMonthDay = task.recurrenceMonthDay
+                t.recurrenceInterval = task.recurrenceInterval
             }
         }
         try? modelContext.save()

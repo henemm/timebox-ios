@@ -94,6 +94,7 @@ final class LocalTaskSource: @preconcurrency TaskSource, @preconcurrency TaskSou
         recurrencePattern: String = "none",
         recurrenceWeekdays: [Int]? = nil,
         recurrenceMonthDay: Int? = nil,
+        recurrenceInterval: Int? = nil,
         description: String? = nil
     ) async throws -> LocalTask {
         let nextSortOrder = try await getNextSortOrder()
@@ -110,6 +111,7 @@ final class LocalTaskSource: @preconcurrency TaskSource, @preconcurrency TaskSou
             recurrencePattern: recurrencePattern,
             recurrenceWeekdays: recurrenceWeekdays,
             recurrenceMonthDay: recurrenceMonthDay,
+            recurrenceInterval: recurrenceInterval,
             taskDescription: description,
             sourceSystem: "local"
         )

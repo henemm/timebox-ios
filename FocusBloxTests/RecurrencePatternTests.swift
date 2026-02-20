@@ -131,4 +131,76 @@ final class RecurrencePatternTests: XCTestCase {
         XCTAssertTrue(allRawValues.contains("semiannually"), "allCases should include semiannually")
         XCTAssertTrue(allRawValues.contains("yearly"), "allCases should include yearly")
     }
+
+    // MARK: - Phase 2: Custom Pattern
+
+    /// Bricht wenn: RecurrencePattern hat keinen `custom` case mit rawValue "custom"
+    func test_custom_rawValueExists() {
+        let pattern = RecurrencePattern(rawValue: "custom")
+        XCTAssertNotNil(pattern, "RecurrencePattern should have a 'custom' case")
+    }
+
+    /// Bricht wenn: RecurrencePattern.custom.displayName != "Eigene"
+    func test_custom_displayName() {
+        guard let pattern = RecurrencePattern(rawValue: "custom") else {
+            XCTFail("custom pattern must exist")
+            return
+        }
+        XCTAssertEqual(pattern.displayName, "Eigene")
+    }
+
+    /// Bricht wenn: allCases enthält "custom" nicht
+    func test_allCases_includesCustom() {
+        let allRawValues = RecurrencePattern.allCases.map(\.rawValue)
+        XCTAssertTrue(allRawValues.contains("custom"), "allCases should include custom")
+    }
+
+    /// Custom pattern needs base frequency selection — requiresCustomConfig should be true
+    /// Bricht wenn: RecurrencePattern.custom.requiresCustomConfig fehlt oder ist false
+    func test_custom_requiresCustomConfig() {
+        guard let pattern = RecurrencePattern(rawValue: "custom") else {
+            XCTFail("custom pattern must exist")
+            return
+        }
+        XCTAssertTrue(pattern.requiresCustomConfig,
+            "Custom pattern should require custom configuration (base frequency + interval)")
+    }
+
+    // MARK: - Phase 2: Custom Display Text
+
+    /// Bricht wenn: customDisplayName(basePatter:interval:) fehlt oder falsch formatiert
+    func test_customDisplayName_dailyInterval3() {
+        XCTAssertEqual(
+            RecurrencePattern.customDisplayName(basePattern: "daily", interval: 3),
+            "Alle 3 Tage"
+        )
+    }
+
+    func test_customDisplayName_weeklyInterval2() {
+        XCTAssertEqual(
+            RecurrencePattern.customDisplayName(basePattern: "weekly", interval: 2),
+            "Alle 2 Wochen"
+        )
+    }
+
+    func test_customDisplayName_monthlyInterval4() {
+        XCTAssertEqual(
+            RecurrencePattern.customDisplayName(basePattern: "monthly", interval: 4),
+            "Alle 4 Monate"
+        )
+    }
+
+    func test_customDisplayName_yearlyInterval1() {
+        XCTAssertEqual(
+            RecurrencePattern.customDisplayName(basePattern: "yearly", interval: 1),
+            "Jedes Jahr"
+        )
+    }
+
+    func test_customDisplayName_dailyInterval1() {
+        XCTAssertEqual(
+            RecurrencePattern.customDisplayName(basePattern: "daily", interval: 1),
+            "Jeden Tag"
+        )
+    }
 }

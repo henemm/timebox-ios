@@ -22,7 +22,7 @@ struct TaskFormSheet: View {
     }
 
     let mode: Mode
-    let onSave: ((String, Int?, Int?, [String], String?, String, Date?, String?, String, [Int]?, Int?) -> Void)?
+    let onSave: ((String, Int?, Int?, [String], String?, String, Date?, String?, String, [Int]?, Int?, Int?) -> Void)?
     let onDelete: (() -> Void)?
     var onCreateComplete: (() -> Void)?
 
@@ -43,6 +43,8 @@ struct TaskFormSheet: View {
     @State private var recurrencePattern: RecurrencePattern = .none
     @State private var selectedWeekdays: Set<Int> = []
     @State private var monthDay: Int = 1
+    @State private var customBasePattern: String = "daily"
+    @State private var customInterval: Int = 1
 
     // MARK: - Initializers
 
@@ -56,7 +58,7 @@ struct TaskFormSheet: View {
 
     /// Edit mode initializer
     init(task: PlanItem,
-         onSave: @escaping (String, Int?, Int?, [String], String?, String, Date?, String?, String, [Int]?, Int?) -> Void,
+         onSave: @escaping (String, Int?, Int?, [String], String?, String, Date?, String?, String, [Int]?, Int?, Int?) -> Void,
          onDelete: @escaping () -> Void) {
         self.mode = .edit(task)
         self.onSave = onSave
@@ -78,6 +80,18 @@ struct TaskFormSheet: View {
         _recurrencePattern = State(initialValue: RecurrencePattern(rawValue: task.recurrencePattern ?? "none") ?? .none)
         _selectedWeekdays = State(initialValue: Set(task.recurrenceWeekdays ?? []))
         _monthDay = State(initialValue: task.recurrenceMonthDay ?? 1)
+
+        // Custom pattern state
+        let basePattern: String
+        switch task.recurrenceMonthDay {
+        case 1001: basePattern = "daily"
+        case 1002: basePattern = "weekly"
+        case 1003: basePattern = "monthly"
+        case 1004: basePattern = "yearly"
+        default: basePattern = "daily"
+        }
+        _customBasePattern = State(initialValue: basePattern)
+        _customInterval = State(initialValue: task.recurrenceInterval ?? 1)
     }
 
     // MARK: - Task Type Options
@@ -240,6 +254,29 @@ struct TaskFormSheet: View {
                             }
                             .accessibilityIdentifier("monthDayPicker")
                         }
+
+                        // Inline: Custom config (base frequency + interval)
+                        if recurrencePattern.requiresCustomConfig {
+                            VStack(alignment: .leading, spacing: 8) {
+                                Picker("Frequenz", selection: $customBasePattern) {
+                                    ForEach(RecurrencePattern.customBaseFrequencies, id: \.pattern) { freq in
+                                        Text(freq.label).tag(freq.pattern)
+                                    }
+                                }
+                                .pickerStyle(.menu)
+                                .accessibilityIdentifier("customBasePatternPicker")
+
+                                Stepper("Alle \(customInterval)", value: $customInterval, in: 1...99)
+                                    .accessibilityIdentifier("customIntervalStepper")
+
+                                Text(RecurrencePattern.customDisplayName(
+                                    basePattern: customBasePattern,
+                                    interval: customInterval
+                                ))
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                            }
+                        }
                     }
 
                     // MARK: - Description
@@ -312,6 +349,19 @@ struct TaskFormSheet: View {
         UrgencyUI.label(for: urgency)
     }
 
+    // MARK: - Custom Recurrence Helper
+
+    /// Encodes the custom base pattern as a monthDay code (1001-1004)
+    private var customBasePatternCode: Int {
+        switch customBasePattern {
+        case "daily": return 1001
+        case "weekly": return 1002
+        case "monthly": return 1003
+        case "yearly": return 1004
+        default: return 1001
+        }
+    }
+
     // MARK: - Category Color Helper
 
     private func categoryColor(for type: String) -> Color {
@@ -359,7 +409,8 @@ struct TaskFormSheet: View {
         case .create:
             // Prepare recurrence data
             let weekdays: [Int]? = recurrencePattern.requiresWeekdays ? Array(selectedWeekdays).sorted() : nil
-            let monthDayValue: Int? = recurrencePattern.requiresMonthDay ? monthDay : nil
+            let monthDayValue: Int? = recurrencePattern.requiresCustomConfig ? customBasePatternCode : (recurrencePattern.requiresMonthDay ? monthDay : nil)
+            let intervalValue: Int? = recurrencePattern.requiresCustomConfig ? customInterval : nil
 
             Task {
                 do {
@@ -375,6 +426,7 @@ struct TaskFormSheet: View {
                         recurrencePattern: recurrencePattern.rawValue,
                         recurrenceWeekdays: weekdays,
                         recurrenceMonthDay: monthDayValue,
+                        recurrenceInterval: intervalValue,
                         description: finalDescription
                     )
 
@@ -399,7 +451,8 @@ struct TaskFormSheet: View {
         case .edit:
             // Prepare recurrence data
             let weekdays: [Int]? = recurrencePattern.requiresWeekdays ? Array(selectedWeekdays).sorted() : nil
-            let monthDayValue: Int? = recurrencePattern.requiresMonthDay ? monthDay : nil
+            let monthDayValue: Int? = recurrencePattern.requiresCustomConfig ? customBasePatternCode : (recurrencePattern.requiresMonthDay ? monthDay : nil)
+            let intervalValue: Int? = recurrencePattern.requiresCustomConfig ? customInterval : nil
 
             onSave?(
                 title.trimmingCharacters(in: .whitespaces),
@@ -412,7 +465,8 @@ struct TaskFormSheet: View {
                 finalDescription,
                 recurrencePattern.rawValue,
                 weekdays,
-                monthDayValue
+                monthDayValue,
+                intervalValue
             )
             dismiss()
         }
