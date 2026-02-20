@@ -367,7 +367,9 @@ Backlog-Filter "Wiederkehrend". iOS + macOS.
 
 **Phase 2:** "Eigene" (Custom) Pattern mit waehlbarer Basis-Frequenz (Taeglich/Woechentlich/Monatlich/Jaehrlich) + Intervall-Multiplikator (z.B. "Alle 3 Tage"). Neues Model-Feld `recurrenceInterval`. Custom UI in TaskFormSheet (iOS), TaskInspector (macOS), CreateTaskView (iOS). RecurrenceService behandelt "custom" Pattern durch Aufloesung zur Basis-Frequenz.
 
-**Fix:** recurringView nutzte ScrollView statt List — Swipe-Gesten (Edit/Delete/NextUp) fehlten.
+**Fix:** ALLE Views nutzten ScrollView statt List — Swipe-Gesten (Edit/Delete/NextUp) fehlten.
+Gefixt: listView, recurringView, categoryView, durationView, dueDateView, tbdView, completedView, smartPriorityView.
+eisenhowerMatrixView nutzt Context Menu (Long Press) wegen Grid-Layout.
 
 **Tests:** 71 Unit Tests GREEN (30 RecurrenceService, 25 RecurrencePattern, 16 SyncEngine).
 
