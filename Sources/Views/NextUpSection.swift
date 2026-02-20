@@ -43,6 +43,26 @@ struct NextUpSection: View {
                             onRemoveFromNextUp(task.id)
                         }
                         .accessibilityIdentifier("nextUpRow")
+                        .contextMenu {
+                            Button {
+                                onEditTask?(task)
+                            } label: {
+                                Label("Bearbeiten", systemImage: "pencil")
+                            }
+                            Button {
+                                onRemoveFromNextUp(task.id)
+                            } label: {
+                                Label("Aus Next Up entfernen", systemImage: "arrow.down.circle")
+                            }
+                            Divider()
+                            Button(role: .destructive) {
+                                onDeleteTask?(task)
+                            } label: {
+                                Label("Löschen", systemImage: "trash")
+                            }
+                        } preview: {
+                            TaskPreviewView(task: task)
+                        }
                         .listRowInsets(EdgeInsets(top: 3, leading: 10, bottom: 3, trailing: 10))
                         .listRowBackground(Color.clear)
                         .listRowSeparator(.hidden)

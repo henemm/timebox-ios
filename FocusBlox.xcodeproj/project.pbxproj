@@ -27,6 +27,7 @@
 		53697A70444E5ECF3B760A1C /* SyncEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34D186C26C7135F80A5E3B0B /* SyncEngine.swift */; };
 		5696B45863B3DACF0773DF6C /* DebugHierarchyTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10F0B986805B8F703DB62935 /* DebugHierarchyTest.swift */; };
 		58649A426A8AF17A4944DBCF /* NextUpSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B35F02DA57C64E51F6EC483 /* NextUpSection.swift */; };
+		NXLP01PVBLD0001 /* TaskPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = NXLP01PVREF0001 /* TaskPreviewView.swift */; };
 		586B7D1F1588622970BCEED8 /* MiniBacklogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1430133DDF6FA76E9E129534 /* MiniBacklogView.swift */; };
 		60EF444FADDBAC17F14380E0 /* FocusLiveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 710817B02FE720EDA21132FA /* FocusLiveView.swift */; };
 		65B5E7020B61B9C1785BD378 /* SettingsToolbarModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26CD9467C8156E2C66B2DC9C /* SettingsToolbarModifier.swift */; };
@@ -176,6 +177,7 @@
 		MAC024BUILD00000001 /* EditFocusBlockSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 515D3A83205F8E00941BD4D0 /* EditFocusBlockSheet.swift */; };
 		MAC024BUILD00000002 /* FocusBlockTasksSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74598614EAF4B9965981C7CB /* FocusBlockTasksSheet.swift */; };
 		NOTIF02BUILD000001 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 350DD1256F45268992636DEA /* NotificationService.swift */; };
+		NXLP01UIBLD0001 /* NextUpLongPressUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = NXLP01UIREF0001 /* NextUpLongPressUITests.swift */; };
 		NXSWIPE01UIBLD01 /* NextUpSwipeActionsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = NXSWIPE01UIREF01 /* NextUpSwipeActionsUITests.swift */; };
 		NXSWIPE01UTBLD01 /* NextUpSwipeActionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = NXSWIPE01UTREF01 /* NextUpSwipeActionsTests.swift */; };
 		NXTDRAG01BUILD0001 /* NextUpDragDropUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = NXTDRAG01FILE00001 /* NextUpDragDropUITests.swift */; };
@@ -450,6 +452,7 @@
 		999425519C2EA7E01EFD2490 /* BacklogSwipeActionsUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BacklogSwipeActionsUITests.swift; sourceTree = "<group>"; };
 		999C0690FA25D74051BA1C6F /* LocalTaskSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalTaskSource.swift; sourceTree = "<group>"; };
 		9B35F02DA57C64E51F6EC483 /* NextUpSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NextUpSection.swift; sourceTree = "<group>"; };
+		NXLP01PVREF0001 /* TaskPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskPreviewView.swift; sourceTree = "<group>"; };
 		9DC26C4D8FDC4B811001FD2C /* EventKitRepositoryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventKitRepositoryTests.swift; sourceTree = "<group>"; };
 		A0B1EE7295AF0AD91CA0027A /* FocusBlock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusBlock.swift; sourceTree = "<group>"; };
 		A36E40124EBA31D7428EAA80 /* DailyReviewView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DailyReviewView.swift; sourceTree = "<group>"; };
@@ -542,6 +545,7 @@
 		LIVACT01FILEREF00001 /* LiveActivityUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivityUITests.swift; sourceTree = "<group>"; };
 		LIVACT02FILEREF00001 /* LiveActivityManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivityManagerTests.swift; sourceTree = "<group>"; };
 		LIVACT03FILEREF00001 /* LiveActivityManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivityManager.swift; sourceTree = "<group>"; };
+		NXLP01UIREF0001 /* NextUpLongPressUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NextUpLongPressUITests.swift; sourceTree = "<group>"; };
 		NXSWIPE01UIREF01 /* NextUpSwipeActionsUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NextUpSwipeActionsUITests.swift; sourceTree = "<group>"; };
 		NXSWIPE01UTREF01 /* NextUpSwipeActionsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NextUpSwipeActionsTests.swift; sourceTree = "<group>"; };
 		NXTDRAG01FILE00001 /* NextUpDragDropUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NextUpDragDropUITests.swift; sourceTree = "<group>"; };
@@ -784,6 +788,7 @@
 				RVWCT01FILE00001 /* ReviewCompletedTasksUITests.swift */,
 				UNIFTAB01UIREF01 /* UnifiedTabSymbolsUITests.swift */,
 				NXSWIPE01UIREF01 /* NextUpSwipeActionsUITests.swift */,
+				NXLP01UIREF0001 /* NextUpLongPressUITests.swift */,
 				AISCORE01UIFILE001 /* AITaskScoringUITests.swift */,
 				DUEDN02FILE0000001 /* DueDateNotificationUITests.swift */,
 				BSRCH01FILE000001 /* BacklogSearchUITests.swift */,
@@ -874,6 +879,7 @@
 			children = (
 				92133F2683BB9B90566D7646 /* BacklogRow.swift */,
 				9B35F02DA57C64E51F6EC483 /* NextUpSection.swift */,
+				NXLP01PVREF0001 /* TaskPreviewView.swift */,
 				86453EFF3FD7231E39EC5E4D /* BacklogView.swift */,
 				DSGNSYS02FILE00001 /* DesignSystem.swift */,
 				CATBDG02FILE00001 /* CategoryIconBadge.swift */,
@@ -1506,6 +1512,7 @@
 			files = (
 				E907CB03C20C1B55A48C4B1B /* BacklogRow.swift in Sources */,
 				58649A426A8AF17A4944DBCF /* NextUpSection.swift in Sources */,
+				NXLP01PVBLD0001 /* TaskPreviewView.swift in Sources */,
 				402B599EB1486BA1E69EF4FF /* BacklogView.swift in Sources */,
 				DSGNSYS02BUILD0001 /* DesignSystem.swift in Sources */,
 				CATBDG02BUILD0001 /* CategoryIconBadge.swift in Sources */,
@@ -1654,6 +1661,7 @@
 				RVWCT01BUILD0001 /* ReviewCompletedTasksUITests.swift in Sources */,
 				UNIFTAB01UIBLD01 /* UnifiedTabSymbolsUITests.swift in Sources */,
 				NXSWIPE01UIBLD01 /* NextUpSwipeActionsUITests.swift in Sources */,
+				NXLP01UIBLD0001 /* NextUpLongPressUITests.swift in Sources */,
 				DUEDN02BUILD000001 /* DueDateNotificationUITests.swift in Sources */,
 				BSRCH01BUILD00001 /* BacklogSearchUITests.swift in Sources */,
 			);

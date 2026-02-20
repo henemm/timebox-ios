@@ -616,6 +616,16 @@ struct DraggableTaskRow: View {
             RoundedRectangle(cornerRadius: 8)
                 .strokeBorder(.blue.opacity(0.3), lineWidth: 1)
         )
+        .contextMenu {
+            Button {
+                handleMoveUp()
+            } label: {
+                Label("In Block verschieben", systemImage: "arrow.up.circle")
+            }
+            .disabled(availableBlocks.isEmpty)
+        } preview: {
+            TaskPreviewView(task: task)
+        }
         .draggable(PlanItemTransfer(from: task))
         .confirmationDialog("Block auswählen", isPresented: $showBlockSelection) {
             ForEach(availableBlocks) { block in
