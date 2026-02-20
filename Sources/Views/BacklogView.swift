@@ -80,42 +80,54 @@ struct BacklogView: View {
     @State private var taskToDeleteRecurring: PlanItem?
     @State private var taskToEditRecurring: PlanItem?
     @State private var editSeriesMode: Bool = false
+    @State private var searchText = ""
+
+    // MARK: - Search Filter
+    private func matchesSearch(_ item: PlanItem) -> Bool {
+        guard !searchText.isEmpty else { return true }
+        let query = searchText
+        if item.title.localizedCaseInsensitiveContains(query) { return true }
+        if item.tags.contains(where: { $0.localizedCaseInsensitiveContains(query) }) { return true }
+        if let cat = TaskCategory(rawValue: item.taskType),
+           cat.localizedName.localizedCaseInsensitiveContains(query) { return true }
+        return false
+    }
 
     // MARK: - Next Up Tasks
     private var nextUpTasks: [PlanItem] {
-        planItems.filter { $0.isNextUp && !$0.isCompleted }
+        planItems.filter { $0.isNextUp && !$0.isCompleted && matchesSearch($0) }
     }
 
     private var backlogTasks: [PlanItem] {
         // Filter: nicht erledigt, nicht Next Up, nicht einem FocusBlock zugeordnet
-        planItems.filter { !$0.isCompleted && !$0.isNextUp && $0.assignedFocusBlockID == nil }
+        planItems.filter { !$0.isCompleted && !$0.isNextUp && $0.assignedFocusBlockID == nil && matchesSearch($0) }
     }
 
     // MARK: - Eisenhower Matrix Filters (nur vollständige Tasks, keine TBDs)
     private var doFirstTasks: [PlanItem] {
-        planItems.filter { $0.urgency == "urgent" && $0.importance == 3 && !$0.isTbd && !$0.isCompleted && !$0.isNextUp }
+        planItems.filter { $0.urgency == "urgent" && $0.importance == 3 && !$0.isTbd && !$0.isCompleted && !$0.isNextUp && matchesSearch($0) }
     }
 
     private var scheduleTasks: [PlanItem] {
-        planItems.filter { $0.urgency == "not_urgent" && $0.importance == 3 && !$0.isTbd && !$0.isCompleted && !$0.isNextUp }
+        planItems.filter { $0.urgency == "not_urgent" && $0.importance == 3 && !$0.isTbd && !$0.isCompleted && !$0.isNextUp && matchesSearch($0) }
     }
 
     private var delegateTasks: [PlanItem] {
-        planItems.filter { $0.urgency == "urgent" && ($0.importance ?? 0) < 3 && !$0.isTbd && !$0.isCompleted && !$0.isNextUp }
+        planItems.filter { $0.urgency == "urgent" && ($0.importance ?? 0) < 3 && !$0.isTbd && !$0.isCompleted && !$0.isNextUp && matchesSearch($0) }
     }
 
     private var eliminateTasks: [PlanItem] {
-        planItems.filter { $0.urgency == "not_urgent" && ($0.importance ?? 0) < 3 && !$0.isTbd && !$0.isCompleted && !$0.isNextUp }
+        planItems.filter { $0.urgency == "not_urgent" && ($0.importance ?? 0) < 3 && !$0.isTbd && !$0.isCompleted && !$0.isNextUp && matchesSearch($0) }
     }
 
     // MARK: - Recurring Tasks (all incomplete, ignoring isVisibleInBacklog)
     private var recurringTasks: [PlanItem] {
-        allRecurringItems.filter { !$0.isCompleted && !$0.isNextUp }
+        allRecurringItems.filter { !$0.isCompleted && !$0.isNextUp && matchesSearch($0) }
     }
 
     // MARK: - TBD Tasks (unvollständig)
     private var tbdTasks: [PlanItem] {
-        planItems.filter { $0.isTbd && !$0.isCompleted && !$0.isNextUp }
+        planItems.filter { $0.isTbd && !$0.isCompleted && !$0.isNextUp && matchesSearch($0) }
     }
 
     private var tbdCount: Int {
@@ -126,7 +138,7 @@ struct BacklogView: View {
     private var tasksByCategory: [(category: String, tasks: [PlanItem])] {
         let categories = ["deep_work", "shallow_work", "meetings", "maintenance", "creative", "strategic"]
         return categories.compactMap { category in
-            let filtered = planItems.filter { $0.taskType == category && !$0.isCompleted && !$0.isNextUp }
+            let filtered = planItems.filter { $0.taskType == category && !$0.isCompleted && !$0.isNextUp && matchesSearch($0) }
             guard !filtered.isEmpty else { return nil }
             return (category: category.localizedCategory, tasks: filtered)
         }
@@ -142,7 +154,7 @@ struct BacklogView: View {
         ]
         return buckets.compactMap { (label, range) in
             let filtered = planItems.filter {
-                !$0.isCompleted && !$0.isNextUp && range.contains($0.effectiveDuration)
+                !$0.isCompleted && !$0.isNextUp && range.contains($0.effectiveDuration) && matchesSearch($0)
             }
             guard !filtered.isEmpty else { return nil }
             return (bucket: label, tasks: filtered)
@@ -158,31 +170,31 @@ struct BacklogView: View {
 
         let todayTasks = planItems.filter {
             guard let due = $0.dueDate, !$0.isCompleted, !$0.isNextUp else { return false }
-            return calendar.isDateInToday(due)
+            return calendar.isDateInToday(due) && matchesSearch($0)
         }
         if !todayTasks.isEmpty { grouped.append(("Heute", todayTasks)) }
 
         let tomorrowTasks = planItems.filter {
             guard let due = $0.dueDate, !$0.isCompleted, !$0.isNextUp else { return false }
-            return calendar.isDateInTomorrow(due)
+            return calendar.isDateInTomorrow(due) && matchesSearch($0)
         }
         if !tomorrowTasks.isEmpty { grouped.append(("Morgen", tomorrowTasks)) }
 
         let weekTasks = planItems.filter {
             guard let due = $0.dueDate, !$0.isCompleted, !$0.isNextUp else { return false }
             return calendar.isDate(due, equalTo: today, toGranularity: .weekOfYear) &&
-                   !calendar.isDateInToday(due) && !calendar.isDateInTomorrow(due)
+                   !calendar.isDateInToday(due) && !calendar.isDateInTomorrow(due) && matchesSearch($0)
         }
         if !weekTasks.isEmpty { grouped.append(("Diese Woche", weekTasks)) }
 
         let laterTasks = planItems.filter {
             guard let due = $0.dueDate, !$0.isCompleted, !$0.isNextUp else { return false }
             guard let nextWeek = calendar.date(byAdding: .weekOfYear, value: 1, to: today) else { return false }
-            return due > nextWeek
+            return due > nextWeek && matchesSearch($0)
         }
         if !laterTasks.isEmpty { grouped.append(("Später", laterTasks)) }
 
-        let noDueDateTasks = planItems.filter { $0.dueDate == nil && !$0.isCompleted && !$0.isNextUp }
+        let noDueDateTasks = planItems.filter { $0.dueDate == nil && !$0.isCompleted && !$0.isNextUp && matchesSearch($0) }
         if !noDueDateTasks.isEmpty { grouped.append(("Ohne Fälligkeitsdatum", noDueDateTasks)) }
 
         return grouped
@@ -387,6 +399,7 @@ struct BacklogView: View {
                 }
             }
         }
+        .searchable(text: $searchText, prompt: "Tasks durchsuchen")
         .task(id: remindersSyncEnabled) {
             await loadTasks()
         }

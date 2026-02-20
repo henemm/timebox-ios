@@ -1,0 +1,13 @@
+TDD RED — Backlog Search Unit Test Check
+Date: 2026-02-20
+
+Test: matchesSearch() function
+Result: FAILED — function does not exist yet
+Reason: matchesSearch() not implemented in BacklogView.swift
+
+The search filter logic (title, tags, category matching) has no unit test because:
+- Logic is trivial string matching (localizedCaseInsensitiveContains)
+- Fully covered by 3 UI tests in BacklogSearchUITests.swift
+- testSearchFieldExists, testSearchFiltersByTitle, testSearchNoResults all FAILED (RED)
+
+Root cause: .searchable() modifier and matchesSearch() function not yet added.

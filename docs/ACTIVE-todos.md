@@ -26,7 +26,7 @@
 | 1 | ~~Einheitliche Symbole Tab-Bar/Sidebar~~ | ERLEDIGT | XS | — | — | — |
 | 2 | ~~NextUp Wischgesten (Edit+Delete)~~ | ERLEDIGT | XS | ~15-20k | 3 | ~80 |
 | 3 | ~~NextUp Long Press Vorschau~~ | ERLEDIGT | XS | ~15-20k | 3 | ~120 |
-| 4 | Generische Suche (iOS+macOS) | MITTEL | S | ~15-20k | 2-3 | ~25 |
+| 4 | ~~Generische Suche (iOS+macOS)~~ | ERLEDIGT | S | ~15-20k | 2-3 | ~25 |
 | 5 | MAC-022 Spotlight Integration | P2 | S | ~15-25k | 1-2 | ~30 |
 | 6 | ~~Recurring Tasks Phase 1B/2 (inkl. Sichtbarkeit + Edit/Delete Dialog)~~ | ERLEDIGT | M-L | ~60-100k | 5-6 | ~200 |
 | 7 | Kalender-App Deep Link (iOS+macOS) | MITTEL | M | ~40-50k | 3-4 | ~100 |
@@ -47,7 +47,7 @@
 
 **Komplexitaet:** XS = halbe Stunde | S = 1 Session | M = 2-3 Sessions | L = halber Tag | XL = ganzer Tag+
 
-**Guenstigster Quick Win:** #4 Generische Suche (~15-20k), Shake to Undo (XS)
+**Guenstigster Quick Win:** Shake to Undo (XS)
 **Teuerste Items:** #17 OrganizeMyDay (~150k), #13 Drag & Drop (~150k), #14 NC Widget (~120k)
 **WARTEND (Apple-Abhaengigkeit):** #20 ITB-F — Developer-APIs verfuegbar, wartet auf Siri On-Screen Awareness (iOS 26.5/27)
 **RESEARCH Items:** #21 ITB-G - API-Verifizierung noetig vor Planung
@@ -65,7 +65,7 @@
 - ~~NextUp Long Press Vorschau~~ ERLEDIGT
 
 ### Bundle B: Backlog & Suche
-- Generische Suche (iOS+macOS)
+- ~~Generische Suche (iOS+macOS)~~ ERLEDIGT
 - MAC-022 Spotlight Integration
 
 ### Bundle C: Erinnerungen & Verknuepfungen
@@ -321,13 +321,15 @@
 ---
 
 ### Feature: Generische Suche (iOS + macOS)
-**Status:** OFFEN
+**Status:** ERLEDIGT (2026-02-20)
 **Prioritaet:** MITTEL
 **Komplexitaet:** S (~15-20k Tokens)
 
 **Problem:** Kein Suchfeld fuer Tasks. Bei vielen Tasks muss man manuell scrollen.
-**Gewuenschtes Verhalten:** Suchfeld im Backlog (iOS + macOS) filtert Tasks nach Titel, Tags, Kategorie.
-**Scope:** ~25 LoC, 2-3 Dateien
+**Loesung:** `.searchable()` Modifier auf NavigationStack (iOS) und NavigationSplitView (macOS).
+Suche nach Titel, Tags und Kategorie (localizedCaseInsensitiveContains). Wirkt orthogonal
+zu allen bestehenden Filtern/ViewModes. 3 UI-Tests (Suchfeld existiert, Filterung, No Results).
+**Scope:** ~30 LoC, 2 Dateien + UI-Tests
 
 ---
 

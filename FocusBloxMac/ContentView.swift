@@ -67,10 +67,23 @@ struct ContentView: View {
     // Quick Add
     @State private var newTaskTitle = ""
 
+    @State private var searchText = ""
+
     // Recurring dialogs
     @State private var taskToDeleteRecurring: LocalTask?
     @State private var taskToEditRecurring: LocalTask?
     @State private var editSeriesMode: Bool = false
+
+    // MARK: - Search Filter
+    private func matchesSearch(_ task: LocalTask) -> Bool {
+        guard !searchText.isEmpty else { return true }
+        let query = searchText
+        if task.title.localizedCaseInsensitiveContains(query) { return true }
+        if task.tags.contains(where: { $0.localizedCaseInsensitiveContains(query) }) { return true }
+        if let cat = TaskCategory(rawValue: task.taskType),
+           cat.localizedName.localizedCaseInsensitiveContains(query) { return true }
+        return false
+    }
 
     // Base filter: exclude future-dated recurring tasks (same logic as iOS LocalTaskSource)
     private var visibleTasks: [LocalTask] {
@@ -111,36 +124,37 @@ struct ContentView: View {
         tasks.filter { !$0.isCompleted && $0.recurrencePattern != "none" }.count
     }
 
-    // Filtered tasks based on sidebar selection
+    // Filtered tasks based on sidebar selection + search
     private var filteredTasks: [LocalTask] {
+        let base: [LocalTask]
         switch selectedFilter {
         case .all:
-            return visibleTasks
+            base = visibleTasks
         case .category(let category):
-            return visibleTasks.filter { $0.taskType == category }
+            base = visibleTasks.filter { $0.taskType == category }
         case .nextUp:
-            return visibleTasks.filter { $0.isNextUp }
+            base = visibleTasks.filter { $0.isNextUp }
         case .tbd:
-            return visibleTasks.filter { $0.isTbd }
+            base = visibleTasks.filter { $0.isTbd }
         case .overdue:
             let now = Date()
-            return visibleTasks.filter { task in
+            base = visibleTasks.filter { task in
                 guard let dueDate = task.dueDate else { return false }
                 return dueDate < now
             }
         case .upcoming:
             let now = Date()
             let weekFromNow = Calendar.current.date(byAdding: .day, value: 7, to: now) ?? now
-            return visibleTasks.filter { task in
+            base = visibleTasks.filter { task in
                 guard let dueDate = task.dueDate else { return false }
                 return dueDate >= now && dueDate <= weekFromNow
             }
         case .completed:
-            return tasks.filter { $0.isCompleted }
+            base = tasks.filter { $0.isCompleted }
         case .recurring:
-            return tasks.filter { !$0.isCompleted && $0.recurrencePattern != "none" }
+            base = tasks.filter { !$0.isCompleted && $0.recurrencePattern != "none" }
         case .smartPriority:
-            return visibleTasks
+            base = visibleTasks
                 .sorted {
                     TaskPriorityScoringService.calculateScore(
                         importance: $0.importance, urgency: $0.urgency, dueDate: $0.dueDate,
@@ -155,6 +169,7 @@ struct ContentView: View {
                     )
                 }
         }
+        return searchText.isEmpty ? base : base.filter { matchesSearch($0) }
     }
 
     // Selected task for inspector (single selection)
@@ -206,6 +221,7 @@ struct ContentView: View {
             Text(importStatusMessage ?? "")
         }
         .frame(minWidth: 1000, minHeight: 600)
+        .searchable(text: $searchText, prompt: "Tasks durchsuchen")
         .toolbar(id: "mainNavigation") {
             // Main navigation in toolbar
             ToolbarItem(id: "navigationPicker", placement: .principal) {
@@ -250,42 +266,43 @@ struct ContentView: View {
 
     // MARK: - Backlog View
 
-    // Next Up tasks (sorted by nextUpSortOrder)
+    // Next Up tasks (sorted by nextUpSortOrder, search-filtered)
     private var nextUpTasks: [LocalTask] {
-        tasks.filter { $0.isNextUp && !$0.isCompleted }
+        tasks.filter { $0.isNextUp && !$0.isCompleted && matchesSearch($0) }
             .sorted { ($0.nextUpSortOrder ?? Int.max) < ($1.nextUpSortOrder ?? Int.max) }
     }
 
-    // Regular tasks (non-Next Up, filtered)
+    // Regular tasks (non-Next Up, filtered + search)
     private var regularFilteredTasks: [LocalTask] {
+        let base: [LocalTask]
         switch selectedFilter {
         case .all:
-            return visibleTasks.filter { !$0.isNextUp }
+            base = visibleTasks.filter { !$0.isNextUp }
         case .category(let category):
-            return visibleTasks.filter { !$0.isNextUp && $0.taskType == category }
+            base = visibleTasks.filter { !$0.isNextUp && $0.taskType == category }
         case .nextUp:
-            return []  // Next Up section handles this
+            base = []  // Next Up section handles this
         case .tbd:
-            return visibleTasks.filter { !$0.isNextUp && $0.isTbd }
+            base = visibleTasks.filter { !$0.isNextUp && $0.isTbd }
         case .overdue:
             let now = Date()
-            return visibleTasks.filter { task in
+            base = visibleTasks.filter { task in
                 guard !task.isNextUp, let dueDate = task.dueDate else { return false }
                 return dueDate < now
             }
         case .upcoming:
             let now = Date()
             let weekFromNow = Calendar.current.date(byAdding: .day, value: 7, to: now) ?? now
-            return visibleTasks.filter { task in
+            base = visibleTasks.filter { task in
                 guard !task.isNextUp, let dueDate = task.dueDate else { return false }
                 return dueDate >= now && dueDate <= weekFromNow
             }
         case .completed:
-            return tasks.filter { $0.isCompleted }
+            base = tasks.filter { $0.isCompleted }
         case .recurring:
-            return tasks.filter { !$0.isCompleted && !$0.isNextUp && $0.recurrencePattern != "none" }
+            base = tasks.filter { !$0.isCompleted && !$0.isNextUp && $0.recurrencePattern != "none" }
         case .smartPriority:
-            return visibleTasks.filter { !$0.isNextUp }
+            base = visibleTasks.filter { !$0.isNextUp }
                 .sorted {
                     TaskPriorityScoringService.calculateScore(
                         importance: $0.importance, urgency: $0.urgency, dueDate: $0.dueDate,
@@ -300,6 +317,7 @@ struct ContentView: View {
                     )
                 }
         }
+        return searchText.isEmpty ? base : base.filter { matchesSearch($0) }
     }
 
     // Show Next Up section only in "All" filter
