@@ -119,10 +119,10 @@ struct BacklogRow: View {
         isEditingTitle = false
     }
 
-    // MARK: - Metadata Row (fixed size badges, no nested ScrollView to avoid scroll issues)
+    // MARK: - Metadata Row (FlowLayout wraps badges to next line when they exceed available width)
 
     private var metadataRow: some View {
-        HStack(spacing: 6) {
+        FlowLayout(spacing: 6) {
             // 1. Importance Badge (always visible, gray "?" if not set)
             importanceBadge
 
@@ -182,7 +182,6 @@ struct BacklogRow: View {
                 .lineLimit(1)
             }
         }
-        .clipped()
     }
 
     // MARK: - Importance Badge (tappable, cycles 1 → 2 → 3 → 1)

@@ -89,7 +89,7 @@
 - ~~macOS-Divergenz: Zukunfts-Filter + Wiederkehrend-Sidebar~~ ERLEDIGT
 - ~~Quick-Edit Recurrence-Params Fix~~ ERLEDIGT
 - ~~Recurrence-Editing Phase 2: Intervalle + Eigene (z.B. "Jeden 3. Tag")~~ ERLEDIGT
-- Bug: Attribute-Badges in BacklogRow abgeschnitten (1-zeilig) — 2-zeiliges Layout noetig
+- ~~Bug: Attribute-Badges in BacklogRow abgeschnitten (1-zeilig)~~ ERLEDIGT (FlowLayout)
 
 ### Bundle G: Intelligent Task Blox (Apple Intelligence + System-Integration)
 **Empfohlene Reihenfolge:**
@@ -124,6 +124,26 @@
 **Betroffene Datei:** `.claude/hooks/ui_screenshot_gate.py`
 
 **Update 2026-02-21:** UI-Test-Skill um System-Permission-Dialog-Handling erweitert (addUIInterruptionMonitor, Springboard, resetAuthorizationStatus). Simulator-ID im Skill korrigiert.
+
+---
+
+### Tooling: TDD-Gate blockiert Test-Daten-Erstellung (Huhn-Ei-Problem)
+**Status:** OFFEN
+**Prioritaet:** HOCH
+**Komplexitaet:** S
+
+**Problem:** Der `strict_code_gate.py` blockiert ALLE Edits an geschuetzten Dateien bis TDD RED abgeschlossen ist. Aber manchmal muessen Mock-Daten (z.B. in `seedUITestData()`) erst erstellt werden, DAMIT der Test fehlschlagen kann. Das erzeugt ein Huhn-Ei-Problem:
+1. Test braucht Mock-Daten um zu failen
+2. Mock-Daten erfordern Edit an FocusBloxApp.swift
+3. Gate blockiert Edit weil TDD RED nicht fertig ist
+4. TDD RED kann nicht fertig werden ohne Mock-Daten
+
+**Gewuenschtes Verhalten:** Gate soll Test-Infrastruktur-Dateien vom TDD-Gate ausnehmen:
+- Option A: Whitelist fuer Test-Daten-Dateien (seedUITestData, Mock-Klassen, Test-Fixtures)
+- Option B: Edits an `seedUITestData()` oder `*Mock*` Dateien sind in TDD RED Phase erlaubt
+- Option C: Separater Gate-Modus "test-setup" der vor TDD RED kommt
+
+**Betroffene Datei:** `.claude/hooks/strict_code_gate.py`
 
 ---
 
@@ -410,15 +430,16 @@ Context Menu bleibt zusaetzlich erhalten.
 ---
 
 ### Bug: BacklogRow Attribute-Badges abgeschnitten
-**Status:** OFFEN
+**Status:** ERLEDIGT (2026-02-21)
 **Prioritaet:** MITTEL
 **Plattform:** iOS
 
-**Problem:** Die Attribute-Badges (Wichtigkeit, Flamme, Kategorie, Wiederholung, Dauer, Score, Datum) werden in einer einzelnen Zeile dargestellt und am rechten Rand abgeschnitten. Insbesondere bei laengeren Werten (z.B. "Taeglich", Score "31") wird Text mit "..." abgekuerzt.
+**Problem:** Die Attribute-Badges (Wichtigkeit, Flamme, Kategorie, Wiederholung, Dauer, Score, Datum) wurden in einer einzelnen Zeile (HStack) dargestellt und am rechten Rand mit `.clipped()` abgeschnitten.
 
-**Gewuenschtes Verhalten:** 2-zeiliges Layout fuer Attribute, sodass alle Badges vollstaendig sichtbar sind.
+**Fix:** `HStack(spacing: 6)` durch bestehendes `FlowLayout(spacing: 6)` ersetzt + `.clipped()` entfernt. Badges umbrechen jetzt automatisch in die naechste Zeile wenn der Platz nicht reicht.
 
-**Betroffene Dateien:** Sources/Views/Components/BacklogRow.swift
+**Dateien:** `BacklogRow.swift` (2 Zeilen geaendert), `FocusBloxApp.swift` (Mock-Task fuer Badge-Overflow-Test)
+**Screenshots:** `docs/artifacts/bug-backlog-badges-clipped/screenshots/` (before + after)
 
 ---
 

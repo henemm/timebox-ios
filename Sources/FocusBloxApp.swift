@@ -520,6 +520,15 @@ struct FocusBloxApp: App {
         context.insert(fbTask2)
         context.insert(fbTask3)
 
+        // Badge-overflow task: ALL badges set to demonstrate FlowLayout wrapping
+        let badgeOverflowTask = LocalTask(title: "Badge Overflow Demo", importance: 3, estimatedDuration: 120, urgency: "urgent")
+        badgeOverflowTask.isNextUp = false
+        badgeOverflowTask.taskType = "learning"
+        badgeOverflowTask.tags = ["design", "research", "project"]
+        badgeOverflowTask.dueDate = Date()
+        badgeOverflowTask.recurrencePattern = "weekly"
+        context.insert(badgeOverflowTask)
+
         // Completed task outside any FocusBlock (for Review tab testing)
         let completedOutsideBlock = LocalTask(title: "Erledigte Backlog-Aufgabe", importance: 2, estimatedDuration: 20, urgency: "not_urgent")
         completedOutsideBlock.isNextUp = false
