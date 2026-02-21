@@ -154,6 +154,7 @@
 		FBRND002BUILDFILE0001 /* FocusBloxRebrandTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBRND002FILEREF00001 /* FocusBloxRebrandTests.swift */; };
 		FBSNOT01BUILD0001 /* FocusBlockStartNotificationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBSNOT01FILE00001 /* FocusBlockStartNotificationTests.swift */; };
 		INTENT01BUILD00001 /* TaskEnums.swift in Sources */ = {isa = PBXBuildFile; fileRef = INTENT01FILEREF0001 /* TaskEnums.swift */; };
+		FBENTITY02BUILD01 /* FocusBlockEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBENTITY02FILE001 /* FocusBlockEntity.swift */; };
 		INTENT02BUILD00001 /* TaskEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = INTENT02FILEREF0001 /* TaskEntity.swift */; };
 		INTENT03BUILD00001 /* CreateTaskIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = INTENT03FILEREF0001 /* CreateTaskIntent.swift */; };
 		INTENT04BUILD00001 /* GetNextUpIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = INTENT04FILEREF0001 /* GetNextUpIntent.swift */; };
@@ -204,6 +205,7 @@
 		RECRPAT01BUILD0001 /* RecurrencePatternTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = RECRPAT01FILE00001 /* RecurrencePatternTests.swift */; };
 		RECRPAT02BUILD001 /* RecurrencePattern.swift in Sources */ = {isa = PBXBuildFile; fileRef = RECRPAT02FILE0001 /* RecurrencePattern.swift */; };
 		RECRPAT02BUILD002 /* RecurrencePattern.swift in Sources */ = {isa = PBXBuildFile; fileRef = RECRPAT02FILE0001 /* RecurrencePattern.swift */; };
+		FBENTITY01BUILD01 /* FocusBlockEntityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBENTITY01FILE001 /* FocusBlockEntityTests.swift */; };
 		RECRSVC01BUILD0001 /* RecurrenceServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = RECRSVC01FILE00001 /* RecurrenceServiceTests.swift */; };
 		RECRSVC02BUILD001 /* RecurrenceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = RECRSVC02FILE0001 /* RecurrenceService.swift */; };
 		RECRSVC02BUILD002 /* RecurrenceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = RECRSVC02FILE0001 /* RecurrenceService.swift */; };
@@ -549,6 +551,7 @@
 		FBSNOT01FILE00001 /* FocusBlockStartNotificationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusBlockStartNotificationTests.swift; sourceTree = "<group>"; };
 		FDD319A3F7DEE05F6A8885FC /* DurationBadge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DurationBadge.swift; sourceTree = "<group>"; };
 		INTENT01FILEREF0001 /* TaskEnums.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskEnums.swift; sourceTree = "<group>"; };
+		FBENTITY02FILE001 /* FocusBlockEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusBlockEntity.swift; sourceTree = "<group>"; };
 		INTENT02FILEREF0001 /* TaskEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskEntity.swift; sourceTree = "<group>"; };
 		INTENT03FILEREF0001 /* CreateTaskIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateTaskIntent.swift; sourceTree = "<group>"; };
 		INTENT04FILEREF0001 /* GetNextUpIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetNextUpIntent.swift; sourceTree = "<group>"; };
@@ -581,6 +584,7 @@
 		RECREDT01FILE00001 /* RecurrenceEditingUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecurrenceEditingUITests.swift; sourceTree = "<group>"; };
 		RECRPAT01FILE00001 /* RecurrencePatternTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecurrencePatternTests.swift; sourceTree = "<group>"; };
 		RECRPAT02FILE0001 /* RecurrencePattern.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecurrencePattern.swift; sourceTree = "<group>"; };
+		FBENTITY01FILE001 /* FocusBlockEntityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusBlockEntityTests.swift; sourceTree = "<group>"; };
 		RECRSVC01FILE00001 /* RecurrenceServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecurrenceServiceTests.swift; sourceTree = "<group>"; };
 		RECRSVC02FILE0001 /* RecurrenceService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecurrenceService.swift; sourceTree = "<group>"; };
 		RECTMPL01FILE0001 /* RecurringTemplateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecurringTemplateTests.swift; sourceTree = "<group>"; };
@@ -1119,6 +1123,7 @@
 				BUG50RO01FILE0001 /* CalendarEventReadOnlyTests.swift */,
 				CATBDG01FILE00001 /* CategoryIconBadgeTests.swift */,
 				RECRPAT01FILE00001 /* RecurrencePatternTests.swift */,
+				FBENTITY01FILE001 /* FocusBlockEntityTests.swift */,
 				RECRSVC01FILE00001 /* RecurrenceServiceTests.swift */,
 				RECTMPL01FILE0001 /* RecurringTemplateTests.swift */,
 				TMPDEDUP01FILE001 /* TemplateDedupTests.swift */,
@@ -1201,6 +1206,7 @@
 			children = (
 				INTENT01FILEREF0001 /* TaskEnums.swift */,
 				INTENT02FILEREF0001 /* TaskEntity.swift */,
+				FBENTITY02FILE001 /* FocusBlockEntity.swift */,
 				INTENT03FILEREF0001 /* CreateTaskIntent.swift */,
 				BUG35SNP01FILEREF01 /* CreateTaskSnippetIntent.swift */,
 				BUG35SNP02FILEREF01 /* QuickCaptureState.swift */,
@@ -1758,6 +1764,7 @@
 				A4A8AF1E9B1B715FE913F6F4 /* NotificationService.swift in Sources */,
 				INTENT01BUILD00001 /* TaskEnums.swift in Sources */,
 				INTENT02BUILD00001 /* TaskEntity.swift in Sources */,
+				FBENTITY02BUILD01 /* FocusBlockEntity.swift in Sources */,
 				INTENT03BUILD00001 /* CreateTaskIntent.swift in Sources */,
 				BUG36CC01BUILD00001 /* CCQuickAddIntents.swift in Sources */,
 				BUG35SNP01BUILD0001 /* CreateTaskSnippetIntent.swift in Sources */,
@@ -1891,6 +1898,7 @@
 				BUG50RO01BUILD001 /* CalendarEventReadOnlyTests.swift in Sources */,
 				CATBDG01BUILD0001 /* CategoryIconBadgeTests.swift in Sources */,
 				RECRPAT01BUILD0001 /* RecurrencePatternTests.swift in Sources */,
+				FBENTITY01BUILD01 /* FocusBlockEntityTests.swift in Sources */,
 				RECRSVC01BUILD0001 /* RecurrenceServiceTests.swift in Sources */,
 				RECTMPL01BUILD001 /* RecurringTemplateTests.swift in Sources */,
 				TMPDEDUP01BUILD01 /* TemplateDedupTests.swift in Sources */,

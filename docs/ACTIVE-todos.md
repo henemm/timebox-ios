@@ -38,7 +38,7 @@
 | 12 | MAC-026 Enhanced Quick Capture | P2 | L | ~80-120k | 4 | ~200 |
 | 13 | MAC-020 Drag & Drop Planung | P2 | XL | ~100-150k | 3-4 | ~250 |
 | 14 | MAC-032 NC Widget | P3 | XL | ~80-120k | neues Target | ~200 |
-| 15 | ITB-A: FocusBlockEntity (AppEntity) | MITTEL | S | ~30-40k | 2 | ~60 |
+| 15 | ~~ITB-A: FocusBlockEntity (AppEntity)~~ | ERLEDIGT | S | ~30-40k | 2 | ~60 |
 | 16 | ~~ITB-B: Smart Priority (AI-Enrichment + Hybrid-Scoring)~~ | ERLEDIGT | L | ~80-120k | 12 | ~250 |
 | 17 | ITB-C: OrganizeMyDay Intent | MITTEL | XL | ~100-150k | 4-5 | ~250 |
 | 18 | ITB-D: Enhanced Liquid Glass (aktive Blocks) | NIEDRIG | S | ~20-30k | 2 | ~40 |
@@ -94,9 +94,9 @@
 
 ### Bundle G: Intelligent Task Blox (Apple Intelligence + System-Integration)
 **Empfohlene Reihenfolge:**
-1. ITB-D (Liquid Glass) - Quick Win, unabhaengig
-2. ITB-A (FocusBlockEntity) - Grundlage fuer Intents
-3. ITB-E (Share Extension) - unabhaengig von AI
+1. ~~ITB-A (FocusBlockEntity)~~ ERLEDIGT - Grundlage fuer Intents
+2. ITB-E (Share Extension) - hoechster User-Value
+3. ITB-D (Liquid Glass) - visuelles Polish
 4. ~~ITB-B (Smart Priority)~~ ERLEDIGT - AI-Enrichment + deterministischer Score
 5. ITB-C (OrganizeMyDay) - braucht A+B
 6. ITB-F (Context Capture) - WARTEND: Developer-APIs da, Siri On-Screen Awareness fehlt (iOS 26.5/27)
@@ -107,6 +107,18 @@
 ---
 
 ## 🔴 OFFEN
+
+---
+
+### SaveQuickCaptureIntent: AI-Enrichment fehlt bei Siri-Task-Erstellung
+**Status:** OFFEN
+**Prioritaet:** HOCH
+**Komplexitaet:** XS-S
+
+- **Problem:** `SaveQuickCaptureIntent` (Siri / Interactive Snippets) erstellt Tasks direkt via `LocalTask()` Constructor, nicht ueber `LocalTaskSource.createTask()`. Dadurch greift das zentrale AI-Enrichment nicht.
+- **Location:** `Sources/Intents/QuickCaptureSubIntents.swift:116-125`
+- **Loesung:** Intent auf `LocalTaskSource.createTask()` umbauen. Herausforderung: `LocalTaskSource` ist `@MainActor`, Intent laeuft nicht auf MainActor. Swift Concurrency isolation hop via `await` noetig.
+- **Zusammenhang:** Follow-up aus Fix "AI-Enrichment in alle Task-Creation-Paths eingebaut" (Commit `91dd88b`)
 
 ---
 
@@ -620,18 +632,18 @@ Context Menu bleibt zusaetzlich erhalten.
 ---
 
 ### ITB-A: FocusBlockEntity (AppEntity fuer Blocks)
-**Status:** OFFEN
+**Status:** ERLEDIGT
 **Prioritaet:** MITTEL
 **Komplexitaet:** S (~30-40k Tokens)
 **Abhaengigkeiten:** Keine (baut auf bestehendem TaskEntity-Pattern auf)
 
-**Problem:** FocusBlocks sind nicht als AppEntity exponiert - kein Zugriff fuer Shortcuts, Siri oder Spotlight.
-**Gewuenschtes Verhalten:**
-- FocusBlock als `AppEntity` mit `EntityQuery`
-- Spotlight-Indexierung fuer Blocks
-- Grundlage fuer alle weiteren Intent-basierten Features
-**Bestehendes Pattern:** TaskEntity + 5 App Intents in `Sources/Intents/`
-**Scope:** ~60 LoC, 2 Dateien (neue Entity + FocusBloxShortcuts Erweiterung)
+**Implementiert:**
+- `FocusBlockEntity` als `AppEntity` mit `EntityQuery` — Siri/Shortcuts koennen FocusBlocks finden und anzeigen
+- `FocusBlockEntityQuery` laedt heutige Blocks via `EventKitRepository.fetchFocusBlocks(for:)`
+- `DisplayRepresentation` zeigt Titel, Zeitbereich, Dauer und Task-Fortschritt
+- Pattern exakt wie `TaskEntity`, aber Datenquelle ist EventKit statt SwiftData
+**Dateien:** `Sources/Intents/FocusBlockEntity.swift` (neu, ~75 LoC), `FocusBloxTests/FocusBlockEntityTests.swift` (neu, 4 Tests)
+**Tests:** 4/4 Unit Tests GREEN, iOS + macOS Build SUCCEEDED
 
 ---
 

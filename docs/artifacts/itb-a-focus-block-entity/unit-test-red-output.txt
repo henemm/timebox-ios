@@ -1,0 +1,6 @@
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/FocusBlockEntityTests.swift:24:22: error: cannot find 'FocusBlockEntity' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/FocusBlockEntityTests.swift:47:22: error: cannot find 'FocusBlockEntity' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/FocusBlockEntityTests.swift:64:22: error: cannot find 'FocusBlockEntity' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/FocusBlockEntityTests.swift:78:22: error: cannot find 'FocusBlockEntity' in scope
+Testing failed:
+** TEST FAILED **

@@ -1,0 +1,4 @@
+UI Test N/A: FocusBlockEntity is a backend-only AppEntity for Siri/Shortcuts.
+No new UI elements are added to FocusBlox.
+The entity is used by Shortcuts.app and Siri - not visible in our app UI.
+Testing is covered by unit tests (FocusBlockEntityTests).
