@@ -517,7 +517,8 @@ Context Menu bleibt zusaetzlich erhalten.
 **Loesung:** Neues `isTemplate: Bool` Feld auf LocalTask. Templates sind unsichtbare Mutterinstanzen die nur in "Wiederkehrend" erscheinen. Kind-Instanzen erscheinen im Backlog wenn faellig. Neue Instanzen kopieren Attribute vom Template statt von der erledigten Instanz. "Serie beenden" loescht Template + offene Kinder, behaelt History.
 
 **Dateien:** `LocalTask.swift`, `PlanItem.swift`, `RecurrenceService.swift`, `SyncEngine.swift`, `BacklogView.swift`, `ContentView.swift`, `FocusBloxApp.swift`, `FocusBloxMacApp.swift` (8 Dateien, ~+460 LoC)
-**Tests:** 9 Unit Tests (RecurringTemplateTests.swift) — alle GREEN
+**Tests:** 9 Unit Tests (RecurringTemplateTests.swift) + 3 UI Tests (RecurringTemplateUITests.swift) — alle GREEN
+**Fix (2026-02-21):** UserDefaults-Guard aus Migration entfernt (war unnoetig, verursachte Bug auf macOS). Mock-Daten fuer Recurring Templates in seedUITestData hinzugefuegt.
 
 ---
 

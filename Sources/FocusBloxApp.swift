@@ -531,6 +531,61 @@ struct FocusBloxApp: App {
         badgeOverflowTask.recurrencePattern = "weekly"
         context.insert(badgeOverflowTask)
 
+        // MARK: - Recurring Template Mock Data (for Wiederkehrend UI tests)
+        // Series 1: Daily — template + open child
+        let recurringGroupID1 = "uitest-recurring-group-1"
+        let recurringTemplate1 = LocalTask(
+            title: "Taeglich lesen",
+            importance: 2,
+            tags: ["learning"],
+            estimatedDuration: 15,
+            recurrencePattern: "daily",
+            recurrenceGroupID: recurringGroupID1
+        )
+        recurringTemplate1.isTemplate = true
+        recurringTemplate1.isNextUp = false
+        context.insert(recurringTemplate1)
+
+        let recurringChild1 = LocalTask(
+            title: "Taeglich lesen",
+            importance: 2,
+            tags: ["learning"],
+            dueDate: Date(),
+            estimatedDuration: 15,
+            recurrencePattern: "daily",
+            recurrenceGroupID: recurringGroupID1
+        )
+        recurringChild1.isNextUp = false
+        context.insert(recurringChild1)
+
+        // Series 2: Weekly — template + open child
+        let recurringGroupID2 = "uitest-recurring-group-2"
+        let recurringTemplate2 = LocalTask(
+            title: "Wochenreview",
+            importance: 3,
+            tags: ["planning"],
+            estimatedDuration: 30,
+            recurrencePattern: "weekly",
+            recurrenceWeekdays: [5],
+            recurrenceGroupID: recurringGroupID2
+        )
+        recurringTemplate2.isTemplate = true
+        recurringTemplate2.isNextUp = false
+        context.insert(recurringTemplate2)
+
+        let recurringChild2 = LocalTask(
+            title: "Wochenreview",
+            importance: 3,
+            tags: ["planning"],
+            dueDate: Date(),
+            estimatedDuration: 30,
+            recurrencePattern: "weekly",
+            recurrenceWeekdays: [5],
+            recurrenceGroupID: recurringGroupID2
+        )
+        recurringChild2.isNextUp = false
+        context.insert(recurringChild2)
+
         // Completed task outside any FocusBlock (for Review tab testing)
         let completedOutsideBlock = LocalTask(title: "Erledigte Backlog-Aufgabe", importance: 2, estimatedDuration: 20, urgency: "not_urgent")
         completedOutsideBlock.isNextUp = false

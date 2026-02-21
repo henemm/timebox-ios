@@ -207,6 +207,7 @@
 		WKDYBTN01BUILD001 /* WeekdayButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = WKDYBTN01FILE0001 /* WeekdayButton.swift */; };
 		WKDYBTN01BUILD002 /* WeekdayButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = WKDYBTN01FILE0001 /* WeekdayButton.swift */; };
 		RECVISFILT01BLD01 /* RecurringVisibilityFilterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = RECVISFILT01FIL01 /* RecurringVisibilityFilterTests.swift */; };
+		RECTMPLUI01BLD001 /* RecurringTemplateUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = RECTMPLUI01FIL001 /* RecurringTemplateUITests.swift */; };
 		REMLIST1BUILDFILE001 /* ReminderListsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = REMLIST1FILEREF0001 /* ReminderListsUITests.swift */; };
 		REMLIST2BUILDFILE001 /* ReminderListInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = REMLIST2FILEREF0001 /* ReminderListInfo.swift */; };
 		REMSYNC1BUILDFILE001 /* RemindersSyncUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = REMSYNC1FILEREF0001 /* RemindersSyncUITests.swift */; };
@@ -575,6 +576,7 @@
 		RECRSVC02FILE0001 /* RecurrenceService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecurrenceService.swift; sourceTree = "<group>"; };
 		WKDYBTN01FILE0001 /* WeekdayButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeekdayButton.swift; sourceTree = "<group>"; };
 		RECVISFILT01FIL01 /* RecurringVisibilityFilterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecurringVisibilityFilterTests.swift; sourceTree = "<group>"; };
+		RECTMPLUI01FIL001 /* RecurringTemplateUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecurringTemplateUITests.swift; sourceTree = "<group>"; };
 		REMLIST1FILEREF0001 /* ReminderListsUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReminderListsUITests.swift; sourceTree = "<group>"; };
 		REMLIST2FILEREF0001 /* ReminderListInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReminderListInfo.swift; sourceTree = "<group>"; };
 		REMSYNC1FILEREF0001 /* RemindersSyncUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemindersSyncUITests.swift; sourceTree = "<group>"; };
@@ -799,6 +801,7 @@
 				DUEDN02FILE0000001 /* DueDateNotificationUITests.swift */,
 				BSRCH01FILE000001 /* BacklogSearchUITests.swift */,
 				LVCLN01UIFILE0001 /* ListViewsCleanupUITests.swift */,
+				RECTMPLUI01FIL001 /* RecurringTemplateUITests.swift */,
 			);
 			path = FocusBloxUITests;
 			sourceTree = "<group>";
@@ -1674,6 +1677,7 @@
 				DUEDN02BUILD000001 /* DueDateNotificationUITests.swift in Sources */,
 				BSRCH01BUILD00001 /* BacklogSearchUITests.swift in Sources */,
 				LVCLN01UIBUILD001 /* ListViewsCleanupUITests.swift in Sources */,
+				RECTMPLUI01BLD001 /* RecurringTemplateUITests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -13,13 +13,10 @@ final class RecurringTemplateTests: XCTestCase {
     override func setUpWithError() throws {
         let config = ModelConfiguration(isStoredInMemoryOnly: true)
         container = try ModelContainer(for: LocalTask.self, configurations: config)
-        // Reset migration key so migration tests can run
-        UserDefaults.standard.removeObject(forKey: "recurringTemplateMigrationDone")
     }
 
     override func tearDownWithError() throws {
         container = nil
-        UserDefaults.standard.removeObject(forKey: "recurringTemplateMigrationDone")
     }
 
     // MARK: - Model Tests

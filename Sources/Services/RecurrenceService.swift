@@ -158,18 +158,16 @@ enum RecurrenceService {
     @MainActor
     @discardableResult
     static func migrateToTemplateModel(in modelContext: ModelContext) -> Int {
-        let key = "recurringTemplateMigrationDone"
-        guard !UserDefaults.standard.bool(forKey: key) else { return 0 }
+        // No UserDefaults guard — runs every app start.
+        // Already idempotent: skips series that have a template.
+        // Cheap: one fetch + in-memory check per series.
 
         // Fetch all incomplete recurring tasks (candidates for template creation)
         let descriptor = FetchDescriptor<LocalTask>(
             predicate: #Predicate<LocalTask> { !$0.isCompleted && $0.recurrencePattern != "none" }
         )
         guard let recurringTasks = try? modelContext.fetch(descriptor) else { return 0 }
-        guard !recurringTasks.isEmpty else {
-            UserDefaults.standard.set(true, forKey: key)
-            return 0
-        }
+        guard !recurringTasks.isEmpty else { return 0 }
 
         // Group by recurrenceGroupID
         var groupedByID: [String: [LocalTask]] = [:]
@@ -211,7 +209,6 @@ enum RecurrenceService {
             try? modelContext.save()
         }
 
-        UserDefaults.standard.set(true, forKey: key)
         return created
     }
 
