@@ -752,6 +752,9 @@ struct ContentView: View {
         for id in ids {
             if let task = tasks.first(where: { $0.uuid == id }) {
                 task.isCompleted = true
+                task.completedAt = Date()
+                task.assignedFocusBlockID = nil
+                task.isNextUp = false
             }
         }
         try? modelContext.save()

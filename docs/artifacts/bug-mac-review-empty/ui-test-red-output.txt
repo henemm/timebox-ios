@@ -1,0 +1,4 @@
+UI Test not applicable for this bug - pure data-layer fix.
+The bug is in completion handlers not setting completedAt.
+No UI change needed, only data assignment fix in 3 functions.
+Unit test proves the bug: task with isCompleted=true but completedAt=nil is filtered out of review.

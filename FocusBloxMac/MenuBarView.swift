@@ -406,6 +406,13 @@ struct MenuBarView: View {
 
     private func toggleComplete(_ task: LocalTask) {
         task.isCompleted.toggle()
+        if task.isCompleted {
+            task.completedAt = Date()
+            task.assignedFocusBlockID = nil
+            task.isNextUp = false
+        } else {
+            task.completedAt = nil
+        }
     }
 
     private func markTaskComplete(taskID: String, block: FocusBlock) {

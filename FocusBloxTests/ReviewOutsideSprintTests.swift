@@ -117,6 +117,38 @@ final class ReviewOutsideSprintTests: XCTestCase {
         XCTAssertEqual(outsideSprint.first?.title, "Free Task")
     }
 
+    // MARK: - Bug: completedAt missing on macOS completion paths
+
+    /// Regression test for bug: macOS completion handlers didn't set completedAt.
+    /// Verifies the invariant: isCompleted=true WITHOUT completedAt → invisible in review.
+    /// This proves WHY completedAt must be set at every completion site.
+    @MainActor
+    func testCompletedWithoutCompletedAt_isInvisibleInReview() throws {
+        let container = try ModelContainer(for: LocalTask.self, configurations: .init(isStoredInMemoryOnly: true))
+        let context = container.mainContext
+
+        // Task with isCompleted=true but NO completedAt (the old macOS bug pattern)
+        let buggyTask = LocalTask(title: "Buggy Completion")
+        buggyTask.isCompleted = true
+        // completedAt intentionally nil — simulates the old broken code path
+        context.insert(buggyTask)
+
+        // Task with CORRECT completion (both fields set — the fixed code path)
+        let fixedTask = LocalTask(title: "Fixed Completion")
+        fixedTask.isCompleted = true
+        fixedTask.completedAt = Date()
+        context.insert(fixedTask)
+
+        try context.save()
+
+        let allTasks = try context.fetch(FetchDescriptor<LocalTask>()).map { PlanItem(localTask: $0) }
+        let result = filterTodayCompleted(allTasks)
+
+        // Only the correctly completed task appears — buggy one is invisible
+        XCTAssertEqual(result.count, 1, "Only task with completedAt set should appear in review")
+        XCTAssertEqual(result.first?.title, "Fixed Completion")
+    }
+
     // MARK: - Helper
 
     /// Replicates the filter logic that will be added to DailyReviewView

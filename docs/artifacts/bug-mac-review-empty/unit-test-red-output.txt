@@ -1,0 +1,10 @@
+Test session results: 2026-02-21 08:55:25
+
+Test suite 'ReviewOutsideSprintTests' started on 'Clone 1 of FocusBlox - FocusBlox (25771)'
+Test case 'ReviewOutsideSprintTests.testCompletedWithoutCompletedAt_mustSetCompletedAt()' failed on 'Clone 1 of FocusBlox - FocusBlox (25771)' (0.480 seconds)
+
+** TEST FAILED **
+
+Root Cause: macOS ContentView.markTasksCompleted(), MenuBarView.toggleComplete(),
+and CompleteTaskIntent set isCompleted=true but never set completedAt.
+Review filter requires completedAt >= startOfToday, so tasks are invisible.

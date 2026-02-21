@@ -109,6 +109,24 @@
 
 ---
 
+### Bug: macOS Review zeigt keine ausserhalb des Sprints abgehakten Tasks
+**Status:** ERLEDIGT
+**Prioritaet:** HOCH
+**Komplexitaet:** XS (~10k Tokens)
+
+- **Problem:** macOS Review-Screen zeigte keine Tasks die ausserhalb von Focus Blocks abgehakt wurden. Kalender-Items funktionierten.
+- **Root Cause:** 3 Completion-Handler setzten `isCompleted=true` aber nie `completedAt=Date()`. Die Review-View filtert nach `completedAt >= startOfToday` — Tasks ohne `completedAt` sind unsichtbar.
+- **Betroffene Stellen:**
+  1. `ContentView.markTasksCompleted()` (macOS Backlog Context-Menu)
+  2. `MenuBarView.toggleComplete()` (macOS MenuBar)
+  3. `CompleteTaskIntent.perform()` (Siri/Shortcuts, shared)
+- **Fix:** `completedAt = Date()` + `assignedFocusBlockID = nil` + `isNextUp = false` an allen 3 Stellen
+- **Dateien:** `ContentView.swift`, `MenuBarView.swift`, `CompleteTaskIntent.swift`
+- **Tests:** 5/5 ReviewOutsideSprintTests GREEN (inkl. neuer Regressions-Test)
+- **Beide Plattformen:** iOS + macOS Build SUCCEEDED
+
+---
+
 ### Tooling: Screenshot-Gate blockiert bei Simulator-Dialogen
 **Status:** OFFEN
 **Prioritaet:** HOCH

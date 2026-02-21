@@ -27,6 +27,9 @@ struct CompleteTaskIntent: AppIntent {
         }
 
         localTask.isCompleted = true
+        localTask.completedAt = Date()
+        localTask.assignedFocusBlockID = nil
+        localTask.isNextUp = false
         try context.save()
 
         return .result(dialog: "Task '\(task.title)' erledigt.")
