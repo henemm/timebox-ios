@@ -76,6 +76,8 @@ struct FocusBloxMacApp: App {
     @State private var showShortcuts = false
     @State private var syncMonitor = CloudKitSyncMonitor()
     @FocusedValue(\.taskActions) private var taskActions
+    @State private var showUndoAlert = false
+    @State private var undoResultMessage = ""
 
     /// SyncedSettings fuer iCloud KV Store Sync zwischen Geraeten
     private let syncedSettings = SyncedSettings()
@@ -153,6 +155,11 @@ struct FocusBloxMacApp: App {
                 .onContinueUserActivity(CSSearchableItemActionType) { activity in
                     handleSpotlightActivity(activity)
                 }
+                .alert("Rückgängig", isPresented: $showUndoAlert) {
+                    Button("OK") { }
+                } message: {
+                    Text(undoResultMessage)
+                }
         }
         .modelContainer(container)
         .defaultSize(width: 900, height: 600)
@@ -191,6 +198,14 @@ struct FocusBloxMacApp: App {
                 .disabled(taskActions?.hasSelection != true)
             }
 
+            CommandGroup(replacing: .undoRedo) {
+                Button("Undo Completion") {
+                    undoLastCompletion()
+                }
+                .keyboardShortcut("z", modifiers: .command)
+                .disabled(!TaskCompletionUndoService.canUndo)
+            }
+
             CommandGroup(replacing: .help) {
                 Button("Keyboard Shortcuts") {
                     showShortcuts = true
@@ -205,6 +220,22 @@ struct FocusBloxMacApp: App {
                 .environment(\.eventKitRepository, eventKitRepository)
         }
         .modelContainer(container)
+    }
+
+    private func undoLastCompletion() {
+        guard TaskCompletionUndoService.canUndo else {
+            undoResultMessage = "Nichts zum Rückgängigmachen"
+            showUndoAlert = true
+            return
+        }
+        do {
+            if let title = try TaskCompletionUndoService.undo(in: container.mainContext) {
+                undoResultMessage = "\(title) wiederhergestellt"
+            }
+        } catch {
+            undoResultMessage = "Fehler: \(error.localizedDescription)"
+        }
+        showUndoAlert = true
     }
 
     private func rescheduleDueDateNotifications() {

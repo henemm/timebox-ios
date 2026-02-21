@@ -147,6 +147,13 @@ final class SyncEngine {
         // Templates cannot be completed — they represent the series, not an instance
         if task.isTemplate { return }
 
+        // Capture state for undo BEFORE modifying
+        TaskCompletionUndoService.capture(
+            taskID: task.id,
+            wasNextUp: task.isNextUp,
+            assignedFocusBlockID: task.assignedFocusBlockID
+        )
+
         task.isCompleted = true
         task.completedAt = Date()
         // Clear assignment when completing
@@ -154,9 +161,12 @@ final class SyncEngine {
         task.isNextUp = false
 
         // Generate next instance for recurring tasks
+        var newInstanceID: String?
         if task.recurrencePattern != "none" {
-            RecurrenceService.createNextInstance(from: task, in: modelContext)
+            let newInstance = RecurrenceService.createNextInstance(from: task, in: modelContext)
+            newInstanceID = newInstance?.id
         }
+        TaskCompletionUndoService.recordCreatedInstance(id: newInstanceID)
 
         try modelContext.save()
     }

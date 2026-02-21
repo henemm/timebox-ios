@@ -48,7 +48,7 @@
 
 **Komplexitaet:** XS = halbe Stunde | S = 1 Session | M = 2-3 Sessions | L = halber Tag | XL = ganzer Tag+
 
-**Guenstigster Quick Win:** Shake to Undo (XS)
+**Guenstigster Quick Win:** ~~Shake to Undo (XS)~~ ERLEDIGT
 **Teuerste Items:** #17 OrganizeMyDay (~150k), #13 Drag & Drop (~150k), #14 NC Widget (~120k)
 **WARTEND (Apple-Abhaengigkeit):** #20 ITB-F — Developer-APIs verfuegbar, wartet auf Siri On-Screen Awareness (iOS 26.5/27)
 **RESEARCH Items:** #21 ITB-G - API-Verifizierung noetig vor Planung
@@ -533,13 +533,21 @@ Context Menu bleibt zusaetzlich erhalten.
 
 ---
 
-### Feature: Shake to Undo — Zurueck zu Backlog (iOS)
-**Status:** OFFEN
+### Feature: Undo Task Completion — Shake (iOS) + Cmd+Z (macOS)
+**Status:** ERLEDIGT
 **Prioritaet:** NIEDRIG
-**Komplexitaet:** XS
+**Komplexitaet:** S
 
-**Problem:** Versehentlich zu Next Up hinzugefuegt, kein einfacher Weg zurueck.
-**Gewuenschtes Verhalten:** Shake-Geste macht letzte Next-Up-Zuweisung rueckgaengig.
+- **Problem:** Versehentlich abgehakte Tasks haben keinen einfachen Weg zurueck.
+- **Loesung:** `TaskCompletionUndoService` als Shared Service (in `Sources/Services/`):
+  - Snapshot vor Completion (Task-ID, wasNextUp, assignedFocusBlockID)
+  - Bei Recurring Tasks: loescht die neu erstellte Instanz
+  - iOS: Shake-Geste (.onShake Modifier in BacklogView)
+  - macOS: Cmd+Z (CommandGroup replacing .undoRedo in FocusBloxMacApp)
+  - Alert zeigt "TaskName wiederhergestellt" nach Undo
+- **Dateien:** `TaskCompletionUndoService.swift` (neu), `ShakeGestureModifier.swift` (neu), `BacklogView.swift`, `SyncEngine.swift`, `FocusBloxMacApp.swift`, `ContentView.swift` (macOS)
+- **Tests:** 8 Unit Tests (capture, replace, restore, deleteRecurring, clear, noSnapshot, taskDeleted) + 1 UI Test (checkbox complete removes task), alle GREEN
+- **Beide Plattformen:** iOS + macOS Build SUCCEEDED
 
 ---
 

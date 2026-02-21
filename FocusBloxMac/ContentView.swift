@@ -30,6 +30,7 @@ struct TaskActions {
     let completeSelected: () -> Void
     let editSelected: () -> Void
     let deleteSelected: () -> Void
+    let undoLastCompletion: () -> Void
     let hasSelection: Bool
 }
 

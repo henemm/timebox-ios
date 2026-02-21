@@ -66,6 +66,8 @@ struct BacklogView: View {
     @State private var editSeriesMode: Bool = false
     @State private var taskToEndSeries: PlanItem?
     @State private var searchText = ""
+    @State private var showUndoAlert = false
+    @State private var undoResultMessage = ""
 
     // MARK: - Search Filter
     private func matchesSearch(_ item: PlanItem) -> Bool {
@@ -304,6 +306,16 @@ struct BacklogView: View {
             }
         }
         .searchable(text: $searchText, prompt: "Tasks durchsuchen")
+        #if canImport(UIKit)
+        .onShake {
+            undoLastCompletion()
+        }
+        #endif
+        .alert("Rückgängig", isPresented: $showUndoAlert) {
+            Button("OK") { }
+        } message: {
+            Text(undoResultMessage)
+        }
         .task(id: remindersSyncEnabled) {
             await loadTasks()
         }
@@ -317,6 +329,24 @@ struct BacklogView: View {
         .refreshable {
             await loadTasks()
         }
+    }
+
+    private func undoLastCompletion() {
+        guard TaskCompletionUndoService.canUndo else {
+            undoResultMessage = "Nichts zum Rückgängigmachen"
+            showUndoAlert = true
+            return
+        }
+        do {
+            if let title = try TaskCompletionUndoService.undo(in: modelContext) {
+                undoResultMessage = "\(title) wiederhergestellt"
+                completeFeedback.toggle()
+                Task { await loadTasks() }
+            }
+        } catch {
+            undoResultMessage = "Fehler: \(error.localizedDescription)"
+        }
+        showUndoAlert = true
     }
 
     private func loadTasks() async {
