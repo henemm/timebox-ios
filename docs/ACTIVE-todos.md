@@ -109,6 +109,24 @@
 
 ---
 
+### Tooling: Screenshot-Gate blockiert bei Simulator-Dialogen
+**Status:** OFFEN
+**Prioritaet:** HOCH
+**Komplexitaet:** S
+
+**Problem:** Der `ui_screenshot_gate.py` Hook verlangt einen BEFORE-Screenshot vor UI-Edits. Claude kann aber keine Simulator-Dialoge (Berechtigungen, Alerts) per CLI wegklicken — `simctl` hat keinen Tap-Befehl. Das fuehrt zu wiederholten Blockaden wo Claude Workarounds versucht statt Henning zu fragen.
+
+**Gewuenschtes Verhalten:** Gate soll einen alternativen Pfad haben wenn Screenshot nicht automatisiert moeglich ist:
+- Option A: Gate akzeptiert ein manuell von Henning bereitgestelltes Screenshot
+- Option B: Gate hat einen "skip with reason"-Modus (z.B. `--reason "simulator dialog blocking"`) der dokumentiert WARUM kein Screenshot moeglich war
+- Option C: Simulator-Berechtigungen vorab per `simctl privacy` setzen (vor App-Start), sodass Dialoge gar nicht erscheinen
+
+**Betroffene Datei:** `.claude/hooks/ui_screenshot_gate.py`
+
+**Update 2026-02-21:** UI-Test-Skill um System-Permission-Dialog-Handling erweitert (addUIInterruptionMonitor, Springboard, resetAuthorizationStatus). Simulator-ID im Skill korrigiert.
+
+---
+
 ### List-Views Cleanup: ViewModes von 9 auf 5 reduzieren
 **Status:** ERLEDIGT
 **Prioritaet:** MITTEL

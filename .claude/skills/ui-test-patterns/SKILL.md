@@ -204,6 +204,138 @@ XCTAssertTrue(toggle.wait(for: \.value as? String, toEqual: "1", timeout: 3))
 
 ---
 
+## System-Permission-Dialoge (Alerts von iOS)
+
+System-Dialoge wie "FocusBlox moechte auf Erinnerungen zugreifen" laufen in einem **anderen Prozess** (Springboard), nicht in der App. Deshalb brauchen sie besondere Behandlung.
+
+### Ansatz 1: addUIInterruptionMonitor (EMPFOHLEN)
+
+```swift
+final class MyFeatureUITests: XCTestCase {
+    var app: XCUIApplication!
+
+    override func setUpWithError() throws {
+        continueAfterFailure = false
+        app = XCUIApplication()
+
+        // Monitor registrieren VOR app.launch()
+        addUIInterruptionMonitor(withDescription: "System Permission") { alert in
+            // Deutsch + Englisch abdecken
+            for label in ["Erlauben", "Allow", "Allow Full Access", "OK",
+                          "Beim Verwenden der App erlauben", "Allow While Using App"] {
+                let button = alert.buttons[label]
+                if button.exists {
+                    button.tap()
+                    return true  // Alert wurde behandelt
+                }
+            }
+            return false  // Alert nicht erkannt → naechsten Monitor probieren
+        }
+
+        app.launchArguments = ["-UITesting"]
+        app.launch()
+
+        // KRITISCH: Nach launch() einmal die App antippen!
+        // Der Monitor feuert NUR wenn ein tap()/swipe() vom Alert blockiert wird.
+        app.tap()
+    }
+}
+```
+
+**ACHTUNG — Haeufigster Fehler:** Ohne `app.tap()` nach `launch()` wird der Monitor **nie** ausgeloest! Der Monitor reagiert nur, wenn eine Interaktion vom Alert blockiert wird.
+
+**Sichere Tap-Stelle** (falls `app.tap()` nicht reicht):
+```swift
+// Auf NavigationBar tippen — existiert fast immer
+app.navigationBars.firstMatch.tap()
+
+// Oder auf ein bekanntes Element
+app.tabBars.firstMatch.tap()
+```
+
+### Ansatz 2: Springboard-Zugriff (FALLBACK)
+
+Wenn `addUIInterruptionMonitor` nicht greift (selten, aber moeglich):
+
+```swift
+func dismissSystemAlert() {
+    let springboard = XCUIApplication(bundleIdentifier: "com.apple.springboard")
+
+    // Deutsch + Englisch
+    for label in ["Erlauben", "Allow", "Allow Full Access", "OK"] {
+        let button = springboard.buttons[label]
+        if button.waitForExistence(timeout: 3) {
+            button.tap()
+            return
+        }
+    }
+
+    // Fallback: Alerts-Collection durchsuchen
+    let alert = springboard.alerts.firstMatch
+    if alert.waitForExistence(timeout: 2) {
+        // Zweiten Button nehmen (rechts = "Erlauben")
+        let allowButton = alert.buttons.element(boundBy: 1)
+        if allowButton.exists {
+            allowButton.tap()
+        }
+    }
+}
+```
+
+### Ansatz 3: resetAuthorizationStatus (Permission zuruecksetzen)
+
+Erzwingt, dass der Permission-Dialog beim naechsten Launch erscheint:
+
+```swift
+override func setUpWithError() throws {
+    let app = XCUIApplication()
+    app.resetAuthorizationStatus(for: .reminders)  // Reminders-Permission resetten
+    // Auch moeglich: .calendar, .location, .photos, .contacts, .microphone, .camera
+    app.launch()
+}
+```
+
+**Wann nutzen:** Wenn ein Test den Dialog selbst pruefen soll (z.B. "Tap auf Erlauben fuehrt zu Sync-Start").
+
+### Gotchas bei System-Dialogen
+
+| Problem | Loesung |
+|---------|---------|
+| Monitor feuert nicht | `app.tap()` nach `launch()` vergessen! |
+| Button-Label falsch | Unicode-Apostroph beachten: `Don\u{2019}t Allow` statt `Don't Allow` |
+| Mehrere Dialoge nacheinander | Monitor bleibt aktiv, aber nach jedem Dialog erneut `app.tap()` |
+| Dialog auf Deutsch | Sowohl DE als auch EN Labels pruefen (Simulator-Sprache variiert) |
+| Dialog erscheint nicht | `resetAuthorizationStatus(for:)` in setUp verwenden |
+
+### Helper fuer FocusBlox (Copy-Paste-Ready)
+
+```swift
+extension XCTestCase {
+    /// Registriert Monitor fuer alle gaengigen System-Permission-Dialoge.
+    /// MUSS vor app.launch() aufgerufen werden.
+    /// Nach app.launch() MUSS app.tap() folgen!
+    func registerPermissionHandler() {
+        addUIInterruptionMonitor(withDescription: "System Permission") { alert in
+            let allowLabels = [
+                "Erlauben", "Allow", "Allow Full Access", "OK",
+                "Beim Verwenden der App erlauben", "Allow While Using App",
+                "Vollen Zugriff erlauben"
+            ]
+            for label in allowLabels {
+                let button = alert.buttons[label]
+                if button.exists {
+                    button.tap()
+                    return true
+                }
+            }
+            return false
+        }
+    }
+}
+```
+
+---
+
 ## Test-Setup Pattern
 
 ```swift
@@ -215,11 +347,13 @@ final class MyFeatureUITests: XCTestCase {
         continueAfterFailure = false
 
         app = XCUIApplication()
+        registerPermissionHandler()  // System-Dialoge automatisch behandeln
         app.launchArguments = [
             "-UITesting",           // Aktiviert Mock-Mode
             "-ResetUserDefaults"    // Frischer State pro Test
         ]
         app.launch()
+        app.tap()  // KRITISCH: Monitor aktivieren
     }
 
     override func tearDownWithError() throws {
@@ -321,14 +455,14 @@ print("DEBUG: \(app.buttons.allElementsBoundByIndex.map { $0.identifier.isEmpty 
 ```bash
 killall "Simulator" 2>/dev/null
 xcrun simctl shutdown all 2>/dev/null
-xcrun simctl boot 877731AF-6250-4E23-A07E-80270C69D827 2>/dev/null
-xcrun simctl bootstatus 877731AF-6250-4E23-A07E-80270C69D827 -b
+xcrun simctl boot 6364A54B-5048-4346-899E-FFB67E630D53 2>/dev/null
+xcrun simctl bootstatus 6364A54B-5048-4346-899E-FFB67E630D53 -b
 ```
 
 **Stabile Test-Ausfuehrung:**
 ```bash
 xcodebuild test -project FocusBlox.xcodeproj -scheme FocusBlox \
-  -destination 'id=877731AF-6250-4E23-A07E-80270C69D827' \
+  -destination 'id=6364A54B-5048-4346-899E-FFB67E630D53' \
   -only-testing:FocusBloxUITests/[TestClass]/[testMethod] \
   -parallel-testing-enabled NO \
   -disable-concurrent-destination-testing \
@@ -353,4 +487,4 @@ xcodebuild test -project FocusBlox.xcodeproj -scheme FocusBlox \
 
 ---
 
-Aktualisiert: 2026-01-25
+Aktualisiert: 2026-02-21 (System-Permission-Dialoge, Simulator-ID korrigiert)
