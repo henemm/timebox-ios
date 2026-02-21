@@ -60,6 +60,12 @@ struct MacBacklogRow: View {
             }
         }
         .padding(.vertical, 4)
+        .userActivity("com.henning.focusblox.viewTask", isActive: !task.isCompleted) { activity in
+            activity.title = task.title
+            activity.isEligibleForSearch = true
+            activity.targetContentIdentifier = "task://\(task.uuid.uuidString)"
+            activity.userInfo = ["entityID": task.uuid.uuidString]
+        }
     }
 
     // MARK: - Metadata Row (iOS-aligned)

@@ -99,7 +99,7 @@
 3. ~~ITB-D (Liquid Glass)~~ ERLEDIGT - visuelles Polish (FocusGlowModifier iOS+macOS)
 4. ~~ITB-B (Smart Priority)~~ ERLEDIGT - AI-Enrichment + deterministischer Score
 5. ITB-C (OrganizeMyDay) - braucht A+B
-6. ITB-F (Context Capture) - WARTEND: Developer-APIs da, Siri On-Screen Awareness fehlt (iOS 26.5/27)
+6. ITB-F (Context Capture) - WARTEND: NSUserActivity-Prep ERLEDIGT (ITB-F-lite), wartet auf Siri On-Screen Awareness (iOS 26.5/27)
 7. ITB-G (Proaktive Vorschlaege) - RESEARCH: API-Verifizierung zuerst
 
 **Prinzip:** AI ergaenzt manuelles Scoring - schlaegt vor, User bestaetigt/ueberschreibt. Features unsichtbar auf Nicht-AI-Geraeten (Graceful Degradation).
@@ -735,10 +735,10 @@ API-Verifizierung abgeschlossen. Ergebnisse:
 **Realisierter Ansatz (statt eigenem Screen-Reader):**
 Siri liest den Screen-Inhalt anderer Apps (wenn diese ihn exponieren). User sagt "Erstelle Task daraus in FocusBlox". Siri ruft FocusBlox-Intent mit Kontext auf.
 
-**FocusBlox-seitige Vorbereitung (jetzt umsetzbar):**
-1. `TaskEntity` via `NSUserActivity` + `appEntityIdentifier` exponieren
+**FocusBlox-seitige Vorbereitung:**
+1. ~~`TaskEntity` via `NSUserActivity` exponieren~~ ERLEDIGT (ITB-F-lite)
 2. `CreateTaskFromContextIntent` mit optionalem Kontext-Parameter
-3. FocusBlox-Views mit `.userActivity()` Modifier ausstatten
+3. ~~FocusBlox-Views mit `.userActivity()` Modifier ausstatten~~ ERLEDIGT (BacklogRow + MacBacklogRow)
 
 **Wartet auf Apple:**
 - Siri On-Screen Awareness war fuer iOS 26.4 geplant

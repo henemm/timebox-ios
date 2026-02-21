@@ -45,6 +45,13 @@ struct BacklogRow: View {
                 .fill(.ultraThinMaterial)
         )
         .contentShape(Rectangle())
+        .userActivity(TaskEntity.activityType, isActive: !item.isCompleted) { activity in
+            activity.title = item.title
+            activity.isEligibleForSearch = true
+            activity.isEligibleForPrediction = true
+            activity.targetContentIdentifier = "task://\(item.id)"
+            activity.userInfo = ["entityID": item.id]
+        }
         // NOTE: No accessibilityIdentifier on parent - children have their own identifiers
         // Parent identifier would override all child identifiers in SwiftUI
     }

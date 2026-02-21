@@ -206,6 +206,7 @@
 		RECRPAT02BUILD001 /* RecurrencePattern.swift in Sources */ = {isa = PBXBuildFile; fileRef = RECRPAT02FILE0001 /* RecurrencePattern.swift */; };
 		RECRPAT02BUILD002 /* RecurrencePattern.swift in Sources */ = {isa = PBXBuildFile; fileRef = RECRPAT02FILE0001 /* RecurrencePattern.swift */; };
 		FBENTITY01BUILD01 /* FocusBlockEntityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBENTITY01FILE001 /* FocusBlockEntityTests.swift */; };
+		ITBFLITE01BUILD01 /* TaskEntityUserActivityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ITBFLITE01FILE001 /* TaskEntityUserActivityTests.swift */; };
 		RECRSVC01BUILD0001 /* RecurrenceServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = RECRSVC01FILE00001 /* RecurrenceServiceTests.swift */; };
 		RECRSVC02BUILD001 /* RecurrenceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = RECRSVC02FILE0001 /* RecurrenceService.swift */; };
 		RECRSVC02BUILD002 /* RecurrenceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = RECRSVC02FILE0001 /* RecurrenceService.swift */; };
@@ -585,6 +586,7 @@
 		RECRPAT01FILE00001 /* RecurrencePatternTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecurrencePatternTests.swift; sourceTree = "<group>"; };
 		RECRPAT02FILE0001 /* RecurrencePattern.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecurrencePattern.swift; sourceTree = "<group>"; };
 		FBENTITY01FILE001 /* FocusBlockEntityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusBlockEntityTests.swift; sourceTree = "<group>"; };
+		ITBFLITE01FILE001 /* TaskEntityUserActivityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskEntityUserActivityTests.swift; sourceTree = "<group>"; };
 		RECRSVC01FILE00001 /* RecurrenceServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecurrenceServiceTests.swift; sourceTree = "<group>"; };
 		RECRSVC02FILE0001 /* RecurrenceService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecurrenceService.swift; sourceTree = "<group>"; };
 		RECTMPL01FILE0001 /* RecurringTemplateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecurringTemplateTests.swift; sourceTree = "<group>"; };
@@ -1124,6 +1126,7 @@
 				CATBDG01FILE00001 /* CategoryIconBadgeTests.swift */,
 				RECRPAT01FILE00001 /* RecurrencePatternTests.swift */,
 				FBENTITY01FILE001 /* FocusBlockEntityTests.swift */,
+				ITBFLITE01FILE001 /* TaskEntityUserActivityTests.swift */,
 				RECRSVC01FILE00001 /* RecurrenceServiceTests.swift */,
 				RECTMPL01FILE0001 /* RecurringTemplateTests.swift */,
 				TMPDEDUP01FILE001 /* TemplateDedupTests.swift */,
@@ -1899,6 +1902,7 @@
 				CATBDG01BUILD0001 /* CategoryIconBadgeTests.swift in Sources */,
 				RECRPAT01BUILD0001 /* RecurrencePatternTests.swift in Sources */,
 				FBENTITY01BUILD01 /* FocusBlockEntityTests.swift in Sources */,
+				ITBFLITE01BUILD01 /* TaskEntityUserActivityTests.swift in Sources */,
 				RECRSVC01BUILD0001 /* RecurrenceServiceTests.swift in Sources */,
 				RECTMPL01BUILD001 /* RecurringTemplateTests.swift in Sources */,
 				TMPDEDUP01BUILD01 /* TemplateDedupTests.swift in Sources */,

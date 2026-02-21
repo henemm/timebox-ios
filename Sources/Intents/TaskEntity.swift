@@ -1,4 +1,5 @@
 import AppIntents
+import Foundation
 import SwiftData
 
 // MARK: - Shared ModelContainer
@@ -41,6 +42,22 @@ struct TaskEntity: AppEntity {
     }
 
     static let defaultQuery = TaskEntityQuery()
+
+    // MARK: - NSUserActivity (Siri/Spotlight Discovery)
+
+    /// Stable activity type for Handoff and Spotlight indexing.
+    static let activityType = "com.henning.focusblox.viewTask"
+
+    /// Creates an NSUserActivity for Siri/Spotlight discovery.
+    var userActivity: NSUserActivity {
+        let activity = NSUserActivity(activityType: Self.activityType)
+        activity.title = title
+        activity.isEligibleForSearch = true
+        activity.isEligibleForPrediction = true
+        activity.targetContentIdentifier = "task://\(id)"
+        activity.userInfo = ["entityID": id]
+        return activity
+    }
 
     init(id: String, title: String, importance: TaskImportanceEnum? = nil, duration: Int? = nil, isCompleted: Bool = false) {
         self.id = id
