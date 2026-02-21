@@ -70,7 +70,8 @@ enum RecurrenceService {
         }
     }
 
-    /// Creates a new task instance copying attributes from the completed task.
+    /// Creates a new task instance for a recurring series.
+    /// Copies attributes from the series template if one exists, otherwise from the completed task.
     /// Returns nil if the task is not recurring (pattern == "none").
     @MainActor
     @discardableResult
@@ -104,7 +105,7 @@ enum RecurrenceService {
             let targetDay = cal.startOfDay(for: newDueDate)
             let descriptor = FetchDescriptor<LocalTask>(
                 predicate: #Predicate<LocalTask> {
-                    $0.recurrenceGroupID == groupID && !$0.isCompleted
+                    $0.recurrenceGroupID == groupID && !$0.isCompleted && !$0.isTemplate
                 }
             )
             if let openSiblings = try? modelContext.fetch(descriptor),
@@ -116,24 +117,123 @@ enum RecurrenceService {
             }
         }
 
+        // Use template as attribute source if one exists, fallback to completed task
+        let source = findTemplate(groupID: groupID, in: modelContext) ?? completedTask
+
         let instance = LocalTask(
-            title: completedTask.title,
-            importance: completedTask.importance,
-            tags: completedTask.tags,
+            title: source.title,
+            importance: source.importance,
+            tags: source.tags,
             dueDate: newDueDate,
-            estimatedDuration: completedTask.estimatedDuration,
-            urgency: completedTask.urgency,
-            taskType: completedTask.taskType,
-            recurrencePattern: completedTask.recurrencePattern,
-            recurrenceWeekdays: completedTask.recurrenceWeekdays,
-            recurrenceMonthDay: completedTask.recurrenceMonthDay,
-            recurrenceInterval: completedTask.recurrenceInterval,
+            estimatedDuration: source.estimatedDuration,
+            urgency: source.urgency,
+            taskType: source.taskType,
+            recurrencePattern: source.recurrencePattern,
+            recurrenceWeekdays: source.recurrenceWeekdays,
+            recurrenceMonthDay: source.recurrenceMonthDay,
+            recurrenceInterval: source.recurrenceInterval,
             recurrenceGroupID: groupID,
-            taskDescription: completedTask.taskDescription
+            taskDescription: source.taskDescription
         )
 
         modelContext.insert(instance)
         return instance
+    }
+
+    /// Finds the template (mother instance) for a recurring series.
+    @MainActor
+    static func findTemplate(groupID: String, in modelContext: ModelContext) -> LocalTask? {
+        let descriptor = FetchDescriptor<LocalTask>(
+            predicate: #Predicate<LocalTask> {
+                $0.recurrenceGroupID == groupID && $0.isTemplate == true
+            }
+        )
+        return try? modelContext.fetch(descriptor).first
+    }
+
+    // MARK: - Template Migration
+
+    /// One-time migration: creates a template (mother instance) for each recurring series
+    /// that doesn't have one yet. Idempotent — skips series that already have a template.
+    @MainActor
+    @discardableResult
+    static func migrateToTemplateModel(in modelContext: ModelContext) -> Int {
+        let key = "recurringTemplateMigrationDone"
+        guard !UserDefaults.standard.bool(forKey: key) else { return 0 }
+
+        // Fetch all incomplete recurring tasks (candidates for template creation)
+        let descriptor = FetchDescriptor<LocalTask>(
+            predicate: #Predicate<LocalTask> { !$0.isCompleted && $0.recurrencePattern != "none" }
+        )
+        guard let recurringTasks = try? modelContext.fetch(descriptor) else { return 0 }
+        guard !recurringTasks.isEmpty else {
+            UserDefaults.standard.set(true, forKey: key)
+            return 0
+        }
+
+        // Group by recurrenceGroupID
+        var groupedByID: [String: [LocalTask]] = [:]
+        var tasksWithoutGroupID: [LocalTask] = []
+
+        for task in recurringTasks {
+            if let gid = task.recurrenceGroupID {
+                // Include templates in group so the dedup check below finds them
+                groupedByID[gid, default: []].append(task)
+            } else if !task.isTemplate {
+                tasksWithoutGroupID.append(task)
+            }
+        }
+
+        var created = 0
+
+        // For tasks without groupID: assign one and create template
+        for task in tasksWithoutGroupID {
+            let gid = UUID().uuidString
+            task.recurrenceGroupID = gid
+            let template = createTemplateFrom(task, groupID: gid)
+            modelContext.insert(template)
+            created += 1
+        }
+
+        // For groups with groupID: create template if none exists
+        for (gid, tasks) in groupedByID {
+            // Check if template already exists
+            if tasks.contains(where: { $0.isTemplate }) { continue }
+
+            // Use the oldest open task as the source
+            let source = tasks.sorted(by: { $0.createdAt < $1.createdAt }).first!
+            let template = createTemplateFrom(source, groupID: gid)
+            modelContext.insert(template)
+            created += 1
+        }
+
+        if created > 0 {
+            try? modelContext.save()
+        }
+
+        UserDefaults.standard.set(true, forKey: key)
+        return created
+    }
+
+    /// Creates a template LocalTask from an existing recurring task.
+    private static func createTemplateFrom(_ source: LocalTask, groupID: String) -> LocalTask {
+        let template = LocalTask(
+            title: source.title,
+            importance: source.importance,
+            tags: source.tags,
+            dueDate: nil, // Templates have no due date
+            estimatedDuration: source.estimatedDuration,
+            urgency: source.urgency,
+            taskType: source.taskType,
+            recurrencePattern: source.recurrencePattern,
+            recurrenceWeekdays: source.recurrenceWeekdays,
+            recurrenceMonthDay: source.recurrenceMonthDay,
+            recurrenceInterval: source.recurrenceInterval,
+            recurrenceGroupID: groupID,
+            taskDescription: source.taskDescription
+        )
+        template.isTemplate = true
+        return template
     }
 
     // MARK: - Repair Orphaned Series

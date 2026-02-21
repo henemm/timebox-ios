@@ -143,6 +143,10 @@ final class SyncEngine {
         guard let task = try findTask(byID: itemID) else {
             return
         }
+
+        // Templates cannot be completed — they represent the series, not an instance
+        if task.isTemplate { return }
+
         task.isCompleted = true
         task.completedAt = Date()
         // Clear assignment when completing
@@ -154,6 +158,19 @@ final class SyncEngine {
             RecurrenceService.createNextInstance(from: task, in: modelContext)
         }
 
+        try modelContext.save()
+    }
+
+    /// Deletes a recurring template and all its open children (ends the series).
+    /// Completed children are preserved for history.
+    func deleteRecurringTemplate(groupID: String) throws {
+        let descriptor = FetchDescriptor<LocalTask>(
+            predicate: #Predicate { $0.recurrenceGroupID == groupID && !$0.isCompleted }
+        )
+        let tasks = try modelContext.fetch(descriptor)
+        for task in tasks {
+            modelContext.delete(task) // Deletes template + all open children
+        }
         try modelContext.save()
     }
 

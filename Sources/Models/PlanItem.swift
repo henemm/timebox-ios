@@ -26,6 +26,9 @@ struct PlanItem: Identifiable, Sendable {
     let recurrenceInterval: Int?
     let recurrenceGroupID: String?
 
+    /// Whether this task is a recurring template (mother instance)
+    let isTemplate: Bool
+
     // AI Task Scoring (legacy fields — kept for migration, not used in UI)
     let aiScore: Int?
     let aiEnergyLevel: String?
@@ -123,6 +126,7 @@ struct PlanItem: Identifiable, Sendable {
         self.recurrenceMonthDay = nil
         self.recurrenceInterval = nil
         self.recurrenceGroupID = nil
+        self.isTemplate = false
 
         self.modifiedAt = nil
     }
@@ -169,6 +173,7 @@ struct PlanItem: Identifiable, Sendable {
         self.recurrenceMonthDay = localTask.recurrenceMonthDay
         self.recurrenceInterval = localTask.recurrenceInterval
         self.recurrenceGroupID = localTask.recurrenceGroupID
+        self.isTemplate = localTask.isTemplate
 
         self.modifiedAt = localTask.modifiedAt
     }

@@ -56,10 +56,16 @@ final class LocalTask {
     /// nil for non-recurring or legacy tasks (gets assigned on next completion).
     var recurrenceGroupID: String?
 
+    /// Whether this task is a recurring template (mother instance).
+    /// Templates represent the series and are only visible in "Wiederkehrend".
+    /// Child instances (isTemplate=false) appear in Backlog/Priority when due.
+    var isTemplate: Bool = false
+
     /// Whether this task should be visible in the backlog.
     /// Hides future-dated recurring task instances (due tomorrow or later).
     /// Non-recurring tasks and recurring tasks without dueDate are always visible.
     var isVisibleInBacklog: Bool {
+        if isTemplate { return false }
         guard recurrencePattern != "none" else { return true }
         guard let dueDate = dueDate else { return true }
         let startOfTomorrow = Calendar.current.startOfDay(

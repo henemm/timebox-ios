@@ -64,6 +64,7 @@ struct BacklogView: View {
     @State private var taskToDeleteRecurring: PlanItem?
     @State private var taskToEditRecurring: PlanItem?
     @State private var editSeriesMode: Bool = false
+    @State private var taskToEndSeries: PlanItem?
     @State private var searchText = ""
 
     // MARK: - Search Filter
@@ -87,9 +88,9 @@ struct BacklogView: View {
         planItems.filter { !$0.isCompleted && !$0.isNextUp && $0.assignedFocusBlockID == nil && matchesSearch($0) }
     }
 
-    // MARK: - Recurring Tasks (all incomplete, ignoring isVisibleInBacklog)
+    // MARK: - Recurring Tasks (only templates = series overview)
     private var recurringTasks: [PlanItem] {
-        allRecurringItems.filter { !$0.isCompleted && !$0.isNextUp && matchesSearch($0) }
+        allRecurringItems.filter { $0.isTemplate && !$0.isCompleted && matchesSearch($0) }
     }
 
     // MARK: - Overdue Tasks (dueDate < today)
@@ -280,6 +281,26 @@ struct BacklogView: View {
                 Button("Abbrechen", role: .cancel) {
                     taskToEditRecurring = nil
                 }
+            }
+            .confirmationDialog(
+                "Serie beenden?",
+                isPresented: Binding(
+                    get: { taskToEndSeries != nil },
+                    set: { if !$0 { taskToEndSeries = nil } }
+                ),
+                titleVisibility: .visible
+            ) {
+                Button("Serie beenden", role: .destructive) {
+                    if let task = taskToEndSeries {
+                        endSeries(task)
+                        taskToEndSeries = nil
+                    }
+                }
+                Button("Abbrechen", role: .cancel) {
+                    taskToEndSeries = nil
+                }
+            } message: {
+                Text("Die Vorlage und alle offenen Aufgaben werden gelöscht. Erledigte Aufgaben bleiben erhalten.")
             }
         }
         .searchable(text: $searchText, prompt: "Tasks durchsuchen")
@@ -520,6 +541,22 @@ struct BacklogView: View {
             }
         } catch {
             errorMessage = "Serie konnte nicht gelöscht werden."
+        }
+    }
+
+    /// Ends a recurring series: deletes template + all open children, preserves completed history.
+    private func endSeries(_ task: PlanItem) {
+        guard let groupID = task.recurrenceGroupID else { return }
+        do {
+            let taskSource = LocalTaskSource(modelContext: modelContext)
+            let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
+            try syncEngine.deleteRecurringTemplate(groupID: groupID)
+
+            Task {
+                await loadTasks()
+            }
+        } catch {
+            errorMessage = "Serie konnte nicht beendet werden."
         }
     }
 
@@ -860,14 +897,35 @@ struct BacklogView: View {
             ForEach(recurringTasks) { item in
                 BacklogRow(
                     item: item,
-                    onComplete: { completeTask(item) },
+                    onComplete: {
+                        // Templates can't be completed — checkbox means "end series"
+                        if item.isTemplate {
+                            taskToEndSeries = item
+                        } else {
+                            completeTask(item)
+                        }
+                    },
                     onDurationTap: { selectedItemForDuration = item },
                     onAddToNextUp: { updateNextUp(for: item, isNextUp: true) },
                     onImportanceCycle: { newImportance in updateImportance(for: item, importance: newImportance) },
                     onUrgencyToggle: { newUrgency in updateUrgency(for: item, urgency: newUrgency) },
                     onCategoryTap: { selectedItemForCategory = item },
-                    onEditTap: { handleEditTap(item) },
-                    onDeleteTap: { deleteTask(item) },
+                    onEditTap: {
+                        // Template edit always means series edit — no dialog needed
+                        if item.isTemplate {
+                            editSeriesMode = true
+                            taskToEditDirectly = item
+                        } else {
+                            handleEditTap(item)
+                        }
+                    },
+                    onDeleteTap: {
+                        if item.isTemplate {
+                            taskToEndSeries = item
+                        } else {
+                            deleteTask(item)
+                        }
+                    },
                     onTitleSave: { newTitle in
                         saveTitleEdit(for: item, title: newTitle)
                     }

@@ -131,6 +131,10 @@ struct FocusBloxMacApp: App {
                     }
                     // Bug 38: Force CloudKit to sync all extended attribute fields
                     MacModelContainer.forceCloudKitFieldSync(in: container.mainContext)
+                    // Repair orphaned recurring series (missing successors)
+                    RecurrenceService.repairOrphanedRecurringSeries(in: container.mainContext)
+                    // Migrate recurring tasks to template model (one-time)
+                    RecurrenceService.migrateToTemplateModel(in: container.mainContext)
                     // Bug 58: Menu bar icon (after app is fully initialized)
                     MenuBarController.shared.setup(
                         container: container,

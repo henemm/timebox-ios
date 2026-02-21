@@ -90,6 +90,7 @@
 - ~~Quick-Edit Recurrence-Params Fix~~ ERLEDIGT
 - ~~Recurrence-Editing Phase 2: Intervalle + Eigene (z.B. "Jeden 3. Tag")~~ ERLEDIGT
 - ~~Bug: Attribute-Badges in BacklogRow abgeschnitten (1-zeilig)~~ ERLEDIGT (FlowLayout)
+- ~~Template-Architektur (Mutter/Kind): Mutterinstanz als Template, Kinder im Backlog~~ ERLEDIGT
 
 ### Bundle G: Intelligent Task Blox (Apple Intelligence + System-Integration)
 **Empfohlene Reihenfolge:**
@@ -503,6 +504,20 @@ Context Menu bleibt zusaetzlich erhalten.
 **Fix:** `RecurrenceService.repairOrphanedRecurringSeries()` — laeuft beim App-Start, findet completed recurring Tasks ohne offenen Nachfolger, erstellt fehlende Instanzen via `createNextInstance()`. Idempotent (Dedup-Logik verhindert Duplikate).
 
 **Dateien:** `RecurrenceService.swift` (+55 LoC), `FocusBloxApp.swift` (+1 Zeile), `RecurrenceServiceTests.swift` (+80 LoC, 3 Tests)
+
+---
+
+### Feature: Recurring Template-Architektur (Mutter/Kind)
+**Status:** ERLEDIGT (2026-02-21)
+**Prioritaet:** HOCH
+**Plattform:** iOS + macOS
+
+**Problem:** Wiederkehrende Tasks waren eine Kette gleichwertiger Instanzen — kein persistentes Template. User konnte Serie nicht zentral verwalten. Abhaken in normaler View liess die "Mutterinstanz" verschwinden.
+
+**Loesung:** Neues `isTemplate: Bool` Feld auf LocalTask. Templates sind unsichtbare Mutterinstanzen die nur in "Wiederkehrend" erscheinen. Kind-Instanzen erscheinen im Backlog wenn faellig. Neue Instanzen kopieren Attribute vom Template statt von der erledigten Instanz. "Serie beenden" loescht Template + offene Kinder, behaelt History.
+
+**Dateien:** `LocalTask.swift`, `PlanItem.swift`, `RecurrenceService.swift`, `SyncEngine.swift`, `BacklogView.swift`, `ContentView.swift`, `FocusBloxApp.swift`, `FocusBloxMacApp.swift` (8 Dateien, ~+460 LoC)
+**Tests:** 9 Unit Tests (RecurringTemplateTests.swift) — alle GREEN
 
 ---
 

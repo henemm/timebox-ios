@@ -73,6 +73,7 @@ struct ContentView: View {
     @State private var taskToDeleteRecurring: LocalTask?
     @State private var taskToEditRecurring: LocalTask?
     @State private var editSeriesMode: Bool = false
+    @State private var taskToEndSeries: LocalTask?
 
     // MARK: - Search Filter
     private func matchesSearch(_ task: LocalTask) -> Bool {
@@ -104,7 +105,7 @@ struct ContentView: View {
     }
 
     private var recurringCount: Int {
-        tasks.filter { !$0.isCompleted && $0.recurrencePattern != "none" }.count
+        tasks.filter { $0.isTemplate && !$0.isCompleted }.count
     }
 
     // Filtered tasks based on sidebar selection + search
@@ -142,7 +143,7 @@ struct ContentView: View {
         case .completed:
             base = tasks.filter { $0.isCompleted }
         case .recurring:
-            base = tasks.filter { !$0.isCompleted && $0.recurrencePattern != "none" }
+            base = tasks.filter { $0.isTemplate && !$0.isCompleted }
         }
         return searchText.isEmpty ? base : base.filter { matchesSearch($0) }
     }
@@ -279,7 +280,7 @@ struct ContentView: View {
         case .completed:
             base = tasks.filter { $0.isCompleted }
         case .recurring:
-            base = tasks.filter { !$0.isCompleted && !$0.isNextUp && $0.recurrencePattern != "none" }
+            base = tasks.filter { $0.isTemplate && !$0.isCompleted }
         }
         return searchText.isEmpty ? base : base.filter { matchesSearch($0) }
     }
@@ -556,6 +557,26 @@ struct ContentView: View {
                 taskToEditRecurring = nil
             }
         }
+        .confirmationDialog(
+            "Serie beenden?",
+            isPresented: Binding(
+                get: { taskToEndSeries != nil },
+                set: { if !$0 { taskToEndSeries = nil } }
+            ),
+            titleVisibility: .visible
+        ) {
+            Button("Serie beenden", role: .destructive) {
+                if let task = taskToEndSeries {
+                    endSeries(task)
+                    taskToEndSeries = nil
+                }
+            }
+            Button("Abbrechen", role: .cancel) {
+                taskToEndSeries = nil
+            }
+        } message: {
+            Text("Die Vorlage und alle offenen Aufgaben werden gelöscht. Erledigte Aufgaben bleiben erhalten.")
+        }
     }
 
     private var filterTitle: String {
@@ -748,6 +769,15 @@ struct ContentView: View {
         selectedTasks.removeAll()
     }
 
+    /// Ends a recurring series: deletes template + all open children, preserves completed history.
+    private func endSeries(_ task: LocalTask) {
+        guard let groupID = task.recurrenceGroupID else { return }
+        let taskSource = LocalTaskSource(modelContext: modelContext)
+        let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
+        try? syncEngine.deleteRecurringTemplate(groupID: groupID)
+        selectedTasks.removeAll()
+    }
+
     private func markTasksCompleted(_ ids: Set<UUID>) {
         let taskSource = LocalTaskSource(modelContext: modelContext)
         let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
@@ -845,9 +875,14 @@ struct ContentView: View {
         MacBacklogRow(
             task: task,
             onToggleComplete: {
-                let taskSource = LocalTaskSource(modelContext: modelContext)
-                let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
-                try? syncEngine.completeTask(itemID: task.id)
+                // Templates can't be completed — checkbox means "end series"
+                if task.isTemplate {
+                    taskToEndSeries = task
+                } else {
+                    let taskSource = LocalTaskSource(modelContext: modelContext)
+                    let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
+                    try? syncEngine.completeTask(itemID: task.id)
+                }
             },
             onImportanceCycle: { newValue in
                 task.importance = newValue
