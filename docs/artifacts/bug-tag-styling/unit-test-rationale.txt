@@ -1,0 +1,4 @@
+Tag-Styling: Rein visueller Fix (SwiftUI View-Layer).
+Keine Business-Logik-Aenderung — nur .padding(), .background(), Capsule() auf Text-Views.
+Unit Test nicht moeglich: SwiftUI View-Rendering ist nicht unit-testbar.
+Visueller Beweis: BEFORE-Screenshot zeigt plain text Tags, AFTER-Screenshot wird Chip-Styling zeigen.

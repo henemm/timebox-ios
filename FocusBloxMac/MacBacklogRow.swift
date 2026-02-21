@@ -94,13 +94,19 @@ struct MacBacklogRow: View {
                 .accessibilityIdentifier("recurrenceBadge_\(task.id)")
             }
 
-            // 5. Tags (max 2, dann "+N") - plain text, iOS-aligned
+            // 5. Tags (max 2, dann "+N") - chip style
             if !task.tags.isEmpty {
                 ForEach(Array(task.tags.prefix(2).enumerated()), id: \.offset) { index, tag in
-                    Text("#\(tag)")
+                    Text(tag)
                         .font(.caption2)
                         .lineLimit(1)
                         .foregroundStyle(.secondary)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(
+                            Capsule()
+                                .fill(Color.secondary.opacity(0.15))
+                        )
                         .fixedSize()
                         .accessibilityIdentifier("tag_\(task.id)_\(index)")
                 }
@@ -109,6 +115,12 @@ struct MacBacklogRow: View {
                     Text("+\(task.tags.count - 2)")
                         .font(.caption2)
                         .foregroundStyle(.secondary)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(
+                            Capsule()
+                                .fill(Color.secondary.opacity(0.15))
+                        )
                         .fixedSize()
                         .accessibilityIdentifier("tagOverflow_\(task.id)")
                 }

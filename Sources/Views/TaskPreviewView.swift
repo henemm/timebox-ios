@@ -51,9 +51,31 @@ struct TaskPreviewView: View {
 
             // Tags
             if !task.tags.isEmpty {
-                Text(task.tags.map { "#\($0)" }.joined(separator: " "))
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                HStack(spacing: 6) {
+                    ForEach(task.tags.prefix(2), id: \.self) { tag in
+                        Text(tag)
+                            .font(.caption)
+                            .lineLimit(1)
+                            .foregroundStyle(.secondary)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background(
+                                Capsule()
+                                    .fill(Color.secondary.opacity(0.15))
+                            )
+                    }
+                    if task.tags.count > 2 {
+                        Text("+\(task.tags.count - 2)")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background(
+                                Capsule()
+                                    .fill(Color.secondary.opacity(0.15))
+                            )
+                    }
+                }
             }
 
             // Due Date

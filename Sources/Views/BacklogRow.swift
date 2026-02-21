@@ -149,19 +149,31 @@ struct BacklogRow: View {
                 )
             }
 
-            // 4. Tags (max 2, dann "+N") - plain text, no chips
+            // 4. Tags (max 2, dann "+N") - chip style
             if !item.tags.isEmpty {
                 ForEach(item.tags.prefix(2), id: \.self) { tag in
-                    Text("#\(tag)")
+                    Text(tag)
                         .font(.caption2)
                         .lineLimit(1)
                         .foregroundStyle(.secondary)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(
+                            Capsule()
+                                .fill(Color.secondary.opacity(0.15))
+                        )
                 }
 
                 if item.tags.count > 2 {
                     Text("+\(item.tags.count - 2)")
                         .font(.caption2)
                         .foregroundStyle(.secondary)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(
+                            Capsule()
+                                .fill(Color.secondary.opacity(0.15))
+                        )
                 }
             }
 

@@ -443,6 +443,20 @@ Context Menu bleibt zusaetzlich erhalten.
 
 ---
 
+### Bug: Tag-Styling in List-Views (plain text statt Chips)
+**Status:** ERLEDIGT (2026-02-21)
+**Prioritaet:** NIEDRIG
+**Plattform:** iOS + macOS
+
+**Problem:** Tags wurden als plain text mit `#`-Prefix dargestellt (z.B. `#design`, `#research`). Kein visueller Unterschied zu normalem Text — Tags sahen nicht wie Tags aus.
+
+**Fix:** Tags als Capsule-Chips gestylt: kein Hash-Prefix, `Capsule().fill(Color.secondary.opacity(0.15))` Hintergrund, padding 8H x 4V. Auf allen 3 Views identisch.
+
+**Dateien:** `BacklogRow.swift` (iOS), `MacBacklogRow.swift` (macOS), `TaskPreviewView.swift` (iOS Long Press Preview)
+**Screenshots:** `docs/artifacts/bug-tag-styling/screenshots/` (before + after)
+
+---
+
 ### Feature: Control Center Inline-Eingabe (iOS 26+)
 **Status:** OFFEN
 **Prioritaet:** NIEDRIG
