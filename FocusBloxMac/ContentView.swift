@@ -749,15 +749,13 @@ struct ContentView: View {
     }
 
     private func markTasksCompleted(_ ids: Set<UUID>) {
+        let taskSource = LocalTaskSource(modelContext: modelContext)
+        let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
         for id in ids {
             if let task = tasks.first(where: { $0.uuid == id }) {
-                task.isCompleted = true
-                task.completedAt = Date()
-                task.assignedFocusBlockID = nil
-                task.isNextUp = false
+                try? syncEngine.completeTask(itemID: task.id)
             }
         }
-        try? modelContext.save()
     }
 
     private func updateRecurringSeries(_ task: LocalTask) {
@@ -847,8 +845,9 @@ struct ContentView: View {
         MacBacklogRow(
             task: task,
             onToggleComplete: {
-                task.isCompleted.toggle()
-                try? modelContext.save()
+                let taskSource = LocalTaskSource(modelContext: modelContext)
+                let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
+                try? syncEngine.completeTask(itemID: task.id)
             },
             onImportanceCycle: { newValue in
                 task.importance = newValue

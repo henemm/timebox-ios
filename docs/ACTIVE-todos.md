@@ -475,6 +475,24 @@ Context Menu bleibt zusaetzlich erhalten.
 
 ---
 
+### Bug: Recurring Task verschwindet nach Completion (macOS + Siri)
+**Status:** ERLEDIGT (2026-02-21)
+**Prioritaet:** HOCH
+**Plattform:** macOS (+ iOS Siri Intent)
+
+**Problem:** Wenn ein wiederkehrender Task auf macOS im Backlog abgehakt wird, verschwindet er komplett — keine neue Instanz wird erstellt. Ursache: macOS ContentView + MenuBarView setzen `isCompleted = true` direkt, ohne `RecurrenceService.createNextInstance()` aufzurufen. Gleiches Problem bei CompleteTaskIntent (Siri/Shortcuts).
+
+**Fix:** Alle 4 betroffenen Completion-Pfade auf `SyncEngine.completeTask()` bzw. `RecurrenceService.createNextInstance()` umgestellt:
+1. `ContentView.swift:849-851` — onToggleComplete → SyncEngine
+2. `ContentView.swift:751-761` — markTasksCompleted → SyncEngine
+3. `MenuBarView.swift:407-416` — toggleComplete → SyncEngine
+4. `CompleteTaskIntent.swift:29-33` — RecurrenceService hinzugefuegt
+
+**Dateien:** `ContentView.swift` (macOS), `MenuBarView.swift` (macOS), `CompleteTaskIntent.swift` (Shared), `SyncEngineTests.swift` (2 neue Tests)
+**Analyse:** `docs/artifacts/bug-recurring-disappears/analysis.md`
+
+---
+
 ### Feature: Control Center Inline-Eingabe (iOS 26+)
 **Status:** OFFEN
 **Prioritaet:** NIEDRIG

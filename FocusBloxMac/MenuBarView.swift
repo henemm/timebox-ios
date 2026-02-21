@@ -405,13 +405,14 @@ struct MenuBarView: View {
     }
 
     private func toggleComplete(_ task: LocalTask) {
-        task.isCompleted.toggle()
-        if task.isCompleted {
-            task.completedAt = Date()
-            task.assignedFocusBlockID = nil
-            task.isNextUp = false
+        if !task.isCompleted {
+            let taskSource = LocalTaskSource(modelContext: modelContext)
+            let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
+            try? syncEngine.completeTask(itemID: task.id)
         } else {
-            task.completedAt = nil
+            let taskSource = LocalTaskSource(modelContext: modelContext)
+            let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
+            try? syncEngine.uncompleteTask(itemID: task.id)
         }
     }
 

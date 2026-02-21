@@ -11,6 +11,7 @@ struct CompleteTaskIntent: AppIntent {
     @Parameter(title: "Task")
     var task: TaskEntity
 
+    @MainActor
     func perform() async throws -> some IntentResult & ProvidesDialog {
         let container = try SharedModelContainer.create()
         let context = ModelContext(container)
@@ -30,6 +31,12 @@ struct CompleteTaskIntent: AppIntent {
         localTask.completedAt = Date()
         localTask.assignedFocusBlockID = nil
         localTask.isNextUp = false
+
+        // Generate next instance for recurring tasks
+        if localTask.recurrencePattern != "none" {
+            RecurrenceService.createNextInstance(from: localTask, in: context)
+        }
+
         try context.save()
 
         return .result(dialog: "Task '\(task.title)' erledigt.")

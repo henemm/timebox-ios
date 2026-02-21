@@ -287,6 +287,43 @@ final class SyncEngineTests: XCTestCase {
             "Completed tasks should not be affected by series recurrence updates")
     }
 
+    // MARK: - completeTask + Recurrence Tests
+
+    /// Completing a recurring task via SyncEngine must create a new instance.
+    /// Bricht wenn: SyncEngine.swift:153-154 — RecurrenceService-Aufruf entfernt/fehlt.
+    func test_completeTask_recurring_createsNextInstance() throws {
+        let context = container.mainContext
+        let task = LocalTask(title: "Recurring Daily", recurrencePattern: "daily")
+        task.dueDate = Calendar.current.startOfDay(for: Date())
+        context.insert(task)
+        try context.save()
+
+        try syncEngine.completeTask(itemID: task.id)
+
+        let allTasks = try context.fetch(FetchDescriptor<LocalTask>())
+        let openTasks = allTasks.filter { !$0.isCompleted }
+
+        XCTAssertTrue(task.isCompleted, "Original task should be completed")
+        XCTAssertEqual(openTasks.count, 1, "A new open instance should exist after completing recurring task")
+        XCTAssertEqual(openTasks.first?.recurrencePattern, "daily", "New instance should inherit recurrence pattern")
+        XCTAssertEqual(openTasks.first?.title, "Recurring Daily", "New instance should inherit title")
+    }
+
+    /// Completing a NON-recurring task must NOT create a new instance.
+    /// Bricht wenn: SyncEngine.swift:153 — Guard-Check entfernt.
+    func test_completeTask_nonRecurring_doesNotCreateInstance() throws {
+        let context = container.mainContext
+        let task = LocalTask(title: "One-Off Task", recurrencePattern: "none")
+        context.insert(task)
+        try context.save()
+
+        try syncEngine.completeTask(itemID: task.id)
+
+        let allTasks = try context.fetch(FetchDescriptor<LocalTask>())
+        XCTAssertEqual(allTasks.count, 1, "No new instance should be created for non-recurring task")
+        XCTAssertTrue(allTasks.first!.isCompleted)
+    }
+
     // MARK: - updateSortOrder Tests
 
     func test_updateSortOrder_updatesTasksSortOrder() async throws {
