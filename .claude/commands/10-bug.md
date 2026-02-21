@@ -133,13 +133,38 @@ Aber **DU** darfst es nicht ueberspringen nur weil du ueberzeugt bist.
 - Welche anderen Features/Flows koennten betroffen sein?
 - Gibt es aehnliche Patterns die das gleiche Problem haben?
 
+## Schritt 5.5: Devil's Advocate — Analyse challengen
+
+**PFLICHT vor Praesentation an Henning!**
+
+Schicke einen `analysis-challenger` Agenten los mit:
+- Pfad zur `docs/artifacts/bug-[name]/analysis.md`
+- Die originale Bug-Beschreibung (Symptom)
+
+```
+Task: analysis-challenger Agent
+Input: analysis.md Pfad + Bug-Beschreibung
+Output: Challenge Report mit Verdict (SOLIDE / LUECKEN / SCHWACH)
+```
+
+### Nach dem Challenge Report:
+
+| Verdict | Aktion |
+|---------|--------|
+| **SOLIDE** | Weiter zu Schritt 6 — Analyse Henning praesentieren |
+| **LUECKEN** | Offene Fragen und uebersehene Hypothesen in die Analyse einarbeiten. Dann ERNEUT challengen lassen. |
+| **SCHWACH** | Zurueck zu Schritt 2 — neue Investigate-Tasks fuer die gefundenen Luecken. NICHT mit schwacher Analyse weitermachen! |
+
+**Max 2 Challenge-Runden.** Wenn nach 2 Runden immer noch SCHWACH → Henning informieren mit den offenen Fragen.
+
 ## Schritt 6: Henning die Analyse praesentieren
 
 Zeige Henning:
 1. Die Anzahl gefundener Hypothesen
 2. Die wahrscheinlichste Ursache mit Beweis
 3. Den Blast Radius
-4. Frage: "Soll ich auf dieser Basis einen Fix vorschlagen?"
+4. **Challenge-Verdict** (SOLIDE/LUECKEN) + wichtigste offene Frage falls vorhanden
+5. Frage: "Soll ich auf dieser Basis einen Fix vorschlagen?"
 
 **WARTE auf Hennings Bestaetigung.**
 

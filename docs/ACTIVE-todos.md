@@ -946,6 +946,13 @@ Siri liest den Screen-Inhalt anderer Apps (wenn diese ihn exponieren). User sagt
 
 ## Tooling
 
+### Devil's Advocate Agent fuer Bug-Analyse
+**Status:** ERLEDIGT (2026-02-21)
+**Dateien:** `.claude/agents/analysis-challenger.md`, `.claude/commands/10-bug.md`
+**Aenderung:** Neuer `analysis-challenger` Agent der Bug-Analysen kritisch hinterfragt (Schritt 5.5 im `/bug` Workflow). Prueft: Symptom-Abdeckung, Dead-Code-Risiko, Wiederholungs-Muster, Plattform-Annahmen, einfachere Erklaerungen. Verdict: SOLIDE/LUECKEN/SCHWACH mit konkreter Eskalations-Logik.
+
+---
+
 ### Test-Qualitaet: Erst verstehen, dann testen
 **Status:** ERLEDIGT (2026-02-19)
 **Dateien:** `.claude/commands/04-tdd-red.md`, `.claude/commands/10-bug.md`
