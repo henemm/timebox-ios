@@ -166,8 +166,18 @@ enum RecurrenceService {
         let descriptor = FetchDescriptor<LocalTask>(
             predicate: #Predicate<LocalTask> { !$0.isCompleted && $0.recurrencePattern != "none" }
         )
-        guard let recurringTasks = try? modelContext.fetch(descriptor) else { return 0 }
-        guard !recurringTasks.isEmpty else { return 0 }
+        guard let recurringTasks = try? modelContext.fetch(descriptor) else {
+            print("[TemplateMigration] Fetch failed — no recurring tasks found")
+            return 0
+        }
+        guard !recurringTasks.isEmpty else {
+            print("[TemplateMigration] No incomplete recurring tasks — nothing to migrate")
+            return 0
+        }
+
+        let existingTemplates = recurringTasks.filter { $0.isTemplate }
+        let existingChildren = recurringTasks.filter { !$0.isTemplate }
+        print("[TemplateMigration] Found \(recurringTasks.count) recurring tasks (\(existingTemplates.count) templates, \(existingChildren.count) children)")
 
         // Group by recurrenceGroupID
         var groupedByID: [String: [LocalTask]] = [:]
@@ -182,6 +192,8 @@ enum RecurrenceService {
             }
         }
 
+        print("[TemplateMigration] \(groupedByID.count) groups with ID, \(tasksWithoutGroupID.count) tasks without groupID")
+
         var created = 0
 
         // For tasks without groupID: assign one and create template
@@ -191,22 +203,34 @@ enum RecurrenceService {
             let template = createTemplateFrom(task, groupID: gid)
             modelContext.insert(template)
             created += 1
+            print("[TemplateMigration] Created template for '\(task.title)' (no groupID, new gid: \(gid.prefix(8))...)")
         }
 
         // For groups with groupID: create template if none exists
         for (gid, tasks) in groupedByID {
             // Check if template already exists
-            if tasks.contains(where: { $0.isTemplate }) { continue }
+            if tasks.contains(where: { $0.isTemplate }) {
+                print("[TemplateMigration] Skipping group \(gid.prefix(8))... — template exists")
+                continue
+            }
 
             // Use the oldest open task as the source
             let source = tasks.sorted(by: { $0.createdAt < $1.createdAt }).first!
             let template = createTemplateFrom(source, groupID: gid)
             modelContext.insert(template)
             created += 1
+            print("[TemplateMigration] Created template for '\(source.title)' (group: \(gid.prefix(8))...)")
         }
 
         if created > 0 {
-            try? modelContext.save()
+            do {
+                try modelContext.save()
+                print("[TemplateMigration] ✅ Saved \(created) new template(s)")
+            } catch {
+                print("[TemplateMigration] ❌ SAVE FAILED: \(error)")
+            }
+        } else {
+            print("[TemplateMigration] No new templates needed — all series already have templates")
         }
 
         return created

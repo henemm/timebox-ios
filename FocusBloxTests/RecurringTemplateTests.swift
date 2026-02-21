@@ -87,6 +87,97 @@ final class RecurringTemplateTests: XCTestCase {
         XCTAssertEqual(templates.count, 1, "Migration should not create duplicate templates")
     }
 
+    // MARK: - Real-World Migration Test
+
+    /// Simuliert den echten App-Start: bestehende recurring Tasks OHNE Templates.
+    /// Migration muss Templates erstellen, danach darf der Filter nur Templates zeigen.
+    /// Bricht wenn: Migration keine Templates erstellt ODER Filter nicht funktioniert.
+    func test_realWorldMigration_onlyTemplatesVisibleInRecurringView() throws {
+        let context = container.mainContext
+
+        // Simulate Henning's real data: 2 series, each with 1 open + 1 completed child, NO templates
+        let groupA = "real-group-A"
+        let groupB = "real-group-B"
+
+        // Series A: "1 Blink lesen" (daily)
+        let childA1 = LocalTask(title: "1 Blink lesen", dueDate: Date(), recurrencePattern: "daily", recurrenceGroupID: groupA)
+        context.insert(childA1)
+        let childA2 = LocalTask(title: "1 Blink lesen", recurrencePattern: "daily", recurrenceGroupID: groupA)
+        childA2.isCompleted = true
+        childA2.completedAt = Calendar.current.date(byAdding: .day, value: -1, to: Date())
+        context.insert(childA2)
+
+        // Series B: "Wochenreview" (weekly)
+        let childB1 = LocalTask(title: "Wochenreview", dueDate: Date(), recurrencePattern: "weekly", recurrenceWeekdays: [5], recurrenceGroupID: groupB)
+        context.insert(childB1)
+
+        try context.save()
+
+        // Before migration: NO templates
+        let allBefore = try context.fetch(FetchDescriptor<LocalTask>())
+        let templatesBefore = allBefore.filter { $0.isTemplate }
+        XCTAssertEqual(templatesBefore.count, 0, "Before migration: no templates should exist")
+
+        // Run migration (same as macOS app start)
+        let created = RecurrenceService.migrateToTemplateModel(in: context)
+
+        // After migration: Templates should exist
+        XCTAssertEqual(created, 2, "Migration should create exactly 2 templates (one per series)")
+
+        let allAfter = try context.fetch(FetchDescriptor<LocalTask>())
+        let templatesAfter = allAfter.filter { $0.isTemplate && !$0.isCompleted }
+        XCTAssertEqual(templatesAfter.count, 2, "After migration: 2 templates visible")
+
+        // Simulate the macOS ContentView Wiederkehrend filter
+        let wiederkehrendItems = allAfter.filter { $0.isTemplate && !$0.isCompleted }
+        XCTAssertEqual(wiederkehrendItems.count, 2, "Wiederkehrend view should show exactly 2 items")
+
+        // Verify NO children in Wiederkehrend view
+        let childrenInView = wiederkehrendItems.filter { !$0.isTemplate }
+        XCTAssertEqual(childrenInView.count, 0, "Wiederkehrend view must NOT show children")
+
+        // Verify titles are correct
+        let titles = Set(wiederkehrendItems.map { $0.title })
+        XCTAssertTrue(titles.contains("1 Blink lesen"), "Template for '1 Blink lesen' should exist")
+        XCTAssertTrue(titles.contains("Wochenreview"), "Template for 'Wochenreview' should exist")
+    }
+
+    /// Verifies that completing a child does NOT remove the template from Wiederkehrend.
+    /// This was the original bug: "Task verschwindet komplett nach Abhaken"
+    func test_completingChild_templateRemainsVisible() throws {
+        let context = container.mainContext
+        let groupID = UUID().uuidString
+
+        // Setup: template + open child
+        let template = LocalTask(title: "Daily Task", recurrencePattern: "daily", recurrenceGroupID: groupID)
+        template.isTemplate = true
+        context.insert(template)
+
+        let child = LocalTask(title: "Daily Task", dueDate: Date(), recurrencePattern: "daily", recurrenceGroupID: groupID)
+        context.insert(child)
+        try context.save()
+
+        // Complete the child via SyncEngine
+        let syncEngine = SyncEngine(
+            taskSource: LocalTaskSource(modelContext: context),
+            modelContext: context
+        )
+        try syncEngine.completeTask(itemID: child.id)
+
+        // Template must still be visible in Wiederkehrend
+        let allTasks = try context.fetch(FetchDescriptor<LocalTask>())
+        let wiederkehrendItems = allTasks.filter { $0.isTemplate && !$0.isCompleted }
+        XCTAssertEqual(wiederkehrendItems.count, 1, "Template must remain in Wiederkehrend after child completion")
+        XCTAssertEqual(wiederkehrendItems.first?.title, "Daily Task")
+
+        // Child should be completed
+        XCTAssertTrue(child.isCompleted, "Child should be completed")
+
+        // A new child instance should have been spawned
+        let openChildren = allTasks.filter { !$0.isTemplate && !$0.isCompleted && $0.recurrenceGroupID == groupID }
+        XCTAssertEqual(openChildren.count, 1, "A new child instance should be spawned after completion")
+    }
+
     // MARK: - Spawning Tests
 
     /// Bricht wenn: RecurrenceService.createNextInstance nicht Template als Quelle nutzt
