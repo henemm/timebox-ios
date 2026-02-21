@@ -136,6 +136,58 @@ enum RecurrenceService {
         return instance
     }
 
+    // MARK: - Repair Orphaned Series
+
+    /// Finds completed recurring tasks whose series has no open successor,
+    /// and creates the missing next instance for each.
+    /// Returns the number of repaired series.
+    @MainActor
+    @discardableResult
+    static func repairOrphanedRecurringSeries(in modelContext: ModelContext) -> Int {
+        // 1. Fetch all completed recurring tasks
+        let completedDescriptor = FetchDescriptor<LocalTask>(
+            predicate: #Predicate<LocalTask> { $0.isCompleted }
+        )
+        guard let completedTasks = try? modelContext.fetch(completedDescriptor) else { return 0 }
+
+        let recurringCompleted = completedTasks.filter { $0.recurrencePattern != "none" }
+        guard !recurringCompleted.isEmpty else { return 0 }
+
+        // 2. Fetch all open tasks to find existing successors
+        let openDescriptor = FetchDescriptor<LocalTask>(
+            predicate: #Predicate<LocalTask> { !$0.isCompleted }
+        )
+        let openTasks = (try? modelContext.fetch(openDescriptor)) ?? []
+
+        var openGroupIDs = Set<String>()
+        for task in openTasks {
+            if let gid = task.recurrenceGroupID { openGroupIDs.insert(gid) }
+        }
+
+        // 3. For each orphaned series, create successor from most recent completion
+        var seenGroupIDs = Set<String>()
+        var repaired = 0
+
+        let sorted = recurringCompleted.sorted {
+            ($0.completedAt ?? .distantPast) > ($1.completedAt ?? .distantPast)
+        }
+
+        for task in sorted {
+            let groupID = task.recurrenceGroupID ?? task.id
+            guard !seenGroupIDs.contains(groupID) else { continue }
+            seenGroupIDs.insert(groupID)
+
+            guard !openGroupIDs.contains(groupID) else { continue }
+
+            if let _ = createNextInstance(from: task, in: modelContext) {
+                repaired += 1
+            }
+        }
+
+        if repaired > 0 { try? modelContext.save() }
+        return repaired
+    }
+
     // MARK: - Private Helpers
 
     /// Finds the next matching weekday after baseDate.

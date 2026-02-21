@@ -233,6 +233,7 @@ struct FocusBloxApp: App {
                     Self.cleanupRemindersDuplicates(in: sharedModelContainer.mainContext)
                     Self.cleanupOrphanedBlockAssignments(in: sharedModelContainer.mainContext)
                     Self.forceCloudKitFieldSync(in: sharedModelContainer.mainContext)
+                    RecurrenceService.repairOrphanedRecurringSeries(in: sharedModelContainer.mainContext)
                 }
                 // Request calendar/reminders permission on app launch (Bug 8 fix)
                 requestPermissionsOnLaunch()

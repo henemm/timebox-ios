@@ -493,6 +493,19 @@ Context Menu bleibt zusaetzlich erhalten.
 
 ---
 
+### Fix: Repair verwaister Recurring-Serien (fehlende Nachfolger)
+**Status:** ERLEDIGT (2026-02-21)
+**Prioritaet:** HOCH
+**Plattform:** iOS + macOS
+
+**Problem:** Tasks die VOR dem Recurring-Fix abgehakt wurden, haben nie eine neue Instanz bekommen. Diese Tasks sind permanent verschwunden weil kein offener Nachfolger in der DB existiert.
+
+**Fix:** `RecurrenceService.repairOrphanedRecurringSeries()` — laeuft beim App-Start, findet completed recurring Tasks ohne offenen Nachfolger, erstellt fehlende Instanzen via `createNextInstance()`. Idempotent (Dedup-Logik verhindert Duplikate).
+
+**Dateien:** `RecurrenceService.swift` (+55 LoC), `FocusBloxApp.swift` (+1 Zeile), `RecurrenceServiceTests.swift` (+80 LoC, 3 Tests)
+
+---
+
 ### Feature: Control Center Inline-Eingabe (iOS 26+)
 **Status:** OFFEN
 **Prioritaet:** NIEDRIG

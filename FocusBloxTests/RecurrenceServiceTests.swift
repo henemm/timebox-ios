@@ -574,6 +574,91 @@ final class RecurrenceServiceTests: XCTestCase {
         XCTAssertEqual(calendar.component(.day, from: result!), 21)
     }
 
+    // MARK: - repairOrphanedRecurringSeries Tests
+
+    /// Completed recurring task without open successor must be repaired.
+    /// Bricht wenn: RecurrenceService.repairOrphanedRecurringSeries() nicht implementiert oder nicht aufgerufen.
+    @MainActor
+    func test_repairOrphaned_createsSuccessorForOrphanedSeries() throws {
+        let container = try ModelContainer(for: LocalTask.self, configurations: .init(isStoredInMemoryOnly: true))
+        let context = container.mainContext
+        let groupID = "orphaned-series"
+
+        // Completed recurring task — NO open successor exists
+        let completed = LocalTask(
+            title: "1 Blink lesen",
+            dueDate: Calendar.current.startOfDay(for: Date()),
+            recurrencePattern: "daily",
+            recurrenceGroupID: groupID
+        )
+        completed.isCompleted = true
+        completed.completedAt = Date()
+        context.insert(completed)
+        try context.save()
+
+        // Verify: no open tasks exist
+        let beforeOpen = try context.fetch(FetchDescriptor<LocalTask>(
+            predicate: #Predicate { !$0.isCompleted }
+        ))
+        XCTAssertEqual(beforeOpen.count, 0, "No open tasks should exist before repair")
+
+        // Run repair
+        let repaired = RecurrenceService.repairOrphanedRecurringSeries(in: context)
+
+        // Verify: new open task created
+        let afterOpen = try context.fetch(FetchDescriptor<LocalTask>(
+            predicate: #Predicate { !$0.isCompleted }
+        ))
+        XCTAssertEqual(repaired, 1, "Should repair exactly 1 orphaned series")
+        XCTAssertEqual(afterOpen.count, 1, "One open successor should exist after repair")
+        XCTAssertEqual(afterOpen.first?.title, "1 Blink lesen")
+        XCTAssertEqual(afterOpen.first?.recurrencePattern, "daily")
+        XCTAssertEqual(afterOpen.first?.recurrenceGroupID, groupID)
+    }
+
+    /// Series WITH an open successor should NOT be repaired (no duplicates).
+    /// Bricht wenn: Repair-Logik Dedup-Check fehlt.
+    @MainActor
+    func test_repairOrphaned_skipsSeriesWithOpenSuccessor() throws {
+        let container = try ModelContainer(for: LocalTask.self, configurations: .init(isStoredInMemoryOnly: true))
+        let context = container.mainContext
+        let groupID = "healthy-series"
+
+        // Completed + open successor already exists
+        let completed = LocalTask(title: "Healthy Task", dueDate: Date(), recurrencePattern: "daily", recurrenceGroupID: groupID)
+        completed.isCompleted = true
+        completed.completedAt = Date()
+
+        let openSuccessor = LocalTask(title: "Healthy Task", dueDate: Calendar.current.date(byAdding: .day, value: 1, to: Date()), recurrencePattern: "daily", recurrenceGroupID: groupID)
+
+        context.insert(completed)
+        context.insert(openSuccessor)
+        try context.save()
+
+        let repaired = RecurrenceService.repairOrphanedRecurringSeries(in: context)
+        XCTAssertEqual(repaired, 0, "Healthy series should NOT be repaired")
+
+        let allOpen = try context.fetch(FetchDescriptor<LocalTask>(predicate: #Predicate { !$0.isCompleted }))
+        XCTAssertEqual(allOpen.count, 1, "Still exactly one open task")
+    }
+
+    /// Non-recurring completed tasks should be ignored.
+    /// Bricht wenn: Guard-Check fuer recurrencePattern fehlt.
+    @MainActor
+    func test_repairOrphaned_ignoresNonRecurring() throws {
+        let container = try ModelContainer(for: LocalTask.self, configurations: .init(isStoredInMemoryOnly: true))
+        let context = container.mainContext
+
+        let completed = LocalTask(title: "One-Off", recurrencePattern: "none")
+        completed.isCompleted = true
+        completed.completedAt = Date()
+        context.insert(completed)
+        try context.save()
+
+        let repaired = RecurrenceService.repairOrphanedRecurringSeries(in: context)
+        XCTAssertEqual(repaired, 0, "Non-recurring tasks should not be repaired")
+    }
+
     private var calendar: Calendar { Calendar.current }
 
     private func makeDate(_ year: Int, _ month: Int, _ day: Int) -> Date {
