@@ -80,7 +80,7 @@ struct BacklogView: View {
 
     // MARK: - Next Up Tasks
     private var nextUpTasks: [PlanItem] {
-        planItems.filter { $0.isNextUp && !$0.isCompleted && matchesSearch($0) }
+        planItems.filter { $0.isNextUp && !$0.isCompleted && !$0.isTemplate && matchesSearch($0) }
     }
 
     private var backlogTasks: [PlanItem] {
@@ -892,8 +892,6 @@ struct BacklogView: View {
     // MARK: - Recurring View (wiederkehrende Tasks)
     private var recurringView: some View {
         List {
-            nextUpListSection
-
             ForEach(recurringTasks) { item in
                 BacklogRow(
                     item: item,

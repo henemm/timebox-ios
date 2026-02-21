@@ -241,7 +241,7 @@ struct ContentView: View {
 
     // Next Up tasks (sorted by nextUpSortOrder, search-filtered)
     private var nextUpTasks: [LocalTask] {
-        tasks.filter { $0.isNextUp && !$0.isCompleted && matchesSearch($0) }
+        tasks.filter { $0.isNextUp && !$0.isCompleted && !$0.isTemplate && matchesSearch($0) }
             .sorted { ($0.nextUpSortOrder ?? Int.max) < ($1.nextUpSortOrder ?? Int.max) }
     }
 
@@ -287,7 +287,7 @@ struct ContentView: View {
 
     // Show Next Up section in all views except Completed
     private var showNextUpSection: Bool {
-        selectedFilter != .completed && !nextUpTasks.isEmpty
+        selectedFilter != .completed && selectedFilter != .recurring && !nextUpTasks.isEmpty
     }
 
     private var backlogView: some View {

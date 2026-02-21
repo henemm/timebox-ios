@@ -135,6 +135,7 @@ struct FocusBloxMacApp: App {
                     RecurrenceService.repairOrphanedRecurringSeries(in: container.mainContext)
                     // Migrate recurring tasks to template model (one-time)
                     RecurrenceService.migrateToTemplateModel(in: container.mainContext)
+                    RecurrenceService.deduplicateTemplates(in: container.mainContext)
                     // Bug 58: Menu bar icon (after app is fully initialized)
                     MenuBarController.shared.setup(
                         container: container,

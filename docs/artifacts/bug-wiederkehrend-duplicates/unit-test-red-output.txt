@@ -1,0 +1,6 @@
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/TemplateDedupTests.swift:38:41: error: type 'RecurrenceService' has no member 'deduplicateTemplates'
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/TemplateDedupTests.swift:64:27: error: type 'RecurrenceService' has no member 'deduplicateTemplates'
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/TemplateDedupTests.swift:101:27: error: type 'RecurrenceService' has no member 'deduplicateTemplates'
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/TemplateDedupTests.swift:124:41: error: type 'RecurrenceService' has no member 'deduplicateTemplates'
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/TemplateDedupTests.swift:152:27: error: type 'RecurrenceService' has no member 'deduplicateTemplates'
+** TEST FAILED **

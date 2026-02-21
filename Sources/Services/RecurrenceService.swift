@@ -233,7 +233,120 @@ enum RecurrenceService {
             print("[TemplateMigration] No new templates needed — all series already have templates")
         }
 
+        // DIAGNOSTIC: List all templates for debugging duplicate analysis
+        dumpTemplates(in: modelContext)
+
         return created
+    }
+
+    /// Diagnostic: prints all templates grouped by title+pattern to identify duplicates.
+    /// Remove after bug-wiederkehrend-duplicates is resolved.
+    @MainActor
+    static func dumpTemplates(in modelContext: ModelContext) {
+        let descriptor = FetchDescriptor<LocalTask>(
+            predicate: #Predicate<LocalTask> { $0.isTemplate && !$0.isCompleted }
+        )
+        guard let templates = try? modelContext.fetch(descriptor) else {
+            print("[TemplateDiag] ❌ Fetch failed")
+            return
+        }
+
+        print("[TemplateDiag] === ALLE TEMPLATES (\(templates.count) total) ===")
+
+        // Group by title + pattern to find duplicates
+        var grouped: [String: [(groupID: String, pattern: String, interval: Int?, weekdays: [Int]?, monthDay: Int?)]] = [:]
+        for t in templates {
+            let key = "\(t.title)||\(t.recurrencePattern)"
+            grouped[key, default: []].append((
+                groupID: t.recurrenceGroupID ?? "nil",
+                pattern: t.recurrencePattern,
+                interval: t.recurrenceInterval,
+                weekdays: t.recurrenceWeekdays,
+                monthDay: t.recurrenceMonthDay
+            ))
+        }
+
+        for (key, entries) in grouped.sorted(by: { $0.key < $1.key }) {
+            let isDuplicate = entries.count > 1 ? " ⚠️ DUPLIKAT" : ""
+            print("[TemplateDiag] \(key) — \(entries.count) template(s)\(isDuplicate)")
+            for e in entries {
+                var details = "  groupID=\(e.groupID.prefix(8))..."
+                if let i = e.interval, i > 1 { details += " interval=\(i)" }
+                if let w = e.weekdays, !w.isEmpty { details += " weekdays=\(w)" }
+                if let m = e.monthDay { details += " monthDay=\(m)" }
+                print("[TemplateDiag]   \(details)")
+            }
+        }
+
+        let uniqueKeys = grouped.count
+        let duplicateKeys = grouped.filter { $0.value.count > 1 }.count
+        print("[TemplateDiag] === SUMMARY: \(templates.count) templates, \(uniqueKeys) unique series, \(duplicateKeys) with duplicates ===")
+    }
+
+    // MARK: - Template Deduplication
+
+    /// Consolidates duplicate templates into one per series (grouped by title).
+    /// Historical bug: 3 independent code paths generated different GroupIDs for the same
+    /// logical series, resulting in multiple templates per series.
+    /// Returns the number of deleted duplicate templates.
+    @MainActor
+    @discardableResult
+    static func deduplicateTemplates(in modelContext: ModelContext) -> Int {
+        let descriptor = FetchDescriptor<LocalTask>(
+            predicate: #Predicate<LocalTask> { $0.isTemplate && !$0.isCompleted }
+        )
+        guard let templates = try? modelContext.fetch(descriptor), templates.count > 1 else {
+            return 0
+        }
+
+        // Group by title (NOT title+pattern, because pattern can change over time)
+        var grouped: [String: [LocalTask]] = [:]
+        for t in templates {
+            grouped[t.title, default: []].append(t)
+        }
+
+        var deleted = 0
+
+        for (title, group) in grouped {
+            guard group.count > 1 else { continue }
+
+            // Keep newest template (has most current recurrence settings)
+            let sorted = group.sorted { $0.createdAt < $1.createdAt }
+            let survivor = sorted.last!
+            let duplicates = sorted.dropLast()
+
+            print("[Dedup] \(title): \(group.count) templates → keeping \(survivor.recurrenceGroupID?.prefix(8) ?? "nil")...")
+
+            // Reassign ALL children of duplicate templates to survivor's GroupID
+            for dup in duplicates {
+                guard let oldGroupID = dup.recurrenceGroupID,
+                      let newGroupID = survivor.recurrenceGroupID else { continue }
+
+                let childDescriptor = FetchDescriptor<LocalTask>(
+                    predicate: #Predicate<LocalTask> {
+                        $0.recurrenceGroupID == oldGroupID && !$0.isTemplate
+                    }
+                )
+                if let children = try? modelContext.fetch(childDescriptor) {
+                    for child in children {
+                        child.recurrenceGroupID = newGroupID
+                    }
+                    if !children.isEmpty {
+                        print("[Dedup]   Reassigned \(children.count) children from \(oldGroupID.prefix(8))... → \(newGroupID.prefix(8))...")
+                    }
+                }
+
+                modelContext.delete(dup)
+                deleted += 1
+            }
+        }
+
+        if deleted > 0 {
+            try? modelContext.save()
+            print("[Dedup] ✅ Deleted \(deleted) duplicate templates")
+        }
+
+        return deleted
     }
 
     /// Creates a template LocalTask from an existing recurring task.
