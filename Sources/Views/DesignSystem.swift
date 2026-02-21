@@ -141,6 +141,12 @@ extension View {
         self.shadow(color: color.opacity(0.6), radius: radius, x: 0, y: 0)
     }
 
+    /// Pulsating glow effect for active Focus Block sessions.
+    /// Subtle breathing animation that signals "focus mode is active".
+    func focusGlowEffect(isActive: Bool, color: Color = .blue) -> some View {
+        self.modifier(FocusGlowModifier(isActive: isActive, glowColor: color))
+    }
+
     /// Sets the adaptive app background
     func appBackground() -> some View {
         self.background(DesignSystem.Colors.appBackground.ignoresSafeArea())
@@ -153,6 +159,42 @@ extension View {
             transform(self)
         } else {
             self
+        }
+    }
+}
+
+// MARK: - Focus Glow Modifier
+
+/// Subtle pulsating glow during active Focus Block sessions.
+/// Uses a breathing shadow animation (3s cycle) to signal active focus.
+struct FocusGlowModifier: ViewModifier {
+    let isActive: Bool
+    let glowColor: Color
+
+    @State private var glowIntensity: CGFloat = 0.3
+
+    func body(content: Content) -> some View {
+        content
+            .shadow(
+                color: isActive ? glowColor.opacity(glowIntensity) : .clear,
+                radius: isActive ? 12 : 0
+            )
+            .animation(.smooth, value: isActive)
+            .onChange(of: isActive) { _, active in
+                if active {
+                    startBreathing()
+                }
+            }
+            .onAppear {
+                if isActive {
+                    startBreathing()
+                }
+            }
+    }
+
+    private func startBreathing() {
+        withAnimation(.easeInOut(duration: 1.5).repeatForever(autoreverses: true)) {
+            glowIntensity = 0.7
         }
     }
 }

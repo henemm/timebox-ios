@@ -347,6 +347,7 @@ struct FocusLiveView: View {
                 .font(.title2.weight(.semibold))
                 .multilineTextAlignment(.center)
                 .padding(.horizontal)
+                .focusGlowEffect(isActive: block.isActive, color: .blue)
             Text("\(task.effectiveDuration) min geschätzt")
                 .font(.caption)
                 .foregroundStyle(.secondary)

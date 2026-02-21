@@ -254,6 +254,7 @@ struct MacFocusView: View {
                 .font(.title.weight(.semibold))
                 .multilineTextAlignment(.center)
                 .padding(.horizontal)
+                .focusGlowEffect(isActive: block.isActive, color: .blue)
 
             if let duration = task.estimatedDuration {
                 Text("\(duration) min geschätzt")
@@ -981,6 +982,44 @@ private struct MacReviewTaskRow: View {
             RoundedRectangle(cornerRadius: 8)
                 .strokeBorder(isCompleted ? Color.green.opacity(0.3) : Color.secondary.opacity(0.2), lineWidth: 1)
         )
+    }
+}
+
+// MARK: - Focus Glow Modifier (macOS)
+
+/// Pulsating glow during active Focus Block sessions.
+/// Defined locally because DesignSystem.swift requires UIKit (iOS-only).
+private struct MacFocusGlowModifier: ViewModifier {
+    let isActive: Bool
+    let glowColor: Color
+
+    @State private var glowIntensity: CGFloat = 0.3
+
+    func body(content: Content) -> some View {
+        content
+            .shadow(
+                color: isActive ? glowColor.opacity(glowIntensity) : .clear,
+                radius: isActive ? 12 : 0
+            )
+            .animation(.smooth, value: isActive)
+            .onChange(of: isActive) { _, active in
+                if active { startBreathing() }
+            }
+            .onAppear {
+                if isActive { startBreathing() }
+            }
+    }
+
+    private func startBreathing() {
+        withAnimation(.easeInOut(duration: 1.5).repeatForever(autoreverses: true)) {
+            glowIntensity = 0.7
+        }
+    }
+}
+
+private extension View {
+    func focusGlowEffect(isActive: Bool, color: Color = .blue) -> some View {
+        modifier(MacFocusGlowModifier(isActive: isActive, glowColor: color))
     }
 }
 

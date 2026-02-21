@@ -41,7 +41,7 @@
 | 15 | ~~ITB-A: FocusBlockEntity (AppEntity)~~ | ERLEDIGT | S | ~30-40k | 2 | ~60 |
 | 16 | ~~ITB-B: Smart Priority (AI-Enrichment + Hybrid-Scoring)~~ | ERLEDIGT | L | ~80-120k | 12 | ~250 |
 | 17 | ITB-C: OrganizeMyDay Intent | MITTEL | XL | ~100-150k | 4-5 | ~250 |
-| 18 | ITB-D: Enhanced Liquid Glass (aktive Blocks) | NIEDRIG | S | ~20-30k | 2 | ~40 |
+| 18 | ~~ITB-D: Enhanced Liquid Glass (aktive Blocks)~~ | ERLEDIGT | S | ~20-30k | 2 | ~40 |
 | 19 | ITB-E: Share Extension / Transferable | MITTEL | L | ~80-120k | 3-4 + Target | ~200 |
 | 20 | ITB-F: CaptureContextIntent (Siri On-Screen) | WARTEND | M | ~40-60k | 3-4 | ~80 |
 | 21 | ITB-G: Proaktive System-Vorschlaege | RESEARCH | XL | unbekannt | unbekannt | unbekannt |
@@ -96,7 +96,7 @@
 **Empfohlene Reihenfolge:**
 1. ~~ITB-A (FocusBlockEntity)~~ ERLEDIGT - Grundlage fuer Intents
 2. ITB-E (Share Extension) - hoechster User-Value
-3. ITB-D (Liquid Glass) - visuelles Polish
+3. ~~ITB-D (Liquid Glass)~~ ERLEDIGT - visuelles Polish (FocusGlowModifier iOS+macOS)
 4. ~~ITB-B (Smart Priority)~~ ERLEDIGT - AI-Enrichment + deterministischer Score
 5. ITB-C (OrganizeMyDay) - braucht A+B
 6. ITB-F (Context Capture) - WARTEND: Developer-APIs da, Siri On-Screen Awareness fehlt (iOS 26.5/27)
@@ -689,18 +689,16 @@ Context Menu bleibt zusaetzlich erhalten.
 ---
 
 ### ITB-D: Enhanced Liquid Glass fuer aktive Blocks
-**Status:** OFFEN
+**Status:** ERLEDIGT
 **Prioritaet:** NIEDRIG
 **Komplexitaet:** S (~20-30k Tokens)
 **Abhaengigkeiten:** Keine
 
-**Problem:** Aktive FocusBlock-Sessions sehen statisch aus - kein visueller Unterschied zwischen Idle und Flow.
-**Gewuenschtes Verhalten:**
-- Erweiterte Liquid Glass Effekte waehrend aktiver Sessions
-- Subtile Animationen die den Focus-Zustand widerspiegeln
-- Konsistent auf iOS (FocusLiveView) und macOS (MacFocusView)
-**Bestehendes Pattern:** `.glassCard()`, `.ultraThinMaterial` im DesignSystem
-**Scope:** ~40 LoC, 2 Dateien (DesignSystem Erweiterung + FocusView Anpassungen)
+**Implementierung:**
+- `FocusGlowModifier` mit pulsierendem Glow-Shadow (3s Breathing-Cycle)
+- iOS: `.focusGlowEffect()` in `Sources/Views/DesignSystem.swift` + angewandt in `FocusLiveView.swift`
+- macOS: `MacFocusGlowModifier` in `MacFocusView.swift` (separater Modifier weil DesignSystem UIKit nutzt)
+- Subtiler blauer Glow auf aktiver Task-Title waehrend Focus-Session
 
 ---
 
