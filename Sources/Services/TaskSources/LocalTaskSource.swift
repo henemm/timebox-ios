@@ -117,6 +117,11 @@ final class LocalTaskSource: @preconcurrency TaskSource, @preconcurrency TaskSou
         )
         modelContext.insert(task)
         try modelContext.save()
+
+        // AI enrichment: fill missing attributes (importance, urgency, taskType, energyLevel)
+        let enrichment = SmartTaskEnrichmentService(modelContext: modelContext)
+        await enrichment.enrichTask(task)
+
         return task
     }
 

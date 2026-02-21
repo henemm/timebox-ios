@@ -713,10 +713,7 @@ struct ContentView: View {
 
         Task {
             let taskSource = LocalTaskSource(modelContext: modelContext)
-            if let newTask = try? await taskSource.createTask(title: title, taskType: "") {
-                let enrichment = SmartTaskEnrichmentService(modelContext: modelContext)
-                await enrichment.enrichTask(newTask)
-            }
+            _ = try? await taskSource.createTask(title: title, taskType: "")
         }
     }
 

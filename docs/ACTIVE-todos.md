@@ -110,6 +110,20 @@
 
 ---
 
+### Bug: AI-Enrichment greift nicht bei neuen Tasks
+**Status:** ERLEDIGT
+**Prioritaet:** HOCH
+**Komplexitaet:** XS (~2 LoC Fix)
+
+- **Problem:** AI-Enrichment (Smart Task Enrichment) fuellt keine Attribute (Wichtigkeit, Dringlichkeit, Kategorie, Energielevel) beim Erstellen neuer Tasks. Weder iOS noch macOS. Switch war an.
+- **Root Cause:** `SmartTaskEnrichmentService.enrichTask()` wurde nur in 2 von 6 Task-Creation-Paths aufgerufen (CreateTaskView + macOS ContentView). Die 4 haeufigsten Paths (TaskFormSheet, QuickCaptureView, MenuBarView, QuickCapturePanel) hatten keinen Aufruf.
+- **Fix:** Enrichment-Aufruf zentral in `LocalTaskSource.createTask()` eingebaut. Damit sind ALLE Creation-Paths abgedeckt, die LocalTaskSource nutzen. Redundante Aufrufe in CreateTaskView + ContentView entfernt.
+- **Dateien:** `LocalTaskSource.swift` (+3 LoC), `CreateTaskView.swift` (-3 LoC), `ContentView.swift` (-3 LoC)
+- **Tests:** 8 SmartTaskEnrichmentServiceTests GREEN, Build iOS + macOS SUCCEEDED
+- **Offener Follow-up:** `SaveQuickCaptureIntent` (Siri) erstellt Tasks direkt via `LocalTask()` ohne LocalTaskSource — hat weiterhin kein Enrichment. Separater Fix noetig wenn Siri-Task-Erstellung genutzt wird.
+
+---
+
 ### Bug: macOS Review zeigt keine ausserhalb des Sprints abgehakten Tasks
 **Status:** ERLEDIGT
 **Prioritaet:** HOCH
