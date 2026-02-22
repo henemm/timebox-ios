@@ -52,6 +52,17 @@
                ReferencedContainer = "container:FocusBlox.xcodeproj">
             </BuildableReference>
          </TestableReference>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "B7A16D152F20FDD400165284"
+               BuildableName = "FocusBloxCoreTests.xctest"
+               BlueprintName = "FocusBloxCoreTests"
+               ReferencedContainer = "container:FocusBlox.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction

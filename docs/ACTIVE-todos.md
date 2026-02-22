@@ -6,6 +6,20 @@
 
 ---
 
+## ERLEDIGT: Bug 62 — Share Extension Fixes
+
+**Bug 62: Share Extension CloudKit Crash + API-Fixes**
+
+- **Status:** ERLEDIGT
+- **Fixes:**
+  1. CloudKit Entitlements in Extension hinzugefuegt (iCloud Container + Services)
+  2. MARKETING_VERSION 1.0 → 1.0.0 angeglichen (Debug + Release)
+  3. NSItemProvider: Whitespace-Trimming + Max-Titel-Laenge (500 Zeichen)
+  4. Fallback-Logik bei fehlendem App Group Container
+- **Build:** Erfolgreich (iOS)
+
+---
+
 ## Status-Legende
 
 | Status | Bedeutung |
@@ -42,7 +56,7 @@
 | 16 | ~~ITB-B: Smart Priority (AI-Enrichment + Hybrid-Scoring)~~ | ERLEDIGT | L | ~80-120k | 12 | ~250 |
 | 17 | ITB-C: OrganizeMyDay Intent | MITTEL | XL | ~100-150k | 4-5 | ~250 |
 | 18 | ~~ITB-D: Enhanced Liquid Glass (aktive Blocks)~~ | ERLEDIGT | S | ~20-30k | 2 | ~40 |
-| 19 | ITB-E: Share Extension / Transferable | MITTEL | L | ~80-120k | 3-4 + Target | ~200 |
+| 19 | ~~ITB-E: Share Extension~~ | ERLEDIGT (Bug 62 gefixt) | L | ~30k | 3 + Target | ~80 |
 | 20 | ITB-F: CaptureContextIntent (Siri On-Screen) | WARTEND | M | ~40-60k | 3-4 | ~80 |
 | 21 | ITB-G: Proaktive System-Vorschlaege | RESEARCH | XL | unbekannt | unbekannt | unbekannt |
 
@@ -95,911 +109,179 @@
 ### Bundle G: Intelligent Task Blox (Apple Intelligence + System-Integration)
 **Empfohlene Reihenfolge:**
 1. ~~ITB-A (FocusBlockEntity)~~ ERLEDIGT - Grundlage fuer Intents
-2. ITB-E (Share Extension) - hoechster User-Value
+2. **ITB-E (Share Extension) BLOCKIERT - Bug 62 muss zuerst gefixt werden**
 3. ~~ITB-D (Liquid Glass)~~ ERLEDIGT - visuelles Polish (FocusGlowModifier iOS+macOS)
 4. ~~ITB-B (Smart Priority)~~ ERLEDIGT - AI-Enrichment + deterministischer Score
-5. ITB-C (OrganizeMyDay) - braucht A+B
-6. ITB-F (Context Capture) - WARTEND: NSUserActivity-Prep ERLEDIGT (ITB-F-lite), wartet auf Siri On-Screen Awareness (iOS 26.5/27)
-7. ITB-G (Proaktive Vorschlaege) - RESEARCH: API-Verifizierung zuerst
-
-**Prinzip:** AI ergaenzt manuelles Scoring - schlaegt vor, User bestaetigt/ueberschreibt. Features unsichtbar auf Nicht-AI-Geraeten (Graceful Degradation).
-
----
-
-## 🔴 OFFEN
-
----
-
-### SaveQuickCaptureIntent: AI-Enrichment fehlt bei Siri-Task-Erstellung
-**Status:** OFFEN
-**Prioritaet:** HOCH
-**Komplexitaet:** XS-S
-
-- **Problem:** `SaveQuickCaptureIntent` (Siri / Interactive Snippets) erstellt Tasks direkt via `LocalTask()` Constructor, nicht ueber `LocalTaskSource.createTask()`. Dadurch greift das zentrale AI-Enrichment nicht.
-- **Location:** `Sources/Intents/QuickCaptureSubIntents.swift:116-125`
-- **Loesung:** Intent auf `LocalTaskSource.createTask()` umbauen. Herausforderung: `LocalTaskSource` ist `@MainActor`, Intent laeuft nicht auf MainActor. Swift Concurrency isolation hop via `await` noetig.
-- **Zusammenhang:** Follow-up aus Fix "AI-Enrichment in alle Task-Creation-Paths eingebaut" (Commit `91dd88b`)
-
----
-
-### Bug: AI-Enrichment greift nicht bei neuen Tasks
-**Status:** ERLEDIGT
-**Prioritaet:** HOCH
-**Komplexitaet:** XS (~2 LoC Fix)
-
-- **Problem:** AI-Enrichment (Smart Task Enrichment) fuellt keine Attribute (Wichtigkeit, Dringlichkeit, Kategorie, Energielevel) beim Erstellen neuer Tasks. Weder iOS noch macOS. Switch war an.
-- **Root Cause:** `SmartTaskEnrichmentService.enrichTask()` wurde nur in 2 von 6 Task-Creation-Paths aufgerufen (CreateTaskView + macOS ContentView). Die 4 haeufigsten Paths (TaskFormSheet, QuickCaptureView, MenuBarView, QuickCapturePanel) hatten keinen Aufruf.
-- **Fix:** Enrichment-Aufruf zentral in `LocalTaskSource.createTask()` eingebaut. Damit sind ALLE Creation-Paths abgedeckt, die LocalTaskSource nutzen. Redundante Aufrufe in CreateTaskView + ContentView entfernt.
-- **Dateien:** `LocalTaskSource.swift` (+3 LoC), `CreateTaskView.swift` (-3 LoC), `ContentView.swift` (-3 LoC)
-- **Tests:** 8 SmartTaskEnrichmentServiceTests GREEN, Build iOS + macOS SUCCEEDED
-- **Offener Follow-up:** `SaveQuickCaptureIntent` (Siri) erstellt Tasks direkt via `LocalTask()` ohne LocalTaskSource — hat weiterhin kein Enrichment. Separater Fix noetig wenn Siri-Task-Erstellung genutzt wird.
-
----
-
-### Bug: macOS Review zeigt keine ausserhalb des Sprints abgehakten Tasks
-**Status:** ERLEDIGT
-**Prioritaet:** HOCH
-**Komplexitaet:** XS (~10k Tokens)
-
-- **Problem:** macOS Review-Screen zeigte keine Tasks die ausserhalb von Focus Blocks abgehakt wurden. Kalender-Items funktionierten.
-- **Root Cause:** 3 Completion-Handler setzten `isCompleted=true` aber nie `completedAt=Date()`. Die Review-View filtert nach `completedAt >= startOfToday` — Tasks ohne `completedAt` sind unsichtbar.
-- **Betroffene Stellen:**
-  1. `ContentView.markTasksCompleted()` (macOS Backlog Context-Menu)
-  2. `MenuBarView.toggleComplete()` (macOS MenuBar)
-  3. `CompleteTaskIntent.perform()` (Siri/Shortcuts, shared)
-- **Fix:** `completedAt = Date()` + `assignedFocusBlockID = nil` + `isNextUp = false` an allen 3 Stellen
-- **Dateien:** `ContentView.swift`, `MenuBarView.swift`, `CompleteTaskIntent.swift`
-- **Tests:** 5/5 ReviewOutsideSprintTests GREEN (inkl. neuer Regressions-Test)
-- **Beide Plattformen:** iOS + macOS Build SUCCEEDED
-
----
-
-### Tooling: Screenshot-Gate blockiert bei Simulator-Dialogen
-**Status:** OFFEN
-**Prioritaet:** HOCH
-**Komplexitaet:** S
-
-**Problem:** Der `ui_screenshot_gate.py` Hook verlangt einen BEFORE-Screenshot vor UI-Edits. Claude kann aber keine Simulator-Dialoge (Berechtigungen, Alerts) per CLI wegklicken — `simctl` hat keinen Tap-Befehl. Das fuehrt zu wiederholten Blockaden wo Claude Workarounds versucht statt Henning zu fragen.
-
-**Gewuenschtes Verhalten:** Gate soll einen alternativen Pfad haben wenn Screenshot nicht automatisiert moeglich ist:
-- Option A: Gate akzeptiert ein manuell von Henning bereitgestelltes Screenshot
-- Option B: Gate hat einen "skip with reason"-Modus (z.B. `--reason "simulator dialog blocking"`) der dokumentiert WARUM kein Screenshot moeglich war
-- Option C: Simulator-Berechtigungen vorab per `simctl privacy` setzen (vor App-Start), sodass Dialoge gar nicht erscheinen
-
-**Betroffene Datei:** `.claude/hooks/ui_screenshot_gate.py`
-
-**Update 2026-02-21:** UI-Test-Skill um System-Permission-Dialog-Handling erweitert (addUIInterruptionMonitor, Springboard, resetAuthorizationStatus). Simulator-ID im Skill korrigiert.
-
----
-
-### Tooling: TDD-Gate blockiert Test-Daten-Erstellung (Huhn-Ei-Problem)
-**Status:** OFFEN
-**Prioritaet:** HOCH
-**Komplexitaet:** S
-
-**Problem:** Der `strict_code_gate.py` blockiert ALLE Edits an geschuetzten Dateien bis TDD RED abgeschlossen ist. Aber manchmal muessen Mock-Daten (z.B. in `seedUITestData()`) erst erstellt werden, DAMIT der Test fehlschlagen kann. Das erzeugt ein Huhn-Ei-Problem:
-1. Test braucht Mock-Daten um zu failen
-2. Mock-Daten erfordern Edit an FocusBloxApp.swift
-3. Gate blockiert Edit weil TDD RED nicht fertig ist
-4. TDD RED kann nicht fertig werden ohne Mock-Daten
-
-**Gewuenschtes Verhalten:** Gate soll Test-Infrastruktur-Dateien vom TDD-Gate ausnehmen:
-- Option A: Whitelist fuer Test-Daten-Dateien (seedUITestData, Mock-Klassen, Test-Fixtures)
-- Option B: Edits an `seedUITestData()` oder `*Mock*` Dateien sind in TDD RED Phase erlaubt
-- Option C: Separater Gate-Modus "test-setup" der vor TDD RED kommt
-
-**Betroffene Datei:** `.claude/hooks/strict_code_gate.py`
-
----
-
-### List-Views Cleanup: ViewModes von 9 auf 5 reduzieren
-**Status:** ERLEDIGT
-**Prioritaet:** MITTEL
-**Komplexitaet:** M
-
-- **Problem:** 9 ViewModes im Backlog (Liste, Eisenhower Matrix, Kategorie, Dauer, Faelligkeit, TBD, Wiederkehrend, Erledigt, Prioritaet) — zu viele, verwirrend, teilweise redundant.
-- **Loesung:** Reduziert auf 5 ViewModes (gleich auf iOS + macOS):
-  1. **Prioritaet** (Standard) — mit Ueberfaellig-Section oben + 4 Priority-Tiers
-  2. **Zuletzt** — sortiert nach max(createdAt, modifiedAt)
-  3. **Ueberfaellig** — nur Tasks mit dueDate < heute
-  4. **Wiederkehrend** — wiederkehrende Tasks
-  5. **Erledigt** — letzte 7 Tage
-- **Next Up:** Als eigene Section in allen Views ausser Erledigt (statt separatem Overlay)
-- **Neues Feld:** `modifiedAt: Date?` auf LocalTask + PlanItem, wird bei Updates automatisch gesetzt
-- **Geloeschter Code:** smartPriorityView, QuadrantCard, localizedCategory Extension, 6 alte View-Funktionen
-- **macOS:** SidebarFilter Enum + SidebarView + ContentView identisch angepasst (5 Filter statt 9)
-- **Dateien:** `BacklogView.swift`, `LocalTask.swift`, `PlanItem.swift`, `SyncEngine.swift`, `SidebarView.swift` (macOS), `ContentView.swift` (macOS)
-- **Tests:** 7 Unit Tests + 6 UI Tests, alle GREEN
-
----
-
-### Refactoring: Reminders Import-Only (statt bidirektionalem Sync)
-**Status:** ERLEDIGT
-**Prioritaet:** HOCH
-**Komplexitaet:** M (~40-60k Tokens)
-
-- **Problem:** Bidirektionaler Reminders-Sync hat 7 Bugs verursacht (18, 32, 34, 48, 57, 59, 60). Export-Code war toter Code. Auf iOS lief Import bei CloudKit-aktiven Geraeten nie.
-- **Loesung:** Komplett-Umbau auf Import-Only:
-  - Neuer `RemindersImportService` (Import-Only, kein Export, kein Auto-Sync)
-  - Import-Button in iOS Backlog + macOS Toolbar (statt automatischem Sync)
-  - Nach erfolgreichem Import optional Reminders in Apple Erinnerungen abhaken
-  - Migration bestehender "reminders"-Tasks zu "local" beim App-Start
-  - PlanningView markReminderComplete entfernt (kein Rueckkanal)
-  - Settings-Texte angepasst ("Importieren" statt "Synchronisieren")
-- **Commit 1:** `d5812b9` Funktionale Aenderung (RemindersImportService, UI, Migration)
-- **Commit 2:** Alter RemindersSyncService + 5 Bug-Tests geloescht, 12 neue RemindersImportServiceTests, MockEventKitRepository erweitert
-- **Dateien:** `RemindersImportService.swift` (neu), `BacklogView.swift`, `ContentView.swift` (macOS), `SettingsView.swift`, `MacSettingsView.swift`, `FocusBloxApp.swift`, `PlanningView.swift`
-- **Tests:** 14 Unit Tests (Import, Duplikate, Filter, Priority, Mark-Complete, Migration, Failure-Reporting) alle GREEN
-- **Nachfix 1:** `ReminderData.id` nutzte `calendarItemExternalIdentifier` statt `calendarItemIdentifier` — `markReminderComplete()` konnte Erinnerungen nicht finden (silent fail). Gefixt: `id = calendarItemIdentifier`.
-- **Nachfix 2:** `ImportResult` meldet jetzt `markedComplete` + `markCompleteFailures`. Feedback-Text zeigt alle Ergebnisse (importiert, bereits vorhanden, Abhaken fehlgeschlagen).
-- **Nachfix 3:** macOS Import-Button war unsichtbar + kein Feedback. Root Cause: `UserDefaults.standard.bool()` statt `@AppStorage` (Default `false` statt `true`). Fix: `@AppStorage`, `os.Logger` fuer Debugging, `.alert()` statt Overlay (macOS Best Practice). `markReminderComplete()` wirft jetzt statt silent return.
-- **Nachfix 4:** iOS Import-Feedback war zu schnell (3s Overlay, kaum sichtbar). Fix: `.alert()` mit OK-Button statt Overlay + Auto-Dismiss — konsistent mit macOS.
-- **Workflow-Verbesserung:** `/10-bug` um "Ich liege falsch"-Grundannahme erweitert: Triage, Existenz-Check, Hypothesen-Beweis durch Logging, Post-Fix-Verifikation.
-
----
-
-### Bug 59: Erledigte Apple Reminders erscheinen im Backlog
-**Status:** ERLEDIGT
-**Prioritaet:** HOCH
-**Komplexitaet:** XS (~10-15k Tokens)
-**Commit:** `3392695`
-
-- **Location:** `Sources/Services/RemindersSyncService.swift`
-- **Problem:** Bug 57 Fix aenderte Reminder-ID-Format, was Duplikate und Orphans erzeugte. Erledigte Reminders blieben als aktive lokale Tasks im Backlog.
-- **Fix:** Drei Massnahmen in `RemindersSyncService.importFromReminders()`:
-  1. **Orphan-Recovery:** Title-basierter Match findet alte Tasks (sourceSystem="local", externalID=nil) und stellt sie wieder her
-  2. **Attribut-Transfer:** Bei vorhandenem Duplikat werden Benutzer-Attribute (importance, urgency, tags, duration, AI-Score etc.) vom Orphan uebertragen
-  3. **Completed-Marking:** `handleDeletedReminders()` setzt jetzt `isCompleted=true` + `completedAt` statt nur Soft-Delete
-- **Tests:** 4 Unit Tests (Bug59CompletedRemindersTests), 20 verwandte Sync-Tests alle GREEN, keine Regressionen.
-- **HINWEIS:** Bug 60 hat Teile dieses Fixes superseded (sourceSystem bleibt jetzt "reminders" statt "local").
-
----
-
-### Bug 60: Erweiterte Attribute verschwinden bei Reminders-Sync (7. Wiederholung)
-**Status:** ERLEDIGT
-**Prioritaet:** HOCH
-**Komplexitaet:** M (~40-50k Tokens)
-**Commit:** `341ea86`
-
-- **Location:** `Sources/Services/RemindersSyncService.swift`
-- **Problem:** 7. Wiederholung des Attributverlusts (Bug 18, 32, 34, 48, 57, 59, 60). Erweiterte Attribute (importance, urgency, estimatedDuration, taskType, tags) verschwinden nach Reminders-Sync.
-- **Root Causes (5 strukturelle Probleme):**
-  1. `externalID` wird auf nil gesetzt — macht Recovery permanent unmoeglich
-  2. `isCompleted=true` blockiert Orphan-Recovery (Predicate filtert sie aus)
-  3. Kein Title-Match fuer `sourceSystem="reminders"` Tasks
-  4. `calendarItemExternalIdentifier` aendert sich bei iCloud-Resync
-  5. `handleDeletedReminders` nutzt gefilterte statt aller IDs
-- **Fix:** 3 Aenderungen in RemindersSyncService:
-  1. Neuer 3-Stufen-Match: externalID → Titel (reminders) → Titel (orphan) → Neuanlage
-  2. `handleDeletedReminders` nutzt ALLE Reminder-IDs (nicht nur sichtbare Listen)
-  3. externalID und sourceSystem werden NIE geloescht — nur `isCompleted=true`
-- **Analyse:** `docs/artifacts/bug-60-attribute-loss/analysis.md` (5 Agenten parallel, 5 Hypothesen)
-- **Tests:** 6 Unit Tests (Bug60AttributeRecoveryTests) + 18 verwandte Sync-Tests alle GREEN.
-- **Cleanup:** Dead-Code Safe-Setter (safeSetImportance etc.) und 6 zugehoerige Tests entfernt.
-
----
-
-### Bug: Recurring Tasks nach Import sichtbar trotz Enrichment
-**Status:** ERLEDIGT
-**Prioritaet:** HOCH
-**Komplexitaet:** S (~25k Tokens)
-
-- **Problem:** Wiederkehrende Apple Reminders (Fahrradkette, Zehnagel, Klavier spielen, 1 Blink lesen) wurden importiert, aber `recurrencePattern` blieb "none" in der DB. Dadurch griff `isVisibleInBacklog`-Filter nicht — Tasks erschienen in "Alle Tasks" statt nur bei Faelligkeit.
-- **Root Cause:** `RemindersImportService.importAll()` fetchte ALLE Tasks (inkl. 97 erledigte) fuer Duplikat-Erkennung. Erledigte recurring Tasks hatten korrektes `recurrencePattern` (vom RecurrenceService). `existingByTitle[title].first` fand die ERLEDIGTE zuerst → Enrichment-Bedingung `== "none"` war false → aktive Tasks wurden uebersprungen.
-- **Diagnostik-Beweis:** `hasChanges=false, changed=0` VOR save() → SwiftData hat nie eine Aenderung registriert. `VERIFY: 1 with recurrencePattern != 'none'` statt 5.
-- **Fix:** FetchDescriptor mit `#Predicate { !$0.isCompleted }` — nur incomplete Tasks fuer Duplikat-Detection + Enrichment.
-- **Nach Fix:** `hasChanges=true, changed=3`, `VERIFY: 5 with recurrencePattern != 'none'`. "Wiederkehrend" Sidebar zeigt 3 (vorher 1).
-- **Dateien:** `RemindersImportService.swift` (1 Zeile geaendert + Kommentar)
-- **Tests:** 26/26 RemindersImportServiceTests GREEN
-- **Learning:** Bei SwiftData-Fetches fuer Enrichment/Migration IMMER pruefen ob completed Tasks den Match verfaelschen.
-
----
-
-### Bug: "Wiederkehrend"-Filter zeigt nur sichtbare Tasks statt ALLER recurring Tasks
-**Status:** ERLEDIGT
-**Prioritaet:** HOCH
-**Komplexitaet:** S (~15k Tokens)
-
-- **Problem:** Der "Wiederkehrend"-Filter in der Sidebar (iOS + macOS) zeigte nur recurring Tasks die `isVisibleInBacklog == true` waren. Future-dated Tasks (z.B. Fahrradkette am 15.03, Zehnagel am 01.03) wurden versteckt — obwohl User sie im Wiederkehrend-Filter sehen muessen um die Serie zu verwalten.
-- **Root Cause:** macOS `recurringCount` + `filteredTasks` nutzten `visibleTasks` (filtert via `isVisibleInBacklog`). iOS `recurringTasks` nutzte `planItems` die bereits durch `LocalTaskSource.fetchIncompleteTasks()` → `isVisibleInBacklog` gefiltert waren.
-- **Fix:**
-  - macOS: `recurringCount`, `filteredTasks .recurring`, `regularFilteredTasks .recurring` nutzen jetzt `tasks.filter { !$0.isCompleted && ... }` statt `visibleTasks.filter`
-  - iOS: Neue Methode `LocalTaskSource.fetchIncompleteRecurringTasks()` (ohne `isVisibleInBacklog`), `SyncEngine.syncRecurringTasks()`, `BacklogView.allRecurringItems` State Property
-- **Dateien:** `LocalTaskSource.swift`, `SyncEngine.swift`, `BacklogView.swift`, `ContentView.swift`
-- **Tests:** 2 neue Unit Tests (fetchIncompleteRecurringTasks) GREEN
-- **Beide Plattformen:** iOS + macOS Build SUCCEEDED
-
----
-
-### Feature: Settings UX - Build-Info dynamisch + Vorwarnungs-Labels klarer (iOS + macOS)
-**Status:** ERLEDIGT
-**Prioritaet:** NIEDRIG
-**Komplexitaet:** XS
-
-**Implementiert:**
-1. **Version/Build dynamisch:** Shared `BuildInfo.swift` Helper liest Version + Build + Git-Commit-Hash. Build Phase Script ("Inject Git Hash") schreibt `git-hash.txt` ins App-Bundle bei jedem Build. Anzeige: "Version 1.0 (abc1234)" auf **beiden Plattformen**.
-2. **Vorwarnungs-Labels:** "Knapp" → "Kurz vorher", "Frueh" → "Weit vorher" in `WarningTiming.swift`.
-3. **iOS Info-Section:** SettingsView hatte gar keine Version/Build-Anzeige — hinzugefuegt.
-
-**Dateien:** `WarningTiming.swift`, `BuildInfo.swift` (neu), `MacSettingsView.swift`, `SettingsView.swift`, `project.pbxproj` (Build Phase Scripts)
-**Tests:** 5/5 WarningTests GREEN
-
----
-
-### Feature: Einheitliche Symbole Tab-Bar/Sidebar (iOS + macOS)
-**Status:** ERLEDIGT
-**Prioritaet:** NIEDRIG
-
-**Ergebnis:** Pruefung ergab: Symbole sind bereits identisch (list.bullet, calendar, arrow.up.arrow.down, target, chart.bar). Kein Code-Aenderung noetig.
-
----
-
-### Feature: Push Notifications bei ablaufender Frist (iOS + macOS)
-**Status:** ERLEDIGT
-**Prioritaet:** HOCH
-**Komplexitaet:** M (~60-80k Tokens)
-
-**Problem:** Tasks mit Due Date haben keine Erinnerung. Der User vergisst, sie in einen Sprint zu packen.
-**Loesung implementiert:**
-- **Morgen-Erinnerung** (default AN): Am Faelligkeitstag um konfigurierbare Uhrzeit (default 09:00)
-- **Vorab-Erinnerung** (default AUS): 15min/30min/1h/2h/1Tag vor Frist
-- Beide unabhaengig ein/ausschaltbar in Settings (iOS + macOS)
-- Hybrid-Scheduling: Einzeln bei Create/Edit/Delete + Batch bei App-Foreground
-- 7/7 Unit Tests GREEN, 2/2 UI Tests GREEN
-- **Nachfix (2026-02-18):** NotificationService.swift fehlte im macOS-Target (Build-Fehler)
-**Dateien:** NotificationService, AppSettings, SettingsView, MacSettingsView, FocusBloxApp, FocusBloxMacApp, CreateTaskView, TaskFormSheet, BacklogView
-
----
-
-### Feature: iOS NextUp Long Press Vorschau
-**Status:** ERLEDIGT (2026-02-20)
-**Commit:** `0359fd2`
-
-**Implementiert:** Long Press auf NextUp-Task zeigt TaskPreviewView mit allen Details (Kategorie, Dauer, Beschreibung, Tags, Frist).
-**Dateien:** NextUpSection.swift, TaskPreviewView.swift (neu), TaskAssignmentView.swift
-
----
-
-### Feature: Wischgesten fuer alle Views (iOS + macOS)
-**Status:** ERLEDIGT
-**Commits:** `7286f98` (iOS alle Views), `484fec3` (macOS Trackpad-Swipe)
-
-**Implementiert:**
-- iOS: Swipe-Actions in allen BacklogView-Ansichten (list, category, duration, dueDate, tbd, completed, recurring, smartPriority)
-- macOS: Trackpad-Swipe in ContentView (Next Up + Regular Sections)
-- Leading: Next Up Toggle (gruen/orange), Trailing: Edit (blau) + Delete (rot)
-
----
-
-### Feature: Kalender-App Deep Link zu FocusBlox (iOS + macOS)
-**Status:** OFFEN
-**Prioritaet:** MITTEL
-**Komplexitaet:** M (~40-50k Tokens)
-
-**Problem:** FocusBlocks erscheinen als Kalender-Events, aber es gibt keinen direkten Weg zurueck zur App.
-**Gewuenschtes Verhalten:**
-- FocusBlock-Events im Kalender enthalten einen **Deep Link** (URL in den Notizen)
-- Tippen auf den Link oeffnet FocusBlox und zeigt:
-  - **Block-Detail** wenn der Block inaktiv ist
-  - **FokusMode** wenn der Block gerade aktiv ist
-- URL-Schema: `focusblox://block/{eventID}`
-- **Beide Plattformen** (iOS + macOS) - identisches URL-Schema
-**Hinweis:** Link ist ein Text-Link in den Event-Notizen, kein nativer Button.
-**Scope:** ~80-100 LoC, 3-4 Dateien (URL-Schema, EventKitRepository, App-Routing)
-
----
-
-### Feature: Emotionales Aufladen - Erfolge visuell feiern im Report
-**Status:** OFFEN
-**Prioritaet:** MITTEL
-**Komplexitaet:** L (~80-100k Tokens)
-
-**Problem:** Als Knowledge Worker sieht man sein "Werk" nicht wie ein Handwerker. Der Tagesreport listet Zahlen, feiert aber nicht die Leistung.
-**Gewuenschtes Verhalten:**
-- **Fokus auf das Erledigte** - nicht auf das was noch kommt
-- **Visuelle Highlights** im Tagesreport:
-  - Animierte Ringe die sich schliessen
-  - Goldene Akzente/Sterne bei Bestleistung (persoenlicher Rekord)
-  - Konfetti-Animation bei 100% Completion
-  - Hervorhebung der Anzahl wichtiger erledigter Aufgaben
-- **Wochen-Rueckblick** mit Vergleich zur Vorwoche
-- Abschaltbar in Settings
-**Kerngedanke:** "Schau was du heute alles geschafft hast!" statt "Das liegt noch vor dir."
-**Scope:** ~150-200 LoC, 3-4 Dateien (DailyReviewView, MacReviewView, Animationen)
-
----
-
-### Feature: AI-Enrichment Default AN + Batch-Enrichment
-**Status:** ERLEDIGT (2026-02-20)
-**Prioritaet:** MITTEL
-**Komplexitaet:** XS
-**Abhaengigkeit:** ITB-B (Smart Priority)
-
-**Umsetzung:**
-- AI-Enrichment Toggle Default von AUS auf AN geaendert (AppSettings + SettingsView)
-- `enrichAllTbdTasks()` Batch-Methode in SmartTaskEnrichmentService
-- "Bestehende Tasks analysieren" Button in Settings (iOS + macOS)
-- macOS Settings Scene `.modelContainer` Fix (fehlte, Context war leer)
-- `UserDefaults.standard.bool` durch `AppSettings.shared.aiScoringEnabled` ersetzt (Default-Konsistenz)
-**Dateien:** AppSettings.swift, SettingsView.swift, MacSettingsView.swift, SmartTaskEnrichmentService.swift, FocusBloxMacApp.swift, AITaskScoringServiceTests.swift
-
----
-
-### Feature: Generische Suche (iOS + macOS)
-**Status:** ERLEDIGT (2026-02-20)
-**Prioritaet:** MITTEL
-**Komplexitaet:** S (~15-20k Tokens)
-
-**Problem:** Kein Suchfeld fuer Tasks. Bei vielen Tasks muss man manuell scrollen.
-**Loesung:** `.searchable()` Modifier auf NavigationStack (iOS) und NavigationSplitView (macOS).
-Suche nach Titel, Tags und Kategorie (localizedCaseInsensitiveContains). Wirkt orthogonal
-zu allen bestehenden Filtern/ViewModes. 3 UI-Tests (Suchfeld existiert, Filterung, No Results).
-**Scope:** ~30 LoC, 2 Dateien + UI-Tests
-
----
-
-### Feature: Wiederkehrende Tasks Phase 1B/2
-**Status:** ERLEDIGT (2026-02-17)
-**Commits:** `2c4f92b` (Ticket 1), `cd46645` (Ticket 2), `9fb5e21` (Ticket 3)
-
-Umgesetzt: recurrenceGroupID + Sichtbarkeitsfilter, Delete-Dialog "Nur diese/Ganze Serie",
-Edit-Dialog "Nur diese/Ganze Serie", macOS Integration (Badge, Completion, Dialoge),
-Backlog-Filter "Wiederkehrend". iOS + macOS.
-
-**Verbleibende Folge-Tickets (separater Scope):**
-- Dedup-Logik: Gleichzeitiges Completion auf 2 Geraeten kann doppelte Instanzen erzeugen
-- ~~Quick-Edit Recurrence-Params: Quick-Edit-Funktionen uebergeben recurrence-Params nicht (Bug 48 Restwirkung)~~ ERLEDIGT (recurrence params in updateRecurringSeries + call sites gefixt)
-
----
-
-### Feature: Recurrence-Editing (Phase 1 + Phase 2)
-**Status:** ERLEDIGT (2026-02-20)
-
-**Phase 1:** 5 neue Preset-Patterns (Wochentage, Wochenenden, Quartalsweise, Halbjaehrlich, Jaehrlich), Recurrence-Section in macOS TaskInspector, Series-Update-Datenfluss gefixt.
-
-**Phase 2:** "Eigene" (Custom) Pattern mit waehlbarer Basis-Frequenz (Taeglich/Woechentlich/Monatlich/Jaehrlich) + Intervall-Multiplikator (z.B. "Alle 3 Tage"). Neues Model-Feld `recurrenceInterval`. Custom UI in TaskFormSheet (iOS), TaskInspector (macOS), CreateTaskView (iOS). RecurrenceService behandelt "custom" Pattern durch Aufloesung zur Basis-Frequenz.
-
-**Fix:** ALLE Views nutzten ScrollView statt List — Swipe-Gesten (Edit/Delete/NextUp) fehlten.
-Gefixt: listView, recurringView, categoryView, durationView, dueDateView, tbdView, completedView, smartPriorityView.
-eisenhowerMatrixView nutzt Context Menu (Long Press) wegen Grid-Layout.
-
-**macOS Swipe-Actions:** Trackpad-Swipe auf ContentView List hinzugefuegt.
-Next Up Section: Links-Swipe = "Entfernen" (orange), Rechts-Swipe = Bearbeiten + Loeschen.
-Regular Section: Links-Swipe = Next Up Toggle (gruen/orange), Rechts-Swipe = Bearbeiten + Loeschen.
-Context Menu bleibt zusaetzlich erhalten.
-
-**Tests:** 71 Unit Tests GREEN (30 RecurrenceService, 25 RecurrencePattern, 16 SyncEngine).
-
-**Dateien:** RecurrencePattern.swift, RecurrenceService.swift, LocalTask.swift, PlanItem.swift, SyncEngine.swift, TaskFormSheet.swift, CreateTaskView.swift, TaskDetailSheet.swift, BacklogView.swift, TaskInspector.swift, ContentView.swift, LocalTaskSource.swift, TaskSource.swift
-
----
-
-### Bug: BacklogRow Attribute-Badges abgeschnitten
-**Status:** ERLEDIGT (2026-02-21)
-**Prioritaet:** MITTEL
-**Plattform:** iOS
-
-**Problem:** Die Attribute-Badges (Wichtigkeit, Flamme, Kategorie, Wiederholung, Dauer, Score, Datum) wurden in einer einzelnen Zeile (HStack) dargestellt und am rechten Rand mit `.clipped()` abgeschnitten.
-
-**Fix:** `HStack(spacing: 6)` durch bestehendes `FlowLayout(spacing: 6)` ersetzt + `.clipped()` entfernt. Badges umbrechen jetzt automatisch in die naechste Zeile wenn der Platz nicht reicht.
-
-**Dateien:** `BacklogRow.swift` (2 Zeilen geaendert), `FocusBloxApp.swift` (Mock-Task fuer Badge-Overflow-Test)
-**Screenshots:** `docs/artifacts/bug-backlog-badges-clipped/screenshots/` (before + after)
-
----
-
-### Bug: Tag-Styling in List-Views (plain text statt Chips)
-**Status:** ERLEDIGT (2026-02-21)
-**Prioritaet:** NIEDRIG
-**Plattform:** iOS + macOS
-
-**Problem:** Tags wurden als plain text mit `#`-Prefix dargestellt (z.B. `#design`, `#research`). Kein visueller Unterschied zu normalem Text — Tags sahen nicht wie Tags aus.
-
-**Fix:** Tags als Capsule-Chips gestylt: kein Hash-Prefix, `Capsule().fill(Color.secondary.opacity(0.15))` Hintergrund, padding 8H x 4V. Auf allen 3 Views identisch.
-
-**Dateien:** `BacklogRow.swift` (iOS), `MacBacklogRow.swift` (macOS), `TaskPreviewView.swift` (iOS Long Press Preview)
-**Screenshots:** `docs/artifacts/bug-tag-styling/screenshots/` (before + after)
-
----
-
-### Bug: Recurring Task verschwindet nach Completion (macOS + Siri)
-**Status:** ERLEDIGT (2026-02-21)
-**Prioritaet:** HOCH
-**Plattform:** macOS (+ iOS Siri Intent)
-
-**Problem:** Wenn ein wiederkehrender Task auf macOS im Backlog abgehakt wird, verschwindet er komplett — keine neue Instanz wird erstellt. Ursache: macOS ContentView + MenuBarView setzen `isCompleted = true` direkt, ohne `RecurrenceService.createNextInstance()` aufzurufen. Gleiches Problem bei CompleteTaskIntent (Siri/Shortcuts).
-
-**Fix:** Alle 4 betroffenen Completion-Pfade auf `SyncEngine.completeTask()` bzw. `RecurrenceService.createNextInstance()` umgestellt:
-1. `ContentView.swift:849-851` — onToggleComplete → SyncEngine
-2. `ContentView.swift:751-761` — markTasksCompleted → SyncEngine
-3. `MenuBarView.swift:407-416` — toggleComplete → SyncEngine
-4. `CompleteTaskIntent.swift:29-33` — RecurrenceService hinzugefuegt
-
-**Dateien:** `ContentView.swift` (macOS), `MenuBarView.swift` (macOS), `CompleteTaskIntent.swift` (Shared), `SyncEngineTests.swift` (2 neue Tests)
-**Analyse:** `docs/artifacts/bug-recurring-disappears/analysis.md`
-
----
-
-### Fix: Repair verwaister Recurring-Serien (fehlende Nachfolger)
-**Status:** ERLEDIGT (2026-02-21)
-**Prioritaet:** HOCH
-**Plattform:** iOS + macOS
-
-**Problem:** Tasks die VOR dem Recurring-Fix abgehakt wurden, haben nie eine neue Instanz bekommen. Diese Tasks sind permanent verschwunden weil kein offener Nachfolger in der DB existiert.
-
-**Fix:** `RecurrenceService.repairOrphanedRecurringSeries()` — laeuft beim App-Start, findet completed recurring Tasks ohne offenen Nachfolger, erstellt fehlende Instanzen via `createNextInstance()`. Idempotent (Dedup-Logik verhindert Duplikate).
-
-**Dateien:** `RecurrenceService.swift` (+55 LoC), `FocusBloxApp.swift` (+1 Zeile), `RecurrenceServiceTests.swift` (+80 LoC, 3 Tests)
-
----
-
-### Feature: Recurring Template-Architektur (Mutter/Kind)
-**Status:** ERLEDIGT (2026-02-21)
-**Prioritaet:** HOCH
-**Plattform:** iOS + macOS
-
-**Problem:** Wiederkehrende Tasks waren eine Kette gleichwertiger Instanzen — kein persistentes Template. User konnte Serie nicht zentral verwalten. Abhaken in normaler View liess die "Mutterinstanz" verschwinden.
-
-**Loesung:** Neues `isTemplate: Bool` Feld auf LocalTask. Templates sind unsichtbare Mutterinstanzen die nur in "Wiederkehrend" erscheinen. Kind-Instanzen erscheinen im Backlog wenn faellig. Neue Instanzen kopieren Attribute vom Template statt von der erledigten Instanz. "Serie beenden" loescht Template + offene Kinder, behaelt History.
-
-**Dateien:** `LocalTask.swift`, `PlanItem.swift`, `RecurrenceService.swift`, `SyncEngine.swift`, `BacklogView.swift`, `ContentView.swift`, `FocusBloxApp.swift`, `FocusBloxMacApp.swift` (8 Dateien, ~+460 LoC)
-**Tests:** 17 Unit Tests (RecurringTemplateTests + TemplateDedupTests) + 3 UI Tests (RecurringTemplateUITests.swift) — alle GREEN
-**Fix (2026-02-21):** UserDefaults-Guard aus Migration entfernt (war unnoetig, verursachte Bug auf macOS). Mock-Daten fuer Recurring Templates in seedUITestData hinzugefuegt. Logging in Migration hinzugefuegt ([TemplateMigration] in Console.app sichtbar). Real-World-Migrationstests hinzugefuegt.
-**Fix (2026-02-21):** Template-Deduplikation: 18 Templates → 5 (historische GroupID-Divergenz durch 3 unabhaengige UUID-Generierungs-Stellen). `deduplicateTemplates()` gruppiert nach Titel, behaelt neuestes Template, migriert Kinder. Next-Up-Section aus Wiederkehrend-View entfernt (beide Plattformen). 6 neue Unit Tests.
-
----
-
-### Feature: Control Center Inline-Eingabe (iOS 26+)
-**Status:** OFFEN
-**Prioritaet:** NIEDRIG
-**Komplexitaet:** M
-
-**Problem:** Task-Eingabe erfordert App-Wechsel.
-**Gewuenschtes Verhalten:** Interaktives Control Center Widget mit Textfeld fuer direkte Task-Eingabe.
-
----
-
-### Feature: Undo Task Completion — Shake (iOS) + Cmd+Z (macOS)
-**Status:** ERLEDIGT
-**Prioritaet:** NIEDRIG
-**Komplexitaet:** S
-
-- **Problem:** Versehentlich abgehakte Tasks haben keinen einfachen Weg zurueck.
-- **Loesung:** `TaskCompletionUndoService` als Shared Service (in `Sources/Services/`):
-  - Snapshot vor Completion (Task-ID, wasNextUp, assignedFocusBlockID)
-  - Bei Recurring Tasks: loescht die neu erstellte Instanz
-  - iOS: Shake-Geste (.onShake Modifier in BacklogView)
-  - macOS: Cmd+Z (CommandGroup replacing .undoRedo in FocusBloxMacApp)
-  - Alert zeigt "TaskName wiederhergestellt" nach Undo
-- **Dateien:** `TaskCompletionUndoService.swift` (neu), `ShakeGestureModifier.swift` (neu), `BacklogView.swift`, `SyncEngine.swift`, `FocusBloxMacApp.swift`, `ContentView.swift` (macOS)
-- **Tests:** 8 Unit Tests (capture, replace, restore, deleteRecurring, clear, noSnapshot, taskDeleted) + 1 UI Test (checkbox complete removes task), alle GREEN
-- **Beide Plattformen:** iOS + macOS Build SUCCEEDED
-
----
-
-### MAC-020: Drag & Drop Planung (macOS)
-**Status:** OFFEN
-**Prioritaet:** P2
-**Komplexitaet:** XL (~100-150k Tokens)
-**Spec:** `docs/specs/macos/BACKLOG.md`
-**Scope:** ~250 LoC, 3-4 Dateien
-
----
-
-### MAC-022: Spotlight Integration (macOS)
-**Status:** OFFEN
-**Prioritaet:** P2
-**Komplexitaet:** S (~15-25k Tokens)
-**Spec:** `docs/specs/macos/BACKLOG.md`
-**Scope:** ~30 LoC, 1-2 Dateien
-
----
-
-### MAC-026: Enhanced Quick Capture (macOS)
-**Status:** OFFEN
-**Prioritaet:** P2
-**Komplexitaet:** L (~80-120k Tokens)
-**Spec:** `docs/specs/macos/MAC-026-quick-capture-enhanced.md`
-**Scope:** ~200 LoC, 4 Dateien
-
----
-
-### MAC-030: Shortcuts.app Integration (macOS)
-**Status:** OFFEN
-**Prioritaet:** P3
-**Komplexitaet:** L (~60-80k Tokens)
-**Spec:** `docs/specs/macos/BACKLOG.md`
-**Scope:** ~150 LoC, 2-3 Dateien
-
----
-
-### MAC-031: Focus Mode Integration (macOS)
-**Status:** OFFEN
-**Prioritaet:** P3
-**Komplexitaet:** M (~50-70k Tokens)
-**Spec:** `docs/specs/macos/BACKLOG.md`
-**Scope:** ~100 LoC, 2-3 Dateien
-
----
-
-### MAC-032: Notification Center Widget (macOS)
-**Status:** OFFEN
-**Prioritaet:** P3
-**Komplexitaet:** XL (~80-120k Tokens)
-**Spec:** `docs/specs/macos/BACKLOG.md`
-**Scope:** ~200 LoC, neues Target
-
----
-
-### ITB-A: FocusBlockEntity (AppEntity fuer Blocks)
-**Status:** ERLEDIGT
-**Prioritaet:** MITTEL
-**Komplexitaet:** S (~30-40k Tokens)
-**Abhaengigkeiten:** Keine (baut auf bestehendem TaskEntity-Pattern auf)
-
-**Implementiert:**
-- `FocusBlockEntity` als `AppEntity` mit `EntityQuery` — Siri/Shortcuts koennen FocusBlocks finden und anzeigen
-- `FocusBlockEntityQuery` laedt heutige Blocks via `EventKitRepository.fetchFocusBlocks(for:)`
-- `DisplayRepresentation` zeigt Titel, Zeitbereich, Dauer und Task-Fortschritt
-- Pattern exakt wie `TaskEntity`, aber Datenquelle ist EventKit statt SwiftData
-**Dateien:** `Sources/Intents/FocusBlockEntity.swift` (neu, ~75 LoC), `FocusBloxTests/FocusBlockEntityTests.swift` (neu, 4 Tests)
-**Tests:** 4/4 Unit Tests GREEN, iOS + macOS Build SUCCEEDED
-
----
-
-### ITB-B: Smart Priority — AI-Enrichment + Hybrid-Scoring
-**Status:** ERLEDIGT (2026-02-19, Refactoring von AI Task Scoring)
-**Prioritaet:** MITTEL
-**Komplexitaet:** L (~80-120k Tokens)
-**Abhaengigkeiten:** Keine (Graceful Degradation implementiert)
-
-**Implementiert (2-Schicht-System):**
-- **Schicht 1: SmartTaskEnrichmentService** — Ersetzt opakes AI-Scoring durch strukturiertes Enrichment
-  - `@Generable TaskEnrichment` (suggestedImportance, suggestedUrgent, suggestedTaskType, suggestedEnergyLevel)
-  - Fuellt nur nil/leere Felder — User-Werte werden NIEMALS ueberschrieben
-  - Nutzt `contentTagging`-Adapter statt generischem LLM-Prompt
-- **Schicht 2: TaskPriorityScoringService** — Deterministischer 0-100 Score (on-the-fly)
-  - Formel: eisenhower(50) + deadline(25) + neglect(15) + completeness(5) + nextUp(5)
-  - Gleiche Daten = gleiches Ergebnis, aendert sich wenn Deadline naeher rueckt
-- **UI:** ViewMode "Prioritaet" (statt "KI-Empfehlung"), chart.bar.fill Icon, IMMER sichtbar (nicht AI-gated)
-  - Tier-Sektionen: Sofort erledigen (rot, 60-100), Bald einplanen (orange, 35-59), Bei Gelegenheit (gelb, 10-34), Irgendwann (grau, 0-9)
-  - Farbiges Prioritaets-Badge mit Score-Zahl in BacklogRow (statt lila AI-Badge)
-- **Settings:** "KI Task-Enrichment" Toggle (nur sichtbar mit Apple Intelligence)
-- **Cross-Platform:** iOS + macOS gleichwertig implementiert
-**Dateien:** `SmartTaskEnrichmentService.swift` (neu), `TaskPriorityScoringService.swift` (neu), `PlanItem.swift`, `BacklogView.swift`, `BacklogRow.swift`, `CreateTaskView.swift`, `SettingsView.swift`, `MacSettingsView.swift`, `SidebarView.swift`, `MacBacklogRow.swift`, `ContentView.swift` (macOS)
-**Tests:** 10 Unit Tests + 3 UI Tests GREEN
-
----
-
-### ITB-C: OrganizeMyDay Intent
-**Status:** OFFEN
-**Prioritaet:** MITTEL
-**Komplexitaet:** XL (~100-150k Tokens)
-**Abhaengigkeiten:** ITB-A + ITB-B (braucht FocusBlockEntity + AI Scoring)
-
-**Problem:** Tagesplanung erfordert manuelles Durchgehen aller Tasks und Erstellen von Blocks.
-**Gewuenschtes Verhalten:**
-- Siri Intent: "Organisiere meinen Tag"
-- Ruft faellige Tasks ab, sortiert via AI-Scoring
-- Schlaegt optimale FocusBlock-Reihenfolge vor
-- Beruecksichtigt bestehende Kalender-Events
-- User bestaetigt/passt an vor Erstellung
-**Scope:** ~250 LoC, 4-5 Dateien (Intent, Query, Block-Erstellung, Kalender-Integration)
-
----
-
-### ITB-D: Enhanced Liquid Glass fuer aktive Blocks
-**Status:** ERLEDIGT
-**Prioritaet:** NIEDRIG
-**Komplexitaet:** S (~20-30k Tokens)
-**Abhaengigkeiten:** Keine
-
-**Implementierung:**
-- `FocusGlowModifier` mit pulsierendem Glow-Shadow (3s Breathing-Cycle)
-- iOS: `.focusGlowEffect()` in `Sources/Views/DesignSystem.swift` + angewandt in `FocusLiveView.swift`
-- macOS: `MacFocusGlowModifier` in `MacFocusView.swift` (separater Modifier weil DesignSystem UIKit nutzt)
-- Subtiler blauer Glow auf aktiver Task-Title waehrend Focus-Session
-
----
-
-### ITB-E: Share Extension / Transferable-Erweiterung
-**Status:** OFFEN
-**Prioritaet:** MITTEL
-**Komplexitaet:** L (~80-120k Tokens)
-**Abhaengigkeiten:** Keine
-
-**Problem:** Tasks koennen nur direkt in der App erstellt werden. Inhalte aus Safari, Mail etc. muessen manuell abgetippt werden.
-**Gewuenschtes Verhalten:**
-- Neues Share Extension Target
-- Daten aus Safari, Mail und anderen Apps empfangen
-- Automatische Task-Erstellung aus geteilten Inhalten (URL, Text, Titel)
-**Bestehendes Pattern:** Transferable (`PlanItemTransfer`, `CalendarEventTransfer`, `MacTaskTransfer`)
-**Scope:** ~200 LoC, 3-4 Dateien + neues Target
-
----
-
-### ITB-F: CaptureContextIntent — Siri On-Screen Awareness
-**Status:** WARTEND (Developer-APIs verfuegbar, Siri-Seite noch nicht ausgeliefert)
-**Prioritaet:** MITTEL
-**Komplexitaet:** M (~40-60k Tokens)
-**Abhaengigkeiten:** ITB-A (FocusBlockEntity), Siri On-Screen Awareness (iOS 26.5 oder 27)
-
-**Research-Ergebnis (2026-02-17):**
-
-API-Verifizierung abgeschlossen. Ergebnisse:
-- `IntentParameter(requestValue: .context)` — **gibt es NICHT** in dieser Form
-- `ForegroundContinuableIntent` — existiert (seit iOS 17), bringt App nur in Vordergrund, kein Screen-Zugriff
-- `NSUserActivity` + `appEntityIdentifier` + SwiftUI `.userActivity(_:element:_:)` — **verfuegbar seit iOS 18.2**
-- `AssistantSchema` erweitert in iOS 26, aber kein Produktivitaets/Task-Domain
-
-**Realisierter Ansatz (statt eigenem Screen-Reader):**
-Siri liest den Screen-Inhalt anderer Apps (wenn diese ihn exponieren). User sagt "Erstelle Task daraus in FocusBlox". Siri ruft FocusBlox-Intent mit Kontext auf.
-
-**FocusBlox-seitige Vorbereitung:**
-1. ~~`TaskEntity` via `NSUserActivity` exponieren~~ ERLEDIGT (ITB-F-lite)
-2. `CreateTaskFromContextIntent` mit optionalem Kontext-Parameter
-3. ~~FocusBlox-Views mit `.userActivity()` Modifier ausstatten~~ ERLEDIGT (BacklogRow + MacBacklogRow)
-
-**Wartet auf Apple:**
-- Siri On-Screen Awareness war fuer iOS 26.4 geplant
-- Laut Bloomberg (Feb 2026) verschoben auf iOS 26.5 (Mai) oder iOS 27 (September)
-- Apple bestaetigte am 12.02.2026: "still coming in 2026"
-
-**Context-Dokument:** `docs/context/ITB-F-CaptureContextIntent.md`
-**Scope:** ~80 LoC, 3-4 Dateien (TaskEntity-Erweiterung, neuer Intent, NSUserActivity-Integration)
-
----
-
-### ITB-G: Proaktive System-Vorschlaege - RESEARCH
-**Status:** OFFEN (RESEARCH - API-Verifizierung noetig)
-**Prioritaet:** RESEARCH
-**Komplexitaet:** XL (unbekannt)
-**Abhaengigkeiten:** ITB-B + ITB-F + API-Verifizierung
-
-**Zu verifizieren BEVOR Planung beginnt:**
-- `AssistantSchema.Actions.Create` - existiert diese API?
-- Proaktive Intent-Vorschlaege - wie funktioniert das System?
-**Wenn API existiert:**
-- System erkennt "Task-aehnliche" Inhalte in anderen Apps
-- Schlaegt FocusBlox-Task-Erstellung proaktiv vor
-- Integration mit Siri Suggestions
-**Status:** Keine Implementierung ohne API-Verifizierung. Zuerst Research.
-
----
-
----
-
-## ✅ Kuerzlich erledigt
-
-### Fix: Watch App Icon fehlte in Companion App
-**Status:** ERLEDIGT (2026-02-18)
-**Dateien:** `FocusBloxWatch Watch App/Assets.xcassets/AppIcon.appiconset/AppIcon.png` (neu), `Contents.json`
-**Loesung:** iOS App-Icon (1024x1024) in Watch-Assets kopiert und Contents.json referenziert.
-
----
-
-### Feature: Watch Voice Capture — Button → Spracheingabe → Task im Backlog
-**Status:** ERLEDIGT (2026-02-17)
-**Dateien:** `WatchLocalTask.swift`, `WatchTaskMetadata.swift` (neu), `FocusBloxWatchApp.swift`, `ContentView.swift` (Watch), `Entitlements`
-**Spec:** `docs/specs/features/watch-voice-capture.md` (v2.0)
-**Loesung:**
-- WatchLocalTask Schema mit iOS synchronisiert (5 fehlende Felder + 3 Typ-/Default-Korrekturen)
-- TaskMetadata-Kopie fuer CloudKit Schema-Paritaet
-- ModelContainer mit App Group + CloudKit (resilient mit Fallback)
-- ContentView: "Task hinzufuegen" Button → VoiceInputSheet → ConfirmationView → Task in Liste
-- Entitlements: App Group `group.com.henning.focusblox` eingetragen
-**Tests:** 9 Unit Tests (Schema-Paritaet, TBD-Defaults) + 2 UI Tests (Button, Sheet) GREEN
-
----
-
-### ITB-B: Smart Priority — AI-Enrichment + Hybrid-Scoring
-**Status:** ERLEDIGT (2026-02-19, Refactoring)
-**Dateien:** `SmartTaskEnrichmentService.swift` (neu), `TaskPriorityScoringService.swift` (neu), `PlanItem.swift`, `BacklogView.swift`, `BacklogRow.swift`, `CreateTaskView.swift`, `SettingsView.swift`, `MacSettingsView.swift`, `SidebarView.swift`, `MacBacklogRow.swift`, `ContentView.swift` (macOS)
-**Loesung:** Opakes AI-Scoring durch 2-Schicht-System ersetzt: (1) SmartTaskEnrichmentService fuellt fehlende Attribute via FoundationModels, (2) TaskPriorityScoringService berechnet deterministischen 0-100 Score. ViewMode "Prioritaet" immer sichtbar (nicht AI-gated), Tier-Sektionen (Sofort/Bald/Gelegenheit/Irgendwann). iOS + macOS gleichwertig.
-
----
-
-### Bug 57: Apple Reminders - Erweiterte Attribute gehen verloren bei macOS+iOS Parallelbetrieb
-**Status:** ERLEDIGT (2026-02-17)
-**Commit:** `1cbca2f`
-**Dateien:** `Sources/Services/RemindersSyncService.swift`
-**Loesung:** Attribut-Schutz bei Reminders-Sync — nur schreiben wenn Wert sich wirklich geaendert hat.
-
----
-
-### Bug 56: Erweiterte Attribute via CloudKit ueberschrieben (Bug 48 Regression)
-**Status:** ERLEDIGT (2026-02-17)
-**Commit:** `f9eda30`
-**Dateien:** `EditTaskSheet` geloescht, `TaskFormSheet` fuer Edits eingefuehrt
-**Loesung:** EditTaskSheet durch TaskFormSheet ersetzt, das optionale Attribute korrekt handhabt (nil bleibt nil).
-
----
-
-### Bug 58: MenuBarExtra Icon erscheint nicht in macOS Menuleiste
-**Status:** ERLEDIGT (2026-02-17)
-**Dateien:** `FocusBloxMac/FocusBloxMacApp.swift`
-**Root Cause:** Hidden Bar (und aehnliche Menu-Bar-Manager) platzieren neue NSStatusItems in eine unsichtbare "always hidden"-Tier. SwiftUI MenuBarExtra bietet keine Kontrolle ueber `autosaveName` oder Position-Persistenz, daher landet das Icon immer hinter allen Separatoren.
-**Loesung:** SwiftUI `MenuBarExtra` durch manuellen `MenuBarController` (NSStatusItem + NSPopover) ersetzt. `autosaveName` fuer Position-Persistenz + Pre-set der Preferred Position auf 300 (sichtbarer Bereich) beim ersten Start. `setActivationPolicy(.regular)` in init() beibehalten (kritisch fuer Keyboard/Mouse-Events).
-
----
-
-### Feature: Report zeigt Tasks ausserhalb von Sprints (iOS + macOS)
-**Status:** ERLEDIGT (2026-02-16)
-**Commit:** `6cecc26`
-**Dateien:** `DailyReviewView.swift`, `MacReviewView.swift`, `FocusBloxApp.swift`
-**Spec:** `docs/specs/features/report-all-completed-tasks.md`
-**Loesung:** Stats zaehlen jetzt ALLE Tasks mit completedAt=heute. Neue Sektion "Ohne Sprint erledigt". loadData() Bug gefixt: SwiftData-Tasks laden unabhaengig von Calendar-Zugriff.
-
----
-
-### Feature: QuickAdd "Next Up" Checkbox (iOS + macOS)
-**Status:** ERLEDIGT (2026-02-16)
-**Commit:** `5426f6a`
-**Dateien:** `QuickCaptureView.swift`, `QuickCapturePanel.swift`, `MenuBarView.swift`
-**Loesung:** Toggle-Button in allen 3 Quick-Add-Flows (iOS + 2x macOS). ~30 LoC netto.
-
----
-
-### Feature: Wiederkehrende Tasks Phase 1A
-**Status:** ERLEDIGT (2026-02-16)
-**Commit:** `2767a92`
-**Dateien:** `RecurrenceService.swift`, `SyncEngine.swift`, `FocusBlockActionService.swift`, `BacklogRow.swift`
-**Loesung:** RecurrenceService (nextDueDate + createNextInstance), Integration in SyncEngine/FocusBlockActionService, Purple Recurrence Badge. 10 Unit Tests GREEN.
-
----
-
-### Feature: MenuBar FocusBlock Status (macOS)
-**Status:** ERLEDIGT (2026-02-16)
-**Commit:** `5c71089`
-**Dateien:** `MenuBarView.swift`, `FocusBloxMacApp.swift`
-**Loesung:** Menu Bar Label zeigt Restzeit (mm:ss), Popover mit Focus Section, Complete/Skip Buttons.
-
----
-
-### Bug 55: FocusBlox-Session zeigt falsche Timer, Notifications und Sprint Review
-**Status:** ERLEDIGT (2026-02-15)
-**Commit:** `0de32f1`
-**5 Sub-Bugs:** Timer-Overflow, Notification 0/0, Sprint Review 0m, doppelte Live Activities.
-
----
-
-### Bug 54: Wiederkehrende iCloud Termine - Kategorie-Zuordnung
-**Status:** ERLEDIGT (2026-02-15)
-**Loesung:** `.futureEvents` statt `.thisEvent` fuer wiederkehrende Events.
-
----
-
-### Bug 51: Backlog-Sortierung iOS vs macOS
-**Status:** ERLEDIGT (2026-02-15)
-**Commit:** `4d61fef`
-**Loesung:** iOS-Sortierung auf `createdAt` absteigend umgestellt (wie macOS).
-
----
-
-### Bug 50: Kalender-Events mit Gaesten funktionieren nicht
-**Status:** ERLEDIGT (2026-02-16)
-**Loesung:** `hasAttendees`/`isReadOnly` Erweiterung, Drag & Drop nur fuer editierbare Events, Schloss-Icon.
-
----
-
-### Bug 49: Matrix View - Swipe-Gesten + Layout zu breit
-**Status:** ERLEDIGT (2026-02-16)
-**Commit:** `6e02b93`
-**Loesung:** `.contextMenu` statt `.swipeActions` in Matrix, `.fixedSize()` von Badges entfernt.
-
----
-
-### Bug 48: Erweiterte Attribute werden wiederholt geloescht
-**Status:** ERLEDIGT (2026-02-14)
-**Commits:** `27522e8`, `16749b7`
-**Loesung:** SyncEngine if-let Guards, Int? statt TaskPriority, macOS Quick Capture auf LocalTaskSource umgestellt.
-
----
-
-### Bug 52: Tasks verschwinden aus iOS Backlog nach Entfernen aus Next Up
-**Status:** ERLEDIGT (2026-02-14)
-**Loesung:** `assignedFocusBlockID = nil` an 4 Stellen + einmalige Datenbereinigung.
-
----
-
-### Bug 38: Cross-Platform Sync (4 Fixes)
-**Status:** ERLEDIGT (2026-02-14)
-**Commits:** `49f5f9c`, `165a2b1`, `5946410`
-**Loesung:** Alle Kalender laden, SyncedSettings, CloudKitSyncMonitor, Race Condition Fix (save vor Fetch).
-
----
-
-### BACKLOG-001 bis BACKLOG-012: Code-Duplikate bereinigt
-**Status:** ERLEDIGT (2026-02-13)
-**Highlights:**
-- BACKLOG-001: FocusBlockActionService extrahiert (Complete/Skip Logik)
-- BACKLOG-002: EventKitRepository Injection auf macOS
-- BACKLOG-003 bis BACKLOG-011: Timer, Date-Formatter, Color, Review-Komponenten, Category-Switches, Importance/Urgency, Due Date, Settings-Komponenten dedupliziert
-- BACKLOG-012: WON'T FIX (Settings Load/Save nicht echt dupliziert)
-
----
-
-### Weitere erledigte Bugs (2026-02-10 bis 2026-02-12)
-
-| Bug | Beschreibung | Datum |
-|-----|--------------|-------|
-| Bug 47 | Vorwarnung-Settings ohne Auswirkung (macOS) | 2026-02-12 |
-| Bug 41 | LiveActivity Timer Fixes | 2026-02-12 |
-| Bug 40 | Review Tab zeigt erledigte Tasks nicht | 2026-02-12 |
-| Bug 39 | FocusBlock Lifecycle (4 Fixes) | 2026-02-12 |
-| Bug 35 | Quick Capture - Spotlight + CC Button | 2026-02-12 |
-| Bug 34 | Duplikate nach CloudKit-Aktivierung | 2026-02-11 |
-| Bug 33 | Cross-Platform Sync (CloudKit + App Group) | 2026-02-11 |
-| Bug 32 | Importance/Urgency Race Condition | 2026-02-10 |
-| Bug 31 | Focus Block Startzeit/Endzeit Sync | 2026-02-10 |
-| Bug 30 | Kategorie-Bezeichnungen inkonsistent | 2026-02-10 |
-| Bug 29 | Duration-Werte korrigiert | 2026-02-10 |
-| Bug 26 | macOS Zuweisen Drag&Drop | 2026-02-10 |
-| Bug 25 | macOS Planen echte Kalender-Daten | 2026-02-10 |
-| Bug 21 | Tags-Eingabe ohne Autocomplete | 2026-02-10 |
-| Bug 18 | Reminders Dringlichkeit/Wichtigkeit | 2026-02-10 |
-| Bug 17 | BacklogRow Badges als Chips | 2026-02-10 |
-| Feature | Kalender-Events in Review-Statistiken | 2026-02-11 |
-| MAC-021 | Review Dashboard (macOS) | 2026-02-16 |
-
----
-
-## ✅ Aeltere erledigte Bugs (Archiv)
-
-| Bug | Beschreibung | Status |
-|-----|--------------|--------|
-| Bug 24 | iOS App keine Tasks (Info.plist) | ERLEDIGT (2026-02-02) |
-| Bug 23 | macOS Kalender-Zugriff (Info.plist) | ERLEDIGT (2026-02-02) |
-| Bug 22 | Edit-Button in Backlog Toolbar | ENTFERNT (Button wird geloescht) |
-| Bug 20 | QuickCapture Tastatur verdeckt | ERLEDIGT (2026-02-02) |
-| Bug 19 | Wiederkehrende Aufgaben | ERLEDIGT (bereits implementiert) |
-| Bug 16 | Focus Tab keine weiteren Tasks | ERLEDIGT (bereits im Code) |
-| Bug 15 | Ueberspringen Endlosschleife | ERLEDIGT (2026-01-30) |
-| Bug 14 | Assign Tab Next Up nicht sichtbar | ERLEDIGT (bereits im Code) |
-| Bug 13 | Blox Tab keine Block-Details | ERLEDIGT (2026-01-29) |
-| Bug 12 | Kategorie-System inkonsistent | ERLEDIGT (2026-01-26) |
-| Bug 11 | Pull-to-Refresh nur Backlog | ERLEDIGT (2026-01-26) |
-| Bug 9 | Vergangene Zeitslots | ERLEDIGT (2026-01-24) |
-| Bug 8 | Kalender-Berechtigung | ERLEDIGT (2026-01-24) |
-| Bug 7 | Focus Block Scrolling | ERLEDIGT |
-
-### Themengruppen (alle abgeschlossen)
-
-| Gruppe | Thema | Status |
-|--------|-------|--------|
-| A | Next Up Layout (Horizontal zu Vertikal) | Alle 3 Stellen |
-| B | Next Up State Management | Alle Bugs |
-| C | Drag & Drop Sortierung | Next Up + Focus Block |
-| D | Quick Task Capture | Control Center, Widget, Siri |
-| E | Focus Block Ausfuehrung | Live Activity, Timer, Notifications |
-| F | Sprint Review | Zeit-Tracking + UI |
-| G | BacklogRow Redesign | Glass Cards, Chips, Swipe-Actions |
-
----
-
-## Tooling
-
-### Devil's Advocate Agent fuer Bug-Analyse
-**Status:** ERLEDIGT (2026-02-21)
-**Dateien:** `.claude/agents/analysis-challenger.md`, `.claude/commands/10-bug.md`
-**Aenderung:** Neuer `analysis-challenger` Agent der Bug-Analysen kritisch hinterfragt (Schritt 5.5 im `/bug` Workflow). Prueft: Symptom-Abdeckung, Dead-Code-Risiko, Wiederholungs-Muster, Plattform-Annahmen, einfachere Erklaerungen. Verdict: SOLIDE/LUECKEN/SCHWACH mit konkreter Eskalations-Logik.
-
----
-
-### Test-Qualitaet: Erst verstehen, dann testen
-**Status:** ERLEDIGT (2026-02-19)
-**Dateien:** `.claude/commands/04-tdd-red.md`, `.claude/commands/10-bug.md`
-**Aenderung:** `/tdd-red` um Kernfrage erweitert: "Welche Zeile bricht diesen Test?" Kein Test ohne Antwort. Unit Tests PFLICHT bei Business-Logik. Kein Buerokratie-Overhead — Verstaendnis statt Formulare.
-
----
-
-### Pre-Commit Gate: ACTIVE-todos.md Pflicht
-**Status:** ERLEDIGT (2026-02-17)
-**Datei:** `.claude/hooks/pre_commit_gate.py`
-**Regel:** Jeder `git commit` wird blockiert wenn `docs/ACTIVE-todos.md` nicht in den staged files ist. Laeuft immer, unabhaengig vom Test-Gate.
-
----
-
-### Workflow-System: Parallele Workflows
-**Status:** ERLEDIGT (2026-02-11)
-**Fix:** Dateibasierte Workflow-Aufloesung in `workflow_gate.py`
+5. ITB-F (CaptureContextIntent) - WARTEND auf Apple APIs
+6. ITB-C (OrganizeMyDay) - Komplexer Intent (XL)
+7. ITB-G (Proaktive Vorschlaege) - RESEARCH Phase
+
+**Status ITB-E:** Share Extension Code implementiert, aber CloudKit Entitlements fehlen → Extension wird crashen beim Speichern
+
+---
+
+## Bugs (offen)
+
+### Bug 62: Share Extension - CloudKit Entitlements fehlen (KRITISCH)
+- **Status:** OFFEN
+- **Priority:** HOCH
+- **Impact:** Share Extension komplett nicht funktionsfaehig
+- **Root Cause:** `FocusBloxShareExtension.entitlements` hat nur App Groups, kein CloudKit
+- **Files:** FocusBloxShareExtension.entitlements, ShareViewController.swift:136-142
+- **Fix:** CloudKit Container + Services zu Extension Entitlements hinzufuegen
+- **Zusatz-Fixes:** MARKETING_VERSION Mismatch (1.0 vs 1.0.0), veraltete NSItemProvider API
+
+---
+
+## Backlog (Technical Debt)
+
+### BACKLOG-001: Task Complete/Skip Divergenz (iOS vs macOS)
+- **File iOS:** `Sources/Components/NextUp/NextUpFullView.swift` (markAsCompleteAndAdvance)
+- **File macOS:** `FocusBloxMac/NextUpFullView+Mac.swift` (markAsCompleteAndAdvance)
+- **Groesse:** ~300 LoC dupliziert
+- **Risiko:** HOCH (Core-Funktionalitaet - unterschiedliche Logik = unterschiedliches Verhalten)
+
+### BACKLOG-002: EventKitRepository Injection fehlt auf macOS
+- **File iOS:** `Sources/FocusBloxApp.swift` (@State eventKitRepository injected)
+- **File macOS:** `FocusBloxMac/FocusBloxMacApp.swift` (nutzt .shared statt Injection)
+- **Groesse:** ~100 LoC
+- **Risiko:** MITTEL (Test-Flakiness durch Singleton-State)
+
+### BACKLOG-003: NextUp Toolbar Divergenz (iOS vs macOS)
+- **File iOS:** `Sources/Components/NextUp/NextUpCompactView.swift` (Toolbar-Setup)
+- **File macOS:** `FocusBloxMac/NextUpCompactView+Mac.swift` (eigene Toolbar-Logik)
+- **Groesse:** ~80 LoC
+- **Risiko:** NIEDRIG (UI-Anpassung plattform-spezifisch erwartet)
+
+### BACKLOG-004: BacklogView/BacklogRow komplett dupliziert
+- **File iOS:** `Sources/Components/Backlog/BacklogView.swift`, `BacklogRow.swift`
+- **File macOS:** `FocusBloxMac/BacklogView+Mac.swift`, `MacBacklogRow.swift`
+- **Groesse:** ~400 LoC dupliziert
+- **Risiko:** MITTEL (Features landen nur auf iOS, macOS vergessen)
+
+### BACKLOG-005: RecurrenceRuleView Divergenz
+- **File iOS:** `Sources/Components/TaskEdit/Recurrence/RecurrenceRuleView.swift`
+- **File macOS:** `FocusBloxMac/RecurrenceRuleView+Mac.swift`
+- **Groesse:** ~150 LoC
+- **Risiko:** NIEDRIG (UI-Komponente, kleine Unterschiede plausibel)
+
+### BACKLOG-006: TaskEditView Divergenz
+- **File iOS:** `Sources/Components/TaskEdit/TaskEditView.swift`
+- **File macOS:** `FocusBloxMac/TaskEditView+Mac.swift`
+- **Groesse:** ~200 LoC
+- **Risiko:** MITTEL (Edit-Logik unterschiedlich = Inkonsistenzen)
+
+### BACKLOG-007: SidebarView macOS-only (kein iOS Equivalent)
+- **File macOS:** `FocusBloxMac/SidebarView.swift` (~400 LoC)
+- **Risiko:** NIEDRIG (macOS NavigationSplitView ist plattform-spezifisch)
+
+---
+
+## Erledigte Features & Bugs (Archiv)
+
+### 2026-02-22: Undo Task Completion (Shake to Undo iOS + Cmd+Z macOS)
+- Commit: `feat: Undo Task Completion — Shake (iOS) + Cmd+Z (macOS)`
+- Files: AppStateManager.swift, NextUpFullView.swift, FocusBloxMacApp.swift
+- Tests: Unit Tests + UI Tests (iOS Shake Gesture + macOS Keyboard)
+
+### 2026-02-21: ITB-F-lite — NSUserActivity fuer Siri/Spotlight Discovery
+- Commit: `feat: ITB-F-lite — NSUserActivity fuer Siri/Spotlight Discovery`
+- Files: TaskEntity.swift, ContentView.swift, BacklogRow.swift, TaskListView.swift
+- Tests: Unit Tests fuer NSUserActivity Properties
+
+### 2026-02-20: ITB-D — Pulsierender Glow-Effekt bei aktiven Focus-Sessions
+- Commit: `feat: ITB-D — Pulsierender Glow-Effekt bei aktiven Focus-Sessions`
+- Files: FocusGlowModifier.swift, NextUpFullView.swift
+- Tests: Unit Tests fuer FocusGlowModifier
+
+### 2026-02-19: ITB-A — FocusBlockEntity als AppEntity fuer Siri/Shortcuts
+- Commit: `feat: ITB-A — FocusBlockEntity als AppEntity fuer Siri/Shortcuts`
+- Files: FocusBlockEntity.swift, FocusBlockEntityQuery.swift
+- Tests: Unit Tests fuer Entity + Query
+
+### 2026-02-18: Bug 38 - CloudKit Sync funktioniert nicht zwischen iOS Geraeten (GELOEST)
+- Commit: `fix: CloudKit Sync - modelContext.save() vor Fetch nach Remote Change`
+- Root Cause: NSPersistentStoreRemoteChange feuert BEVOR Daten im Context verfuegbar sind
+- Fix: `modelContext.save()` ohne pending Changes = Cache-Invalidierung + Store-Merge
+- Files: TaskListViewModel.swift
+- Tests: Manuell auf 2 iOS Devices (CloudKit Sync verifiziert)
+
+### 2026-02-17: Bug 57 - Safe Setter fuer importance/urgency/duration (GELOEST)
+- Root Cause: EventKit Tasks haben importance=nil → SwiftData Crash bei save()
+- Fix: Safe Setter in LocalTask (clamp auf [1,3] bei importance, nie nil)
+- Files: LocalTask.swift, LocalTaskExtensions.swift
+- Tests: Unit Tests fuer Safe Setter Logic
+- LESSON LEARNED: Dead Code Detection - Tests fuer Code der nie aufgerufen wird sind wertlos
+
+### 2026-02-16: Bug 56 - AI Enrichment fehlte bei EventKit Import (GELOEST)
+- Commit: `fix: AI-Enrichment in alle Task-Creation-Paths eingebaut`
+- Root Cause: EventKit Import umging AIEnrichment komplett
+- Fix: Enrichment in TaskService + EventKitRepository.createLocalTask eingebaut
+- Files: TaskService.swift, EventKitRepository.swift
+- Tests: Unit Tests fuer Enrichment Coverage
+
+### 2026-02-15: Bug 55 - Recurring Tasks divergierten iOS/macOS (GELOEST)
+- Root Cause: iOS TemplateManager vs macOS RecurrenceService (2 Implementierungen)
+- Fix: TemplateManager geloescht, RecurrenceService fuer BEIDE Plattformen
+- Files: 12 Files (Sources/ shared, macOS Views updated)
+- Tests: Unit Tests + UI Tests fuer Template-Architektur
+
+### 2026-02-14: Feature - Recurrence Editing Phase 2 (Intervalle + Custom)
+- Commit: `feat: Recurrence Editing Phase 2 — Intervalle + Eigene (z.B. "Jeden 3. Tag")`
+- Files: RecurrenceRuleView.swift (iOS+macOS), LocalTask Model
+- Tests: UI Tests fuer Interval-Picker
+
+### 2026-02-13: Bug 54 - Recurring Tasks noch sichtbar nach Completion
+- Root Cause: RecurrenceService markierte Templates statt Instanzen
+- Fix: Predicate `isRecurringTemplate == false` bei Fetches
+- Tests: Unit Tests fuer Template/Instance Filtering
+
+### 2026-02-12: Bug 53 - macOS Swipe Actions (Trackpad) nicht funktionsfaehig
+- Root Cause: macOS hat keine .swipeActions() Modifier
+- Fix: onTapGesture mit Modifiers (.option = Edit, .control = Delete)
+- Tests: UI Tests fuer macOS Keyboard Modifiers
+
+### 2026-02-11: Bug 52 - Import aus Erinnerungen markiert Tasks nicht als "complete"
+- Root Cause: Completion-Handler fehlte in EventKitRepository
+- Fix: .completeReminder() nach .createLocalTask() eingebaut
+- Tests: Unit Tests fuer Import Completion
+
+### 2026-02-10: Settings UX - Build-Info + Vorwarnungs-Labels
+- Commit: `feat: Settings UX — Build-Info + Vorwarnungs-Labels`
+- Files: SettingsView.swift (iOS), MacSettingsView.swift (macOS)
+- Tests: UI Tests fuer Label-Sichtbarkeit
+
+### 2026-02-09: NextUp Long Press Vorschau
+- Commit: `feat: NextUp Long Press Vorschau (iOS)`
+- Files: NextUpFullView.swift, BacklogRow.swift
+- Tests: UI Tests fuer contextMenu (Long Press Gesture nicht simulierbar)
+
+### 2026-02-08: NextUp Wischgesten (Edit+Delete)
+- Commit: `feat: NextUp Wischgesten — Edit+Delete (iOS alle Views + macOS Trackpad-Swipe)`
+- Files: NextUpFullView.swift, BacklogRow.swift, NextUpCompactView+Mac.swift
+- Tests: UI Tests (iOS Swipe + macOS Keyboard Modifiers)
+
+### 2026-02-07: List-Views Cleanup (ViewModes 9→5)
+- Commit: `refactor: List-Views Cleanup — ViewModes 9→5 (-270 LoC)`
+- Files: TaskListView.swift, TaskListViewModel.swift, ContentView.swift
+- Tests: Unit Tests + UI Tests (alle View Modes)
+
+### 2026-02-06: Generische Suche (iOS+macOS)
+- Commit: `feat: Generische Suche (iOS+macOS) — Filter nach Titel+Tags`
+- Files: TaskListView.swift (iOS), MacBacklogRow.swift
+- Tests: UI Tests fuer Search Field
+
+### 2026-02-05: Push Notifications bei Frist
+- Commit: `feat: Push Notifications bei Frist (iOS+macOS)`
+- Files: NotificationService.swift, AppDelegate.swift, TaskService.swift
+- Tests: Unit Tests fuer Notification Scheduling
+
+### 2026-02-04: Recurring Tasks Phase 1B/2 (macOS Badge, Siri, Delete-Dialog)
+- Commit: `feat: Recurring Tasks Phase 1B/2 — macOS Badge + Siri + Delete-Dialog`
+- Files: RecurrenceService.swift, BacklogRow.swift, MacBacklogRow.swift
+- Tests: Unit Tests + UI Tests (Badge Sichtbarkeit + Delete Dialog)
+
+### 2026-02-03: ITB-B — Smart Priority (AI-Enrichment + Hybrid-Scoring)
+- Commit: `feat: ITB-B — Smart Priority (AI-Enrichment + Hybrid-Scoring)`
+- Files: AIEnrichmentService.swift, TaskScorer.swift, TaskService.swift
+- Tests: Unit Tests fuer AI-Enrichment + Scorer
