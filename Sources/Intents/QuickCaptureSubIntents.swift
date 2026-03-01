@@ -124,6 +124,11 @@ struct SaveQuickCaptureIntent: AppIntent {
         context.insert(task)
         try context.save()
 
+        // ITB-G1: Donate intent so Siri learns task creation patterns
+        let donationIntent = CreateTaskIntent()
+        donationIntent.taskTitle = taskTitle
+        try? await IntentDonationManager.shared.donate(intent: donationIntent)
+
         return .result(dialog: "Task '\(taskTitle)' erstellt.")
     }
 }

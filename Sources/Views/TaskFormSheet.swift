@@ -1,3 +1,4 @@
+import AppIntents
 import SwiftUI
 import SwiftData
 
@@ -438,6 +439,11 @@ struct TaskFormSheet: View {
                             dueDate: taskDueDate
                         )
                     }
+
+                    // ITB-G1: Donate intent so Siri learns task creation patterns
+                    let donationIntent = CreateTaskIntent()
+                    donationIntent.taskTitle = newTask.title
+                    try? await IntentDonationManager.shared.donate(intent: donationIntent)
 
                     await MainActor.run {
                         onCreateComplete?()

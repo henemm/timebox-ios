@@ -21,17 +21,38 @@ struct QuickCaptureWidget: Widget {
 
 struct QuickCaptureProvider: TimelineProvider {
     func placeholder(in context: Context) -> QuickCaptureEntry {
-        QuickCaptureEntry(date: Date())
+        QuickCaptureEntry(date: Date(), relevance: nil)
     }
 
     func getSnapshot(in context: Context, completion: @escaping (QuickCaptureEntry) -> Void) {
-        completion(QuickCaptureEntry(date: Date()))
+        completion(QuickCaptureEntry(date: Date(), relevance: nil))
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<QuickCaptureEntry>) -> Void) {
-        // Static widget - no updates needed
-        let entry = QuickCaptureEntry(date: Date())
-        let timeline = Timeline(entries: [entry], policy: .never)
+        // ITB-G3: Read state from App Group UserDefaults for relevance scoring
+        let defaults = UserDefaults(suiteName: "group.com.henning.focusblox")
+        let hasActiveFocusBlock = defaults?.bool(forKey: "widget_hasActiveFocusBlock") ?? false
+        let urgentTaskCount = defaults?.integer(forKey: "widget_urgentTaskCount") ?? 0
+        let totalTaskCount = defaults?.integer(forKey: "widget_totalTaskCount") ?? 0
+
+        // Calculate relevance score for Smart Stack placement
+        let score: Double
+        if hasActiveFocusBlock {
+            score = 100.0
+        } else if urgentTaskCount > 0 {
+            score = 80.0
+        } else if totalTaskCount > 0 {
+            score = 40.0
+        } else {
+            score = 10.0
+        }
+
+        var entry = QuickCaptureEntry(date: Date())
+        entry.relevance = TimelineEntryRelevance(score: Float(score))
+
+        // Update every 15 minutes to refresh relevance
+        let nextUpdate = Calendar.current.date(byAdding: .minute, value: 15, to: Date())!
+        let timeline = Timeline(entries: [entry], policy: .after(nextUpdate))
         completion(timeline)
     }
 }
@@ -40,6 +61,7 @@ struct QuickCaptureProvider: TimelineProvider {
 
 struct QuickCaptureEntry: TimelineEntry {
     let date: Date
+    var relevance: TimelineEntryRelevance?
 }
 
 // MARK: - Widget View
@@ -115,12 +137,12 @@ struct QuickCaptureWidgetView: View {
 #Preview("Small", as: .systemSmall) {
     QuickCaptureWidget()
 } timeline: {
-    QuickCaptureEntry(date: Date())
+    QuickCaptureEntry(date: Date(), relevance: nil)
 }
 
 #Preview("Medium", as: .systemMedium) {
     QuickCaptureWidget()
 } timeline: {
-    QuickCaptureEntry(date: Date())
+    QuickCaptureEntry(date: Date(), relevance: nil)
 }
 #endif

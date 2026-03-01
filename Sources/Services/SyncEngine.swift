@@ -1,3 +1,4 @@
+import AppIntents
 import Foundation
 import SwiftData
 
@@ -169,6 +170,13 @@ final class SyncEngine {
         TaskCompletionUndoService.recordCreatedInstance(id: newInstanceID)
 
         try modelContext.save()
+
+        // ITB-G1: Donate intent so Siri learns completion patterns
+        Task {
+            let donationIntent = CompleteTaskIntent()
+            donationIntent.task = TaskEntity(id: task.id, title: task.title)
+            try? await IntentDonationManager.shared.donate(intent: donationIntent)
+        }
     }
 
     /// Deletes a recurring template and all its open children (ends the series).

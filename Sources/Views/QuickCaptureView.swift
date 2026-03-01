@@ -1,3 +1,4 @@
+import AppIntents
 import SwiftUI
 import SwiftData
 
@@ -310,6 +311,11 @@ struct QuickCaptureView: View {
                     task.nextUpSortOrder = Int.max
                     try? modelContext.save()
                 }
+
+                // ITB-G1: Donate intent so Siri learns task creation patterns
+                let donationIntent = CreateTaskIntent()
+                donationIntent.taskTitle = trimmedTitle
+                try? await IntentDonationManager.shared.donate(intent: donationIntent)
 
                 await MainActor.run {
                     showSuccess = true

@@ -1,3 +1,4 @@
+import AppIntents
 import SwiftUI
 import SwiftData
 @preconcurrency import EventKit
@@ -26,6 +27,7 @@ struct SettingsView: View {
     @State private var allCalendars: [EKCalendar] = []
     @State private var writableCalendars: [EKCalendar] = []
     @State private var allReminderLists: [ReminderListInfo] = []
+    @State private var showCompleteTaskTip = true
 
     var body: some View {
         NavigationStack {
@@ -195,6 +197,13 @@ struct SettingsView: View {
                     Text("Apple Erinnerungen")
                 } footer: {
                     Text("Ermöglicht manuellen Import von Apple Erinnerungen als lokale Tasks. Importierte Erinnerungen können optional in Apple Erinnerungen als erledigt markiert werden.")
+                }
+
+                // ITB-G4: Siri Tip for task completion shortcut
+                Section {
+                    SiriTipView(intent: CompleteTaskIntent(), isVisible: $showCompleteTaskTip)
+                } header: {
+                    Text("Siri Shortcuts")
                 }
 
                 // Section: Info

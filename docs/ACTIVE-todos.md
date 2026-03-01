@@ -58,14 +58,14 @@
 | 18 | ~~ITB-D: Enhanced Liquid Glass (aktive Blocks)~~ | ERLEDIGT | S | ~20-30k | 2 | ~40 |
 | 19 | ~~ITB-E: Share Extension~~ | ERLEDIGT (Bug 62 gefixt) | L | ~30k | 3 + Target | ~80 |
 | 20 | ITB-F: CaptureContextIntent (Siri On-Screen) | WARTEND | M | ~40-60k | 3-4 | ~80 |
-| 21 | ITB-G: Proaktive System-Vorschlaege | RESEARCH | XL | unbekannt | unbekannt | unbekannt |
+| 21 | ~~ITB-G: Proaktive System-Vorschlaege~~ | ERLEDIGT | M | ~40k | 12 | ~115 |
 
 **Komplexitaet:** XS = halbe Stunde | S = 1 Session | M = 2-3 Sessions | L = halber Tag | XL = ganzer Tag+
 
 **Guenstigster Quick Win:** ~~Shake to Undo (XS)~~ ERLEDIGT
 **Teuerste Items:** #17 OrganizeMyDay (~150k), #13 Drag & Drop (~150k), #14 NC Widget (~120k)
 **WARTEND (Apple-Abhaengigkeit):** #20 ITB-F — Developer-APIs verfuegbar, wartet auf Siri On-Screen Awareness (iOS 26.5/27)
-**RESEARCH Items:** #21 ITB-G - API-Verifizierung noetig vor Planung
+**Zuletzt erledigt:** #21 ITB-G — Intent Donations, Spotlight, Widget Relevance, SiriTipViews
 
 > **Dies ist das EINZIGE Backlog.** macOS-Features (MAC-xxx) stehen hier mit Verweis auf ihre Specs in `docs/specs/macos/`. Kein zweites Backlog.
 
@@ -109,12 +109,12 @@
 ### Bundle G: Intelligent Task Blox (Apple Intelligence + System-Integration)
 **Empfohlene Reihenfolge:**
 1. ~~ITB-A (FocusBlockEntity)~~ ERLEDIGT - Grundlage fuer Intents
-2. **ITB-E (Share Extension) BLOCKIERT - Bug 62 muss zuerst gefixt werden**
+2. ~~ITB-E (Share Extension)~~ ERLEDIGT (inkl. Bug 62 Fix)
 3. ~~ITB-D (Liquid Glass)~~ ERLEDIGT - visuelles Polish (FocusGlowModifier iOS+macOS)
 4. ~~ITB-B (Smart Priority)~~ ERLEDIGT - AI-Enrichment + deterministischer Score
 5. ITB-F (CaptureContextIntent) - WARTEND auf Apple APIs
 6. ITB-C (OrganizeMyDay) - Komplexer Intent (XL)
-7. ITB-G (Proaktive Vorschlaege) - RESEARCH Phase
+7. ~~ITB-G (Proaktive Vorschlaege)~~ ERLEDIGT — Intent Donations (6 Punkte), Spotlight Indexing, Widget Relevance, SiriTipViews (3 Stellen)
 
 **Status ITB-E:** Share Extension Code implementiert, aber CloudKit Entitlements fehlen → Extension wird crashen beim Speichern
 

@@ -1,3 +1,4 @@
+import AppIntents
 import Foundation
 import SwiftData
 
@@ -53,6 +54,13 @@ enum FocusBlockActionService {
             // Generate next instance for recurring tasks
             if localTask.recurrencePattern != "none" {
                 RecurrenceService.createNextInstance(from: localTask, in: modelContext)
+            }
+
+            // ITB-G1: Donate intent so Siri learns completion patterns
+            Task {
+                let donationIntent = CompleteTaskIntent()
+                donationIntent.task = TaskEntity(id: localTask.id, title: localTask.title)
+                try? await IntentDonationManager.shared.donate(intent: donationIntent)
             }
 
             try? modelContext.save()

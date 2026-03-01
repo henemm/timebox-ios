@@ -1,0 +1,16 @@
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/WidgetRelevanceTests.swift:11:21: error: cannot find 'WidgetRelevanceCalculator' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/WidgetRelevanceTests.swift:23:21: error: cannot find 'WidgetRelevanceCalculator' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/WidgetRelevanceTests.swift:35:21: error: cannot find 'WidgetRelevanceCalculator' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/WidgetRelevanceTests.swift:47:21: error: cannot find 'WidgetRelevanceCalculator' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/WidgetRelevanceTests.swift:59:21: error: cannot find 'WidgetRelevanceCalculator' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/WidgetRelevanceTests.swift:71:21: error: cannot find 'WidgetRelevanceCalculator' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/SpotlightIndexingServiceTests.swift:17:32: error: cannot find 'SpotlightIndexingService' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/SpotlightIndexingServiceTests.swift:29:32: error: cannot find 'SpotlightIndexingService' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/SpotlightIndexingServiceTests.swift:42:32: error: cannot find 'SpotlightIndexingService' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/SpotlightIndexingServiceTests.swift:56:28: error: cannot find 'SpotlightIndexingService' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/SpotlightIndexingServiceTests.swift:67:28: error: cannot find 'SpotlightIndexingService' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/SpotlightIndexingServiceTests.swift:79:28: error: cannot find 'SpotlightIndexingService' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/SpotlightIndexingServiceTests.swift:92:28: error: cannot find 'SpotlightIndexingService' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/SpotlightIndexingServiceTests.swift:105:30: error: cannot find 'SpotlightIndexingService' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/SpotlightIndexingServiceTests.swift:115:30: error: cannot find 'SpotlightIndexingService' in scope
+** TEST BUILD FAILED **

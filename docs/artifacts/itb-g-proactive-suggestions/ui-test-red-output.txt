@@ -1,0 +1,10 @@
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/SpotlightIndexingServiceTests.swift:56:28: error: cannot find 'SpotlightIndexingService' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/SpotlightIndexingServiceTests.swift:67:28: error: cannot find 'SpotlightIndexingService' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/SpotlightIndexingServiceTests.swift:79:28: error: cannot find 'SpotlightIndexingService' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/SpotlightIndexingServiceTests.swift:92:28: error: cannot find 'SpotlightIndexingService' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/SpotlightIndexingServiceTests.swift:105:30: error: cannot find 'SpotlightIndexingService' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/SpotlightIndexingServiceTests.swift:115:30: error: cannot find 'SpotlightIndexingService' in scope
+Testing failed:
+	Testing cancelled because the build failed.
+** TEST FAILED **
+The following build commands failed:

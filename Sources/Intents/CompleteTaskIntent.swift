@@ -39,6 +39,9 @@ struct CompleteTaskIntent: AppIntent {
 
         try context.save()
 
+        // ITB-G1: Donate intent so Siri learns completion patterns
+        try? await IntentDonationManager.shared.donate(intent: self)
+
         return .result(dialog: "Task '\(task.title)' erledigt.")
     }
 }

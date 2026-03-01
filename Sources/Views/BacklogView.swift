@@ -1,3 +1,4 @@
+import AppIntents
 import SwiftUI
 import SwiftData
 
@@ -68,6 +69,7 @@ struct BacklogView: View {
     @State private var searchText = ""
     @State private var showUndoAlert = false
     @State private var undoResultMessage = ""
+    @State private var showCreateTaskTip = true
 
     // MARK: - Search Filter
     private func matchesSearch(_ item: PlanItem) -> Bool {
@@ -117,6 +119,10 @@ struct BacklogView: View {
     var body: some View {
         NavigationStack {
             Group {
+                // ITB-G4: Siri Tip for task creation shortcut discovery
+                SiriTipView(intent: CreateTaskIntent(), isVisible: $showCreateTaskTip)
+                    .padding(.horizontal)
+
                 if isLoading {
                     ProgressView("Lade Tasks...")
                 } else if let error = errorMessage {
