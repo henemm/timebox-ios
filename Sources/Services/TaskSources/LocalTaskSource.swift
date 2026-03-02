@@ -122,6 +122,10 @@ final class LocalTaskSource: @preconcurrency TaskSource, @preconcurrency TaskSou
         let enrichment = SmartTaskEnrichmentService(modelContext: modelContext)
         await enrichment.enrichTask(task)
 
+        // Flag for background title improvement
+        task.needsTitleImprovement = true
+        try modelContext.save()
+
         return task
     }
 

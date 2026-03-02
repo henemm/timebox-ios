@@ -236,6 +236,9 @@ struct FocusBloxApp: App {
                     RecurrenceService.repairOrphanedRecurringSeries(in: sharedModelContainer.mainContext)
                     RecurrenceService.migrateToTemplateModel(in: sharedModelContainer.mainContext)
                     RecurrenceService.deduplicateTemplates(in: sharedModelContainer.mainContext)
+                    // Background title improvement for tasks from Share Extension, Siri, Watch
+                    let titleEngine = TaskTitleEngine(modelContext: sharedModelContainer.mainContext)
+                    Task { await titleEngine.improveAllPendingTitles() }
                 }
                 // Request calendar/reminders permission on app launch (Bug 8 fix)
                 requestPermissionsOnLaunch()

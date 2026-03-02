@@ -108,6 +108,10 @@ final class LocalTask {
     /// Whether this task has been scored by AI
     var hasAIScoring: Bool { aiScore != nil }
 
+    /// Whether this task's title should be improved by TaskTitleEngine
+    /// Set to true when created from Share Extension, Siri, Watch, etc.
+    var needsTitleImprovement: Bool = false
+
     /// External system identifier for sync (e.g., Notion page ID)
     var externalID: String?
 

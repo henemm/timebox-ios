@@ -67,6 +67,11 @@
 | 19 | ~~ITB-E: Share Extension~~ | ERLEDIGT (Bug 62 gefixt) | L | ~30k | 3 + Target | ~80 |
 | 20 | ITB-F: CaptureContextIntent (Siri On-Screen) | WARTEND | M | ~40-60k | 3-4 | ~80 |
 | 21 | ~~ITB-G: Proaktive System-Vorschlaege~~ | ERLEDIGT | M | ~40k | 12 | ~115 |
+| 22 | ~~CTC-1: TaskTitleEngine (intelligente Titel-KI)~~ | ERLEDIGT | M | ~40-60k | 6 | ~210 |
+| 23 | CTC-2: Share Extension E-Mail-Support + Deep-Link | HOCH | S | ~20-30k | 2 | ~60 |
+| 24 | CTC-3: macOS Share Extension | HOCH | M | ~40-60k | neues Target | ~100 |
+| 25 | CTC-4: Clipboard → Task Flow | MITTEL | S | ~15-25k | 2-3 | ~50 |
+| 26 | CTC-5: Watch-Diktat Titel-Verbesserung | NICE | S | ~15-20k | 1-2 | ~30 |
 
 **Komplexitaet:** XS = halbe Stunde | S = 1 Session | M = 2-3 Sessions | L = halber Tag | XL = ganzer Tag+
 
@@ -74,6 +79,7 @@
 **Teuerste Items:** #17 OrganizeMyDay (~150k), #13 Drag & Drop (~150k), #14 NC Widget (~120k)
 **WARTEND (Apple-Abhaengigkeit):** #20 ITB-F — Developer-APIs verfuegbar, wartet auf Siri On-Screen Awareness (iOS 26.5/27)
 **Zuletzt erledigt:** #21 ITB-G — Intent Donations, Spotlight, Widget Relevance, SiriTipViews
+**Neu (User Story):** #22-26 Contextual Task Capture — siehe `docs/project/stories/contextual-task-capture.md`
 
 > **Dies ist das EINZIGE Backlog.** macOS-Features (MAC-xxx) stehen hier mit Verweis auf ihre Specs in `docs/specs/macos/`. Kein zweites Backlog.
 
@@ -124,20 +130,27 @@
 6. ITB-C (OrganizeMyDay) - Komplexer Intent (XL)
 7. ~~ITB-G (Proaktive Vorschlaege)~~ ERLEDIGT — Intent Donations (6 Punkte), Spotlight Indexing, Widget Relevance, SiriTipViews (3 Stellen)
 
-**Status ITB-E:** Share Extension Code implementiert, aber CloudKit Entitlements fehlen → Extension wird crashen beim Speichern
+### Bundle H: Contextual Task Capture (Cross-Platform)
+> User Story: `docs/project/stories/contextual-task-capture.md`
+
+**Empfohlene Reihenfolge:**
+1. ~~CTC-1 (TaskTitleEngine)~~ ERLEDIGT — Zentraler KI-Service fuer intelligente Titel (Foundation Models, Shared Code)
+2. CTC-2 (E-Mail-Support) — Share Extension: E-Mail Subject + Deep-Link zurueck zur Mail
+3. CTC-3 (macOS Share Extension) — Neues Target, gleiche Funktionalitaet wie iOS
+4. CTC-4 (Clipboard → Task) — Clipboard-Inhalt als Task-Quelle
+5. CTC-5 (Watch-Diktat) — Diktierte Tasks profitieren von TaskTitleEngine
+
+**Kernidee:** Aus jedem Kontext (Mail, Safari, Clipboard, Diktat) mit einem Tap eine Task erstellen. KI generiert actionable Titel im Hintergrund, Original bleibt in Beschreibung erhalten.
 
 ---
 
 ## Bugs (offen)
 
-### Bug 62: Share Extension - CloudKit Entitlements fehlen (KRITISCH)
-- **Status:** OFFEN
-- **Priority:** HOCH
-- **Impact:** Share Extension komplett nicht funktionsfaehig
-- **Root Cause:** `FocusBloxShareExtension.entitlements` hat nur App Groups, kein CloudKit
-- **Files:** FocusBloxShareExtension.entitlements, ShareViewController.swift:136-142
-- **Fix:** CloudKit Container + Services zu Extension Entitlements hinzufuegen
-- **Zusatz-Fixes:** MARKETING_VERSION Mismatch (1.0 vs 1.0.0), veraltete NSItemProvider API
+*Keine offenen Bugs.*
+
+### ~~Bug 62: Share Extension - CloudKit Entitlements fehlen~~ (ERLEDIGT)
+- **Status:** ERLEDIGT (siehe oben: "ERLEDIGT: Bug 62 — Share Extension Fixes")
+- **Fixes:** CloudKit Entitlements, MARKETING_VERSION, NSItemProvider API, Fallback-Logik
 
 ---
 

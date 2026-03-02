@@ -1,0 +1,15 @@
+    export ENABLE_TESTABILITY\=YES
+    export ENABLE_TESTING_SEARCH_PATHS\=NO
+    export TEST_FRAMEWORK_SEARCH_PATHS\=\ /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks\ /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk/Developer/Library/Frameworks
+    export TEST_LIBRARY_SEARCH_PATHS\=\ /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib
+    export TREAT_MISSING_BASELINES_AS_TEST_FAILURES\=NO
+** TEST SUCCEEDED **
+Test case 'TaskTitleEngineTests.test_improveAllPendingTitles_fetchesOnlyFlaggedIncompleteTasks()' passed on 'Clone 1 of FocusBlox - FocusBlox (61427)' (12.591 seconds)
+Test case 'TaskTitleEngineTests.test_improveAllPendingTitles_returnsZeroWhenDisabled()' passed on 'Clone 1 of FocusBlox - FocusBlox (61427)' (0.056 seconds)
+Test case 'TaskTitleEngineTests.test_improveTitleIfNeeded_improvesEmailSubject_whenAvailable()' passed on 'Clone 1 of FocusBlox - FocusBlox (61427)' (6.805 seconds)
+Test case 'TaskTitleEngineTests.test_improveTitleIfNeeded_preservesExistingDescription()' passed on 'Clone 1 of FocusBlox - FocusBlox (61427)' (7.260 seconds)
+Test case 'TaskTitleEngineTests.test_improveTitleIfNeeded_savesOriginalToDescription()' passed on 'Clone 1 of FocusBlox - FocusBlox (61427)' (8.340 seconds)
+Test case 'TaskTitleEngineTests.test_improveTitleIfNeeded_skipsWhenAiDisabled()' passed on 'Clone 1 of FocusBlox - FocusBlox (61427)' (0.010 seconds)
+Test case 'TaskTitleEngineTests.test_improveTitleIfNeeded_skipsWhenFlagIsFalse()' passed on 'Clone 1 of FocusBlox - FocusBlox (61427)' (0.010 seconds)
+Test case 'TaskTitleEngineTests.test_isAvailable_returnsConsistentBool()' passed on 'Clone 1 of FocusBlox - FocusBlox (61427)' (0.005 seconds)
+Test case 'TaskTitleEngineTests.test_needsTitleImprovement_defaultIsFalse()' passed on 'Clone 1 of FocusBlox - FocusBlox (61427)' (0.006 seconds)

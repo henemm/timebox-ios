@@ -166,6 +166,7 @@ struct ShareSheetView: View {
             let context = ModelContext(container)
 
             let task = LocalTask(title: trimmedTitle)
+            task.needsTitleImprovement = true
             context.insert(task)
             try context.save()
 
