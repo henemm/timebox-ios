@@ -109,15 +109,15 @@
 | 24 | ~~CTC-3: macOS Share Extension~~ | ERLEDIGT | M | ~40k | neues Target | ~170 |
 | 25 | ~~CTC-4: Clipboard → Task Flow~~ | ERLEDIGT | S | ~15-25k | 2 | ~50 |
 | 26 | ~~CTC-5: Watch-Diktat Titel-Verbesserung~~ | ERLEDIGT | S | ~15-20k | 2 | ~6 |
-| 27 | CTC-1b: TaskTitleEngine — Konservativ + Metadaten-Extraktion | GEPLANT | S | ~20-30k | 2 | ~60 |
+| 27 | ~~CTC-1b: TaskTitleEngine — Konservativ + Metadaten-Extraktion~~ | ERLEDIGT | S | ~20-30k | 2 | ~60 |
 
 **Komplexitaet:** XS = halbe Stunde | S = 1 Session | M = 2-3 Sessions | L = halber Tag | XL = ganzer Tag+
 
 **Guenstigster Quick Win:** ~~Shake to Undo (XS)~~ ERLEDIGT
 **Teuerste Items:** #17 OrganizeMyDay (~150k), #13 Drag & Drop (~150k), #14 NC Widget (~120k)
 **WARTEND (Apple-Abhaengigkeit):** #20 ITB-F — Developer-APIs verfuegbar, wartet auf Siri On-Screen Awareness (iOS 26.5/27)
-**Zuletzt erledigt:** #26 CTC-5 — Watch-Diktat Titel-Verbesserung (Bundle H komplett!)
-**Naechstes:** #27 CTC-1b — TaskTitleEngine konservativer + Metadaten-Extraktion (dueDate, urgency)
+**Zuletzt erledigt:** #27 CTC-1b — TaskTitleEngine konservativer + Metadaten-Extraktion (dueDate, urgency)
+**Naechstes:** #5 MAC-022 Spotlight Integration oder #7 Kalender-App Deep Link
 **Neu (User Story):** #22-26 Contextual Task Capture — siehe `docs/project/stories/contextual-task-capture.md`
 
 > **Dies ist das EINZIGE Backlog.** macOS-Features (MAC-xxx) stehen hier mit Verweis auf ihre Specs in `docs/specs/macos/`. Kein zweites Backlog.
@@ -206,6 +206,13 @@
 ### ~~Bug 62: Share Extension - CloudKit Entitlements fehlen~~ (ERLEDIGT)
 - **Status:** ERLEDIGT (siehe oben: "ERLEDIGT: Bug 62 — Share Extension Fixes")
 - **Fixes:** CloudKit Entitlements, MARKETING_VERSION, NSItemProvider API, Fallback-Logik
+
+### Bug 65: Listendarstellung iOS vs macOS divergiert (Sektionen)
+- **Status:** OFFEN
+- **Plattform:** macOS (fehlende Sektionen)
+- **Symptom:** iOS zeigt 5 Sektionen: "nextUp", "Ueberfaellig", "Sofort erledigen", "Bald einplanen", "Bei Gelegenheit". macOS zeigt nur 2: "nextUp" und "Backlog" (alles in einem Topf).
+- **Verwandt:** BACKLOG-004 (BacklogView/BacklogRow komplett dupliziert)
+- **Prioritaet:** Offen — bei Gelegenheit angleichen
 
 ---
 

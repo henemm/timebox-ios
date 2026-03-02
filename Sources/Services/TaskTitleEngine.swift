@@ -23,14 +23,32 @@ final class TaskTitleEngine {
         return false
     }
 
+    // MARK: - Date Helper
+
+    /// Maps relative date strings from AI output to actual dates.
+    /// Accepts both German and English variants.
+    static func relativeDateFrom(_ value: String?) -> Date? {
+        switch value?.lowercased() {
+        case "today", "heute":    return Calendar.current.startOfDay(for: Date())
+        case "tomorrow", "morgen": return Calendar.current.date(byAdding: .day, value: 1, to: Calendar.current.startOfDay(for: Date()))
+        default:                   return nil
+        }
+    }
+
     // MARK: - Structured Output
 
     #if canImport(FoundationModels)
     @available(iOS 26.0, macOS 26.0, *)
     @Generable
-    struct ImprovedTitle {
-        @Guide(description: "Short, actionable task title (max 80 chars). Start with verb in infinitive form. Keep the language of the input (German if German, English if English). If the title is already good, return it unchanged.")
+    struct ImprovedTask {
+        @Guide(description: "Cleaned task title (max 80 chars). Keep ALL original words, names, and abbreviations exactly as they are. Only remove email artifacts (Re:, Fwd:, AW:, WG:) and urgency/deadline phrases (heute, dringend, ASAP, sofort erledigen). Start with verb in infinitive form. Keep the language of the input.")
         let title: String
+
+        @Guide(description: "Relative due date extracted from the text. Return 'heute' if the text says heute/today/sofort, return 'morgen' if morgen/tomorrow. Otherwise return nil.")
+        let dueDateRelative: String?
+
+        @Guide(description: "True if the text expresses urgency (heute erledigen, dringend, ASAP, sofort, urgent, exclamation marks). False otherwise.")
+        let isUrgent: Bool
     }
     #endif
 
@@ -89,20 +107,29 @@ final class TaskTitleEngine {
 
         do {
             let session = LanguageModelSession {
-                "Du verbesserst Task-Titel. Regeln:"
-                "- Kurz und actionable (max 80 Zeichen)"
-                "- Beginne mit Verb im Infinitiv (z.B. 'Antworten auf...', 'Pruefen ob...')"
+                "Du bereinigst Task-Titel und extrahierst Metadaten. Regeln:"
+                "- KEINE Woerter, Abkuerzungen oder Namen aendern — Originalwoerter beibehalten"
+                "- Nur kuerzen durch Weglassen, NICHT durch Umschreiben"
                 "- Entferne E-Mail-Artefakte (Re:, Fwd:, AW:, WG:)"
+                "- Entferne Dringlichkeits-Hinweise aus dem Titel (heute erledigen, dringend, ASAP, sofort)"
+                "- Beginne mit Verb im Infinitiv wenn moeglich"
                 "- Behalte die Sprache des Inputs bei"
-                "- Wenn der Titel bereits gut ist, gib ihn unveraendert zurueck"
+                "- Extrahiere Faelligkeit (heute/morgen) und Dringlichkeit separat"
             }
 
-            let prompt = "Verbessere diesen Task-Titel: \(task.title)"
-            let response = try await session.respond(to: prompt, generating: ImprovedTitle.self)
-            let improved = response.content.title.trimmingCharacters(in: .whitespacesAndNewlines)
+            let prompt = "Bereinige diesen Task-Titel: \(task.title)"
+            let response = try await session.respond(to: prompt, generating: ImprovedTask.self)
+            let result = response.content
+            let improved = result.title.trimmingCharacters(in: .whitespacesAndNewlines)
 
             if !improved.isEmpty {
                 task.title = String(improved.prefix(200))
+            }
+            if task.dueDate == nil, let date = Self.relativeDateFrom(result.dueDateRelative) {
+                task.dueDate = date
+            }
+            if task.urgency == nil, result.isUrgent {
+                task.urgency = "urgent"
             }
             task.needsTitleImprovement = false
             try modelContext.save()

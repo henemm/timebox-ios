@@ -167,6 +167,111 @@ final class TaskTitleEngineTests: XCTestCase {
         XCTAssertEqual(first, second, "isAvailable should return consistent results")
     }
 
+    // MARK: - CTC-1b: relativeDateFrom Helper
+
+    /// Verhalten: "today" wird zu heute (startOfDay) gemappt
+    /// Bricht wenn: TaskTitleEngine.relativeDateFrom() nicht existiert oder "today" nicht handled
+    func test_relativeDateFrom_today() {
+        let result = TaskTitleEngine.relativeDateFrom("today")
+        let expected = Calendar.current.startOfDay(for: Date())
+        XCTAssertEqual(result, expected, "today should map to start of current day")
+    }
+
+    /// Verhalten: "tomorrow" wird zu morgen (startOfDay) gemappt
+    /// Bricht wenn: TaskTitleEngine.relativeDateFrom() "tomorrow" nicht handled
+    func test_relativeDateFrom_tomorrow() {
+        let result = TaskTitleEngine.relativeDateFrom("tomorrow")
+        let expected = Calendar.current.date(byAdding: .day, value: 1, to: Calendar.current.startOfDay(for: Date()))
+        XCTAssertEqual(result, expected, "tomorrow should map to start of next day")
+    }
+
+    /// Verhalten: Unbekannte Werte geben nil zurueck
+    /// Bricht wenn: relativeDateFrom() bei unbekanntem String nicht nil liefert
+    func test_relativeDateFrom_unknown_returnsNil() {
+        XCTAssertNil(TaskTitleEngine.relativeDateFrom("next week"), "Unknown relative date should return nil")
+        XCTAssertNil(TaskTitleEngine.relativeDateFrom(""), "Empty string should return nil")
+        XCTAssertNil(TaskTitleEngine.relativeDateFrom(nil), "nil should return nil")
+    }
+
+    // MARK: - CTC-1b: Metadaten-Extraktion (nur wenn AI verfuegbar)
+
+    /// Verhalten: "heute erledigen!" setzt dueDate auf heute
+    /// Bricht wenn: performImprovement() dueDate nicht aus KI-Response uebernimmt
+    func test_improveTitleIfNeeded_setsDueDate_whenAvailable() async throws {
+        guard TaskTitleEngine.isAvailable else {
+            throw XCTSkip("Apple Intelligence not available")
+        }
+
+        let context = container.mainContext
+        let task = LocalTask(title: "Bahnfahrt buchen heute erledigen!")
+        task.needsTitleImprovement = true
+        context.insert(task)
+        try context.save()
+
+        let engine = TaskTitleEngine(modelContext: context)
+        await engine.improveTitleIfNeeded(task)
+
+        XCTAssertNotNil(task.dueDate, "dueDate should be set from 'heute erledigen'")
+    }
+
+    /// Verhalten: "heute erledigen!" / "dringend" setzt urgency auf "urgent"
+    /// Bricht wenn: performImprovement() urgency nicht aus KI-Response uebernimmt
+    func test_improveTitleIfNeeded_setsUrgency_whenAvailable() async throws {
+        guard TaskTitleEngine.isAvailable else {
+            throw XCTSkip("Apple Intelligence not available")
+        }
+
+        let context = container.mainContext
+        let task = LocalTask(title: "Dringend: Server-Problem fixen ASAP!")
+        task.needsTitleImprovement = true
+        context.insert(task)
+        try context.save()
+
+        let engine = TaskTitleEngine(modelContext: context)
+        await engine.improveTitleIfNeeded(task)
+
+        XCTAssertEqual(task.urgency, "urgent", "urgency should be 'urgent' for ASAP/dringend tasks")
+    }
+
+    /// Verhalten: Bestehende dueDate wird NICHT ueberschrieben
+    /// Bricht wenn: performImprovement() den Guard `task.dueDate == nil` entfernt
+    func test_improveTitleIfNeeded_doesNotOverwriteExistingDueDate() async throws {
+        guard TaskTitleEngine.isAvailable else {
+            throw XCTSkip("Apple Intelligence not available")
+        }
+
+        let context = container.mainContext
+        let existingDate = Calendar.current.date(byAdding: .day, value: 7, to: Date())!
+        let task = LocalTask(title: "Heute erledigen: Report schreiben", dueDate: existingDate)
+        task.needsTitleImprovement = true
+        context.insert(task)
+        try context.save()
+
+        let engine = TaskTitleEngine(modelContext: context)
+        await engine.improveTitleIfNeeded(task)
+
+        XCTAssertEqual(task.dueDate, existingDate, "Existing dueDate must NOT be overwritten")
+    }
+
+    /// Verhalten: Bestehende urgency wird NICHT ueberschrieben
+    /// Bricht wenn: performImprovement() den Guard `task.urgency == nil` entfernt
+    func test_improveTitleIfNeeded_doesNotOverwriteExistingUrgency() async throws {
+        guard TaskTitleEngine.isAvailable else {
+            throw XCTSkip("Apple Intelligence not available")
+        }
+
+        let context = container.mainContext
+        let task = LocalTask(title: "ASAP: Budget Review", urgency: "not_urgent")
+        task.needsTitleImprovement = true
+        context.insert(task)
+        try context.save()
+
+        let engine = TaskTitleEngine(modelContext: context)
+        await engine.improveTitleIfNeeded(task)
+
+        XCTAssertEqual(task.urgency, "not_urgent", "Existing urgency must NOT be overwritten")
+    }
+
     // MARK: - AI Title Improvement (nur wenn verfuegbar)
 
     /// Verhalten: KI verbessert kryptischen E-Mail-Subject zu actionable Titel
