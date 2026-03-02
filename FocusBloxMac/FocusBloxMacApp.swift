@@ -71,6 +71,7 @@ final class MenuBarController: NSObject {
 
 @main
 struct FocusBloxMacApp: App {
+    @Environment(\.scenePhase) private var scenePhase
     let container: ModelContainer
     @State private var quickCapture = QuickCaptureController.shared
     @State private var showShortcuts = false
@@ -159,6 +160,12 @@ struct FocusBloxMacApp: App {
                     Button("OK") { }
                 } message: {
                     Text(undoResultMessage)
+                }
+                .onChange(of: scenePhase) { _, newPhase in
+                    if newPhase == .active {
+                        syncMonitor.triggerSync()
+                        syncedSettings.pushToCloud()
+                    }
                 }
         }
         .modelContainer(container)

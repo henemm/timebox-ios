@@ -508,6 +508,15 @@ struct ContentView: View {
         .task {
             cloudKitMonitor.triggerSync()
         }
+        .onChange(of: cloudKitMonitor.remoteChangeCount) { _, _ in
+            // Bug 38 pattern: Force context merge after CloudKit import.
+            // @Query reads from ModelContext cache which is stale after remote import.
+            // save() with no pending changes invalidates the cache and merges persistent store.
+            Task {
+                try? await Task.sleep(for: .milliseconds(200))
+                try? modelContext.save()
+            }
+        }
         .confirmationDialog(
             "Wiederkehrende Aufgabe löschen",
             isPresented: Binding(

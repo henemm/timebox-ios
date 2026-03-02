@@ -1,0 +1,6 @@
+TDD RED: 2026-03-02T16:02:06+0100
+Tests: CloudKitSyncMonitorTests
+Test 7: testSimulateRemoteChange_incrementsRemoteChangeCount → COMPILE ERROR (simulateRemoteChange() does not exist)
+Test 8: testSimulateEvent_importSuccess_incrementsImportSuccessCount → blocked by compile error
+
+Error: Value of type 'CloudKitSyncMonitor' has no member 'simulateRemoteChange'

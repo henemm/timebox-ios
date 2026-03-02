@@ -143,6 +143,9 @@ final class CloudKitSyncMonitor {
         guard let container = modelContainer else { return }
         let context = container.mainContext
         do {
+            // Bug 38 pattern: Force context merge with persistent store before fetch.
+            // Without this, modelContext returns cached/stale data after CloudKit import.
+            try context.save()
             let tasks = try context.fetch(FetchDescriptor<LocalTask>())
             var newSnapshot: [String: String] = [:]
             for task in tasks {
@@ -280,8 +283,18 @@ final class CloudKitSyncMonitor {
 
         switch type {
         case .setup:  setupState = newState
-        case .import: importState = newState
+        case .import:
+            importState = newState
+            if case .succeeded = newState {
+                importSuccessCount += 1
+            }
         case .export: exportState = newState
         }
+    }
+
+    /// Simulate a remote store change for unit testing.
+    /// Mirrors handleRemoteStoreChange() without requiring real notifications.
+    func simulateRemoteChange() {
+        remoteChangeCount += 1
     }
 }

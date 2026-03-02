@@ -113,4 +113,40 @@ final class CloudKitSyncMonitorTests: XCTestCase {
         XCTAssertFalse(monitor.isSyncing)
         XCTAssertFalse(monitor.hasSyncError)
     }
+
+    // MARK: - Test 7: Remote Change Simulation (Bug: Sync slow)
+
+    /// Tests that simulateRemoteChange() increments remoteChangeCount.
+    /// This method is needed so macOS views can react to remote changes.
+    /// FAILS because simulateRemoteChange() does not exist yet.
+    func testSimulateRemoteChange_incrementsRemoteChangeCount() {
+        let monitor = CloudKitSyncMonitor()
+
+        XCTAssertEqual(monitor.remoteChangeCount, 0)
+
+        monitor.simulateRemoteChange()
+
+        XCTAssertEqual(monitor.remoteChangeCount, 1)
+
+        monitor.simulateRemoteChange()
+
+        XCTAssertEqual(monitor.remoteChangeCount, 2)
+    }
+
+    // MARK: - Test 8: Import Success increments importSuccessCount
+
+    /// Tests that a successful import event also increments importSuccessCount.
+    /// Views use importSuccessCount to know when to refresh data.
+    /// FAILS because simulateEvent does not increment importSuccessCount.
+    func testSimulateEvent_importSuccess_incrementsImportSuccessCount() {
+        let monitor = CloudKitSyncMonitor()
+
+        XCTAssertEqual(monitor.importSuccessCount, 0)
+
+        let start = Date()
+        let end = Date()
+        monitor.simulateEvent(type: .import, started: start, ended: end, succeeded: true, error: nil)
+
+        XCTAssertEqual(monitor.importSuccessCount, 1, "Successful import should increment importSuccessCount")
+    }
 }
