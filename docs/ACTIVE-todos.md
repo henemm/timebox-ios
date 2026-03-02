@@ -78,7 +78,7 @@
 | 20 | ITB-F: CaptureContextIntent (Siri On-Screen) | WARTEND | M | ~40-60k | 3-4 | ~80 |
 | 21 | ~~ITB-G: Proaktive System-Vorschlaege~~ | ERLEDIGT | M | ~40k | 12 | ~115 |
 | 22 | ~~CTC-1: TaskTitleEngine (intelligente Titel-KI)~~ | ERLEDIGT | M | ~40-60k | 6 | ~210 |
-| 23 | CTC-2: Share Extension E-Mail-Support + Deep-Link | HOCH | S | ~20-30k | 2 | ~60 |
+| 23 | ~~CTC-2: Share Extension sourceURL~~ | ERLEDIGT | S | ~20-30k | 3 | ~79 |
 | 24 | CTC-3: macOS Share Extension | HOCH | M | ~40-60k | neues Target | ~100 |
 | 25 | CTC-4: Clipboard → Task Flow | MITTEL | S | ~15-25k | 2-3 | ~50 |
 | 26 | CTC-5: Watch-Diktat Titel-Verbesserung | NICE | S | ~15-20k | 1-2 | ~30 |
@@ -88,7 +88,7 @@
 **Guenstigster Quick Win:** ~~Shake to Undo (XS)~~ ERLEDIGT
 **Teuerste Items:** #17 OrganizeMyDay (~150k), #13 Drag & Drop (~150k), #14 NC Widget (~120k)
 **WARTEND (Apple-Abhaengigkeit):** #20 ITB-F — Developer-APIs verfuegbar, wartet auf Siri On-Screen Awareness (iOS 26.5/27)
-**Zuletzt erledigt:** #21 ITB-G — Intent Donations, Spotlight, Widget Relevance, SiriTipViews
+**Zuletzt erledigt:** #23 CTC-2 — sourceURL in Share Extension persistieren
 **Neu (User Story):** #22-26 Contextual Task Capture — siehe `docs/project/stories/contextual-task-capture.md`
 
 > **Dies ist das EINZIGE Backlog.** macOS-Features (MAC-xxx) stehen hier mit Verweis auf ihre Specs in `docs/specs/macos/`. Kein zweites Backlog.
@@ -145,7 +145,7 @@
 
 **Empfohlene Reihenfolge:**
 1. ~~CTC-1 (TaskTitleEngine)~~ ERLEDIGT — Zentraler KI-Service fuer intelligente Titel (Foundation Models, Shared Code)
-2. CTC-2 (E-Mail-Support) — Share Extension: E-Mail Subject + Deep-Link zurueck zur Mail
+2. ~~CTC-2 (sourceURL)~~ ERLEDIGT — Share Extension speichert Quell-URL (Safari-Link etc.)
 3. CTC-3 (macOS Share Extension) — Neues Target, gleiche Funktionalitaet wie iOS
 4. CTC-4 (Clipboard → Task) — Clipboard-Inhalt als Task-Quelle
 5. CTC-5 (Watch-Diktat) — Diktierte Tasks profitieren von TaskTitleEngine

@@ -62,6 +62,7 @@
 		ADEEAB024BB9B2C40CD6313D /* DebugLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71582A64B51A62129A2409B7 /* DebugLogger.swift */; };
 		AISCORE01BUILD0001 /* AITaskScoringServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AISCORE01FILE00001 /* AITaskScoringServiceTests.swift */; };
 		CTC1TEST0BUILD0001 /* TaskTitleEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CTC1TEST0FILE00001 /* TaskTitleEngineTests.swift */; };
+		CTC2TEST0BUILD0001 /* SourceURLTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CTC2TEST0FILE00001 /* SourceURLTests.swift */; };
 		AISCORE01UIBLD0001 /* AITaskScoringUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AISCORE01UIFILE001 /* AITaskScoringUITests.swift */; };
 		AITASKSCOR0BUILD001 /* AITaskScoringService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AITASKSCOR0FILE0001 /* AITaskScoringService.swift */; };
 		AITASKSCOR0BUILD002 /* AITaskScoringService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AITASKSCOR0FILE0001 /* AITaskScoringService.swift */; };
@@ -498,6 +499,7 @@
 		AB1AD4FECCC4DD0F13D886B5 /* ITB_G_SiriTipUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ITB_G_SiriTipUITests.swift; sourceTree = "<group>"; };
 		AISCORE01FILE00001 /* AITaskScoringServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AITaskScoringServiceTests.swift; sourceTree = "<group>"; };
 		CTC1TEST0FILE00001 /* TaskTitleEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskTitleEngineTests.swift; sourceTree = "<group>"; };
+		CTC2TEST0FILE00001 /* SourceURLTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SourceURLTests.swift; sourceTree = "<group>"; };
 		AISCORE01UIFILE001 /* AITaskScoringUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AITaskScoringUITests.swift; sourceTree = "<group>"; };
 		AITASKSCOR0FILE0001 /* AITaskScoringService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AITaskScoringService.swift; sourceTree = "<group>"; };
 		APPGRP02FILE00001 /* AppGroupSwiftDataTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppGroupSwiftDataTests.swift; sourceTree = "<group>"; };
@@ -1197,6 +1199,7 @@
 				8D6520F9246BDCE0D9B157B6 /* SpotlightIndexingServiceTests.swift */,
 				781B8F9B8D98DCC35B898300 /* WidgetRelevanceTests.swift */,
 				CTC1TEST0FILE00001 /* TaskTitleEngineTests.swift */,
+				CTC2TEST0FILE00001 /* SourceURLTests.swift */,
 			);
 			path = FocusBloxTests;
 			sourceTree = "<group>";
@@ -2016,6 +2019,7 @@
 				30515A046C05070B90FD3C90 /* SpotlightIndexingServiceTests.swift in Sources */,
 				BF7EA53A03F4E19B23B48ADD /* WidgetRelevanceTests.swift in Sources */,
 				CTC1TEST0BUILD0001 /* TaskTitleEngineTests.swift in Sources */,
+				CTC2TEST0BUILD0001 /* SourceURLTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

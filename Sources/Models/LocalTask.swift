@@ -118,6 +118,9 @@ final class LocalTask {
     /// Source system identifier (local/notion/todoist)
     var sourceSystem: String = "local"
 
+    /// Source URL from Share Extension (e.g. Safari link)
+    var sourceURL: String?
+
     /// String id for TaskSourceData protocol conformance
     var id: String { uuid.uuidString }
 

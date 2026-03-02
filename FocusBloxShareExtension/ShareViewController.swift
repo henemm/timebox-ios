@@ -37,6 +37,7 @@ struct ShareSheetView: View {
     let extensionContext: NSExtensionContext?
 
     @State private var taskTitle = ""
+    @State private var sourceURL: String?
     @State private var isLoading = true
     @State private var errorMessage: String?
 
@@ -100,6 +101,7 @@ struct ShareSheetView: View {
                 if provider.hasItemConformingToTypeIdentifier(UTType.url.identifier) {
                     if let result = try? await provider.loadItem(forTypeIdentifier: UTType.url.identifier),
                        let url = result as? URL {
+                        sourceURL = url.absoluteString
                         let title = item.attributedContentText?.string
                             .trimmingCharacters(in: .whitespacesAndNewlines)
                         if let title, !title.isEmpty {
@@ -167,6 +169,7 @@ struct ShareSheetView: View {
 
             let task = LocalTask(title: trimmedTitle)
             task.needsTitleImprovement = true
+            task.sourceURL = sourceURL
             context.insert(task)
             try context.save()
 

@@ -1,0 +1,20 @@
+    
+    Signing Identity:     "Sign to Run Locally"
+    
+    /usr/bin/codesign --force --sign - --timestamp\=none --generate-entitlement-der /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-iphonesimulator/FocusBloxUITests-Runner.app/PlugIns/FocusBloxUITests.xctest
+
+note: Run script build phase 'Inject Git Hash' will be run during every build because the option to run the script phase "Based on dependency analysis" is unchecked. (in target 'FocusBlox' from project 'FocusBlox')
+2026-03-02 10:04:44.833 xcodebuild[67392:21438608] [MT] IDETestOperationsObserverDebug: 116.363 elapsed -- Testing started completed.
+2026-03-02 10:04:44.839 xcodebuild[67392:21438608] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2026-03-02 10:04:44.839 xcodebuild[67392:21438608] [MT] IDETestOperationsObserverDebug: 116.363 sec, +116.363 sec -- end
+
+Test session results, code coverage, and logs:
+	/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Logs/Test/Test-FocusBlox-2026.03.02_10-02-23-+0100.xcresult
+
+** TEST SUCCEEDED **
+
+Testing started
+Test suite 'SourceURLTests' started on 'Clone 1 of FocusBlox - FocusBlox (67846)'
+Test case 'SourceURLTests.test_sourceURL_defaultIsNil()' passed on 'Clone 1 of FocusBlox - FocusBlox (67846)' (0.011 seconds)
+Test case 'SourceURLTests.test_sourceURL_persistsInSwiftData()' passed on 'Clone 1 of FocusBlox - FocusBlox (67846)' (0.061 seconds)
+Test case 'SourceURLTests.test_sourceURL_preservedAfterTitleImprovement()' passed on 'Clone 1 of FocusBlox - FocusBlox (67846)' (20.426 seconds)
