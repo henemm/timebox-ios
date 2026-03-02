@@ -1,0 +1,11 @@
+macOS XCUITest Limitation: Swipe actions in macOS List are not testable via XCUITest.
+MenuBarExtra StatusItems and macOS-specific List interactions cannot be automated.
+See MEMORY.md: 'macOS XCUITest Limitierungen'
+
+Business logic is fully covered by unit tests in NextUpOverflowTests.swift:
+- test_addToNextUp_withExistingIntMaxSortOrder_doesNotOverflow
+- test_addMultipleTasksToNextUp_viaSync_doesNotOverflow
+- test_removeFromNextUp_viaSyncEngine_clearsBlockAssignment
+- test_updateNextUp_alreadyInNextUp_preservesSortOrder
+
+All 4 tests PASSED.

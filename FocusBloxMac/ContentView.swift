@@ -820,26 +820,23 @@ struct ContentView: View {
     }
 
     private func addToNextUp(_ ids: Set<UUID>) {
-        let maxOrder = nextUpTasks.compactMap(\.nextUpSortOrder).max() ?? 0
-        var order = maxOrder + 1
+        let taskSource = LocalTaskSource(modelContext: modelContext)
+        let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
         for id in ids {
             if let task = tasks.first(where: { $0.uuid == id }) {
-                task.isNextUp = true
-                task.nextUpSortOrder = order
-                order += 1
+                try? syncEngine.updateNextUp(itemID: task.id, isNextUp: true)
             }
         }
-        try? modelContext.save()
     }
 
     private func removeFromNextUp(_ ids: Set<UUID>) {
+        let taskSource = LocalTaskSource(modelContext: modelContext)
+        let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
         for id in ids {
             if let task = tasks.first(where: { $0.uuid == id }) {
-                task.isNextUp = false
-                task.nextUpSortOrder = nil
+                try? syncEngine.updateNextUp(itemID: task.id, isNextUp: false)
             }
         }
-        try? modelContext.save()
     }
 
     // MARK: - Drag Reorder

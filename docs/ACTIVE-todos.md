@@ -6,6 +6,16 @@
 
 ---
 
+## ERLEDIGT: Bug — macOS Arithmetic Overflow in addToNextUp
+
+- **Symptom:** Crash `Thread 1: Swift runtime failure: arithmetic overflow` beim Swipe → "Next Up" auf macOS
+- **Root Cause:** macOS `addToNextUp()` machte `max() + 1` auf `nextUpSortOrder`, aber SyncEngine setzt `Int.max` als Sentinel → `Int.max + 1` = Overflow
+- **Fix:** macOS `addToNextUp()` und `removeFromNextUp()` nutzen jetzt `SyncEngine.updateNextUp()` statt lokaler Logik — beseitigt Plattform-Divergenz (BACKLOG-001 teilweise)
+- **Bonus:** `removeFromNextUp` raeumt jetzt auch `assignedFocusBlockID` auf (Bug 52 Regression-Schutz)
+- **Tests:** 4 Unit Tests (NextUpOverflowTests), Build OK (iOS + macOS)
+
+---
+
 ## ERLEDIGT: ITB-G macOS Build Fix
 
 - Intent Donations in Shared-Services (SyncEngine, FocusBlockActionService) mit `#if !os(macOS)` guarded
