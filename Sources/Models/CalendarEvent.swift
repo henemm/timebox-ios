@@ -11,6 +11,9 @@ struct CalendarEvent: Identifiable, Sendable {
     let notes: String?
     let hasAttendees: Bool
     let isReadOnly: Bool
+    let calendarItemIdentifier: String
+
+    private static let categoryMappingKey = "calendarEventCategories"
 
     init(from event: EKEvent) {
         self.id = event.eventIdentifier ?? UUID().uuidString
@@ -22,10 +25,11 @@ struct CalendarEvent: Identifiable, Sendable {
         self.notes = event.notes
         self.hasAttendees = event.hasAttendees
         self.isReadOnly = event.hasAttendees || !(event.calendar?.allowsContentModifications ?? true)
+        self.calendarItemIdentifier = event.calendarItemIdentifier
     }
 
     // For testing
-    init(id: String, title: String, startDate: Date, endDate: Date, isAllDay: Bool, calendarColor: String?, notes: String?, hasAttendees: Bool = false) {
+    init(id: String, title: String, startDate: Date, endDate: Date, isAllDay: Bool, calendarColor: String?, notes: String?, hasAttendees: Bool = false, calendarItemIdentifier: String? = nil) {
         self.id = id
         self.title = title
         self.startDate = startDate
@@ -35,6 +39,7 @@ struct CalendarEvent: Identifiable, Sendable {
         self.notes = notes
         self.hasAttendees = hasAttendees
         self.isReadOnly = hasAttendees
+        self.calendarItemIdentifier = calendarItemIdentifier ?? id
     }
 
     var durationMinutes: Int {
@@ -49,22 +54,13 @@ struct CalendarEvent: Identifiable, Sendable {
 
     // MARK: - Category Support
 
-    /// Returns the category from notes or iCloud fallback (for read-only events with attendees)
+    /// Returns the category from local UserDefaults mapping (keyed by calendarItemIdentifier).
+    /// Bug 63: Previously stored in notes (read-only for events with attendees) and iCloud KV Store
+    /// (unstable eventIdentifier per occurrence). Now uses calendarItemIdentifier which is stable
+    /// across all occurrences of a recurring event.
     var category: String? {
-        if let notes, let fromNotes = parseNotesValue(prefix: "category:", from: notes) {
-            return fromNotes
-        }
-        return NSUbiquitousKeyValueStore.default.string(forKey: "eventCat_\(id)")
-    }
-
-    /// Parse a single value from notes with format "prefix:value"
-    private func parseNotesValue(prefix: String, from notes: String) -> String? {
-        let lines = notes.components(separatedBy: "\n")
-        guard let line = lines.first(where: { $0.hasPrefix(prefix) }) else {
-            return nil
-        }
-        let value = String(line.dropFirst(prefix.count))
-        return value.isEmpty ? nil : value
+        let dict = UserDefaults.standard.dictionary(forKey: Self.categoryMappingKey) as? [String: String] ?? [:]
+        return dict[calendarItemIdentifier]
     }
 
     // MARK: - Focus Block Support

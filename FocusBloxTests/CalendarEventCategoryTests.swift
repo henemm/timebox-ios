@@ -2,15 +2,26 @@ import XCTest
 @testable import FocusBlox
 
 /// Unit Tests for CalendarEvent category functionality
-/// TDD RED: These tests MUST FAIL because category property doesn't exist yet
+/// Updated for Bug 63: Category now stored in UserDefaults mapping (not notes)
 final class CalendarEventCategoryTests: XCTestCase {
 
-    // MARK: - Category Parsing Tests
+    private let mappingKey = "calendarEventCategories"
 
-    /// GIVEN: CalendarEvent with notes containing "category:income"
+    override func tearDown() {
+        UserDefaults.standard.removeObject(forKey: mappingKey)
+        super.tearDown()
+    }
+
+    // MARK: - Category from UserDefaults Mapping
+
+    /// GIVEN: CalendarEvent with category stored in UserDefaults mapping
     /// WHEN: Accessing .category property
-    /// THEN: Returns "income"
-    func testCategoryParsedFromNotes() throws {
+    /// THEN: Returns the category
+    func testCategoryParsedFromMapping() throws {
+        let calendarItemID = "test-1-series"
+        let dict: [String: String] = [calendarItemID: "income"]
+        UserDefaults.standard.set(dict, forKey: mappingKey)
+
         let event = CalendarEvent(
             id: "test-1",
             title: "Client Meeting",
@@ -18,17 +29,22 @@ final class CalendarEventCategoryTests: XCTestCase {
             endDate: Date().addingTimeInterval(3600),
             isAllDay: false,
             calendarColor: nil,
-            notes: "category:income"
+            notes: nil,
+            calendarItemIdentifier: calendarItemID
         )
 
         XCTAssertEqual(event.category, "income",
-            "Event with 'category:income' in notes should return 'income'")
+            "Event with category in UserDefaults mapping should return 'income'")
     }
 
-    /// GIVEN: CalendarEvent with notes containing multiple lines including category
+    /// GIVEN: CalendarEvent with category in UserDefaults (multiline notes are irrelevant now)
     /// WHEN: Accessing .category property
-    /// THEN: Returns the category value correctly
-    func testCategoryParsedFromMultilineNotes() throws {
+    /// THEN: Returns the category from mapping
+    func testCategoryFromMappingIgnoresNotes() throws {
+        let calendarItemID = "test-2-series"
+        let dict: [String: String] = [calendarItemID: "learning"]
+        UserDefaults.standard.set(dict, forKey: mappingKey)
+
         let event = CalendarEvent(
             id: "test-2",
             title: "Workshop",
@@ -36,17 +52,18 @@ final class CalendarEventCategoryTests: XCTestCase {
             endDate: Date().addingTimeInterval(7200),
             isAllDay: false,
             calendarColor: nil,
-            notes: "Some notes here\ncategory:learning\nMore notes"
+            notes: "Some notes here\nMore notes",
+            calendarItemIdentifier: calendarItemID
         )
 
         XCTAssertEqual(event.category, "learning",
-            "Category should be parsed correctly from multiline notes")
+            "Category should come from UserDefaults mapping, not notes")
     }
 
-    /// GIVEN: CalendarEvent with empty notes
+    /// GIVEN: CalendarEvent with no mapping
     /// WHEN: Accessing .category property
     /// THEN: Returns nil
-    func testCategoryNilWhenNoNotes() throws {
+    func testCategoryNilWhenNoMapping() throws {
         let event = CalendarEvent(
             id: "test-3",
             title: "Random Event",
@@ -58,13 +75,13 @@ final class CalendarEventCategoryTests: XCTestCase {
         )
 
         XCTAssertNil(event.category,
-            "Event without notes should have nil category")
+            "Event without mapping should have nil category")
     }
 
-    /// GIVEN: CalendarEvent with notes but no category line
+    /// GIVEN: CalendarEvent with notes but no mapping
     /// WHEN: Accessing .category property
-    /// THEN: Returns nil
-    func testCategoryNilWhenNotInNotes() throws {
+    /// THEN: Returns nil (notes are no longer used for category)
+    func testCategoryNilWhenNotInMapping() throws {
         let event = CalendarEvent(
             id: "test-4",
             title: "Lunch Break",
@@ -72,16 +89,16 @@ final class CalendarEventCategoryTests: XCTestCase {
             endDate: Date().addingTimeInterval(3600),
             isAllDay: false,
             calendarColor: nil,
-            notes: "Just some regular notes without category"
+            notes: "Just some regular notes"
         )
 
         XCTAssertNil(event.category,
-            "Event without 'category:' in notes should have nil category")
+            "Event without mapping should have nil category even with notes")
     }
 
-    /// GIVEN: CalendarEvent with focusBlock:true in notes
+    /// GIVEN: CalendarEvent that is a focus block (no mapping)
     /// WHEN: Accessing .category property
-    /// THEN: Returns nil (focus blocks use task categories, not event category)
+    /// THEN: Returns nil
     func testFocusBlockHasNoCategory() throws {
         let event = CalendarEvent(
             id: "test-5",
@@ -97,10 +114,14 @@ final class CalendarEventCategoryTests: XCTestCase {
             "Focus blocks should not have event category (they use task categories)")
     }
 
-    /// GIVEN: CalendarEvent with category that has special characters
+    /// GIVEN: CalendarEvent with underscore category in mapping
     /// WHEN: Accessing .category property
     /// THEN: Returns the category value including underscores
     func testCategoryWithUnderscore() throws {
+        let calendarItemID = "test-6-series"
+        let dict: [String: String] = [calendarItemID: "giving_back"]
+        UserDefaults.standard.set(dict, forKey: mappingKey)
+
         let event = CalendarEvent(
             id: "test-6",
             title: "Giving Back Session",
@@ -108,22 +129,27 @@ final class CalendarEventCategoryTests: XCTestCase {
             endDate: Date().addingTimeInterval(3600),
             isAllDay: false,
             calendarColor: nil,
-            notes: "category:giving_back"
+            notes: nil,
+            calendarItemIdentifier: calendarItemID
         )
 
         XCTAssertEqual(event.category, "giving_back",
-            "Category with underscore should be parsed correctly")
+            "Category with underscore should be returned correctly")
     }
 
     // MARK: - All Category Values
 
-    /// GIVEN: Events with each valid category
+    /// GIVEN: Events with each valid category in mapping
     /// WHEN: Accessing .category
-    /// THEN: All 5 categories are correctly parsed
+    /// THEN: All 5 categories are correctly returned
     func testAllCategoryValues() throws {
         let categories = ["income", "maintenance", "recharge", "learning", "giving_back"]
 
         for cat in categories {
+            let calendarItemID = "test-\(cat)-series"
+            let dict: [String: String] = [calendarItemID: cat]
+            UserDefaults.standard.set(dict, forKey: mappingKey)
+
             let event = CalendarEvent(
                 id: "test-\(cat)",
                 title: "Test \(cat)",
@@ -131,11 +157,12 @@ final class CalendarEventCategoryTests: XCTestCase {
                 endDate: Date().addingTimeInterval(3600),
                 isAllDay: false,
                 calendarColor: nil,
-                notes: "category:\(cat)"
+                notes: nil,
+                calendarItemIdentifier: calendarItemID
             )
 
             XCTAssertEqual(event.category, cat,
-                "Category '\(cat)' should be parsed correctly")
+                "Category '\(cat)' should be returned from mapping")
         }
     }
 }

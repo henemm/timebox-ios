@@ -1,0 +1,12 @@
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/CalendarCategoryMappingTests.swift:37:37: error: extra argument 'calendarItemIdentifier' in call
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/CalendarCategoryMappingTests.swift:65:37: error: extra argument 'calendarItemIdentifier' in call
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/CalendarCategoryMappingTests.swift:91:37: error: extra argument 'calendarItemIdentifier' in call
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/CalendarCategoryMappingTests.swift:103:37: error: extra argument 'calendarItemIdentifier' in call
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/CalendarCategoryMappingTests.swift:125:37: error: extra argument 'calendarItemIdentifier' in call
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/CalendarCategoryMappingTests.swift:149:37: error: extra argument 'calendarItemIdentifier' in call
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/CalendarCategoryMappingTests.swift:177:41: error: extra argument 'calendarItemIdentifier' in call
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/CalendarCategoryMappingTests.swift:181:37: error: incorrect argument label in call (have 'calendarItemID:category:', expected 'eventID:category:')
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/CalendarCategoryMappingTests.swift:184:29: error: value of type 'MockEventKitRepository' has no member 'lastUpdatedCalendarItemID'
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/CalendarCategoryMappingTests.swift:200:37: error: incorrect argument label in call (have 'calendarItemID:category:', expected 'eventID:category:')
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/CalendarCategoryMappingTests.swift:229:41: error: extra argument 'calendarItemIdentifier' in call
+** TEST FAILED **

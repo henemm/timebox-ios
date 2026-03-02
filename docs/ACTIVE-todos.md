@@ -24,6 +24,16 @@
 
 ---
 
+## ERLEDIGT: CTC-3 — macOS Share Extension
+
+- **Was:** Share Extension fuer macOS (Safari, Mail, Notes etc.)
+- **Scope:** Neues Target `FocusBloxMacShareExtension` mit 3 Dateien + pbxproj
+- **Architektur:** NSViewController + NSHostingView, gleiche Shared-Logik (LocalTask, sourceURL, needsTitleImprovement)
+- **Entitlements:** App Group + CloudKit (identisch zu iOS)
+- **Build:** Erfolgreich (macOS + iOS)
+
+---
+
 ## ERLEDIGT: Bug 62 — Share Extension Fixes
 
 **Bug 62: Share Extension CloudKit Crash + API-Fixes**
@@ -79,7 +89,7 @@
 | 21 | ~~ITB-G: Proaktive System-Vorschlaege~~ | ERLEDIGT | M | ~40k | 12 | ~115 |
 | 22 | ~~CTC-1: TaskTitleEngine (intelligente Titel-KI)~~ | ERLEDIGT | M | ~40-60k | 6 | ~210 |
 | 23 | ~~CTC-2: Share Extension sourceURL~~ | ERLEDIGT | S | ~20-30k | 3 | ~79 |
-| 24 | CTC-3: macOS Share Extension | HOCH | M | ~40-60k | neues Target | ~100 |
+| 24 | ~~CTC-3: macOS Share Extension~~ | ERLEDIGT | M | ~40k | neues Target | ~170 |
 | 25 | CTC-4: Clipboard → Task Flow | MITTEL | S | ~15-25k | 2-3 | ~50 |
 | 26 | CTC-5: Watch-Diktat Titel-Verbesserung | NICE | S | ~15-20k | 1-2 | ~30 |
 
@@ -88,7 +98,7 @@
 **Guenstigster Quick Win:** ~~Shake to Undo (XS)~~ ERLEDIGT
 **Teuerste Items:** #17 OrganizeMyDay (~150k), #13 Drag & Drop (~150k), #14 NC Widget (~120k)
 **WARTEND (Apple-Abhaengigkeit):** #20 ITB-F — Developer-APIs verfuegbar, wartet auf Siri On-Screen Awareness (iOS 26.5/27)
-**Zuletzt erledigt:** #23 CTC-2 — sourceURL in Share Extension persistieren
+**Zuletzt erledigt:** #24 CTC-3 — macOS Share Extension (Safari, Mail etc.)
 **Neu (User Story):** #22-26 Contextual Task Capture — siehe `docs/project/stories/contextual-task-capture.md`
 
 > **Dies ist das EINZIGE Backlog.** macOS-Features (MAC-xxx) stehen hier mit Verweis auf ihre Specs in `docs/specs/macos/`. Kein zweites Backlog.
@@ -156,7 +166,15 @@
 
 ## Bugs (offen)
 
-*Keine offenen Bugs.*
+### Bug 63: Kategorie-Zuweisung bei wiederkehrenden Kalender-Events mit Gaesten (ERLEDIGT)
+- **Status:** ERLEDIGT
+- **Plattform:** iOS + macOS
+- **Symptom:** Wiederkehrende Events mit Gaesten konnten nicht kategorisiert werden (3 gescheiterte Versuche)
+- **Root Cause:** Architektur-Problem — Notes read-only bei Gaesten, `eventIdentifier` instabil fuer recurring Occurrences, KV Store Key mismatch
+- **Fix:** Komplett neuer Ansatz — lokales UserDefaults-Mapping mit `calendarItemIdentifier` als Key (stabil ueber alle Occurrences). Kein EventKit-Schreibzugriff, keine Notes-Manipulation, keine read-only-Unterscheidung noetig.
+- **Dateien:** CalendarEvent.swift, EventKitRepository.swift, EventKitRepositoryProtocol.swift, MockEventKitRepository.swift, BlockPlanningView.swift, MacPlanningView.swift
+- **Tests:** 21/21 gruen (8 neue CalendarCategoryMappingTests + 7 aktualisierte CalendarEventCategoryTests + 6 CalendarEventReadOnlyTests)
+- **Analyse:** `docs/artifacts/bug-recurring-calendar-category/analysis.md`
 
 ### ~~Bug 62: Share Extension - CloudKit Entitlements fehlen~~ (ERLEDIGT)
 - **Status:** ERLEDIGT (siehe oben: "ERLEDIGT: Bug 62 — Share Extension Fixes")

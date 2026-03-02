@@ -159,46 +159,26 @@ final class MockEventKitRepository: EventKitRepositoryProtocol, @unchecked Senda
     }
 
     var updateEventCategoryCalled = false
-    var lastUpdatedEventID: String?
+    var lastUpdatedCalendarItemID: String?
     var lastUpdatedCategory: String?
 
-    func updateEventCategory(eventID: String, category: String?) throws {
+    func updateEventCategory(calendarItemID: String, category: String?) throws {
         guard mockCalendarAuthStatus == .fullAccess else {
             throw EventKitError.notAuthorized
         }
         updateEventCategoryCalled = true
-        lastUpdatedEventID = eventID
+        lastUpdatedCalendarItemID = calendarItemID
         lastUpdatedCategory = category
 
-        // Actually update the mock event's notes so the category change is visible
-        if let index = mockEvents.firstIndex(where: { $0.id == eventID }) {
-            let oldEvent = mockEvents[index]
-            var notes = oldEvent.notes ?? ""
-
-            // Remove existing category line
-            var lines = notes.components(separatedBy: "\n")
-            lines.removeAll { $0.hasPrefix("category:") }
-
-            // Add new category if provided
-            if let category = category, !category.isEmpty {
-                lines.append("category:\(category)")
-            }
-
-            // Rebuild notes
-            notes = lines.filter { !$0.isEmpty }.joined(separator: "\n")
-
-            // Create new event with updated notes
-            let updatedEvent = CalendarEvent(
-                id: oldEvent.id,
-                title: oldEvent.title,
-                startDate: oldEvent.startDate,
-                endDate: oldEvent.endDate,
-                isAllDay: oldEvent.isAllDay,
-                calendarColor: oldEvent.calendarColor,
-                notes: notes.isEmpty ? nil : notes
-            )
-            mockEvents[index] = updatedEvent
+        // Store category in UserDefaults mapping (same as real implementation)
+        let key = "calendarEventCategories"
+        var dict = UserDefaults.standard.dictionary(forKey: key) as? [String: String] ?? [:]
+        if let category = category, !category.isEmpty {
+            dict[calendarItemID] = category
+        } else {
+            dict.removeValue(forKey: calendarItemID)
         }
+        UserDefaults.standard.set(dict, forKey: key)
     }
 
     // MARK: - Protocol Implementation - Focus Blocks

@@ -242,37 +242,15 @@ final class EventKitRepository: EventKitRepositoryProtocol, @unchecked Sendable 
         try eventStore.save(event, span: .thisEvent)
     }
 
-    func updateEventCategory(eventID: String, category: String?) throws {
-        guard calendarAuthStatus == .fullAccess else {
-            throw EventKitError.notAuthorized
-        }
-        guard let event = eventStore.event(withIdentifier: eventID) else {
-            return // Silent fail if event not found
-        }
-
-        let isReadOnly = event.hasAttendees || !(event.calendar?.allowsContentModifications ?? true)
-
-        if !isReadOnly {
-            // Editable event: save to notes
-            var notes = event.notes ?? ""
-            var lines = notes.components(separatedBy: "\n")
-            lines.removeAll { $0.hasPrefix("category:") }
-            if let category = category, !category.isEmpty {
-                lines.append("category:\(category)")
-            }
-            event.notes = lines.filter { !$0.isEmpty }.joined(separator: "\n")
-            let span: EKSpan = event.hasRecurrenceRules ? .futureEvents : .thisEvent
-            try eventStore.save(event, span: span)
+    func updateEventCategory(calendarItemID: String, category: String?) throws {
+        let key = "calendarEventCategories"
+        var dict = UserDefaults.standard.dictionary(forKey: key) as? [String: String] ?? [:]
+        if let category = category, !category.isEmpty {
+            dict[calendarItemID] = category
         } else {
-            // Read-only event (attendees or read-only calendar): iCloud KV Store
-            let store = NSUbiquitousKeyValueStore.default
-            if let category = category, !category.isEmpty {
-                store.set(category, forKey: "eventCat_\(eventID)")
-            } else {
-                store.removeObject(forKey: "eventCat_\(eventID)")
-            }
-            store.synchronize()
+            dict.removeValue(forKey: calendarItemID)
         }
+        UserDefaults.standard.set(dict, forKey: key)
     }
 
     // MARK: - Focus Block Methods

@@ -114,6 +114,7 @@
 		C3F49C8B0CD3C6552054BE7D /* EventKitRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4451B46B76517090C636FA94 /* EventKitRepository.swift */; };
 		C89E9F957213671FF1B0DC91 /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4383C656C07E4B4F56335921 /* MainTabView.swift */; };
 		CALCATUI01BUILD0001 /* CalendarCategoryUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CALCATUI01FILE00001 /* CalendarCategoryUITests.swift */; };
+		CALCATMAP01BUILD001 /* CalendarCategoryMappingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CALCATMAP01FILE0001 /* CalendarCategoryMappingTests.swift */; };
 		CALCATUT01BUILD0001 /* CalendarEventCategoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CALCATUT01FILE0001 /* CalendarEventCategoryTests.swift */; };
 		CATBDG01BUILD0001 /* CategoryIconBadgeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CATBDG01FILE00001 /* CategoryIconBadgeTests.swift */; };
 		CATBDG02BUILD0001 /* CategoryIconBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = CATBDG02FILE00001 /* CategoryIconBadge.swift */; };
@@ -241,6 +242,10 @@
 		SETCMP02BUILD00001 /* SettingsComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = SETCMP01FILE000001 /* SettingsComponents.swift */; };
 		SETCMP03BUILD00001 /* SettingsComponentsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = SETCMP03FILE000001 /* SettingsComponentsTests.swift */; };
 		SGAP001F48BE79B9EB7C818 /* SmartGapsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = SGAP002545C0FA15517B9CE4 /* SmartGapsUITests.swift */; };
+		MACSHARE01BUILD001 /* LocalTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A27D4BE199FA040FC61FFD6 /* LocalTask.swift */; };
+		MACSHARE01BUILD002 /* TaskMetadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42790F5402B3E1F632874F5A /* TaskMetadata.swift */; };
+		MACSHARE01BUILD003 /* TaskSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 414BC475930C1DCDA3E9033B /* TaskSource.swift */; };
+		MACSHARE01BUILD004 /* FocusBloxMacShareExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = MACSHARE04FREF0001 /* FocusBloxMacShareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		SHARE01BUILD00001 /* LocalTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A27D4BE199FA040FC61FFD6 /* LocalTask.swift */; };
 		SHARE01BUILD00002 /* TaskMetadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42790F5402B3E1F632874F5A /* TaskMetadata.swift */; };
 		SHARE01BUILD00003 /* TaskSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 414BC475930C1DCDA3E9033B /* TaskSource.swift */; };
@@ -305,6 +310,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = B7A160492F4AD5F5001FD20C;
 			remoteInfo = FocusBloxShareExtension;
+		};
+		MACSHARE02PROXY001 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C836E08D5A70572AE8F0B7F0 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = MACSHARE08TARGET01;
+			remoteInfo = FocusBloxMacShareExtension;
 		};
 		B7A16CE42F1FE3BE00165284 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -386,6 +398,17 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		MACSHARE03EMBED001 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				MACSHARE01BUILD004 /* FocusBloxMacShareExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		B7A16CE72F1FE3BE00165284 /* Embed Foundation Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -510,6 +533,7 @@
 		B31CB18EF0C80E62953F34D6 /* SprintReviewSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SprintReviewSheet.swift; sourceTree = "<group>"; };
 		B77251F3B87AF26FD6473763 /* EventBlock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventBlock.swift; sourceTree = "<group>"; };
 		B7A1604A2F4AD5F5001FD20C /* FocusBloxShareExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = FocusBloxShareExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		MACSHARE04FREF0001 /* FocusBloxMacShareExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = FocusBloxMacShareExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		B7A16CD02F1FE3BC00165284 /* FocusBloxWidgetsExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = FocusBloxWidgetsExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		B7A16CD22F1FE3BC00165284 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		B7A16CD42F1FE3BC00165284 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
@@ -543,6 +567,7 @@
 		C4520CF15C46DC2B515637C5 /* BuildInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BuildInfo.swift; sourceTree = "<group>"; };
 		C945F5092F6FFB66C11FD4C2 /* TimelineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineView.swift; sourceTree = "<group>"; };
 		CALCATUI01FILE00001 /* CalendarCategoryUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarCategoryUITests.swift; sourceTree = "<group>"; };
+		CALCATMAP01FILE0001 /* CalendarCategoryMappingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarCategoryMappingTests.swift; sourceTree = "<group>"; };
 		CALCATUT01FILE0001 /* CalendarEventCategoryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarEventCategoryTests.swift; sourceTree = "<group>"; };
 		CATBDG01FILE00001 /* CategoryIconBadgeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryIconBadgeTests.swift; sourceTree = "<group>"; };
 		CATBDG02FILE00001 /* CategoryIconBadge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryIconBadge.swift; sourceTree = "<group>"; };
@@ -683,6 +708,13 @@
 			);
 			target = B7A160492F4AD5F5001FD20C /* FocusBloxShareExtension */;
 		};
+		MACSHARE05EXCPT001 /* Exceptions for "FocusBloxMacShareExtension" folder in "FocusBloxMacShareExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = MACSHARE08TARGET01 /* FocusBloxMacShareExtension */;
+		};
 		B7A16CEA2F1FE3BE00165284 /* Exceptions for "FocusBloxWidgets" folder in "FocusBloxWidgetsExtension" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -710,6 +742,18 @@
 			explicitFolders = (
 			);
 			path = FocusBloxShareExtension;
+			sourceTree = "<group>";
+		};
+		MACSHARE06FSSRG001 /* FocusBloxMacShareExtension */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				MACSHARE05EXCPT001 /* Exceptions for "FocusBloxMacShareExtension" folder in "FocusBloxMacShareExtension" target */,
+			);
+			explicitFileTypes = {
+			};
+			explicitFolders = (
+			);
+			path = FocusBloxMacShareExtension;
 			sourceTree = "<group>";
 		};
 		B7A16CD62F1FE3BC00165284 /* FocusBloxWidgets */ = {
@@ -829,6 +873,13 @@
 
 /* Begin PBXFrameworksBuildPhase section */
 		B7A160472F4AD5F5001FD20C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		MACSHARE07FWORK001 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -1028,6 +1079,7 @@
 				B7DFC0792F2E8C62009C2881 /* FocusBloxMacTests.xctest */,
 				B7DFC0832F2E8C62009C2881 /* FocusBloxMacUITests.xctest */,
 				B7A1604A2F4AD5F5001FD20C /* FocusBloxShareExtension.appex */,
+				MACSHARE04FREF0001 /* FocusBloxMacShareExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1164,6 +1216,7 @@
 				FBRND002FILEREF00001 /* FocusBloxRebrandTests.swift */,
 				LIVACT02FILEREF00001 /* LiveActivityManagerTests.swift */,
 				PERMREQ02FILE0001 /* PermissionRequestTests.swift */,
+				CALCATMAP01FILE0001 /* CalendarCategoryMappingTests.swift */,
 				CALCATUT01FILE0001 /* CalendarEventCategoryTests.swift */,
 				CATCFGUT01FILE0001 /* CategoryConfigTests.swift */,
 				TSKCAT01FILE000001 /* TaskCategoryTests.swift */,
@@ -1265,6 +1318,7 @@
 				B7DFC07C2F2E8C62009C2881 /* FocusBloxMacTests */,
 				B7DFC0862F2E8C62009C2881 /* FocusBloxMacUITests */,
 				B7A1604B2F4AD5F5001FD20C /* FocusBloxShareExtension */,
+				MACSHARE06FSSRG001 /* FocusBloxMacShareExtension */,
 				B7A16CD12F1FE3BC00165284 /* Frameworks */,
 				43FA5B6630027E2670A055BB /* Products */,
 			);
@@ -1496,10 +1550,12 @@
 				B7DFC06A2F2E8C60009C2881 /* Frameworks */,
 				B7DFC06B2F2E8C60009C2881 /* Resources */,
 				8E072FC28A88AC15B0D8B9DA /* Inject Git Hash */,
+				MACSHARE03EMBED001 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				MACSHARE11TDEP0001 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				B7DFC06E2F2E8C60009C2881 /* FocusBloxMac */,
@@ -1583,6 +1639,26 @@
 			productReference = 4AEE1F0855953868BEB42045 /* FocusBloxTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		MACSHARE08TARGET01 /* FocusBloxMacShareExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = MACSHARE13CFGL0001 /* Build configuration list for PBXNativeTarget "FocusBloxMacShareExtension" */;
+			buildPhases = (
+				MACSHARE10SRCS0001 /* Sources */,
+				MACSHARE07FWORK001 /* Frameworks */,
+				MACSHARE09RSRC0001 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				MACSHARE06FSSRG001 /* FocusBloxMacShareExtension */,
+			);
+			name = FocusBloxMacShareExtension;
+			productName = FocusBloxMacShareExtension;
+			productReference = MACSHARE04FREF0001 /* FocusBloxMacShareExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -1594,6 +1670,9 @@
 				LastUpgradeCheck = 2620;
 				TargetAttributes = {
 					B7A160492F4AD5F5001FD20C = {
+						CreatedOnToolsVersion = 26.2;
+					};
+					MACSHARE08TARGET01 = {
 						CreatedOnToolsVersion = 26.2;
 					};
 					B7A16CCF2F1FE3BC00165284 = {
@@ -1660,12 +1739,20 @@
 				B7DFC0782F2E8C62009C2881 /* FocusBloxMacTests */,
 				B7DFC0822F2E8C62009C2881 /* FocusBloxMacUITests */,
 				B7A160492F4AD5F5001FD20C /* FocusBloxShareExtension */,
+				MACSHARE08TARGET01 /* FocusBloxMacShareExtension */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		B7A160482F4AD5F5001FD20C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		MACSHARE09RSRC0001 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -1985,6 +2072,7 @@
 				FBRND002BUILDFILE0001 /* FocusBloxRebrandTests.swift in Sources */,
 				LIVACT02BUILDFILE0001 /* LiveActivityManagerTests.swift in Sources */,
 				PERMREQ02BUILD0001 /* PermissionRequestTests.swift in Sources */,
+				CALCATMAP01BUILD001 /* CalendarCategoryMappingTests.swift in Sources */,
 				CALCATUT01BUILD0001 /* CalendarEventCategoryTests.swift in Sources */,
 				CATCFGUT01BUILD0001 /* CategoryConfigTests.swift in Sources */,
 				TSKCAT01BUILD00001 /* TaskCategoryTests.swift in Sources */,
@@ -2030,6 +2118,16 @@
 				SHARE01BUILD00001 /* LocalTask.swift in Sources */,
 				SHARE01BUILD00002 /* TaskMetadata.swift in Sources */,
 				SHARE01BUILD00003 /* TaskSource.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		MACSHARE10SRCS0001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				MACSHARE01BUILD001 /* LocalTask.swift in Sources */,
+				MACSHARE01BUILD002 /* TaskMetadata.swift in Sources */,
+				MACSHARE01BUILD003 /* TaskSource.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2158,6 +2256,11 @@
 			isa = PBXTargetDependency;
 			target = B7A160492F4AD5F5001FD20C /* FocusBloxShareExtension */;
 			targetProxy = B7A160522F4AD5F6001FD20C /* PBXContainerItemProxy */;
+		};
+		MACSHARE11TDEP0001 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = MACSHARE08TARGET01 /* FocusBloxMacShareExtension */;
+			targetProxy = MACSHARE02PROXY001 /* PBXContainerItemProxy */;
 		};
 		B7A16CE52F1FE3BE00165284 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -2430,6 +2533,78 @@
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/FocusBlox.app/FocusBlox";
+			};
+			name = Release;
+		};
+		MACSHARE12DBGC0001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_ENTITLEMENTS = FocusBloxMacShareExtension/FocusBloxMacShareExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = FocusBloxMacShareExtension/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = FocusBloxMacShareExtension;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 26.1;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = henemm.FocusBloxMac.ShareExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		MACSHARE12RELC0001 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_ENTITLEMENTS = FocusBloxMacShareExtension/FocusBloxMacShareExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = FocusBloxMacShareExtension/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = FocusBloxMacShareExtension;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 26.1;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = henemm.FocusBloxMac.ShareExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
 		};
@@ -3182,6 +3357,15 @@
 			buildConfigurations = (
 				771D686D08FA61CE954D5EA1 /* Debug */,
 				604CBB52FCE6598C5FA37C29 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		MACSHARE13CFGL0001 /* Build configuration list for PBXNativeTarget "FocusBloxMacShareExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				MACSHARE12DBGC0001 /* Debug */,
+				MACSHARE12RELC0001 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;

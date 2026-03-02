@@ -28,7 +28,7 @@ import Foundation
     func createCalendarEvent(title: String, startDate: Date, endDate: Date, reminderID: String?) throws
     func deleteCalendarEvent(eventID: String) throws
     func moveCalendarEvent(eventID: String, to newStartDate: Date, duration: Int) throws
-    func updateEventCategory(eventID: String, category: String?) throws
+    func updateEventCategory(calendarItemID: String, category: String?) throws
 
     // MARK: - Focus Blocks
 

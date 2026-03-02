@@ -351,7 +351,7 @@ struct MacPlanningView: View {
 
     private func updateEventCategory(event: CalendarEvent, category: String?) {
         do {
-            try eventKitRepo.updateEventCategory(eventID: event.id, category: category)
+            try eventKitRepo.updateEventCategory(calendarItemID: event.calendarItemIdentifier, category: category)
             // Reload to reflect updated category
             Task { await loadCalendarEvents(showSpinner: false) }
         } catch {

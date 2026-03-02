@@ -421,7 +421,7 @@ struct BlockPlanningView: View {
     private func updateEventCategory(event: CalendarEvent, category: String?) {
         Task {
             do {
-                try eventKitRepo.updateEventCategory(eventID: event.id, category: category)
+                try eventKitRepo.updateEventCategory(calendarItemID: event.calendarItemIdentifier, category: category)
                 await loadData()
             } catch {
                 errorMessage = "Kategorie konnte nicht gespeichert werden."
