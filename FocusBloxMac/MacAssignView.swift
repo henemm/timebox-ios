@@ -26,7 +26,7 @@ struct MacAssignView: View {
     @State private var errorMessage: String?
     @State private var assignmentFeedback = false
 
-    private let eventKitRepo = EventKitRepository()
+    @Environment(\.eventKitRepository) private var eventKitRepo
 
     var body: some View {
         HSplitView {

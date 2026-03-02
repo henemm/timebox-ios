@@ -43,7 +43,7 @@ struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
 
     // EventKit for Reminders sync
-    private let eventKitRepo = EventKitRepository()
+    @Environment(\.eventKitRepository) private var eventKitRepo
 
     // Navigation state
     @State private var columnVisibility: NavigationSplitViewVisibility = .all

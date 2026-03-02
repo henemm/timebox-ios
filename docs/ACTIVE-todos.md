@@ -221,45 +221,26 @@
 
 ## Backlog (Technical Debt)
 
-### BACKLOG-001: Task Complete/Skip Divergenz (iOS vs macOS)
-- **File iOS:** `Sources/Components/NextUp/NextUpFullView.swift` (markAsCompleteAndAdvance)
-- **File macOS:** `FocusBloxMac/NextUpFullView+Mac.swift` (markAsCompleteAndAdvance)
-- **Groesse:** ~300 LoC dupliziert
-- **Risiko:** HOCH (Core-Funktionalitaet - unterschiedliche Logik = unterschiedliches Verhalten)
+### ~~BACKLOG-001: Task Complete/Skip Divergenz~~ ERLEDIGT
+- Beide Plattformen nutzen jetzt shared `SyncEngine.updateNextUp()` — keine duplizierte Completion-Logik mehr
 
-### BACKLOG-002: EventKitRepository Injection fehlt auf macOS
-- **File iOS:** `Sources/FocusBloxApp.swift` (@State eventKitRepository injected)
-- **File macOS:** `FocusBloxMac/FocusBloxMacApp.swift` (nutzt .shared statt Injection)
-- **Groesse:** ~100 LoC
-- **Risiko:** MITTEL (Test-Flakiness durch Singleton-State)
+### ~~BACKLOG-002: EventKitRepository Injection fehlt auf macOS~~ ERLEDIGT
+- ContentView.swift + MacAssignView.swift nutzen jetzt `@Environment(\.eventKitRepository)` statt eigener Instanz — alle 8 macOS-Views konsistent
 
-### BACKLOG-003: NextUp Toolbar Divergenz (iOS vs macOS)
-- **File iOS:** `Sources/Components/NextUp/NextUpCompactView.swift` (Toolbar-Setup)
-- **File macOS:** `FocusBloxMac/NextUpCompactView+Mac.swift` (eigene Toolbar-Logik)
-- **Groesse:** ~80 LoC
-- **Risiko:** NIEDRIG (UI-Anpassung plattform-spezifisch erwartet)
+### ~~BACKLOG-003: NextUp Toolbar Divergenz~~ ERLEDIGT
+- Dateien geloescht, ersetzt durch shared `NextUpSection.swift`
 
-### BACKLOG-004: BacklogView/BacklogRow komplett dupliziert
-- **File iOS:** `Sources/Components/Backlog/BacklogView.swift`, `BacklogRow.swift`
-- **File macOS:** `FocusBloxMac/BacklogView+Mac.swift`, `MacBacklogRow.swift`
-- **Groesse:** ~400 LoC dupliziert
-- **Risiko:** MITTEL (Features landen nur auf iOS, macOS vergessen)
+### ~~BACKLOG-004: BacklogView/BacklogRow~~ ERLEDIGT
+- `BacklogView` nicht mehr dupliziert; `MacBacklogRow` ist bewusst eigene Datei (anderes Model/Actions)
 
-### BACKLOG-005: RecurrenceRuleView Divergenz
-- **File iOS:** `Sources/Components/TaskEdit/Recurrence/RecurrenceRuleView.swift`
-- **File macOS:** `FocusBloxMac/RecurrenceRuleView+Mac.swift`
-- **Groesse:** ~150 LoC
-- **Risiko:** NIEDRIG (UI-Komponente, kleine Unterschiede plausibel)
+### ~~BACKLOG-005: RecurrenceRuleView Divergenz~~ ERLEDIGT
+- Dateien geloescht, ersetzt durch shared `TaskFormSheet.swift`
 
-### BACKLOG-006: TaskEditView Divergenz
-- **File iOS:** `Sources/Components/TaskEdit/TaskEditView.swift`
-- **File macOS:** `FocusBloxMac/TaskEditView+Mac.swift`
-- **Groesse:** ~200 LoC
-- **Risiko:** MITTEL (Edit-Logik unterschiedlich = Inkonsistenzen)
+### ~~BACKLOG-006: TaskEditView Divergenz~~ ERLEDIGT
+- Dateien geloescht, ersetzt durch shared `TaskFormSheet.swift`
 
-### BACKLOG-007: SidebarView macOS-only (kein iOS Equivalent)
-- **File macOS:** `FocusBloxMac/SidebarView.swift` (~400 LoC)
-- **Risiko:** NIEDRIG (macOS NavigationSplitView ist plattform-spezifisch)
+### ~~BACKLOG-007: SidebarView macOS-only~~ Kein Debt
+- macOS-Sidebar ist plattform-spezifisch by Design (NavigationSplitView)
 
 ---
 
