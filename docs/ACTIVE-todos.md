@@ -166,6 +166,14 @@
 
 ## Bugs (offen)
 
+### Bug 64: Kategorie-Icon auf Kalender-Events zu klein (ERLEDIGT)
+- **Status:** ERLEDIGT
+- **Plattform:** iOS + macOS (Shared Component)
+- **Symptom:** CategoryIconBadge war ein winziger 18x18 Kreis mit 9pt Icon — kaum erkennbar
+- **Fix:** Zweizeilige Capsule-Badge mit Icon (11pt) + Kategorie-Label (localizedName)
+- **Dateien:** CategoryIconBadge.swift (1 Datei geaendert), CategoryIconBadgeTests.swift (+2 Tests)
+- **Tests:** 5/5 gruen
+
 ### Bug 63: Kategorie-Zuweisung bei wiederkehrenden Kalender-Events mit Gaesten (ERLEDIGT)
 - **Status:** ERLEDIGT
 - **Plattform:** iOS + macOS

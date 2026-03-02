@@ -34,5 +34,26 @@ final class CategoryIconBadgeTests: XCTestCase {
         XCTAssertEqual(badge.category.color, .cyan)
     }
 
-    // MARK: - Two-line badge (removed: TDD RED tests for unimplemented labelText property)
+    // MARK: - Two-line badge with label
+
+    /// GIVEN: CategoryIconBadge for .income
+    /// WHEN: Accessing labelText
+    /// THEN: Returns the localized category name for display
+    func testBadge_labelText_returnsLocalizedName() {
+        let badge = CategoryIconBadge(category: .income)
+        XCTAssertEqual(badge.labelText, "Geld")
+    }
+
+    /// GIVEN: CategoryIconBadge for all categories
+    /// WHEN: Accessing labelText
+    /// THEN: All labels are short enough for a badge (max 8 chars)
+    func testBadge_labelText_allCategoriesAreBadgeFriendly() {
+        for category in TaskCategory.allCases {
+            let badge = CategoryIconBadge(category: category)
+            XCTAssertLessThanOrEqual(
+                badge.labelText.count, 8,
+                "\(category.rawValue) label '\(badge.labelText)' too long for badge"
+            )
+        }
+    }
 }
