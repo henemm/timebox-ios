@@ -6,6 +6,14 @@
 
 ---
 
+## ERLEDIGT: ITB-G macOS Build Fix
+
+- Intent Donations in Shared-Services (SyncEngine, FocusBlockActionService) mit `#if !os(macOS)` guarded
+- CompleteTaskIntent/TaskEntity existieren nur im iOS-Target
+- Build: Erfolgreich (iOS + macOS)
+
+---
+
 ## ERLEDIGT: Bug 62 — Share Extension Fixes
 
 **Bug 62: Share Extension CloudKit Crash + API-Fixes**

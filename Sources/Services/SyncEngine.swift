@@ -172,11 +172,13 @@ final class SyncEngine {
         try modelContext.save()
 
         // ITB-G1: Donate intent so Siri learns completion patterns
+        #if !os(macOS)
         Task {
             let donationIntent = CompleteTaskIntent()
             donationIntent.task = TaskEntity(id: task.id, title: task.title)
             try? await IntentDonationManager.shared.donate(intent: donationIntent)
         }
+        #endif
     }
 
     /// Deletes a recurring template and all its open children (ends the series).

@@ -57,11 +57,13 @@ enum FocusBlockActionService {
             }
 
             // ITB-G1: Donate intent so Siri learns completion patterns
+            #if !os(macOS)
             Task {
                 let donationIntent = CompleteTaskIntent()
                 donationIntent.task = TaskEntity(id: localTask.id, title: localTask.title)
                 try? await IntentDonationManager.shared.donate(intent: donationIntent)
             }
+            #endif
 
             try? modelContext.save()
         }
