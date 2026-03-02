@@ -207,12 +207,15 @@
 - **Status:** ERLEDIGT (siehe oben: "ERLEDIGT: Bug 62 — Share Extension Fixes")
 - **Fixes:** CloudKit Entitlements, MARKETING_VERSION, NSItemProvider API, Fallback-Logik
 
-### Bug 65: Listendarstellung iOS vs macOS divergiert (Sektionen)
-- **Status:** OFFEN
-- **Plattform:** macOS (fehlende Sektionen)
-- **Symptom:** iOS zeigt 5 Sektionen: "nextUp", "Ueberfaellig", "Sofort erledigen", "Bald einplanen", "Bei Gelegenheit". macOS zeigt nur 2: "nextUp" und "Backlog" (alles in einem Topf).
-- **Verwandt:** BACKLOG-004 (BacklogView/BacklogRow komplett dupliziert)
-- **Prioritaet:** Offen — bei Gelegenheit angleichen
+### Bug 65: Listendarstellung iOS vs macOS divergiert (Sektionen) (ERLEDIGT)
+- **Status:** ERLEDIGT
+- **Plattform:** macOS
+- **Symptom:** macOS zeigte nur 2 Sektionen (Next Up + Backlog), iOS hatte 6 (Next Up, Ueberfaellig, Sofort erledigen, Bald einplanen, Bei Gelegenheit, Irgendwann)
+- **Root Cause:** Priority-Tier-Sektionen wurden nie auf macOS uebertragen (BACKLOG-004 Divergenz)
+- **Fix:** macOS ContentView.swift: Neue `priorityBacklogView` mit Overdue-Section + 4 Priority-Tier-Sections (analog iOS). Flat-List bleibt fuer andere Filter (recent, overdue, completed, recurring). `taskRowWithSwipe` Helper reduziert Code-Duplikation.
+- **Dateien:** FocusBloxMac/ContentView.swift (1 Datei)
+- **Tests:** 8 Unit Tests (MacBacklogSectionsTests), 3 UI Tests (MacBacklogSectionsUITests)
+- **Analyse:** `docs/artifacts/bug-65-mac-sections/analysis.md`
 
 ---
 

@@ -1,0 +1,14 @@
+TDD RED Phase - Bug 65 macOS Backlog Sections
+Date: 2026-03-02
+
+Unit Tests (FocusBloxTests/MacBacklogSectionsTests):
+- 8/8 PASSED (scoring logic building blocks ready)
+
+macOS UI Tests (FocusBloxMacUITests/MacBacklogSectionsUITests):
+- FAILED: System authentication error (env issue, not code)
+- Tests look for tier section headers ("Sofort erledigen", "Bald einplanen", etc.)
+- These headers DON'T EXIST in macOS ContentView yet → would fail (RED)
+
+Test Classes:
+- MacBacklogSectionsTests: 8 tests (tier calculation, overdue detection, grouping)
+- MacBacklogSectionsUITests: 3 tests (tier headers visible, next up visible, no tiers in recent)

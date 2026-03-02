@@ -291,6 +291,37 @@ struct ContentView: View {
         selectedFilter != .completed && selectedFilter != .recurring && !nextUpTasks.isEmpty
     }
 
+    // MARK: - Priority Section Helpers
+
+    // Calculate priority score for a task (inline, no LocalTask extension needed)
+    private func scoreFor(_ task: LocalTask) -> Int {
+        TaskPriorityScoringService.calculateScore(
+            importance: task.importance, urgency: task.urgency, dueDate: task.dueDate,
+            createdAt: task.createdAt, rescheduleCount: task.rescheduleCount,
+            estimatedDuration: task.estimatedDuration, taskType: task.taskType,
+            isNextUp: task.isNextUp
+        )
+    }
+
+    // Overdue tasks (non-NextUp, dueDate before today)
+    private var overdueTasks: [LocalTask] {
+        let startOfToday = Calendar.current.startOfDay(for: Date())
+        return visibleTasks.filter { task in
+            guard !task.isNextUp, let dueDate = task.dueDate else { return false }
+            return dueDate < startOfToday && matchesSearch(task)
+        }.sorted { ($0.dueDate ?? .distantFuture) < ($1.dueDate ?? .distantFuture) }
+    }
+
+    // Color for priority tier section headers
+    private func tierColor(_ tier: TaskPriorityScoringService.PriorityTier) -> Color {
+        switch tier {
+        case .doNow: return .red
+        case .planSoon: return .orange
+        case .eventually: return .yellow
+        case .someday: return .gray
+        }
+    }
+
     private var backlogView: some View {
         VStack(spacing: 0) {
             // Quick Add Bar
@@ -364,47 +395,74 @@ struct ContentView: View {
                     }
                 }
 
-                // MARK: Regular Tasks Section
-                Section {
-                    ForEach(regularFilteredTasks, id: \.uuid) { task in
-                        makeBacklogRow(task: task)
-                            .tag(task.uuid)
-                            .swipeActions(edge: .leading, allowsFullSwipe: true) {
-                                Button {
-                                    if task.isNextUp {
-                                        removeFromNextUp([task.uuid])
-                                    } else {
-                                        addToNextUp([task.uuid])
-                                    }
-                                } label: {
-                                    Label(
-                                        task.isNextUp ? "Entfernen" : "Next Up",
-                                        systemImage: task.isNextUp ? "arrow.down.circle.fill" : "arrow.up.circle.fill"
-                                    )
-                                }
-                                .tint(task.isNextUp ? .orange : .green)
+                // MARK: Regular Tasks — Priority Tier Sections or Flat List
+                if selectedFilter == .priority {
+                    // Overdue section (at top, like iOS)
+                    if !overdueTasks.isEmpty {
+                        Section {
+                            ForEach(overdueTasks, id: \.uuid) { task in
+                                taskRowWithSwipe(task: task)
                             }
-                            .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                                Button(role: .destructive) {
-                                    deleteTasksByIds([task.uuid])
-                                } label: {
-                                    Label("Löschen", systemImage: "trash")
-                                }
+                        } header: {
+                            HStack {
+                                Text("Überfällig")
+                                    .font(.headline)
+                                    .foregroundStyle(.red)
+                                Spacer()
+                                Text("\(overdueTasks.count)")
+                                    .font(.caption)
+                                    .foregroundStyle(.red)
+                                    .padding(.horizontal, 6)
+                                    .padding(.vertical, 2)
+                                    .background(Color.red.opacity(0.2))
+                                    .clipShape(Capsule())
+                            }
+                        }
+                    }
 
-                                Button {
-                                    selectedTasks = [task.uuid]
-                                } label: {
-                                    Label("Bearbeiten", systemImage: "pencil")
+                    // Priority tier sections (doNow, planSoon, eventually, someday)
+                    ForEach(TaskPriorityScoringService.PriorityTier.allCases, id: \.self) { tier in
+                        let tierTasks = regularFilteredTasks.filter { task in
+                            let taskTier = TaskPriorityScoringService.PriorityTier.from(score: scoreFor(task))
+                            let isOverdue = overdueTasks.contains(where: { $0.uuid == task.uuid })
+                            return taskTier == tier && !isOverdue
+                        }.sorted { scoreFor($0) > scoreFor($1) }
+
+                        if !tierTasks.isEmpty {
+                            Section {
+                                ForEach(tierTasks, id: \.uuid) { task in
+                                    taskRowWithSwipe(task: task)
                                 }
-                                .tint(.blue)
+                            } header: {
+                                HStack {
+                                    Text(tier.label)
+                                        .font(.headline)
+                                        .foregroundStyle(tierColor(tier))
+                                    Spacer()
+                                    Text("\(tierTasks.count)")
+                                        .font(.caption)
+                                        .foregroundStyle(tierColor(tier))
+                                        .padding(.horizontal, 6)
+                                        .padding(.vertical, 2)
+                                        .background(tierColor(tier).opacity(0.2))
+                                        .clipShape(Capsule())
+                                }
                             }
+                        }
                     }
-                    .onMove { from, to in
-                        moveRegularTasks(from: from, to: to)
-                    }
-                } header: {
-                    if showNextUpSection {
-                        Text("Backlog")
+                } else {
+                    // Non-priority filters: flat list (recent, overdue, completed, recurring)
+                    Section {
+                        ForEach(regularFilteredTasks, id: \.uuid) { task in
+                            taskRowWithSwipe(task: task)
+                        }
+                        .onMove { from, to in
+                            moveRegularTasks(from: from, to: to)
+                        }
+                    } header: {
+                        if showNextUpSection {
+                            Text("Backlog")
+                        }
                     }
                 }
             }
@@ -870,6 +928,43 @@ struct ContentView: View {
             task.sortOrder = index
         }
         try? modelContext.save()
+    }
+
+    // MARK: - Task Row with Swipe Actions (shared by all sections)
+
+    @ViewBuilder
+    private func taskRowWithSwipe(task: LocalTask) -> some View {
+        makeBacklogRow(task: task)
+            .tag(task.uuid)
+            .swipeActions(edge: .leading, allowsFullSwipe: true) {
+                Button {
+                    if task.isNextUp {
+                        removeFromNextUp([task.uuid])
+                    } else {
+                        addToNextUp([task.uuid])
+                    }
+                } label: {
+                    Label(
+                        task.isNextUp ? "Entfernen" : "Next Up",
+                        systemImage: task.isNextUp ? "arrow.down.circle.fill" : "arrow.up.circle.fill"
+                    )
+                }
+                .tint(task.isNextUp ? .orange : .green)
+            }
+            .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                Button(role: .destructive) {
+                    deleteTasksByIds([task.uuid])
+                } label: {
+                    Label("Löschen", systemImage: "trash")
+                }
+
+                Button {
+                    selectedTasks = [task.uuid]
+                } label: {
+                    Label("Bearbeiten", systemImage: "pencil")
+                }
+                .tint(.blue)
+            }
     }
 
     // MARK: - Row Builder
