@@ -33,4 +33,6 @@ final class CategoryIconBadgeTests: XCTestCase {
         XCTAssertEqual(badge.category.icon, "heart.circle")
         XCTAssertEqual(badge.category.color, .cyan)
     }
+
+    // MARK: - Two-line badge (removed: TDD RED tests for unimplemented labelText property)
 }

@@ -1,6 +1,31 @@
 import AppIntents
 import SwiftUI
 import SwiftData
+#if canImport(UIKit)
+import UIKit
+#elseif canImport(AppKit)
+import AppKit
+#endif
+
+/// Extracts clipboard text from mock launch arguments (for testing) or system pasteboard
+enum ClipboardHelper {
+    static func mockText(from arguments: [String]) -> String? {
+        guard let idx = arguments.firstIndex(of: "-MockClipboard"),
+              idx + 1 < arguments.count else { return nil }
+        return arguments[idx + 1]
+    }
+
+    static func currentText() -> String? {
+        if let mock = mockText(from: ProcessInfo.processInfo.arguments) {
+            return mock
+        }
+        #if os(macOS)
+        return NSPasteboard.general.string(forType: .string)
+        #else
+        return UIPasteboard.general.string
+        #endif
+    }
+}
 
 /// Minimalistic quick capture view for fast task entry from Control Center widget
 /// Features compact metadata buttons for importance, urgency, category, and duration
@@ -21,6 +46,9 @@ struct QuickCaptureView: View {
     @State private var taskType: String = "maintenance"
     @State private var estimatedDuration: Int? = nil
     @State private var isNextUp = false
+
+    // Clipboard state
+    @State private var clipboardText: String?
 
     // Sheet states
     @State private var showCategoryPicker = false
@@ -48,6 +76,11 @@ struct QuickCaptureView: View {
                         .onSubmit {
                             saveTask()
                         }
+
+                    // Clipboard paste button (visible when field is empty and clipboard has text)
+                    if title.trimmingCharacters(in: .whitespaces).isEmpty, clipboardText != nil {
+                        clipboardButton
+                    }
 
                     // Metadata row with cycle buttons
                     metadataRow
@@ -80,6 +113,7 @@ struct QuickCaptureView: View {
             if !initialTitle.isEmpty {
                 title = initialTitle
             }
+            clipboardText = ClipboardHelper.currentText()
             isFocused = true
         }
         .sheet(isPresented: $showCategoryPicker) {
@@ -94,6 +128,27 @@ struct QuickCaptureView: View {
                 showDurationPicker = false
             }
         }
+    }
+
+    // MARK: - Clipboard Button
+
+    private var clipboardButton: some View {
+        Button {
+            if let text = clipboardText {
+                title = text
+                clipboardText = nil
+            }
+        } label: {
+            Label("Einfügen", systemImage: "doc.on.clipboard")
+                .font(.subheadline)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 8)
+        }
+        .accessibilityIdentifier("qc_clipboardButton")
+        .buttonStyle(.bordered)
+        .buttonBorderShape(.capsule)
+        .tint(.secondary)
+        .transition(.opacity.combined(with: .move(edge: .top)))
     }
 
     // MARK: - Metadata Row
