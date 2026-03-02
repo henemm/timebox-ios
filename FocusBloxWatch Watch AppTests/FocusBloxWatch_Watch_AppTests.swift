@@ -56,6 +56,30 @@ struct WatchLocalTaskSchemaTests {
         #expect(task.taskType == "")
     }
 
+    // MARK: - CTC-5: Title Improvement Flag (Schema Parity)
+
+    /// Verhalten: Watch-Model hat needsTitleImprovement Feld (Default false)
+    /// Bricht wenn: WatchLocalTask.swift fehlt das Feld needsTitleImprovement
+    @Test func watchLocalTask_hasNeedsTitleImprovement() {
+        let task = LocalTask(title: "Diktat Test")
+        #expect(task.needsTitleImprovement == false)
+    }
+
+    /// Verhalten: Watch-Model hat sourceURL Feld (Schema-Paritaet mit iOS)
+    /// Bricht wenn: WatchLocalTask.swift fehlt das Feld sourceURL
+    @Test func watchLocalTask_hasSourceURL() {
+        let task = LocalTask(title: "URL Test")
+        #expect(task.sourceURL == nil)
+    }
+
+    /// Verhalten: needsTitleImprovement kann auf true gesetzt werden
+    /// Bricht wenn: Feld ist read-only oder fehlt
+    @Test func watchLocalTask_needsTitleImprovement_canBeSetToTrue() {
+        let task = LocalTask(title: "Diktat Task")
+        task.needsTitleImprovement = true
+        #expect(task.needsTitleImprovement == true)
+    }
+
     // MARK: - TBD Task Creation (Watch use case)
 
     @Test func createTask_withTitleOnly_isTBD() {

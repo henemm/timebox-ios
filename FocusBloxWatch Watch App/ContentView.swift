@@ -53,6 +53,7 @@ struct ContentView: View {
 
     private func saveTask(title: String) {
         let task = LocalTask(title: title)
+        task.needsTitleImprovement = true
         modelContext.insert(task)
         try? modelContext.save()
     }

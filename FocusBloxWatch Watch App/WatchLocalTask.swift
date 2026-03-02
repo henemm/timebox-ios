@@ -34,6 +34,8 @@ final class LocalTask {
     var completedAt: Date?
     var aiScore: Int?
     var aiEnergyLevel: String?
+    var needsTitleImprovement: Bool
+    var sourceURL: String?
 
     /// String id for compatibility
     var id: String { uuid.uuidString }
@@ -67,7 +69,9 @@ final class LocalTask {
         rescheduleCount: Int = 0,
         completedAt: Date? = nil,
         aiScore: Int? = nil,
-        aiEnergyLevel: String? = nil
+        aiEnergyLevel: String? = nil,
+        needsTitleImprovement: Bool = false,
+        sourceURL: String? = nil
     ) {
         self.uuid = uuid
         self.title = title
@@ -94,5 +98,7 @@ final class LocalTask {
         self.completedAt = completedAt
         self.aiScore = aiScore
         self.aiEnergyLevel = aiEnergyLevel
+        self.needsTitleImprovement = needsTitleImprovement
+        self.sourceURL = sourceURL
     }
 }
