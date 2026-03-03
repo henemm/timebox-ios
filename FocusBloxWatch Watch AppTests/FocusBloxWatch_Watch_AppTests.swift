@@ -1,4 +1,6 @@
+import Foundation
 import Testing
+import SwiftData
 @testable import FocusBloxWatch_Watch_App
 
 struct WatchLocalTaskSchemaTests {
@@ -80,6 +82,29 @@ struct WatchLocalTaskSchemaTests {
         #expect(task.needsTitleImprovement == true)
     }
 
+    // MARK: - Schema Parity: Fields added after initial Watch release
+
+    /// Verhalten: Watch-Model hat recurrenceInterval (Schema-Paritaet mit iOS)
+    /// Bricht wenn: WatchLocalTask.swift fehlt das Feld recurrenceInterval
+    @Test func watchLocalTask_hasRecurrenceInterval() {
+        let task = LocalTask(title: "Schema Test")
+        #expect(task.recurrenceInterval == nil)
+    }
+
+    /// Verhalten: Watch-Model hat isTemplate (Schema-Paritaet mit iOS)
+    /// Bricht wenn: WatchLocalTask.swift fehlt das Feld isTemplate
+    @Test func watchLocalTask_hasIsTemplate() {
+        let task = LocalTask(title: "Schema Test")
+        #expect(task.isTemplate == false)
+    }
+
+    /// Verhalten: Watch-Model hat modifiedAt (Schema-Paritaet mit iOS)
+    /// Bricht wenn: WatchLocalTask.swift fehlt das Feld modifiedAt
+    @Test func watchLocalTask_hasModifiedAt() {
+        let task = LocalTask(title: "Schema Test")
+        #expect(task.modifiedAt == nil)
+    }
+
     // MARK: - TBD Task Creation (Watch use case)
 
     @Test func createTask_withTitleOnly_isTBD() {
@@ -91,5 +116,61 @@ struct WatchLocalTaskSchemaTests {
         #expect(task.isCompleted == false)
         #expect(task.isNextUp == false)
         #expect(task.sourceSystem == "local")
+    }
+
+    // MARK: - ModelContainer Integration: Full iOS-Schema Data Round-Trip
+
+    /// Verhalten: Watch ModelContainer kann Tasks mit ALLEN iOS-Feldern speichern und laden
+    /// Bricht wenn: Schema-Mismatch — fehlende Felder verhindern Container-Init oder Daten-Round-Trip
+    /// Simuliert: iPhone synct Task via CloudKit → Watch muss sie lesen koennen
+    @Test func modelContainer_roundTrip_withFullIOSSchema() throws {
+        let config = ModelConfiguration(isStoredInMemoryOnly: true)
+        let container = try ModelContainer(
+            for: LocalTask.self, TaskMetadata.self,
+            configurations: config
+        )
+        let context = ModelContext(container)
+
+        // Seed: Task mit ALLEN Feldern die iOS setzt (simuliert CloudKit-Sync)
+        let task = LocalTask(title: "iOS-synced Task")
+        task.importance = 3
+        task.urgency = "urgent"
+        task.estimatedDuration = 25
+        task.taskType = "income"
+        task.recurrencePattern = "weekly"
+        task.recurrenceWeekdays = [1, 3, 5]
+        task.recurrenceMonthDay = nil
+        task.recurrenceInterval = 2          // iOS-only field
+        task.recurrenceGroupID = "group-123"
+        task.isTemplate = false              // iOS-only field
+        task.modifiedAt = Date()             // iOS-only field
+        task.isNextUp = true
+        task.nextUpSortOrder = 1
+        task.assignedFocusBlockID = "block-abc"
+        task.rescheduleCount = 2
+        task.completedAt = nil
+        task.aiScore = 85
+        task.aiEnergyLevel = "high"
+        task.needsTitleImprovement = true
+        task.sourceURL = "https://example.com"
+        task.externalID = "ext-456"
+        task.sourceSystem = "reminders"
+
+        context.insert(task)
+        try context.save()
+
+        // Fetch: Watch muss die Task vollstaendig lesen koennen
+        let descriptor = FetchDescriptor<LocalTask>()
+        let fetched = try context.fetch(descriptor)
+
+        #expect(fetched.count == 1)
+        let t = fetched[0]
+        #expect(t.title == "iOS-synced Task")
+        #expect(t.recurrenceInterval == 2)
+        #expect(t.isTemplate == false)
+        #expect(t.modifiedAt != nil)
+        #expect(t.importance == 3)
+        #expect(t.aiScore == 85)
+        #expect(t.needsTitleImprovement == true)
     }
 }

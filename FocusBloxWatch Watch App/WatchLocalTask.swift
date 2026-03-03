@@ -20,7 +20,9 @@ final class LocalTask {
     var recurrencePattern: String
     var recurrenceWeekdays: [Int]?
     var recurrenceMonthDay: Int?
+    var recurrenceInterval: Int?
     var recurrenceGroupID: String?
+    var isTemplate: Bool
     var taskDescription: String?
     var externalID: String?
     var sourceSystem: String
@@ -36,6 +38,7 @@ final class LocalTask {
     var aiEnergyLevel: String?
     var needsTitleImprovement: Bool
     var sourceURL: String?
+    var modifiedAt: Date?
 
     /// String id for compatibility
     var id: String { uuid.uuidString }
@@ -60,6 +63,7 @@ final class LocalTask {
         recurrencePattern: String = "none",
         recurrenceWeekdays: [Int]? = nil,
         recurrenceMonthDay: Int? = nil,
+        recurrenceInterval: Int? = nil,
         recurrenceGroupID: String? = nil,
         taskDescription: String? = nil,
         externalID: String? = nil,
@@ -71,7 +75,8 @@ final class LocalTask {
         aiScore: Int? = nil,
         aiEnergyLevel: String? = nil,
         needsTitleImprovement: Bool = false,
-        sourceURL: String? = nil
+        sourceURL: String? = nil,
+        modifiedAt: Date? = nil
     ) {
         self.uuid = uuid
         self.title = title
@@ -87,7 +92,9 @@ final class LocalTask {
         self.recurrencePattern = recurrencePattern
         self.recurrenceWeekdays = recurrenceWeekdays
         self.recurrenceMonthDay = recurrenceMonthDay
+        self.recurrenceInterval = recurrenceInterval
         self.recurrenceGroupID = recurrenceGroupID
+        self.isTemplate = false
         self.taskDescription = taskDescription
         self.externalID = externalID
         self.sourceSystem = sourceSystem
@@ -100,5 +107,6 @@ final class LocalTask {
         self.aiEnergyLevel = aiEnergyLevel
         self.needsTitleImprovement = needsTitleImprovement
         self.sourceURL = sourceURL
+        self.modifiedAt = modifiedAt
     }
 }

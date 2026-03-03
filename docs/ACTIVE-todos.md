@@ -6,6 +6,16 @@
 
 ---
 
+## ERLEDIGT: Bug — Watch-App Crash auf Apple Watch Ultra 3
+
+- **Symptom:** App laedt kurz und stuerzt dann ab auf echter Apple Watch Ultra 3. Simulator funktioniert.
+- **Root Cause:** Schema-Mismatch zwischen iOS `LocalTask` und Watch `LocalTask`. iOS hatte 3 Felder (`recurrenceInterval`, `isTemplate`, `modifiedAt`) die dem Watch-Model fehlten. CloudKit synct iOS-Daten mit diesen Feldern → `ModelContainer`-Init schlaegt fehl → `fatalError` → Crash. Simulator hat keine CloudKit-Daten → kein Crash.
+- **Fix:** 3 fehlende Felder in `WatchLocalTask.swift` ergaenzt (Properties + init)
+- **Tests:** 4 neue Tests (3 Schema-Parity + 1 ModelContainer-Integration mit vollen iOS-Daten), alle 16 Watch-Tests gruen
+- **Hinweis:** Watch-App muss auf dem Geraet geloescht und neu installiert werden (alter SwiftData-Store)
+
+---
+
 ## ERLEDIGT: Feature — Unified Calendar View (Phase 1)
 
 - **Ziel:** Zuordnen-Tab entfernen, Task-Zuweisung direkt im Block-Sheet
