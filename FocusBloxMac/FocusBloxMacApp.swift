@@ -20,25 +20,38 @@ final class MenuBarController: NSObject {
 
     private var statusItem: NSStatusItem?
     private var popover: NSPopover?
+    private var eventKitRepo: (any EventKitRepositoryProtocol)?
+    private var iconTimer: Timer?
+    private var cachedBlock: FocusBlock?
+    private var lastFetchTime = Date.distantPast
+    private static let fetchInterval: TimeInterval = 15
 
     private static let autosaveName = "com.focusblox.menubar"
     private static let positionKey = "NSStatusItem Preferred Position \(autosaveName)"
 
+    private static let idleImage = NSImage(
+        systemSymbolName: "cube.fill",
+        accessibilityDescription: "FocusBlox"
+    )
+    private static let allDoneImage = NSImage(
+        systemSymbolName: "checkmark.circle.fill",
+        accessibilityDescription: "FocusBlox — alle Tasks erledigt"
+    )
+
     func setup(container: ModelContainer, eventKitRepository: any EventKitRepositoryProtocol) {
+        self.eventKitRepo = eventKitRepository
+
         // Pre-set visible position on first launch so menu bar managers
         // (e.g. Hidden Bar) don't hide the icon in an unreachable tier.
         if UserDefaults.standard.object(forKey: Self.positionKey) == nil {
             UserDefaults.standard.set(300.0, forKey: Self.positionKey)
         }
 
-        let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
+        let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         item.autosaveName = Self.autosaveName
 
         if let button = item.button {
-            button.image = NSImage(
-                systemSymbolName: "cube.fill",
-                accessibilityDescription: "FocusBlox"
-            )
+            button.image = Self.idleImage
             button.action = #selector(togglePopover)
             button.target = self
         }
@@ -54,6 +67,38 @@ final class MenuBarController: NSObject {
 
         self.statusItem = item
         self.popover = pop
+
+        // Start 1s timer for dynamic icon updates
+        iconTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
+            self?.updateIcon()
+        }
+        updateIcon()
+    }
+
+    private func updateIcon() {
+        let now = Date()
+
+        // Re-fetch from EventKit every 15s (not every second)
+        if now.timeIntervalSince(lastFetchTime) >= Self.fetchInterval {
+            lastFetchTime = now
+            let blocks = try? eventKitRepo?.fetchFocusBlocks(for: now)
+            cachedBlock = blocks?.first { $0.isActive }
+        }
+
+        let state = MenuBarIconState.from(block: cachedBlock, now: now)
+        guard let button = statusItem?.button else { return }
+
+        switch state {
+        case .idle:
+            button.title = ""
+            button.image = Self.idleImage
+        case .active(let timerText):
+            button.image = nil
+            button.title = timerText
+        case .allDone:
+            button.title = ""
+            button.image = Self.allDoneImage
+        }
     }
 
     @objc private func togglePopover() {

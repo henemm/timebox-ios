@@ -291,6 +291,9 @@
 		WARNUI01BUILDFILE0001 /* WarningSettingsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = WARNUI01FILEREF00001 /* WarningSettingsUITests.swift */; };
 		WKDYBTN01BUILD001 /* WeekdayButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = WKDYBTN01FILE0001 /* WeekdayButton.swift */; };
 		WKDYBTN01BUILD002 /* WeekdayButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = WKDYBTN01FILE0001 /* WeekdayButton.swift */; };
+		F4222F8AEAECD043130A4C6B /* MenuBarIconStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95142243688D96B229D2FA41 /* MenuBarIconStateTests.swift */; };
+		0ED7EC4A998FAB585C67F8E6 /* MenuBarIconState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60DE55FC2A796A308478E2B9 /* MenuBarIconState.swift */; };
+		AD52DB9608DDF4562B67279F /* MenuBarIconState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60DE55FC2A796A308478E2B9 /* MenuBarIconState.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -699,6 +702,8 @@
 		WARNTIM01FILEREF0001 /* WarningTiming.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WarningTiming.swift; sourceTree = "<group>"; };
 		WARNUI01FILEREF00001 /* WarningSettingsUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WarningSettingsUITests.swift; sourceTree = "<group>"; };
 		WKDYBTN01FILE0001 /* WeekdayButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeekdayButton.swift; sourceTree = "<group>"; };
+		95142243688D96B229D2FA41 /* MenuBarIconStateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarIconStateTests.swift; sourceTree = "<group>"; };
+		60DE55FC2A796A308478E2B9 /* MenuBarIconState.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MenuBarIconState.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -1140,7 +1145,8 @@
 				CTC1TEST0FILE00001 /* TaskTitleEngineTests.swift */,
 				CBHELP01FILE00001 /* ClipboardHelperTests.swift */,
 				CTC2TEST0FILE00001 /* SourceURLTests.swift */,
-			);
+							95142243688D96B229D2FA41 /* MenuBarIconStateTests.swift */,
+);
 			path = FocusBloxTests;
 			sourceTree = "<group>";
 		};
@@ -1181,6 +1187,7 @@
 				76D00C9F307A1EC64537A9C7 /* TaskSources */,
 				350DD1256F45268992636DEA /* NotificationService.swift */,
 				RECRSVC02FILE0001 /* RecurrenceService.swift */,
+				60DE55FC2A796A308478E2B9 /* MenuBarIconState.swift */,
 				233B665A0DF1A421C1CDF80A /* TaskCompletionUndoService.swift */,
 				5FEFD473342A7BED5A2A93AF /* SpotlightIndexingService.swift */,
 				2224B7322726CC9CD1E9C9E3 /* WidgetRelevanceCalculator.swift */,
@@ -1857,6 +1864,7 @@
 				186664F5A9219E0AC9A4588A /* ShakeGestureModifier.swift in Sources */,
 				2D85A50AEA4DE4D67F40EA5D /* SpotlightIndexingService.swift in Sources */,
 				7F3072E8F964D76F3A908E76 /* WidgetRelevanceCalculator.swift in Sources */,
+				0ED7EC4A998FAB585C67F8E6 /* MenuBarIconState.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1999,7 +2007,8 @@
 				CTC1TEST0BUILD0001 /* TaskTitleEngineTests.swift in Sources */,
 				CBHELP01BUILD0001 /* ClipboardHelperTests.swift in Sources */,
 				CTC2TEST0BUILD0001 /* SourceURLTests.swift in Sources */,
-			);
+							F4222F8AEAECD043130A4C6B /* MenuBarIconStateTests.swift in Sources */,
+);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		B7A160462F4AD5F5001FD20C /* Sources */ = {
@@ -2103,6 +2112,7 @@
 				TMDUI02BUILD000001 /* TaskMetadataUI.swift in Sources */,
 				ED4DB7732BC3C933CBA5B55A /* TaskCompletionUndoService.swift in Sources */,
 				CE465D61D24BA0B73AB397E4 /* ShakeGestureModifier.swift in Sources */,
+				AD52DB9608DDF4562B67279F /* MenuBarIconState.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

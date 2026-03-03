@@ -144,7 +144,7 @@
 **Guenstigster Quick Win:** ~~Shake to Undo (XS)~~ ERLEDIGT
 **Teuerste Items:** #17 OrganizeMyDay (~150k), #13 Drag & Drop (~150k), #14 NC Widget (~120k)
 **WARTEND (Apple-Abhaengigkeit):** #20 ITB-F — Developer-APIs verfuegbar, wartet auf Siri On-Screen Awareness (iOS 26.5/27)
-**Zuletzt erledigt:** Deferred List Sorting — Items bleiben nach Badge-Tap an Ort und Stelle, 3s Timer, dann Resort (iOS + macOS)
+**Zuletzt erledigt:** Bug 66 — macOS FocusBlock dynamisches MenuBar-Icon + Sync-Deadlock Fix
 **Naechstes:** #5 MAC-022 Spotlight Integration oder #7 Kalender-App Deep Link
 **Neu (User Story):** #22-26 Contextual Task Capture — siehe `docs/project/stories/contextual-task-capture.md`
 
@@ -212,6 +212,20 @@
 ---
 
 ## Bugs (offen)
+
+### Bug 66: macOS FocusBlock nicht sichtbar in MenuBar + Sync-Deadlock (ERLEDIGT)
+- **Status:** ERLEDIGT
+- **Plattform:** macOS
+- **Symptom:** MenuBar-Icon zeigte immer nur statisches `cube.fill` — kein Timer, kein Checkmark bei aktivem FocusBlock. Ausserdem: Erledigte Tasks sync'ten nicht waehrend eines aktiven Blocks.
+- **Root Cause (2 Bugs):**
+  1. **Bug A (Statisches Icon):** Bug-58-Migration (MenuBarExtra → NSStatusItem) hat dynamisches Label nie reimplementiert. `button.image` wurde einmal auf `cube.fill` gesetzt, nie aktualisiert.
+  2. **Bug B (Timer Deadlock):** `activeTimer` (1s) aktualisierte nur `currentTime`, `pollingTimer` (60s) war durch `guard activeBlock == nil` blockiert — `loadFocusBlock()` wurde waehrend aktiver Blocks NIE automatisch aufgerufen.
+- **Fix:**
+  - Bug A: `MenuBarController` mit `updateIcon()` Methode (1s Timer), `MenuBarIconState` Pure-Logic-Enum (idle/active/allDone), `variableLength` statt `squareLength`
+  - Bug B: `refreshCounter` in `MenuBarView` — alle 15 Ticks `loadFocusBlock()` waehrend aktiver Blocks
+- **Dateien:** MenuBarIconState.swift (NEU), FocusBloxMacApp.swift, MenuBarView.swift, project.pbxproj
+- **Tests:** 10 Unit Tests (MenuBarIconStateTests), UI Test nicht anwendbar (NSStatusItem = SystemUIServer)
+- **Analyse:** `docs/artifacts/bug-mac-focusblock-menubar/analysis.md`
 
 ### Bug 64: Kategorie-Icon auf Kalender-Events zu klein (ERLEDIGT)
 - **Status:** ERLEDIGT

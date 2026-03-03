@@ -1,0 +1,20 @@
+	Type 'Equatable' has no member 'idle'
+	Cannot find 'MenuBarIconState' in scope
+	Cannot find 'MenuBarIconState' in scope
+	Cannot find 'MenuBarIconState' in scope
+	Type 'Equatable' has no member 'allDone'
+	Cannot find 'MenuBarIconState' in scope
+	Cannot find 'MenuBarIconState' in scope
+	Cannot find 'MenuBarIconState' in scope
+	Cannot find 'MenuBarIconState' in scope
+	Cannot find 'MenuBarIconState' in scope
+	Testing cancelled because the build failed.
+
+** TEST FAILED **
+
+
+The following build commands failed:
+	SwiftCompile normal arm64 Compiling\ MenuBarIconStateTests.swift /Users/hem/Developer/my-daily-sprints/FocusBloxTests/MenuBarIconStateTests.swift (in target 'FocusBloxTests' from project 'FocusBlox')
+	SwiftCompile normal arm64 /Users/hem/Developer/my-daily-sprints/FocusBloxTests/MenuBarIconStateTests.swift (in target 'FocusBloxTests' from project 'FocusBlox')
+	Testing project FocusBlox with scheme FocusBlox
+(3 failures)

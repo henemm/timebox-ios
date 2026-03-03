@@ -46,6 +46,7 @@ struct MenuBarView: View {
     @State private var currentTime = Date()
     @State private var taskStartTime: Date?
     @State private var lastTaskID: String?
+    @State private var refreshCounter = 0
 
     // Timer: 1s when active block, 60s polling otherwise
     private let activeTimer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
@@ -88,6 +89,10 @@ struct MenuBarView: View {
         .onReceive(activeTimer) { time in
             guard activeBlock != nil else { return }
             currentTime = time
+            // Fix timer deadlock: periodically reload block from EventKit
+            // so completed tasks from other devices are picked up
+            refreshCounter += 1
+            if refreshCounter % 15 == 0 { loadFocusBlock() }
         }
         .onReceive(pollingTimer) { _ in
             guard activeBlock == nil else { return }

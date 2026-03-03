@@ -1,0 +1,18 @@
+UI Test Not Applicable: NSStatusItem MenuBar Icon
+
+Reason: NSStatusItem (macOS MenuBar) is NOT testable via XCUITest.
+The StatusItem belongs to SystemUIServer, not the app process.
+XCUITest cannot interact with or inspect NSStatusItem buttons.
+
+This is a documented limitation — see memory file:
+"macOS XCUITest Limitierungen: MenuBarExtra StatusItems per XCUITest NICHT testbar"
+
+What IS tested:
+- MenuBarIconState pure logic (unit tests in MenuBarIconStateTests.swift)
+- FocusBlock model (existing tests in FocusBlockTests.swift)
+- MenuBarTimerFormatter logic (tested via MenuBarIconState.formatTimer)
+
+Previous precedent:
+- docs/artifacts/bug-nextup-overflow/ui-test-not-applicable.txt
+
+** TEST NOT APPLICABLE **
