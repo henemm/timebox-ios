@@ -70,6 +70,10 @@ struct BacklogView: View {
     @State private var showSettings = false
     @State private var undoResultMessage = ""
 
+    // Deferred sort: items stay in place after badge tap, re-sort after 3s timeout
+    @State private var pendingResortIDs: Set<String> = []
+    @State private var resortTimer: Task<Void, Never>?
+
     // MARK: - Search Filter
     private func matchesSearch(_ item: PlanItem) -> Bool {
         guard !searchText.isEmpty else { return true }
@@ -456,7 +460,7 @@ struct BacklogView: View {
             try syncEngine.updateDuration(itemID: item.id, minutes: minutes)
             durationFeedback.toggle()
 
-            Task { await refreshLocalTasks() }
+            scheduleDeferredResort(for: item.id)
         } catch {
             errorMessage = "Dauer konnte nicht gespeichert werden."
         }
@@ -498,10 +502,7 @@ struct BacklogView: View {
             let taskSource = LocalTaskSource(modelContext: modelContext)
             let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
             try syncEngine.updateTask(itemID: item.id, title: item.title, importance: importance, duration: item.estimatedDuration, tags: item.tags, urgency: item.urgency, taskType: item.taskType, dueDate: item.dueDate, description: item.taskDescription)
-
-            // Refresh local data only - no loading indicator, no Reminders import
-            // This preserves scroll position and avoids overwriting local changes
-            Task { await refreshLocalTasks() }
+            scheduleDeferredResort(for: item.id)
         } catch {
             errorMessage = "Wichtigkeit konnte nicht aktualisiert werden."
         }
@@ -512,9 +513,7 @@ struct BacklogView: View {
             let taskSource = LocalTaskSource(modelContext: modelContext)
             let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
             try syncEngine.updateTask(itemID: item.id, title: item.title, importance: item.importance, duration: item.estimatedDuration, tags: item.tags, urgency: urgency, taskType: item.taskType, dueDate: item.dueDate, description: item.taskDescription)
-
-            // Refresh local data only - no loading indicator, no Reminders import
-            Task { await refreshLocalTasks() }
+            scheduleDeferredResort(for: item.id)
         } catch {
             errorMessage = "Dringlichkeit konnte nicht aktualisiert werden."
         }
@@ -525,9 +524,27 @@ struct BacklogView: View {
             let taskSource = LocalTaskSource(modelContext: modelContext)
             let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
             try syncEngine.updateTask(itemID: item.id, title: item.title, importance: item.importance, duration: item.estimatedDuration, tags: item.tags, urgency: item.urgency, taskType: category, dueDate: item.dueDate, description: item.taskDescription)
-            Task { await refreshLocalTasks() }
+            scheduleDeferredResort(for: item.id)
         } catch {
             errorMessage = "Kategorie konnte nicht aktualisiert werden."
+        }
+    }
+
+    // MARK: - Deferred Sort (item stays in place after badge tap, re-sorts after 3s)
+    private func scheduleDeferredResort(for itemID: String) {
+        pendingResortIDs.insert(itemID)
+        resortTimer?.cancel()
+        resortTimer = Task {
+            try? await Task.sleep(for: .seconds(3))
+            guard !Task.isCancelled else { return }
+            // Phase 1: fade out borders
+            withAnimation(.easeOut(duration: 0.3)) {
+                pendingResortIDs.removeAll()
+            }
+            // Phase 2: pause, then re-sort
+            try? await Task.sleep(for: .milliseconds(200))
+            guard !Task.isCancelled else { return }
+            await refreshLocalTasks()
         }
     }
 
@@ -706,7 +723,8 @@ struct BacklogView: View {
                         onCategoryTap: { selectedItemForCategory = item },
                         onEditTap: { taskToEditDirectly = item },
                         onDeleteTap: { deleteTask(item) },
-                        onTitleSave: { newTitle in saveTitleEdit(for: item, title: newTitle) }
+                        onTitleSave: { newTitle in saveTitleEdit(for: item, title: newTitle) },
+                        isPendingResort: pendingResortIDs.contains(item.id)
                     )
                     .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
                     .listRowBackground(Color.clear)
@@ -764,7 +782,8 @@ struct BacklogView: View {
             onCategoryTap: { selectedItemForCategory = item },
             onEditTap: { handleEditTap(item) },
             onDeleteTap: { deleteTask(item) },
-            onTitleSave: { newTitle in saveTitleEdit(for: item, title: newTitle) }
+            onTitleSave: { newTitle in saveTitleEdit(for: item, title: newTitle) },
+            isPendingResort: pendingResortIDs.contains(item.id)
         )
         .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
         .listRowBackground(Color.clear)
@@ -957,7 +976,8 @@ struct BacklogView: View {
                     },
                     onTitleSave: { newTitle in
                         saveTitleEdit(for: item, title: newTitle)
-                    }
+                    },
+                    isPendingResort: pendingResortIDs.contains(item.id)
                 )
                 .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
                 .listRowBackground(Color.clear)

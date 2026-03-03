@@ -12,6 +12,7 @@ struct BacklogRow: View {
     var onEditTap: (() -> Void)?
     var onDeleteTap: (() -> Void)?
     var onTitleSave: ((String) -> Void)?  // Inline title edit callback
+    var isPendingResort: Bool = false  // Deferred sort: shows border when item changed but not yet re-sorted
 
     // State for inline title editing (double-tap)
     @State private var isEditingTitle = false
@@ -44,6 +45,16 @@ struct BacklogRow: View {
             RoundedRectangle(cornerRadius: 16)
                 .fill(.ultraThinMaterial)
         )
+        .overlay {
+            if isPendingResort {
+                RoundedRectangle(cornerRadius: 16)
+                    .strokeBorder(Color.accentColor, lineWidth: 2)
+                    .transition(.opacity)
+                    .allowsHitTesting(false)
+                    .accessibilityIdentifier("pendingResortBorder_\(item.id)")
+            }
+        }
+        .animation(.easeOut(duration: 0.3), value: isPendingResort)
         .contentShape(Rectangle())
         .userActivity(TaskEntity.activityType, isActive: !item.isCompleted) { activity in
             activity.title = item.title

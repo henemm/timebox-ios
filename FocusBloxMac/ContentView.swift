@@ -76,6 +76,16 @@ struct ContentView: View {
     @State private var editSeriesMode: Bool = false
     @State private var taskToEndSeries: LocalTask?
 
+    // Deferred sort: items stay in place after badge tap, re-sort after 3s timeout
+    @State private var pendingResortIDs: Set<UUID> = []
+    @State private var displaySnapshot: [LocalTask]?
+    @State private var resortTimer: Task<Void, Never>?
+
+    /// Tasks to display: uses snapshot during deferred sort, otherwise live data
+    private var displayedRegularTasks: [LocalTask] {
+        displaySnapshot ?? regularFilteredTasks
+    }
+
     // MARK: - Search Filter
     private func matchesSearch(_ task: LocalTask) -> Bool {
         guard !searchText.isEmpty else { return true }
@@ -422,7 +432,7 @@ struct ContentView: View {
 
                     // Priority tier sections (doNow, planSoon, eventually, someday)
                     ForEach(TaskPriorityScoringService.PriorityTier.allCases, id: \.self) { tier in
-                        let tierTasks = regularFilteredTasks.filter { task in
+                        let tierTasks = displayedRegularTasks.filter { task in
                             let taskTier = TaskPriorityScoringService.PriorityTier.from(score: scoreFor(task))
                             let isOverdue = overdueTasks.contains(where: { $0.uuid == task.uuid })
                             return taskTier == tier && !isOverdue
@@ -453,7 +463,7 @@ struct ContentView: View {
                 } else {
                     // Non-priority filters: flat list (recent, overdue, completed, recurring)
                     Section {
-                        ForEach(regularFilteredTasks, id: \.uuid) { task in
+                        ForEach(displayedRegularTasks, id: \.uuid) { task in
                             taskRowWithSwipe(task: task)
                         }
                         .onMove { from, to in
@@ -986,20 +996,46 @@ struct ContentView: View {
             onImportanceCycle: { newValue in
                 task.importance = newValue
                 try? modelContext.save()
+                scheduleDeferredResort(taskID: task.uuid)
             },
             onUrgencyToggle: { newValue in
                 task.urgency = newValue
                 try? modelContext.save()
+                scheduleDeferredResort(taskID: task.uuid)
             },
             onCategorySelect: { category in
                 task.taskType = category
                 try? modelContext.save()
+                scheduleDeferredResort(taskID: task.uuid)
             },
             onDurationSelect: { duration in
                 task.estimatedDuration = duration
                 try? modelContext.save()
-            }
+                scheduleDeferredResort(taskID: task.uuid)
+            },
+            isPendingResort: pendingResortIDs.contains(task.uuid)
         )
+    }
+
+    // MARK: - Deferred Sort (item stays in place after badge tap, re-sorts after 3s)
+    private func scheduleDeferredResort(taskID: UUID) {
+        if displaySnapshot == nil {
+            displaySnapshot = regularFilteredTasks
+        }
+        pendingResortIDs.insert(taskID)
+        resortTimer?.cancel()
+        resortTimer = Task {
+            try? await Task.sleep(for: .seconds(3))
+            guard !Task.isCancelled else { return }
+            withAnimation(.easeOut(duration: 0.3)) {
+                pendingResortIDs.removeAll()
+            }
+            try? await Task.sleep(for: .milliseconds(200))
+            guard !Task.isCancelled else { return }
+            withAnimation(.spring) {
+                displaySnapshot = nil
+            }
+        }
     }
 }
 
