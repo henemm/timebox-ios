@@ -13,11 +13,6 @@ struct MainTabView: View {
                     Label("Blöcke", systemImage: "calendar")
                 }
 
-            TaskAssignmentView()
-                .tabItem {
-                    Label("Zuordnen", systemImage: "arrow.up.arrow.down")
-                }
-
             FocusLiveView()
                 .tabItem {
                     Label("Fokus", systemImage: "target")

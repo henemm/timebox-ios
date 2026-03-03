@@ -5,16 +5,17 @@ import SwiftUI
 struct FocusBlockTasksSheet: View {
     let block: FocusBlock
     let tasks: [PlanItem]
+    let nextUpTasks: [PlanItem]
     let onReorder: ([String]) -> Void
     let onRemoveTask: (String) -> Void
-    let onAddTask: () -> Void
+    let onAssignTask: (String) -> Void
 
     @Environment(\.dismiss) private var dismiss
     @State private var taskOrder: [PlanItem] = []
 
     var body: some View {
         NavigationStack {
-            contentView
+            taskListView
                 .navigationTitle("Tasks im Block")
                 #if os(iOS)
                 .navigationBarTitleDisplayMode(.inline)
@@ -34,72 +35,53 @@ struct FocusBlockTasksSheet: View {
         }
     }
 
-    @ViewBuilder
-    private var contentView: some View {
-        if taskOrder.isEmpty {
-            emptyStateView
-        } else {
-            taskListView
-        }
-    }
-
-    private var emptyStateView: some View {
-        VStack(spacing: 16) {
-            Image(systemName: "tray")
-                .font(.system(size: 48))
-                .foregroundStyle(.secondary)
-
-            Text("Keine Tasks im Block")
-                .font(.headline)
-
-            Text("Füge Tasks hinzu, um diesen Focus Block zu füllen.")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
-
-            Button {
-                onAddTask()
-            } label: {
-                Label("Task hinzufügen", systemImage: "plus.circle.fill")
-                    .frame(maxWidth: .infinity)
-            }
-            .buttonStyle(.borderedProminent)
-            .accessibilityIdentifier("addTaskToBlockButton")
-        }
-        .padding()
-    }
-
     private var taskListView: some View {
-        VStack(spacing: 0) {
-            List {
-                ForEach(taskOrder) { task in
-                    BlockTaskRow(task: task)
-                        .accessibilityIdentifier("blockTask_\(task.id)")
+        List {
+            // MARK: - Assigned Tasks Section
+            if taskOrder.isEmpty {
+                Section {
+                    VStack(spacing: 12) {
+                        Image(systemName: "tray")
+                            .font(.system(size: 36))
+                            .foregroundStyle(.secondary)
+                        Text("Keine Tasks im Block")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 8)
                 }
-                .onMove(perform: moveTask)
-                .onDelete(perform: deleteTask)
-            }
-            #if os(iOS)
-            .listStyle(.insetGrouped)
-            #else
-            .listStyle(.plain)
-            #endif
-
-            // Footer with Add Task button
-            HStack {
-                Button {
-                    onAddTask()
-                } label: {
-                    Label("Task hinzufügen", systemImage: "plus.circle.fill")
+            } else {
+                Section {
+                    ForEach(taskOrder) { task in
+                        BlockTaskRow(task: task)
+                            .accessibilityIdentifier("blockTask_\(task.id)")
+                    }
+                    .onMove(perform: moveTask)
+                    .onDelete(perform: deleteTask)
                 }
-                .buttonStyle(.bordered)
-                .accessibilityIdentifier("addTaskToBlockButton")
-
-                Spacer()
             }
-            .padding()
-            .background(.ultraThinMaterial)
+
+            // MARK: - Next Up Section
+            if !nextUpTasks.isEmpty {
+                Section {
+                    ForEach(nextUpTasks) { task in
+                        SheetNextUpRow(task: task) {
+                            onAssignTask(task.id)
+                        }
+                        .accessibilityIdentifier("nextUpTask_\(task.id)")
+                    }
+                } header: {
+                    Text("Next Up (\(nextUpTasks.count))")
+                        .accessibilityIdentifier("nextUpSectionHeader")
+                }
+            }
         }
+        #if os(iOS)
+        .listStyle(.insetGrouped)
+        #else
+        .listStyle(.plain)
+        #endif
     }
 
     private func moveTask(from source: IndexSet, to destination: Int) {
@@ -112,6 +94,45 @@ struct FocusBlockTasksSheet: View {
             onRemoveTask(taskOrder[index].id)
         }
         taskOrder.remove(atOffsets: offsets)
+    }
+}
+
+// MARK: - Next Up Task Row
+
+/// Row for a Next Up task in the FocusBlockTasksSheet
+/// Tap the arrow-up button to assign the task to the current block
+struct SheetNextUpRow: View {
+    let task: PlanItem
+    let onAssign: () -> Void
+
+    var body: some View {
+        HStack(spacing: 12) {
+            // Task info
+            VStack(alignment: .leading, spacing: 2) {
+                Text(task.title)
+                    .font(.body)
+                    .lineLimit(2)
+
+                Label("\(task.effectiveDuration) min", systemImage: "clock")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
+            Spacer()
+
+            // Assign button
+            Button {
+                onAssign()
+            } label: {
+                Image(systemName: "arrow.up.circle")
+                    .font(.title2)
+                    .foregroundStyle(.blue)
+            }
+            .buttonStyle(.borderless)
+            .accessibilityIdentifier("assignNextUpTask_\(task.id)")
+            .accessibilityLabel("Task zum Block hinzufügen")
+        }
+        .padding(.vertical, 4)
     }
 }
 
@@ -192,8 +213,9 @@ struct BlockTaskRow: View {
             taskIDs: ["task1", "task2"]
         ),
         tasks: [],
+        nextUpTasks: [],
         onReorder: { _ in },
         onRemoveTask: { _ in },
-        onAddTask: {}
+        onAssignTask: { _ in }
     )
 }

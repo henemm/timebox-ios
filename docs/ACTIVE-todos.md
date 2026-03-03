@@ -6,6 +6,18 @@
 
 ---
 
+## ERLEDIGT: Feature — Unified Calendar View (Phase 1)
+
+- **Ziel:** Zuordnen-Tab entfernen, Task-Zuweisung direkt im Block-Sheet
+- **Aenderungen:**
+  - `MainTabView.swift`: Zuordnen-Tab entfernt (5→4 Tabs)
+  - `BlockPlanningView.swift`: assignTaskToBlock + removeTaskFromBlock mit SyncEngine, nextUpTasksNotInBlock, Gear-Icon statt Ellipsis
+  - `FocusBlockTasksSheet.swift`: Next-Up-Sektion mit arrow.up.circle Button zum Zuweisen
+- **Tests:** 8 UI Tests gruen (2 neue + 6 Regression), Build OK (iOS + macOS)
+- **Spec:** `docs/specs/features/unified-calendar-view.md`
+
+---
+
 ## ERLEDIGT: Bug — Siri-Shortcuts nicht funktional + SiriTipView nicht persistent
 
 - **Symptom:** Siri-Tipps erscheinen in der App (ContentView, SettingsView), Siri-Kommandos funktionieren nicht auf echtem Geraet, SiriTipView erscheint bei jedem App-Start neu

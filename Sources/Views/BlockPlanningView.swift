@@ -15,6 +15,7 @@ struct BlockPlanningView: View {
     @State private var blockToEdit: FocusBlock?
     @State private var blockForTasks: FocusBlock?
     @State private var eventToCategories: CalendarEvent?
+    @State private var assignmentFeedback = false
 
     private let hourHeight: CGFloat = 60
     private let startHour = 6
@@ -91,18 +92,20 @@ struct BlockPlanningView: View {
                     }
                 )
             }
+            .sensoryFeedback(.success, trigger: assignmentFeedback)
             .sheet(item: $blockForTasks) { block in
                 FocusBlockTasksSheet(
                     block: block,
                     tasks: tasksForBlock(block),
+                    nextUpTasks: nextUpTasksNotInBlock(block),
                     onReorder: { newOrder in
                         reorderTasksInBlock(block, taskIDs: newOrder)
                     },
                     onRemoveTask: { taskID in
                         removeTaskFromBlock(block, taskID: taskID)
                     },
-                    onAddTask: {
-                        // Will be implemented: show task picker
+                    onAssignTask: { taskID in
+                        assignTaskToBlock(taskID: taskID, block: block)
                     }
                 )
             }
@@ -372,9 +375,46 @@ struct BlockPlanningView: View {
                     completedTaskIDs: block.completedTaskIDs,
                     taskTimes: block.taskTimes
                 )
+
+                // Clear assignedFocusBlockID and restore to Next Up
+                let taskSource = LocalTaskSource(modelContext: modelContext)
+                let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
+                try syncEngine.updateAssignedFocusBlock(itemID: taskID, focusBlockID: nil)
+                try syncEngine.updateNextUp(itemID: taskID, isNextUp: true)
+
                 await loadData()
+                assignmentFeedback.toggle()
             } catch {
                 errorMessage = "Task konnte nicht entfernt werden."
+            }
+        }
+    }
+
+    private func assignTaskToBlock(taskID: String, block: FocusBlock) {
+        Task {
+            do {
+                var updatedTaskIDs = block.taskIDs
+                if !updatedTaskIDs.contains(taskID) {
+                    updatedTaskIDs.append(taskID)
+                }
+
+                try eventKitRepo.updateFocusBlock(
+                    eventID: block.id,
+                    taskIDs: updatedTaskIDs,
+                    completedTaskIDs: block.completedTaskIDs,
+                    taskTimes: block.taskTimes
+                )
+
+                // Remove from Next Up and set assignedFocusBlockID
+                let taskSource = LocalTaskSource(modelContext: modelContext)
+                let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
+                try syncEngine.updateNextUp(itemID: taskID, isNextUp: false)
+                try syncEngine.updateAssignedFocusBlock(itemID: taskID, focusBlockID: block.id)
+
+                await loadData()
+                assignmentFeedback.toggle()
+            } catch {
+                errorMessage = "Task konnte nicht zugeordnet werden."
             }
         }
     }
@@ -466,6 +506,11 @@ struct BlockPlanningView: View {
         block.taskIDs.compactMap { taskID in
             allTasks.first { $0.id == taskID }
         }
+    }
+
+    private func nextUpTasksNotInBlock(_ block: FocusBlock) -> [PlanItem] {
+        let blockTaskIDs = Set(block.taskIDs)
+        return allTasks.filter { $0.isNextUp && !$0.isCompleted && !blockTaskIDs.contains($0.id) }
     }
 
     private func createFocusBlock(startDate: Date, endDate: Date) {
@@ -1211,11 +1256,11 @@ struct TimelineFocusBlockRow: View {
             .accessibilityAddTraits(.isButton)
             .accessibilityLabel("Tasks anzeigen")
 
-            // Edit button (ellipsis) - opens Edit Sheet
+            // Edit button (gear) - opens Edit Sheet
             Button {
                 onTapEdit()
             } label: {
-                Image(systemName: "ellipsis")
+                Image(systemName: "gearshape")
                     .font(.body)
                     .foregroundStyle(.secondary)
                     .padding(8)
