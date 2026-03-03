@@ -6,6 +6,20 @@
 
 ---
 
+## ERLEDIGT: Bug — Siri-Shortcuts nicht funktional + SiriTipView nicht persistent
+
+- **Symptom:** Siri-Tipps erscheinen in der App (ContentView, SettingsView), Siri-Kommandos funktionieren nicht auf echtem Geraet, SiriTipView erscheint bei jedem App-Start neu
+- **Root Cause:**
+  1. `updateAppShortcutParameters()` wurde nie aufgerufen — Siri konnte die Shortcuts nicht indizieren
+  2. SiriTipView-Dismissal nutzte `@State` statt `@AppStorage` — State ging bei App-Neustart verloren
+- **Fix:**
+  - `FocusBloxApp.swift`: `FocusBloxShortcuts.updateAppShortcutParameters()` beim App-Start aufrufen
+  - `ContentView.swift`: `@State` → `@AppStorage("siriTipGetNextUpVisible")` fuer persistentes Dismissal
+  - `SettingsView.swift`: `@State` → `@AppStorage("siriTipCompleteTaskVisible")` fuer persistentes Dismissal
+- **Tests:** UI Test (SiriTipPersistenceUITests) — Dismissal persistiert nach App-Relaunch
+
+---
+
 ## ERLEDIGT: Bug — Toolbar inkonsistent in BacklogView (iOS)
 
 - **Symptom:** + Button fehlt auf echtem Geraet, Import-Button erscheint inkonsistent, "..." Overflow, Dropdown fehlt in Wiederkehrend-Mode

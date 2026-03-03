@@ -240,6 +240,8 @@ struct FocusBloxApp: App {
                     let titleEngine = TaskTitleEngine(modelContext: sharedModelContainer.mainContext)
                     Task { await titleEngine.improveAllPendingTitles() }
                 }
+                // Register App Shortcuts with Siri so voice commands are discoverable
+                FocusBloxShortcuts.updateAppShortcutParameters()
                 // Request calendar/reminders permission on app launch (Bug 8 fix)
                 requestPermissionsOnLaunch()
                 // Check for CC trigger (App Group flag)

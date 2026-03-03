@@ -2,7 +2,7 @@ import AppIntents
 import SwiftUI
 
 struct ContentView: View {
-    @State private var showGetNextUpTip = true
+    @AppStorage("siriTipGetNextUpVisible") private var showGetNextUpTip = true
 
     var body: some View {
         VStack(spacing: 0) {

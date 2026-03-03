@@ -27,7 +27,7 @@ struct SettingsView: View {
     @State private var allCalendars: [EKCalendar] = []
     @State private var writableCalendars: [EKCalendar] = []
     @State private var allReminderLists: [ReminderListInfo] = []
-    @State private var showCompleteTaskTip = true
+    @AppStorage("siriTipCompleteTaskVisible") private var showCompleteTaskTip = true
 
     var body: some View {
         NavigationStack {
