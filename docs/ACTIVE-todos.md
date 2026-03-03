@@ -6,6 +6,20 @@
 
 ---
 
+## ERLEDIGT: Bug — Toolbar inkonsistent in BacklogView (iOS)
+
+- **Symptom:** + Button fehlt auf echtem Geraet, Import-Button erscheint inkonsistent, "..." Overflow, Dropdown fehlt in Wiederkehrend-Mode
+- **Root Cause:** SiriTipView (Commit ef8460b, nie angefordert) im Group-Container erzeugte TupleView + zu viele Toolbar-Items (4-5 statt 3) + zwei separate .toolbar Modifier
+- **Fix:**
+  - SiriTipView komplett entfernt (import AppIntents, @State showCreateTaskTip, SiriTipView)
+  - Import-Button aus Toolbar entfernt (gehoert in Settings)
+  - Toolbar konsolidiert: genau 3 Items (+, Dropdown, Gear) in einem einzigen .toolbar Block
+  - .withSettingsToolbar() durch inline Gear-Button ersetzt
+- **Betroffene Datei:** Sources/Views/BacklogView.swift
+- **Tests:** UI Tests (BacklogToolbarConsistencyUITests) — 7 Tests, alle 5 View-Modes geprueft
+
+---
+
 ## ERLEDIGT: Bug — Sync zwischen macOS und iOS langsam/nicht automatisch
 
 - **Symptom:** Sync dauert sehr lange, Aenderungen (Tasks, NextUp, Kategorien) werden nicht automatisch gepusht/gepullt

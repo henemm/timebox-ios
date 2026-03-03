@@ -1,4 +1,3 @@
-import AppIntents
 import SwiftUI
 import SwiftData
 
@@ -68,8 +67,8 @@ struct BacklogView: View {
     @State private var taskToEndSeries: PlanItem?
     @State private var searchText = ""
     @State private var showUndoAlert = false
+    @State private var showSettings = false
     @State private var undoResultMessage = ""
-    @State private var showCreateTaskTip = true
 
     // MARK: - Search Filter
     private func matchesSearch(_ item: PlanItem) -> Bool {
@@ -119,10 +118,6 @@ struct BacklogView: View {
     var body: some View {
         NavigationStack {
             Group {
-                // ITB-G4: Siri Tip for task creation shortcut discovery
-                SiriTipView(intent: CreateTaskIntent(), isVisible: $showCreateTaskTip)
-                    .padding(.horizontal)
-
                 if isLoading {
                     ProgressView("Lade Tasks...")
                 } else if let error = errorMessage {
@@ -156,26 +151,23 @@ struct BacklogView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItemGroup(placement: .topBarTrailing) {
-                    viewModeSwitcher
-
-                    if remindersSyncEnabled {
-                        Button {
-                            Task { await importFromReminders() }
-                        } label: {
-                            Image(systemName: "square.and.arrow.down")
-                        }
-                        .accessibilityIdentifier("importRemindersButton")
-                    }
-
                     Button {
                         showCreateTask = true
                     } label: {
                         Image(systemName: "plus")
                     }
                     .accessibilityIdentifier("addTaskButton")
+
+                    viewModeSwitcher
+
+                    Button {
+                        showSettings = true
+                    } label: {
+                        Image(systemName: "gear")
+                    }
+                    .accessibilityIdentifier("settingsButton")
                 }
             }
-            .withSettingsToolbar()
             .alert("Erinnerungen importiert", isPresented: Binding(
                 get: { importStatusMessage != nil },
                 set: { if !$0 { importStatusMessage = nil } }
@@ -228,6 +220,9 @@ struct BacklogView: View {
                         await loadTasks()
                     }
                 }
+            }
+            .sheet(isPresented: $showSettings) {
+                SettingsView()
             }
             .sheet(item: $taskToEdit) { task in
                 TaskDetailSheet(
