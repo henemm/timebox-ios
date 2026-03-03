@@ -202,7 +202,63 @@ final class DeferredSortUITests: XCTestCase {
         )
     }
 
-    // MARK: - Test 4: Timer resets on subsequent badge tap
+    // MARK: - Test 4: Urgency cycle reaches nil (Bug 2 regression test)
+
+    /// Verhalten: Tapping urgency badge 3 times should cycle through all states:
+    /// nil → not_urgent → urgent → nil. The accessibility label changes with each state.
+    ///
+    /// Bricht wenn: updateUrgency() doesn't persist nil (e.g. SyncEngine.updateTask
+    /// uses `if let urgency` which skips nil assignments).
+    func testUrgencyCycleReachesNil() throws {
+        navigateToBacklog()
+
+        let firstBadge = app.buttons.matching(
+            NSPredicate(format: "identifier BEGINSWITH 'urgencyBadge_'")
+        ).firstMatch
+
+        guard firstBadge.waitForExistence(timeout: 5) else {
+            XCTFail("No urgency badge found — need at least one task in backlog")
+            return
+        }
+
+        // Pin to this specific badge by its full identifier (includes task ID)
+        let badgeID = firstBadge.identifier
+        let badge = app.buttons[badgeID]
+
+        // Read initial state (case-insensitive: label uses lowercase "nicht gesetzt")
+        let initialLabel = badge.label.lowercased()
+
+        // Determine how many taps to complete a full cycle back to nil
+        // Cycle: nil("nicht gesetzt") → not_urgent("nicht dringend") → urgent("dringend") → nil("nicht gesetzt")
+        let tapCount: Int
+        if initialLabel.contains("nicht gesetzt") {
+            tapCount = 3
+        } else if initialLabel.contains("nicht dringend") {
+            tapCount = 2
+        } else {
+            tapCount = 1
+        }
+
+        // Tap quickly — each tap resets the 3s deferred sort timer,
+        // so no list re-sort happens during the cycle
+        for _ in 0..<tapCount {
+            tapBadge(badge)
+            usleep(500_000) // 0.5s — fast enough to stay within timer window
+        }
+
+        // Brief wait for UI to settle
+        usleep(500_000)
+
+        // After full cycle, should be back to "nicht gesetzt" (nil)
+        let finalLabel = badge.label.lowercased()
+        XCTAssertTrue(
+            finalLabel.contains("nicht gesetzt"),
+            "After cycling through all urgency states, badge should show 'nicht gesetzt' (nil). "
+            + "Got: '\(badge.label)'. If stuck at 'Dringend', nil assignment is not persisted."
+        )
+    }
+
+    // MARK: - Test 5: Timer resets on subsequent badge tap
 
     /// EXPECTED TO FAIL (RED): No pending borders exist (feature not implemented).
     ///

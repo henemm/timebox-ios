@@ -326,6 +326,10 @@ struct BacklogView: View {
         }
         .onChange(of: cloudKitMonitor.remoteChangeCount) { oldVal, newVal in
             print("[CloudKit Debug] remoteChange onChange FIRED: \(oldVal) -> \(newVal)")
+            guard pendingResortIDs.isEmpty else {
+                print("[CloudKit Debug] Skipping refresh — deferred sort pending")
+                return
+            }
             Task {
                 try? await Task.sleep(for: .milliseconds(200))
                 await refreshLocalTasks()
@@ -499,9 +503,16 @@ struct BacklogView: View {
 
     private func updateImportance(for item: PlanItem, importance: Int?) {
         do {
-            let taskSource = LocalTaskSource(modelContext: modelContext)
-            let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
-            try syncEngine.updateTask(itemID: item.id, title: item.title, importance: importance, duration: item.estimatedDuration, tags: item.tags, urgency: item.urgency, taskType: item.taskType, dueDate: item.dueDate, description: item.taskDescription)
+            guard let itemUUID = UUID(uuidString: item.id) else { return }
+            let descriptor = FetchDescriptor<LocalTask>(predicate: #Predicate { $0.uuid == itemUUID })
+            guard let task = try modelContext.fetch(descriptor).first else { return }
+            task.importance = importance
+            task.modifiedAt = Date()
+            try modelContext.save()
+            // Update local PlanItem immediately so badge shows new value
+            if let index = planItems.firstIndex(where: { $0.id == item.id }) {
+                planItems[index] = PlanItem(localTask: task)
+            }
             scheduleDeferredResort(for: item.id)
         } catch {
             errorMessage = "Wichtigkeit konnte nicht aktualisiert werden."
@@ -510,9 +521,16 @@ struct BacklogView: View {
 
     private func updateUrgency(for item: PlanItem, urgency: String?) {
         do {
-            let taskSource = LocalTaskSource(modelContext: modelContext)
-            let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
-            try syncEngine.updateTask(itemID: item.id, title: item.title, importance: item.importance, duration: item.estimatedDuration, tags: item.tags, urgency: urgency, taskType: item.taskType, dueDate: item.dueDate, description: item.taskDescription)
+            guard let itemUUID = UUID(uuidString: item.id) else { return }
+            let descriptor = FetchDescriptor<LocalTask>(predicate: #Predicate { $0.uuid == itemUUID })
+            guard let task = try modelContext.fetch(descriptor).first else { return }
+            task.urgency = urgency
+            task.modifiedAt = Date()
+            try modelContext.save()
+            // Update local PlanItem immediately so badge shows new value
+            if let index = planItems.firstIndex(where: { $0.id == item.id }) {
+                planItems[index] = PlanItem(localTask: task)
+            }
             scheduleDeferredResort(for: item.id)
         } catch {
             errorMessage = "Dringlichkeit konnte nicht aktualisiert werden."

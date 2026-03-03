@@ -17,6 +17,7 @@ struct MacBacklogRow: View {
     var onCategorySelect: ((String) -> Void)?  // Direct category selection (macOS Menu)
     var onDurationSelect: ((Int?) -> Void)?    // Direct duration selection (macOS Menu)
     var isPendingResort: Bool = false  // Deferred sort: shows border when item changed but not yet re-sorted
+    @State private var pendingPulse = false
 
     var body: some View {
         HStack(spacing: 10) {
@@ -64,13 +65,22 @@ struct MacBacklogRow: View {
         .overlay {
             if isPendingResort {
                 RoundedRectangle(cornerRadius: 8)
-                    .strokeBorder(Color.accentColor, lineWidth: 2)
-                    .transition(.opacity)
+                    .strokeBorder(Color.orange, lineWidth: pendingPulse ? 2.5 : 1.5)
+                    .opacity(pendingPulse ? 0.9 : 0.4)
                     .allowsHitTesting(false)
                     .accessibilityIdentifier("pendingResortBorder_\(task.uuid.uuidString)")
             }
         }
         .animation(.easeOut(duration: 0.3), value: isPendingResort)
+        .onChange(of: isPendingResort) { _, pending in
+            if pending {
+                withAnimation(.easeInOut(duration: 0.8).repeatForever(autoreverses: true)) {
+                    pendingPulse = true
+                }
+            } else {
+                pendingPulse = false
+            }
+        }
         .userActivity("com.henning.focusblox.viewTask", isActive: !task.isCompleted) { activity in
             activity.title = task.title
             activity.isEligibleForSearch = true

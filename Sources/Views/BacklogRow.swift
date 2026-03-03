@@ -18,6 +18,7 @@ struct BacklogRow: View {
     @State private var isEditingTitle = false
     @State private var editableTitle: String = ""
     @FocusState private var titleFieldFocused: Bool
+    @State private var pendingPulse = false
 
     // MARK: - Body
 
@@ -48,13 +49,22 @@ struct BacklogRow: View {
         .overlay {
             if isPendingResort {
                 RoundedRectangle(cornerRadius: 16)
-                    .strokeBorder(Color.accentColor, lineWidth: 2)
-                    .transition(.opacity)
+                    .strokeBorder(Color.orange, lineWidth: pendingPulse ? 2.5 : 1.5)
+                    .opacity(pendingPulse ? 0.9 : 0.4)
                     .allowsHitTesting(false)
                     .accessibilityIdentifier("pendingResortBorder_\(item.id)")
             }
         }
         .animation(.easeOut(duration: 0.3), value: isPendingResort)
+        .onChange(of: isPendingResort) { _, pending in
+            if pending {
+                withAnimation(.easeInOut(duration: 0.8).repeatForever(autoreverses: true)) {
+                    pendingPulse = true
+                }
+            } else {
+                pendingPulse = false
+            }
+        }
         .contentShape(Rectangle())
         .userActivity(TaskEntity.activityType, isActive: !item.isCompleted) { activity in
             activity.title = item.title

@@ -144,7 +144,7 @@
 **Guenstigster Quick Win:** ~~Shake to Undo (XS)~~ ERLEDIGT
 **Teuerste Items:** #17 OrganizeMyDay (~150k), #13 Drag & Drop (~150k), #14 NC Widget (~120k)
 **WARTEND (Apple-Abhaengigkeit):** #20 ITB-F — Developer-APIs verfuegbar, wartet auf Siri On-Screen Awareness (iOS 26.5/27)
-**Zuletzt erledigt:** Bug 66 — macOS FocusBlock dynamisches MenuBar-Icon + Sync-Deadlock Fix
+**Zuletzt erledigt:** Deferred List Sorting — 3 Bugfixes (Urgency-Nil-Zyklus, onChange Guard, Orange Puls-Border)
 **Naechstes:** #5 MAC-022 Spotlight Integration oder #7 Kalender-App Deep Link
 **Neu (User Story):** #22-26 Contextual Task Capture — siehe `docs/project/stories/contextual-task-capture.md`
 
@@ -287,6 +287,14 @@
 ---
 
 ## Erledigte Features & Bugs (Archiv)
+
+### 2026-03-03: Deferred List Sorting — 3 Bugfixes
+- Commit: `fix: Deferred List Sorting — 3 Bugs (Urgency-Nil-Zyklus, onChange Guard, Orange Puls-Border)`
+- **Bug 1 (iOS springt sofort):** `.onChange(of: remoteChangeCount)` Guard — Refresh wird uebersprungen wenn `pendingResortIDs` nicht leer ist
+- **Bug 2 (Urgency haengt bei Dringend):** `updateUrgency()`/`updateImportance()` umgehen jetzt SyncEngine und setzen LocalTask direkt (nil funktioniert korrekt) + lokales PlanItem-Update nach Save
+- **Bug 3 (Blauer Rahmen = Selektion):** Orange pulsierender Rahmen statt statischem Blau (iOS + macOS)
+- Files: BacklogView.swift, BacklogRow.swift, MacBacklogRow.swift, LocalTaskTests.swift, DeferredSortUITests.swift, MacDeferredSortUITests.swift (NEU)
+- Tests: 1 Unit Test + 5 iOS UI Tests + 3 macOS UI Tests = 9 Tests, alle GREEN
 
 ### 2026-02-22: Undo Task Completion (Shake to Undo iOS + Cmd+Z macOS)
 - Commit: `feat: Undo Task Completion — Shake (iOS) + Cmd+Z (macOS)`

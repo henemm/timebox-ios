@@ -228,6 +228,44 @@ final class LocalTaskTests: XCTestCase {
         XCTAssertEqual(task.urgency, "urgent")
     }
 
+    /// Tests the full urgency cycle: nil → not_urgent → urgent → nil.
+    /// Bug 2 fix: SyncEngine.updateTask() used `if let urgency` which ignored nil,
+    /// so the cycle got stuck at "urgent". Direct LocalTask mutation fixes this.
+    func test_localTask_urgencyCycleReachesNil() throws {
+        let context = container.mainContext
+        let task = LocalTask(title: "Cycle Test", importance: 1)
+        context.insert(task)
+        try context.save()
+
+        // Step 0: Default is nil
+        XCTAssertNil(task.urgency, "Default urgency should be nil")
+
+        // Step 1: nil → not_urgent
+        task.urgency = "not_urgent"
+        task.modifiedAt = Date()
+        try context.save()
+
+        let uuid1 = task.uuid
+        let fetched1 = try context.fetch(FetchDescriptor<LocalTask>(predicate: #Predicate { $0.uuid == uuid1 })).first
+        XCTAssertEqual(fetched1?.urgency, "not_urgent", "After first cycle step, urgency should be 'not_urgent'")
+
+        // Step 2: not_urgent → urgent
+        task.urgency = "urgent"
+        task.modifiedAt = Date()
+        try context.save()
+
+        let fetched2 = try context.fetch(FetchDescriptor<LocalTask>(predicate: #Predicate { $0.uuid == uuid1 })).first
+        XCTAssertEqual(fetched2?.urgency, "urgent", "After second cycle step, urgency should be 'urgent'")
+
+        // Step 3: urgent → nil (THIS was the bug — nil assignment must persist)
+        task.urgency = nil
+        task.modifiedAt = Date()
+        try context.save()
+
+        let fetched3 = try context.fetch(FetchDescriptor<LocalTask>(predicate: #Predicate { $0.uuid == uuid1 })).first
+        XCTAssertNil(fetched3?.urgency, "After third cycle step, urgency should be nil again — not stuck at 'urgent'")
+    }
+
     func test_localTask_taskTypeCanBeSet() throws {
         let context = container.mainContext
         let taskIncome = LocalTask(title: "Work", importance: 2, taskType: "income")
