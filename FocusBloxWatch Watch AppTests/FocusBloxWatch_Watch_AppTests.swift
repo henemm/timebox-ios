@@ -118,6 +118,53 @@ struct WatchLocalTaskSchemaTests {
         #expect(task.sourceSystem == "local")
     }
 
+    // MARK: - CloudKit Entitlements (bug-watch-to-iphone-sync)
+
+    /// Verhalten: Watch-Entitlements enthalten iCloud-Container-Identifier fuer CloudKit-Sync
+    /// Bricht wenn: Entitlements-Datei fehlt com.apple.developer.icloud-container-identifiers
+    @Test func watchEntitlements_hasCloudKitContainerIdentifier() throws {
+        let entitlements = try loadWatchEntitlements()
+        let containers = entitlements["com.apple.developer.icloud-container-identifiers"] as? [String]
+        #expect(containers?.contains("iCloud.com.henning.focusblox") == true,
+                "Watch entitlements must include iCloud container for CloudKit sync")
+    }
+
+    /// Verhalten: Watch-Entitlements enthalten CloudKit-Service-Deklaration
+    /// Bricht wenn: Entitlements-Datei fehlt com.apple.developer.icloud-services
+    @Test func watchEntitlements_hasCloudKitService() throws {
+        let entitlements = try loadWatchEntitlements()
+        let services = entitlements["com.apple.developer.icloud-services"] as? [String]
+        #expect(services?.contains("CloudKit") == true,
+                "Watch entitlements must include CloudKit service for sync")
+    }
+
+    // MARK: - Watch ModelContainer Logging (bug-watch-to-iphone-sync)
+
+    /// Verhalten: Watch-App loggt CloudKit-Container-Status beim Start
+    /// Bricht wenn: FocusBloxWatchApp.swift hat kein Logging im ModelContainer-Setup
+    @Test func watchApp_logsCloudKitStatus() throws {
+        let testFile = URL(fileURLWithPath: #filePath)
+        let projectRoot = testFile.deletingLastPathComponent().deletingLastPathComponent()
+        let appFile = projectRoot
+            .appendingPathComponent("FocusBloxWatch Watch App")
+            .appendingPathComponent("FocusBloxWatchApp.swift")
+        let source = try String(contentsOf: appFile, encoding: .utf8)
+        #expect(source.contains("[CloudKit]"),
+                "FocusBloxWatchApp must log CloudKit container status for diagnostics")
+    }
+
+    // MARK: - Helper
+
+    private func loadWatchEntitlements() throws -> [String: Any] {
+        let testFile = URL(fileURLWithPath: #filePath)
+        let projectRoot = testFile.deletingLastPathComponent().deletingLastPathComponent()
+        let entitlementsURL = projectRoot
+            .appendingPathComponent("FocusBloxWatch Watch App")
+            .appendingPathComponent("FocusBloxWatch Watch App.entitlements")
+        let data = try Data(contentsOf: entitlementsURL)
+        return try PropertyListSerialization.propertyList(from: data, format: nil) as! [String: Any]
+    }
+
     // MARK: - ModelContainer Integration: Full iOS-Schema Data Round-Trip
 
     /// Verhalten: Watch ModelContainer kann Tasks mit ALLEN iOS-Feldern speichern und laden

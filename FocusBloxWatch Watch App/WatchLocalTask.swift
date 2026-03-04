@@ -6,37 +6,37 @@ import SwiftData
 /// Note: CloudKit requires all attributes to have default values.
 @Model
 final class LocalTask {
-    var uuid: UUID
-    var title: String
+    var uuid: UUID = UUID()
+    var title: String = ""
     var importance: Int?
-    var isCompleted: Bool
-    var tags: [String]
+    var isCompleted: Bool = false
+    var tags: [String] = []
     var dueDate: Date?
-    var createdAt: Date
-    var sortOrder: Int
+    var createdAt: Date = Date()
+    var sortOrder: Int = 0
     var estimatedDuration: Int?
     var urgency: String?
-    var taskType: String
-    var recurrencePattern: String
+    var taskType: String = ""
+    var recurrencePattern: String = "none"
     var recurrenceWeekdays: [Int]?
     var recurrenceMonthDay: Int?
     var recurrenceInterval: Int?
     var recurrenceGroupID: String?
-    var isTemplate: Bool
+    var isTemplate: Bool = false
     var taskDescription: String?
     var externalID: String?
-    var sourceSystem: String
-    var isNextUp: Bool
+    var sourceSystem: String = "local"
+    var isNextUp: Bool = false
     var nextUpSortOrder: Int?
 
     // MARK: - Fields synced from iOS (must exist for CloudKit schema parity)
 
     var assignedFocusBlockID: String?
-    var rescheduleCount: Int
+    var rescheduleCount: Int = 0
     var completedAt: Date?
     var aiScore: Int?
     var aiEnergyLevel: String?
-    var needsTitleImprovement: Bool
+    var needsTitleImprovement: Bool = false
     var sourceURL: String?
     var modifiedAt: Date?
 

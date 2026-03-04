@@ -6,6 +6,21 @@
 
 ---
 
+## ERLEDIGT: Bug — Watch-Task erscheint nicht auf iPhone (Watch→iPhone Sync)
+
+- **Symptom:** Task auf Apple Watch erstellt → erscheint NIE im iPhone-Backlog
+- **Root Cause:** Zwei Probleme in der Watch-App:
+  1. **Fehlende CloudKit-Entitlements:** Watch-Entitlements hatten nur App Group, keine `icloud-container-identifiers` oder `icloud-services` → ModelContainer-Init mit CloudKit konnte fehlschlagen → stiller Fallback auf `.cloudKitDatabase: .none` (kein Sync)
+  2. **Fehlende Stored-Property-Defaults:** WatchLocalTask.swift hatte keine Default-Werte auf den gespeicherten Properties (z.B. `var isCompleted: Bool` statt `var isCompleted: Bool = false`). CloudKit erfordert Default-Werte fuer Schema-Evolution.
+- **Fix (3 Dateien):**
+  - `WatchLocalTask.swift`: 13 Stored-Property-Defaults hinzugefuegt (Paritaet mit iOS LocalTask)
+  - `FocusBloxWatch Watch App.entitlements`: CloudKit-Entitlements hinzugefuegt (`icloud-container-identifiers` + `icloud-services`)
+  - `FocusBloxWatchApp.swift`: Logging bei ModelContainer-Init (Erfolg/Fallback sichtbar in Console)
+- **Tests:** 3 neue Tests (Entitlements + Logging), alle 19 Watch-Tests gruen
+- **Hinweis:** Watch-App muss auf dem Geraet geloescht und neu installiert werden
+
+---
+
 ## ERLEDIGT: Bug — Watch-App Crash auf Apple Watch Ultra 3
 
 - **Symptom:** App laedt kurz und stuerzt dann ab auf echter Apple Watch Ultra 3. Simulator funktioniert.
@@ -137,7 +152,7 @@
 | 3 | ~~NextUp Long Press Vorschau~~ | ERLEDIGT | XS | ~15-20k | 3 | ~120 |
 | 4 | ~~Generische Suche (iOS+macOS)~~ | ERLEDIGT | S | ~15-20k | 2-3 | ~25 |
 | 4b | ~~List-Views Cleanup (ViewModes 9→5)~~ | ERLEDIGT | M | ~50-70k | 6 | ~-270 |
-| 5 | MAC-022 Spotlight Integration | P2 | S | ~15-25k | 1-2 | ~30 |
+| 5 | MAC-022 Spotlight Integration | P2 | S | ~15-25k | 4 | ~20 |
 | 6 | ~~Recurring Tasks Phase 1B/2 (inkl. Sichtbarkeit + Edit/Delete Dialog)~~ | ERLEDIGT | M-L | ~60-100k | 5-6 | ~200 |
 | 7 | Kalender-App Deep Link (iOS+macOS) | MITTEL | M | ~40-50k | 3-4 | ~100 |
 | 8 | ~~Push Notifications bei Frist~~ | ERLEDIGT | M | ~60-80k | 9 | ~180 |
@@ -305,6 +320,18 @@
 
 ### ~~BACKLOG-007: SidebarView macOS-only~~ Kein Debt
 - macOS-Sidebar ist plattform-spezifisch by Design (NavigationSplitView)
+
+### BACKLOG-008: Workflow-System — Echte Parallelitaet
+- **Status:** OFFEN
+- **Prio:** P2 (blockiert aktiv die Arbeit)
+- **Problem:** `workflow_state_multi.py` hat nur EIN `active_workflow` — alle Hooks (Override-Token, Code-Gate, TDD-Enforcement) pruefen immer nur den aktiven. Bei 100+ Workflows im State wechselt `complete_workflow()` automatisch auf irgendeinen alten Workflow. Override-Tokens landen beim falschen Workflow.
+- **Gewuenschtes Verhalten:**
+  - Hooks erkennen anhand der **betroffenen Dateien**, welchem Workflow ein Edit gehoert
+  - Override-Token bezieht sich auf einen expliziten Workflow (nicht blind den aktiven)
+  - Kein `active_workflow` Konzept mehr noetig
+  - Mehrere Workflows koennen gleichzeitig in Implementation-Phase sein
+- **Betroffene Dateien:** `.claude/hooks/workflow_state_multi.py`, `.claude/hooks/strict_code_gate.py`, `.claude/hooks/tdd_enforcement.py`
+- **Aufwand:** M (2-3 Sessions)
 
 ---
 

@@ -12,20 +12,28 @@ struct FocusBloxWatch_Watch_AppApp: App {
         ])
 
         // Try with App Group + CloudKit first, fallback to local-only
-        if let _ = FileManager.default.containerURL(
+        if let containerURL = FileManager.default.containerURL(
             forSecurityApplicationGroupIdentifier: appGroupID
         ) {
+            print("[CloudKit] Watch: App Group verfuegbar (\(containerURL.path))")
             let cloudConfig = ModelConfiguration(
                 schema: schema,
                 groupContainer: .identifier(appGroupID),
                 cloudKitDatabase: .private("iCloud.com.henning.focusblox")
             )
-            if let container = try? ModelContainer(for: schema, configurations: [cloudConfig]) {
+            do {
+                let container = try ModelContainer(for: schema, configurations: [cloudConfig])
+                print("[CloudKit] Watch: ModelContainer mit CloudKit ERFOLGREICH erstellt")
                 return container
+            } catch {
+                print("[CloudKit] Watch: ModelContainer mit CloudKit FEHLGESCHLAGEN: \(error)")
             }
+        } else {
+            print("[CloudKit] Watch: App Group NICHT verfuegbar — kein CloudKit moeglich")
         }
 
-        // Fallback: CloudKit without App Group
+        // Fallback: local-only (NO CloudKit sync!)
+        print("[CloudKit] Watch: FALLBACK auf lokalen Speicher OHNE CloudKit-Sync!")
         let fallbackConfig = ModelConfiguration(
             schema: schema,
             isStoredInMemoryOnly: false,
