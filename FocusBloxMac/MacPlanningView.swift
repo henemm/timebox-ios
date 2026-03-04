@@ -86,6 +86,12 @@ struct MacPlanningView: View {
                 await loadPlanItems()
             }
         }
+        .onChange(of: eventKitRepo.eventStoreChangeCount) {
+            Task {
+                await loadCalendarEvents()
+                await loadPlanItems()
+            }
+        }
         .sheet(item: $blockToEdit) { block in
             EditFocusBlockSheet(
                 block: block,

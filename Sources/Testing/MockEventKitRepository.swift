@@ -4,6 +4,10 @@ import Foundation
 /// Mock implementation of EventKitRepositoryProtocol for testing
 /// Available in both main and test targets for UI testing support
 final class MockEventKitRepository: EventKitRepositoryProtocol, @unchecked Sendable {
+    // MARK: - Event Store Changes
+
+    var eventStoreChangeCount: Int = 0
+
     // MARK: - Configurable Mock State
 
     var mockReminderAuthStatus: EKAuthorizationStatus = .fullAccess

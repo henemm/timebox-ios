@@ -4,6 +4,27 @@ import Foundation
 @Observable
 final class EventKitRepository: EventKitRepositoryProtocol, @unchecked Sendable {
     private let eventStore = EKEventStore()
+    private var eventStoreObserver: Any?
+
+    /// Incremented when EventKit database changes (local or via iCloud sync).
+    /// Views can observe this to auto-refresh FocusBlocks.
+    var eventStoreChangeCount = 0
+
+    init() {
+        eventStoreObserver = NotificationCenter.default.addObserver(
+            forName: .EKEventStoreChanged,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.eventStoreChangeCount += 1
+        }
+    }
+
+    deinit {
+        if let observer = eventStoreObserver {
+            NotificationCenter.default.removeObserver(observer)
+        }
+    }
 
     /// Check if running in UI test mode
     static var isUITesting: Bool {

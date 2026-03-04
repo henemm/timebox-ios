@@ -4,6 +4,11 @@ import Foundation
 /// Protocol for EventKit operations.
 /// Enables dependency injection and mocking in tests.
 @preconcurrency protocol EventKitRepositoryProtocol: Sendable {
+    // MARK: - Event Store Changes
+
+    /// Incremented when EventKit database changes (local or via iCloud sync)
+    var eventStoreChangeCount: Int { get }
+
     // MARK: - Authorization
 
     var reminderAuthStatus: EKAuthorizationStatus { get }

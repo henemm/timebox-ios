@@ -283,14 +283,16 @@
 - **Geaenderte Dateien:** FocusBlockTasksSheet.swift, BlockPlanningView.swift, MacPlanningView.swift, ContentView.swift (macOS)
 - **UI Tests:** 5/5 gruen (Bug68BlockTaskSheetUITests)
 
-### Bug 69: FocusBlock Cross-Platform Sync zu langsam / nur unidirektional (OFFEN)
-- **Status:** OFFEN — Architektur-Analyse noetig
+### Bug 69: FocusBlock Cross-Platform Sync zu langsam (ERLEDIGT)
+- **Status:** ERLEDIGT
 - **Plattform:** iOS ↔ macOS
-- **Prio:** L-XL (Architektur-Entscheidung, potenziell grosser Umbau)
-- **Symptom:** Neue FocusBlocks erscheinen nicht innerhalb von 10sec auf der anderen Plattform. Sync funktioniert anscheinend nur iOS→macOS, nicht umgekehrt.
-- **Architektur-Hintergrund:** FocusBlocks sind EventKit Calendar Events. Sync laeuft ueber Apple's iCloud Calendar Sync (nicht unsere Kontrolle). Task-Daten syncen ueber SwiftData/CloudKit (funktioniert).
-- **Analyse noetig:** Soll FocusBlock-Storage von EventKit auf SwiftData migriert werden? Das wuerde uns volle Kontrolle ueber Sync geben (Push/Pull via CloudKit), ist aber ein grosser Architektur-Umbau.
-- **Naechster Schritt:** Analyse der SwiftData-Migration (Machbarkeit, Aufwand, Risiken)
+- **Symptom:** Neue FocusBlocks erscheinen nicht innerhalb von 10sec auf der anderen Plattform
+- **Root Cause:** Fehlender `EKEventStoreChangedNotification` Listener — Views haben nie automatisch neu geladen wenn EventKit-DB sich aenderte (z.B. durch iCloud Calendar Sync)
+- **Fix:** EKEventStoreChangedNotification Listener in EventKitRepository + reaktiver .onChange in BlockPlanningView (iOS) und MacPlanningView (macOS)
+- **Dateien:** EventKitRepository.swift, EventKitRepositoryProtocol.swift, MockEventKitRepository.swift, BlockPlanningView.swift, MacPlanningView.swift
+- **Tests:** 3 Unit Tests (EventStoreChangeNotificationTests), Build OK (iOS + macOS)
+- **Analyse:** `docs/artifacts/bug-focusblock-sync-slow/analysis.md`
+- **Hinweis:** Refresh-Latenz haengt von Apple iCloud Calendar Sync ab (typisch 5-30s)
 
 ### Bug 70: Drag & Drop fuer FocusBlocks auf Timeline (OFFEN)
 - **Status:** OFFEN — ueberschneidet sich mit Backlog #13 (MAC-020 Drag & Drop Planung)

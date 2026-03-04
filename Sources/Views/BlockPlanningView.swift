@@ -119,6 +119,11 @@ struct BlockPlanningView: View {
                 await loadData()
             }
         }
+        .onChange(of: eventKitRepo.eventStoreChangeCount) {
+            Task {
+                await loadData()
+            }
+        }
     }
 
     // MARK: - Timeline Content (Unified Planning View)
