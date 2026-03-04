@@ -197,11 +197,11 @@
 
 **Komplexitaet:** XS = halbe Stunde | S = 1 Session | M = 2-3 Sessions | L = halber Tag | XL = ganzer Tag+
 
-**Guenstigster Quick Win:** Bug 68 View-Umbau (M)
+**Guenstigster Quick Win:** #7 Kalender-App Deep Link (M)
 **Teuerste Items:** #17 OrganizeMyDay (~150k), Bug 70/~~#13~~ Drag & Drop (~150k), #14 NC Widget (~120k)
 **WARTEND (Apple-Abhaengigkeit):** #20 ITB-F — Developer-APIs verfuegbar, wartet auf Siri On-Screen Awareness (iOS 26.5/27)
-**Zuletzt erledigt:** Bug 67 Tab-Labels Deutsch→English (iOS + macOS)
-**Naechstes:** Bug 68 (View-Umbau, M) → Bug 69 (Sync-Analyse, L) → Bug 70 (D&D, XL)
+**Zuletzt erledigt:** Bug 69 FocusBlock Auto-Refresh (Cross-Device Sync)
+**Naechstes:** Bug 70 (D&D, XL) oder #7 Kalender Deep Link (M)
 **Neu (User Story):** #22-26 Contextual Task Capture — siehe `docs/project/stories/contextual-task-capture.md`
 
 > **Dies ist das EINZIGE Backlog.** macOS-Features (MAC-xxx) stehen hier mit Verweis auf ihre Specs in `docs/specs/macos/`. Kein zweites Backlog.
