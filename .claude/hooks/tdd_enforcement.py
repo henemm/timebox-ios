@@ -32,13 +32,13 @@ from datetime import datetime, timedelta
 # Import multi-workflow state manager
 try:
     from workflow_state_multi import (
-        load_state, get_active_workflow, PHASES,
+        load_state, get_active_workflow, find_workflow_for_file, PHASES,
         PHASE_NAMES, TEST_REQUIRED_PHASES
     )
 except ImportError:
     sys.path.insert(0, str(Path(__file__).parent))
     from workflow_state_multi import (
-        load_state, get_active_workflow, PHASES,
+        load_state, get_active_workflow, find_workflow_for_file, PHASES,
         PHASE_NAMES, TEST_REQUIRED_PHASES
     )
 
@@ -350,7 +350,14 @@ def check_tdd_requirements(file_path: str) -> tuple[bool, str]:
     Check if TDD requirements are met for modifying a file.
     Returns (allowed, reason).
     """
-    workflow = get_active_workflow()
+    # PRIMARY: Find workflow by file ownership
+    candidates = find_workflow_for_file(file_path)
+    if candidates:
+        wf_name, workflow = candidates[0]
+        workflow["name"] = wf_name
+    else:
+        # FALLBACK: Legacy workflows with empty affected_files
+        workflow = get_active_workflow()
 
     if not workflow:
         return True, "No active workflow, TDD check skipped"
@@ -374,8 +381,13 @@ def check_tdd_requirements(file_path: str) -> tuple[bool, str]:
     return True, "TDD requirements met"
 
 
-def check_user_override() -> bool:
-    """Check if user has granted override via token file (not workflow state)."""
+def check_user_override(workflow_name: str = None) -> bool:
+    """Check if user has granted override via token file (not workflow state).
+
+    Args:
+        workflow_name: Explicit workflow name to check against token.
+                       Falls back to active_workflow if None.
+    """
     token_path = Path(__file__).parent.parent / "user_override_token.json"
     if not token_path.exists():
         return False
@@ -390,7 +402,9 @@ def check_user_override() -> bool:
             if _dt.now() - created_dt > _td(hours=1):
                 token_path.unlink(missing_ok=True)
                 return False
-        # Check workflow match
+        # Check workflow match — prefer explicit name, fallback to active
+        if workflow_name:
+            return token.get("workflow") == workflow_name
         state = load_state()
         active_name = state.get("active_workflow", "")
         return token.get("workflow") == active_name
@@ -420,7 +434,10 @@ def main():
         sys.exit(0)
 
     # Check for user override FIRST (allows bypassing TDD for edge cases)
-    if check_user_override():
+    # Resolve workflow name for this file to match override token correctly
+    _candidates = find_workflow_for_file(file_path)
+    _resolved_name = _candidates[0][0] if _candidates else None
+    if check_user_override(workflow_name=_resolved_name):
         sys.exit(0)
 
     # Skip for non-code files

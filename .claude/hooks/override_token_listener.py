@@ -40,17 +40,26 @@ OVERRIDE_KEYWORDS = [
 TOKEN_FILE = Path(__file__).parent.parent / "user_override_token.json"
 
 
-def is_override_message(message: str) -> bool:
-    """Check if message contains an override keyword."""
+def is_override_message(message: str) -> tuple[bool, str | None]:
+    """Check if message contains an override keyword.
+
+    Returns (is_override, explicit_workflow_name_or_None).
+    Supports "override <workflow-name>" for explicit targeting.
+    """
     message_lower = message.lower().strip()
+
+    # Check for "override <workflow-name>" pattern first
+    explicit_match = re.match(r'^override\s+([\w-]+)$', message_lower)
+    if explicit_match:
+        return True, explicit_match.group(1)
 
     for keyword in OVERRIDE_KEYWORDS:
         # Word boundary match to avoid false positives
         pattern = r'\b' + re.escape(keyword) + r'\b'
         if re.search(pattern, message_lower):
-            return True
+            return True, None
 
-    return False
+    return False, None
 
 
 def create_token(workflow_name: str) -> None:
@@ -78,20 +87,29 @@ def main():
         sys.exit(0)
 
     # Check if this is an override message
-    if not is_override_message(user_message):
+    is_override, explicit_name = is_override_message(user_message)
+    if not is_override:
         sys.exit(0)
 
-    # Check for active workflow
+    # Resolve target workflow
     state = load_state()
-    active_name = state.get("active_workflow")
 
-    if not active_name or active_name not in state.get("workflows", {}):
-        print("Override requested but no active workflow found.", file=sys.stderr)
-        sys.exit(0)
+    if explicit_name:
+        # Explicit workflow name provided — validate it exists
+        if explicit_name not in state.get("workflows", {}):
+            print(f"Override requested for unknown workflow: {explicit_name}", file=sys.stderr)
+            sys.exit(0)
+        target_name = explicit_name
+    else:
+        # No explicit name — fall back to active workflow
+        target_name = state.get("active_workflow")
+        if not target_name or target_name not in state.get("workflows", {}):
+            print("Override requested but no active workflow found.", file=sys.stderr)
+            sys.exit(0)
 
     # Create the token
-    create_token(active_name)
-    print(f"Override token created for workflow: {active_name}")
+    create_token(target_name)
+    print(f"Override token created for workflow: {target_name}")
 
     sys.exit(0)
 

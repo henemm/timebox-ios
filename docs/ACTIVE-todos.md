@@ -152,7 +152,7 @@
 | 3 | ~~NextUp Long Press Vorschau~~ | ERLEDIGT | XS | ~15-20k | 3 | ~120 |
 | 4 | ~~Generische Suche (iOS+macOS)~~ | ERLEDIGT | S | ~15-20k | 2-3 | ~25 |
 | 4b | ~~List-Views Cleanup (ViewModes 9→5)~~ | ERLEDIGT | M | ~50-70k | 6 | ~-270 |
-| 5 | MAC-022 Spotlight Integration | P2 | S | ~15-25k | 4 | ~20 |
+| 5 | ~~MAC-022 Spotlight Integration~~ | ERLEDIGT | S | ~15-25k | 4 | ~20 |
 | 6 | ~~Recurring Tasks Phase 1B/2 (inkl. Sichtbarkeit + Edit/Delete Dialog)~~ | ERLEDIGT | M-L | ~60-100k | 5-6 | ~200 |
 | 7 | Kalender-App Deep Link (iOS+macOS) | MITTEL | M | ~40-50k | 3-4 | ~100 |
 | 8 | ~~Push Notifications bei Frist~~ | ERLEDIGT | M | ~60-80k | 9 | ~180 |
@@ -181,8 +181,8 @@
 **Guenstigster Quick Win:** ~~Shake to Undo (XS)~~ ERLEDIGT
 **Teuerste Items:** #17 OrganizeMyDay (~150k), #13 Drag & Drop (~150k), #14 NC Widget (~120k)
 **WARTEND (Apple-Abhaengigkeit):** #20 ITB-F — Developer-APIs verfuegbar, wartet auf Siri On-Screen Awareness (iOS 26.5/27)
-**Zuletzt erledigt:** Deferred List Sorting — 3 Bugfixes (Urgency-Nil-Zyklus, onChange Guard, Orange Puls-Border)
-**Naechstes:** #5 MAC-022 Spotlight Integration oder #7 Kalender-App Deep Link
+**Zuletzt erledigt:** MAC-022 Spotlight Integration (iOS + macOS)
+**Naechstes:** #7 Kalender-App Deep Link
 **Neu (User Story):** #22-26 Contextual Task Capture — siehe `docs/project/stories/contextual-task-capture.md`
 
 > **Dies ist das EINZIGE Backlog.** macOS-Features (MAC-xxx) stehen hier mit Verweis auf ihre Specs in `docs/specs/macos/`. Kein zweites Backlog.
@@ -199,7 +199,7 @@
 
 ### Bundle B: Backlog & Suche
 - ~~Generische Suche (iOS+macOS)~~ ERLEDIGT
-- MAC-022 Spotlight Integration
+- ~~MAC-022 Spotlight Integration~~ ERLEDIGT
 
 ### Bundle C: Erinnerungen & Verknuepfungen
 - Push Notifications bei Frist
@@ -321,17 +321,16 @@
 ### ~~BACKLOG-007: SidebarView macOS-only~~ Kein Debt
 - macOS-Sidebar ist plattform-spezifisch by Design (NavigationSplitView)
 
-### BACKLOG-008: Workflow-System — Echte Parallelitaet
-- **Status:** OFFEN
-- **Prio:** P2 (blockiert aktiv die Arbeit)
-- **Problem:** `workflow_state_multi.py` hat nur EIN `active_workflow` — alle Hooks (Override-Token, Code-Gate, TDD-Enforcement) pruefen immer nur den aktiven. Bei 100+ Workflows im State wechselt `complete_workflow()` automatisch auf irgendeinen alten Workflow. Override-Tokens landen beim falschen Workflow.
-- **Gewuenschtes Verhalten:**
-  - Hooks erkennen anhand der **betroffenen Dateien**, welchem Workflow ein Edit gehoert
-  - Override-Token bezieht sich auf einen expliziten Workflow (nicht blind den aktiven)
-  - Kein `active_workflow` Konzept mehr noetig
-  - Mehrere Workflows koennen gleichzeitig in Implementation-Phase sein
-- **Betroffene Dateien:** `.claude/hooks/workflow_state_multi.py`, `.claude/hooks/strict_code_gate.py`, `.claude/hooks/tdd_enforcement.py`
-- **Aufwand:** M (2-3 Sessions)
+### ~~BACKLOG-008: Workflow-System — Echte Parallelitaet~~ ERLEDIGT
+- **Status:** DONE
+- **Commit:** `699a715`
+- **Loesung:** File-basierte Workflow-Zuordnung statt blindem `active_workflow`
+  - `find_workflow_for_file()` sucht Workflows anhand `affected_files`
+  - Code-Gate + TDD-Hook nutzen file-basierte Suche als primaeren Pfad
+  - Fallback auf `active_workflow` fuer alte Workflows ohne `affected_files`
+  - `complete_workflow()` setzt `active_workflow = None` statt zufaelligem Workflow
+  - Override-Token: `"override [workflow-name]"` fuer explizite Zuweisung
+- **Betroffene Dateien:** `.claude/hooks/workflow_state_multi.py`, `.claude/hooks/strict_code_gate.py`, `.claude/hooks/tdd_enforcement.py`, `.claude/hooks/override_token_listener.py`
 
 ---
 

@@ -452,6 +452,51 @@ def can_modify_code(workflow_name: str = None) -> tuple[bool, str]:
     return True, "OK"
 
 
+def find_workflow_for_file(file_path: str) -> list[tuple[str, dict]]:
+    """
+    Find workflows that claim a file in their affected_files.
+
+    Searches all workflows in CODE_MODIFY_PHASES (phase6+).
+    Returns list of (workflow_name, workflow_dict) sorted by last_updated (newest first).
+    """
+    state = load_state()
+    matches = []
+
+    normalized_file = file_path.replace("./", "")
+
+    for name, workflow in state.get("workflows", {}).items():
+        phase = workflow.get("current_phase", "phase0_idle")
+        if phase not in CODE_MODIFY_PHASES:
+            continue
+
+        affected_files = workflow.get("affected_files", [])
+        if not affected_files:
+            continue
+
+        normalized_affected = [f.replace("./", "") for f in affected_files]
+
+        for affected in normalized_affected:
+            # Exact match
+            if normalized_file == affected:
+                matches.append((name, workflow))
+                break
+            # Path suffix match (absolute vs relative)
+            if normalized_file.endswith("/" + affected) or normalized_file.endswith(affected):
+                matches.append((name, workflow))
+                break
+            # Glob pattern
+            if "*" in affected:
+                import re as _re
+                regex_pattern = affected.replace("*", ".*")
+                if _re.match(regex_pattern, normalized_file):
+                    matches.append((name, workflow))
+                    break
+
+    # Sort by last_updated descending (most recently active first)
+    matches.sort(key=lambda x: x[1].get("last_updated", ""), reverse=True)
+    return matches
+
+
 def complete_workflow(name: str) -> bool:
     """Mark a workflow as complete and archive it."""
     state = load_state()
@@ -464,12 +509,9 @@ def complete_workflow(name: str) -> bool:
     state["workflows"][name]["user_override"] = False  # Remove override on completion
     state["workflows"][name]["last_updated"] = datetime.now().isoformat()
 
-    # If this was the active workflow, clear it
+    # If this was the active workflow, clear it (don't auto-switch to random workflow)
     if state.get("active_workflow") == name:
-        # Find next active or clear
-        remaining = [n for n in state["workflows"] if n != name and
-                    state["workflows"][n]["current_phase"] != "phase8_complete"]
-        state["active_workflow"] = remaining[0] if remaining else None
+        state["active_workflow"] = None
 
     save_state(state)
     return True

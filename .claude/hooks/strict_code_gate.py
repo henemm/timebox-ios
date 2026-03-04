@@ -29,16 +29,18 @@ from pathlib import Path
 
 # Try to import state manager
 try:
-    from workflow_state_multi import load_state, get_active_workflow, PHASE_NAMES
+    from workflow_state_multi import load_state, get_active_workflow, find_workflow_for_file, PHASE_NAMES
 except ImportError:
     sys.path.insert(0, str(Path(__file__).parent))
     try:
-        from workflow_state_multi import load_state, get_active_workflow, PHASE_NAMES
+        from workflow_state_multi import load_state, get_active_workflow, find_workflow_for_file, PHASE_NAMES
     except ImportError:
         def load_state():
             return {"version": "2.0", "workflows": {}, "active_workflow": None}
         def get_active_workflow():
             return None
+        def find_workflow_for_file(fp):
+            return []
         PHASE_NAMES = {}
 
 
@@ -108,8 +110,14 @@ def is_code_file(file_path: str) -> bool:
     return any(file_path.endswith(ext) for ext in CODE_EXTENSIONS)
 
 
-def check_user_override(workflow: dict = None) -> bool:
-    """Check if user has granted override via token file (not workflow state)."""
+def check_user_override(workflow: dict = None, workflow_name: str = None) -> bool:
+    """Check if user has granted override via token file (not workflow state).
+
+    Args:
+        workflow: Workflow dict (unused, kept for compat)
+        workflow_name: Explicit workflow name to check against token.
+                       Falls back to active_workflow if None.
+    """
     token_path = Path(__file__).parent.parent / "user_override_token.json"
     if not token_path.exists():
         return False
@@ -123,7 +131,9 @@ def check_user_override(workflow: dict = None) -> bool:
             if _dt.now() - created_dt > _td(hours=1):
                 token_path.unlink(missing_ok=True)
                 return False
-        # Check workflow match
+        # Check workflow match — prefer explicit name, fallback to active
+        if workflow_name:
+            return token.get("workflow") == workflow_name
         state = load_state()
         active_name = state.get("active_workflow", "")
         return token.get("workflow") == active_name
@@ -217,7 +227,14 @@ def main():
         sys.exit(0)
 
     # CODE FILE → Workflow required!
-    workflow = get_active_workflow()
+    # PRIMARY: Find workflow by file ownership (affected_files)
+    candidates = find_workflow_for_file(file_path)
+    if candidates:
+        wf_name, workflow = candidates[0]
+        workflow["name"] = wf_name
+    else:
+        # FALLBACK: Legacy workflows with empty affected_files
+        workflow = get_active_workflow()
 
     if not workflow:
         print("""
@@ -261,7 +278,7 @@ def main():
         "phase8_complete",
     ]
 
-    if phase not in ALLOWED_PHASES:
+    if phase not in ALLOWED_PHASES and not check_user_override(workflow, workflow_name=workflow_name):
         print(f"""
 ╔══════════════════════════════════════════════════════════════════╗
 ║  🔴 BLOCKED: Wrong Phase!                                        ║
@@ -283,7 +300,7 @@ def main():
         sys.exit(2)
 
     # Check if RED test is done (TDD enforcement) OR user override
-    if not check_red_test_done(workflow) and not check_user_override(workflow):
+    if not check_red_test_done(workflow) and not check_user_override(workflow, workflow_name=workflow_name):
         print(f"""
 ╔══════════════════════════════════════════════════════════════════╗
 ║  🔴 BLOCKED: TDD RED Phase Not Complete!                         ║
@@ -312,6 +329,11 @@ def main():
         sys.exit(2)
 
     # Verify file belongs to workflow (if affected_files declared)
+    # Skip if workflow was already resolved via find_workflow_for_file (file already matched)
+    if candidates:
+        # File was matched by find_workflow_for_file — already verified
+        sys.exit(0)
+
     allowed, reason = verify_file_in_workflow(workflow, file_path)
 
     if not allowed:
