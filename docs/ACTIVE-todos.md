@@ -28,7 +28,7 @@
   - `FocusBloxWatchWidgets/FocusBloxWatchWidgets.entitlements`: App Group
   - `FocusBloxWatch Watch App/ContentView.swift`: .onOpenURL Deep-Link Handler (focusblox://voice-capture)
   - `FocusBlox.xcodeproj/project.pbxproj`: Neues Target FocusBloxWatchWidgetsExtension
-- **Tests:** 22 Watch-Tests gruen (3 neue Complication + 19 bestehende)
+- **Tests:** 28 Watch-Tests gruen (3 Unit + 6 UI, davon 2 neue Complication-Flow-Tests + 19 bestehende Unit)
 - **Spec:** `docs/specs/features/watch-complication.md`
 - **Naechste Schritte (Backlog):** Siri Shortcut Integration
 

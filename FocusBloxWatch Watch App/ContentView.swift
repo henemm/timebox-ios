@@ -42,6 +42,11 @@ struct ContentView: View {
             .sheet(isPresented: $showingInput) {
                 VoiceInputSheet(modelContext: modelContext)
             }
+            .onOpenURL { url in
+                if url.host == "voice-capture" {
+                    showingInput = true
+                }
+            }
         }
     }
 }

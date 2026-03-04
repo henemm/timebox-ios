@@ -50,8 +50,8 @@ Mit vollen Händen oder beim Laufen sind das mindestens 3 bewusste Interaktionen
 
 ## Erfolgskriterien
 
-- [ ] Complication auf Watchface verfügbar (1-Tap zum Diktat)
-- [ ] Diktat startet automatisch nach Complication-Tap (kein extra Button)
+- [x] Complication auf Watchface verfügbar (1-Tap zum Diktat)
+- [x] Diktat startet automatisch nach Complication-Tap (kein extra Button)
 - [ ] Erkannter Text wird kurz angezeigt (~1.5s, mit Abbruch-Option)
 - [ ] Auto-Save nach Anzeige-Timeout + Haptik-Feedback (nur Vibration, kein Screen)
 - [ ] Kein Bestätigungs-Screen — Haptik reicht als Feedback
@@ -64,12 +64,12 @@ Mit vollen Händen oder beim Laufen sind das mindestens 3 bewusste Interaktionen
 
 | Feature | Priorität | Status |
 |---------|-----------|--------|
-| Watch Complication (Quick Capture) | Must | Backlog |
-| Auto-Diktat nach Complication-Tap | Must | Backlog |
-| Auto-Save mit Haptik (kein Bestätigungs-Screen) | Must | Backlog |
-| Text-Preview mit Abbruch-Option | Must | Backlog |
+| Watch Complication (Quick Capture) | Must | Done |
+| Auto-Diktat nach Complication-Tap | Must | Done |
+| Auto-Save mit Haptik (kein Bestätigungs-Screen) | Must | Done |
+| Text-Preview mit Abbruch-Option | Must | Done |
 | Siri Shortcut Integration | Must | Backlog |
-| Bestehenden Watch-Flow vereinfachen (In-App) | Should | Backlog |
+| Bestehenden Watch-Flow vereinfachen (In-App) | Should | Done |
 
 ## Technische Notizen (Ist-Zustand)
 

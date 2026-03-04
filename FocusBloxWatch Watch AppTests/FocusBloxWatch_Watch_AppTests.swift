@@ -165,6 +165,55 @@ struct WatchLocalTaskSchemaTests {
         return try PropertyListSerialization.propertyList(from: data, format: nil) as! [String: Any]
     }
 
+    // MARK: - Watch Complication: Source-Based Tests
+
+    /// Verhalten: ContentView hat .onOpenURL Handler fuer Deep-Link voice-capture
+    /// Bricht wenn: ContentView.swift NICHT .onOpenURL mit "voice-capture" enthaelt
+    @Test func watchContentView_hasOnOpenURLHandler() throws {
+        let testFile = URL(fileURLWithPath: #filePath)
+        let projectRoot = testFile.deletingLastPathComponent().deletingLastPathComponent()
+        let contentViewFile = projectRoot
+            .appendingPathComponent("FocusBloxWatch Watch App")
+            .appendingPathComponent("ContentView.swift")
+        let source = try String(contentsOf: contentViewFile, encoding: .utf8)
+        #expect(source.contains("onOpenURL"),
+                "ContentView must have .onOpenURL handler for complication deep-link")
+        #expect(source.contains("voice-capture"),
+                "ContentView must handle voice-capture URL host")
+    }
+
+    /// Verhalten: QuickCaptureComplication.swift existiert mit StaticConfiguration
+    /// Bricht wenn: Datei fehlt oder kein Widget definiert
+    @Test func watchComplication_fileExists() throws {
+        let testFile = URL(fileURLWithPath: #filePath)
+        let projectRoot = testFile.deletingLastPathComponent().deletingLastPathComponent()
+        let complicationFile = projectRoot
+            .appendingPathComponent("FocusBloxWatchWidgets")
+            .appendingPathComponent("QuickCaptureComplication.swift")
+        let source = try String(contentsOf: complicationFile, encoding: .utf8)
+        #expect(source.contains("StaticConfiguration"),
+                "Complication must use StaticConfiguration")
+        #expect(source.contains("accessoryCircular"),
+                "Complication must support accessoryCircular family")
+        #expect(source.contains("focusblox://voice-capture"),
+                "Complication must set widgetURL for deep-link")
+    }
+
+    /// Verhalten: Widget Bundle existiert mit @main Entry Point
+    /// Bricht wenn: Bundle-Datei fehlt oder kein @main
+    @Test func watchWidgetBundle_fileExists() throws {
+        let testFile = URL(fileURLWithPath: #filePath)
+        let projectRoot = testFile.deletingLastPathComponent().deletingLastPathComponent()
+        let bundleFile = projectRoot
+            .appendingPathComponent("FocusBloxWatchWidgets")
+            .appendingPathComponent("FocusBloxWatchWidgetsBundle.swift")
+        let source = try String(contentsOf: bundleFile, encoding: .utf8)
+        #expect(source.contains("@main"),
+                "Widget bundle must have @main entry point")
+        #expect(source.contains("QuickCaptureComplication"),
+                "Widget bundle must include QuickCaptureComplication")
+    }
+
     // MARK: - ModelContainer Integration: Full iOS-Schema Data Round-Trip
 
     /// Verhalten: Watch ModelContainer kann Tasks mit ALLEN iOS-Feldern speichern und laden
