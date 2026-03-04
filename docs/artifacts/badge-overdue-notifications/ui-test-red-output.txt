@@ -1,0 +1,4 @@
+    export TREAT_MISSING_BASELINES_AS_TEST_FAILURES\=NO
+** TEST FAILED **
+Test case 'BadgeOverdueUITests.testCompletingOverdueTaskRemovesFromSection()' failed on 'Clone 1 of FocusBlox - FocusBloxUITests-Runner (44775)' (27.931 seconds)
+Test case 'BadgeOverdueUITests.testOverdueTasksVisibleInPriorityView()' failed on 'Clone 1 of FocusBlox - FocusBloxUITests-Runner (44775)' (19.298 seconds)

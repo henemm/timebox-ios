@@ -1,0 +1,5 @@
+    export TREAT_MISSING_BASELINES_AS_TEST_FAILURES\=NO
+** TEST FAILED **
+Test case 'BadgeOverdueNotificationTests.test_advanceRequest_hasCategoryAndUserInfo()' failed on 'Clone 1 of FocusBlox - FocusBlox (43570)' (0.783 seconds)
+Test case 'BadgeOverdueNotificationTests.test_dueDateCategory_isRegistered()' failed on 'Clone 1 of FocusBlox - FocusBlox (43570)' (0.042 seconds)
+Test case 'BadgeOverdueNotificationTests.test_morningRequest_hasCategoryAndUserInfo()' failed on 'Clone 1 of FocusBlox - FocusBlox (43570)' (0.007 seconds)

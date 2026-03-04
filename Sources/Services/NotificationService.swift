@@ -1,3 +1,4 @@
+import SwiftData
 import UserNotifications
 
 /// Service for scheduling local push notifications
@@ -7,6 +8,59 @@ enum NotificationService {
     private static let taskNotificationPrefix = "task-timer-"
     private static let focusBlockNotificationPrefix = "focus-block-start-"
     private static let focusBlockEndPrefix = "focus-block-end-"
+
+    // MARK: - Interactive Due Date Actions
+
+    private static let dueDateInteractiveCategory = "DUE_DATE_INTERACTIVE"
+    static let actionNextUp = "ACTION_NEXT_UP"
+    static let actionPostpone = "ACTION_POSTPONE"
+    static let actionComplete = "ACTION_COMPLETE"
+
+    /// Register notification category with 3 interactive actions for due date notifications.
+    static func registerDueDateActions() {
+        let nextUp = UNNotificationAction(
+            identifier: actionNextUp, title: "Next Up", options: []
+        )
+        let postpone = UNNotificationAction(
+            identifier: actionPostpone, title: "Morgen", options: []
+        )
+        let complete = UNNotificationAction(
+            identifier: actionComplete, title: "Erledigt", options: .destructive
+        )
+
+        let category = UNNotificationCategory(
+            identifier: dueDateInteractiveCategory,
+            actions: [nextUp, postpone, complete],
+            intentIdentifiers: [],
+            options: []
+        )
+
+        UNUserNotificationCenter.current().setNotificationCategories([category])
+    }
+
+    // MARK: - Badge (iOS only)
+
+    #if !os(macOS)
+    /// Update app icon badge with overdue task count.
+    static func updateOverdueBadge(container: ModelContainer) {
+        let context = ModelContext(container)
+        let startOfToday = Calendar.current.startOfDay(for: Date())
+
+        let descriptor = FetchDescriptor<LocalTask>(
+            predicate: #Predicate<LocalTask> {
+                $0.dueDate != nil && !$0.isCompleted && !$0.isTemplate
+            }
+        )
+
+        do {
+            let tasks = try context.fetch(descriptor)
+            let overdueCount = tasks.filter { $0.dueDate! < startOfToday }.count
+            UNUserNotificationCenter.current().setBadgeCount(overdueCount)
+        } catch {
+            print("Failed to update overdue badge: \(error)")
+        }
+    }
+    #endif
 
     // MARK: - Permission
 
@@ -236,6 +290,8 @@ enum NotificationService {
         content.title = "Heute fällig"
         content.body = "\(title) — pack ihn in einen Sprint"
         content.sound = .default
+        content.categoryIdentifier = dueDateInteractiveCategory
+        content.userInfo = ["taskID": taskID]
 
         let triggerComps = cal.dateComponents([.year, .month, .day, .hour, .minute], from: fireDate)
         let trigger = UNCalendarNotificationTrigger(dateMatching: triggerComps, repeats: false)
@@ -267,6 +323,8 @@ enum NotificationService {
         content.title = title
         content.body = "\(title) ist in \(Self.formattedAdvanceDuration(advanceMinutes)) fällig"
         content.sound = .default
+        content.categoryIdentifier = dueDateInteractiveCategory
+        content.userInfo = ["taskID": taskID]
 
         let trigger = UNTimeIntervalNotificationTrigger(timeInterval: timeInterval, repeats: false)
 

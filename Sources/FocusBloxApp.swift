@@ -3,6 +3,7 @@ import SwiftData
 import AppIntents
 import CoreSpotlight
 import FocusBloxCore
+import UserNotifications
 
 // MARK: - Notification Name for Control Center Widget
 extension Notification.Name {
@@ -16,6 +17,7 @@ struct FocusBloxApp: App {
     @State private var quickCaptureTitle = ""
     @State private var permissionRequested = false
     @State private var syncMonitor = CloudKitSyncMonitor()
+    @State private var notificationDelegate: NotificationActionDelegate?
 
     private static let appGroupID = "group.com.henning.focusblox"
 
@@ -259,6 +261,11 @@ struct FocusBloxApp: App {
                 }
                 // Register App Shortcuts with Siri so voice commands are discoverable
                 FocusBloxShortcuts.updateAppShortcutParameters()
+                // Register interactive notification actions + delegate
+                NotificationService.registerDueDateActions()
+                let delegate = NotificationActionDelegate(container: sharedModelContainer)
+                UNUserNotificationCenter.current().delegate = delegate
+                notificationDelegate = delegate
                 // Request calendar/reminders permission on app launch (Bug 8 fix)
                 requestPermissionsOnLaunch()
                 // Check for CC trigger (App Group flag)
@@ -275,6 +282,7 @@ struct FocusBloxApp: App {
                     checkCCQuickCaptureTrigger()
                     syncedSettings.pushToCloud()
                     rescheduleDueDateNotifications()
+                    NotificationService.updateOverdueBadge(container: sharedModelContainer)
                 }
             }
             .onOpenURL { url in
@@ -647,5 +655,88 @@ struct FocusBloxApp: App {
         context.insert(completedOutsideBlock)
 
         try? context.save()
+    }
+}
+
+// MARK: - Notification Action Handler
+
+/// Handles interactive notification actions (NextUp, Postpone, Complete) for due date notifications.
+@MainActor
+final class NotificationActionDelegate: NSObject, @preconcurrency UNUserNotificationCenterDelegate {
+    let container: ModelContainer
+
+    init(container: ModelContainer) {
+        self.container = container
+    }
+
+    nonisolated func userNotificationCenter(
+        _ center: UNUserNotificationCenter,
+        didReceive response: UNNotificationResponse,
+        withCompletionHandler completionHandler: @escaping @Sendable () -> Void
+    ) {
+        let userInfo = response.notification.request.content.userInfo
+        guard let taskID = userInfo["taskID"] as? String else {
+            completionHandler()
+            return
+        }
+        let actionID = response.actionIdentifier
+
+        Task { @MainActor in
+            self.handleAction(actionID, taskID: taskID)
+            completionHandler()
+        }
+    }
+
+    nonisolated func userNotificationCenter(
+        _ center: UNUserNotificationCenter,
+        willPresent notification: UNNotification,
+        withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void
+    ) {
+        completionHandler([.banner, .sound])
+    }
+
+    private func handleAction(_ actionID: String, taskID: String) {
+        let context = container.mainContext
+        let descriptor = FetchDescriptor<LocalTask>(
+            predicate: #Predicate { $0.id == taskID }
+        )
+        guard let task = try? context.fetch(descriptor).first else { return }
+
+        switch actionID {
+        case NotificationService.actionNextUp:
+            task.isNextUp = true
+            let maxOrder = (try? context.fetch(
+                FetchDescriptor<LocalTask>(
+                    predicate: #Predicate { $0.isNextUp && !$0.isCompleted },
+                    sortBy: [SortDescriptor(\LocalTask.nextUpSortOrder, order: .reverse)]
+                )
+            ).first?.nextUpSortOrder) ?? 0
+            task.nextUpSortOrder = maxOrder + 1
+
+        case NotificationService.actionPostpone:
+            if let currentDue = task.dueDate {
+                let newDue = Calendar.current.date(byAdding: .day, value: 1, to: currentDue)!
+                task.dueDate = newDue
+                NotificationService.cancelDueDateNotifications(taskID: taskID)
+                NotificationService.scheduleDueDateNotifications(
+                    taskID: taskID, title: task.title, dueDate: newDue
+                )
+            }
+
+        case NotificationService.actionComplete:
+            task.isCompleted = true
+            task.completedAt = Date()
+            task.assignedFocusBlockID = nil
+            task.isNextUp = false
+            NotificationService.cancelDueDateNotifications(taskID: taskID)
+
+        default:
+            break
+        }
+
+        task.modifiedAt = Date()
+        try? context.save()
+
+        NotificationService.updateOverdueBadge(container: container)
     }
 }

@@ -6,6 +6,34 @@
 
 ---
 
+## ERLEDIGT: Feature #29 — Badge-Zahl (Overdue) + Interaktive Frist-Notifications
+
+- **Ziel:** App-Icon Badge zeigt Anzahl ueberfaelliger Tasks, Frist-Notifications bieten 3 Buttons (NextUp, Verschieben +1 Tag, Erledigt)
+- **Aenderungen:**
+  - `Sources/Services/NotificationService.swift`: Category-Registration, userInfo an Due-Date-Notifs, Badge-Update (iOS only)
+  - `Sources/FocusBloxApp.swift`: NotificationActionDelegate, Badge bei Foreground + Remote-Change
+  - `FocusBloxMac/FocusBloxMacApp.swift`: NotificationActionDelegate (ohne Badge)
+- **Tests:** 5 Tests gruen (3 Unit + 2 UI)
+- **Spec:** `docs/specs/features/badge-overdue-notifications.md`
+
+---
+
+## ERLEDIGT: Feature — Watch Quick Capture Complication
+
+- **Ziel:** 1-Tap vom Watchface zur Diktat-Eingabe (kein App-Oeffnen noetig)
+- **User Story:** `docs/project/stories/watch-quick-capture.md`
+- **Aenderungen:**
+  - `FocusBloxWatchWidgets/QuickCaptureComplication.swift`: WidgetKit Complication (.accessoryCircular, StaticConfiguration, .never refresh)
+  - `FocusBloxWatchWidgets/FocusBloxWatchWidgetsBundle.swift`: @main WidgetBundle
+  - `FocusBloxWatchWidgets/FocusBloxWatchWidgets.entitlements`: App Group
+  - `FocusBloxWatch Watch App/ContentView.swift`: .onOpenURL Deep-Link Handler (focusblox://voice-capture)
+  - `FocusBlox.xcodeproj/project.pbxproj`: Neues Target FocusBloxWatchWidgetsExtension
+- **Tests:** 22 Watch-Tests gruen (3 neue Complication + 19 bestehende)
+- **Spec:** `docs/specs/features/watch-complication.md`
+- **Naechste Schritte (Backlog):** Siri Shortcut Integration
+
+---
+
 ## ERLEDIGT: Feature — Watch Quick Capture In-App Flow vereinfacht
 
 - **Ziel:** Watch-Task-Erfassung von 5 auf 2 Schritte reduzieren (App oeffnen → sprechen → fertig)
@@ -16,7 +44,7 @@
   - `ConfirmationView.swift`: Komplett geloescht (Haptik ersetzt den Screen)
 - **Tests:** 4 UI Tests gruen (auto-open, no-OK-button, cancel-exists, no-confirmation)
 - **Spec:** `docs/specs/features/watch-quick-capture-inapp.md`
-- **Naechste Schritte (Backlog):** Watch Complication + Siri Shortcut Integration
+- **Naechste Schritte (Backlog):** ~~Watch Complication~~ ERLEDIGT + Siri Shortcut Integration
 
 ---
 
@@ -190,7 +218,7 @@
 | 26 | ~~CTC-5: Watch-Diktat Titel-Verbesserung~~ | ERLEDIGT | S | ~15-20k | 2 | ~6 |
 | 27 | ~~CTC-1b: TaskTitleEngine — Konservativ + Metadaten-Extraktion~~ | ERLEDIGT | S | ~20-30k | 2 | ~60 |
 | 28 | ~~CTC-6: Smart Task Interpretation + Similar-Task Learning~~ | ERLEDIGT | S | ~20k | 4 | ~70 |
-| 29 | Badge-Zahl (Overdue) + Interaktive Frist-Notifications | OFFEN | M | ~50-70k | 3-4 | ~150-200 |
+| 29 | Badge-Zahl (Overdue) + Interaktive Frist-Notifications | ERLEDIGT | M | ~50-70k | 3-4 | ~150-200 |
 | ~~Bug 67~~ | ~~Tab-Labels Deutsch→English~~ | ERLEDIGT | XS | ~5k | 5 | ~10 |
 | Bug 68 | FocusBlock View-Umbau — Full-Screen Sheet mit 3 Sektionen | ERLEDIGT | M | ~40-60k | 4 | ~100 |
 | Bug 69 | FocusBlock Sync — Architektur-Analyse (EventKit→SwiftData?) | P2 | L-XL | ~80-120k | Analyse | TBD |
@@ -201,8 +229,8 @@
 **Guenstigster Quick Win:** #7 Kalender-App Deep Link (M)
 **Teuerste Items:** #17 OrganizeMyDay (~150k), Bug 70/~~#13~~ Drag & Drop (~150k), #14 NC Widget (~120k)
 **WARTEND (Apple-Abhaengigkeit):** #20 ITB-F — Developer-APIs verfuegbar, wartet auf Siri On-Screen Awareness (iOS 26.5/27)
-**Zuletzt erledigt:** Bug 69 FocusBlock Auto-Refresh (Cross-Device Sync)
-**Naechstes:** #29 Badge + Interaktive Notifications (M) → Bug 70 (D&D, XL) oder #7 Kalender Deep Link (M)
+**Zuletzt erledigt:** #29 Badge-Zahl (Overdue) + Interaktive Frist-Notifications
+**Naechstes:** Bug 70 (D&D, XL) oder #7 Kalender Deep Link (M)
 **Neu (User Story):** #22-26 Contextual Task Capture — siehe `docs/project/stories/contextual-task-capture.md`
 
 > **Dies ist das EINZIGE Backlog.** macOS-Features (MAC-xxx) stehen hier mit Verweis auf ihre Specs in `docs/specs/macos/`. Kein zweites Backlog.

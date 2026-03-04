@@ -1,0 +1,5 @@
+error: Unable to resolve build file: BuildFile<b1550d77dab9f9dfc610f70748633c50251755dfcfdf4fcd138401dd6d1e5791> (The workspace has a reference to a missing target with GUID 'b1550d77dab9f9dfc610f70748633c50f0a6fca06115477dc37bd5ec30303a7f') (in target 'FocusBloxWatch Watch App' from project 'FocusBlox')
+Testing failed:
+	Testing cancelled because the build failed.
+** TEST FAILED **
+The following build commands failed:

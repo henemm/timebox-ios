@@ -9,6 +9,7 @@ import SwiftUI
 import SwiftData
 import CoreSpotlight
 import AppKit
+import UserNotifications
 
 // MARK: - Menu Bar Controller
 
@@ -124,6 +125,7 @@ struct FocusBloxMacApp: App {
     @FocusedValue(\.taskActions) private var taskActions
     @State private var showUndoAlert = false
     @State private var undoResultMessage = ""
+    @State private var notificationDelegate: NotificationActionDelegate?
 
     /// SyncedSettings fuer iCloud KV Store Sync zwischen Geraeten
     private let syncedSettings = SyncedSettings()
@@ -204,6 +206,11 @@ struct FocusBloxMacApp: App {
                         container: container,
                         eventKitRepository: eventKitRepository
                     )
+                    // Register interactive notification actions + delegate
+                    NotificationService.registerDueDateActions()
+                    let delegate = NotificationActionDelegate(container: container)
+                    UNUserNotificationCenter.current().delegate = delegate
+                    notificationDelegate = delegate
                     // Request notification permission + schedule due date notifications
                     Task {
                         _ = await NotificationService.requestPermission()

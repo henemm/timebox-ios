@@ -21,6 +21,7 @@
 		262C4B292E1B067D9A637C1C /* ITB_G_SiriTipUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB1AD4FECCC4DD0F13D886B5 /* ITB_G_SiriTipUITests.swift */; };
 		2D85A50AEA4DE4D67F40EA5D /* SpotlightIndexingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FEFD473342A7BED5A2A93AF /* SpotlightIndexingService.swift */; };
 		2EF5DE158DB80CCCB409F66F /* SiriTipPersistenceUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAED8A7A7959F354879F7615 /* SiriTipPersistenceUITests.swift */; };
+		2EFD29958D8ED6D538FDAFE7 /* FocusBlockDragDropUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FD5047036F6943519870D4 /* FocusBlockDragDropUITests.swift */; };
 		2F7184DE552C8D322971EDED /* MockEventKitRepositoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37586E91853A38D88E035A33 /* MockEventKitRepositoryTests.swift */; };
 		30515A046C05070B90FD3C90 /* SpotlightIndexingServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D6520F9246BDCE0D9B157B6 /* SpotlightIndexingServiceTests.swift */; };
 		36C24ECAE1DAEC6AC61E16E8 /* EditFocusBlockSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 515D3A83205F8E00941BD4D0 /* EditFocusBlockSheet.swift */; };
@@ -62,6 +63,7 @@
 		99A9D9F812F3D5E2E99489C1 /* SpotlightIndexingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FEFD473342A7BED5A2A93AF /* SpotlightIndexingService.swift */; };
 		9E4DE0DFDA16F42B8D28D6CD /* ManualBlockCreationUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41F2A36E471937592F06F0C9 /* ManualBlockCreationUITests.swift */; };
 		9F9185F5A9BD5A8CFF79DECA /* ErrorStateUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B596C16F99039490702E0B7 /* ErrorStateUITests.swift */; };
+		A056E12CD65C0F6401860BDB /* CalendarEventTransfer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D1F03B35977548B59D7269F /* CalendarEventTransfer.swift */; };
 		A37B483E47D5F1A662D498CC /* SchedulingUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7ED51F72D6039EFAC3D85A3 /* SchedulingUITests.swift */; };
 		A4A8AF1E9B1B715FE913F6F4 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 350DD1256F45268992636DEA /* NotificationService.swift */; };
 		AA657A3EBF3967B2DECE4314 /* CreateTaskView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04068491AA7CD2368A273C00 /* CreateTaskView.swift */; };
@@ -499,6 +501,7 @@
 		34D186C26C7135F80A5E3B0B /* SyncEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncEngine.swift; sourceTree = "<group>"; };
 		350DD1256F45268992636DEA /* NotificationService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
 		37586E91853A38D88E035A33 /* MockEventKitRepositoryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockEventKitRepositoryTests.swift; sourceTree = "<group>"; };
+		37FD5047036F6943519870D4 /* FocusBlockDragDropUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = FocusBlockDragDropUITests.swift; sourceTree = "<group>"; };
 		3B596C16F99039490702E0B7 /* ErrorStateUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorStateUITests.swift; sourceTree = "<group>"; };
 		3F276F67582A827E523D8ED6 /* EventKitRepositoryEnvironment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventKitRepositoryEnvironment.swift; sourceTree = "<group>"; };
 		407BE145C7716D6B1A1BB67F /* FocusBloxApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusBloxApp.swift; sourceTree = "<group>"; };
@@ -599,6 +602,7 @@
 		CATUI001FILEREF00001 /* CategoriesUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoriesUITests.swift; sourceTree = "<group>"; };
 		CBHELP01FILE00001 /* ClipboardHelperTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardHelperTests.swift; sourceTree = "<group>"; };
 		CBPASTE01FILE00001 /* ClipboardTaskFlowUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardTaskFlowUITests.swift; sourceTree = "<group>"; };
+		CE21F83C52F46219D0186198 /* FocusBlockDragTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = FocusBlockDragTests.swift; sourceTree = "<group>"; };
 		CKSM01FILE000001 /* CloudKitSyncMonitorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitSyncMonitorTests.swift; sourceTree = "<group>"; };
 		CKSM02FILE000001 /* CloudKitSyncMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitSyncMonitor.swift; sourceTree = "<group>"; };
 		CLRHEX01FILEREF001 /* Color+Hex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Hex.swift"; sourceTree = "<group>"; };
@@ -724,6 +728,7 @@
 		WARN001FILEREF000001 /* WarningTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WarningTests.swift; sourceTree = "<group>"; };
 		WARNTIM01FILEREF0001 /* WarningTiming.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WarningTiming.swift; sourceTree = "<group>"; };
 		WARNUI01FILEREF00001 /* WarningSettingsUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WarningSettingsUITests.swift; sourceTree = "<group>"; };
+		WDGTWCH01FILEREF001 /* FocusBloxWatchWidgetsExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = FocusBloxWatchWidgetsExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		WKDYBTN01FILE0001 /* WeekdayButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeekdayButton.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -762,6 +767,13 @@
 				Info.plist,
 			);
 			target = 16ED0EAB4D5DFBFFCCD4B1B6 /* FocusBlox */;
+		};
+		WDGTWCH01EXCEPT0001 /* Exceptions for "FocusBloxWatchWidgets" folder in "FocusBloxWatchWidgetsExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = WDGTWCH01TARGET0001 /* FocusBloxWatchWidgetsExtension */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
@@ -903,6 +915,18 @@
 			path = Resources;
 			sourceTree = "<group>";
 		};
+		WDGTWCH01FOLDER0001 /* FocusBloxWatchWidgets */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				WDGTWCH01EXCEPT0001 /* Exceptions for "FocusBloxWatchWidgets" folder in "FocusBloxWatchWidgetsExtension" target */,
+			);
+			explicitFileTypes = {
+			};
+			explicitFolders = (
+			);
+			path = FocusBloxWatchWidgets;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -996,6 +1020,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		WDGTWCH01FWORKS0001 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -1074,6 +1105,7 @@
 				CA3FAC0479FF87E70224A37A /* UnifiedCalendarViewUITests.swift */,
 				BUG70ASNPUI01FILE0001 /* Bug70aSnapUITests.swift */,
 				0CB1D1EF0A6758E6B9B2921F /* BadgeOverdueUITests.swift */,
+				37FD5047036F6943519870D4 /* FocusBlockDragDropUITests.swift */,
 			);
 			path = FocusBloxUITests;
 			sourceTree = "<group>";
@@ -1115,6 +1147,7 @@
 				B7A16D0C2F20FDD400165284 /* FocusBloxCore.framework */,
 				B7A16D162F20FDD400165284 /* FocusBloxCoreTests.xctest */,
 				B7DFC0332F2E73EC009C2881 /* FocusBloxWatch Watch App.app */,
+				WDGTWCH01FILEREF001 /* FocusBloxWatchWidgetsExtension.appex */,
 				B7DFC03F2F2E73ED009C2881 /* FocusBloxWatch Watch AppTests.xctest */,
 				B7DFC0492F2E73ED009C2881 /* FocusBloxWatch Watch AppUITests.xctest */,
 				B7DFC06D2F2E8C60009C2881 /* FocusBloxMac.app */,
@@ -1302,6 +1335,7 @@
 				95142243688D96B229D2FA41 /* MenuBarIconStateTests.swift */,
 				SMTENR01FILE00001 /* SmartTaskEnrichmentServiceTests.swift */,
 				0B783A31231C9313A86914B9 /* BadgeOverdueNotificationTests.swift */,
+				CE21F83C52F46219D0186198 /* FocusBlockDragTests.swift */,
 			);
 			path = FocusBloxTests;
 			sourceTree = "<group>";
@@ -1364,6 +1398,7 @@
 				B7DFC0342F2E73EC009C2881 /* FocusBloxWatch Watch App */,
 				B7DFC0422F2E73ED009C2881 /* FocusBloxWatch Watch AppTests */,
 				B7DFC04C2F2E73ED009C2881 /* FocusBloxWatch Watch AppUITests */,
+				WDGTWCH01FOLDER0001 /* FocusBloxWatchWidgets */,
 				B7DFC06E2F2E8C60009C2881 /* FocusBloxMac */,
 				B7DFC07C2F2E8C62009C2881 /* FocusBloxMacTests */,
 				B7DFC0862F2E8C62009C2881 /* FocusBloxMacUITests */,
@@ -1709,6 +1744,26 @@
 			productReference = MACSHARE04FREF0001 /* FocusBloxMacShareExtension.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
+		WDGTWCH01TARGET0001 /* FocusBloxWatchWidgetsExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = WDGTWCH01CFGLST0001 /* Build configuration list for PBXNativeTarget "FocusBloxWatchWidgetsExtension" */;
+			buildPhases = (
+				WDGTWCH01SOURCES001 /* Sources */,
+				WDGTWCH01FWORKS0001 /* Frameworks */,
+				WDGTWCH01RSRCES0001 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				WDGTWCH01FOLDER0001 /* FocusBloxWatchWidgets */,
+			);
+			name = FocusBloxWatchWidgetsExtension;
+			productName = FocusBloxWatchWidgetsExtension;
+			productReference = WDGTWCH01FILEREF001 /* FocusBloxWatchWidgetsExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -1790,6 +1845,7 @@
 				B7DFC0822F2E8C62009C2881 /* FocusBloxMacUITests */,
 				B7A160492F4AD5F5001FD20C /* FocusBloxShareExtension */,
 				MACSHARE08TARGET01 /* FocusBloxMacShareExtension */,
+				WDGTWCH01TARGET0001 /* FocusBloxWatchWidgetsExtension */,
 			);
 		};
 /* End PBXProject section */
@@ -1873,6 +1929,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		RESRC001BUILDPHASE001 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		WDGTWCH01RSRCES0001 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -2100,6 +2163,7 @@
 				BB98D59A1AE55221C769098C /* UnifiedCalendarViewUITests.swift in Sources */,
 				BUG70ASNPUI01BUILD001 /* Bug70aSnapUITests.swift in Sources */,
 				56CCCE1A3FEE81C6B13F6262 /* BadgeOverdueUITests.swift in Sources */,
+				2EFD29958D8ED6D538FDAFE7 /* FocusBlockDragDropUITests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2280,6 +2344,7 @@
 				CE465D61D24BA0B73AB397E4 /* ShakeGestureModifier.swift in Sources */,
 				AD52DB9608DDF4562B67279F /* MenuBarIconState.swift in Sources */,
 				99A9D9F812F3D5E2E99489C1 /* SpotlightIndexingService.swift in Sources */,
+				A056E12CD65C0F6401860BDB /* CalendarEventTransfer.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2304,6 +2369,13 @@
 				MACSHARE01BUILD001 /* LocalTask.swift in Sources */,
 				MACSHARE01BUILD002 /* TaskMetadata.swift in Sources */,
 				MACSHARE01BUILD003 /* TaskSource.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		WDGTWCH01SOURCES001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3408,6 +3480,88 @@
 			};
 			name = Release;
 		};
+		WDGTWCH01DBGCFG0001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_ENTITLEMENTS = FocusBloxWatchWidgets/FocusBloxWatchWidgets.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = FocusBloxWatchWidgets/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = FocusBloxWatchWidgets;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.henning.timebox.watchkitapp.widgets;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 26.2;
+			};
+			name = Debug;
+		};
+		WDGTWCH01RELCFG0001 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_ENTITLEMENTS = FocusBloxWatchWidgets/FocusBloxWatchWidgets.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = FocusBloxWatchWidgets/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = FocusBloxWatchWidgets;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.henning.timebox.watchkitapp.widgets;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				VALIDATE_PRODUCT = YES;
+				WATCHOS_DEPLOYMENT_TARGET = 26.2;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -3542,6 +3696,15 @@
 			buildConfigurations = (
 				MACSHARE12DBGC0001 /* Debug */,
 				MACSHARE12RELC0001 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		WDGTWCH01CFGLST0001 /* Build configuration list for PBXNativeTarget "FocusBloxWatchWidgetsExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				WDGTWCH01DBGCFG0001 /* Debug */,
+				WDGTWCH01RELCFG0001 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
