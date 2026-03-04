@@ -1,3 +1,4 @@
+import CoreSpotlight
 import Foundation
 import SwiftData
 
@@ -98,9 +99,10 @@ final class LocalTaskSource: @preconcurrency TaskSource, @preconcurrency TaskSou
         description: String? = nil
     ) async throws -> LocalTask {
         let nextSortOrder = try await getNextSortOrder()
+        let cleanedTitle = TaskTitleEngine.stripKeywords(title)
 
         let task = LocalTask(
-            title: title,
+            title: cleanedTitle,
             importance: importance,
             tags: tags,
             dueDate: dueDate,
@@ -122,9 +124,17 @@ final class LocalTaskSource: @preconcurrency TaskSource, @preconcurrency TaskSou
         let enrichment = SmartTaskEnrichmentService(modelContext: modelContext)
         await enrichment.enrichTask(task)
 
-        // Flag for background title improvement
+        // AI title improvement: run immediately (not deferred to app start)
         task.needsTitleImprovement = true
+        let titleEngine = TaskTitleEngine(modelContext: modelContext)
+        await titleEngine.improveTitleIfNeeded(task)
         try modelContext.save()
+
+        // Index new task in Spotlight for system-wide search (nonisolated helpers avoid actor boundary)
+        if SpotlightIndexingService.shared.shouldIndex(task),
+           let item = try? SpotlightIndexingService.shared.buildSearchableItem(for: task) {
+            CSSearchableIndex.default().indexSearchableItems([item]) { _ in }
+        }
 
         return task
     }

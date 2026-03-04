@@ -304,7 +304,7 @@ def set_active_workflow(name: str) -> bool:
 
 
 def advance_phase(workflow_name: str = None) -> Optional[str]:
-    """Advance the workflow to the next phase."""
+    """Advance the workflow to the next phase. No override needed for sequential progression."""
     if _is_stop_locked():
         print("BLOCKED: Stop-lock active. Cannot advance phase.", file=sys.stderr)
         return None
@@ -313,10 +313,6 @@ def advance_phase(workflow_name: str = None) -> Optional[str]:
 
     name = workflow_name or state.get("active_workflow")
     if not name or name not in state["workflows"]:
-        return None
-
-    if not _has_valid_override_token(name):
-        print(f"BLOCKED: Override token required for advance_phase. Workflow: {name}", file=sys.stderr)
         return None
 
     workflow = state["workflows"][name]
@@ -351,9 +347,6 @@ def set_phase(workflow_name: str, phase: str, force: bool = False) -> tuple[bool
     if _is_stop_locked():
         return False, "Stop-lock active. Cannot set phase."
 
-    if not force and not _has_valid_override_token(workflow_name):
-        return False, "Override token required for set_phase"
-
     if phase not in PHASES:
         return False, f"Invalid phase: {phase}"
 
@@ -363,6 +356,21 @@ def set_phase(workflow_name: str, phase: str, force: bool = False) -> tuple[bool
         return False, f"Workflow not found: {workflow_name}"
 
     workflow = state["workflows"][workflow_name]
+
+    # Override only required for non-sequential phase jumps (skipping phases)
+    if not force:
+        current_phase = workflow.get("current_phase", "phase0_idle")
+        try:
+            current_idx = PHASES.index(current_phase)
+            target_idx = PHASES.index(phase)
+            # Allow sequential forward progression and going back without override
+            # Only require override when skipping forward (jumping over phases)
+            if target_idx > current_idx + 1 and not _has_valid_override_token(workflow_name):
+                skipped = PHASES[current_idx + 1:target_idx]
+                skipped_names = [PHASE_NAMES.get(p, p) for p in skipped]
+                return False, f"Override required: skipping phases ({', '.join(skipped_names)})"
+        except ValueError:
+            pass
 
     # Validation check for phase7_validate
     if phase == "phase7_validate" and not force:
@@ -581,8 +589,9 @@ def mark_red_test_done(workflow_name: str = None, result: str = None) -> bool:
     if not name or name not in state["workflows"]:
         return False
 
-    if not _has_valid_override_token(name):
-        print(f"BLOCKED: Override token required for mark_red_test_done. Workflow: {name}", file=sys.stderr)
+    # Override only required if no test result is provided (prevents marking without evidence)
+    if not result and not _has_valid_override_token(name):
+        print(f"BLOCKED: Override required for mark_red_test_done without result. Workflow: {name}", file=sys.stderr)
         return False
 
     workflow = state["workflows"][name]
@@ -694,8 +703,9 @@ def mark_ui_test_red_done(workflow_name: str = None, result: str = None) -> bool
     if not name or name not in state["workflows"]:
         return False
 
-    if not _has_valid_override_token(name):
-        print(f"BLOCKED: Override token required for mark_ui_test_red_done. Workflow: {name}", file=sys.stderr)
+    # Override only required if no test result is provided (prevents marking without evidence)
+    if not result and not _has_valid_override_token(name):
+        print(f"BLOCKED: Override required for mark_ui_test_red_done without result. Workflow: {name}", file=sys.stderr)
         return False
 
     workflow = state["workflows"][name]

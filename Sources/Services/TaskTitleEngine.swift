@@ -23,6 +23,30 @@ final class TaskTitleEngine {
         return false
     }
 
+    // MARK: - Deterministic Keyword Stripping
+
+    /// Removes known urgency/deadline keywords from task titles.
+    /// Runs synchronously — no AI needed. Handles parenthesized and prefix formats.
+    static func stripKeywords(_ title: String) -> String {
+        var cleaned = title
+
+        // Parenthesized keywords: "(dringend)", "(urgent)", "(ASAP)", "(sofort)"
+        cleaned = cleaned.replacingOccurrences(
+            of: #"\s*\(\s*(?:dringend|urgent|asap|sofort|eilig)\s*\)"#,
+            with: "",
+            options: [.regularExpression, .caseInsensitive]
+        )
+
+        // Prefix keywords: "dringend:", "urgent:", "ASAP:"
+        cleaned = cleaned.replacingOccurrences(
+            of: #"^(?:dringend|urgent|asap|sofort|eilig)\s*:\s*"#,
+            with: "",
+            options: [.regularExpression, .caseInsensitive]
+        )
+
+        return cleaned.trimmingCharacters(in: .whitespaces)
+    }
+
     // MARK: - Date Helper
 
     /// Maps relative date strings from AI output to actual dates.

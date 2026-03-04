@@ -294,6 +294,17 @@
 - **Analyse:** `docs/artifacts/bug-focusblock-sync-slow/analysis.md`
 - **Hinweis:** Refresh-Latenz haengt von Apple iCloud Calendar Sync ab (typisch 5-30s)
 
+### Bug 71: Urgency-Keywords nicht aus Titel entfernt (ERLEDIGT)
+- **Status:** ERLEDIGT
+- **Plattform:** iOS + macOS
+- **Symptom:** Task "Flüge für Retreat buchen (dringend)" — Priorität wird korrekt auf Dringend gesetzt, aber "(dringend)" bleibt im Titel
+- **Root Cause:** TaskTitleEngine lief nur beim App-Start (nicht nach Task-Erstellung). Kein deterministisches Keyword-Stripping vorhanden.
+- **Fix:** `stripKeywords()` entfernt Urgency-Keywords synchron vor dem Speichern. `improveTitleIfNeeded()` wird jetzt direkt nach Task-Erstellung aufgerufen statt erst beim naechsten App-Start.
+- **Dateien:** TaskTitleEngine.swift, LocalTaskSource.swift
+- **Tests:** 7 neue Unit Tests (alle GREEN), 23 Gesamt-Tests GREEN
+- **Analyse:** `docs/artifacts/bug-title-keyword-not-stripped/analysis.md`
+- **Nebenfix:** workflow_state_multi.py — Override-Token nur noch bei Phasen-Spruengen noetig
+
 ### Bug 70: Drag & Drop fuer FocusBlocks auf Timeline (OFFEN)
 - **Status:** OFFEN — ueberschneidet sich mit Backlog #13 (MAC-020 Drag & Drop Planung)
 - **Plattform:** iOS + macOS

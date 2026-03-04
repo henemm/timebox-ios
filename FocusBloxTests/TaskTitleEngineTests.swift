@@ -342,4 +342,55 @@ final class TaskTitleEngineTests: XCTestCase {
         XCTAssertFalse(task.needsTitleImprovement, "Flag should be false after improvement")
         XCTAssertNotNil(task.taskDescription, "Original should be saved in description")
     }
+
+    // MARK: - Deterministic Keyword Stripping (Bug: title keywords not removed)
+
+    /// Verhalten: "(dringend)" wird aus dem Titel entfernt
+    /// Bricht wenn: stripKeywords() das Pattern "(dringend)" nicht erkennt
+    func test_stripKeywords_removesParenthesizedDringend() {
+        let result = TaskTitleEngine.stripKeywords("Flüge für Retreat buchen (dringend)")
+        XCTAssertEqual(result, "Flüge für Retreat buchen")
+    }
+
+    /// Verhalten: "(urgent)" wird aus dem Titel entfernt
+    /// Bricht wenn: stripKeywords() das englische Pattern nicht erkennt
+    func test_stripKeywords_removesParenthesizedUrgent() {
+        let result = TaskTitleEngine.stripKeywords("Book flights (urgent)")
+        XCTAssertEqual(result, "Book flights")
+    }
+
+    /// Verhalten: "(ASAP)" wird aus dem Titel entfernt (case-insensitive)
+    /// Bricht wenn: stripKeywords() Grossschreibung nicht handled
+    func test_stripKeywords_removesParenthesizedASAP() {
+        let result = TaskTitleEngine.stripKeywords("Server fixen (ASAP)")
+        XCTAssertEqual(result, "Server fixen")
+    }
+
+    /// Verhalten: "(sofort)" wird aus dem Titel entfernt
+    /// Bricht wenn: stripKeywords() "sofort" nicht in der Keyword-Liste hat
+    func test_stripKeywords_removesParenthesizedSofort() {
+        let result = TaskTitleEngine.stripKeywords("Antwort schreiben (sofort)")
+        XCTAssertEqual(result, "Antwort schreiben")
+    }
+
+    /// Verhalten: "dringend:" am Anfang wird entfernt
+    /// Bricht wenn: stripKeywords() das Prefix-Pattern nicht erkennt
+    func test_stripKeywords_removesDringendPrefix() {
+        let result = TaskTitleEngine.stripKeywords("dringend: Server-Problem fixen")
+        XCTAssertEqual(result, "Server-Problem fixen")
+    }
+
+    /// Verhalten: Titel ohne Keywords bleibt unveraendert
+    /// Bricht wenn: stripKeywords() normale Titel faelschlicherweise aendert
+    func test_stripKeywords_leavesNormalTitleUnchanged() {
+        let result = TaskTitleEngine.stripKeywords("Einkaufen gehen")
+        XCTAssertEqual(result, "Einkaufen gehen")
+    }
+
+    /// Verhalten: Keyword in der Mitte des Titels wird entfernt
+    /// Bricht wenn: stripKeywords() nur am Ende matcht
+    func test_stripKeywords_removesKeywordInMiddle() {
+        let result = TaskTitleEngine.stripKeywords("Flüge (dringend) für Retreat buchen")
+        XCTAssertEqual(result, "Flüge für Retreat buchen")
+    }
 }
