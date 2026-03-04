@@ -6,6 +6,8 @@ import SwiftData
 /// Note: CloudKit requires all attributes to have default values.
 @Model
 final class LocalTask {
+    #Index<LocalTask>([\.isCompleted], [\.isNextUp], [\.dueDate], [\.isTemplate])
+
     /// Unique identifier stored as UUID for SwiftData
     var uuid: UUID = UUID()
     var title: String = ""

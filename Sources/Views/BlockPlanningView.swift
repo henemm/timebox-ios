@@ -111,63 +111,10 @@ struct BlockPlanningView: View {
             }
         }
         .task {
-            print("🟣 .task modifier triggered - calling loadData()")
             await loadData()
         }
         .onChange(of: selectedDate) {
-            print("🟣 selectedDate changed - calling loadData()")
             Task {
-                await loadData()
-            }
-        }
-    }
-
-    private var blockPlanningTimeline: some View {
-        GeometryReader { _ in
-            ScrollView {
-                ZStack(alignment: .topLeading) {
-                    // Hour grid
-                    VStack(spacing: 0) {
-                        ForEach(startHour..<endHour, id: \.self) { hour in
-                            BlockPlanningHourRow(
-                                hour: hour,
-                                hourHeight: hourHeight,
-                                date: selectedDate,
-                                events: calendarEvents,
-                                focusBlocks: focusBlocks,
-                                onTapFreeSlot: { slot in
-                                    selectedSlot = slot
-                                }
-                            )
-                        }
-                    }
-
-                    // Existing events overlay (grayed out, tappable for categorization)
-                    ForEach(nonFocusBlockEvents) { event in
-                        ExistingEventBlock(
-                            event: event,
-                            hourHeight: hourHeight,
-                            startHour: startHour,
-                            onTap: {
-                                eventToCategories = event
-                            }
-                        )
-                    }
-
-                    // Focus blocks overlay (highlighted)
-                    ForEach(focusBlocks) { block in
-                        FocusBlockView(
-                            block: block,
-                            hourHeight: hourHeight,
-                            startHour: startHour
-                        )
-                    }
-                }
-                .padding(.top, 8)
-                .frame(minHeight: CGFloat(endHour - startHour) * hourHeight)
-            }
-            .scrollIndicators(.hidden)
-            .refreshable {
                 await loadData()
             }
         }
@@ -205,52 +152,6 @@ struct BlockPlanningView: View {
             .padding(.top, 8)
         }
         .accessibilityIdentifier("planningTimeline")
-        .refreshable {
-            await loadData()
-        }
-    }
-
-    // MARK: - Smart Gaps Content
-
-    private var smartGapsContent: some View {
-        ScrollView {
-            VStack(spacing: 16) {
-                // Smart Gaps Section
-                SmartGapsSection(
-                    slots: computedFreeSlots,
-                    isDayFree: isDayMostlyFree,
-                    onCreateBlock: { slot in
-                        createFocusBlock(startDate: slot.startDate, endDate: slot.endDate)
-                    }
-                )
-
-                // Manual Block Creation Button
-                Button {
-                    let startDate = roundedCurrentTime()
-                    selectedSlot = TimeSlot(
-                        startDate: startDate,
-                        endDate: startDate.addingTimeInterval(3600)
-                    )
-                } label: {
-                    Label("Eigenen Block erstellen", systemImage: "plus.rectangle")
-                        .frame(maxWidth: .infinity)
-                }
-                .buttonStyle(.bordered)
-                .tint(.blue)
-                .accessibilityIdentifier("createCustomBlockButton")
-
-                // Existing Focus Blocks
-                if !focusBlocks.isEmpty {
-                    existingBlocksSection
-                }
-
-                // Calendar Events (tappable for categorization)
-                if !nonFocusBlockEvents.isEmpty {
-                    calendarEventsSection
-                }
-            }
-            .padding()
-        }
         .refreshable {
             await loadData()
         }

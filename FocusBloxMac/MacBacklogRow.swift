@@ -106,7 +106,7 @@ struct MacBacklogRow: View {
             if task.recurrencePattern != "none" {
                 HStack(spacing: 3) {
                     Image(systemName: "arrow.triangle.2.circlepath")
-                    Text(recurrenceDisplayName(task.recurrencePattern))
+                    Text(RecurrencePattern(rawValue: task.recurrencePattern)?.displayName ?? task.recurrencePattern)
                         .lineLimit(1)
                 }
                 .font(.caption2)
@@ -356,18 +356,6 @@ struct MacBacklogRow: View {
         .menuStyle(.borderlessButton)
         .fixedSize()
         .accessibilityIdentifier("durationBadge_\(task.id)")
-    }
-
-    // MARK: - Recurrence Display Name
-
-    private func recurrenceDisplayName(_ pattern: String) -> String {
-        switch pattern {
-        case "daily": "Täglich"
-        case "weekly": "Wöchentlich"
-        case "biweekly": "Zweiwöchentlich"
-        case "monthly": "Monatlich"
-        default: pattern
-        }
     }
 
     // MARK: - Due Date Badge

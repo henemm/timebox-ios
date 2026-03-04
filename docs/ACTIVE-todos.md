@@ -181,7 +181,7 @@
 **Guenstigster Quick Win:** ~~Shake to Undo (XS)~~ ERLEDIGT
 **Teuerste Items:** #17 OrganizeMyDay (~150k), #13 Drag & Drop (~150k), #14 NC Widget (~120k)
 **WARTEND (Apple-Abhaengigkeit):** #20 ITB-F — Developer-APIs verfuegbar, wartet auf Siri On-Screen Awareness (iOS 26.5/27)
-**Zuletzt erledigt:** MAC-022 Spotlight Integration (iOS + macOS)
+**Zuletzt erledigt:** Tech-Debt Quick Wins (SwiftData Indizes, Recurrence-Text macOS, Dead-Code-Cleanup)
 **Naechstes:** #7 Kalender-App Deep Link
 **Neu (User Story):** #22-26 Contextual Task Capture — siehe `docs/project/stories/contextual-task-capture.md`
 
@@ -333,9 +333,28 @@
   - Overlap-Detection: Warnung wenn Datei von mehreren aktiven Workflows beansprucht wird
 - **Betroffene Dateien:** `.claude/hooks/workflow_state_multi.py`, `.claude/hooks/strict_code_gate.py`, `.claude/hooks/tdd_enforcement.py`, `.claude/hooks/override_token_listener.py`
 
+### BACKLOG-009: Tech-Debt Quick Wins (ERLEDIGT)
+- **SwiftData Indizes:** `#Index<LocalTask>` auf isCompleted, isNextUp, dueDate, isTemplate — Performance bei >500 Tasks
+- **recurrenceDisplayName macOS:** Private Funktion in MacBacklogRow geloescht, nutzt jetzt shared `RecurrencePattern.displayName` (behebt Text-Mismatch "Zweiwoechentlich" → "Alle 2 Wochen")
+- **Dead Code:** ~130 LoC ungenutzter Code + Debug-Prints in BlockPlanningView entfernt
+- **macOS Mock Data:** seedUITestData fuer FocusBloxMacApp hinzugefuegt (identisch zu iOS, mit in-memory Store)
+- **Tests:** 6 Unit Tests (TechDebtQuickWinsTests) + 2 macOS UI Tests (MacRecurrenceDisplayUITests)
+- **Analyse:** `docs/context/tech-debt-analysis.md` (gewichtete Gesamtliste aller Tech-Debts)
+
+### Verbleibende Tech-Debts (dokumentiert in `docs/context/tech-debt-analysis.md`)
+- **TD-01:** God-Views (BlockPlanningView 1400 LoC, BacklogView 1181 LoC) — Aufwand: L
+- **TD-02:** iOS/macOS View-Duplikation (~9000 LoC) — Aufwand: XL, strategische Entscheidung
+- **TD-03:** 4 Services ohne Unit Tests (NotificationService, TaskPriorityScoringService, FocusBlockActionService, GapFinder) — Aufwand: M
+
 ---
 
 ## Erledigte Features & Bugs (Archiv)
+
+### 2026-03-04: Tech-Debt Quick Wins Bundle
+- Commit: (pending)
+- SwiftData Indizes + Recurrence-Text-Fix macOS + Dead-Code-Cleanup + macOS Mock Data
+- Files: LocalTask.swift, MacBacklogRow.swift, BlockPlanningView.swift, FocusBloxMacApp.swift, FocusBloxApp.swift
+- Tests: 6 Unit + 2 macOS UI = 8 Tests, alle GREEN
 
 ### 2026-03-03: Deferred List Sorting — 3 Bugfixes
 - Commit: `fix: Deferred List Sorting — 3 Bugs (Urgency-Nil-Zyklus, onChange Guard, Orange Puls-Border)`

@@ -135,8 +135,18 @@ struct FocusBloxMacApp: App {
         // CRITICAL: Required for the app to receive keyboard and mouse events
         NSApplication.shared.setActivationPolicy(.regular)
 
+        let isUITesting = ProcessInfo.processInfo.arguments.contains("-UITesting")
+
         do {
-            container = try MacModelContainer.create()
+            if isUITesting {
+                // In-memory store for UI tests — no CloudKit, no persistence
+                let schema = Schema([LocalTask.self, TaskMetadata.self])
+                let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
+                container = try ModelContainer(for: schema, configurations: [config])
+                Self.seedUITestData(into: container.mainContext)
+            } else {
+                container = try MacModelContainer.create()
+            }
             QuickCaptureController.shared.setup(with: container)
             indexQuickCaptureAction()
         } catch {
@@ -144,7 +154,9 @@ struct FocusBloxMacApp: App {
         }
 
         // Lokale Einstellungen in iCloud pushen
-        syncedSettings.pushToCloud()
+        if !isUITesting {
+            syncedSettings.pushToCloud()
+        }
     }
 
     private func indexQuickCaptureAction() {
@@ -184,6 +196,9 @@ struct FocusBloxMacApp: App {
                     // Migrate recurring tasks to template model (one-time)
                     RecurrenceService.migrateToTemplateModel(in: container.mainContext)
                     RecurrenceService.deduplicateTemplates(in: container.mainContext)
+                    // Spotlight: reindex all active tasks so they appear in system search
+                    let spotlightContext = container.mainContext
+                    Task { try? await SpotlightIndexingService.shared.reindexAllTasks(context: spotlightContext) }
                     // Bug 58: Menu bar icon (after app is fully initialized)
                     MenuBarController.shared.setup(
                         container: container,
@@ -317,6 +332,7 @@ struct FocusBloxMacApp: App {
         if identifier == "com.focusblox.quickcapture" {
             quickCapture.showPanel()
         }
+        // Task tapped in Spotlight — bring app to front (deep-link navigation not in scope)
     }
 }
 
@@ -388,5 +404,59 @@ enum MacModelContainer {
             print("[CloudKit] macOS V2 field sync failed: \(error)")
             return -1
         }
+    }
+}
+
+// MARK: - UI Test Mock Data
+
+extension FocusBloxMacApp {
+    static func seedUITestData(into context: ModelContext) {
+        let descriptor = FetchDescriptor<LocalTask>(predicate: #Predicate { $0.title == "Mock Task 1 #30min" })
+        guard (try? context.fetch(descriptor))?.isEmpty ?? true else { return }
+
+        // Next Up tasks
+        let task1 = LocalTask(title: "Mock Task 1 #30min", importance: 3, estimatedDuration: 30, urgency: "urgent")
+        task1.isNextUp = true
+        let task2 = LocalTask(title: "Mock Task 2 #15min", importance: 2, estimatedDuration: 15, urgency: "not_urgent")
+        task2.isNextUp = true
+        let task3 = LocalTask(title: "Mock Task 3 #45min", importance: 1, estimatedDuration: 45, urgency: "not_urgent")
+        task3.isNextUp = true
+
+        // Backlog tasks
+        let backlogTask1 = LocalTask(title: "Backlog Task 1", importance: 2, estimatedDuration: 25, urgency: "urgent")
+        backlogTask1.tags = ["work", "urgent"]
+        backlogTask1.taskType = "deep_work"
+        backlogTask1.dueDate = Date()
+
+        let backlogTask2 = LocalTask(title: "Backlog Task 2", importance: 1, estimatedDuration: 15, urgency: "not_urgent")
+        backlogTask2.taskType = "shallow_work"
+
+        // Recurring: daily template + child
+        let group1 = "uitest-recurring-group-1"
+        let tmpl1 = LocalTask(title: "Taeglich lesen", importance: 2, tags: ["learning"], estimatedDuration: 15, recurrencePattern: "daily", recurrenceGroupID: group1)
+        tmpl1.isTemplate = true
+        let child1 = LocalTask(title: "Taeglich lesen", importance: 2, tags: ["learning"], dueDate: Date(), estimatedDuration: 15, recurrencePattern: "daily", recurrenceGroupID: group1)
+
+        // Recurring: weekly template + child
+        let group2 = "uitest-recurring-group-2"
+        let tmpl2 = LocalTask(title: "Wochenreview", importance: 3, tags: ["planning"], estimatedDuration: 30, recurrencePattern: "weekly", recurrenceWeekdays: [5], recurrenceGroupID: group2)
+        tmpl2.isTemplate = true
+        let child2 = LocalTask(title: "Wochenreview", importance: 3, tags: ["planning"], dueDate: Date(), estimatedDuration: 30, recurrencePattern: "weekly", recurrenceWeekdays: [5], recurrenceGroupID: group2)
+
+        // Recurring: biweekly template + child (for recurrence display test)
+        let group3 = "uitest-recurring-group-3"
+        let tmpl3 = LocalTask(title: "Zweiwochentlich aufraeumen", importance: 1, tags: ["maintenance"], estimatedDuration: 45, recurrencePattern: "biweekly", recurrenceGroupID: group3)
+        tmpl3.isTemplate = true
+        let child3 = LocalTask(title: "Zweiwochentlich aufraeumen", importance: 1, tags: ["maintenance"], dueDate: Date(), estimatedDuration: 45, recurrencePattern: "biweekly", recurrenceGroupID: group3)
+
+        // Completed task
+        let completed = LocalTask(title: "Erledigte Aufgabe", importance: 2, estimatedDuration: 20, urgency: "not_urgent")
+        completed.isCompleted = true
+        completed.completedAt = Date()
+
+        for task in [task1, task2, task3, backlogTask1, backlogTask2, tmpl1, child1, tmpl2, child2, tmpl3, child3, completed] {
+            context.insert(task)
+        }
+        try? context.save()
     }
 }

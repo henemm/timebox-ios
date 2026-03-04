@@ -1,0 +1,8 @@
+    export TREAT_MISSING_BASELINES_AS_TEST_FAILURES\=NO
+/Users/hem/Developer/my-daily-sprints/FocusBloxMacUITests/MacRecurrenceDisplayUITests.swift:67: error: -[FocusBloxMacUITests.MacRecurrenceDisplayUITests testBiweeklyRecurrenceBadgeShowsCorrectText] : XCTAssertGreaterThan failed: ("0") is not greater than ("0") - Biweekly task must show 'Alle 2 Wochen' (from RecurrencePattern.displayName), not 'Zweiwöchentlich'
+Test Case '-[FocusBloxMacUITests.MacRecurrenceDisplayUITests testBiweeklyRecurrenceBadgeShowsCorrectText]' failed (9.348 seconds).
+Test Suite 'MacRecurrenceDisplayUITests' failed at 2026-03-04 08:34:01.011.
+Test Suite 'FocusBloxMacUITests.xctest' failed at 2026-03-04 08:34:01.012.
+Test Suite 'Selected tests' failed at 2026-03-04 08:34:01.012.
+** TEST FAILED **
+Test case 'MacRecurrenceDisplayUITests.testBiweeklyRecurrenceBadgeShowsCorrectText()' failed on 'My Mac - FocusBloxMacUITests-Runner (44994)' (9.348 seconds)

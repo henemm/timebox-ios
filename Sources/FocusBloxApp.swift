@@ -1,6 +1,7 @@
 import SwiftUI
 import SwiftData
 import AppIntents
+import CoreSpotlight
 import FocusBloxCore
 
 // MARK: - Notification Name for Control Center Widget
@@ -239,6 +240,9 @@ struct FocusBloxApp: App {
                     // Background title improvement for tasks from Share Extension, Siri, Watch
                     let titleEngine = TaskTitleEngine(modelContext: sharedModelContainer.mainContext)
                     Task { await titleEngine.improveAllPendingTitles() }
+                    // Spotlight: reindex all active tasks so they appear in system search
+                    let spotlightContext = sharedModelContainer.mainContext
+                    Task { try? await SpotlightIndexingService.shared.reindexAllTasks(context: spotlightContext) }
                 }
                 // Register App Shortcuts with Siri so voice commands are discoverable
                 FocusBloxShortcuts.updateAppShortcutParameters()
@@ -268,6 +272,9 @@ struct FocusBloxApp: App {
             }
             .onReceive(NotificationCenter.default.publisher(for: .quickCaptureRequested)) { _ in
                 showQuickCapture = true
+            }
+            .onContinueUserActivity(CSSearchableItemActionType) { _ in
+                // Spotlight task tapped — app opens (deep-link navigation not in scope)
             }
             .sheet(isPresented: $showQuickCapture) {
                 QuickCaptureView(initialTitle: quickCaptureTitle)
@@ -591,6 +598,32 @@ struct FocusBloxApp: App {
         )
         recurringChild2.isNextUp = false
         context.insert(recurringChild2)
+
+        // Series 3: Biweekly — template + open child (for recurrence display consistency test)
+        let recurringGroupID3 = "uitest-recurring-group-3"
+        let recurringTemplate3 = LocalTask(
+            title: "Zweiwochentlich aufraeumen",
+            importance: 1,
+            tags: ["maintenance"],
+            estimatedDuration: 45,
+            recurrencePattern: "biweekly",
+            recurrenceGroupID: recurringGroupID3
+        )
+        recurringTemplate3.isTemplate = true
+        recurringTemplate3.isNextUp = false
+        context.insert(recurringTemplate3)
+
+        let recurringChild3 = LocalTask(
+            title: "Zweiwochentlich aufraeumen",
+            importance: 1,
+            tags: ["maintenance"],
+            dueDate: Date(),
+            estimatedDuration: 45,
+            recurrencePattern: "biweekly",
+            recurrenceGroupID: recurringGroupID3
+        )
+        recurringChild3.isNextUp = false
+        context.insert(recurringChild3)
 
         // Completed task outside any FocusBlock (for Review tab testing)
         let completedOutsideBlock = LocalTask(title: "Erledigte Backlog-Aufgabe", importance: 2, estimatedDuration: 20, urgency: "not_urgent")
