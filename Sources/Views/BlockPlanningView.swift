@@ -634,8 +634,8 @@ struct CreateFocusBlockSheet: View {
     init(slot: TimeSlot, onCreate: @escaping (Date, Date) -> Void) {
         self.slot = slot
         self.onCreate = onCreate
-        _startTime = State(initialValue: slot.startDate)
-        _endTime = State(initialValue: slot.endDate)
+        _startTime = State(initialValue: FocusBlock.snapToQuarterHour(slot.startDate))
+        _endTime = State(initialValue: FocusBlock.snapToQuarterHour(slot.endDate))
     }
 
     var body: some View {
@@ -668,7 +668,8 @@ struct CreateFocusBlockSheet: View {
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Erstellen") {
-                        onCreate(startTime, endTime)
+                        onCreate(FocusBlock.snapToQuarterHour(startTime),
+                                 FocusBlock.snapToQuarterHour(endTime))
                         dismiss()
                     }
                     .disabled(endTime <= startTime)

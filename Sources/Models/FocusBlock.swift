@@ -91,6 +91,23 @@ extension FocusBlock {
         }
         return normalized
     }
+
+    /// Snap a date to the nearest 15-minute boundary (round-to-nearest).
+    /// 09:06 → 09:00, 09:08 → 09:15, 09:53 → 10:00
+    static func snapToQuarterHour(_ date: Date) -> Date {
+        let calendar = Calendar.current
+        let comps = calendar.dateComponents([.year, .month, .day, .hour, .minute], from: date)
+        let minute = comps.minute ?? 0
+        let snapped = ((minute + 7) / 15) * 15
+        let hourOverflow = snapped / 60
+        let finalMinute = snapped % 60
+
+        var result = comps
+        result.hour = (result.hour ?? 0) + hourOverflow
+        result.minute = finalMinute
+        result.second = 0
+        return calendar.date(from: result) ?? date
+    }
 }
 
 // MARK: - Notes Serialization

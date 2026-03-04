@@ -123,7 +123,20 @@ struct FocusBloxApp: App {
                 completedTaskIDs: []
             )
 
-            mock.mockFocusBlocks = [focusBlock1, focusBlock2, activeBlock]
+            // Focus Block 4: NON-ALIGNED times for Bug 70a snapping test
+            // 09:13 - 10:47 (NOT on 15-min grid — tests that EditSheet snaps to 09:15 - 10:45)
+            let block4Start = calendar.date(bySettingHour: 9, minute: 13, second: 0, of: now)!
+            let block4End = calendar.date(bySettingHour: 10, minute: 47, second: 0, of: now)!
+            let unalignedBlock = FocusBlock(
+                id: "mock-block-unaligned",
+                title: "Unaligned Block 09:13",
+                startDate: block4Start,
+                endDate: block4End,
+                taskIDs: [],
+                completedTaskIDs: []
+            )
+
+            mock.mockFocusBlocks = [focusBlock1, focusBlock2, activeBlock, unalignedBlock]
 
             // Add mock Calendar Events for timeline testing
             let meeting1Start = calendar.date(byAdding: .hour, value: 8, to: startOfDay)!

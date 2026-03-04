@@ -13,8 +13,8 @@ struct EditFocusBlockSheet: View {
         self.block = block
         self.onSave = onSave
         self.onDelete = onDelete
-        _startTime = State(initialValue: block.startDate)
-        _endTime = State(initialValue: block.endDate)
+        _startTime = State(initialValue: FocusBlock.snapToQuarterHour(block.startDate))
+        _endTime = State(initialValue: FocusBlock.snapToQuarterHour(block.endDate))
     }
 
     var body: some View {
@@ -58,7 +58,8 @@ struct EditFocusBlockSheet: View {
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Speichern") {
-                        onSave(startTime, endTime)
+                        onSave(FocusBlock.snapToQuarterHour(startTime),
+                               FocusBlock.snapToQuarterHour(endTime))
                         dismiss()
                     }
                     .disabled(endTime <= startTime)

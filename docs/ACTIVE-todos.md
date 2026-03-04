@@ -190,6 +190,7 @@
 | 26 | ~~CTC-5: Watch-Diktat Titel-Verbesserung~~ | ERLEDIGT | S | ~15-20k | 2 | ~6 |
 | 27 | ~~CTC-1b: TaskTitleEngine — Konservativ + Metadaten-Extraktion~~ | ERLEDIGT | S | ~20-30k | 2 | ~60 |
 | 28 | ~~CTC-6: Smart Task Interpretation + Similar-Task Learning~~ | ERLEDIGT | S | ~20k | 4 | ~70 |
+| 29 | Badge-Zahl (Overdue) + Interaktive Frist-Notifications | OFFEN | M | ~50-70k | 3-4 | ~150-200 |
 | ~~Bug 67~~ | ~~Tab-Labels Deutsch→English~~ | ERLEDIGT | XS | ~5k | 5 | ~10 |
 | Bug 68 | FocusBlock View-Umbau — Full-Screen Sheet mit 3 Sektionen | ERLEDIGT | M | ~40-60k | 4 | ~100 |
 | Bug 69 | FocusBlock Sync — Architektur-Analyse (EventKit→SwiftData?) | P2 | L-XL | ~80-120k | Analyse | TBD |
@@ -201,7 +202,7 @@
 **Teuerste Items:** #17 OrganizeMyDay (~150k), Bug 70/~~#13~~ Drag & Drop (~150k), #14 NC Widget (~120k)
 **WARTEND (Apple-Abhaengigkeit):** #20 ITB-F — Developer-APIs verfuegbar, wartet auf Siri On-Screen Awareness (iOS 26.5/27)
 **Zuletzt erledigt:** Bug 69 FocusBlock Auto-Refresh (Cross-Device Sync)
-**Naechstes:** Bug 70 (D&D, XL) oder #7 Kalender Deep Link (M)
+**Naechstes:** #29 Badge + Interaktive Notifications (M) → Bug 70 (D&D, XL) oder #7 Kalender Deep Link (M)
 **Neu (User Story):** #22-26 Contextual Task Capture — siehe `docs/project/stories/contextual-task-capture.md`
 
 > **Dies ist das EINZIGE Backlog.** macOS-Features (MAC-xxx) stehen hier mit Verweis auf ihre Specs in `docs/specs/macos/`. Kein zweites Backlog.
@@ -221,8 +222,9 @@
 - ~~MAC-022 Spotlight Integration~~ ERLEDIGT
 
 ### Bundle C: Erinnerungen & Verknuepfungen
-- Push Notifications bei Frist
+- ~~Push Notifications bei Frist~~ ERLEDIGT
 - Kalender-App Deep Link
+- **#29 Badge-Zahl (Overdue) + Interaktive Frist-Notifications** — App-Icon Badge zeigt Anzahl ueberfaelliger Tasks, Frist-Notifications bieten 3 Buttons: NextUp, Verschieben (+1 Tag), Erledigt
 
 ### Bundle D: Erfolge feiern
 - Emotionales Aufladen im Report
@@ -305,6 +307,15 @@
 - **Analyse:** `docs/artifacts/bug-title-keyword-not-stripped/analysis.md`
 - **Nebenfix:** workflow_state_multi.py — Override-Token nur noch bei Phasen-Spruengen noetig
 
+### Bug 70a: 15-Min-Snapping bei FocusBlock-Erstellung (ERLEDIGT)
+- **Status:** ERLEDIGT
+- **Plattform:** iOS + macOS (Shared)
+- **Symptom:** FocusBlock-Zeiten konnten auf beliebige Minuten gesetzt werden (09:13, 09:47 etc.)
+- **Fix:** `FocusBlock.snapToQuarterHour()` rundet zur naechsten Viertelstunde (round-to-nearest). Angewendet in init (Initialwerte) + save (Speichern) aller 3 Sheets.
+- **Dateien:** FocusBlock.swift, BlockPlanningView.swift, EditFocusBlockSheet.swift, MacPlanningView.swift
+- **Tests:** 14 Unit Tests (FocusBlockSnapTests), alle GREEN, Build OK (iOS + macOS)
+- **Analyse:** `docs/artifacts/bug-70a-15min-snapping/analysis.md`
+
 ### Bug 70: Drag & Drop fuer FocusBlocks auf Timeline (OFFEN)
 - **Status:** OFFEN — ueberschneidet sich mit Backlog #13 (MAC-020 Drag & Drop Planung)
 - **Plattform:** iOS + macOS
@@ -312,7 +323,7 @@
 - **Symptom:** Blocks koennen nicht per Drag & Drop auf der Timeline verschoben werden (Zeitslot aendern)
 - **Kontext:** MAC-020 im Backlog deckt macOS-Seite ab. Dieses Ticket erweitert den Scope auf iOS.
 - **Hinweis:** Innerhalb eines Blocks funktioniert Task-Reordering bereits (List.onMove)
-- **Naechster Schritt:** MAC-020 Spec aktualisieren fuer beide Plattformen
+- **Naechster Schritt:** Bug 70b (Block verschieben per DragGesture) → Bug 70c (Block resizen)
 
 ### Bug 66: macOS FocusBlock nicht sichtbar in MenuBar + Sync-Deadlock (ERLEDIGT)
 - **Status:** ERLEDIGT
