@@ -330,6 +330,7 @@
   - Fallback auf `active_workflow` fuer alte Workflows ohne `affected_files`
   - `complete_workflow()` setzt `active_workflow = None` statt zufaelligem Workflow
   - Override-Token: `"override [workflow-name]"` fuer explizite Zuweisung
+  - Overlap-Detection: Warnung wenn Datei von mehreren aktiven Workflows beansprucht wird
 - **Betroffene Dateien:** `.claude/hooks/workflow_state_multi.py`, `.claude/hooks/strict_code_gate.py`, `.claude/hooks/tdd_enforcement.py`, `.claude/hooks/override_token_listener.py`
 
 ---

@@ -229,6 +229,31 @@ def main():
     # CODE FILE → Workflow required!
     # PRIMARY: Find workflow by file ownership (affected_files)
     candidates = find_workflow_for_file(file_path)
+
+    # OVERLAP DETECTION: Warn if multiple ACTIVE workflows claim this file
+    active_candidates = [
+        (n, w) for n, w in candidates
+        if w.get("current_phase") in ("phase6_implement", "phase7_validate")
+    ]
+    if len(active_candidates) > 1:
+        names = [n for n, _ in active_candidates]
+        print(f"""
+╔══════════════════════════════════════════════════════════════════╗
+║  🟡 WARNING: File Overlap Detected!                              ║
+╠══════════════════════════════════════════════════════════════════╣
+║  File: {file_path[-58:]:<58}║
+║                                                                  ║
+║  This file is claimed by MULTIPLE active workflows:              ║""", file=sys.stderr)
+        for n in names:
+            print(f"║    - {n:<59}║", file=sys.stderr)
+        print(f"""║                                                                  ║
+║  Using most recently updated: {names[0]:<34}║
+║                                                                  ║
+║  RISK: Parallel edits to the same file can cause conflicts!      ║
+║  Consider moving this file to only ONE workflow's affected_files. ║
+╚══════════════════════════════════════════════════════════════════╝
+""", file=sys.stderr)
+
     if candidates:
         wf_name, workflow = candidates[0]
         workflow["name"] = wf_name
