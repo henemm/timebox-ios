@@ -41,6 +41,7 @@ Phases (in order):
 
 import json
 import os
+import sys
 from datetime import datetime
 from pathlib import Path
 from typing import Optional
@@ -117,6 +118,37 @@ CODE_MODIFY_PHASES = ["phase6_implement", "phase7_validate", "phase8_complete"]
 
 # Phases that require test artifacts
 TEST_REQUIRED_PHASES = ["phase6_implement", "phase7_validate"]
+
+
+def _is_stop_locked() -> bool:
+    """Check if the stop-lock is active."""
+    lock_path = Path(__file__).parent.parent / "stop_lock.json"
+    if not lock_path.exists():
+        return False
+    try:
+        lock = json.loads(lock_path.read_text())
+        return lock.get("enabled", False)
+    except (json.JSONDecodeError, Exception):
+        return False
+
+
+def _has_valid_override_token(workflow_name: str = None) -> bool:
+    """Check if a valid override token exists for the given workflow."""
+    token_path = Path(__file__).parent.parent / "user_override_token.json"
+    if not token_path.exists():
+        return False
+    try:
+        token = json.loads(token_path.read_text())
+        created = token.get("created", "")
+        if created:
+            created_dt = datetime.fromisoformat(created)
+            if (datetime.now() - created_dt).total_seconds() > 3600:
+                return False
+        if workflow_name:
+            return token.get("workflow") == workflow_name
+        return True
+    except (json.JSONDecodeError, ValueError, Exception):
+        return False
 
 
 def get_state_file() -> Path:
@@ -273,10 +305,18 @@ def set_active_workflow(name: str) -> bool:
 
 def advance_phase(workflow_name: str = None) -> Optional[str]:
     """Advance the workflow to the next phase."""
+    if _is_stop_locked():
+        print("BLOCKED: Stop-lock active. Cannot advance phase.", file=sys.stderr)
+        return None
+
     state = load_state()
 
     name = workflow_name or state.get("active_workflow")
     if not name or name not in state["workflows"]:
+        return None
+
+    if not _has_valid_override_token(name):
+        print(f"BLOCKED: Override token required for advance_phase. Workflow: {name}", file=sys.stderr)
         return None
 
     workflow = state["workflows"][name]
@@ -303,11 +343,17 @@ def set_phase(workflow_name: str, phase: str, force: bool = False) -> tuple[bool
     Args:
         workflow_name: Name of the workflow
         phase: Target phase
-        force: If True, skip validation checks
+        force: If True, skip validation checks (CLI only)
 
     Returns:
         (success, message) tuple
     """
+    if _is_stop_locked():
+        return False, "Stop-lock active. Cannot set phase."
+
+    if not force and not _has_valid_override_token(workflow_name):
+        return False, "Override token required for set_phase"
+
     if phase not in PHASES:
         return False, f"Invalid phase: {phase}"
 
@@ -525,10 +571,18 @@ def mark_red_test_done(workflow_name: str = None, result: str = None) -> bool:
         workflow_name: Name of workflow (uses active if None)
         result: Description of the failing test result
     """
+    if _is_stop_locked():
+        print("BLOCKED: Stop-lock active. Cannot mark red test done.", file=sys.stderr)
+        return False
+
     state = load_state()
 
     name = workflow_name or state.get("active_workflow")
     if not name or name not in state["workflows"]:
+        return False
+
+    if not _has_valid_override_token(name):
+        print(f"BLOCKED: Override token required for mark_red_test_done. Workflow: {name}", file=sys.stderr)
         return False
 
     workflow = state["workflows"][name]
@@ -630,10 +684,18 @@ def mark_ui_test_red_done(workflow_name: str = None, result: str = None) -> bool
         workflow_name: Name of workflow (uses active if None)
         result: Description of the failing UI test result
     """
+    if _is_stop_locked():
+        print("BLOCKED: Stop-lock active. Cannot mark UI test red done.", file=sys.stderr)
+        return False
+
     state = load_state()
 
     name = workflow_name or state.get("active_workflow")
     if not name or name not in state["workflows"]:
+        return False
+
+    if not _has_valid_override_token(name):
+        print(f"BLOCKED: Override token required for mark_ui_test_red_done. Workflow: {name}", file=sys.stderr)
         return False
 
     workflow = state["workflows"][name]

@@ -181,7 +181,7 @@
 **Guenstigster Quick Win:** ~~Shake to Undo (XS)~~ ERLEDIGT
 **Teuerste Items:** #17 OrganizeMyDay (~150k), #13 Drag & Drop (~150k), #14 NC Widget (~120k)
 **WARTEND (Apple-Abhaengigkeit):** #20 ITB-F — Developer-APIs verfuegbar, wartet auf Siri On-Screen Awareness (iOS 26.5/27)
-**Zuletzt erledigt:** Tech-Debt Quick Wins (SwiftData Indizes, Recurrence-Text macOS, Dead-Code-Cleanup)
+**Zuletzt erledigt:** Stop-Lock + API-Guard (Schutzmechanismen gegen Workflow-Manipulation)
 **Naechstes:** #7 Kalender-App Deep Link
 **Neu (User Story):** #22-26 Contextual Task Capture — siehe `docs/project/stories/contextual-task-capture.md`
 
@@ -349,6 +349,12 @@
 ---
 
 ## Erledigte Features & Bugs (Archiv)
+
+### 2026-03-04: Stop-Lock + API-Guard
+- Stop-Lock: User tippt "stopp" → alle Edit/Write/Bash gesperrt bis "weiter"
+- API-Guard: advance_phase/set_phase/mark_*_test_done brauchen Override-Token
+- Files: stop_lock_guard.py (NEU), stop_lock_listener.py (NEU), workflow_state_multi.py, settings.json
+- Tests: Isolierte Tests (Guard blockt, API-Funktionen blockiert ohne Token)
 
 ### 2026-03-04: Tech-Debt Quick Wins Bundle
 - Commit: (pending)

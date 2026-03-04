@@ -15,6 +15,11 @@
         "hooks": [
           {
             "type": "command",
+            "command": "python3 /Users/hem/Developer/my-daily-sprints/.claude/hooks/stop_lock_guard.py",
+            "timeout": 5
+          },
+          {
+            "type": "command",
             "command": "python3 /Users/hem/Developer/my-daily-sprints/.claude/hooks/override_token_guard.py",
             "timeout": 5
           },
@@ -90,6 +95,11 @@
         "hooks": [
           {
             "type": "command",
+            "command": "python3 /Users/hem/Developer/my-daily-sprints/.claude/hooks/stop_lock_guard.py",
+            "timeout": 5
+          },
+          {
+            "type": "command",
             "command": "python3 /Users/hem/Developer/my-daily-sprints/.claude/hooks/override_token_bash_guard.py",
             "timeout": 5
           },
@@ -120,6 +130,11 @@
     "UserPromptSubmit": [
       {
         "hooks": [
+          {
+            "type": "command",
+            "command": "python3 /Users/hem/Developer/my-daily-sprints/.claude/hooks/stop_lock_listener.py",
+            "timeout": 5
+          },
           {
             "type": "command",
             "command": "python3 /Users/hem/Developer/my-daily-sprints/.claude/hooks/workflow_state_updater.py",
