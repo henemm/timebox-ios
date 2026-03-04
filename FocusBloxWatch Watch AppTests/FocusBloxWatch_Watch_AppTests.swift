@@ -165,53 +165,55 @@ struct WatchLocalTaskSchemaTests {
         return try PropertyListSerialization.propertyList(from: data, format: nil) as! [String: Any]
     }
 
-    // MARK: - Watch Complication: Source-Based Tests
+    // MARK: - Watch Complication: Build Artifact Tests
+    //
+    // Diese Tests pruefen ECHTE Build-Artefakte, nicht Source-Dateien.
+    // Sie haetten den Bug "Extension gebaut aber nicht eingebettet" sofort gefangen.
 
-    /// Verhalten: ContentView hat .onOpenURL Handler fuer Deep-Link voice-capture
-    /// Bricht wenn: ContentView.swift NICHT .onOpenURL mit "voice-capture" enthaelt
-    @Test func watchContentView_hasOnOpenURLHandler() throws {
-        let testFile = URL(fileURLWithPath: #filePath)
-        let projectRoot = testFile.deletingLastPathComponent().deletingLastPathComponent()
-        let contentViewFile = projectRoot
-            .appendingPathComponent("FocusBloxWatch Watch App")
-            .appendingPathComponent("ContentView.swift")
-        let source = try String(contentsOf: contentViewFile, encoding: .utf8)
-        #expect(source.contains("onOpenURL"),
-                "ContentView must have .onOpenURL handler for complication deep-link")
-        #expect(source.contains("voice-capture"),
-                "ContentView must handle voice-capture URL host")
+    /// Hilfsfunktion: Findet das Watch App Bundle im Build-Products-Verzeichnis.
+    /// Unit Tests laufen IN der Watch App (Test Host), also ist Bundle.main die Watch App selbst.
+    private func watchAppBundleURL() -> URL {
+        Bundle.main.bundleURL
     }
 
-    /// Verhalten: QuickCaptureComplication.swift existiert mit StaticConfiguration
-    /// Bricht wenn: Datei fehlt oder kein Widget definiert
-    @Test func watchComplication_fileExists() throws {
-        let testFile = URL(fileURLWithPath: #filePath)
-        let projectRoot = testFile.deletingLastPathComponent().deletingLastPathComponent()
-        let complicationFile = projectRoot
-            .appendingPathComponent("FocusBloxWatchWidgets")
-            .appendingPathComponent("QuickCaptureComplication.swift")
-        let source = try String(contentsOf: complicationFile, encoding: .utf8)
-        #expect(source.contains("StaticConfiguration"),
-                "Complication must use StaticConfiguration")
-        #expect(source.contains("accessoryCircular"),
-                "Complication must support accessoryCircular family")
-        #expect(source.contains("focusblox://voice-capture"),
-                "Complication must set widgetURL for deep-link")
+    /// Verhalten: Widget Extension .appex ist im PlugIns/ der Watch App eingebettet
+    /// Bricht wenn: pbxproj — "Embed Foundation Extensions" Build Phase fehlt oder Widget Extension nicht als Dependency
+    @Test func watchApp_embedsWidgetExtension() throws {
+        let watchAppURL = watchAppBundleURL()
+        let plugInsURL = watchAppURL.appendingPathComponent("PlugIns")
+        let widgetAppexURL = plugInsURL.appendingPathComponent("FocusBloxWatchWidgetsExtension.appex")
+
+        #expect(FileManager.default.fileExists(atPath: plugInsURL.path),
+                "Watch App must have PlugIns/ directory")
+        #expect(FileManager.default.fileExists(atPath: widgetAppexURL.path),
+                "Widget Extension .appex must be embedded in Watch App PlugIns/")
     }
 
-    /// Verhalten: Widget Bundle existiert mit @main Entry Point
-    /// Bricht wenn: Bundle-Datei fehlt oder kein @main
-    @Test func watchWidgetBundle_fileExists() throws {
-        let testFile = URL(fileURLWithPath: #filePath)
-        let projectRoot = testFile.deletingLastPathComponent().deletingLastPathComponent()
-        let bundleFile = projectRoot
-            .appendingPathComponent("FocusBloxWatchWidgets")
-            .appendingPathComponent("FocusBloxWatchWidgetsBundle.swift")
-        let source = try String(contentsOf: bundleFile, encoding: .utf8)
-        #expect(source.contains("@main"),
-                "Widget bundle must have @main entry point")
-        #expect(source.contains("QuickCaptureComplication"),
-                "Widget bundle must include QuickCaptureComplication")
+    /// Verhalten: Eingebettete Widget Extension hat gueltige Info.plist mit Bundle ID und NSExtension
+    /// Bricht wenn: GENERATE_INFOPLIST_FILE=NO oder NSExtension fehlt in Info.plist
+    @Test func watchWidgetExtension_hasValidInfoPlist() throws {
+        let widgetAppexURL = watchAppBundleURL()
+            .appendingPathComponent("PlugIns")
+            .appendingPathComponent("FocusBloxWatchWidgetsExtension.appex")
+        let appexInfoURL = widgetAppexURL.appendingPathComponent("Info.plist")
+
+        #expect(FileManager.default.fileExists(atPath: appexInfoURL.path),
+                "Widget Extension must contain Info.plist")
+
+        let plistData = try Data(contentsOf: appexInfoURL)
+        let plist = try PropertyListSerialization.propertyList(from: plistData, format: nil) as! [String: Any]
+
+        // Bundle ID muss Watch App Bundle ID als Prefix haben
+        let bundleId = plist["CFBundleIdentifier"] as? String ?? ""
+        #expect(bundleId.contains("watchkitapp.widgets"),
+                "Widget bundle ID must contain 'watchkitapp.widgets', got: \(bundleId)")
+
+        // NSExtension mit WidgetKit Extension Point
+        let nsExtension = plist["NSExtension"] as? [String: Any]
+        #expect(nsExtension != nil, "Info.plist must contain NSExtension dictionary")
+        let extensionPoint = nsExtension?["NSExtensionPointIdentifier"] as? String ?? ""
+        #expect(extensionPoint == "com.apple.widgetkit-extension",
+                "Extension point must be com.apple.widgetkit-extension, got: \(extensionPoint)")
     }
 
     // MARK: - ModelContainer Integration: Full iOS-Schema Data Round-Trip

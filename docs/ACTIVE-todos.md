@@ -44,7 +44,7 @@
   - `FocusBloxWatchWidgets/FocusBloxWatchWidgets.entitlements`: App Group
   - `FocusBloxWatch Watch App/ContentView.swift`: .onOpenURL Deep-Link Handler (focusblox://voice-capture)
   - `FocusBlox.xcodeproj/project.pbxproj`: Neues Target FocusBloxWatchWidgetsExtension
-- **Tests:** 28 Watch-Tests gruen (3 Unit + 6 UI, davon 2 neue Complication-Flow-UI-Tests + 19 bestehende Unit)
+- **Tests:** 27 Watch-Tests gruen (21 Unit + 6 UI). 2 Build-Artifact-Tests pruefen dass .appex in Watch App eingebettet ist.
 - **Spec:** `docs/specs/features/watch-complication.md`
 - **Naechste Schritte (Backlog):** Siri Shortcut Integration
 
