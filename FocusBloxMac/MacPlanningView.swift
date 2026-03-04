@@ -56,7 +56,7 @@ struct MacPlanningView: View {
             nextUpSection
                 .frame(minWidth: 250, maxWidth: 350, maxHeight: .infinity)
         }
-        .navigationTitle("Planen")
+        .navigationTitle("Blox")
         .toolbar {
             ToolbarItem(placement: .automatic) {
                 MacDateNavigator(selectedDate: $selectedDate)

@@ -192,7 +192,7 @@ struct DailyReviewView: View {
                     }
                 }
             }
-            .navigationTitle("Rückblick")
+            .navigationTitle("Review")
             .withSettingsToolbar()
         }
         .task {

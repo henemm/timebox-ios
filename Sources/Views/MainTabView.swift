@@ -10,17 +10,17 @@ struct MainTabView: View {
 
             BlockPlanningView()
                 .tabItem {
-                    Label("Blöcke", systemImage: "calendar")
+                    Label("Blox", systemImage: "calendar")
                 }
 
             FocusLiveView()
                 .tabItem {
-                    Label("Fokus", systemImage: "target")
+                    Label("Focus", systemImage: "target")
                 }
 
             DailyReviewView()
                 .tabItem {
-                    Label("Rückblick", systemImage: "chart.bar")
+                    Label("Review", systemImage: "chart.bar")
                 }
         }
         .accessibilityIdentifier("mainTabView_unified")

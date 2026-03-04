@@ -160,7 +160,7 @@
 | 10 | MAC-030 Shortcuts.app | P3 | L | ~60-80k | 2-3 | ~150 |
 | 11 | Emotionales Aufladen (Report) | MITTEL | L | ~80-100k | 3-4 | ~200 |
 | 12 | MAC-026 Enhanced Quick Capture | P2 | L | ~80-120k | 4 | ~200 |
-| 13 | MAC-020 Drag & Drop Planung | P2 | XL | ~100-150k | 3-4 | ~250 |
+| 13 | ~~MAC-020 Drag & Drop Planung~~ → siehe Bug 70 (iOS+macOS) | P2 | XL | ~100-150k | 3-4 | ~250 |
 | 14 | MAC-032 NC Widget | P3 | XL | ~80-120k | neues Target | ~200 |
 | 15 | ~~ITB-A: FocusBlockEntity (AppEntity)~~ | ERLEDIGT | S | ~30-40k | 2 | ~60 |
 | 16 | ~~ITB-B: Smart Priority (AI-Enrichment + Hybrid-Scoring)~~ | ERLEDIGT | L | ~80-120k | 12 | ~250 |
@@ -176,14 +176,18 @@
 | 26 | ~~CTC-5: Watch-Diktat Titel-Verbesserung~~ | ERLEDIGT | S | ~15-20k | 2 | ~6 |
 | 27 | ~~CTC-1b: TaskTitleEngine — Konservativ + Metadaten-Extraktion~~ | ERLEDIGT | S | ~20-30k | 2 | ~60 |
 | 28 | ~~CTC-6: Smart Task Interpretation + Similar-Task Learning~~ | ERLEDIGT | S | ~20k | 4 | ~70 |
+| ~~Bug 67~~ | ~~Tab-Labels Deutsch→English~~ | ERLEDIGT | XS | ~5k | 5 | ~10 |
+| Bug 68 | FocusBlock View-Umbau — Tap→Detail View fehlt | P1 | M | ~40-60k | 3-4 | ~100 |
+| Bug 69 | FocusBlock Sync — Architektur-Analyse (EventKit→SwiftData?) | P2 | L-XL | ~80-120k | Analyse | TBD |
+| Bug 70 | Drag & Drop Blocks auf Timeline (iOS+macOS) → erweitert #13 | P2 | XL | ~100-150k | 3-4 | ~250 |
 
 **Komplexitaet:** XS = halbe Stunde | S = 1 Session | M = 2-3 Sessions | L = halber Tag | XL = ganzer Tag+
 
-**Guenstigster Quick Win:** ~~Shake to Undo (XS)~~ ERLEDIGT
-**Teuerste Items:** #17 OrganizeMyDay (~150k), #13 Drag & Drop (~150k), #14 NC Widget (~120k)
+**Guenstigster Quick Win:** Bug 68 View-Umbau (M)
+**Teuerste Items:** #17 OrganizeMyDay (~150k), Bug 70/~~#13~~ Drag & Drop (~150k), #14 NC Widget (~120k)
 **WARTEND (Apple-Abhaengigkeit):** #20 ITB-F — Developer-APIs verfuegbar, wartet auf Siri On-Screen Awareness (iOS 26.5/27)
-**Zuletzt erledigt:** CTC-6 Smart Task Interpretation (Floskel-Erkennung + Similar-Task-Lernen)
-**Naechstes:** #7 Kalender-App Deep Link
+**Zuletzt erledigt:** Bug 67 Tab-Labels Deutsch→English (iOS + macOS)
+**Naechstes:** Bug 68 (View-Umbau, M) → Bug 69 (Sync-Analyse, L) → Bug 70 (D&D, XL)
 **Neu (User Story):** #22-26 Contextual Task Capture — siehe `docs/project/stories/contextual-task-capture.md`
 
 > **Dies ist das EINZIGE Backlog.** macOS-Features (MAC-xxx) stehen hier mit Verweis auf ihre Specs in `docs/specs/macos/`. Kein zweites Backlog.
@@ -251,6 +255,39 @@
 ---
 
 ## Bugs (offen)
+
+### ~~Bug 67: Tab-Labels Deutsch→English~~ (ERLEDIGT)
+- **Status:** ERLEDIGT
+- **Plattform:** iOS + macOS
+- **Fix:** Labels auf beiden Plattformen auf Englisch: Blöcke→Blox, Fokus→Focus, Rückblick→Review (iOS), Planen→Blox, Zuweisen→Assign (macOS)
+- **Dateien:** MainTabView.swift, DailyReviewView.swift, SidebarView.swift, MacPlanningView.swift, MacAssignView.swift
+
+### Bug 68: FocusBlock View-Umbau unvollstaendig — Tap→Detail View fehlt (OFFEN)
+- **Status:** OFFEN
+- **Plattform:** iOS + macOS
+- **Prio:** M (mittlerer Aufwand, ~40-60k Tokens)
+- **Symptom iOS:** Tap auf einen FocusBlock im Blox-Tab oeffnet KEIN Detail-Sheet/View fuer Task-Zuweisung. Die Navigation nach Entfernung des Zuordnen-Tabs ist unvollstaendig.
+- **Symptom macOS:** Zwei Views vorhanden (MacPlanningView + MacAssignView), statt einer einheitlichen View
+- **Kontext:** Commit `4861e2f` ("Unified Calendar View") hat den Zuordnen-Tab entfernt und Task-Zuweisung ins Block-Sheet verschoben. Die Tap-Navigation scheint aber nicht korrekt verdrahtet zu sein.
+- **Naechster Schritt:** Analyse welche Navigation aktuell bei Tap ausgeloest wird (oder eben nicht)
+
+### Bug 69: FocusBlock Cross-Platform Sync zu langsam / nur unidirektional (OFFEN)
+- **Status:** OFFEN — Architektur-Analyse noetig
+- **Plattform:** iOS ↔ macOS
+- **Prio:** L-XL (Architektur-Entscheidung, potenziell grosser Umbau)
+- **Symptom:** Neue FocusBlocks erscheinen nicht innerhalb von 10sec auf der anderen Plattform. Sync funktioniert anscheinend nur iOS→macOS, nicht umgekehrt.
+- **Architektur-Hintergrund:** FocusBlocks sind EventKit Calendar Events. Sync laeuft ueber Apple's iCloud Calendar Sync (nicht unsere Kontrolle). Task-Daten syncen ueber SwiftData/CloudKit (funktioniert).
+- **Analyse noetig:** Soll FocusBlock-Storage von EventKit auf SwiftData migriert werden? Das wuerde uns volle Kontrolle ueber Sync geben (Push/Pull via CloudKit), ist aber ein grosser Architektur-Umbau.
+- **Naechster Schritt:** Analyse der SwiftData-Migration (Machbarkeit, Aufwand, Risiken)
+
+### Bug 70: Drag & Drop fuer FocusBlocks auf Timeline (OFFEN)
+- **Status:** OFFEN — ueberschneidet sich mit Backlog #13 (MAC-020 Drag & Drop Planung)
+- **Plattform:** iOS + macOS
+- **Prio:** XL (~100-150k Tokens, ~250 LoC)
+- **Symptom:** Blocks koennen nicht per Drag & Drop auf der Timeline verschoben werden (Zeitslot aendern)
+- **Kontext:** MAC-020 im Backlog deckt macOS-Seite ab. Dieses Ticket erweitert den Scope auf iOS.
+- **Hinweis:** Innerhalb eines Blocks funktioniert Task-Reordering bereits (List.onMove)
+- **Naechster Schritt:** MAC-020 Spec aktualisieren fuer beide Plattformen
 
 ### Bug 66: macOS FocusBlock nicht sichtbar in MenuBar + Sync-Deadlock (ERLEDIGT)
 - **Status:** ERLEDIGT

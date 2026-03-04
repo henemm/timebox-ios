@@ -1,0 +1,7 @@
+TDD RED - UI Tests failed as expected (2026-03-04)
+
+All 4 tests FAILED:
+- testBloxTabLabelIsEnglish: 'Blox' tab not found (currently 'Blöcke')
+- testFocusTabLabelIsEnglish: 'Focus' tab not found (currently 'Fokus')
+- testReviewTabLabelIsEnglish: 'Review' tab not found (currently 'Rückblick')
+- testGermanLabelsDoNotExist: German labels still present

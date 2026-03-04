@@ -38,7 +38,7 @@ struct MacAssignView: View {
             nextUpSection
                 .frame(minWidth: 250, maxWidth: 350, maxHeight: .infinity)
         }
-        .navigationTitle("Zuweisen")
+        .navigationTitle("Assign")
         .toolbar {
             ToolbarItem(placement: .automatic) {
                 MacDateNavigator(selectedDate: $selectedDate)

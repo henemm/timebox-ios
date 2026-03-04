@@ -10,8 +10,8 @@ import SwiftUI
 /// Main navigation sections
 enum MainSection: String, Hashable, CaseIterable {
     case backlog = "Backlog"
-    case planning = "Planen"
-    case assign = "Zuweisen"
+    case planning = "Blox"
+    case assign = "Assign"
     case focus = "Focus"
     case review = "Review"
 

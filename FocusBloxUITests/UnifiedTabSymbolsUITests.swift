@@ -39,16 +39,14 @@ final class UnifiedTabSymbolsUITests: XCTestCase {
         XCTAssertTrue(tabBar.waitForExistence(timeout: 5), "Tab bar should exist")
 
         let backlogTab = tabBar.buttons["Backlog"]
-        let blocksTab = tabBar.buttons["Blöcke"]
-        let assignTab = tabBar.buttons["Zuordnen"]
-        let focusTab = tabBar.buttons["Fokus"]
-        let reviewTab = tabBar.buttons["Rückblick"]
+        let blocksTab = tabBar.buttons["Blox"]
+        let focusTab = tabBar.buttons["Focus"]
+        let reviewTab = tabBar.buttons["Review"]
 
         XCTAssertTrue(backlogTab.exists, "Backlog tab should exist")
-        XCTAssertTrue(blocksTab.exists, "Blöcke tab should exist")
-        XCTAssertTrue(assignTab.exists, "Zuordnen tab should exist")
-        XCTAssertTrue(focusTab.exists, "Fokus tab should exist")
-        XCTAssertTrue(reviewTab.exists, "Rückblick tab should exist")
+        XCTAssertTrue(blocksTab.exists, "Blox tab should exist")
+        XCTAssertTrue(focusTab.exists, "Focus tab should exist")
+        XCTAssertTrue(reviewTab.exists, "Review tab should exist")
     }
 
     /// GIVEN: Unified symbols are applied
@@ -58,16 +56,16 @@ final class UnifiedTabSymbolsUITests: XCTestCase {
         let tabBar = app.tabBars.firstMatch
         XCTAssertTrue(tabBar.waitForExistence(timeout: 5), "Tab bar should exist")
 
-        // Tap Blöcke tab (symbol changed from rectangle.split.3x1 to calendar)
-        tabBar.buttons["Blöcke"].tap()
+        // Tap Blox tab (symbol changed from rectangle.split.3x1 to calendar)
+        tabBar.buttons["Blox"].tap()
         sleep(1)
 
-        // Tap Zuordnen tab (symbol changed from arrow.up.and.down.text.horizontal to arrow.up.arrow.down)
-        tabBar.buttons["Zuordnen"].tap()
+        // Tap Focus tab
+        tabBar.buttons["Focus"].tap()
         sleep(1)
 
-        // Tap Rückblick tab (symbol changed from clock.arrow.circlepath to chart.bar)
-        tabBar.buttons["Rückblick"].tap()
+        // Tap Review tab (symbol changed from clock.arrow.circlepath to chart.bar)
+        tabBar.buttons["Review"].tap()
         sleep(1)
 
         // Tap back to Backlog (symbol unchanged: list.bullet)

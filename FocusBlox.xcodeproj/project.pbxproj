@@ -128,7 +128,6 @@
 		CATUI001BUILDFILE0001 /* CategoriesUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CATUI001FILEREF00001 /* CategoriesUITests.swift */; };
 		CBHELP01BUILD0001 /* ClipboardHelperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBHELP01FILE00001 /* ClipboardHelperTests.swift */; };
 		CBPASTE01BUILD0001 /* ClipboardTaskFlowUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBPASTE01FILE00001 /* ClipboardTaskFlowUITests.swift */; };
-		SMTSK01BUILD00001 /* SmartTaskInterpretationUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = SMTSK01FILE000001 /* SmartTaskInterpretationUITests.swift */; };
 		CC3848FFA2D898F1A3FDFC27 /* TaskSourceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76296762878DC5D17EA4E12A /* TaskSourceTests.swift */; };
 		CC61BCDC9DB25FDB433AC477 /* TaskCompletionUndoService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 233B665A0DF1A421C1CDF80A /* TaskCompletionUndoService.swift */; };
 		CE465D61D24BA0B73AB397E4 /* ShakeGestureModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14CEC8C14442ABE7F65B5EE8 /* ShakeGestureModifier.swift */; };
@@ -142,7 +141,6 @@
 		CTC1SERV0BUILD0002 /* TaskTitleEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = CTC1SERV0FILE00001 /* TaskTitleEngine.swift */; };
 		CTC1TEST0BUILD0001 /* TaskTitleEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CTC1TEST0FILE00001 /* TaskTitleEngineTests.swift */; };
 		CTC2TEST0BUILD0001 /* SourceURLTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CTC2TEST0FILE00001 /* SourceURLTests.swift */; };
-		SMTENR01BUILD0001 /* SmartTaskEnrichmentServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = SMTENR01FILE00001 /* SmartTaskEnrichmentServiceTests.swift */; };
 		D23F767C76495B0CA789C0B4 /* TaskAssignmentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0461CA6D7F62F83512E8AD05 /* TaskAssignmentView.swift */; };
 		D4D7EAC3019BD5B643DC70F8 /* CalendarEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7B0BE54BB8E4DC5B9F85C28 /* CalendarEvent.swift */; };
 		D4EB0D97525927CB36D81D07 /* PlanItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9826FCF9A087183038C6ACED /* PlanItem.swift */; };
@@ -267,6 +265,8 @@
 		SMARTENR00BUILD001 /* SmartTaskEnrichmentService.swift in Sources */ = {isa = PBXBuildFile; fileRef = SMARTENR00FILE0001 /* SmartTaskEnrichmentService.swift */; };
 		SMARTENR00BUILD002 /* SmartTaskEnrichmentService.swift in Sources */ = {isa = PBXBuildFile; fileRef = SMARTENR00FILE0001 /* SmartTaskEnrichmentService.swift */; };
 		SMARTGAPS001BUILDFILE00001 /* SmartGapsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = SMARTGAPS001FILEREF000001 /* SmartGapsTests.swift */; };
+		SMTENR01BUILD0001 /* SmartTaskEnrichmentServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = SMTENR01FILE00001 /* SmartTaskEnrichmentServiceTests.swift */; };
+		SMTSK01BUILD00001 /* SmartTaskInterpretationUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = SMTSK01FILE000001 /* SmartTaskInterpretationUITests.swift */; };
 		SNDSVC01BUILDFILE0001 /* SoundServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = SNDSVC01FILEREF00001 /* SoundServiceTests.swift */; };
 		SNDSVC02BUILDFILE0001 /* SoundService.swift in Sources */ = {isa = PBXBuildFile; fileRef = SNDSVC02FILEREF00001 /* SoundService.swift */; };
 		SNDUI001BUILDFILE0001 /* SoundSettingsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = SNDUI001FILEREF00001 /* SoundSettingsUITests.swift */; };
@@ -274,6 +274,7 @@
 		SYNSET01BUILD0001 /* SyncedSettingsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = SYNSET01FILE00001 /* SyncedSettingsTests.swift */; };
 		SYNSET02BUILD0001 /* SyncedSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = SYNSET02FILE00001 /* SyncedSettings.swift */; };
 		SYNSET02BUILD0002 /* SyncedSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = SYNSET02FILE00001 /* SyncedSettings.swift */; };
+		TABLBL01UIBUILD01 /* TabLabelsEnglishUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = TABLBL01UIFILE001 /* TabLabelsEnglishUITests.swift */; };
 		TAGINP01BUILD000001 /* TagInputView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TAGINP01FILEREF0001 /* TagInputView.swift */; };
 		TAGINP02BUILD000001 /* TagInputView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TAGINP01FILEREF0001 /* TagInputView.swift */; };
 		TASKCAT01BUILD00001 /* TaskCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = TASKCAT01FILEREF0001 /* TaskCategory.swift */; };
@@ -588,14 +589,12 @@
 		CATUI001FILEREF00001 /* CategoriesUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoriesUITests.swift; sourceTree = "<group>"; };
 		CBHELP01FILE00001 /* ClipboardHelperTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardHelperTests.swift; sourceTree = "<group>"; };
 		CBPASTE01FILE00001 /* ClipboardTaskFlowUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardTaskFlowUITests.swift; sourceTree = "<group>"; };
-		SMTSK01FILE000001 /* SmartTaskInterpretationUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartTaskInterpretationUITests.swift; sourceTree = "<group>"; };
 		CKSM01FILE000001 /* CloudKitSyncMonitorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitSyncMonitorTests.swift; sourceTree = "<group>"; };
 		CKSM02FILE000001 /* CloudKitSyncMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitSyncMonitor.swift; sourceTree = "<group>"; };
 		CLRHEX01FILEREF001 /* Color+Hex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Hex.swift"; sourceTree = "<group>"; };
 		CTC1SERV0FILE00001 /* TaskTitleEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskTitleEngine.swift; sourceTree = "<group>"; };
 		CTC1TEST0FILE00001 /* TaskTitleEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskTitleEngineTests.swift; sourceTree = "<group>"; };
 		CTC2TEST0FILE00001 /* SourceURLTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SourceURLTests.swift; sourceTree = "<group>"; };
-		SMTENR01FILE00001 /* SmartTaskEnrichmentServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartTaskEnrichmentServiceTests.swift; sourceTree = "<group>"; };
 		D5F22CE94E29A523114817BF /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		D7ED51F72D6039EFAC3D85A3 /* SchedulingUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchedulingUITests.swift; sourceTree = "<group>"; };
 		DAILYR01FILEREF00001 /* DailyReviewUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyReviewUITests.swift; sourceTree = "<group>"; };
@@ -688,12 +687,15 @@
 		SKIPLOOP01FILE0001 /* SkipTaskLoopUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkipTaskLoopUITests.swift; sourceTree = "<group>"; };
 		SMARTENR00FILE0001 /* SmartTaskEnrichmentService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartTaskEnrichmentService.swift; sourceTree = "<group>"; };
 		SMARTGAPS001FILEREF000001 /* SmartGapsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartGapsTests.swift; sourceTree = "<group>"; };
+		SMTENR01FILE00001 /* SmartTaskEnrichmentServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartTaskEnrichmentServiceTests.swift; sourceTree = "<group>"; };
+		SMTSK01FILE000001 /* SmartTaskInterpretationUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartTaskInterpretationUITests.swift; sourceTree = "<group>"; };
 		SNDSVC01FILEREF00001 /* SoundServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundServiceTests.swift; sourceTree = "<group>"; };
 		SNDSVC02FILEREF00001 /* SoundService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundService.swift; sourceTree = "<group>"; };
 		SNDUI001FILEREF00001 /* SoundSettingsUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundSettingsUITests.swift; sourceTree = "<group>"; };
 		SPRNTRV01FILE00001 /* SprintReviewUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SprintReviewUITests.swift; sourceTree = "<group>"; };
 		SYNSET01FILE00001 /* SyncedSettingsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncedSettingsTests.swift; sourceTree = "<group>"; };
 		SYNSET02FILE00001 /* SyncedSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncedSettings.swift; sourceTree = "<group>"; };
+		TABLBL01UIFILE001 /* TabLabelsEnglishUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabLabelsEnglishUITests.swift; sourceTree = "<group>"; };
 		TAGINP01FILEREF0001 /* TagInputView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagInputView.swift; sourceTree = "<group>"; };
 		TASKCAT01FILEREF0001 /* TaskCategory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskCategory.swift; sourceTree = "<group>"; };
 		TASKFORM01FILEREF01 /* TaskFormSheet.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TaskFormSheet.swift; sourceTree = "<group>"; };
@@ -922,6 +924,7 @@
 				RECRBDG01FILE00001 /* RecurrenceBadgeUITests.swift */,
 				RECREDT01FILE00001 /* RecurrenceEditingUITests.swift */,
 				RVWCT01FILE00001 /* ReviewCompletedTasksUITests.swift */,
+				TABLBL01UIFILE001 /* TabLabelsEnglishUITests.swift */,
 				UNIFTAB01UIREF01 /* UnifiedTabSymbolsUITests.swift */,
 				NXSWIPE01UIREF01 /* NextUpSwipeActionsUITests.swift */,
 				NXLP01UIREF0001 /* NextUpLongPressUITests.swift */,
@@ -1943,6 +1946,7 @@
 				RECRBDG01BUILD0001 /* RecurrenceBadgeUITests.swift in Sources */,
 				RECREDT01BUILD0001 /* RecurrenceEditingUITests.swift in Sources */,
 				RVWCT01BUILD0001 /* ReviewCompletedTasksUITests.swift in Sources */,
+				TABLBL01UIBUILD01 /* TabLabelsEnglishUITests.swift in Sources */,
 				UNIFTAB01UIBLD01 /* UnifiedTabSymbolsUITests.swift in Sources */,
 				NXSWIPE01UIBLD01 /* NextUpSwipeActionsUITests.swift in Sources */,
 				NXLP01UIBLD0001 /* NextUpLongPressUITests.swift in Sources */,
