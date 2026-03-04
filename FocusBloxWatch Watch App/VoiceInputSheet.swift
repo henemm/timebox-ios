@@ -1,11 +1,14 @@
 import SwiftUI
+import SwiftData
+import WatchKit
 
 struct VoiceInputSheet: View {
     @Environment(\.dismiss) private var dismiss
     @State private var taskTitle = ""
+    @State private var autoSaveTask: DispatchWorkItem?
     @FocusState private var isFocused: Bool
 
-    let onSave: (String) -> Void
+    let modelContext: ModelContext
 
     var body: some View {
         NavigationStack {
@@ -18,6 +21,9 @@ struct VoiceInputSheet: View {
                     .textFieldStyle(.plain)
                     .focused($isFocused)
                     .accessibilityIdentifier("taskTitleField")
+                    .onChange(of: taskTitle) { _, newValue in
+                        scheduleAutoSave(for: newValue)
+                    }
             }
             .padding()
             .navigationTitle("Neuer Task")
@@ -25,31 +31,41 @@ struct VoiceInputSheet: View {
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Abbrechen") {
+                        autoSaveTask?.cancel()
                         dismiss()
                     }
                     .accessibilityIdentifier("cancelButton")
                 }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("OK") {
-                        if !taskTitle.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                            onSave(taskTitle.trimmingCharacters(in: .whitespacesAndNewlines))
-                            dismiss()
-                        }
-                    }
-                    .disabled(taskTitle.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                    .accessibilityIdentifier("saveButton")
-                }
             }
             .onAppear {
-                // Auto-focus to trigger dictation keyboard on Watch
                 isFocused = true
             }
         }
     }
+
+    private func scheduleAutoSave(for text: String) {
+        autoSaveTask?.cancel()
+
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return }
+
+        let workItem = DispatchWorkItem { [trimmed] in
+            saveTask(title: trimmed)
+            WKInterfaceDevice.current().play(.success)
+            dismiss()
+        }
+        autoSaveTask = workItem
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5, execute: workItem)
+    }
+
+    private func saveTask(title: String) {
+        let task = LocalTask(title: title)
+        task.needsTitleImprovement = true
+        modelContext.insert(task)
+        try? modelContext.save()
+    }
 }
 
 #Preview {
-    VoiceInputSheet { title in
-        print("Saved: \(title)")
-    }
+    VoiceInputSheet(modelContext: try! ModelContainer(for: LocalTask.self).mainContext)
 }

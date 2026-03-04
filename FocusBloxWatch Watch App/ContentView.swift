@@ -10,8 +10,7 @@ struct ContentView: View {
     ) private var recentTasks: [LocalTask]
 
     @State private var showingInput = false
-    @State private var showingConfirmation = false
-    @State private var pendingConfirmation = false
+    @State private var hasAutoOpened = false
 
     var body: some View {
         NavigationStack {
@@ -34,28 +33,16 @@ struct ContentView: View {
                 }
             }
             .navigationTitle("FocusBlox")
-            .sheet(isPresented: $showingInput, onDismiss: {
-                if pendingConfirmation {
-                    pendingConfirmation = false
-                    showingConfirmation = true
-                }
-            }) {
-                VoiceInputSheet { title in
-                    saveTask(title: title)
-                    pendingConfirmation = true
+            .onAppear {
+                if !hasAutoOpened {
+                    hasAutoOpened = true
+                    showingInput = true
                 }
             }
-            .sheet(isPresented: $showingConfirmation) {
-                ConfirmationView()
+            .sheet(isPresented: $showingInput) {
+                VoiceInputSheet(modelContext: modelContext)
             }
         }
-    }
-
-    private func saveTask(title: String) {
-        let task = LocalTask(title: title)
-        task.needsTitleImprovement = true
-        modelContext.insert(task)
-        try? modelContext.save()
     }
 }
 

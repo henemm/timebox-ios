@@ -9,29 +9,46 @@ final class WatchVoiceCaptureUITests: XCTestCase {
         app.launch()
     }
 
-    // MARK: - ContentView Smoke Tests
-
-    /// Test: "Task hinzufuegen" button should exist on main screen.
-    @MainActor
-    func test_addTaskButton_exists() throws {
-        let addButton = app.buttons["addTaskButton"]
-        XCTAssertTrue(addButton.waitForExistence(timeout: 5),
-                      "Add Task button should exist on Watch main screen")
+    override func tearDownWithError() throws {
+        app.terminate()
+        try super.tearDownWithError()
     }
 
-    /// Test: Tapping button should open VoiceInputSheet.
-    @MainActor
-    func test_addTaskButton_opensInputSheet() throws {
-        let addButton = app.buttons["addTaskButton"]
-        XCTAssertTrue(addButton.waitForExistence(timeout: 5))
-        addButton.tap()
+    // MARK: - Quick Capture Flow Tests
 
+    /// Test: VoiceInputSheet opens automatically on app launch (no button tap needed).
+    @MainActor
+    func test_appLaunch_autoDiktatOpens() throws {
         let textField = app.textFields["taskTitleField"]
-        XCTAssertTrue(textField.waitForExistence(timeout: 3),
-                      "VoiceInputSheet should appear with text field")
+        XCTAssertTrue(textField.waitForExistence(timeout: 5),
+                      "VoiceInputSheet should open automatically on app launch")
     }
 
-    // Note: Save/Confirmation flow not UI-tested — watchOS Simulator
-    // sheet-to-sheet transitions are unreliable. Business logic (task
-    // creation, schema parity, TBD defaults) covered by unit tests.
+    /// Test: OK/Save button no longer exists — auto-save replaces it.
+    @MainActor
+    func test_voiceInputSheet_noOKButton() throws {
+        let textField = app.textFields["taskTitleField"]
+        XCTAssertTrue(textField.waitForExistence(timeout: 5))
+        XCTAssertFalse(app.buttons["saveButton"].exists,
+                       "OK button should not exist — auto-save replaces manual confirm")
+    }
+
+    /// Test: Cancel button still exists for aborting bad dictation.
+    @MainActor
+    func test_voiceInputSheet_cancelButtonExists() throws {
+        let textField = app.textFields["taskTitleField"]
+        XCTAssertTrue(textField.waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["cancelButton"].exists,
+                      "Cancel button should still exist for aborting")
+    }
+
+    /// Test: No confirmation screen exists in the app (ConfirmationView deleted).
+    @MainActor
+    func test_noConfirmationScreenExists() throws {
+        let textField = app.textFields["taskTitleField"]
+        XCTAssertTrue(textField.waitForExistence(timeout: 10))
+        // ConfirmationView was deleted — "Task gespeichert" text must not exist anywhere
+        XCTAssertFalse(app.staticTexts["Task gespeichert"].exists,
+                       "Confirmation screen should not exist — haptic feedback only")
+    }
 }

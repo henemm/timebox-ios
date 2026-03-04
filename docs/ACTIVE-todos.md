@@ -6,6 +6,20 @@
 
 ---
 
+## ERLEDIGT: Feature — Watch Quick Capture In-App Flow vereinfacht
+
+- **Ziel:** Watch-Task-Erfassung von 5 auf 2 Schritte reduzieren (App oeffnen → sprechen → fertig)
+- **User Story:** `docs/project/stories/watch-quick-capture.md`
+- **Aenderungen:**
+  - `ContentView.swift`: Auto-Open Sheet bei App-Start, ConfirmationView-Flow entfernt
+  - `VoiceInputSheet.swift`: Auto-Save Timer (1.5s), Haptik-Feedback, OK-Button entfernt
+  - `ConfirmationView.swift`: Komplett geloescht (Haptik ersetzt den Screen)
+- **Tests:** 4 UI Tests gruen (auto-open, no-OK-button, cancel-exists, no-confirmation)
+- **Spec:** `docs/specs/features/watch-quick-capture-inapp.md`
+- **Naechste Schritte (Backlog):** Watch Complication + Siri Shortcut Integration
+
+---
+
 ## ERLEDIGT: Bug — Watch-Task erscheint nicht auf iPhone (Watch→iPhone Sync)
 
 - **Symptom:** Task auf Apple Watch erstellt → erscheint NIE im iPhone-Backlog
