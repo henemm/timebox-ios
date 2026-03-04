@@ -17,6 +17,7 @@
   - `Sources/FocusBloxApp.swift`: +2 Zeilen (enrichAllTbdTasks bei App-Start)
   - `Sources/Views/BacklogView.swift`: +6 Zeilen (enrichAllTbdTasks nach Sync)
   - `FocusBloxMac/FocusBloxMacApp.swift`: +4 Zeilen (Title+Enrichment bei App-Start)
+  - `FocusBloxMac/ContentView.swift`: +3 Zeilen (enrichAllTbdTasks nach CloudKit-Sync)
 - **Tests:** 5 Unit Tests (WatchEnrichmentGapTests) — alle gruen
 - **Blast Radius:** Fix gilt auch fuer Siri, Share Extension, Reminders Import
 

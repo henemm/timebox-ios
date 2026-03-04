@@ -579,6 +579,9 @@ struct ContentView: View {
             Task {
                 try? await Task.sleep(for: .milliseconds(200))
                 try? modelContext.save()
+                // Enrich remote tasks (Watch, Share Extension, Siri) that arrived without attributes
+                let enrichment = SmartTaskEnrichmentService(modelContext: modelContext)
+                _ = await enrichment.enrichAllTbdTasks()
             }
         }
         .confirmationDialog(
