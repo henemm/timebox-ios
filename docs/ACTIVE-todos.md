@@ -6,6 +6,22 @@
 
 ---
 
+## ERLEDIGT: Bug — Watch-Tasks ohne Enrichment (? ? (?) ? im Backlog)
+
+- **Symptom:** Via Apple Watch erstellte Tasks zeigen auf iPhone `? ? (?) ?` und Score 0
+- **Root Cause:** Watch nutzt `modelContext.insert()` direkt — umgeht `LocalTaskSource.createTask()` und damit die gesamte Enrichment-Pipeline. Kein Code-Pfad triggerte Enrichment fuer remote/synced Tasks.
+- **Fix:** `enrichAllTbdTasks()` wird jetzt automatisch aufgerufen bei:
+  - App-Start (`FocusBloxApp.onAppear` + `FocusBloxMacApp.onAppear`)
+  - CloudKit-Sync (`BacklogView.refreshLocalTasks()`)
+- **Aenderungen:**
+  - `Sources/FocusBloxApp.swift`: +2 Zeilen (enrichAllTbdTasks bei App-Start)
+  - `Sources/Views/BacklogView.swift`: +6 Zeilen (enrichAllTbdTasks nach Sync)
+  - `FocusBloxMac/FocusBloxMacApp.swift`: +4 Zeilen (Title+Enrichment bei App-Start)
+- **Tests:** 5 Unit Tests (WatchEnrichmentGapTests) — alle gruen
+- **Blast Radius:** Fix gilt auch fuer Siri, Share Extension, Reminders Import
+
+---
+
 ## ERLEDIGT: Feature #29 — Badge-Zahl (Overdue) + Interaktive Frist-Notifications
 
 - **Ziel:** App-Icon Badge zeigt Anzahl ueberfaelliger Tasks, Frist-Notifications bieten 3 Buttons (NextUp, Verschieben +1 Tag, Erledigt)

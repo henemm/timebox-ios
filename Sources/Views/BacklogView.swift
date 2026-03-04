@@ -437,7 +437,15 @@ struct BacklogView: View {
             let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
             planItems = try await syncEngine.sync()
             allRecurringItems = try await syncEngine.syncRecurringTasks()
-            print("[CloudKit Debug] refreshLocalTasks() DONE - new planItems: \(planItems.count)")
+
+            // Enrich remote tasks (Watch, Share Extension, Siri) that arrived without attributes
+            let enrichment = SmartTaskEnrichmentService(modelContext: modelContext)
+            let enriched = await enrichment.enrichAllTbdTasks()
+            if enriched > 0 {
+                planItems = try await syncEngine.sync()
+            }
+
+            print("[CloudKit Debug] refreshLocalTasks() DONE - new planItems: \(planItems.count), enriched: \(enriched)")
         } catch {
             print("[CloudKit Debug] refreshLocalTasks() ERROR: \(error)")
             errorMessage = error.localizedDescription

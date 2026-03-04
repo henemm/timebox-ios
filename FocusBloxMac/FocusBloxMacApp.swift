@@ -198,6 +198,12 @@ struct FocusBloxMacApp: App {
                     // Migrate recurring tasks to template model (one-time)
                     RecurrenceService.migrateToTemplateModel(in: container.mainContext)
                     RecurrenceService.deduplicateTemplates(in: container.mainContext)
+                    // Background title improvement + enrichment for tasks from Watch, Siri, etc.
+                    let mainContext = container.mainContext
+                    let titleEngine = TaskTitleEngine(modelContext: mainContext)
+                    Task { await titleEngine.improveAllPendingTitles() }
+                    let enrichment = SmartTaskEnrichmentService(modelContext: mainContext)
+                    Task { await enrichment.enrichAllTbdTasks() }
                     // Spotlight: reindex all active tasks so they appear in system search
                     let spotlightContext = container.mainContext
                     Task { try? await SpotlightIndexingService.shared.reindexAllTasks(context: spotlightContext) }

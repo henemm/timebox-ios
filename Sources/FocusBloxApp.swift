@@ -255,6 +255,9 @@ struct FocusBloxApp: App {
                     // Background title improvement for tasks from Share Extension, Siri, Watch
                     let titleEngine = TaskTitleEngine(modelContext: sharedModelContainer.mainContext)
                     Task { await titleEngine.improveAllPendingTitles() }
+                    // Enrich tasks with missing attributes (Watch, Share Extension, Siri — these bypass createTask())
+                    let enrichment = SmartTaskEnrichmentService(modelContext: sharedModelContainer.mainContext)
+                    Task { await enrichment.enrichAllTbdTasks() }
                     // Spotlight: reindex all active tasks so they appear in system search
                     let spotlightContext = sharedModelContainer.mainContext
                     Task { try? await SpotlightIndexingService.shared.reindexAllTasks(context: spotlightContext) }
