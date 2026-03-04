@@ -1,0 +1,7 @@
+=== UI TEST RED OUTPUT ===
+Date: Mi.  4 März 2026 09:56:13 CET
+
+Test case 'SmartTaskInterpretationUITests.testQuickCaptureStripsIchMussNochPhrase()' failed (103.669 seconds)
+Test case 'SmartTaskInterpretationUITests.testQuickCaptureStripsReminderPhrase()' failed (101.176 seconds)
+
+** TEST FAILED **

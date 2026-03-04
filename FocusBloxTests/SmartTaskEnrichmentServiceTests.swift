@@ -116,6 +116,78 @@ final class SmartTaskEnrichmentServiceTests: XCTestCase {
         XCTAssertEqual(first, second, "isAvailable should return consistent results")
     }
 
+    // MARK: - Similar-Task Context (Feature B)
+
+    /// Verhalten: fetchRecentTaskContext() gibt String mit Task-Infos zurueck wenn Tasks mit Attributen existieren
+    /// Bricht wenn: SmartTaskEnrichmentService.fetchRecentTaskContext() entfernt wird oder leeren String liefert
+    func test_fetchRecentTaskContext_returnsContextWithAttributes() async throws {
+        let context = container.mainContext
+
+        let task1 = LocalTask(title: "Lohnsteuer abgeben", importance: 3, urgency: "urgent", taskType: "income")
+        context.insert(task1)
+        let task2 = LocalTask(title: "Wohnung putzen", importance: 1, taskType: "maintenance")
+        context.insert(task2)
+        try context.save()
+
+        let service = SmartTaskEnrichmentService(modelContext: context)
+        let result = service.fetchRecentTaskContext()
+
+        XCTAssertTrue(result.contains("Lohnsteuer"), "Context should contain task title 'Lohnsteuer'")
+        XCTAssertTrue(result.contains("income"), "Context should contain taskType 'income'")
+        XCTAssertTrue(result.contains("Wohnung putzen"), "Context should contain task title 'Wohnung putzen'")
+    }
+
+    /// Verhalten: fetchRecentTaskContext() ignoriert Tasks ohne jegliche Attribute
+    /// Bricht wenn: Fetch-Filter keine Attribut-Filterung hat
+    func test_fetchRecentTaskContext_ignoresTasksWithoutAttributes() async throws {
+        let context = container.mainContext
+
+        let emptyTask = LocalTask(title: "Leere Task")
+        context.insert(emptyTask)
+        let richTask = LocalTask(title: "Steuer machen", importance: 3, taskType: "income")
+        context.insert(richTask)
+        try context.save()
+
+        let service = SmartTaskEnrichmentService(modelContext: context)
+        let result = service.fetchRecentTaskContext()
+
+        XCTAssertTrue(result.contains("Steuer machen"), "Context should contain rich task")
+        XCTAssertFalse(result.contains("Leere Task"), "Context should NOT contain empty task")
+    }
+
+    /// Verhalten: fetchRecentTaskContext() gibt leeren String zurueck wenn keine Tasks mit Attributen existieren
+    /// Bricht wenn: Methode auch ohne passende Tasks Text generiert
+    func test_fetchRecentTaskContext_returnsEmptyWhenNoAttributedTasks() async throws {
+        let context = container.mainContext
+
+        let task = LocalTask(title: "Irgendwas")
+        context.insert(task)
+        try context.save()
+
+        let service = SmartTaskEnrichmentService(modelContext: context)
+        let result = service.fetchRecentTaskContext()
+
+        XCTAssertTrue(result.isEmpty, "Context should be empty when no tasks have attributes")
+    }
+
+    /// Verhalten: buildPrompt() enthaelt "Bestehende Tasks" Block wenn Kontext vorhanden
+    /// Bricht wenn: buildPrompt() den Kontext-Block nicht einbaut
+    func test_buildPrompt_includesSimilarTaskContext() async throws {
+        let context = container.mainContext
+
+        let existing = LocalTask(title: "Steuererklaerung", importance: 3, taskType: "income")
+        context.insert(existing)
+        let newTask = LocalTask(title: "Lohnsteuer abgeben")
+        context.insert(newTask)
+        try context.save()
+
+        let service = SmartTaskEnrichmentService(modelContext: context)
+        let prompt = service.buildPrompt(for: newTask)
+
+        XCTAssertTrue(prompt.contains("Bestehende Tasks"), "Prompt should contain similar task context header")
+        XCTAssertTrue(prompt.contains("Steuererklaerung"), "Prompt should include existing task title")
+    }
+
     // MARK: - createTask Enrichment Integration
 
     /// GIVEN: A task created via LocalTaskSource.createTask() with no attributes

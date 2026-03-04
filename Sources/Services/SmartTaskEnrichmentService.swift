@@ -123,6 +123,9 @@ final class SmartTaskEnrichmentService {
                 "Dringlichkeit: Zeitkritische Begriffe (Termin, Frist, morgen, heute) = true"
                 "Kategorie: income (Geld verdienen), maintenance (Pflege/Haushalt), recharge (Erholung), learning (Lernen), giving_back (Helfen)"
                 "Energie: high = tiefe Fokus-Arbeit (Programmieren, Schreiben, Analyse), low = Routine (Einkaufen, Putzen)"
+                ""
+                "Orientiere dich an den Attributen aehnlicher bestehender Tasks wenn vorhanden."
+                "Beispiel: Wenn mehrere Tasks zum Thema Steuern importance=3 und category=income haben, uebernimm das fuer neue Steuer-Tasks."
             }
 
             let response = try await session.respond(to: prompt, generating: TaskEnrichment.self)
@@ -154,7 +157,35 @@ final class SmartTaskEnrichmentService {
     }
     #endif
 
-    private func buildPrompt(for task: LocalTask) -> String {
+    // MARK: - Similar-Task Context
+
+    /// Fetches recent tasks with at least one set attribute to provide context for enrichment.
+    /// Returns a compact multi-line string or empty string if no attributed tasks found.
+    func fetchRecentTaskContext() -> String {
+        var descriptor = FetchDescriptor<LocalTask>(
+            sortBy: [SortDescriptor(\.createdAt, order: .reverse)]
+        )
+        descriptor.fetchLimit = 50
+
+        guard let allTasks = try? modelContext.fetch(descriptor) else { return "" }
+
+        // Filter to tasks with at least one meaningful attribute set
+        let attributed = allTasks.filter { task in
+            task.importance != nil || task.urgency != nil || !task.taskType.isEmpty
+        }.prefix(30)
+
+        if attributed.isEmpty { return "" }
+
+        return attributed.map { task in
+            var parts = ["- \(task.title)"]
+            if !task.taskType.isEmpty { parts.append("Kat: \(task.taskType)") }
+            if let imp = task.importance { parts.append("Imp: \(imp)") }
+            if let urg = task.urgency { parts.append("Urg: \(urg)") }
+            return parts.joined(separator: " | ")
+        }.joined(separator: "\n")
+    }
+
+    func buildPrompt(for task: LocalTask) -> String {
         var parts: [String] = []
         parts.append("Task: \(task.title)")
 
@@ -169,6 +200,13 @@ final class SmartTaskEnrichmentService {
         }
         if let description = task.taskDescription, !description.isEmpty {
             parts.append("Beschreibung: \(description)")
+        }
+
+        let context = fetchRecentTaskContext()
+        if !context.isEmpty {
+            parts.append("")
+            parts.append("Bestehende Tasks des Nutzers (orientiere dich an deren Attributen fuer aehnliche Tasks):")
+            parts.append(context)
         }
 
         return parts.joined(separator: "\n")

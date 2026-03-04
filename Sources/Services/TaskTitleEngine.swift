@@ -26,13 +26,47 @@ final class TaskTitleEngine {
     // MARK: - Date Helper
 
     /// Maps relative date strings from AI output to actual dates.
-    /// Accepts both German and English variants.
+    /// Accepts German and English variants, weekdays, and extended phrases.
     static func relativeDateFrom(_ value: String?) -> Date? {
+        let cal = Calendar.current
+        let today = cal.startOfDay(for: Date())
+
         switch value?.lowercased() {
-        case "today", "heute":    return Calendar.current.startOfDay(for: Date())
-        case "tomorrow", "morgen": return Calendar.current.date(byAdding: .day, value: 1, to: Calendar.current.startOfDay(for: Date()))
-        default:                   return nil
+        case "today", "heute":
+            return today
+        case "tomorrow", "morgen":
+            return cal.date(byAdding: .day, value: 1, to: today)
+        case "uebermorgen", "übermorgen":
+            return cal.date(byAdding: .day, value: 2, to: today)
+        case "naechste woche", "nächste woche", "next week":
+            return nextWeekday(2, after: today) // Monday
+        case "montag", "monday":
+            return nextWeekday(2, after: today)
+        case "dienstag", "tuesday":
+            return nextWeekday(3, after: today)
+        case "mittwoch", "wednesday":
+            return nextWeekday(4, after: today)
+        case "donnerstag", "thursday":
+            return nextWeekday(5, after: today)
+        case "freitag", "friday":
+            return nextWeekday(6, after: today)
+        case "samstag", "saturday":
+            return nextWeekday(7, after: today)
+        case "sonntag", "sunday":
+            return nextWeekday(1, after: today)
+        default:
+            return nil
         }
+    }
+
+    /// Returns the next occurrence of the given weekday (1=Sun .. 7=Sat).
+    /// Always returns a future date (never today).
+    private static func nextWeekday(_ weekday: Int, after date: Date) -> Date {
+        let cal = Calendar.current
+        let current = cal.component(.weekday, from: date)
+        var daysAhead = weekday - current
+        if daysAhead <= 0 { daysAhead += 7 }
+        return cal.date(byAdding: .day, value: daysAhead, to: date)!
     }
 
     // MARK: - Structured Output
@@ -41,10 +75,10 @@ final class TaskTitleEngine {
     @available(iOS 26.0, macOS 26.0, *)
     @Generable
     struct ImprovedTask {
-        @Guide(description: "Cleaned task title (max 80 chars). Keep ALL original words, names, and abbreviations exactly as they are. Only remove email artifacts (Re:, Fwd:, AW:, WG:) and urgency/deadline phrases (heute, dringend, ASAP, sofort erledigen). Start with verb in infinitive form. Keep the language of the input.")
+        @Guide(description: "Cleaned task title (max 80 chars). Keep ALL original words, names, and abbreviations exactly as they are. Remove: email artifacts (Re:, Fwd:, AW:, WG:), urgency/deadline phrases (heute, dringend, ASAP, sofort), and introductory phrases like 'Erinnere mich daran', 'Ich muss noch', 'Vergiss nicht'. The title should describe the ACTION, not the reminder. Example: 'Erinnere mich heute daran Herrn Mueller anzurufen' → 'Herrn Mueller anrufen'. Start with verb in infinitive form. Keep the language of the input.")
         let title: String
 
-        @Guide(description: "Relative due date extracted from the text. Return 'heute' if the text says heute/today/sofort, return 'morgen' if morgen/tomorrow. Otherwise return nil.")
+        @Guide(description: "Relative due date extracted from the text. Return 'heute' for heute/today/sofort, 'morgen' for morgen/tomorrow, 'uebermorgen' for uebermorgen/day after tomorrow, 'naechste woche' for naechste Woche/next week, or a weekday name like 'montag'/'freitag' if mentioned (e.g. 'bis Freitag' → 'freitag'). Return nil if no date mentioned.")
         let dueDateRelative: String?
 
         @Guide(description: "True if the text expresses urgency (heute erledigen, dringend, ASAP, sofort, urgent, exclamation marks). False otherwise.")
@@ -112,9 +146,14 @@ final class TaskTitleEngine {
                 "- Nur kuerzen durch Weglassen, NICHT durch Umschreiben"
                 "- Entferne E-Mail-Artefakte (Re:, Fwd:, AW:, WG:)"
                 "- Entferne Dringlichkeits-Hinweise aus dem Titel (heute erledigen, dringend, ASAP, sofort)"
+                "- Entferne Einleitungsfloskeln: 'Erinnere mich daran', 'Ich muss noch', 'Vergiss nicht', 'Denk daran'"
+                "- Extrahiere Zeitangaben aus Floskeln: 'heute', 'morgen', 'naechste Woche', 'bis Freitag', 'uebermorgen'"
+                "- Der bereinigte Titel soll die AKTION beschreiben, nicht die Erinnerung"
+                "- Beispiel: 'Erinnere mich heute daran Herrn Mueller anzurufen' → title='Herrn Mueller anrufen', dueDate='heute'"
+                "- Beispiel: 'Ich muss morgen noch Steuern machen' → title='Steuern machen', dueDate='morgen'"
                 "- Beginne mit Verb im Infinitiv wenn moeglich"
                 "- Behalte die Sprache des Inputs bei"
-                "- Extrahiere Faelligkeit (heute/morgen) und Dringlichkeit separat"
+                "- Extrahiere Faelligkeit und Dringlichkeit separat"
             }
 
             let prompt = "Bereinige diesen Task-Titel: \(task.title)"

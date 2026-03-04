@@ -188,9 +188,53 @@ final class TaskTitleEngineTests: XCTestCase {
     /// Verhalten: Unbekannte Werte geben nil zurueck
     /// Bricht wenn: relativeDateFrom() bei unbekanntem String nicht nil liefert
     func test_relativeDateFrom_unknown_returnsNil() {
-        XCTAssertNil(TaskTitleEngine.relativeDateFrom("next week"), "Unknown relative date should return nil")
         XCTAssertNil(TaskTitleEngine.relativeDateFrom(""), "Empty string should return nil")
         XCTAssertNil(TaskTitleEngine.relativeDateFrom(nil), "nil should return nil")
+    }
+
+    // MARK: - Erweiterte relative Datumsangaben
+
+    /// Verhalten: "uebermorgen" wird zu +2 Tage gemappt
+    /// Bricht wenn: TaskTitleEngine.relativeDateFrom() den case "uebermorgen" entfernt
+    func test_relativeDateFrom_uebermorgen() {
+        let result = TaskTitleEngine.relativeDateFrom("uebermorgen")
+        let expected = Calendar.current.date(byAdding: .day, value: 2, to: Calendar.current.startOfDay(for: Date()))
+        XCTAssertEqual(result, expected, "uebermorgen should map to start of day +2")
+    }
+
+    /// Verhalten: "naechste woche" wird zum naechsten Montag gemappt
+    /// Bricht wenn: TaskTitleEngine.relativeDateFrom() den case "naechste woche" entfernt
+    func test_relativeDateFrom_naechsteWoche() {
+        let result = TaskTitleEngine.relativeDateFrom("naechste woche")
+        XCTAssertNotNil(result, "naechste woche should return a date")
+        if let date = result {
+            let weekday = Calendar.current.component(.weekday, from: date)
+            XCTAssertEqual(weekday, 2, "naechste woche should be a Monday (weekday 2)")
+            XCTAssertTrue(date > Date(), "naechste woche should be in the future")
+        }
+    }
+
+    /// Verhalten: "freitag" wird zum naechsten Freitag gemappt
+    /// Bricht wenn: TaskTitleEngine.relativeDateFrom() Wochentag-Mapping entfernt
+    func test_relativeDateFrom_weekday_freitag() {
+        let result = TaskTitleEngine.relativeDateFrom("freitag")
+        XCTAssertNotNil(result, "freitag should return a date")
+        if let date = result {
+            let weekday = Calendar.current.component(.weekday, from: date)
+            XCTAssertEqual(weekday, 6, "freitag should be a Friday (weekday 6)")
+            XCTAssertTrue(date > Calendar.current.startOfDay(for: Date()), "freitag should be in the future")
+        }
+    }
+
+    /// Verhalten: "montag" wird zum naechsten Montag gemappt
+    /// Bricht wenn: TaskTitleEngine.relativeDateFrom() Wochentag-Mapping entfernt
+    func test_relativeDateFrom_weekday_montag() {
+        let result = TaskTitleEngine.relativeDateFrom("montag")
+        XCTAssertNotNil(result, "montag should return a date")
+        if let date = result {
+            let weekday = Calendar.current.component(.weekday, from: date)
+            XCTAssertEqual(weekday, 2, "montag should be a Monday (weekday 2)")
+        }
     }
 
     // MARK: - CTC-1b: Metadaten-Extraktion (nur wenn AI verfuegbar)

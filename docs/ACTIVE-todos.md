@@ -175,13 +175,14 @@
 | 25 | ~~CTC-4: Clipboard → Task Flow~~ | ERLEDIGT | S | ~15-25k | 2 | ~50 |
 | 26 | ~~CTC-5: Watch-Diktat Titel-Verbesserung~~ | ERLEDIGT | S | ~15-20k | 2 | ~6 |
 | 27 | ~~CTC-1b: TaskTitleEngine — Konservativ + Metadaten-Extraktion~~ | ERLEDIGT | S | ~20-30k | 2 | ~60 |
+| 28 | ~~CTC-6: Smart Task Interpretation + Similar-Task Learning~~ | ERLEDIGT | S | ~20k | 4 | ~70 |
 
 **Komplexitaet:** XS = halbe Stunde | S = 1 Session | M = 2-3 Sessions | L = halber Tag | XL = ganzer Tag+
 
 **Guenstigster Quick Win:** ~~Shake to Undo (XS)~~ ERLEDIGT
 **Teuerste Items:** #17 OrganizeMyDay (~150k), #13 Drag & Drop (~150k), #14 NC Widget (~120k)
 **WARTEND (Apple-Abhaengigkeit):** #20 ITB-F — Developer-APIs verfuegbar, wartet auf Siri On-Screen Awareness (iOS 26.5/27)
-**Zuletzt erledigt:** Stop-Lock + API-Guard (Schutzmechanismen gegen Workflow-Manipulation)
+**Zuletzt erledigt:** CTC-6 Smart Task Interpretation (Floskel-Erkennung + Similar-Task-Lernen)
 **Naechstes:** #7 Kalender-App Deep Link
 **Neu (User Story):** #22-26 Contextual Task Capture — siehe `docs/project/stories/contextual-task-capture.md`
 
@@ -243,6 +244,7 @@
 3. CTC-3 (macOS Share Extension) — Neues Target, gleiche Funktionalitaet wie iOS
 4. ~~CTC-4 (Clipboard → Task)~~ ERLEDIGT — Paste-Button in QuickCaptureView (iOS+macOS)
 5. ~~CTC-5 (Watch-Diktat)~~ ERLEDIGT — needsTitleImprovement Flag im Watch-Model + saveTask()
+6. ~~CTC-6 (Smart Interpretation)~~ ERLEDIGT — Floskel-Erkennung ("Erinnere mich...") + Similar-Task-Lernen (Attribute von aehnlichen Tasks uebernehmen)
 
 **Kernidee:** Aus jedem Kontext (Mail, Safari, Clipboard, Diktat) mit einem Tap eine Task erstellen. KI generiert actionable Titel im Hintergrund, Original bleibt in Beschreibung erhalten.
 
