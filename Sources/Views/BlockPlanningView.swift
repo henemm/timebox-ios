@@ -151,6 +151,9 @@ struct BlockPlanningView: View {
                         },
                         onTapEvent: { event in
                             eventToCategories = event
+                        },
+                        onMoveFocusBlock: { blockID, newStart in
+                            moveFocusBlock(blockID: blockID, to: newStart)
                         }
                     )
                 }
@@ -319,6 +322,14 @@ struct BlockPlanningView: View {
                 errorMessage = "Block konnte nicht aktualisiert werden."
             }
         }
+    }
+
+    private func moveFocusBlock(blockID: String, to newStart: Date) {
+        guard let block = focusBlocks.first(where: { $0.id == blockID }),
+              block.isFuture else { return }
+        let duration = block.endDate.timeIntervalSince(block.startDate)
+        let newEnd = newStart.addingTimeInterval(duration)
+        updateBlock(block, startDate: newStart, endDate: newEnd)
     }
 
     private func updateEventCategory(event: CalendarEvent, category: String?) {
@@ -990,6 +1001,7 @@ struct TimelineHourRow: View {
     let onTapEditBlock: (FocusBlock) -> Void
     let onTapFreeSlot: (TimeSlot) -> Void
     let onTapEvent: (CalendarEvent) -> Void
+    var onMoveFocusBlock: ((String, Date) -> Void)?
 
     private let timeFormatter: DateFormatter = {
         let f = DateFormatter()
@@ -1044,6 +1056,15 @@ struct TimelineHourRow: View {
         }
         .frame(minHeight: hourHeight)
         .padding(.trailing)
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("timelineDropZone_\(hour)")
+        .dropDestination(for: CalendarEventTransfer.self) { items, _ in
+            guard let transfer = items.first else { return false }
+            let dropTime = createDateForHour(hour: hour, minute: 0)
+            let snapped = FocusBlock.snapToQuarterHour(dropTime)
+            onMoveFocusBlock?(transfer.id, snapped)
+            return true
+        }
     }
 
     // MARK: - Filtered Items
@@ -1151,6 +1172,9 @@ struct TimelineFocusBlockRow: View {
         )
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("focusBlock_\(block.id)")
+        .if(block.isFuture) { view in
+            view.draggable(CalendarEventTransfer(from: block))
+        }
     }
 }
 

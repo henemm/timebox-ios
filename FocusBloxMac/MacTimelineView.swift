@@ -64,6 +64,7 @@ struct MacTimelineView: View {
     var onTapEditBlock: ((FocusBlock) -> Void)?
     var onTapFreeSlot: ((TimeSlot) -> Void)?
     var onTapEvent: ((CalendarEvent) -> Void)?
+    var onMoveFocusBlock: ((String, Date) -> Void)?
 
     // Timeline configuration
     private let startHour = 6
@@ -184,6 +185,16 @@ struct MacTimelineView: View {
             return true
         } isTargeted: { targeted in
             isDropTargeted = targeted
+        }
+        .dropDestination(for: CalendarEventTransfer.self) { items, location in
+            guard let transfer = items.first else { return false }
+            // Only move future FocusBlocks — ignore active/past blocks and regular calendar events
+            guard let block = focusBlocks.first(where: { $0.id == transfer.id }),
+                  block.isFuture else { return false }
+            let dropTime = calculateTimeFromLocation(location)
+            let snapped = FocusBlock.snapToQuarterHour(dropTime)
+            onMoveFocusBlock?(transfer.id, snapped)
+            return true
         }
         .onContinuousHover { phase in
             switch phase {
@@ -544,6 +555,7 @@ struct FocusBlockView: View {
                 isDropTargeted = targeted
             }
         }
+        .draggable(CalendarEventTransfer(from: block))
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("focusBlock_\(block.id)")
     }

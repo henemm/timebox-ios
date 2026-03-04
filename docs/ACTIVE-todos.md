@@ -361,14 +361,16 @@
 - **Tests:** 14 Unit Tests (FocusBlockSnapTests), alle GREEN, Build OK (iOS + macOS)
 - **Analyse:** `docs/artifacts/bug-70a-15min-snapping/analysis.md`
 
-### Bug 70: Drag & Drop fuer FocusBlocks auf Timeline (OFFEN)
-- **Status:** OFFEN — ueberschneidet sich mit Backlog #13 (MAC-020 Drag & Drop Planung)
+### Bug 70b: FocusBlock verschieben per Drag & Drop auf Timeline (ERLEDIGT)
+- **Status:** ERLEDIGT
 - **Plattform:** iOS + macOS
-- **Prio:** XL (~100-150k Tokens, ~250 LoC)
-- **Symptom:** Blocks koennen nicht per Drag & Drop auf der Timeline verschoben werden (Zeitslot aendern)
-- **Kontext:** MAC-020 im Backlog deckt macOS-Seite ab. Dieses Ticket erweitert den Scope auf iOS.
-- **Hinweis:** Innerhalb eines Blocks funktioniert Task-Reordering bereits (List.onMove)
-- **Naechster Schritt:** Bug 70b (Block verschieben per DragGesture) → Bug 70c (Block resizen)
+- **Symptom:** Blocks konnten nicht per Drag & Drop auf der Timeline verschoben werden (Zeitslot aendern)
+- **Root Cause:** iOS BlockPlanningView und macOS MacTimelineView hatten keine `.draggable()` / `.dropDestination()` fuer FocusBlocks
+- **Fix:** CalendarEventTransfer(from: FocusBlock) init, `.draggable()` auf FocusBlockRows, `.dropDestination(for: CalendarEventTransfer.self)` auf TimelineHourRows, 15-Min-Snapping via `FocusBlock.snapToQuarterHour()`. Nur Future-Blocks draggable.
+- **Nebenfix:** macOS `updateBlockTime()` persistierte nicht zu EventKit — jetzt behoben
+- **Dateien:** CalendarEventTransfer.swift, BlockPlanningView.swift, MacTimelineView.swift, MacPlanningView.swift, MockEventKitRepository.swift
+- **Tests:** 10 Unit Tests (FocusBlockDragTests), 4 UI Tests (FocusBlockDragDropUITests), alle GREEN
+- **Naechster Schritt:** Bug 70c (Block resizen per Drag)
 
 ### Bug 66: macOS FocusBlock nicht sichtbar in MenuBar + Sync-Deadlock (ERLEDIGT)
 - **Status:** ERLEDIGT

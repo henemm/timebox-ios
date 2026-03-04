@@ -179,6 +179,9 @@ struct MacPlanningView: View {
                 },
                 onTapEvent: { event in
                     eventToCategories = event
+                },
+                onMoveFocusBlock: { blockID, newStart in
+                    moveFocusBlock(blockID: blockID, to: newStart)
                 }
             )
         }
@@ -452,9 +455,18 @@ struct MacPlanningView: View {
 
     // MARK: - Focus Block Edit Actions
 
+    private func moveFocusBlock(blockID: String, to newStart: Date) {
+        guard let block = focusBlocks.first(where: { $0.id == blockID }),
+              block.isFuture else { return }
+        let duration = block.endDate.timeIntervalSince(block.startDate)
+        let newEnd = newStart.addingTimeInterval(duration)
+        updateBlockTime(block: block, start: newStart, end: newEnd)
+    }
+
     private func updateBlockTime(block: FocusBlock, start: Date, end: Date) {
         guard let index = calendarEvents.firstIndex(where: { $0.id == block.id }) else { return }
 
+        // Update local state immediately for UI responsiveness
         let event = calendarEvents[index]
         let updatedEvent = CalendarEvent(
             id: event.id,
@@ -465,8 +477,16 @@ struct MacPlanningView: View {
             calendarColor: event.calendarColor,
             notes: event.notes
         )
-
         calendarEvents[index] = updatedEvent
+
+        // Persist to EventKit
+        do {
+            try eventKitRepo.updateFocusBlockTime(eventID: block.id, startDate: start, endDate: end)
+        } catch {
+            // Rollback on failure
+            calendarEvents[index] = event
+            errorMessage = "Block konnte nicht verschoben werden."
+        }
     }
 
     private func deleteBlock(block: FocusBlock) {

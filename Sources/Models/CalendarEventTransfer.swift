@@ -19,6 +19,13 @@ struct CalendarEventTransfer: Codable, Transferable, Sendable {
         self.reminderID = event.reminderID
     }
 
+    init(from block: FocusBlock) {
+        self.id = block.id
+        self.title = block.title
+        self.duration = block.durationMinutes
+        self.reminderID = nil
+    }
+
     static var transferRepresentation: some TransferRepresentation {
         CodableRepresentation(contentType: .calendarEvent)
     }

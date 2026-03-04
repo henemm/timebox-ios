@@ -226,11 +226,17 @@ final class MockEventKitRepository: EventKitRepositoryProtocol, @unchecked Senda
         mockFocusBlocks.removeAll { $0.id == eventID }
     }
 
+    var lastUpdatedFocusBlockID: String?
+    var lastUpdatedFocusBlockStart: Date?
+    var lastUpdatedFocusBlockEnd: Date?
+
     func updateFocusBlockTime(eventID: String, startDate: Date, endDate: Date) throws {
         guard mockCalendarAuthStatus == .fullAccess else {
             throw EventKitError.notAuthorized
         }
-        // Silent implementation for mock
+        lastUpdatedFocusBlockID = eventID
+        lastUpdatedFocusBlockStart = startDate
+        lastUpdatedFocusBlockEnd = endDate
     }
 
     // MARK: - Protocol Implementation - Calendars
