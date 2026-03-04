@@ -16,7 +16,6 @@ struct MacPlanningView: View {
     private var nextUpTasks: [LocalTask]
 
     @Binding var selectedDate: Date
-    let onNavigateToBlock: (String) -> Void
 
     @State private var calendarEvents: [CalendarEvent] = []
     @State private var isLoading = false
@@ -25,6 +24,12 @@ struct MacPlanningView: View {
 
     // Sheet state for editing block time
     @State private var blockToEdit: FocusBlock?
+
+    // Sheet state for task assignment (same component as iOS)
+    @State private var blockForTasks: FocusBlock?
+
+    // All tasks loaded via SyncEngine (for FocusBlockTasksSheet)
+    @State private var allPlanItems: [PlanItem] = []
 
     // Sheet state for event category assignment
     @State private var eventToCategories: CalendarEvent?
@@ -73,9 +78,13 @@ struct MacPlanningView: View {
         }
         .task {
             await requestCalendarAccess()
+            await loadPlanItems()
         }
         .onChange(of: selectedDate) {
-            Task { await loadCalendarEvents() }
+            Task {
+                await loadCalendarEvents()
+                await loadPlanItems()
+            }
         }
         .sheet(item: $blockToEdit) { block in
             EditFocusBlockSheet(
@@ -100,6 +109,23 @@ struct MacPlanningView: View {
             MacEventCategorySheet(event: event) { category in
                 updateEventCategory(event: event, category: category)
             }
+        }
+        .sheet(item: $blockForTasks) { block in
+            FocusBlockTasksSheet(
+                block: block,
+                tasks: tasksForBlock(block),
+                nextUpTasks: nextUpTasksNotInBlock(block),
+                allTasks: backlogTasksNotInBlock(block),
+                onReorder: { newOrder in
+                    reorderTasksInBlockFromSheet(block, taskIDs: newOrder)
+                },
+                onRemoveTask: { taskID in
+                    removeTaskFromBlockFromSheet(block, taskID: taskID)
+                },
+                onAssignTask: { taskID in
+                    assignTaskToBlockFromSheet(taskID: taskID, block: block)
+                }
+            )
         }
     }
 
@@ -137,7 +163,7 @@ struct MacPlanningView: View {
                     Task { await addTaskToBlock(blockID: blockID, taskID: taskID) }
                 },
                 onTapBlock: { block in
-                    onNavigateToBlock(block.id)
+                    blockForTasks = block
                 },
                 onTapEditBlock: { block in
                     blockToEdit = block
@@ -229,6 +255,98 @@ struct MacPlanningView: View {
         }
 
         if showSpinner { isLoading = false }
+    }
+
+    // MARK: - Task Loading (for FocusBlockTasksSheet)
+
+    private func loadPlanItems() async {
+        do {
+            let taskSource = LocalTaskSource(modelContext: modelContext)
+            let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
+            allPlanItems = try await syncEngine.sync()
+        } catch {
+            // Task loading failure is non-critical for the planning view
+        }
+    }
+
+    private func tasksForBlock(_ block: FocusBlock) -> [PlanItem] {
+        block.taskIDs.compactMap { taskID in
+            allPlanItems.first { $0.id == taskID }
+        }
+    }
+
+    private func nextUpTasksNotInBlock(_ block: FocusBlock) -> [PlanItem] {
+        let blockTaskIDs = Set(block.taskIDs)
+        return allPlanItems.filter { $0.isNextUp && !$0.isCompleted && !blockTaskIDs.contains($0.id) }
+    }
+
+    private func backlogTasksNotInBlock(_ block: FocusBlock) -> [PlanItem] {
+        let blockTaskIDs = Set(block.taskIDs)
+        return allPlanItems.filter { !$0.isCompleted && !$0.isNextUp && !blockTaskIDs.contains($0.id) }
+    }
+
+    // MARK: - Sheet Actions (Reorder, Remove, Assign)
+
+    private func reorderTasksInBlockFromSheet(_ block: FocusBlock, taskIDs: [String]) {
+        do {
+            try eventKitRepo.updateFocusBlock(
+                eventID: block.id,
+                taskIDs: taskIDs,
+                completedTaskIDs: block.completedTaskIDs,
+                taskTimes: block.taskTimes
+            )
+            Task { await loadCalendarEvents(showSpinner: false) }
+        } catch {
+            errorMessage = "Task-Reihenfolge konnte nicht gespeichert werden."
+        }
+    }
+
+    private func removeTaskFromBlockFromSheet(_ block: FocusBlock, taskID: String) {
+        do {
+            var newTaskIDs = block.taskIDs
+            newTaskIDs.removeAll { $0 == taskID }
+            try eventKitRepo.updateFocusBlock(
+                eventID: block.id,
+                taskIDs: newTaskIDs,
+                completedTaskIDs: block.completedTaskIDs,
+                taskTimes: block.taskTimes
+            )
+            let taskSource = LocalTaskSource(modelContext: modelContext)
+            let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
+            try syncEngine.updateAssignedFocusBlock(itemID: taskID, focusBlockID: nil)
+            try syncEngine.updateNextUp(itemID: taskID, isNextUp: true)
+            Task {
+                await loadCalendarEvents(showSpinner: false)
+                await loadPlanItems()
+            }
+        } catch {
+            errorMessage = "Task konnte nicht entfernt werden."
+        }
+    }
+
+    private func assignTaskToBlockFromSheet(taskID: String, block: FocusBlock) {
+        Task {
+            do {
+                var updatedTaskIDs = block.taskIDs
+                if !updatedTaskIDs.contains(taskID) {
+                    updatedTaskIDs.append(taskID)
+                }
+                try eventKitRepo.updateFocusBlock(
+                    eventID: block.id,
+                    taskIDs: updatedTaskIDs,
+                    completedTaskIDs: block.completedTaskIDs,
+                    taskTimes: block.taskTimes
+                )
+                let taskSource = LocalTaskSource(modelContext: modelContext)
+                let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
+                try syncEngine.updateNextUp(itemID: taskID, isNextUp: false)
+                try syncEngine.updateAssignedFocusBlock(itemID: taskID, focusBlockID: block.id)
+                await loadCalendarEvents(showSpinner: false)
+                await loadPlanItems()
+            } catch {
+                errorMessage = "Task konnte nicht zugeordnet werden."
+            }
+        }
     }
 
     // MARK: - Focus Block Actions
@@ -639,8 +757,7 @@ struct MacDateNavigator: View {
 
 #Preview {
     MacPlanningView(
-        selectedDate: .constant(Date()),
-        onNavigateToBlock: { _ in }
+        selectedDate: .constant(Date())
     )
     .frame(width: 800, height: 600)
 }

@@ -191,7 +191,7 @@
 | 27 | ~~CTC-1b: TaskTitleEngine — Konservativ + Metadaten-Extraktion~~ | ERLEDIGT | S | ~20-30k | 2 | ~60 |
 | 28 | ~~CTC-6: Smart Task Interpretation + Similar-Task Learning~~ | ERLEDIGT | S | ~20k | 4 | ~70 |
 | ~~Bug 67~~ | ~~Tab-Labels Deutsch→English~~ | ERLEDIGT | XS | ~5k | 5 | ~10 |
-| Bug 68 | FocusBlock View-Umbau — Tap→Detail View fehlt | P1 | M | ~40-60k | 3-4 | ~100 |
+| Bug 68 | FocusBlock View-Umbau — Full-Screen Sheet mit 3 Sektionen | ERLEDIGT | M | ~40-60k | 4 | ~100 |
 | Bug 69 | FocusBlock Sync — Architektur-Analyse (EventKit→SwiftData?) | P2 | L-XL | ~80-120k | Analyse | TBD |
 | Bug 70 | Drag & Drop Blocks auf Timeline (iOS+macOS) → erweitert #13 | P2 | XL | ~100-150k | 3-4 | ~250 |
 
@@ -276,14 +276,12 @@
 - **Fix:** Labels auf beiden Plattformen auf Englisch: Blöcke→Blox, Fokus→Focus, Rückblick→Review (iOS), Planen→Blox, Zuweisen→Assign (macOS)
 - **Dateien:** MainTabView.swift, DailyReviewView.swift, SidebarView.swift, MacPlanningView.swift, MacAssignView.swift
 
-### Bug 68: FocusBlock View-Umbau unvollstaendig — Tap→Detail View fehlt (OFFEN)
-- **Status:** OFFEN
+### Bug 68: FocusBlock View-Umbau — Full-Screen Sheet mit 3 Sektionen (ERLEDIGT)
+- **Status:** ERLEDIGT
 - **Plattform:** iOS + macOS
-- **Prio:** M (mittlerer Aufwand, ~40-60k Tokens)
-- **Symptom iOS:** Tap auf einen FocusBlock im Blox-Tab oeffnet KEIN Detail-Sheet/View fuer Task-Zuweisung. Die Navigation nach Entfernung des Zuordnen-Tabs ist unvollstaendig.
-- **Symptom macOS:** Zwei Views vorhanden (MacPlanningView + MacAssignView), statt einer einheitlichen View
-- **Kontext:** Commit `4861e2f` ("Unified Calendar View") hat den Zuordnen-Tab entfernt und Task-Zuweisung ins Block-Sheet verschoben. Die Tap-Navigation scheint aber nicht korrekt verdrahtet zu sein.
-- **Naechster Schritt:** Analyse welche Navigation aktuell bei Tap ausgeloest wird (oder eben nicht)
+- **Fix:** FocusBlockTasksSheet als Full-Screen Sheet (.large) mit 3 Sektionen: Assigned Tasks, Next Up (immer sichtbar), "Alle Tasks" (expandierbar). iOS: vertikal gestapelt, macOS: side-by-side. macOS MacPlanningView oeffnet jetzt Sheet direkt statt ueber separate View.
+- **Geaenderte Dateien:** FocusBlockTasksSheet.swift, BlockPlanningView.swift, MacPlanningView.swift, ContentView.swift (macOS)
+- **UI Tests:** 5/5 gruen (Bug68BlockTaskSheetUITests)
 
 ### Bug 69: FocusBlock Cross-Platform Sync zu langsam / nur unidirektional (OFFEN)
 - **Status:** OFFEN — Architektur-Analyse noetig

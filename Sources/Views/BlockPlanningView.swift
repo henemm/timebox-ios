@@ -98,6 +98,7 @@ struct BlockPlanningView: View {
                     block: block,
                     tasks: tasksForBlock(block),
                     nextUpTasks: nextUpTasksNotInBlock(block),
+                    allTasks: backlogTasksNotInBlock(block),
                     onReorder: { newOrder in
                         reorderTasksInBlock(block, taskIDs: newOrder)
                     },
@@ -203,50 +204,6 @@ struct BlockPlanningView: View {
         let nonAllDayEvents = calendarEvents.filter { !$0.isAllDay && !$0.isFocusBlock }
         let totalBusyMinutes = nonAllDayEvents.reduce(0) { $0 + $1.durationMinutes }
         return totalBusyMinutes < 120 // Less than 2 hours of meetings
-    }
-
-    private var existingBlocksSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                Image(systemName: "rectangle.split.3x1.fill")
-                    .foregroundStyle(.blue)
-                Text("Today's Blox")
-                    .font(.headline)
-                Spacer()
-                Text("\(focusBlocks.count)")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 2)
-                    .background(Capsule().fill(.blue.opacity(0.15)))
-            }
-
-            LazyVStack(spacing: 8) {
-                ForEach(focusBlocks) { block in
-                    ExistingBlockRow(block: block)
-                        .contentShape(Rectangle())
-                        .onTapGesture {
-                            blockToEdit = block
-                        }
-                        .contextMenu {
-                            Button(role: .destructive) {
-                                deleteBlock(block)
-                            } label: {
-                                Label("Löschen", systemImage: "trash")
-                            }
-                        }
-                }
-            }
-        }
-        .padding()
-        .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(.blue.opacity(0.05))
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: 12)
-                .stroke(.blue.opacity(0.2), lineWidth: 1)
-        )
     }
 
     private func reorderTasksInBlock(_ block: FocusBlock, taskIDs: [String]) {
@@ -412,6 +369,11 @@ struct BlockPlanningView: View {
     private func nextUpTasksNotInBlock(_ block: FocusBlock) -> [PlanItem] {
         let blockTaskIDs = Set(block.taskIDs)
         return allTasks.filter { $0.isNextUp && !$0.isCompleted && !blockTaskIDs.contains($0.id) }
+    }
+
+    private func backlogTasksNotInBlock(_ block: FocusBlock) -> [PlanItem] {
+        let blockTaskIDs = Set(block.taskIDs)
+        return allTasks.filter { !$0.isCompleted && !$0.isNextUp && !blockTaskIDs.contains($0.id) }
     }
 
     private func createFocusBlock(startDate: Date, endDate: Date) {

@@ -230,11 +230,7 @@ struct ContentView: View {
             backlogView
         case .planning:
             MacPlanningView(
-                selectedDate: $sharedDate,
-                onNavigateToBlock: { blockID in
-                    highlightedBlockID = blockID
-                    selectedSection = .assign
-                }
+                selectedDate: $sharedDate
             )
         case .assign:
             MacAssignView(

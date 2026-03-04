@@ -22,6 +22,7 @@
 		2D85A50AEA4DE4D67F40EA5D /* SpotlightIndexingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FEFD473342A7BED5A2A93AF /* SpotlightIndexingService.swift */; };
 		2EF5DE158DB80CCCB409F66F /* SiriTipPersistenceUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAED8A7A7959F354879F7615 /* SiriTipPersistenceUITests.swift */; };
 		2F7184DE552C8D322971EDED /* MockEventKitRepositoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37586E91853A38D88E035A33 /* MockEventKitRepositoryTests.swift */; };
+		478E7E2CEBE24581992C2815 /* EventStoreChangeNotificationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8459789309884DC1920AC464 /* EventStoreChangeNotificationTests.swift */; };
 		30515A046C05070B90FD3C90 /* SpotlightIndexingServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D6520F9246BDCE0D9B157B6 /* SpotlightIndexingServiceTests.swift */; };
 		36C24ECAE1DAEC6AC61E16E8 /* EditFocusBlockSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 515D3A83205F8E00941BD4D0 /* EditFocusBlockSheet.swift */; };
 		3F9639915C12205F6DE53C7D /* SyncEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14E16E8941781A7134CBEE3A /* SyncEngineTests.swift */; };
@@ -532,6 +533,7 @@
 		999C0690FA25D74051BA1C6F /* LocalTaskSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalTaskSource.swift; sourceTree = "<group>"; };
 		9B35F02DA57C64E51F6EC483 /* NextUpSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NextUpSection.swift; sourceTree = "<group>"; };
 		9DC26C4D8FDC4B811001FD2C /* EventKitRepositoryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventKitRepositoryTests.swift; sourceTree = "<group>"; };
+		8459789309884DC1920AC464 /* EventStoreChangeNotificationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventStoreChangeNotificationTests.swift; sourceTree = "<group>"; };
 		A0B1EE7295AF0AD91CA0027A /* FocusBlock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusBlock.swift; sourceTree = "<group>"; };
 		A36E40124EBA31D7428EAA80 /* DailyReviewView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DailyReviewView.swift; sourceTree = "<group>"; };
 		AB1AD4FECCC4DD0F13D886B5 /* ITB_G_SiriTipUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ITB_G_SiriTipUITests.swift; sourceTree = "<group>"; };
@@ -1102,6 +1104,7 @@
 				SMARTGAPS001FILEREF000001 /* SmartGapsTests.swift */,
 				F1CCA00FEA15FD7BA149CDDE /* CalendarSelectionTests.swift */,
 				9DC26C4D8FDC4B811001FD2C /* EventKitRepositoryTests.swift */,
+				8459789309884DC1920AC464 /* EventStoreChangeNotificationTests.swift */,
 				1177F32AD2A8E3DE065A8945 /* FocusBlockTests.swift */,
 				BUG14DUR01FILEREF0001 /* FocusBlockDurationTests.swift */,
 				BUG34DDP01FILEREF0001 /* DedupCleanupTests.swift */,
@@ -1967,6 +1970,7 @@
 			files = (
 				EDE19804EA6D5CB9BCCB6981 /* CalendarSelectionTests.swift in Sources */,
 				968A3087301F055E331E560C /* EventKitRepositoryTests.swift in Sources */,
+				478E7E2CEBE24581992C2815 /* EventStoreChangeNotificationTests.swift in Sources */,
 				480FAFAEB03560F38352900B /* FocusBlockTests.swift in Sources */,
 				BUG14DUR01BUILD000001 /* FocusBlockDurationTests.swift in Sources */,
 				BUG34DDP01BUILD000001 /* DedupCleanupTests.swift in Sources */,

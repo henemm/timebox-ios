@@ -1,21 +1,25 @@
 import SwiftUI
 
 /// Sheet showing tasks within a FocusBlock
-/// Allows viewing, reordering, and removing tasks from the block
+/// Allows viewing, reordering, removing, and assigning tasks
+/// iOS: Sections stacked vertically (full-screen sheet)
+/// macOS: Assigned tasks left, Next Up + Alle Tasks right (side by side)
 struct FocusBlockTasksSheet: View {
     let block: FocusBlock
     let tasks: [PlanItem]
     let nextUpTasks: [PlanItem]
+    let allTasks: [PlanItem]
     let onReorder: ([String]) -> Void
     let onRemoveTask: (String) -> Void
     let onAssignTask: (String) -> Void
 
     @Environment(\.dismiss) private var dismiss
     @State private var taskOrder: [PlanItem] = []
+    @State private var isAllTasksExpanded = false
 
     var body: some View {
         NavigationStack {
-            taskListView
+            sheetContent
                 .navigationTitle("Tasks im Block")
                 #if os(iOS)
                 .navigationBarTitleDisplayMode(.inline)
@@ -28,60 +32,143 @@ struct FocusBlockTasksSheet: View {
                     }
                 }
         }
-        .presentationDetents([.medium, .large])
+        #if os(iOS)
+        .presentationDetents([.large])
+        #endif
+        #if os(macOS)
+        .frame(minWidth: 600, minHeight: 400)
+        #endif
         .accessibilityIdentifier("focusBlockTasksSheet")
         .onAppear {
             taskOrder = tasks
         }
     }
 
-    private var taskListView: some View {
+    // MARK: - Platform-Specific Layout
+
+    @ViewBuilder
+    private var sheetContent: some View {
+        #if os(macOS)
+        HStack(spacing: 0) {
+            // Left: Assigned Tasks
+            List {
+                assignedSection
+            }
+            .listStyle(.plain)
+            .frame(minWidth: 250)
+
+            Divider()
+
+            // Right: Next Up + Alle Tasks
+            List {
+                nextUpSection
+                allTasksSection
+            }
+            .listStyle(.plain)
+            .frame(minWidth: 250)
+        }
+        #else
         List {
-            // MARK: - Assigned Tasks Section
-            if taskOrder.isEmpty {
-                Section {
-                    VStack(spacing: 12) {
-                        Image(systemName: "tray")
-                            .font(.system(size: 36))
-                            .foregroundStyle(.secondary)
-                        Text("Keine Tasks im Block")
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 8)
+            assignedSection
+            nextUpSection
+            allTasksSection
+        }
+        .listStyle(.insetGrouped)
+        #endif
+    }
+
+    // MARK: - Assigned Tasks Section
+
+    @ViewBuilder
+    private var assignedSection: some View {
+        if taskOrder.isEmpty {
+            Section {
+                VStack(spacing: 12) {
+                    Image(systemName: "tray")
+                        .font(.system(size: 36))
+                        .foregroundStyle(.secondary)
+                    Text("Keine Tasks im Block")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
                 }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 8)
+            }
+        } else {
+            Section {
+                ForEach(taskOrder) { task in
+                    BlockTaskRow(task: task)
+                        .accessibilityIdentifier("blockTask_\(task.id)")
+                }
+                .onMove(perform: moveTask)
+                .onDelete(perform: deleteTask)
+            }
+        }
+    }
+
+    // MARK: - Next Up Section (Always Visible)
+
+    private var nextUpSection: some View {
+        Section {
+            if nextUpTasks.isEmpty {
+                Text("Keine Next Up Tasks")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    .padding(.vertical, 8)
             } else {
-                Section {
-                    ForEach(taskOrder) { task in
-                        BlockTaskRow(task: task)
-                            .accessibilityIdentifier("blockTask_\(task.id)")
+                ForEach(nextUpTasks) { task in
+                    SheetNextUpRow(task: task) {
+                        onAssignTask(task.id)
                     }
-                    .onMove(perform: moveTask)
-                    .onDelete(perform: deleteTask)
+                    .accessibilityIdentifier("nextUpTask_\(task.id)")
                 }
             }
+        } header: {
+            Text("Next Up (\(nextUpTasks.count))")
+                .accessibilityIdentifier("nextUpSectionHeader")
+        }
+    }
 
-            // MARK: - Next Up Section
-            if !nextUpTasks.isEmpty {
-                Section {
-                    ForEach(nextUpTasks) { task in
-                        SheetNextUpRow(task: task) {
-                            onAssignTask(task.id)
-                        }
-                        .accessibilityIdentifier("nextUpTask_\(task.id)")
+    // MARK: - Alle Tasks Section (Expandable)
+
+    private var allTasksSection: some View {
+        Section {
+            // Expandable header (tappable)
+            HStack {
+                Image(systemName: isAllTasksExpanded ? "chevron.down" : "chevron.right")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.secondary)
+                    .frame(width: 16)
+                Text("Alle Tasks")
+                    .font(.subheadline.weight(.medium))
+                Spacer()
+                Text("\(allTasks.count)")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 2)
+                    .background(Capsule().fill(.gray.opacity(0.15)))
+            }
+            .contentShape(Rectangle())
+            .onTapGesture {
+                withAnimation {
+                    isAllTasksExpanded.toggle()
+                }
+            }
+            .accessibilityElement(children: .combine)
+            .accessibilityIdentifier("allTasksDisclosure")
+
+            // Expanded content
+            if isAllTasksExpanded {
+                ForEach(allTasks) { task in
+                    SheetNextUpRow(task: task, identifierPrefix: "assignAllTask") {
+                        onAssignTask(task.id)
                     }
-                } header: {
-                    Text("Next Up (\(nextUpTasks.count))")
-                        .accessibilityIdentifier("nextUpSectionHeader")
+                    .accessibilityIdentifier("allTask_\(task.id)")
                 }
             }
         }
-        #if os(iOS)
-        .listStyle(.insetGrouped)
-        #else
-        .listStyle(.plain)
-        #endif
     }
 
     private func moveTask(from source: IndexSet, to destination: Int) {
@@ -97,12 +184,13 @@ struct FocusBlockTasksSheet: View {
     }
 }
 
-// MARK: - Next Up Task Row
+// MARK: - Assignable Task Row
 
-/// Row for a Next Up task in the FocusBlockTasksSheet
-/// Tap the arrow-up button to assign the task to the current block
+/// Row for a task that can be assigned to the current block
+/// Used in both Next Up and Alle Tasks sections
 struct SheetNextUpRow: View {
     let task: PlanItem
+    var identifierPrefix: String = "assignNextUpTask"
     let onAssign: () -> Void
 
     var body: some View {
@@ -129,7 +217,7 @@ struct SheetNextUpRow: View {
                     .foregroundStyle(.blue)
             }
             .buttonStyle(.borderless)
-            .accessibilityIdentifier("assignNextUpTask_\(task.id)")
+            .accessibilityIdentifier("\(identifierPrefix)_\(task.id)")
             .accessibilityLabel("Task zum Block hinzufügen")
         }
         .padding(.vertical, 4)
@@ -214,6 +302,7 @@ struct BlockTaskRow: View {
         ),
         tasks: [],
         nextUpTasks: [],
+        allTasks: [],
         onReorder: { _ in },
         onRemoveTask: { _ in },
         onAssignTask: { _ in }
