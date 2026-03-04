@@ -84,6 +84,7 @@
 		B59D2883B998A9D4A297ED2C /* LocalTaskSourceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64C281ADBE9DA2AC381CB747 /* LocalTaskSourceTests.swift */; };
 		B703FF51FE4B31A1D059A453 /* NextUpTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D81A830A7874C023E289830 /* NextUpTests.swift */; };
 		B7A160542F4AD5F6001FD20C /* FocusBloxShareExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = B7A1604A2F4AD5F5001FD20C /* FocusBloxShareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		WDGTWCH01EMBED0002 /* FocusBloxWatchWidgetsExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = WDGTWCH01FILEREF001 /* FocusBloxWatchWidgetsExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		B7A16CD32F1FE3BC00165284 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B7A16CD22F1FE3BC00165284 /* WidgetKit.framework */; };
 		B7A16CD52F1FE3BC00165284 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B7A16CD42F1FE3BC00165284 /* SwiftUI.framework */; };
 		B7A16CE62F1FE3BE00165284 /* FocusBloxWidgetsExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = B7A16CD02F1FE3BC00165284 /* FocusBloxWidgetsExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -331,6 +332,13 @@
 			remoteGlobalIDString = B7A160492F4AD5F5001FD20C;
 			remoteInfo = FocusBloxShareExtension;
 		};
+		WDGTWCH01PROXY0002 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C836E08D5A70572AE8F0B7F0 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = WDGTWCH01TARGET0001;
+			remoteInfo = FocusBloxWatchWidgetsExtension;
+		};
 		B7A16CE42F1FE3BE00165284 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = C836E08D5A70572AE8F0B7F0 /* Project object */;
@@ -470,6 +478,17 @@
 			dstSubfolderSpec = 13;
 			files = (
 				MACSHARE01BUILD004 /* FocusBloxMacShareExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		WDGTWCH01EMBED0001 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				WDGTWCH01EMBED0002 /* FocusBloxWatchWidgetsExtension.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1572,10 +1591,12 @@
 				B7DFC02F2F2E73EC009C2881 /* Sources */,
 				B7DFC0302F2E73EC009C2881 /* Frameworks */,
 				B7DFC0312F2E73EC009C2881 /* Resources */,
+				WDGTWCH01EMBED0001 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				WDGTWCH01DEPEND0002 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				B7DFC0342F2E73EC009C2881 /* FocusBloxWatch Watch App */,
@@ -2456,6 +2477,11 @@
 			isa = PBXTargetDependency;
 			target = MACSHARE08TARGET01 /* FocusBloxMacShareExtension */;
 			targetProxy = MACSHARE02PROXY001 /* PBXContainerItemProxy */;
+		};
+		WDGTWCH01DEPEND0002 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = WDGTWCH01TARGET0001 /* FocusBloxWatchWidgetsExtension */;
+			targetProxy = WDGTWCH01PROXY0002 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
