@@ -105,3 +105,36 @@ struct PositionedEvent: Identifiable, Sendable {
     let column: Int
     let totalColumns: Int
 }
+
+/// Represents a positioned focus block with column information.
+struct PositionedFocusBlock: Identifiable, Sendable {
+    let id: String
+    let block: FocusBlock
+    let column: Int
+    let totalColumns: Int
+}
+
+// MARK: - Timeline Location Calculator
+
+/// Pure function: converts a Y pixel position on the timeline to a Date.
+/// Shared between iOS and macOS for consistent drop-zone behavior.
+enum TimelineLocationCalculator {
+    static func timeFromLocation(
+        y: CGFloat,
+        hourHeight: CGFloat,
+        startHour: Int,
+        referenceDate: Date
+    ) -> Date {
+        let clampedY = max(0, y)
+        let hoursFromStart = clampedY / hourHeight
+        let hour = Int(hoursFromStart) + startHour
+        let minute = Int((hoursFromStart - floor(hoursFromStart)) * 60)
+        let snappedMinute = (minute / 15) * 15
+
+        var components = Calendar.current.dateComponents([.year, .month, .day], from: referenceDate)
+        components.hour = max(hour, startHour)
+        components.minute = snappedMinute
+
+        return Calendar.current.date(from: components) ?? referenceDate
+    }
+}

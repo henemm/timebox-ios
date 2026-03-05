@@ -395,7 +395,15 @@
 - **Ziel:** TimelineLayout + Collision Detection aus FocusBloxMac/ nach Sources/ extrahieren fuer Cross-Platform Sharing
 - **Dateien:** Sources/Layouts/TimelineLayout.swift (NEU), Sources/Models/TimelineItem.swift (NEU), FocusBloxMac/TimelineLayout.swift (GELOESCHT), FocusBloxMac/MacTimelineView.swift (private Typen entfernt)
 - **Tests:** 14 Unit Tests (TimelineCollisionTests) — 8 Collision Detection + 6 Layout Math, alle GREEN
-- **Naechster Schritt:** Bug 70c-1b (iOS Timeline Canvas Rebuild), dann Bug 70c-2 (Resize Drag)
+- **Naechster Schritt:** Bug 70c-2 (Resize Drag)
+
+### Bug 70c-1b: iOS Timeline Canvas Rebuild (ERLEDIGT)
+- **Status:** ERLEDIGT
+- **Plattform:** iOS
+- **Ziel:** List-basierte Timeline (TimelineHourRow per Stunde) durch Canvas-basierte Timeline (TimelineLayout + Collision Detection) ersetzen — Paritaet mit macOS
+- **Dateien:** Sources/Models/TimelineItem.swift (PositionedFocusBlock + TimelineLocationCalculator als Shared-Types), Sources/Views/BlockPlanningView.swift (Canvas-Rendering), FocusBloxMac/MacTimelineView.swift (private Duplikat entfernt)
+- **Tests:** 8 Unit (IOSTimelineCanvasTests) + 5 UI (IOSTimelineCanvasUITests) — alle GREEN
+- **Naechster Schritt:** Bug 70c-2 (Resize per Drag am unteren Rand)
 
 ### Bug 70d: FocusBlock Drag-Indicator + Titel-Update bei Verschieben (ERLEDIGT)
 - **Status:** ERLEDIGT

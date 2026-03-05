@@ -296,13 +296,7 @@ struct MacTimelineView: View {
     }
 }
 
-/// Positioned focus block for layout
-private struct PositionedFocusBlock: Identifiable {
-    let id: String
-    let block: FocusBlock
-    let column: Int
-    let totalColumns: Int
-}
+// PositionedFocusBlock is now in Sources/Models/TimelineItem.swift (shared)
 
 // MARK: - Event Block View (readonly calendar events)
 
