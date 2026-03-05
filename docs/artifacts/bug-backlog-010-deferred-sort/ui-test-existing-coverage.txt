@@ -1,0 +1,8 @@
+REFACTORING: DeferredSortController Extraktion
+Kein neues UI-Verhalten — bestehende UI Tests decken ab:
+- DeferredSortUITests (5 Tests): Badge-Tap, Pending Border, Timer Reset
+- TaskJumpingBugProofTest (5 Tests): Tasks springen nicht bei Badge-Tap
+- MacDeferredSortUITests (3 Tests): macOS Badge-Tap Verhalten
+
+Diese Tests muessen nach Refactoring WEITERHIN GRUEN sein (regression check).
+Keine neuen UI Tests noetig da keine neue Funktionalitaet.

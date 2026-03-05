@@ -555,10 +555,8 @@
 - **TD-02:** iOS/macOS View-Duplikation (~9000 LoC) — Aufwand: XL, strategische Entscheidung
 - **TD-03:** 4 Services ohne Unit Tests (NotificationService, TaskPriorityScoringService, FocusBlockActionService, GapFinder) — Aufwand: M
 
-### BACKLOG-010: Deferred Sort Logik dupliziert (iOS vs macOS)
-- **Problem:** Deferred-Sort-Freeze ist auf beiden Plattformen separat implementiert (BacklogView.swift + ContentView.swift). Gleiche Logik, unterschiedlicher Code. Hat direkt zum macOS-Bug gefuehrt (scoreFor() wurde uebersehen).
-- **Loesung:** Shared `DeferredSortController` in `Sources/` der Freeze/Unfreeze/EffectiveScore kapselt. Beide Plattformen nutzen denselben.
-- **Aufwand:** M
+### ~~BACKLOG-010: Deferred Sort Logik dupliziert (iOS vs macOS)~~ ERLEDIGT
+- **Loesung:** Shared `DeferredSortController` in `Sources/Services/` extrahiert. Beide Plattformen nutzen `@Environment(DeferredSortController.self)`. Duplizierter Code entfernt. Bonus: fehlender `freeze()`-Call bei Kategorie-Aenderung (iOS) gefixt.
 
 ### BACKLOG-011: macOS hat 3 parallele Sortier-Pfade
 - **Problem:** `filteredTasks`, `regularFilteredTasks` und `scoreFor()` berechnen Priority-Scores unabhaengig voneinander. Nur 2 von 3 nutzen frozen Scores. Fehleranfaellig bei kuenftigen Aenderungen.

@@ -122,6 +122,7 @@ struct FocusBloxMacApp: App {
     @State private var quickCapture = QuickCaptureController.shared
     @State private var showShortcuts = false
     @State private var syncMonitor = CloudKitSyncMonitor()
+    @State private var deferredSort = DeferredSortController()
     @FocusedValue(\.taskActions) private var taskActions
     @State private var showUndoAlert = false
     @State private var undoResultMessage = ""
@@ -181,6 +182,7 @@ struct FocusBloxMacApp: App {
             ContentView()
                 .environment(\.eventKitRepository, eventKitRepository)
                 .environment(syncMonitor)
+                .environment(deferredSort)
                 .sheet(isPresented: $showShortcuts) {
                     KeyboardShortcutsView()
                 }

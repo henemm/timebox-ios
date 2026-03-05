@@ -1,0 +1,8 @@
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/DeferredSortControllerTests.swift:22:26: error: cannot find 'DeferredSortController' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/DeferredSortControllerTests.swift:46:26: error: cannot find 'DeferredSortController' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/DeferredSortControllerTests.swift:66:26: error: cannot find 'DeferredSortController' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/DeferredSortControllerTests.swift:84:26: error: cannot find 'DeferredSortController' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/DeferredSortControllerTests.swift:110:26: error: cannot find 'DeferredSortController' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/DeferredSortControllerTests.swift:140:26: error: cannot find 'DeferredSortController' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/DeferredSortControllerTests.swift:157:26: error: cannot find 'DeferredSortController' in scope
+** TEST FAILED **

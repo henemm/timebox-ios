@@ -17,6 +17,7 @@ struct FocusBloxApp: App {
     @State private var quickCaptureTitle = ""
     @State private var permissionRequested = false
     @State private var syncMonitor = CloudKitSyncMonitor()
+    @State private var deferredSort = DeferredSortController()
     @State private var notificationDelegate: NotificationActionDelegate?
 
     private static let appGroupID = "group.com.henning.focusblox"
@@ -245,6 +246,7 @@ struct FocusBloxApp: App {
                 ContentView()
                     .environment(\.eventKitRepository, eventKitRepository)
                     .environment(syncMonitor)
+                    .environment(deferredSort)
 
                 // Hidden indicator for UI testing that permission was requested
                 if permissionRequested {

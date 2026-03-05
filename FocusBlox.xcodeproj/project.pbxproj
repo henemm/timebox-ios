@@ -35,8 +35,11 @@
 		480FAFAEB03560F38352900B /* FocusBlockTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1177F32AD2A8E3DE065A8945 /* FocusBlockTests.swift */; };
 		4BE1E3D56F11189BF6AA8459 /* UXImprovementsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9C8001C9F5CBCA0AC28B19A /* UXImprovementsUITests.swift */; };
 		4C504D1FB509272D8384ED24 /* IOSTimelineCanvasTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87011C5D2425669950435A61 /* IOSTimelineCanvasTests.swift */; };
+		DFSRT01BUILD00001 /* DeferredSortControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFSRT01FILEREF001 /* DeferredSortControllerTests.swift */; };
 		506459C891B27A9B4B9A1702 /* BuildInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4520CF15C46DC2B515637C5 /* BuildInfo.swift */; };
 		53697A70444E5ECF3B760A1C /* SyncEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34D186C26C7135F80A5E3B0B /* SyncEngine.swift */; };
+		DFSRT02BUILD00001 /* DeferredSortController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFSRT02FILEREF001 /* DeferredSortController.swift */; };
+		DFSRT03BUILD00001 /* DeferredSortController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFSRT02FILEREF001 /* DeferredSortController.swift */; };
 		5696B45863B3DACF0773DF6C /* DebugHierarchyTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10F0B986805B8F703DB62935 /* DebugHierarchyTest.swift */; };
 		56CCCE1A3FEE81C6B13F6262 /* BadgeOverdueUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB1D1EF0A6758E6B9B2921F /* BadgeOverdueUITests.swift */; };
 		58649A426A8AF17A4944DBCF /* NextUpSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B35F02DA57C64E51F6EC483 /* NextUpSection.swift */; };
@@ -533,6 +536,7 @@
 		32E6EA75FACA340867827895 /* PlanItemTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanItemTests.swift; sourceTree = "<group>"; };
 		339BBA1A3799CB0C6CF5897A /* BacklogViewUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BacklogViewUITests.swift; sourceTree = "<group>"; };
 		34D186C26C7135F80A5E3B0B /* SyncEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncEngine.swift; sourceTree = "<group>"; };
+		DFSRT02FILEREF001 /* DeferredSortController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeferredSortController.swift; sourceTree = "<group>"; };
 		350DD1256F45268992636DEA /* NotificationService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
 		37586E91853A38D88E035A33 /* MockEventKitRepositoryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockEventKitRepositoryTests.swift; sourceTree = "<group>"; };
 		37FD5047036F6943519870D4 /* FocusBlockDragDropUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = FocusBlockDragDropUITests.swift; sourceTree = "<group>"; };
@@ -567,6 +571,7 @@
 		8537E6312F33871F310A843F /* PlanningView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanningView.swift; sourceTree = "<group>"; };
 		86453EFF3FD7231E39EC5E4D /* BacklogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BacklogView.swift; sourceTree = "<group>"; };
 		87011C5D2425669950435A61 /* IOSTimelineCanvasTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = IOSTimelineCanvasTests.swift; sourceTree = "<group>"; };
+		DFSRT01FILEREF001 /* DeferredSortControllerTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DeferredSortControllerTests.swift; sourceTree = "<group>"; };
 		8702D64FB57BA327C378D4F4 /* TbdTasksTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TbdTasksTests.swift; sourceTree = "<group>"; };
 		89AF316D695C1B4F9FE018E9 /* FocusBlockTitleUpdateTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = FocusBlockTitleUpdateTests.swift; sourceTree = "<group>"; };
 		8D1A9F10EFE384592B5CDA71 /* TimelineCollisionTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TimelineCollisionTests.swift; sourceTree = "<group>"; };
@@ -1388,6 +1393,7 @@
 				8D1A9F10EFE384592B5CDA71 /* TimelineCollisionTests.swift */,
 				1950589463657F7EB526D130 /* WatchEnrichmentGapTests.swift */,
 				87011C5D2425669950435A61 /* IOSTimelineCanvasTests.swift */,
+				DFSRT01FILEREF001 /* DeferredSortControllerTests.swift */,
 			);
 			path = FocusBloxTests;
 			sourceTree = SOURCE_ROOT;
@@ -1425,6 +1431,7 @@
 				TMRCALC01FILEREF001 /* TimerCalculator.swift */,
 				FBACTSVC01FILEREF001 /* FocusBlockActionService.swift */,
 				34D186C26C7135F80A5E3B0B /* SyncEngine.swift */,
+				DFSRT02FILEREF001 /* DeferredSortController.swift */,
 				CKSM02FILE000001 /* CloudKitSyncMonitor.swift */,
 				76D00C9F307A1EC64537A9C7 /* TaskSources */,
 				350DD1256F45268992636DEA /* NotificationService.swift */,
@@ -2110,6 +2117,7 @@
 				FBACTSVC01BUILD00001 /* FocusBlockActionService.swift in Sources */,
 				LIVACT03BUILDFILE0001 /* LiveActivityManager.swift in Sources */,
 				53697A70444E5ECF3B760A1C /* SyncEngine.swift in Sources */,
+				DFSRT02BUILD00001 /* DeferredSortController.swift in Sources */,
 				CKSM02BUILD00001 /* CloudKitSyncMonitor.swift in Sources */,
 				REMIMPORT_BUILD_IOS /* RemindersImportService.swift in Sources */,
 				RECRSVC02BUILD001 /* RecurrenceService.swift in Sources */,
@@ -2312,6 +2320,7 @@
 				FCC11A29B4F2AF8988F782D3 /* WatchEnrichmentGapTests.swift in Sources */,
 				1F8A2A35834A2A5AFFB0D683 /* TimelineCollisionTests.swift in Sources */,
 				4C504D1FB509272D8384ED24 /* IOSTimelineCanvasTests.swift in Sources */,
+				DFSRT01BUILD00001 /* DeferredSortControllerTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2392,6 +2401,7 @@
 				506459C891B27A9B4B9A1702 /* BuildInfo.swift in Sources */,
 				MAC001BUILD00000009 /* EventKitRepositoryProtocol.swift in Sources */,
 				MAC001BUILD00000010 /* SyncEngine.swift in Sources */,
+				DFSRT03BUILD00001 /* DeferredSortController.swift in Sources */,
 				CKSM02BUILD00002 /* CloudKitSyncMonitor.swift in Sources */,
 				MAC001BUILD00000011 /* LocalTaskSource.swift in Sources */,
 				MAC001BUILD00000012 /* EventKitRepository.swift in Sources */,

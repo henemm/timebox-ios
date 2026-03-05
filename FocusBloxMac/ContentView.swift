@@ -64,6 +64,7 @@ struct ContentView: View {
 
     // CloudKit sync monitor
     @Environment(CloudKitSyncMonitor.self) private var cloudKitMonitor
+    @Environment(DeferredSortController.self) private var deferredSort
 
     // Quick Add
     @State private var newTaskTitle = ""
@@ -76,16 +77,6 @@ struct ContentView: View {
     @State private var editSeriesMode: Bool = false
     @State private var taskToEndSeries: LocalTask?
 
-    // Deferred sort: items stay in place after badge tap, re-sort after 3s timeout
-    @State private var pendingResortIDs: Set<UUID> = []
-    @State private var resortTimer: Task<Void, Never>?
-    /// Frozen priority scores — keeps tasks in place while badge value updates visually
-    @State private var frozenSortSnapshot: [String: Int]?
-
-    /// Tasks to display (uses frozen scores during deferred sort to prevent jumping)
-    private var displayedRegularTasks: [LocalTask] {
-        regularFilteredTasks
-    }
 
     // MARK: - Search Filter
     private func matchesSearch(_ task: LocalTask) -> Bool {
@@ -259,21 +250,7 @@ struct ContentView: View {
         switch selectedFilter {
         case .priority:
             base = visibleTasks.filter { !$0.isNextUp }
-                .sorted {
-                    let score0 = frozenSortSnapshot?[$0.id] ?? TaskPriorityScoringService.calculateScore(
-                        importance: $0.importance, urgency: $0.urgency, dueDate: $0.dueDate,
-                        createdAt: $0.createdAt, rescheduleCount: $0.rescheduleCount,
-                        estimatedDuration: $0.estimatedDuration, taskType: $0.taskType,
-                        isNextUp: $0.isNextUp
-                    )
-                    let score1 = frozenSortSnapshot?[$1.id] ?? TaskPriorityScoringService.calculateScore(
-                        importance: $1.importance, urgency: $1.urgency, dueDate: $1.dueDate,
-                        createdAt: $1.createdAt, rescheduleCount: $1.rescheduleCount,
-                        estimatedDuration: $1.estimatedDuration, taskType: $1.taskType,
-                        isNextUp: $1.isNextUp
-                    )
-                    return score0 > score1
-                }
+                .sorted { scoreFor($0) > scoreFor($1) }
         case .recent:
             base = visibleTasks.filter { !$0.isNextUp }
                 .sorted { a, b in
@@ -302,18 +279,15 @@ struct ContentView: View {
 
     // MARK: - Priority Section Helpers
 
-    // Calculate priority score for a task (inline, no LocalTask extension needed)
+    // Calculate priority score for a task (delegates to shared DeferredSortController)
     private func scoreFor(_ task: LocalTask) -> Int {
-        // Use frozen score if available (during deferred sort freeze period)
-        if let frozenScore = frozenSortSnapshot?[task.id] {
-            return frozenScore
-        }
-        return TaskPriorityScoringService.calculateScore(
+        let liveScore = TaskPriorityScoringService.calculateScore(
             importance: task.importance, urgency: task.urgency, dueDate: task.dueDate,
             createdAt: task.createdAt, rescheduleCount: task.rescheduleCount,
             estimatedDuration: task.estimatedDuration, taskType: task.taskType,
             isNextUp: task.isNextUp
         )
+        return deferredSort.effectiveScore(id: task.id, liveScore: liveScore)
     }
 
     // Overdue tasks (non-NextUp, dueDate before today)
@@ -435,7 +409,7 @@ struct ContentView: View {
 
                     // Priority tier sections (doNow, planSoon, eventually, someday)
                     ForEach(TaskPriorityScoringService.PriorityTier.allCases, id: \.self) { tier in
-                        let tierTasks = displayedRegularTasks.filter { task in
+                        let tierTasks = regularFilteredTasks.filter { task in
                             let taskTier = TaskPriorityScoringService.PriorityTier.from(score: scoreFor(task))
                             let isOverdue = overdueTasks.contains(where: { $0.uuid == task.uuid })
                             return taskTier == tier && !isOverdue
@@ -466,7 +440,7 @@ struct ContentView: View {
                 } else {
                     // Non-priority filters: flat list (recent, overdue, completed, recurring)
                     Section {
-                        ForEach(displayedRegularTasks, id: \.uuid) { task in
+                        ForEach(regularFilteredTasks, id: \.uuid) { task in
                             taskRowWithSwipe(task: task)
                         }
                         .onMove { from, to in
@@ -1003,61 +977,41 @@ struct ContentView: View {
                 freezeSortOrder()
                 task.importance = newValue
                 try? modelContext.save()
-                scheduleDeferredResort(taskID: task.uuid)
+                deferredSort.scheduleDeferredResort(id: task.id)
             },
             onUrgencyToggle: { newValue in
                 freezeSortOrder()
                 task.urgency = newValue
                 try? modelContext.save()
-                scheduleDeferredResort(taskID: task.uuid)
+                deferredSort.scheduleDeferredResort(id: task.id)
             },
             onCategorySelect: { category in
                 freezeSortOrder()
                 task.taskType = category
                 try? modelContext.save()
-                scheduleDeferredResort(taskID: task.uuid)
+                deferredSort.scheduleDeferredResort(id: task.id)
             },
             onDurationSelect: { duration in
                 freezeSortOrder()
                 task.estimatedDuration = duration
                 try? modelContext.save()
-                scheduleDeferredResort(taskID: task.uuid)
+                deferredSort.scheduleDeferredResort(id: task.id)
             },
-            isPendingResort: pendingResortIDs.contains(task.uuid)
+            isPendingResort: deferredSort.isPending(task.id)
         )
     }
 
-    // MARK: - Deferred Sort (item stays in place after badge tap, re-sorts after 3s)
+    // MARK: - Deferred Sort Helper (delegates to shared DeferredSortController)
 
-    /// Freeze current sort scores before a badge update.
-    /// If already frozen (multiple taps in quick succession), keep the original snapshot.
     private func freezeSortOrder() {
-        guard frozenSortSnapshot == nil else { return }
-        frozenSortSnapshot = Dictionary(uniqueKeysWithValues: visibleTasks.filter { !$0.isNextUp }.map {
+        deferredSort.freeze(scores: Dictionary(uniqueKeysWithValues: visibleTasks.filter { !$0.isNextUp }.map {
             ($0.id, TaskPriorityScoringService.calculateScore(
                 importance: $0.importance, urgency: $0.urgency, dueDate: $0.dueDate,
                 createdAt: $0.createdAt, rescheduleCount: $0.rescheduleCount,
                 estimatedDuration: $0.estimatedDuration, taskType: $0.taskType,
                 isNextUp: $0.isNextUp
             ))
-        })
-    }
-
-    private func scheduleDeferredResort(taskID: UUID) {
-        pendingResortIDs.insert(taskID)
-        resortTimer?.cancel()
-        resortTimer = Task {
-            try? await Task.sleep(for: .seconds(3))
-            guard !Task.isCancelled else { return }
-            withAnimation(.easeOut(duration: 0.3)) {
-                pendingResortIDs.removeAll()
-            }
-            try? await Task.sleep(for: .milliseconds(200))
-            guard !Task.isCancelled else { return }
-            withAnimation(.smooth(duration: 0.4)) {
-                frozenSortSnapshot = nil
-            }
-        }
+        }))
     }
 }
 

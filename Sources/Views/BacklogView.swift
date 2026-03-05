@@ -42,6 +42,7 @@ struct BacklogView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.eventKitRepository) private var eventKitRepo
     @Environment(CloudKitSyncMonitor.self) private var cloudKitMonitor
+    @Environment(DeferredSortController.self) private var deferredSort
     @AppStorage("backlogViewMode") private var selectedMode: ViewMode = .priority
     @AppStorage("remindersSyncEnabled") private var remindersSyncEnabled: Bool = false
     @AppStorage("remindersMarkCompleteOnImport") private var remindersMarkCompleteOnImport: Bool = true
@@ -70,11 +71,6 @@ struct BacklogView: View {
     @State private var showSettings = false
     @State private var undoResultMessage = ""
 
-    // Deferred sort: items stay in place after badge tap, re-sort after 3s timeout
-    @State private var pendingResortIDs: Set<String> = []
-    @State private var resortTimer: Task<Void, Never>?
-    /// Frozen priority scores — keeps tasks in place while badge value updates visually
-    @State private var frozenSortSnapshot: [String: Int]?
 
     // MARK: - Search Filter
     private func matchesSearch(_ item: PlanItem) -> Bool {
@@ -328,7 +324,7 @@ struct BacklogView: View {
         }
         .onChange(of: cloudKitMonitor.remoteChangeCount) { oldVal, newVal in
             print("[CloudKit Debug] remoteChange onChange FIRED: \(oldVal) -> \(newVal)")
-            guard pendingResortIDs.isEmpty else {
+            guard deferredSort.pendingIDs.isEmpty else {
                 print("[CloudKit Debug] Skipping refresh — deferred sort pending")
                 return
             }
@@ -563,47 +559,29 @@ struct BacklogView: View {
             let taskSource = LocalTaskSource(modelContext: modelContext)
             let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
             try syncEngine.updateTask(itemID: item.id, title: item.title, importance: item.importance, duration: item.estimatedDuration, tags: item.tags, urgency: item.urgency, taskType: category, dueDate: item.dueDate, description: item.taskDescription)
+            freezeSortOrder()
             scheduleDeferredResort(for: item.id)
         } catch {
             errorMessage = "Kategorie konnte nicht aktualisiert werden."
         }
     }
 
-    // MARK: - Deferred Sort (item stays in place after badge tap, re-sorts after 3s)
+    // MARK: - Deferred Sort Helpers (delegate to shared DeferredSortController)
 
-    /// Returns frozen score if available, otherwise live score
     private func effectivePriorityScore(for item: PlanItem) -> Int {
-        frozenSortSnapshot?[item.id] ?? item.priorityScore
+        deferredSort.effectiveScore(id: item.id, liveScore: item.priorityScore)
     }
 
-    /// Returns tier based on effective (possibly frozen) score
     private func effectivePriorityTier(for item: PlanItem) -> TaskPriorityScoringService.PriorityTier {
         TaskPriorityScoringService.PriorityTier.from(score: effectivePriorityScore(for: item))
     }
 
-    /// Freeze current sort scores for all backlog tasks before a badge update.
-    /// If already frozen (multiple taps in quick succession), keep the original snapshot.
     private func freezeSortOrder() {
-        guard frozenSortSnapshot == nil else { return }
-        frozenSortSnapshot = Dictionary(uniqueKeysWithValues: backlogTasks.map { ($0.id, $0.priorityScore) })
+        deferredSort.freeze(scores: Dictionary(uniqueKeysWithValues: backlogTasks.map { ($0.id, $0.priorityScore) }))
     }
 
     private func scheduleDeferredResort(for itemID: String) {
-        pendingResortIDs.insert(itemID)
-        resortTimer?.cancel()
-        resortTimer = Task {
-            try? await Task.sleep(for: .seconds(3))
-            guard !Task.isCancelled else { return }
-            // Phase 1: fade out borders
-            withAnimation(.easeOut(duration: 0.3)) {
-                pendingResortIDs.removeAll()
-            }
-            // Phase 2: pause, then unfreeze sort order with animation
-            try? await Task.sleep(for: .milliseconds(200))
-            guard !Task.isCancelled else { return }
-            withAnimation(.smooth(duration: 0.4)) {
-                frozenSortSnapshot = nil
-            }
+        deferredSort.scheduleDeferredResort(id: itemID) { [self] in
             await refreshLocalTasks()
         }
     }
@@ -784,7 +762,7 @@ struct BacklogView: View {
                         onEditTap: { taskToEditDirectly = item },
                         onDeleteTap: { deleteTask(item) },
                         onTitleSave: { newTitle in saveTitleEdit(for: item, title: newTitle) },
-                        isPendingResort: pendingResortIDs.contains(item.id)
+                        isPendingResort: deferredSort.isPending(item.id)
                     )
                     .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
                     .listRowBackground(Color.clear)
@@ -843,7 +821,7 @@ struct BacklogView: View {
             onEditTap: { handleEditTap(item) },
             onDeleteTap: { deleteTask(item) },
             onTitleSave: { newTitle in saveTitleEdit(for: item, title: newTitle) },
-            isPendingResort: pendingResortIDs.contains(item.id)
+            isPendingResort: deferredSort.isPending(item.id)
         )
         .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
         .listRowBackground(Color.clear)
@@ -1037,7 +1015,7 @@ struct BacklogView: View {
                     onTitleSave: { newTitle in
                         saveTitleEdit(for: item, title: newTitle)
                     },
-                    isPendingResort: pendingResortIDs.contains(item.id)
+                    isPendingResort: deferredSort.isPending(item.id)
                 )
                 .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
                 .listRowBackground(Color.clear)
