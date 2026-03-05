@@ -16,7 +16,7 @@
   - `FocusBloxMac/ContentView.swift`: displaySnapshot durch frozenSortSnapshot ersetzt, freezeSortOrder() vor jeder Wert-Aenderung
   - `FocusBloxUITests/TaskJumpingBugProofTest.swift`: 5 UI Tests (Importance/Urgency/Duration kein Sprung, Label sofort sichtbar, Reihenfolge stabil)
 - **Tests:** 5 UI Tests gruen
-- **Beide Plattformen:** iOS + macOS gefixt
+- **Beide Plattformen:** iOS + macOS gefixt (macOS Nachbesserung: scoreFor() nutzte frozen Scores nicht)
 
 ---
 

@@ -304,7 +304,11 @@ struct ContentView: View {
 
     // Calculate priority score for a task (inline, no LocalTask extension needed)
     private func scoreFor(_ task: LocalTask) -> Int {
-        TaskPriorityScoringService.calculateScore(
+        // Use frozen score if available (during deferred sort freeze period)
+        if let frozenScore = frozenSortSnapshot?[task.id] {
+            return frozenScore
+        }
+        return TaskPriorityScoringService.calculateScore(
             importance: task.importance, urgency: task.urgency, dueDate: task.dueDate,
             createdAt: task.createdAt, rescheduleCount: task.rescheduleCount,
             estimatedDuration: task.estimatedDuration, taskType: task.taskType,
