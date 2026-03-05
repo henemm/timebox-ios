@@ -1,0 +1,16 @@
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/TimelineCollisionTests.swift:24:114: error: cannot find type 'TimelineItem' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/TimelineCollisionTests.swift:35:22: error: cannot find 'TimelineItem' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/TimelineCollisionTests.swift:41:22: error: cannot find 'TimelineItem' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/TimelineCollisionTests.swift:52:22: error: cannot find 'TimelineItem' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/TimelineCollisionTests.swift:61:22: error: cannot find 'TimelineItem' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/TimelineCollisionTests.swift:72:22: error: cannot find 'TimelineItem' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/TimelineCollisionTests.swift:83:22: error: cannot find 'TimelineItem' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/TimelineCollisionTests.swift:94:22: error: cannot find 'TimelineItem' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/TimelineCollisionTests.swift:109:22: error: cannot find 'TimelineItem' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/TimelineCollisionTests.swift:117:22: error: cannot find 'TimelineLayout' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/TimelineCollisionTests.swift:123:22: error: cannot find 'TimelineLayout' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/TimelineCollisionTests.swift:129:22: error: cannot find 'TimelineLayout' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/TimelineCollisionTests.swift:135:22: error: cannot find 'TimelineLayout' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/TimelineCollisionTests.swift:141:22: error: cannot find 'TimelineLayout' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/TimelineCollisionTests.swift:147:22: error: cannot find 'TimelineLayout' in scope
+** TEST BUILD FAILED **

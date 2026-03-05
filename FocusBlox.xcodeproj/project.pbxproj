@@ -17,6 +17,7 @@
 		186664F5A9219E0AC9A4588A /* ShakeGestureModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14CEC8C14442ABE7F65B5EE8 /* ShakeGestureModifier.swift */; };
 		1B489799D0D38661913FCC34 /* TimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C945F5092F6FFB66C11FD4C2 /* TimelineView.swift */; };
 		1D22359BADEDFEF0CE024E7B /* RemindersQuickEditUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6010F2B272B933C827183F0A /* RemindersQuickEditUITests.swift */; };
+		1F8A2A35834A2A5AFFB0D683 /* TimelineCollisionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D1A9F10EFE384592B5CDA71 /* TimelineCollisionTests.swift */; };
 		22AA189C61A4045FE2B36B64 /* DurationBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDD319A3F7DEE05F6A8885FC /* DurationBadge.swift */; };
 		262C4B292E1B067D9A637C1C /* ITB_G_SiriTipUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB1AD4FECCC4DD0F13D886B5 /* ITB_G_SiriTipUITests.swift */; };
 		2D85A50AEA4DE4D67F40EA5D /* SpotlightIndexingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FEFD473342A7BED5A2A93AF /* SpotlightIndexingService.swift */; };
@@ -183,7 +184,7 @@
 		FBRND001BUILDFILE0001 /* FocusBloxRebrandUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBRND001FILEREF00001 /* FocusBloxRebrandUITests.swift */; };
 		FBRND002BUILDFILE0001 /* FocusBloxRebrandTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBRND002FILEREF00001 /* FocusBloxRebrandTests.swift */; };
 		FBSNOT01BUILD0001 /* FocusBlockStartNotificationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBSNOT01FILE00001 /* FocusBlockStartNotificationTests.swift */; };
-		FCC11A29B4F2AF8988F782D3 /* WatchEnrichmentGapTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1950589463657F7EB526D130 /* WatchEnrichmentGapTests.swift */; };
+		FCC11A29B4F2AF8988F782D3 /* FocusBloxTests/WatchEnrichmentGapTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1950589463657F7EB526D130 /* FocusBloxTests/WatchEnrichmentGapTests.swift */; };
 		INTENT01BUILD00001 /* TaskEnums.swift in Sources */ = {isa = PBXBuildFile; fileRef = INTENT01FILEREF0001 /* TaskEnums.swift */; };
 		INTENT02BUILD00001 /* TaskEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = INTENT02FILEREF0001 /* TaskEntity.swift */; };
 		INTENT03BUILD00001 /* CreateTaskIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = INTENT03FILEREF0001 /* CreateTaskIntent.swift */; };
@@ -192,6 +193,7 @@
 		INTENT06BUILD00001 /* CountOpenTasksIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = INTENT06FILEREF0001 /* CountOpenTasksIntent.swift */; };
 		INTENT07BUILD00001 /* FocusBloxShortcuts.swift in Sources */ = {isa = PBXBuildFile; fileRef = INTENT07FILEREF0001 /* FocusBloxShortcuts.swift */; };
 		ITBFLITE01BUILD01 /* TaskEntityUserActivityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ITBFLITE01FILE001 /* TaskEntityUserActivityTests.swift */; };
+		JUMPBUG01BUILD0001 /* TaskJumpingBugProofTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = JUMPBUG01FILE00001 /* TaskJumpingBugProofTest.swift */; };
 		LIVACT01BUILDFILE0001 /* LiveActivityUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = LIVACT01FILEREF00001 /* LiveActivityUITests.swift */; };
 		LIVACT02BUILDFILE0001 /* LiveActivityManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = LIVACT02FILEREF00001 /* LiveActivityManagerTests.swift */; };
 		LIVACT03BUILDFILE0001 /* LiveActivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = LIVACT03FILEREF00001 /* LiveActivityManager.swift */; };
@@ -218,6 +220,8 @@
 		MACSHARE01BUILD003 /* TaskSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 414BC475930C1DCDA3E9033B /* TaskSource.swift */; };
 		MACSHARE01BUILD004 /* FocusBloxMacShareExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = MACSHARE04FREF0001 /* FocusBloxMacShareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		NOTIF02BUILD000001 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 350DD1256F45268992636DEA /* NotificationService.swift */; };
+		NOTIFACT01BUILD001 /* NotificationActionDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = NOTIFACT01FREF001 /* NotificationActionDelegate.swift */; };
+		NOTIFACT01BUILD002 /* NotificationActionDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = NOTIFACT01FREF001 /* NotificationActionDelegate.swift */; };
 		NXLP01PVBLD0001 /* TaskPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = NXLP01PVREF0001 /* TaskPreviewView.swift */; };
 		NXLP01UIBLD0001 /* NextUpLongPressUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = NXLP01UIREF0001 /* NextUpLongPressUITests.swift */; };
 		NXSWIPE01UIBLD01 /* NextUpSwipeActionsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = NXSWIPE01UIREF01 /* NextUpSwipeActionsUITests.swift */; };
@@ -309,6 +313,10 @@
 		WDGTWCH01EMBED0002 /* FocusBloxWatchWidgetsExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = WDGTWCH01FILEREF001 /* FocusBloxWatchWidgetsExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		WKDYBTN01BUILD001 /* WeekdayButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = WKDYBTN01FILE0001 /* WeekdayButton.swift */; };
 		WKDYBTN01BUILD002 /* WeekdayButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = WKDYBTN01FILE0001 /* WeekdayButton.swift */; };
+		TLI01IOSBLD00001 /* TimelineItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = TLI01FILEREF00001 /* TimelineItem.swift */; };
+		TLI01MACBLD00001 /* TimelineItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = TLI01FILEREF00001 /* TimelineItem.swift */; };
+		TLL01IOSBLD00001 /* TimelineLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = TLL01FILEREF00001 /* TimelineLayout.swift */; };
+		TLL01MACBLD00001 /* TimelineLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = TLL01FILEREF00001 /* TimelineLayout.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -509,7 +517,7 @@
 		14CEC8C14442ABE7F65B5EE8 /* ShakeGestureModifier.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ShakeGestureModifier.swift; sourceTree = "<group>"; };
 		14E16E8941781A7134CBEE3A /* SyncEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncEngineTests.swift; sourceTree = "<group>"; };
 		16DB1BDF5EBAC3B508866AAF /* EditRedesignUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = EditRedesignUITests.swift; sourceTree = "<group>"; };
-		1950589463657F7EB526D130 /* WatchEnrichmentGapTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = FocusBloxTests/WatchEnrichmentGapTests.swift; sourceTree = SOURCE_ROOT; };
+		1950589463657F7EB526D130 /* FocusBloxTests/WatchEnrichmentGapTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = FocusBloxTests/WatchEnrichmentGapTests.swift; sourceTree = SOURCE_ROOT; };
 		1A27D4BE199FA040FC61FFD6 /* LocalTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalTask.swift; sourceTree = "<group>"; };
 		20D808247CA55763ACF23BC5 /* BlockPlanningView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockPlanningView.swift; sourceTree = "<group>"; };
 		2224B7322726CC9CD1E9C9E3 /* WidgetRelevanceCalculator.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WidgetRelevanceCalculator.swift; sourceTree = "<group>"; };
@@ -553,6 +561,7 @@
 		8537E6312F33871F310A843F /* PlanningView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanningView.swift; sourceTree = "<group>"; };
 		86453EFF3FD7231E39EC5E4D /* BacklogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BacklogView.swift; sourceTree = "<group>"; };
 		8702D64FB57BA327C378D4F4 /* TbdTasksTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TbdTasksTests.swift; sourceTree = "<group>"; };
+		8D1A9F10EFE384592B5CDA71 /* TimelineCollisionTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TimelineCollisionTests.swift; sourceTree = "<group>"; };
 		8D6520F9246BDCE0D9B157B6 /* SpotlightIndexingServiceTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SpotlightIndexingServiceTests.swift; sourceTree = "<group>"; };
 		92133F2683BB9B90566D7646 /* BacklogRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BacklogRow.swift; sourceTree = "<group>"; };
 		9356580BE3C5699878A6B87D /* BeforeScreenshotTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BeforeScreenshotTest.swift; sourceTree = "<group>"; };
@@ -671,12 +680,14 @@
 		INTENT06FILEREF0001 /* CountOpenTasksIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CountOpenTasksIntent.swift; sourceTree = "<group>"; };
 		INTENT07FILEREF0001 /* FocusBloxShortcuts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusBloxShortcuts.swift; sourceTree = "<group>"; };
 		ITBFLITE01FILE001 /* TaskEntityUserActivityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskEntityUserActivityTests.swift; sourceTree = "<group>"; };
+		JUMPBUG01FILE00001 /* TaskJumpingBugProofTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskJumpingBugProofTest.swift; sourceTree = "<group>"; };
 		LIVACT01FILEREF00001 /* LiveActivityUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivityUITests.swift; sourceTree = "<group>"; };
 		LIVACT02FILEREF00001 /* LiveActivityManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivityManagerTests.swift; sourceTree = "<group>"; };
 		LIVACT03FILEREF00001 /* LiveActivityManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivityManager.swift; sourceTree = "<group>"; };
 		LVCLN01FILE000001 /* ListViewsCleanupTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListViewsCleanupTests.swift; sourceTree = "<group>"; };
 		LVCLN01UIFILE0001 /* ListViewsCleanupUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListViewsCleanupUITests.swift; sourceTree = "<group>"; };
 		MACSHARE04FREF0001 /* FocusBloxMacShareExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = FocusBloxMacShareExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		NOTIFACT01FREF001 /* NotificationActionDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationActionDelegate.swift; sourceTree = "<group>"; };
 		NXLP01PVREF0001 /* TaskPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskPreviewView.swift; sourceTree = "<group>"; };
 		NXLP01UIREF0001 /* NextUpLongPressUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NextUpLongPressUITests.swift; sourceTree = "<group>"; };
 		NXSWIPE01UIREF01 /* NextUpSwipeActionsUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NextUpSwipeActionsUITests.swift; sourceTree = "<group>"; };
@@ -751,45 +762,47 @@
 		WARNUI01FILEREF00001 /* WarningSettingsUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WarningSettingsUITests.swift; sourceTree = "<group>"; };
 		WDGTWCH01FILEREF001 /* FocusBloxWatchWidgetsExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = FocusBloxWatchWidgetsExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		WKDYBTN01FILE0001 /* WeekdayButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeekdayButton.swift; sourceTree = "<group>"; };
+		TLI01FILEREF00001 /* TimelineItem.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TimelineItem.swift; sourceTree = "<group>"; };
+		TLL01FILEREF00001 /* TimelineLayout.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TimelineLayout.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		B75DB2432F3D2D3500345726 /* Exceptions for "FocusBloxWidgets" folder in "FocusBlox" target */ = {
+		B75DB2432F3D2D3500345726 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				QuickAddTaskControl.swift,
 			);
 			target = 16ED0EAB4D5DFBFFCCD4B1B6 /* FocusBlox */;
 		};
-		B7A160582F4AD5F6001FD20C /* Exceptions for "FocusBloxShareExtension" folder in "FocusBloxShareExtension" target */ = {
+		B7A160582F4AD5F6001FD20C /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
 			);
 			target = B7A160492F4AD5F5001FD20C /* FocusBloxShareExtension */;
 		};
-		B7A16CEA2F1FE3BE00165284 /* Exceptions for "FocusBloxWidgets" folder in "FocusBloxWidgetsExtension" target */ = {
+		B7A16CEA2F1FE3BE00165284 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
 			);
 			target = B7A16CCF2F1FE3BC00165284 /* FocusBloxWidgetsExtension */;
 		};
-		MACSHARE05EXCPT001 /* Exceptions for "FocusBloxMacShareExtension" folder in "FocusBloxMacShareExtension" target */ = {
+		MACSHARE05EXCPT001 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
 			);
 			target = MACSHARE08TARGET01 /* FocusBloxMacShareExtension */;
 		};
-		RESRC001EXCEPTION00001 /* Exceptions for "Resources" folder in "FocusBlox" target */ = {
+		RESRC001EXCEPTION00001 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
 			);
 			target = 16ED0EAB4D5DFBFFCCD4B1B6 /* FocusBlox */;
 		};
-		WDGTWCH01EXCEPT0001 /* Exceptions for "FocusBloxWatchWidgets" folder in "FocusBloxWatchWidgetsExtension" target */ = {
+		WDGTWCH01EXCEPT0001 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
@@ -799,155 +812,19 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		B7A1604B2F4AD5F5001FD20C /* FocusBloxShareExtension */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				B7A160582F4AD5F6001FD20C /* Exceptions for "FocusBloxShareExtension" folder in "FocusBloxShareExtension" target */,
-			);
-			explicitFileTypes = {
-			};
-			explicitFolders = (
-			);
-			path = FocusBloxShareExtension;
-			sourceTree = "<group>";
-		};
-		B7A16CD62F1FE3BC00165284 /* FocusBloxWidgets */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				B75DB2432F3D2D3500345726 /* Exceptions for "FocusBloxWidgets" folder in "FocusBlox" target */,
-				B7A16CEA2F1FE3BE00165284 /* Exceptions for "FocusBloxWidgets" folder in "FocusBloxWidgetsExtension" target */,
-			);
-			explicitFileTypes = {
-			};
-			explicitFolders = (
-			);
-			path = FocusBloxWidgets;
-			sourceTree = "<group>";
-		};
-		B7A16D0D2F20FDD400165284 /* FocusBloxCore */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
-			explicitFileTypes = {
-			};
-			explicitFolders = (
-			);
-			path = FocusBloxCore;
-			sourceTree = "<group>";
-		};
-		B7A16D1C2F20FDD400165284 /* FocusBloxCoreTests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
-			explicitFileTypes = {
-			};
-			explicitFolders = (
-			);
-			path = FocusBloxCoreTests;
-			sourceTree = "<group>";
-		};
-		B7DFC0342F2E73EC009C2881 /* FocusBloxWatch Watch App */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
-			explicitFileTypes = {
-			};
-			explicitFolders = (
-			);
-			path = "FocusBloxWatch Watch App";
-			sourceTree = "<group>";
-		};
-		B7DFC0422F2E73ED009C2881 /* FocusBloxWatch Watch AppTests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
-			explicitFileTypes = {
-			};
-			explicitFolders = (
-			);
-			path = "FocusBloxWatch Watch AppTests";
-			sourceTree = "<group>";
-		};
-		B7DFC04C2F2E73ED009C2881 /* FocusBloxWatch Watch AppUITests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
-			explicitFileTypes = {
-			};
-			explicitFolders = (
-			);
-			path = "FocusBloxWatch Watch AppUITests";
-			sourceTree = "<group>";
-		};
-		B7DFC06E2F2E8C60009C2881 /* FocusBloxMac */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
-			explicitFileTypes = {
-			};
-			explicitFolders = (
-			);
-			path = FocusBloxMac;
-			sourceTree = "<group>";
-		};
-		B7DFC07C2F2E8C62009C2881 /* FocusBloxMacTests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
-			explicitFileTypes = {
-			};
-			explicitFolders = (
-			);
-			path = FocusBloxMacTests;
-			sourceTree = "<group>";
-		};
-		B7DFC0862F2E8C62009C2881 /* FocusBloxMacUITests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
-			explicitFileTypes = {
-			};
-			explicitFolders = (
-			);
-			path = FocusBloxMacUITests;
-			sourceTree = "<group>";
-		};
-		MACSHARE06FSSRG001 /* FocusBloxMacShareExtension */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				MACSHARE05EXCPT001 /* Exceptions for "FocusBloxMacShareExtension" folder in "FocusBloxMacShareExtension" target */,
-			);
-			explicitFileTypes = {
-			};
-			explicitFolders = (
-			);
-			path = FocusBloxMacShareExtension;
-			sourceTree = "<group>";
-		};
-		RESRC001SYNCGROUP00001 /* Resources */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				RESRC001EXCEPTION00001 /* Exceptions for "Resources" folder in "FocusBlox" target */,
-			);
-			explicitFileTypes = {
-			};
-			explicitFolders = (
-			);
-			path = Resources;
-			sourceTree = "<group>";
-		};
-		WDGTWCH01FOLDER0001 /* FocusBloxWatchWidgets */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				WDGTWCH01EXCEPT0001 /* Exceptions for "FocusBloxWatchWidgets" folder in "FocusBloxWatchWidgetsExtension" target */,
-			);
-			explicitFileTypes = {
-			};
-			explicitFolders = (
-			);
-			path = FocusBloxWatchWidgets;
-			sourceTree = "<group>";
-		};
+		B7A1604B2F4AD5F5001FD20C /* FocusBloxShareExtension */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (B7A160582F4AD5F6001FD20C /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = FocusBloxShareExtension; sourceTree = "<group>"; };
+		B7A16CD62F1FE3BC00165284 /* FocusBloxWidgets */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (B75DB2432F3D2D3500345726 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, B7A16CEA2F1FE3BE00165284 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = FocusBloxWidgets; sourceTree = "<group>"; };
+		B7A16D0D2F20FDD400165284 /* FocusBloxCore */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = FocusBloxCore; sourceTree = "<group>"; };
+		B7A16D1C2F20FDD400165284 /* FocusBloxCoreTests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = FocusBloxCoreTests; sourceTree = "<group>"; };
+		B7DFC0342F2E73EC009C2881 /* FocusBloxWatch Watch App */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = "FocusBloxWatch Watch App"; sourceTree = "<group>"; };
+		B7DFC0422F2E73ED009C2881 /* FocusBloxWatch Watch AppTests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = "FocusBloxWatch Watch AppTests"; sourceTree = "<group>"; };
+		B7DFC04C2F2E73ED009C2881 /* FocusBloxWatch Watch AppUITests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = "FocusBloxWatch Watch AppUITests"; sourceTree = "<group>"; };
+		B7DFC06E2F2E8C60009C2881 /* FocusBloxMac */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = FocusBloxMac; sourceTree = "<group>"; };
+		B7DFC07C2F2E8C62009C2881 /* FocusBloxMacTests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = FocusBloxMacTests; sourceTree = "<group>"; };
+		B7DFC0862F2E8C62009C2881 /* FocusBloxMacUITests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = FocusBloxMacUITests; sourceTree = "<group>"; };
+		MACSHARE06FSSRG001 /* FocusBloxMacShareExtension */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (MACSHARE05EXCPT001 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = FocusBloxMacShareExtension; sourceTree = "<group>"; };
+		RESRC001SYNCGROUP00001 /* Resources */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (RESRC001EXCEPTION00001 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = Resources; sourceTree = "<group>"; };
+		WDGTWCH01FOLDER0001 /* FocusBloxWatchWidgets */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (WDGTWCH01EXCEPT0001 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = FocusBloxWatchWidgets; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1127,6 +1004,7 @@
 				BUG70ASNPUI01FILE0001 /* Bug70aSnapUITests.swift */,
 				0CB1D1EF0A6758E6B9B2921F /* BadgeOverdueUITests.swift */,
 				37FD5047036F6943519870D4 /* FocusBlockDragDropUITests.swift */,
+				JUMPBUG01FILE00001 /* TaskJumpingBugProofTest.swift */,
 			);
 			path = FocusBloxUITests;
 			sourceTree = "<group>";
@@ -1208,6 +1086,7 @@
 				42790F5402B3E1F632874F5A /* TaskMetadata.swift */,
 				84C370C5BEDCC25CA912E79F /* GapFinder.swift */,
 				RECRPAT02FILE0001 /* RecurrencePattern.swift */,
+				TLI01FILEREF00001 /* TimelineItem.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -1281,6 +1160,7 @@
 				E8F581D4C161751425D7F776 /* Services */,
 				2FB93EDD424437965784E8F2 /* Testing */,
 				7613DF2BEF00711C6BDA68E3 /* Views */,
+				LAYOUTS01GROUP0001 /* Layouts */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -1357,7 +1237,8 @@
 				SMTENR01FILE00001 /* SmartTaskEnrichmentServiceTests.swift */,
 				0B783A31231C9313A86914B9 /* BadgeOverdueNotificationTests.swift */,
 				CE21F83C52F46219D0186198 /* FocusBlockDragTests.swift */,
-				1950589463657F7EB526D130 /* WatchEnrichmentGapTests.swift */,
+				8D1A9F10EFE384592B5CDA71 /* TimelineCollisionTests.swift */,
+				1950589463657F7EB526D130 /* FocusBloxTests/WatchEnrichmentGapTests.swift */,
 			);
 			path = FocusBloxTests;
 			sourceTree = SOURCE_ROOT;
@@ -1398,6 +1279,7 @@
 				CKSM02FILE000001 /* CloudKitSyncMonitor.swift */,
 				76D00C9F307A1EC64537A9C7 /* TaskSources */,
 				350DD1256F45268992636DEA /* NotificationService.swift */,
+				NOTIFACT01FREF001 /* NotificationActionDelegate.swift */,
 				RECRSVC02FILE0001 /* RecurrenceService.swift */,
 				60DE55FC2A796A308478E2B9 /* MenuBarIconState.swift */,
 				233B665A0DF1A421C1CDF80A /* TaskCompletionUndoService.swift */,
@@ -1458,6 +1340,14 @@
 				WKDYBTN01FILE0001 /* WeekdayButton.swift */,
 			);
 			path = Components;
+			sourceTree = "<group>";
+		};
+		LAYOUTS01GROUP0001 /* Layouts */ = {
+			isa = PBXGroup;
+			children = (
+				TLL01FILEREF00001 /* TimelineLayout.swift */,
+			);
+			path = Layouts;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -2015,6 +1905,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				E907CB03C20C1B55A48C4B1B /* BacklogRow.swift in Sources */,
+				TLI01IOSBLD00001 /* TimelineItem.swift in Sources */,
+				TLL01IOSBLD00001 /* TimelineLayout.swift in Sources */,
 				58649A426A8AF17A4944DBCF /* NextUpSection.swift in Sources */,
 				NXLP01PVBLD0001 /* TaskPreviewView.swift in Sources */,
 				402B599EB1486BA1E69EF4FF /* BacklogView.swift in Sources */,
@@ -2088,6 +1980,7 @@
 				TSKDTL01BUILDFILE0001 /* TaskDetailSheet.swift in Sources */,
 				1800BB7020E3D6044A62475A /* DailyReviewView.swift in Sources */,
 				A4A8AF1E9B1B715FE913F6F4 /* NotificationService.swift in Sources */,
+				NOTIFACT01BUILD001 /* NotificationActionDelegate.swift in Sources */,
 				INTENT01BUILD00001 /* TaskEnums.swift in Sources */,
 				INTENT02BUILD00001 /* TaskEntity.swift in Sources */,
 				FBENTITY02BUILD01 /* FocusBlockEntity.swift in Sources */,
@@ -2119,6 +2012,7 @@
 				4702F3D2CAF394E0AC9AAF96 /* BeforeScreenshotTest.swift in Sources */,
 				6C17452E66E837CD8225506C /* DebugLogReaderTest.swift in Sources */,
 				DEFSORT01BUILD0001 /* DeferredSortUITests.swift in Sources */,
+				JUMPBUG01BUILD0001 /* TaskJumpingBugProofTest.swift in Sources */,
 				BDEDB5DE393186FC2D0BFF58 /* DurationEditingUITests.swift in Sources */,
 				DCHIPSCRL01BUILD001 /* DurationChipScrollUITests.swift in Sources */,
 				9F9185F5A9BD5A8CFF79DECA /* ErrorStateUITests.swift in Sources */,
@@ -2262,7 +2156,8 @@
 				F4222F8AEAECD043130A4C6B /* MenuBarIconStateTests.swift in Sources */,
 				SMTENR01BUILD0001 /* SmartTaskEnrichmentServiceTests.swift in Sources */,
 				6AADB391CAF1B7B43535687E /* BadgeOverdueNotificationTests.swift in Sources */,
-				FCC11A29B4F2AF8988F782D3 /* WatchEnrichmentGapTests.swift in Sources */,
+				FCC11A29B4F2AF8988F782D3 /* FocusBloxTests/WatchEnrichmentGapTests.swift in Sources */,
+				1F8A2A35834A2A5AFFB0D683 /* TimelineCollisionTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2324,6 +2219,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				B7DFC0952F2E9646009C2881 /* LocalTask.swift in Sources */,
+				TLI01MACBLD00001 /* TimelineItem.swift in Sources */,
+				TLL01MACBLD00001 /* TimelineLayout.swift in Sources */,
 				TASKCAT01BUILD00001 /* TaskCategory.swift in Sources */,
 				CATBDG02BUILD0002 /* CategoryIconBadge.swift in Sources */,
 				RVWSTAT02BUILD00001 /* ReviewStatsCalculator.swift in Sources */,
@@ -2360,6 +2257,7 @@
 				SMARTENR00BUILD002 /* SmartTaskEnrichmentService.swift in Sources */,
 				CTC1SERV0BUILD0002 /* TaskTitleEngine.swift in Sources */,
 				NOTIF02BUILD000001 /* NotificationService.swift in Sources */,
+				NOTIFACT01BUILD002 /* NotificationActionDelegate.swift in Sources */,
 				MAC024BUILD00000001 /* EditFocusBlockSheet.swift in Sources */,
 				MAC024BUILD00000002 /* FocusBlockTasksSheet.swift in Sources */,
 				109CE59305D35DA0570AB33E /* GapFinder.swift in Sources */,

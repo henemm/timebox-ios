@@ -8,49 +8,8 @@
 import SwiftUI
 
 // MARK: - Event Layout Model
-
-/// Unified time item for combined collision detection
-private struct TimelineItem: Identifiable {
-    let id: String
-    let startDate: Date
-    let endDate: Date
-    let type: ItemType
-
-    enum ItemType {
-        case event(CalendarEvent)
-        case focusBlock(FocusBlock)
-    }
-
-    init(event: CalendarEvent) {
-        self.id = event.id
-        self.startDate = event.startDate
-        self.endDate = event.endDate
-        self.type = .event(event)
-    }
-
-    init(block: FocusBlock) {
-        self.id = block.id
-        self.startDate = block.startDate
-        self.endDate = block.endDate
-        self.type = .focusBlock(block)
-    }
-}
-
-/// Represents a positioned item with column information for side-by-side layout
-private struct PositionedItem: Identifiable {
-    let id: String
-    let item: TimelineItem
-    let column: Int
-    let totalColumns: Int
-}
-
-/// Represents a positioned event with column information for side-by-side layout
-private struct PositionedEvent: Identifiable {
-    let id: String
-    let event: CalendarEvent
-    let column: Int
-    let totalColumns: Int
-}
+// TimelineItem, PositionedItem, PositionedEvent are now in Sources/Models/TimelineItem.swift (shared)
+// TimelineLayout is now in Sources/Layouts/TimelineLayout.swift (shared)
 
 /// Timeline view showing calendar events and focus blocks for a day
 struct MacTimelineView: View {
@@ -223,7 +182,7 @@ struct MacTimelineView: View {
         allItems.append(contentsOf: focusBlocks.map { TimelineItem(block: $0) })
 
         // Run unified collision detection
-        let groups = groupOverlappingItems(allItems)
+        let groups = TimelineItem.groupOverlapping(allItems)
 
         // Build positioned items with correct column assignments
         var result: [PositionedItem] = []
@@ -268,40 +227,6 @@ struct MacTimelineView: View {
             }
             return nil
         }
-    }
-
-    /// Groups items that overlap in time - unified for both events and focus blocks
-    private func groupOverlappingItems(_ items: [TimelineItem]) -> [[TimelineItem]] {
-        guard !items.isEmpty else { return [] }
-
-        let sorted = items.sorted { $0.startDate < $1.startDate }
-        var groups: [[TimelineItem]] = []
-        var currentGroup: [TimelineItem] = []
-        var currentGroupEndTime: Date?
-
-        for item in sorted {
-            if let endTime = currentGroupEndTime, item.startDate < endTime {
-                // Overlaps with current group
-                currentGroup.append(item)
-                // Extend group end time if needed
-                if item.endDate > endTime {
-                    currentGroupEndTime = item.endDate
-                }
-            } else {
-                // No overlap, start new group
-                if !currentGroup.isEmpty {
-                    groups.append(currentGroup)
-                }
-                currentGroup = [item]
-                currentGroupEndTime = item.endDate
-            }
-        }
-
-        if !currentGroup.isEmpty {
-            groups.append(currentGroup)
-        }
-
-        return groups
     }
 
     // MARK: - Hit Testing

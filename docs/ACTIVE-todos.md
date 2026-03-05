@@ -28,9 +28,11 @@
 - **Ziel:** App-Icon Badge zeigt Anzahl ueberfaelliger Tasks, Frist-Notifications bieten 3 Buttons (NextUp, Verschieben +1 Tag, Erledigt)
 - **Aenderungen:**
   - `Sources/Services/NotificationService.swift`: Category-Registration, userInfo an Due-Date-Notifs, Badge-Update (iOS only)
-  - `Sources/FocusBloxApp.swift`: NotificationActionDelegate, Badge bei Foreground + Remote-Change
+  - `Sources/Services/NotificationActionDelegate.swift`: Shared-Code fuer iOS + macOS (extrahiert aus FocusBloxApp.swift)
+  - `Sources/FocusBloxApp.swift`: Badge bei Foreground + Remote-Change
   - `FocusBloxMac/FocusBloxMacApp.swift`: NotificationActionDelegate (ohne Badge)
-- **Tests:** 5 Tests gruen (3 Unit + 2 UI)
+- **Nachtrag:** macOS Build war kaputt weil NotificationActionDelegate nur im iOS-Target definiert war. Extrahiert nach `Sources/Services/` als Shared-Code.
+- **Tests:** 5 Tests gruen (3 Unit + 2 UI), keine neuen Regressionen
 - **Spec:** `docs/specs/features/badge-overdue-notifications.md`
 
 ---
@@ -371,6 +373,14 @@
 - **Dateien:** CalendarEventTransfer.swift, BlockPlanningView.swift, MacTimelineView.swift, MacPlanningView.swift, MockEventKitRepository.swift
 - **Tests:** 10 Unit Tests (FocusBlockDragTests), 4 UI Tests (FocusBlockDragDropUITests), alle GREEN
 - **Naechster Schritt:** Bug 70c (Block resizen per Drag)
+
+### Bug 70c-1a: Shared Timeline Layout Extraction (ERLEDIGT)
+- **Status:** ERLEDIGT
+- **Plattform:** beide (iOS + macOS)
+- **Ziel:** TimelineLayout + Collision Detection aus FocusBloxMac/ nach Sources/ extrahieren fuer Cross-Platform Sharing
+- **Dateien:** Sources/Layouts/TimelineLayout.swift (NEU), Sources/Models/TimelineItem.swift (NEU), FocusBloxMac/TimelineLayout.swift (GELOESCHT), FocusBloxMac/MacTimelineView.swift (private Typen entfernt)
+- **Tests:** 14 Unit Tests (TimelineCollisionTests) — 8 Collision Detection + 6 Layout Math, alle GREEN
+- **Naechster Schritt:** Bug 70c-1b (iOS Timeline Canvas Rebuild), dann Bug 70c-2 (Resize Drag)
 
 ### Bug 66: macOS FocusBlock nicht sichtbar in MenuBar + Sync-Deadlock (ERLEDIGT)
 - **Status:** ERLEDIGT
