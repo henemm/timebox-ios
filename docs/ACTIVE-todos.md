@@ -257,13 +257,14 @@
 | Bug 69 | FocusBlock Sync — Architektur-Analyse (EventKit→SwiftData?) | P2 | L-XL | ~80-120k | Analyse | TBD |
 | Bug 70 | Drag & Drop Blocks auf Timeline (iOS+macOS) → erweitert #13 | P2 | XL | ~100-150k | 3-4 | ~250 |
 | Bug 72 | macOS — FocusBlock Gear-Icon fehlt (Edit-Sheet nicht erreichbar) | P2 | XS | ~5k | 1 | ~10 |
+| 30 | ~~App Icon Liquid Glass (iOS 26) — Two Rings + Dot~~ | ERLEDIGT | M | ~40-60k | 4 | ~100 |
 
 **Komplexitaet:** XS = halbe Stunde | S = 1 Session | M = 2-3 Sessions | L = halber Tag | XL = ganzer Tag+
 
 **Guenstigster Quick Win:** #7 Kalender-App Deep Link (M)
 **Teuerste Items:** #17 OrganizeMyDay (~150k), Bug 70/~~#13~~ Drag & Drop (~150k), #14 NC Widget (~120k)
 **WARTEND (Apple-Abhaengigkeit):** #20 ITB-F — Developer-APIs verfuegbar, wartet auf Siri On-Screen Awareness (iOS 26.5/27)
-**Zuletzt erledigt:** #29 Badge-Zahl (Overdue) + Interaktive Frist-Notifications
+**Zuletzt erledigt:** #30 App Icon Liquid Glass — Two Rings + Dot (alle Plattformen)
 **Naechstes:** Bug 70 (D&D, XL) oder #7 Kalender Deep Link (M)
 **Neu (User Story):** #22-26 Contextual Task Capture — siehe `docs/project/stories/contextual-task-capture.md`
 
@@ -329,6 +330,17 @@
 6. ~~CTC-6 (Smart Interpretation)~~ ERLEDIGT — Floskel-Erkennung ("Erinnere mich...") + Similar-Task-Lernen (Attribute von aehnlichen Tasks uebernehmen)
 
 **Kernidee:** Aus jedem Kontext (Mail, Safari, Clipboard, Diktat) mit einem Tap eine Task erstellen. KI generiert actionable Titel im Hintergrund, Original bleibt in Beschreibung erhalten.
+
+---
+
+## ERLEDIGT: Feature #28 — App Icon (alle Plattformen)
+
+- **Spec:** `docs/specs/design/app-icon-liquid-glass.md`
+- **Design:** Two Rings + Dot — Zwei konzentrische Cyan-Ringe (aussen halbtransparent, innen voll) + dunklerer Mittelpunkt auf weissem Hintergrund
+- **Layer-Strategie:** Design in Background baken (Farben bleiben erhalten), Foreground nur als Glass-Shape fuer Tiefe/Parallax
+- **Deployed:** iOS 26 (layered .icon), watchOS, Widgets, macOS (alle Groessen)
+- **Dateien:** `AppIcon.icon/`, `scripts/ExportIconLayers.swift`, alle Platform-AppIcon.png
+- **Key Learning:** Liquid Glass entfernt alle Farbe aus dem Foreground-Layer — farbige Elemente muessen in den Background
 
 ---
 

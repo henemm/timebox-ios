@@ -1,16 +1,27 @@
 {
-  "info": {
-    "author": "FocusBlox",
-    "version": 1
-  },
-  "layers": [
+  "fill" : "system-light",
+  "groups" : [
     {
-      "filename": "background.png",
-      "name": "Background"
+      "layers" : [
+        {
+          "image-name" : "background.png",
+          "name" : "Background"
+        }
+      ]
     },
     {
-      "filename": "foreground.png",
-      "name": "Foreground"
+      "layers" : [
+        {
+          "image-name" : "foreground.png",
+          "name" : "Rings"
+        }
+      ]
     }
-  ]
+  ],
+  "supported-platforms" : {
+    "circles" : [
+      "watchOS"
+    ],
+    "squares" : "shared"
+  }
 }

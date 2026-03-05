@@ -1,0 +1,4 @@
+TDD RED: LiquidGlassIcon tests — test file created, awaiting new implementation.
+Old FocusBloxIcon struct exists, LiquidGlassIcon typealias does not yet match new design.
+Tests will verify: struct exists, accepts custom colors, typealias works.
+Timestamp: 2026-03-05T07:06:48Z

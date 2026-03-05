@@ -15,77 +15,77 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 /Users/hem/Developer/my-daily-sprints/.claude/hooks/stop_lock_guard.py",
+            "command": "python3 /Users/hem/Developer/FocusBlox/.claude/hooks/stop_lock_guard.py",
             "timeout": 5
           },
           {
             "type": "command",
-            "command": "python3 /Users/hem/Developer/my-daily-sprints/.claude/hooks/override_token_guard.py",
+            "command": "python3 /Users/hem/Developer/FocusBlox/.claude/hooks/override_token_guard.py",
             "timeout": 5
           },
           {
             "type": "command",
-            "command": "python3 /Users/hem/Developer/my-daily-sprints/.claude/hooks/docs_location_guard.py",
+            "command": "python3 /Users/hem/Developer/FocusBlox/.claude/hooks/docs_location_guard.py",
             "timeout": 5
           },
           {
             "type": "command",
-            "command": "python3 /Users/hem/Developer/my-daily-sprints/.claude/hooks/strict_code_gate.py",
+            "command": "python3 /Users/hem/Developer/FocusBlox/.claude/hooks/strict_code_gate.py",
             "timeout": 5
           },
           {
             "type": "command",
-            "command": "python3 /Users/hem/Developer/my-daily-sprints/.claude/hooks/claude_md_protection.py",
+            "command": "python3 /Users/hem/Developer/FocusBlox/.claude/hooks/claude_md_protection.py",
             "timeout": 5
           },
           {
             "type": "command",
-            "command": "python3 /Users/hem/Developer/my-daily-sprints/.claude/hooks/domain_pattern_guard.py",
+            "command": "python3 /Users/hem/Developer/FocusBlox/.claude/hooks/domain_pattern_guard.py",
             "timeout": 5
           },
           {
             "type": "command",
-            "command": "python3 /Users/hem/Developer/my-daily-sprints/.claude/hooks/plan_validator.py",
+            "command": "python3 /Users/hem/Developer/FocusBlox/.claude/hooks/plan_validator.py",
             "timeout": 5
           },
           {
             "type": "command",
-            "command": "python3 /Users/hem/Developer/my-daily-sprints/.claude/hooks/post_implementation_gate.py",
+            "command": "python3 /Users/hem/Developer/FocusBlox/.claude/hooks/post_implementation_gate.py",
             "timeout": 5
           },
           {
             "type": "command",
-            "command": "python3 /Users/hem/Developer/my-daily-sprints/.claude/hooks/red_test_gate.py",
+            "command": "python3 /Users/hem/Developer/FocusBlox/.claude/hooks/red_test_gate.py",
             "timeout": 5
           },
           {
             "type": "command",
-            "command": "python3 /Users/hem/Developer/my-daily-sprints/.claude/hooks/scope_guard.py",
+            "command": "python3 /Users/hem/Developer/FocusBlox/.claude/hooks/scope_guard.py",
             "timeout": 5
           },
           {
             "type": "command",
-            "command": "python3 /Users/hem/Developer/my-daily-sprints/.claude/hooks/spec_enforcement.py",
+            "command": "python3 /Users/hem/Developer/FocusBlox/.claude/hooks/spec_enforcement.py",
             "timeout": 5
           },
           {
             "type": "command",
-            "command": "python3 /Users/hem/Developer/my-daily-sprints/.claude/hooks/tdd_enforcement.py",
+            "command": "python3 /Users/hem/Developer/FocusBlox/.claude/hooks/tdd_enforcement.py",
             "timeout": 5
           },
           {
             "type": "command",
-            "command": "python3 /Users/hem/Developer/my-daily-sprints/.claude/hooks/track_changes.py",
+            "command": "python3 /Users/hem/Developer/FocusBlox/.claude/hooks/track_changes.py",
             "timeout": 5
           },
           {
             "type": "command",
-            "command": "python3 /Users/hem/Developer/my-daily-sprints/.claude/hooks/ui_screenshot_gate.py",
+            "command": "python3 /Users/hem/Developer/FocusBlox/.claude/hooks/ui_screenshot_gate.py",
             "timeout": 5
           },
           {
             "type": "command",
-            "command": "python3 /Users/hem/Developer/my-daily-sprints/.claude/hooks/workflow_gate.py",
+            "command": "python3 /Users/hem/Developer/FocusBlox/.claude/hooks/workflow_gate.py",
             "timeout": 5
           }
         ]
@@ -95,22 +95,22 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 /Users/hem/Developer/my-daily-sprints/.claude/hooks/stop_lock_guard.py",
+            "command": "python3 /Users/hem/Developer/FocusBlox/.claude/hooks/stop_lock_guard.py",
             "timeout": 5
           },
           {
             "type": "command",
-            "command": "python3 /Users/hem/Developer/my-daily-sprints/.claude/hooks/override_token_bash_guard.py",
+            "command": "python3 /Users/hem/Developer/FocusBlox/.claude/hooks/override_token_bash_guard.py",
             "timeout": 5
           },
           {
             "type": "command",
-            "command": "python3 /Users/hem/Developer/my-daily-sprints/.claude/hooks/pre_commit_gate.py",
+            "command": "python3 /Users/hem/Developer/FocusBlox/.claude/hooks/pre_commit_gate.py",
             "timeout": 5
           },
           {
             "type": "command",
-            "command": "python3 /Users/hem/Developer/my-daily-sprints/.claude/hooks/secrets_guard.py",
+            "command": "python3 /Users/hem/Developer/FocusBlox/.claude/hooks/secrets_guard.py",
             "timeout": 5
           }
         ]
@@ -121,7 +121,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 /Users/hem/Developer/my-daily-sprints/.claude/hooks/notify_sound.py",
+            "command": "python3 /Users/hem/Developer/FocusBlox/.claude/hooks/notify_sound.py",
             "timeout": 5
           }
         ]
@@ -132,17 +132,17 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 /Users/hem/Developer/my-daily-sprints/.claude/hooks/stop_lock_listener.py",
+            "command": "python3 /Users/hem/Developer/FocusBlox/.claude/hooks/stop_lock_listener.py",
             "timeout": 5
           },
           {
             "type": "command",
-            "command": "python3 /Users/hem/Developer/my-daily-sprints/.claude/hooks/workflow_state_updater.py",
+            "command": "python3 /Users/hem/Developer/FocusBlox/.claude/hooks/workflow_state_updater.py",
             "timeout": 5
           },
           {
             "type": "command",
-            "command": "python3 /Users/hem/Developer/my-daily-sprints/.claude/hooks/override_token_listener.py",
+            "command": "python3 /Users/hem/Developer/FocusBlox/.claude/hooks/override_token_listener.py",
             "timeout": 5
           }
         ]

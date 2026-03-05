@@ -1,0 +1,38 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//*)",
+      "Edit(//*)",
+      "Write(//*)",
+      "Glob(//*)",
+      "Grep(//*)",
+      "Bash(python3:*)",
+      "Bash(python3 -c:*)",
+      "Bash(xcodebuild:*)",
+      "Bash(git:*)",
+      "Bash(gh:*)",
+      "Bash(ls:*)",
+      "Bash(mkdir:*)",
+      "Bash(cat:*)",
+      "Bash(awk:*)",
+      "Bash(grep:*)",
+      "Bash(find:*)",
+      "Bash(which:*)",
+      "Bash(echo:*)",
+      "Bash(xcrun simctl:*)",
+      "Bash(osascript:*)",
+      "Bash(/tmp/click:*)",
+      "Bash(/tmp/swipe:*)",
+      "Bash(swiftc:*)",
+      "Bash(sleep:*)",
+      "Bash(open:*)"
+    ]
+  },
+  "enabledPlugins": {
+    "swift-lsp@claude-plugins-official": true
+  },
+  "alwaysThinkingEnabled": true,
+  "autoUpdatesChannel": "stable",
+  "minimumVersion": "2.1.38",
+  "skipDangerousModePermissionPrompt": true
+}
