@@ -78,12 +78,13 @@ struct ContentView: View {
 
     // Deferred sort: items stay in place after badge tap, re-sort after 3s timeout
     @State private var pendingResortIDs: Set<UUID> = []
-    @State private var displaySnapshot: [LocalTask]?
     @State private var resortTimer: Task<Void, Never>?
+    /// Frozen priority scores — keeps tasks in place while badge value updates visually
+    @State private var frozenSortSnapshot: [String: Int]?
 
-    /// Tasks to display: uses snapshot during deferred sort, otherwise live data
+    /// Tasks to display (uses frozen scores during deferred sort to prevent jumping)
     private var displayedRegularTasks: [LocalTask] {
-        displaySnapshot ?? regularFilteredTasks
+        regularFilteredTasks
     }
 
     // MARK: - Search Filter
@@ -259,17 +260,19 @@ struct ContentView: View {
         case .priority:
             base = visibleTasks.filter { !$0.isNextUp }
                 .sorted {
-                    TaskPriorityScoringService.calculateScore(
+                    let score0 = frozenSortSnapshot?[$0.id] ?? TaskPriorityScoringService.calculateScore(
                         importance: $0.importance, urgency: $0.urgency, dueDate: $0.dueDate,
                         createdAt: $0.createdAt, rescheduleCount: $0.rescheduleCount,
                         estimatedDuration: $0.estimatedDuration, taskType: $0.taskType,
                         isNextUp: $0.isNextUp
-                    ) > TaskPriorityScoringService.calculateScore(
+                    )
+                    let score1 = frozenSortSnapshot?[$1.id] ?? TaskPriorityScoringService.calculateScore(
                         importance: $1.importance, urgency: $1.urgency, dueDate: $1.dueDate,
                         createdAt: $1.createdAt, rescheduleCount: $1.rescheduleCount,
                         estimatedDuration: $1.estimatedDuration, taskType: $1.taskType,
                         isNextUp: $1.isNextUp
                     )
+                    return score0 > score1
                 }
         case .recent:
             base = visibleTasks.filter { !$0.isNextUp }
@@ -993,21 +996,25 @@ struct ContentView: View {
                 }
             },
             onImportanceCycle: { newValue in
+                freezeSortOrder()
                 task.importance = newValue
                 try? modelContext.save()
                 scheduleDeferredResort(taskID: task.uuid)
             },
             onUrgencyToggle: { newValue in
+                freezeSortOrder()
                 task.urgency = newValue
                 try? modelContext.save()
                 scheduleDeferredResort(taskID: task.uuid)
             },
             onCategorySelect: { category in
+                freezeSortOrder()
                 task.taskType = category
                 try? modelContext.save()
                 scheduleDeferredResort(taskID: task.uuid)
             },
             onDurationSelect: { duration in
+                freezeSortOrder()
                 task.estimatedDuration = duration
                 try? modelContext.save()
                 scheduleDeferredResort(taskID: task.uuid)
@@ -1017,10 +1024,22 @@ struct ContentView: View {
     }
 
     // MARK: - Deferred Sort (item stays in place after badge tap, re-sorts after 3s)
+
+    /// Freeze current sort scores before a badge update.
+    /// If already frozen (multiple taps in quick succession), keep the original snapshot.
+    private func freezeSortOrder() {
+        guard frozenSortSnapshot == nil else { return }
+        frozenSortSnapshot = Dictionary(uniqueKeysWithValues: visibleTasks.filter { !$0.isNextUp }.map {
+            ($0.id, TaskPriorityScoringService.calculateScore(
+                importance: $0.importance, urgency: $0.urgency, dueDate: $0.dueDate,
+                createdAt: $0.createdAt, rescheduleCount: $0.rescheduleCount,
+                estimatedDuration: $0.estimatedDuration, taskType: $0.taskType,
+                isNextUp: $0.isNextUp
+            ))
+        })
+    }
+
     private func scheduleDeferredResort(taskID: UUID) {
-        if displaySnapshot == nil {
-            displaySnapshot = regularFilteredTasks
-        }
         pendingResortIDs.insert(taskID)
         resortTimer?.cancel()
         resortTimer = Task {
@@ -1031,8 +1050,8 @@ struct ContentView: View {
             }
             try? await Task.sleep(for: .milliseconds(200))
             guard !Task.isCancelled else { return }
-            withAnimation(.spring) {
-                displaySnapshot = nil
+            withAnimation(.smooth(duration: 0.4)) {
+                frozenSortSnapshot = nil
             }
         }
     }

@@ -6,6 +6,20 @@
 
 ---
 
+## ERLEDIGT: Bug — Tasks springen bei Wichtigkeit/Dringlichkeit/Dauer-Aenderung (iOS + macOS)
+
+- **Symptom:** Badge-Tap auf Wichtigkeit/Dringlichkeit → Task springt sofort an neue Position. 3 vorherige Fix-Versuche gescheitert.
+- **Root Cause:** `updateImportance()` ersetzt PlanItem sofort mit neuem `priorityScore`. Priority-View sortiert bei jedem Render nach Score → sofortiger Sprung. `pendingResortIDs` kontrollierte nur den orangenen Rand, nicht die Sortierung.
+- **Fix:** `frozenSortSnapshot` friert Priority-Scores aller Tasks ein BEVOR der PlanItem ersetzt wird. View sortiert nach frozen Scores → Task bleibt an Position. Nach 3s wird Snapshot mit Animation geloescht → Task gleitet sanft.
+- **Aenderungen:**
+  - `Sources/Views/BacklogView.swift`: frozenSortSnapshot State, freezeSortOrder(), effectivePriorityScore/Tier, sofortiger PlanItem-Replace fuer Duration
+  - `FocusBloxMac/ContentView.swift`: displaySnapshot durch frozenSortSnapshot ersetzt, freezeSortOrder() vor jeder Wert-Aenderung
+  - `FocusBloxUITests/TaskJumpingBugProofTest.swift`: 5 UI Tests (Importance/Urgency/Duration kein Sprung, Label sofort sichtbar, Reihenfolge stabil)
+- **Tests:** 5 UI Tests gruen
+- **Beide Plattformen:** iOS + macOS gefixt
+
+---
+
 ## ERLEDIGT: Bug — Watch-Tasks ohne Enrichment (? ? (?) ? im Backlog)
 
 - **Symptom:** Via Apple Watch erstellte Tasks zeigen auf iPhone `? ? (?) ?` und Score 0

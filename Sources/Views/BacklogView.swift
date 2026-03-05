@@ -73,6 +73,8 @@ struct BacklogView: View {
     // Deferred sort: items stay in place after badge tap, re-sort after 3s timeout
     @State private var pendingResortIDs: Set<String> = []
     @State private var resortTimer: Task<Void, Never>?
+    /// Frozen priority scores — keeps tasks in place while badge value updates visually
+    @State private var frozenSortSnapshot: [String: Int]?
 
     // MARK: - Search Filter
     private func matchesSearch(_ item: PlanItem) -> Bool {
@@ -472,6 +474,15 @@ struct BacklogView: View {
             try syncEngine.updateDuration(itemID: item.id, minutes: minutes)
             durationFeedback.toggle()
 
+            // Freeze sort order and update PlanItem so badge shows new value immediately
+            freezeSortOrder()
+            if let itemUUID = UUID(uuidString: item.id) {
+                let descriptor = FetchDescriptor<LocalTask>(predicate: #Predicate { $0.uuid == itemUUID })
+                if let task = try modelContext.fetch(descriptor).first,
+                   let index = planItems.firstIndex(where: { $0.id == item.id }) {
+                    planItems[index] = PlanItem(localTask: task)
+                }
+            }
             scheduleDeferredResort(for: item.id)
         } catch {
             errorMessage = "Dauer konnte nicht gespeichert werden."
@@ -517,7 +528,8 @@ struct BacklogView: View {
             task.importance = importance
             task.modifiedAt = Date()
             try modelContext.save()
-            // Update local PlanItem immediately so badge shows new value
+            // Freeze sort order BEFORE replacing PlanItem — badge updates but task stays in place
+            freezeSortOrder()
             if let index = planItems.firstIndex(where: { $0.id == item.id }) {
                 planItems[index] = PlanItem(localTask: task)
             }
@@ -535,7 +547,8 @@ struct BacklogView: View {
             task.urgency = urgency
             task.modifiedAt = Date()
             try modelContext.save()
-            // Update local PlanItem immediately so badge shows new value
+            // Freeze sort order BEFORE replacing PlanItem — badge updates but task stays in place
+            freezeSortOrder()
             if let index = planItems.firstIndex(where: { $0.id == item.id }) {
                 planItems[index] = PlanItem(localTask: task)
             }
@@ -557,6 +570,24 @@ struct BacklogView: View {
     }
 
     // MARK: - Deferred Sort (item stays in place after badge tap, re-sorts after 3s)
+
+    /// Returns frozen score if available, otherwise live score
+    private func effectivePriorityScore(for item: PlanItem) -> Int {
+        frozenSortSnapshot?[item.id] ?? item.priorityScore
+    }
+
+    /// Returns tier based on effective (possibly frozen) score
+    private func effectivePriorityTier(for item: PlanItem) -> TaskPriorityScoringService.PriorityTier {
+        TaskPriorityScoringService.PriorityTier.from(score: effectivePriorityScore(for: item))
+    }
+
+    /// Freeze current sort scores for all backlog tasks before a badge update.
+    /// If already frozen (multiple taps in quick succession), keep the original snapshot.
+    private func freezeSortOrder() {
+        guard frozenSortSnapshot == nil else { return }
+        frozenSortSnapshot = Dictionary(uniqueKeysWithValues: backlogTasks.map { ($0.id, $0.priorityScore) })
+    }
+
     private func scheduleDeferredResort(for itemID: String) {
         pendingResortIDs.insert(itemID)
         resortTimer?.cancel()
@@ -567,9 +598,12 @@ struct BacklogView: View {
             withAnimation(.easeOut(duration: 0.3)) {
                 pendingResortIDs.removeAll()
             }
-            // Phase 2: pause, then re-sort
+            // Phase 2: pause, then unfreeze sort order with animation
             try? await Task.sleep(for: .milliseconds(200))
             guard !Task.isCancelled else { return }
+            withAnimation(.smooth(duration: 0.4)) {
+                frozenSortSnapshot = nil
+            }
             await refreshLocalTasks()
         }
     }
@@ -868,8 +902,8 @@ struct BacklogView: View {
             // Priority tiers
             ForEach(TaskPriorityScoringService.PriorityTier.allCases, id: \.self) { tier in
                 let tierTasks = backlogTasks
-                    .filter { task in task.priorityTier == tier && !overdueTasks.contains(where: { $0.id == task.id }) }
-                    .sorted { $0.priorityScore > $1.priorityScore }
+                    .filter { task in effectivePriorityTier(for: task) == tier && !overdueTasks.contains(where: { $0.id == task.id }) }
+                    .sorted { effectivePriorityScore(for: $0) > effectivePriorityScore(for: $1) }
                 if !tierTasks.isEmpty {
                     Section {
                         ForEach(tierTasks) { item in
