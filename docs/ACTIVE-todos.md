@@ -256,6 +256,7 @@
 | Bug 68 | FocusBlock View-Umbau — Full-Screen Sheet mit 3 Sektionen | ERLEDIGT | M | ~40-60k | 4 | ~100 |
 | Bug 69 | FocusBlock Sync — Architektur-Analyse (EventKit→SwiftData?) | P2 | L-XL | ~80-120k | Analyse | TBD |
 | Bug 70 | Drag & Drop Blocks auf Timeline (iOS+macOS) → erweitert #13 | P2 | XL | ~100-150k | 3-4 | ~250 |
+| Bug 72 | macOS — FocusBlock Gear-Icon fehlt (Edit-Sheet nicht erreichbar) | P2 | XS | ~5k | 1 | ~10 |
 
 **Komplexitaet:** XS = halbe Stunde | S = 1 Session | M = 2-3 Sessions | L = halber Tag | XL = ganzer Tag+
 
@@ -396,6 +397,31 @@
 - **Tests:** 14 Unit Tests (TimelineCollisionTests) — 8 Collision Detection + 6 Layout Math, alle GREEN
 - **Naechster Schritt:** Bug 70c-1b (iOS Timeline Canvas Rebuild), dann Bug 70c-2 (Resize Drag)
 
+### Bug 70d: FocusBlock Drag-Indicator + Titel-Update bei Verschieben (ERLEDIGT)
+- **Status:** ERLEDIGT
+- **Plattform:** beide (iOS + macOS)
+- **Symptom:** (A) Kein visueller Indicator wohin ein Block beim Drag landet. (B) Block-Name ("FocusBlox HH:MM") aendert sich nicht bei Verschieben auf neue Uhrzeit.
+- **Root Cause:**
+  - (A) iOS hatte kein `DropPreviewIndicator` (macOS hatte eins)
+  - (B) `EventKitRepository.updateFocusBlockTime()` aktualisierte nur startDate/endDate, NICHT event.title
+- **Fix:**
+  - `FocusBlock.generateTitle(for:)` als Single Source of Truth fuer Block-Titel
+  - `EventKitRepository.updateFocusBlockTime()` setzt jetzt auch `event.title`
+  - iOS: `DropPreviewIndicator` + `TimelineDropDelegate` mit live Position
+  - macOS: Optimistic UI verwendet neuen Titel
+  - iOS: Notification-Text verwendet neuen Titel
+- **Dateien:** FocusBlock.swift, EventKitRepository.swift, MockEventKitRepository.swift, BlockPlanningView.swift, MacPlanningView.swift
+- **Tests:** 4 Unit Tests (FocusBlockTitleUpdateTests), 2 UI Tests (FocusBlockDropIndicatorUITests), alle GREEN
+
+### Bug 72: macOS — FocusBlock-Eigenschaften nicht editierbar (Gear-Icon fehlt)
+- **Status:** OFFEN
+- **Plattform:** macOS
+- **Symptom:** Auf macOS gibt es keine Moeglichkeit, die Eigenschaften eines FocusBlocks (Start/End-Zeit, Loeschen) anzupassen. Auf iOS oeffnet ein Gear-Icon das `EditFocusBlockSheet` — auf macOS fehlt dieses UI-Element komplett.
+- **Analyse:** Der Code ist vorbereitet — `FocusBlockView` (MacTimelineView.swift:400-491) hat einen `onTapEdit`-Callback, `MacPlanningView` verdrahtet das Sheet korrekt. Aber in der macOS `FocusBlockView` wird **kein Button gerendert** der den Callback ausloest. Der User hat keinen Weg zum Sheet.
+- **iOS-Referenz:** `TimelineFocusBlockRow` in BlockPlanningView.swift (Zeile 1103-1115) — Gear-Icon (`systemImage: "gearshape"`) mit `.ultraThinMaterial` Hintergrund
+- **Fix-Ansatz:** Gear-Icon Button in macOS `FocusBlockView` hinzufuegen (analog iOS), der `onTapEdit()` aufruft. Sheet-Verdrahtung existiert bereits.
+- **Aufwand:** XS (1 Button hinzufuegen, Sheet-Logik existiert)
+
 ### Bug 66: macOS FocusBlock nicht sichtbar in MenuBar + Sync-Deadlock (ERLEDIGT)
 - **Status:** ERLEDIGT
 - **Plattform:** macOS
@@ -491,6 +517,26 @@
 - **TD-01:** God-Views (BlockPlanningView 1400 LoC, BacklogView 1181 LoC) — Aufwand: L
 - **TD-02:** iOS/macOS View-Duplikation (~9000 LoC) — Aufwand: XL, strategische Entscheidung
 - **TD-03:** 4 Services ohne Unit Tests (NotificationService, TaskPriorityScoringService, FocusBlockActionService, GapFinder) — Aufwand: M
+
+### BACKLOG-010: Deferred Sort Logik dupliziert (iOS vs macOS)
+- **Problem:** Deferred-Sort-Freeze ist auf beiden Plattformen separat implementiert (BacklogView.swift + ContentView.swift). Gleiche Logik, unterschiedlicher Code. Hat direkt zum macOS-Bug gefuehrt (scoreFor() wurde uebersehen).
+- **Loesung:** Shared `DeferredSortController` in `Sources/` der Freeze/Unfreeze/EffectiveScore kapselt. Beide Plattformen nutzen denselben.
+- **Aufwand:** M
+
+### BACKLOG-011: macOS hat 3 parallele Sortier-Pfade
+- **Problem:** `filteredTasks`, `regularFilteredTasks` und `scoreFor()` berechnen Priority-Scores unabhaengig voneinander. Nur 2 von 3 nutzen frozen Scores. Fehleranfaellig bei kuenftigen Aenderungen.
+- **Loesung:** Eine einzige `scoreFor()`-Funktion als Single Source of Truth. `filteredTasks` und `regularFilteredTasks` nutzen `scoreFor()` statt eigener `calculateScore()`-Aufrufe.
+- **Aufwand:** S
+
+### BACKLOG-012: displayedRegularTasks ist toter Wrapper (macOS)
+- **Problem:** Nach Entfernung von `displaySnapshot` gibt `displayedRegularTasks` nur noch `regularFilteredTasks` zurueck — kein Mehrwert.
+- **Loesung:** Wrapper entfernen, Aufrufer direkt auf `regularFilteredTasks` umstellen.
+- **Aufwand:** XS
+
+### BACKLOG-013: calculateScore() wird mit 8 identischen Parametern an 6+ Stellen aufgerufen
+- **Problem:** `TaskPriorityScoringService.calculateScore(importance:urgency:dueDate:createdAt:rescheduleCount:estimatedDuration:taskType:isNextUp:)` — Copy-paste-anfaellig, schwer wartbar.
+- **Loesung:** Extension auf `LocalTask` (und/oder `PlanItem`): `task.priorityScore` als berechnete Property. Einmal definiert, ueberall genutzt.
+- **Aufwand:** S
 
 ---
 

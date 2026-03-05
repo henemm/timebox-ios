@@ -340,6 +340,7 @@ final class EventKitRepository: EventKitRepositoryProtocol, @unchecked Sendable 
         guard let event = eventStore.event(withIdentifier: eventID) else {
             return
         }
+        event.title = FocusBlock.generateTitle(for: startDate)
         event.startDate = startDate
         event.endDate = endDate
         try eventStore.save(event, span: .thisEvent)

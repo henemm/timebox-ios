@@ -65,6 +65,13 @@ extension FocusBlock {
         formatter.timeStyle = .short
         return "\(formatter.string(from: startDate)) - \(formatter.string(from: endDate))"
     }
+
+    /// Generate the default block title from a start time, e.g. "FocusBlox 09:00"
+    static func generateTitle(for startDate: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.timeStyle = .short
+        return "FocusBlox \(formatter.string(from: startDate))"
+    }
 }
 
 // MARK: - Date Normalization

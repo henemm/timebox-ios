@@ -229,6 +229,7 @@ final class MockEventKitRepository: EventKitRepositoryProtocol, @unchecked Senda
     var lastUpdatedFocusBlockID: String?
     var lastUpdatedFocusBlockStart: Date?
     var lastUpdatedFocusBlockEnd: Date?
+    var lastUpdatedFocusBlockTitle: String?
 
     func updateFocusBlockTime(eventID: String, startDate: Date, endDate: Date) throws {
         guard mockCalendarAuthStatus == .fullAccess else {
@@ -237,6 +238,7 @@ final class MockEventKitRepository: EventKitRepositoryProtocol, @unchecked Senda
         lastUpdatedFocusBlockID = eventID
         lastUpdatedFocusBlockStart = startDate
         lastUpdatedFocusBlockEnd = endDate
+        lastUpdatedFocusBlockTitle = FocusBlock.generateTitle(for: startDate)
     }
 
     // MARK: - Protocol Implementation - Calendars

@@ -16,6 +16,7 @@ struct BlockPlanningView: View {
     @State private var blockForTasks: FocusBlock?
     @State private var eventToCategories: CalendarEvent?
     @State private var assignmentFeedback = false
+    @State private var dropTargetTime: Date?
 
     private let hourHeight: CGFloat = 60
     private let startHour = 6
@@ -126,45 +127,181 @@ struct BlockPlanningView: View {
         }
     }
 
-    // MARK: - Timeline Content (Unified Planning View)
+    // MARK: - Timeline Content (Canvas-based, Bug 70c-1b)
+
+    private let timeColumnWidth: CGFloat = 45
+
+    private var totalHeight: CGFloat {
+        CGFloat(endHour - startHour) * hourHeight
+    }
 
     private var timelineContent: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 0) {
-                // Hour rows with events and blocks
-                ForEach(startHour..<endHour, id: \.self) { hour in
-                    TimelineHourRow(
-                        hour: hour,
-                        hourHeight: hourHeight,
-                        date: selectedDate,
-                        events: calendarEvents.filter { !$0.isAllDay && !$0.isFocusBlock },
-                        focusBlocks: focusBlocks,
-                        freeSlots: computedFreeSlots,
-                        onTapBlock: { block in
-                            blockForTasks = block
-                        },
-                        onTapEditBlock: { block in
-                            blockToEdit = block
-                        },
-                        onTapFreeSlot: { slot in
-                            selectedSlot = slot
-                        },
-                        onTapEvent: { event in
-                            eventToCategories = event
-                        },
-                        onMoveFocusBlock: { blockID, newStart in
-                            moveFocusBlock(blockID: blockID, to: newStart)
-                        }
-                    )
+            ZStack(alignment: .topLeading) {
+                // Hour grid background
+                hourGrid
+
+                // Canvas layout — positions all items by time with collision detection
+                TimelineLayout(hourHeight: hourHeight, startHour: startHour, endHour: endHour) {
+                    // Calendar events
+                    ForEach(positionedEvents) { positioned in
+                        TimelineEventRow(
+                            event: positioned.event,
+                            timeFormatter: sharedTimeFormatter,
+                            onTap: { eventToCategories = positioned.event }
+                        )
+                        .frame(maxHeight: .infinity)
+                        .timelinePosition(
+                            hour: Calendar.current.component(.hour, from: positioned.event.startDate),
+                            minute: Calendar.current.component(.minute, from: positioned.event.startDate),
+                            durationMinutes: positioned.event.durationMinutes,
+                            column: positioned.column,
+                            totalColumns: positioned.totalColumns
+                        )
+                    }
+
+                    // Focus blocks
+                    ForEach(positionedFocusBlocks) { positioned in
+                        TimelineFocusBlockRow(
+                            block: positioned.block,
+                            onTapBlock: { blockForTasks = positioned.block },
+                            onTapEdit: { blockToEdit = positioned.block }
+                        )
+                        .frame(maxHeight: .infinity)
+                        .timelinePosition(
+                            hour: Calendar.current.component(.hour, from: positioned.block.startDate),
+                            minute: Calendar.current.component(.minute, from: positioned.block.startDate),
+                            durationMinutes: positioned.block.durationMinutes,
+                            column: positioned.column,
+                            totalColumns: positioned.totalColumns
+                        )
+                    }
+
+                    // Free slots
+                    ForEach(computedFreeSlots) { slot in
+                        TimelineFreeSlotRow(
+                            slot: slot,
+                            timeFormatter: sharedTimeFormatter,
+                            onTap: { selectedSlot = slot }
+                        )
+                        .frame(minHeight: 50)
+                        .timelinePosition(
+                            hour: Calendar.current.component(.hour, from: slot.startDate),
+                            minute: Calendar.current.component(.minute, from: slot.startDate),
+                            durationMinutes: slot.durationMinutes,
+                            column: 0,
+                            totalColumns: 1
+                        )
+                    }
                 }
+                .padding(.leading, timeColumnWidth)
+
+                // Drop preview indicator (always in hierarchy for accessibility; visible only during drag)
+                DropPreviewIndicator(time: dropTargetTime ?? selectedDate)
+                    .offset(x: timeColumnWidth, y: {
+                        guard let dropTime = dropTargetTime else { return 0 }
+                        let dropHour = Calendar.current.component(.hour, from: dropTime)
+                        let dropMinute = Calendar.current.component(.minute, from: dropTime)
+                        return CGFloat(dropHour - startHour) * hourHeight + CGFloat(dropMinute) / 60.0 * hourHeight
+                    }())
+                    .opacity(dropTargetTime != nil ? 1 : 0)
+                    .accessibilityIdentifier("dropPreviewIndicator")
             }
-            .padding(.top, 8)
+            .frame(height: totalHeight)
+            .accessibilityElement(children: .contain)
+            .accessibilityIdentifier("canvasDropZone")
+            .onDrop(of: [.calendarEvent], delegate: TimelineDropDelegate(
+                hourHeight: hourHeight,
+                startHour: startHour,
+                selectedDate: selectedDate,
+                focusBlocks: focusBlocks,
+                dropTargetTime: $dropTargetTime,
+                onDrop: { blockID, snappedTime in
+                    moveFocusBlock(blockID: blockID, to: snappedTime)
+                }
+            ))
         }
         .accessibilityIdentifier("planningTimeline")
         .refreshable {
             await loadData()
         }
     }
+
+    // MARK: - Canvas Positioning (Collision Detection)
+
+    private var positionedItems: [PositionedItem] {
+        let regularEvents = calendarEvents.filter { event in
+            !event.isFocusBlock && !event.isAllDay && event.durationMinutes <= 480
+        }
+
+        var allItems: [TimelineItem] = []
+        allItems.append(contentsOf: regularEvents.map { TimelineItem(event: $0) })
+        allItems.append(contentsOf: focusBlocks.map { TimelineItem(block: $0) })
+
+        let groups = TimelineItem.groupOverlapping(allItems)
+
+        var result: [PositionedItem] = []
+        for group in groups {
+            for (index, item) in group.enumerated() {
+                result.append(PositionedItem(
+                    id: item.id, item: item,
+                    column: index, totalColumns: group.count
+                ))
+            }
+        }
+        return result
+    }
+
+    private var positionedEvents: [PositionedEvent] {
+        positionedItems.compactMap { positioned -> PositionedEvent? in
+            if case .event(let event) = positioned.item.type {
+                return PositionedEvent(
+                    id: positioned.id, event: event,
+                    column: positioned.column, totalColumns: positioned.totalColumns
+                )
+            }
+            return nil
+        }
+    }
+
+    private var positionedFocusBlocks: [PositionedFocusBlock] {
+        positionedItems.compactMap { positioned -> PositionedFocusBlock? in
+            if case .focusBlock(let block) = positioned.item.type {
+                return PositionedFocusBlock(
+                    id: positioned.id, block: block,
+                    column: positioned.column, totalColumns: positioned.totalColumns
+                )
+            }
+            return nil
+        }
+    }
+
+    // MARK: - Hour Grid
+
+    private var hourGrid: some View {
+        VStack(spacing: 0) {
+            ForEach(startHour..<endHour, id: \.self) { hour in
+                HStack(alignment: .top, spacing: 8) {
+                    Text(String(format: "%02d:00", hour))
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .frame(width: timeColumnWidth, alignment: .trailing)
+                        .accessibilityIdentifier("hourMarker_\(hour)")
+
+                    Rectangle()
+                        .fill(.secondary.opacity(0.2))
+                        .frame(height: 1)
+                }
+                .frame(height: hourHeight)
+            }
+        }
+    }
+
+    private let sharedTimeFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.timeStyle = .short
+        return f
+    }()
 
     // MARK: - Calendar Events Section
 
@@ -302,16 +439,17 @@ struct BlockPlanningView: View {
             do {
                 try eventKitRepo.updateFocusBlockTime(eventID: block.id, startDate: startDate, endDate: endDate)
 
-                // Reschedule notifications with new times
+                // Reschedule notifications with new title and times
+                let updatedTitle = FocusBlock.generateTitle(for: startDate)
                 NotificationService.cancelFocusBlockNotification(blockID: block.id)
                 NotificationService.scheduleFocusBlockStartNotification(
                     blockID: block.id,
-                    blockTitle: block.title,
+                    blockTitle: updatedTitle,
                     startDate: startDate
                 )
                 NotificationService.scheduleFocusBlockEndNotification(
                     blockID: block.id,
-                    blockTitle: block.title,
+                    blockTitle: updatedTitle,
                     endDate: endDate,
                     completedCount: block.completedTaskIDs.count,
                     totalCount: block.taskIDs.count
@@ -572,62 +710,6 @@ struct ExistingEventBlock: View {
 
     private func calculateHeight() -> CGFloat {
         let durationHours = CGFloat(event.durationMinutes) / 60.0
-        return durationHours * hourHeight
-    }
-}
-
-// MARK: - Focus Block View (highlighted)
-
-struct FocusBlockView: View {
-    let block: FocusBlock
-    let hourHeight: CGFloat
-    let startHour: Int
-
-    var body: some View {
-        let yOffset = calculateYOffset()
-        let height = calculateHeight()
-
-        RoundedRectangle(cornerRadius: 6)
-            .fill(.blue.opacity(0.3))
-            .overlay(
-                RoundedRectangle(cornerRadius: 6)
-                    .strokeBorder(.blue, lineWidth: 2)
-            )
-            .overlay(
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(block.title)
-                        .font(.caption.weight(.medium))
-                        .lineLimit(1)
-
-                    if !block.taskIDs.isEmpty {
-                        Text("\(block.taskIDs.count) Tasks")
-                            .font(.caption2)
-                            .foregroundStyle(.secondary)
-                    } else {
-                        Text("Keine Tasks")
-                            .font(.caption2)
-                            .foregroundStyle(.secondary)
-                    }
-                }
-                .padding(6),
-                alignment: .topLeading
-            )
-            .frame(height: max(height, 25))
-            .padding(.leading, 55)
-            .padding(.trailing, 8)
-            .offset(y: yOffset)
-    }
-
-    private func calculateYOffset() -> CGFloat {
-        let calendar = Calendar.current
-        let hour = calendar.component(.hour, from: block.startDate)
-        let minute = calendar.component(.minute, from: block.startDate)
-        let hoursFromStart = CGFloat(hour - startHour) + CGFloat(minute) / 60.0
-        return hoursFromStart * hourHeight
-    }
-
-    private func calculateHeight() -> CGFloat {
-        let durationHours = CGFloat(block.durationMinutes) / 60.0
         return durationHours * hourHeight
     }
 }
@@ -986,121 +1068,6 @@ struct CalendarEventRow: View {
     }
 }
 
-// MARK: - Timeline Hour Row (Unified Planning View)
-
-/// A single hour row in the unified timeline view
-/// Displays hour marker, focus blocks, free slots, and calendar events
-struct TimelineHourRow: View {
-    let hour: Int
-    let hourHeight: CGFloat
-    let date: Date
-    let events: [CalendarEvent]
-    let focusBlocks: [FocusBlock]
-    let freeSlots: [TimeSlot]
-    let onTapBlock: (FocusBlock) -> Void
-    let onTapEditBlock: (FocusBlock) -> Void
-    let onTapFreeSlot: (TimeSlot) -> Void
-    let onTapEvent: (CalendarEvent) -> Void
-    var onMoveFocusBlock: ((String, Date) -> Void)?
-
-    private let timeFormatter: DateFormatter = {
-        let f = DateFormatter()
-        f.dateFormat = "HH:mm"
-        return f
-    }()
-
-    var body: some View {
-        HStack(alignment: .top, spacing: 8) {
-            // Hour marker
-            Text(String(format: "%02d:00", hour))
-                .font(.caption)
-                .foregroundStyle(.secondary)
-                .frame(width: 45, alignment: .trailing)
-                .accessibilityIdentifier("hourMarker_\(hour)")
-
-            // Content area for this hour
-            VStack(alignment: .leading, spacing: 4) {
-                // Horizontal line
-                Rectangle()
-                    .fill(.secondary.opacity(0.2))
-                    .frame(height: 1)
-
-                // Focus blocks that start in this hour
-                ForEach(blocksInHour) { block in
-                    TimelineFocusBlockRow(
-                        block: block,
-                        onTapBlock: { onTapBlock(block) },
-                        onTapEdit: { onTapEditBlock(block) }
-                    )
-                }
-
-                // Free slots in this hour
-                ForEach(slotsInHour) { slot in
-                    TimelineFreeSlotRow(
-                        slot: slot,
-                        timeFormatter: timeFormatter,
-                        onTap: { onTapFreeSlot(slot) }
-                    )
-                }
-
-                // Calendar events in this hour
-                ForEach(eventsInHour) { event in
-                    TimelineEventRow(
-                        event: event,
-                        timeFormatter: timeFormatter,
-                        onTap: { onTapEvent(event) }
-                    )
-                }
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-        }
-        .frame(minHeight: hourHeight)
-        .padding(.trailing)
-        .accessibilityElement(children: .contain)
-        .accessibilityIdentifier("timelineDropZone_\(hour)")
-        .dropDestination(for: CalendarEventTransfer.self) { items, _ in
-            guard let transfer = items.first else { return false }
-            let dropTime = createDateForHour(hour: hour, minute: 0)
-            let snapped = FocusBlock.snapToQuarterHour(dropTime)
-            onMoveFocusBlock?(transfer.id, snapped)
-            return true
-        }
-    }
-
-    // MARK: - Filtered Items
-
-    private var blocksInHour: [FocusBlock] {
-        let hourStart = createDateForHour(hour: hour, minute: 0)
-        let hourEnd = createDateForHour(hour: hour + 1, minute: 0)
-        return focusBlocks.filter { block in
-            block.startDate >= hourStart && block.startDate < hourEnd
-        }
-    }
-
-    private var slotsInHour: [TimeSlot] {
-        let hourStart = createDateForHour(hour: hour, minute: 0)
-        let hourEnd = createDateForHour(hour: hour + 1, minute: 0)
-        return freeSlots.filter { slot in
-            slot.startDate >= hourStart && slot.startDate < hourEnd
-        }
-    }
-
-    private var eventsInHour: [CalendarEvent] {
-        let hourStart = createDateForHour(hour: hour, minute: 0)
-        let hourEnd = createDateForHour(hour: hour + 1, minute: 0)
-        return events.filter { event in
-            event.startDate >= hourStart && event.startDate < hourEnd
-        }
-    }
-
-    private func createDateForHour(hour: Int, minute: Int) -> Date {
-        var components = Calendar.current.dateComponents([.year, .month, .day], from: date)
-        components.hour = hour
-        components.minute = minute
-        return Calendar.current.date(from: components) ?? date
-    }
-}
-
 // MARK: - Timeline Focus Block Row
 
 /// A focus block displayed in the timeline
@@ -1174,6 +1141,36 @@ struct TimelineFocusBlockRow: View {
         .accessibilityIdentifier("focusBlock_\(block.id)")
         .if(block.isFuture) { view in
             view.draggable(CalendarEventTransfer(from: block))
+        }
+    }
+}
+
+// MARK: - Drop Preview Indicator
+
+/// Visual indicator showing where a dragged FocusBlock will land
+struct DropPreviewIndicator: View {
+    let time: Date
+
+    private var timeString: String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "HH:mm"
+        return formatter.string(from: time)
+    }
+
+    var body: some View {
+        HStack(spacing: 4) {
+            Text(timeString)
+                .font(.caption)
+                .fontWeight(.medium)
+                .padding(.horizontal, 6)
+                .padding(.vertical, 2)
+                .background(Color.blue)
+                .foregroundStyle(.white)
+                .clipShape(RoundedRectangle(cornerRadius: 4))
+
+            Rectangle()
+                .fill(Color.blue)
+                .frame(height: 2)
         }
     }
 }
@@ -1289,5 +1286,54 @@ struct TimelineEventRow: View {
         .onTapGesture {
             onTap()
         }
+    }
+}
+
+// MARK: - Timeline Drop Delegate
+
+/// DropDelegate that provides continuous position updates during drag
+struct TimelineDropDelegate: DropDelegate {
+    let hourHeight: CGFloat
+    let startHour: Int
+    let selectedDate: Date
+    let focusBlocks: [FocusBlock]
+    @Binding var dropTargetTime: Date?
+    var onDrop: (String, Date) -> Void
+
+    func dropUpdated(info: DropInfo) -> DropProposal? {
+        let dropTime = TimelineLocationCalculator.timeFromLocation(
+            y: info.location.y,
+            hourHeight: hourHeight,
+            startHour: startHour,
+            referenceDate: selectedDate
+        )
+        dropTargetTime = FocusBlock.snapToQuarterHour(dropTime)
+        return DropProposal(operation: .move)
+    }
+
+    func performDrop(info: DropInfo) -> Bool {
+        dropTargetTime = nil
+        let providers = info.itemProviders(for: [.calendarEvent])
+        guard let provider = providers.first else { return false }
+
+        provider.loadTransferable(type: CalendarEventTransfer.self) { result in
+            if case .success(let transfer) = result {
+                let dropTime = TimelineLocationCalculator.timeFromLocation(
+                    y: info.location.y,
+                    hourHeight: hourHeight,
+                    startHour: startHour,
+                    referenceDate: selectedDate
+                )
+                let snapped = FocusBlock.snapToQuarterHour(dropTime)
+                DispatchQueue.main.async {
+                    onDrop(transfer.id, snapped)
+                }
+            }
+        }
+        return true
+    }
+
+    func dropExited(info: DropInfo) {
+        dropTargetTime = nil
     }
 }

@@ -470,7 +470,7 @@ struct MacPlanningView: View {
         let event = calendarEvents[index]
         let updatedEvent = CalendarEvent(
             id: event.id,
-            title: event.title,
+            title: FocusBlock.generateTitle(for: start),
             startDate: start,
             endDate: end,
             isAllDay: event.isAllDay,
