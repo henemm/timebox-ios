@@ -6,6 +6,21 @@
 
 ---
 
+## ERLEDIGT: Bug — Ueberlappende Timeline-Events falsch dargestellt (iOS + macOS)
+
+- **Symptom:** Langes Event (z.B. 08:00-12:00) + mehrere kuerzere Events → jedes Event bekommt eigene Spalte (1/4 Breite statt 1/2). Events die sich nicht direkt ueberlappen werden unnoetig nebeneinander gezeigt.
+- **Root Cause:** Sequentielle Spalten-Zuordnung (`column = index`) statt Greedy Column Packing. Alle Events in einer Overlap-Gruppe bekamen jeweils eine eigene Spalte.
+- **Fix:** `TimelineItem.assignColumns()` — Greedy-Algorithmus der Events in die erste freie Spalte packt. Events die sich zeitlich nicht ueberlappen teilen sich eine Spalte.
+- **Aenderungen:**
+  - `Sources/Models/TimelineItem.swift`: Neue `assignColumns()` Methode (+38 LoC)
+  - `Sources/Views/BlockPlanningView.swift`: `positionedItems` nutzt `assignColumns()`
+  - `FocusBloxMac/MacTimelineView.swift`: Gleicher Fix
+  - `FocusBloxTests/TimelineCollisionTests.swift`: 6 neue Tests fuer Column-Assignment
+- **Tests:** 20/20 gruen (6 neue + 14 bestehende)
+- **Beide Plattformen:** iOS + macOS gefixt
+
+---
+
 ## ERLEDIGT: Bug — Tasks springen bei Wichtigkeit/Dringlichkeit/Dauer-Aenderung (iOS + macOS)
 
 - **Symptom:** Badge-Tap auf Wichtigkeit/Dringlichkeit → Task springt sofort an neue Position. 3 vorherige Fix-Versuche gescheitert.

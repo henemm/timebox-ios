@@ -184,15 +184,16 @@ struct MacTimelineView: View {
         // Run unified collision detection
         let groups = TimelineItem.groupOverlapping(allItems)
 
-        // Build positioned items with correct column assignments
+        // Build positioned items with greedy column packing
         var result: [PositionedItem] = []
         for group in groups {
-            for (index, item) in group.enumerated() {
+            let columns = TimelineItem.assignColumns(group)
+            for entry in columns {
                 result.append(PositionedItem(
-                    id: item.id,
-                    item: item,
-                    column: index,
-                    totalColumns: group.count
+                    id: entry.item.id,
+                    item: entry.item,
+                    column: entry.column,
+                    totalColumns: entry.totalColumns
                 ))
             }
         }

@@ -86,6 +86,44 @@ struct TimelineItem: Identifiable, Sendable {
 
         return groups
     }
+
+    // MARK: - Greedy Column Assignment
+
+    /// Assigns columns to items using greedy packing.
+    /// Items that don't directly overlap can share the same column,
+    /// even if they're in the same overlap group (chain-connected).
+    ///
+    /// Example: A long event (08:00-12:00) with three short ones (08:45, 10:00, 11:00)
+    /// → 2 columns (long in col 0, shorts share col 1) instead of 4.
+    static func assignColumns(_ items: [TimelineItem]) -> [(item: TimelineItem, column: Int, totalColumns: Int)] {
+        guard !items.isEmpty else { return [] }
+
+        let sorted = items.sorted { $0.startDate < $1.startDate }
+
+        // Track end time of last item placed in each column
+        var columnEndTimes: [Date] = []
+        var assignments: [(item: TimelineItem, column: Int)] = []
+
+        for item in sorted {
+            // Find first column where this item fits (no overlap)
+            var placed = false
+            for col in 0..<columnEndTimes.count {
+                if item.startDate >= columnEndTimes[col] {
+                    columnEndTimes[col] = item.endDate
+                    assignments.append((item: item, column: col))
+                    placed = true
+                    break
+                }
+            }
+            if !placed {
+                columnEndTimes.append(item.endDate)
+                assignments.append((item: item, column: columnEndTimes.count - 1))
+            }
+        }
+
+        let totalColumns = columnEndTimes.count
+        return assignments.map { ($0.item, $0.column, totalColumns) }
+    }
 }
 
 // MARK: - Positioned Items

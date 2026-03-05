@@ -111,6 +111,104 @@ final class TimelineCollisionTests: XCTestCase {
         XCTAssertEqual(result[0].count, 3)
     }
 
+    // MARK: - Greedy Column Assignment Tests
+
+    func test_assignColumns_singleItem_getsColumn0() {
+        let items = [makeItem(id: "a", startHour: 9, endHour: 10)]
+        let result = TimelineItem.assignColumns(items)
+        XCTAssertEqual(result.count, 1)
+        XCTAssertEqual(result[0].column, 0)
+        XCTAssertEqual(result[0].totalColumns, 1)
+    }
+
+    func test_assignColumns_twoOverlapping_getSeparateColumns() {
+        let items = [
+            makeItem(id: "a", startHour: 9, endHour: 11),
+            makeItem(id: "b", startHour: 10, endHour: 12)
+        ]
+        let result = TimelineItem.assignColumns(items)
+        XCTAssertEqual(result.count, 2)
+        XCTAssertEqual(result[0].column, 0)
+        XCTAssertEqual(result[1].column, 1)
+        XCTAssertEqual(result[0].totalColumns, 2)
+        XCTAssertEqual(result[1].totalColumns, 2)
+    }
+
+    func test_assignColumns_longEventWithShortOnes_sharesColumns() {
+        // Scenario from bug: Steffi Praxis (08:00-12:00) spans multiple shorter events
+        // Shorter events that DON'T overlap each other should share a column
+        let items = [
+            makeItem(id: "steffi", startHour: 8, endHour: 12),          // 08:00-12:00
+            makeItem(id: "focus", startHour: 8, startMinute: 45, endHour: 9, endMinute: 45), // 08:45-09:45
+            makeItem(id: "henning", startHour: 10, endHour: 10, endMinute: 20),   // 10:00-10:20
+            makeItem(id: "ivo", startHour: 11, endHour: 11, endMinute: 25)        // 11:00-11:25
+        ]
+        let result = TimelineItem.assignColumns(items)
+
+        // Steffi in column 0 (starts first)
+        let steffi = result.first { $0.item.id == "steffi" }!
+        XCTAssertEqual(steffi.column, 0)
+
+        // FocusBlox overlaps Steffi → column 1
+        let focus = result.first { $0.item.id == "focus" }!
+        XCTAssertEqual(focus.column, 1)
+
+        // Henning doesn't overlap FocusBlox (09:45 < 10:00) → reuse column 1
+        let henning = result.first { $0.item.id == "henning" }!
+        XCTAssertEqual(henning.column, 1)
+
+        // Ivo doesn't overlap Henning (10:20 < 11:00) → reuse column 1
+        let ivo = result.first { $0.item.id == "ivo" }!
+        XCTAssertEqual(ivo.column, 1)
+
+        // Only 2 columns needed, not 4
+        XCTAssertEqual(steffi.totalColumns, 2)
+        XCTAssertEqual(focus.totalColumns, 2)
+    }
+
+    func test_assignColumns_threeDirectlyOverlapping_threeColumns() {
+        // All three events overlap at the same time → 3 separate columns
+        let items = [
+            makeItem(id: "a", startHour: 9, endHour: 11),
+            makeItem(id: "b", startHour: 9, startMinute: 30, endHour: 10, endMinute: 30),
+            makeItem(id: "c", startHour: 10, endHour: 11, endMinute: 30)
+        ]
+        let result = TimelineItem.assignColumns(items)
+        // a overlaps b, a overlaps c, b overlaps c → all 3 need separate columns
+        XCTAssertEqual(result.first { $0.item.id == "a" }!.column, 0)
+        XCTAssertEqual(result.first { $0.item.id == "b" }!.column, 1)
+        XCTAssertEqual(result.first { $0.item.id == "c" }!.column, 2)
+        XCTAssertEqual(result[0].totalColumns, 3)
+    }
+
+    func test_assignColumns_nonOverlapping_allColumn0() {
+        let items = [
+            makeItem(id: "a", startHour: 9, endHour: 10),
+            makeItem(id: "b", startHour: 11, endHour: 12),
+            makeItem(id: "c", startHour: 13, endHour: 14)
+        ]
+        let result = TimelineItem.assignColumns(items)
+        // No overlaps → all in column 0
+        XCTAssertEqual(result[0].column, 0)
+        XCTAssertEqual(result[1].column, 0)
+        XCTAssertEqual(result[2].column, 0)
+        XCTAssertEqual(result[0].totalColumns, 1)
+    }
+
+    func test_assignColumns_sortsInputByStartDate() {
+        // Input in reverse order — should still work correctly
+        let items = [
+            makeItem(id: "b", startHour: 10, endHour: 11),
+            makeItem(id: "a", startHour: 9, endHour: 10, endMinute: 30)
+        ]
+        let result = TimelineItem.assignColumns(items)
+        let a = result.first { $0.item.id == "a" }!
+        let b = result.first { $0.item.id == "b" }!
+        XCTAssertEqual(a.column, 0)
+        XCTAssertEqual(b.column, 1)
+        XCTAssertEqual(a.totalColumns, 2)
+    }
+
     // MARK: - TimelineLayout Calculation Tests
 
     func test_calculateYPosition_atStartHour() {
