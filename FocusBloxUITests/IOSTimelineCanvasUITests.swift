@@ -189,6 +189,106 @@ final class IOSTimelineCanvasUITests: XCTestCase {
         )
     }
 
+    // MARK: - Overlap Layout Tests
+
+    /// Overlapping items must be side-by-side (reduced width), not stacked full-width.
+    /// mock-event-long (08:00-12:00) overlaps with mock-block-1 (09:00-11:00).
+    /// Both should have roughly half the timeline width.
+    /// Bricht wenn: Overlap-Detection oder Column-Assignment nicht funktioniert
+    func testOverlappingEventAndBlockAreSideBySide() throws {
+        guard let timeline = navigateToBloxTimeline() else {
+            XCTFail("Timeline should exist on Blox tab")
+            return
+        }
+
+        // Find the long calendar event
+        let longEvent = timeline.descendants(matching: .any)
+            .matching(NSPredicate(format: "identifier == 'timelineEvent_mock-event-long'"))
+            .firstMatch
+
+        // Find focus block 1 (overlaps with long event)
+        let block1 = timeline.descendants(matching: .any)
+            .matching(NSPredicate(format: "identifier == 'focusBlock_mock-block-1'"))
+            .firstMatch
+
+        if !longEvent.waitForExistence(timeout: 3) {
+            timeline.swipeUp()
+            sleep(1)
+        }
+        guard longEvent.waitForExistence(timeout: 5) else {
+            XCTFail("Long calendar event (08:00-12:00) should exist on timeline")
+            return
+        }
+        guard block1.waitForExistence(timeout: 5) else {
+            XCTFail("Focus block 1 (09:00-11:00) should exist on timeline")
+            return
+        }
+
+        let screenshot = XCTAttachment(screenshot: app.screenshot())
+        screenshot.name = "overlap-side-by-side"
+        screenshot.lifetime = .keepAlways
+        add(screenshot)
+
+        // Timeline content width (subtract time column ~45pt from full timeline width)
+        let timelineWidth = timeline.frame.width
+        let contentWidth = timelineWidth - 45
+
+        let eventWidth = longEvent.frame.width
+        let blockWidth = block1.frame.width
+
+        // Both should be LESS than full content width (side-by-side = roughly half each)
+        XCTAssertLessThan(
+            eventWidth, contentWidth * 0.7,
+            "Overlapping event width (\(eventWidth)) should be < 70% of content width (\(contentWidth)) — must be side-by-side, not full-width"
+        )
+        XCTAssertLessThan(
+            blockWidth, contentWidth * 0.7,
+            "Overlapping block width (\(blockWidth)) should be < 70% of content width (\(contentWidth)) — must be side-by-side, not full-width"
+        )
+
+        // They should be at different X positions (not stacked)
+        let eventX = longEvent.frame.minX
+        let blockX = block1.frame.minX
+        XCTAssertNotEqual(
+            eventX, blockX, accuracy: 5,
+            "Overlapping items should be at different X positions (side-by-side). Event.x=\(eventX), Block.x=\(blockX)"
+        )
+    }
+
+    /// Non-overlapping items should remain full-width (not squeezed into columns).
+    /// mock-block-2 (14:00-16:00) doesn't overlap with anything → full width.
+    func testNonOverlappingBlockIsFullWidth() throws {
+        guard let timeline = navigateToBloxTimeline() else {
+            XCTFail("Timeline should exist on Blox tab")
+            return
+        }
+
+        let block2 = timeline.descendants(matching: .any)
+            .matching(NSPredicate(format: "identifier == 'focusBlock_mock-block-2'"))
+            .firstMatch
+
+        if !block2.waitForExistence(timeout: 3) {
+            timeline.swipeUp()
+            sleep(1)
+            timeline.swipeUp()
+            sleep(1)
+        }
+        guard block2.waitForExistence(timeout: 5) else {
+            XCTFail("mock-block-2 should exist")
+            return
+        }
+
+        let timelineWidth = timeline.frame.width
+        let contentWidth = timelineWidth - 45
+        let blockWidth = block2.frame.width
+
+        // Non-overlapping block should be close to full content width
+        XCTAssertGreaterThan(
+            blockWidth, contentWidth * 0.8,
+            "Non-overlapping block width (\(blockWidth)) should be > 80% of content width (\(contentWidth)) — should be full-width"
+        )
+    }
+
     /// Existing blocks should remain tappable after canvas rebuild.
     /// Verifies that tap → FocusBlockTasksSheet still works.
     func testFocusBlockIsTappable() throws {

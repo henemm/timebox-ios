@@ -1287,6 +1287,7 @@ struct TimelineEventRow: View {
         .onTapGesture {
             onTap()
         }
+        .accessibilityIdentifier("timelineEvent_\(event.id)")
     }
 }
 

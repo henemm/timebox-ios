@@ -178,7 +178,21 @@ struct FocusBloxApp: App {
                 notes: "category:learning"
             )
 
-            mock.mockEvents = [meeting1, meeting2, workshop]
+            // Long event overlapping with Focus Block 1 (09:00-11:00)
+            // Reproduces bug: overlapping events should be side-by-side, not stacked
+            let longEventStart = calendar.date(byAdding: .hour, value: 8, to: startOfDay)!
+            let longEventEnd = calendar.date(byAdding: .hour, value: 12, to: startOfDay)!
+            let longEvent = CalendarEvent(
+                id: "mock-event-long",
+                title: "Ganztags-Workshop",
+                startDate: longEventStart,
+                endDate: longEventEnd,
+                isAllDay: false,
+                calendarColor: nil,
+                notes: nil
+            )
+
+            mock.mockEvents = [meeting1, meeting2, workshop, longEvent]
 
             // Add mock Reminders for testing Reminders Sync
             // List IDs for filtering

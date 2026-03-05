@@ -16,7 +16,9 @@
   - `Sources/Views/BlockPlanningView.swift`: `positionedItems` nutzt `assignColumns()`
   - `FocusBloxMac/MacTimelineView.swift`: Gleicher Fix
   - `FocusBloxTests/TimelineCollisionTests.swift`: 6 neue Tests fuer Column-Assignment
-- **Tests:** 20/20 gruen (6 neue + 14 bestehende)
+- **Tests:** 20 Unit Tests + 2 UI Tests gruen
+  - UI: `testOverlappingEventAndBlockAreSideBySide` (Breite < 70%, verschiedene X-Pos)
+  - UI: `testNonOverlappingBlockIsFullWidth` (Breite > 80%)
 - **Beide Plattformen:** iOS + macOS gefixt
 
 ---
