@@ -553,7 +553,7 @@
 ### Verbleibende Tech-Debts (dokumentiert in `docs/context/tech-debt-analysis.md`)
 - **TD-01:** God-Views (BlockPlanningView 1400 LoC, BacklogView 1181 LoC) — Aufwand: L
 - **TD-02:** iOS/macOS View-Duplikation (~9000 LoC) — Aufwand: XL, strategische Entscheidung
-- **TD-03:** 4 Services ohne Unit Tests (NotificationService, TaskPriorityScoringService, FocusBlockActionService, GapFinder) — Aufwand: M
+- **TD-03:** 3 Services ohne Unit Tests (NotificationService, FocusBlockActionService, GapFinder) — Aufwand: M *(TaskPriorityScoringService: 23 Tests, alle gruen)*
 
 ### ~~BACKLOG-010: Deferred Sort Logik dupliziert (iOS vs macOS)~~ ERLEDIGT
 - **Loesung:** Shared `DeferredSortController` in `Sources/Services/` extrahiert. Beide Plattformen nutzen `@Environment(DeferredSortController.self)`. Duplizierter Code entfernt. Bonus: fehlender `freeze()`-Call bei Kategorie-Aenderung (iOS) gefixt.
