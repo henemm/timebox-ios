@@ -93,71 +93,44 @@ struct MacBacklogRow: View {
 
     private var metadataRow: some View {
         HStack(spacing: 6) {
-            // 1. Importance Badge (tappable, cycles 1 → 2 → 3 → 1)
-            importanceBadge
+            // 1. Importance Badge
+            ImportanceBadge(importance: task.importance, taskId: task.id) { next in
+                onImportanceCycle?(next)
+            }
 
-            // 2. Urgency Badge (tappable)
-            urgencyBadge
+            // 2. Urgency Badge
+            UrgencyBadge(urgency: task.urgency, taskId: task.id) { next in
+                onUrgencyToggle?(next)
+            }
 
-            // 3. Category Badge (tappable)
+            // 3. Category Badge (macOS Menu Picker)
             categoryBadge
 
-            // 4. Recurrence Badge (only if recurring, iOS-aligned)
+            // 4. Recurrence Badge
             if task.recurrencePattern != "none" {
-                HStack(spacing: 3) {
-                    Image(systemName: "arrow.triangle.2.circlepath")
-                    Text(RecurrencePattern(rawValue: task.recurrencePattern)?.displayName ?? task.recurrencePattern)
-                        .lineLimit(1)
-                }
-                .font(.caption2)
-                .foregroundStyle(.purple)
-                .padding(.horizontal, 5)
-                .padding(.vertical, 3)
-                .background(
-                    RoundedRectangle(cornerRadius: 5)
-                        .fill(.purple.opacity(0.2))
-                )
-                .fixedSize()
-                .accessibilityIdentifier("recurrenceBadge_\(task.id)")
+                RecurrenceBadge(pattern: task.recurrencePattern, taskId: task.id)
             }
 
-            // 5. Tags (max 2, dann "+N") - chip style
+            // 5. Tags
             if !task.tags.isEmpty {
-                ForEach(Array(task.tags.prefix(2).enumerated()), id: \.offset) { index, tag in
-                    Text(tag)
-                        .font(.caption2)
-                        .lineLimit(1)
-                        .foregroundStyle(.secondary)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
-                        .background(
-                            Capsule()
-                                .fill(Color.secondary.opacity(0.15))
-                        )
-                        .fixedSize()
-                        .accessibilityIdentifier("tag_\(task.id)_\(index)")
-                }
-
-                if task.tags.count > 2 {
-                    Text("+\(task.tags.count - 2)")
-                        .font(.caption2)
-                        .foregroundStyle(.secondary)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
-                        .background(
-                            Capsule()
-                                .fill(Color.secondary.opacity(0.15))
-                        )
-                        .fixedSize()
-                        .accessibilityIdentifier("tagOverflow_\(task.id)")
-                }
+                TagsBadge(tags: task.tags, taskId: task.id)
             }
 
-            // 5. Duration Badge
+            // 6. Duration Badge (macOS Menu Picker)
             durationBadge
 
-            // 6. Priority Score Badge
-            priorityScoreBadge
+            // 7. Priority Score Badge
+            let score = TaskPriorityScoringService.calculateScore(
+                importance: task.importance, urgency: task.urgency, dueDate: task.dueDate,
+                createdAt: task.createdAt, rescheduleCount: task.rescheduleCount,
+                estimatedDuration: task.estimatedDuration, taskType: task.taskType,
+                isNextUp: task.isNextUp
+            )
+            PriorityScoreBadge(
+                score: score,
+                tier: TaskPriorityScoringService.PriorityTier.from(score: score),
+                taskId: task.id
+            )
 
             // 7. Due Date Badge
             if let dueDate = task.dueDate {
@@ -166,75 +139,7 @@ struct MacBacklogRow: View {
         }
     }
 
-    // MARK: - Importance Badge (iOS-aligned)
-
-    private var importanceBadge: some View {
-        Button {
-            let current = task.importance ?? 0
-            let next = current >= 3 ? 1 : current + 1
-            onImportanceCycle?(next)
-        } label: {
-            Image(systemName: importanceSFSymbol)
-                .font(.system(size: 12))
-                .foregroundStyle(importanceColor)
-                .padding(.horizontal, 5)
-                .padding(.vertical, 3)
-                .background(
-                    RoundedRectangle(cornerRadius: 5)
-                        .fill(importanceColor.opacity(0.2))
-                )
-        }
-        .buttonStyle(.plain)
-        .fixedSize()
-        .accessibilityIdentifier("importanceBadge_\(task.id)")
-    }
-
-    private var importanceSFSymbol: String {
-        ImportanceUI.icon(for: task.importance)
-    }
-
-    private var importanceColor: Color {
-        ImportanceUI.color(for: task.importance)
-    }
-
-    // MARK: - Urgency Badge (iOS-aligned)
-
-    private var urgencyBadge: some View {
-        Button {
-            // Cycle: nil → not_urgent → urgent → nil
-            let newUrgency: String?
-            switch task.urgency {
-            case nil: newUrgency = "not_urgent"
-            case "not_urgent": newUrgency = "urgent"
-            case "urgent": newUrgency = nil
-            default: newUrgency = nil
-            }
-            onUrgencyToggle?(newUrgency)
-        } label: {
-            Image(systemName: urgencyIcon)
-                .font(.system(size: 12))
-                .foregroundStyle(urgencyColor)
-                .padding(.horizontal, 5)
-                .padding(.vertical, 3)
-                .background(
-                    RoundedRectangle(cornerRadius: 5)
-                        .fill(urgencyColor.opacity(0.2))
-                )
-        }
-        .buttonStyle(.plain)
-        .fixedSize()
-        .accessibilityIdentifier("urgencyBadge_\(task.id)")
-    }
-
-    private var urgencyIcon: String {
-        UrgencyUI.icon(for: task.urgency)
-    }
-
-    private var urgencyColor: Color {
-        UrgencyUI.color(for: task.urgency)
-    }
-
-    // MARK: - Category Badge (macOS Menu Picker)
+    // MARK: - Category Badge (macOS Menu Picker — platform-specific)
 
     private var categoryBadge: some View {
         Menu {
@@ -283,39 +188,7 @@ struct MacBacklogRow: View {
         TaskCategory(rawValue: task.taskType)?.displayName ?? "Typ"
     }
 
-    // MARK: - Priority Score Badge
-
-    private var priorityScoreBadge: some View {
-        let score = TaskPriorityScoringService.calculateScore(
-            importance: task.importance, urgency: task.urgency, dueDate: task.dueDate,
-            createdAt: task.createdAt, rescheduleCount: task.rescheduleCount,
-            estimatedDuration: task.estimatedDuration, taskType: task.taskType,
-            isNextUp: task.isNextUp
-        )
-        let tier = TaskPriorityScoringService.PriorityTier.from(score: score)
-        let color: Color = switch tier {
-        case .doNow: .red
-        case .planSoon: .orange
-        case .eventually: .yellow
-        case .someday: .gray
-        }
-        return HStack(spacing: 2) {
-            Image(systemName: "chart.bar.fill")
-            Text("\(score)")
-        }
-        .font(.caption2)
-        .foregroundStyle(color)
-        .padding(.horizontal, 5)
-        .padding(.vertical, 3)
-        .background(
-            RoundedRectangle(cornerRadius: 5)
-                .fill(color.opacity(0.2))
-        )
-        .fixedSize()
-        .accessibilityIdentifier("priorityScoreBadge_\(task.id)")
-    }
-
-    // MARK: - Duration Badge (macOS Menu Picker)
+    // MARK: - Duration Badge (macOS Menu Picker — platform-specific)
 
     private var isDurationSet: Bool {
         task.estimatedDuration != nil

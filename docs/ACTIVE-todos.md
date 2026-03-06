@@ -198,6 +198,22 @@
 
 ---
 
+## ERLEDIGT: TD-02 Paket 1 — Shared Badge Components (iOS + macOS)
+
+- **Ziel:** 5 Badge-Views aus iOS BacklogRow + macOS MacBacklogRow in Shared-Code extrahieren (Code-Sharing statt Duplikation)
+- **Shared Badges:** ImportanceBadge, UrgencyBadge, RecurrenceBadge, TagsBadge, PriorityScoreBadge
+- **Nicht geteilt (by Design):** CategoryBadge + DurationBadge (iOS=Button, macOS=Menu — fundamentale UX-Differenz)
+- **Aenderungen:**
+  - `Sources/Views/Components/TaskBadges.swift`: NEU — 5 Shared Badge Views mit `#if os(iOS)/#else` Platform-Sizing (+199 LoC)
+  - `Sources/Views/BacklogRow.swift`: Inline-Badges durch Shared Components ersetzt (-100 LoC netto)
+  - `FocusBloxMac/MacBacklogRow.swift`: Inline-Badges durch Shared Components ersetzt (-80 LoC netto)
+  - `FocusBlox.xcodeproj/project.pbxproj`: Neue Dateien in iOS + macOS Targets registriert
+- **Tests:** 13 Unit Tests (TaskBadgesTests) + 4 UI Tests (SharedBadgesUITests), alle gruen
+- **Spec:** `docs/specs/features/td-02-shared-badges.md`
+- **Naechste Schritte:** TD-02 Paket 2 (Shared Row Layout) + Paket 3 (Weitere Views)
+
+---
+
 ## ERLEDIGT: CTC-3 — macOS Share Extension
 
 - **Was:** Share Extension fuer macOS (Safari, Mail, Notes etc.)

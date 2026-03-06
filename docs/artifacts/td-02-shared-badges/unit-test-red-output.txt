@@ -1,0 +1,50 @@
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/TaskBadgesTests.swift:93:52: error: cannot infer contextual base in reference to member 'someday'
+        let color = PriorityScoreBadge.color(for: .someday)
+                                                  ~^~~~~~~
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/TaskBadgesTests.swift:94:32: error: type 'Equatable' has no member 'gray'
+        XCTAssertEqual(color, .gray)
+                              ~^~~~
+
+SwiftEmitModule normal arm64 Emitting\ module\ for\ FocusBloxTests (in target 'FocusBloxTests' from project 'FocusBlox')
+EmitSwiftModule normal arm64 (in target 'FocusBloxTests' from project 'FocusBlox')
+    cd /Users/hem/Developer/my-daily-sprints
+    
+
+
+Test session results, code coverage, and logs:
+	/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Logs/Test/Test-FocusBlox-2026.03.06_10-48-28-+0100.xcresult
+
+Testing failed:
+	Cannot find 'ImportanceBadge' in scope
+	'nil' requires a contextual type
+	Cannot find 'ImportanceBadge' in scope
+	Cannot find 'ImportanceBadge' in scope
+	Cannot find 'ImportanceBadge' in scope
+	Cannot find 'ImportanceBadge' in scope
+	Cannot find 'UrgencyBadge' in scope
+	'nil' requires a contextual type
+	Cannot find 'UrgencyBadge' in scope
+	Cannot find 'UrgencyBadge' in scope
+	Cannot find 'UrgencyBadge' in scope
+	Cannot find 'PriorityScoreBadge' in scope
+	Cannot infer contextual base in reference to member 'doNow'
+	Type 'Equatable' has no member 'red'
+	Cannot find 'PriorityScoreBadge' in scope
+	Cannot infer contextual base in reference to member 'planSoon'
+	Type 'Equatable' has no member 'orange'
+	Cannot find 'PriorityScoreBadge' in scope
+	Cannot infer contextual base in reference to member 'eventually'
+	Type 'Equatable' has no member 'yellow'
+	Cannot find 'PriorityScoreBadge' in scope
+	Cannot infer contextual base in reference to member 'someday'
+	Type 'Equatable' has no member 'gray'
+	Testing cancelled because the build failed.
+
+** TEST FAILED **
+
+
+The following build commands failed:
+	SwiftCompile normal arm64 Compiling\ TaskBadgesTests.swift /Users/hem/Developer/my-daily-sprints/FocusBloxTests/TaskBadgesTests.swift (in target 'FocusBloxTests' from project 'FocusBlox')
+	SwiftCompile normal arm64 /Users/hem/Developer/my-daily-sprints/FocusBloxTests/TaskBadgesTests.swift (in target 'FocusBloxTests' from project 'FocusBlox')
+	Testing project FocusBlox with scheme FocusBlox
+(3 failures)

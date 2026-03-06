@@ -1,0 +1,30 @@
+	Cannot find 'ImportanceBadge' in scope
+	Cannot find 'ImportanceBadge' in scope
+	Cannot find 'ImportanceBadge' in scope
+	Cannot find 'UrgencyBadge' in scope
+	'nil' requires a contextual type
+	Cannot find 'UrgencyBadge' in scope
+	Cannot find 'UrgencyBadge' in scope
+	Cannot find 'UrgencyBadge' in scope
+	Cannot find 'PriorityScoreBadge' in scope
+	Cannot infer contextual base in reference to member 'doNow'
+	Type 'Equatable' has no member 'red'
+	Cannot find 'PriorityScoreBadge' in scope
+	Cannot infer contextual base in reference to member 'planSoon'
+	Type 'Equatable' has no member 'orange'
+	Cannot find 'PriorityScoreBadge' in scope
+	Cannot infer contextual base in reference to member 'eventually'
+	Type 'Equatable' has no member 'yellow'
+	Cannot find 'PriorityScoreBadge' in scope
+	Cannot infer contextual base in reference to member 'someday'
+	Type 'Equatable' has no member 'gray'
+	Testing cancelled because the build failed.
+
+** TEST FAILED **
+
+
+The following build commands failed:
+	SwiftCompile normal arm64 Compiling\ TaskBadgesTests.swift /Users/hem/Developer/my-daily-sprints/FocusBloxTests/TaskBadgesTests.swift (in target 'FocusBloxTests' from project 'FocusBlox')
+	SwiftCompile normal arm64 /Users/hem/Developer/my-daily-sprints/FocusBloxTests/TaskBadgesTests.swift (in target 'FocusBloxTests' from project 'FocusBlox')
+	Testing project FocusBlox with scheme FocusBlox
+(3 failures)
