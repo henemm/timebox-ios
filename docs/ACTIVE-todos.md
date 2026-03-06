@@ -223,7 +223,17 @@
   - `FocusBlox.xcodeproj/project.pbxproj`: SharedSheets.swift in iOS + macOS Targets registriert
 - **Tests:** Build erfolgreich (iOS + macOS), Full Unit Suite gruen, keine Regressionen
 - **Spec:** `docs/specs/features/td-02-shared-sheets.md`
-- **Naechste Schritte:** TD-02 Paket 3 (FocusBlockCard Header — kleiner Hebel, optional)
+---
+
+## ERLEDIGT: TD-02 Paket 3 — Shared FocusBlockCardHeader (iOS + macOS)
+
+- **Ziel:** Header der FocusBlockCard (Titel, Zeitraum, Dauer-Anzeige) in Shared View extrahieren
+- **Aenderungen:**
+  - `Sources/Views/Components/SharedSheets.swift`: FocusBlockCardHeader hinzugefuegt (+30 LoC)
+  - `Sources/Views/TaskAssignmentView.swift`: Inline-Header durch Shared Component ersetzt (-15 LoC)
+  - `FocusBloxMac/MacAssignView.swift`: Inline-Header durch Shared Component ersetzt (-12 LoC)
+- **Tests:** Build erfolgreich (iOS + macOS), Full Unit Suite gruen
+- **Spec:** `docs/specs/features/td-02-shared-header.md`
 
 ---
 

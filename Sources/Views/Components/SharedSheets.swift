@@ -1,5 +1,56 @@
 import SwiftUI
 
+// MARK: - FocusBlock Card Header (shared iOS + macOS)
+
+/// Shared header for FocusBlockCard: title, time range, duration info
+/// Parameter-based to avoid PlanItem/LocalTask type dependency
+struct FocusBlockCardHeader: View {
+    let title: String
+    let timeRangeText: String
+    let totalDuration: Int
+    let blockDuration: Int
+    var onEdit: (() -> Void)? = nil
+
+    private var remainingMinutes: Int {
+        blockDuration - totalDuration
+    }
+
+    var body: some View {
+        HStack {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.headline)
+                Text(timeRangeText)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
+            Spacer()
+
+            VStack(alignment: .trailing, spacing: 2) {
+                Text("\(totalDuration) / \(blockDuration) min")
+                    .font(.caption.monospacedDigit())
+                if remainingMinutes > 0 {
+                    Text("\(remainingMinutes) min frei")
+                        .font(.caption2)
+                        .foregroundStyle(.green)
+                } else if remainingMinutes < 0 {
+                    Text("\(-remainingMinutes) min über")
+                        .font(.caption2)
+                        .foregroundStyle(.red)
+                }
+            }
+
+            if let onEdit {
+                Image(systemName: "pencil.circle")
+                    .font(.title2)
+                    .foregroundStyle(.blue)
+                    .onTapGesture { onEdit() }
+            }
+        }
+    }
+}
+
 // MARK: - Create Focus Block Sheet (shared iOS + macOS)
 
 struct CreateFocusBlockSheet: View {

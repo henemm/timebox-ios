@@ -304,32 +304,12 @@ struct MacFocusBlockCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             // Header
-            HStack {
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(block.title)
-                        .font(.headline)
-                    Text(timeRangeText)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-
-                Spacer()
-
-                // Duration info
-                VStack(alignment: .trailing, spacing: 2) {
-                    Text("\(totalDuration) / \(block.durationMinutes) min")
-                        .font(.caption.monospacedDigit())
-                    if remainingMinutes > 0 {
-                        Text("\(remainingMinutes) min frei")
-                            .font(.caption2)
-                            .foregroundStyle(.green)
-                    } else if remainingMinutes < 0 {
-                        Text("\(-remainingMinutes) min über")
-                            .font(.caption2)
-                            .foregroundStyle(.red)
-                    }
-                }
-            }
+            FocusBlockCardHeader(
+                title: block.title,
+                timeRangeText: timeRangeText,
+                totalDuration: totalDuration,
+                blockDuration: block.durationMinutes
+            )
 
             Divider()
 
