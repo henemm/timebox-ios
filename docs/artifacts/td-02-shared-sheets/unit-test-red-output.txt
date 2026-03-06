@@ -1,0 +1,4 @@
+No unit tests needed - pure View refactoring without business logic changes.
+CreateFocusBlockSheet and EventCategorySheet are being unified (identical callbacks, identical logic).
+No new functions, no new business logic, no new state management.
+Validation: Build succeeds on iOS + macOS, existing tests pass.

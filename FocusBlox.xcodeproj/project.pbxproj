@@ -166,6 +166,7 @@
 		DFSRT01BUILD00001 /* DeferredSortControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFSRT01FILEREF001 /* DeferredSortControllerTests.swift */; };
 		TSKBDG01BUILD0001 /* TaskBadgesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = TSKBDG01FILE00001 /* TaskBadgesTests.swift */; };
 		SHRBDG01BUILD0001 /* SharedBadgesUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = SHRBDG01FILE00001 /* SharedBadgesUITests.swift */; };
+		SHRSHT01BUILD0001 /* SharedSheetsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = SHRSHT01FILE00001 /* SharedSheetsUITests.swift */; };
 		DFSRT02BUILD00001 /* DeferredSortController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFSRT02FILEREF001 /* DeferredSortController.swift */; };
 		DFSRT03BUILD00001 /* DeferredSortController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFSRT02FILEREF001 /* DeferredSortController.swift */; };
 		DSGNSYS01BUILD0001 /* DesignSystemTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DSGNSYS01FILE00001 /* DesignSystemTests.swift */; };
@@ -280,6 +281,8 @@
 		SETCMP01BUILD00001 /* SettingsComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = SETCMP01FILE000001 /* SettingsComponents.swift */; };
 		TSKBDG02BUILD0001 /* TaskBadges.swift in Sources */ = {isa = PBXBuildFile; fileRef = TSKBDG02FILE00001 /* TaskBadges.swift */; };
 		TSKBDG03BUILD0001 /* TaskBadges.swift in Sources */ = {isa = PBXBuildFile; fileRef = TSKBDG02FILE00001 /* TaskBadges.swift */; };
+		SHRSHT02BUILD0001 /* SharedSheets.swift in Sources */ = {isa = PBXBuildFile; fileRef = SHRSHT02FILE00001 /* SharedSheets.swift */; };
+		SHRSHT03BUILD0001 /* SharedSheets.swift in Sources */ = {isa = PBXBuildFile; fileRef = SHRSHT02FILE00001 /* SharedSheets.swift */; };
 		SETCMP02BUILD00001 /* SettingsComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = SETCMP01FILE000001 /* SettingsComponents.swift */; };
 		SETCMP03BUILD00001 /* SettingsComponentsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = SETCMP03FILE000001 /* SettingsComponentsTests.swift */; };
 		SGAP001F48BE79B9EB7C818 /* SmartGapsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = SGAP002545C0FA15517B9CE4 /* SmartGapsUITests.swift */; };
@@ -667,6 +670,7 @@
 		DFSRT01FILEREF001 /* DeferredSortControllerTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DeferredSortControllerTests.swift; sourceTree = "<group>"; };
 		TSKBDG01FILE00001 /* TaskBadgesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskBadgesTests.swift; sourceTree = "<group>"; };
 		SHRBDG01FILE00001 /* SharedBadgesUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedBadgesUITests.swift; sourceTree = "<group>"; };
+		SHRSHT01FILE00001 /* SharedSheetsUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedSheetsUITests.swift; sourceTree = "<group>"; };
 		DFSRT02FILEREF001 /* DeferredSortController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeferredSortController.swift; sourceTree = "<group>"; };
 		DSGNSYS01FILE00001 /* DesignSystemTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignSystemTests.swift; sourceTree = "<group>"; };
 		DSGNSYS02FILE00001 /* DesignSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignSystem.swift; sourceTree = "<group>"; };
@@ -751,6 +755,7 @@
 		SCROLL001FILEREF00001 /* ScrollingUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollingUITests.swift; sourceTree = "<group>"; };
 		SETCMP01FILE000001 /* SettingsComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsComponents.swift; sourceTree = "<group>"; };
 		TSKBDG02FILE00001 /* TaskBadges.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskBadges.swift; sourceTree = "<group>"; };
+		SHRSHT02FILE00001 /* SharedSheets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedSheets.swift; sourceTree = "<group>"; };
 		SETCMP03FILE000001 /* SettingsComponentsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsComponentsTests.swift; sourceTree = "<group>"; };
 		SGAP002545C0FA15517B9CE4 /* SmartGapsUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartGapsUITests.swift; sourceTree = "<group>"; };
 		SKIPLOOP01FILE0001 /* SkipTaskLoopUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkipTaskLoopUITests.swift; sourceTree = "<group>"; };
@@ -1024,6 +1029,7 @@
 				JUMPBUG01FILE00001 /* TaskJumpingBugProofTest.swift */,
 				3C256CDC6B3B5BA25279A4AA /* IOSTimelineCanvasUITests.swift */,
 				SHRBDG01FILE00001 /* SharedBadgesUITests.swift */,
+				SHRSHT01FILE00001 /* SharedSheetsUITests.swift */,
 			);
 			path = FocusBloxUITests;
 			sourceTree = "<group>";
@@ -1371,6 +1377,7 @@
 			children = (
 				SETCMP01FILE000001 /* SettingsComponents.swift */,
 				TSKBDG02FILE00001 /* TaskBadges.swift */,
+				SHRSHT02FILE00001 /* SharedSheets.swift */,
 				WKDYBTN01FILE0001 /* WeekdayButton.swift */,
 			);
 			path = Components;
@@ -1985,6 +1992,7 @@
 				RVWCMP01BUILD00001 /* ReviewComponents.swift in Sources */,
 				SETCMP01BUILD00001 /* SettingsComponents.swift in Sources */,
 				TSKBDG02BUILD0001 /* TaskBadges.swift in Sources */,
+				SHRSHT02BUILD0001 /* SharedSheets.swift in Sources */,
 				FBACTSVC01BUILD00001 /* FocusBlockActionService.swift in Sources */,
 				LIVACT03BUILDFILE0001 /* LiveActivityManager.swift in Sources */,
 				53697A70444E5ECF3B760A1C /* SyncEngine.swift in Sources */,
@@ -2113,6 +2121,7 @@
 				2EFD29958D8ED6D538FDAFE7 /* FocusBlockDragDropUITests.swift in Sources */,
 				81BCAC999D5EB4584FF50D12 /* IOSTimelineCanvasUITests.swift in Sources */,
 				SHRBDG01BUILD0001 /* SharedBadgesUITests.swift in Sources */,
+				SHRSHT01BUILD0001 /* SharedSheetsUITests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2287,6 +2296,7 @@
 				RVWCMP01BUILD00002 /* ReviewComponents.swift in Sources */,
 				SETCMP02BUILD00001 /* SettingsComponents.swift in Sources */,
 				TSKBDG03BUILD0001 /* TaskBadges.swift in Sources */,
+				SHRSHT03BUILD0001 /* SharedSheets.swift in Sources */,
 				MAC001BUILD00000015 /* FocusBlockActionService.swift in Sources */,
 				RECRSVC02BUILD002 /* RecurrenceService.swift in Sources */,
 				RECRPAT02BUILD002 /* RecurrencePattern.swift in Sources */,

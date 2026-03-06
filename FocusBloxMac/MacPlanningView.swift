@@ -104,7 +104,7 @@ struct MacPlanningView: View {
             )
         }
         .sheet(item: $selectedSlot) { slot in
-            MacCreateFocusBlockSheet(
+            CreateFocusBlockSheet(
                 slot: slot,
                 onCreate: { start, end in
                     Task { await createFocusBlockFromSlot(start: start, end: end) }
@@ -112,7 +112,7 @@ struct MacPlanningView: View {
             )
         }
         .sheet(item: $eventToCategories) { event in
-            MacEventCategorySheet(event: event) { category in
+            EventCategorySheet(event: event) { category in
                 updateEventCategory(event: event, category: category)
             }
         }
@@ -513,148 +513,6 @@ struct MacPlanningView: View {
         } catch {
             errorMessage = "Fehler beim Erstellen: \(error.localizedDescription)"
         }
-    }
-}
-
-// MARK: - Event Category Sheet (macOS)
-
-/// Sheet for selecting a category for a calendar event on macOS
-struct MacEventCategorySheet: View {
-    let event: CalendarEvent
-    let onSelect: (String?) -> Void
-    @Environment(\.dismiss) private var dismiss
-
-    var body: some View {
-        VStack(spacing: 16) {
-            Text("Kategorie wählen")
-                .font(.headline)
-
-            Text(event.title)
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-                .lineLimit(1)
-
-            VStack(spacing: 8) {
-                ForEach(TaskCategory.allCases, id: \.self) { category in
-                    Button {
-                        onSelect(category.rawValue)
-                        dismiss()
-                    } label: {
-                        HStack {
-                            Image(systemName: category.icon)
-                                .foregroundStyle(category.color)
-                                .frame(width: 24)
-
-                            Text(category.displayName)
-                                .foregroundStyle(.primary)
-
-                            Spacer()
-
-                            if event.category == category.rawValue {
-                                Image(systemName: "checkmark")
-                                    .foregroundStyle(.blue)
-                            }
-                        }
-                        .padding(.vertical, 6)
-                        .padding(.horizontal, 12)
-                        .background(
-                            RoundedRectangle(cornerRadius: 6)
-                                .fill(event.category == category.rawValue
-                                      ? category.color.opacity(0.1)
-                                      : Color.clear)
-                        )
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityIdentifier("categoryOption_\(category.rawValue)")
-                }
-            }
-
-            if event.category != nil {
-                Divider()
-                Button(role: .destructive) {
-                    onSelect(nil)
-                    dismiss()
-                } label: {
-                    HStack {
-                        Image(systemName: "xmark.circle")
-                        Text("Kategorie entfernen")
-                    }
-                    .foregroundStyle(.red)
-                }
-                .buttonStyle(.plain)
-            }
-
-            HStack {
-                Spacer()
-                Button("Abbrechen") { dismiss() }
-                    .keyboardShortcut(.cancelAction)
-            }
-        }
-        .padding()
-        .frame(width: 300)
-    }
-}
-
-// MARK: - Create Focus Block Sheet (macOS)
-
-struct MacCreateFocusBlockSheet: View {
-    let slot: TimeSlot
-    let onCreate: (Date, Date) -> Void
-    @Environment(\.dismiss) private var dismiss
-
-    @State private var startTime: Date
-    @State private var endTime: Date
-
-    init(slot: TimeSlot, onCreate: @escaping (Date, Date) -> Void) {
-        self.slot = slot
-        self.onCreate = onCreate
-        _startTime = State(initialValue: FocusBlock.snapToQuarterHour(slot.startDate))
-        _endTime = State(initialValue: FocusBlock.snapToQuarterHour(slot.endDate))
-    }
-
-    var body: some View {
-        VStack(spacing: 20) {
-            Text("FocusBlox erstellen")
-                .font(.headline)
-
-            Form {
-                DatePicker("Start", selection: $startTime, displayedComponents: .hourAndMinute)
-                DatePicker("Ende", selection: $endTime, displayedComponents: .hourAndMinute)
-                    .onChange(of: endTime) {
-                        endTime = FocusBlock.normalizeEndTime(startTime: startTime, endTime: endTime)
-                    }
-                Text("Dauer: \(durationText)")
-                    .foregroundStyle(.secondary)
-            }
-            .formStyle(.grouped)
-            .onChange(of: startTime) { oldStart, newStart in
-                let duration = endTime.timeIntervalSince(oldStart)
-                endTime = newStart.addingTimeInterval(duration)
-            }
-
-            HStack {
-                Button("Abbrechen") { dismiss() }
-                    .keyboardShortcut(.cancelAction)
-                Spacer()
-                Button("Erstellen") {
-                    onCreate(FocusBlock.snapToQuarterHour(startTime),
-                             FocusBlock.snapToQuarterHour(endTime))
-                    dismiss()
-                }
-                .keyboardShortcut(.defaultAction)
-                .disabled(endTime <= startTime)
-            }
-        }
-        .padding()
-        .frame(width: 350, height: 280)
-    }
-
-    private var durationText: String {
-        let minutes = Int(endTime.timeIntervalSince(startTime) / 60)
-        if minutes < 60 { return "\(minutes) Min" }
-        let hours = minutes / 60
-        let rem = minutes % 60
-        return rem == 0 ? "\(hours) Std" : "\(hours) Std \(rem) Min"
     }
 }
 

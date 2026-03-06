@@ -210,7 +210,20 @@
   - `FocusBlox.xcodeproj/project.pbxproj`: Neue Dateien in iOS + macOS Targets registriert
 - **Tests:** 13 Unit Tests (TaskBadgesTests) + 4 UI Tests (SharedBadgesUITests), alle gruen
 - **Spec:** `docs/specs/features/td-02-shared-badges.md`
-- **Naechste Schritte:** TD-02 Paket 2 (Shared Row Layout) + Paket 3 (Weitere Views)
+
+---
+
+## ERLEDIGT: TD-02 Paket 2 — Shared Sheet Components (iOS + macOS)
+
+- **Ziel:** CreateFocusBlockSheet + EventCategorySheet aus Duplikat-Code in Shared-Code mit Platform-Branching
+- **Aenderungen:**
+  - `Sources/Views/Components/SharedSheets.swift`: NEU — 2 Shared Sheet Views mit `#if os(iOS)/#else` (+196 LoC)
+  - `Sources/Views/BlockPlanningView.swift`: Sheets entfernt (jetzt in SharedSheets.swift) (-165 LoC)
+  - `FocusBloxMac/MacPlanningView.swift`: MacCreateFocusBlockSheet + MacEventCategorySheet entfernt, Call-Sites nutzen Shared Sheets (-138 LoC)
+  - `FocusBlox.xcodeproj/project.pbxproj`: SharedSheets.swift in iOS + macOS Targets registriert
+- **Tests:** Build erfolgreich (iOS + macOS), Full Unit Suite gruen, keine Regressionen
+- **Spec:** `docs/specs/features/td-02-shared-sheets.md`
+- **Naechste Schritte:** TD-02 Paket 3 (FocusBlockCard Header — kleiner Hebel, optional)
 
 ---
 

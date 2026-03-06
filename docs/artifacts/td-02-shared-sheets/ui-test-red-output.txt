@@ -1,0 +1,7 @@
+skipped
+Test case 'SharedSheetsUITests.testCreateFocusBlockSheetHasCreateButton()' skipped (no free slots in mock data)
+Test case 'SharedSheetsUITests.testCreateFocusBlockSheetHasDatePickers()' skipped (no free slots in mock data)
+Test case 'SharedSheetsUITests.testEventCategorySheetShowsAllCategories()' skipped (no calendar events in mock data)
+
+Pure refactoring - MacCreateFocusBlockSheet and MacEventCategorySheet still exist as separate structs.
+After implementation they will be removed, both platforms use shared CreateFocusBlockSheet/EventCategorySheet.
