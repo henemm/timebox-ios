@@ -416,13 +416,26 @@ struct FocusBlockView: View {
     var body: some View {
         // Same structure as EventBlockView that works
         VStack(alignment: .leading, spacing: 2) {
-            // Header row with icon
+            // Header row with icon + edit button
             HStack(spacing: 4) {
                 Image(systemName: "target")
                     .font(.system(size: 10, weight: .bold))
                 Text(block.title)
                     .font(.system(size: 11, weight: .bold))
                     .lineLimit(1)
+                Spacer(minLength: 0)
+                Button {
+                    onTapEdit?()
+                } label: {
+                    Image(systemName: "gearshape")
+                        .font(.system(size: 10))
+                        .foregroundStyle(.white.opacity(isHovered ? 1 : 0.6))
+                        .padding(3)
+                        .background(Circle().fill(.white.opacity(isHovered ? 0.25 : 0.1)))
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Block bearbeiten")
+                .accessibilityIdentifier("focusBlockEditButton_\(block.id)")
             }
             .foregroundStyle(.white)
 

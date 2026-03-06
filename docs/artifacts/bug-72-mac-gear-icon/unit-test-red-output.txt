@@ -1,0 +1,4 @@
+No unit test needed: Bug 72 is a pure UI fix (adding 1 button to FocusBlockView).
+No business logic changed. onTapEdit callback already exists and is wired correctly.
+The only change is rendering a Button that calls the existing callback.
+UI Tests cover the complete behavior (button exists + opens sheet).

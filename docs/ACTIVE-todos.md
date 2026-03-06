@@ -307,22 +307,26 @@
 | 26 | ~~CTC-5: Watch-Diktat Titel-Verbesserung~~ | ERLEDIGT | S | ~15-20k | 2 | ~6 |
 | 27 | ~~CTC-1b: TaskTitleEngine — Konservativ + Metadaten-Extraktion~~ | ERLEDIGT | S | ~20-30k | 2 | ~60 |
 | 28 | ~~CTC-6: Smart Task Interpretation + Similar-Task Learning~~ | ERLEDIGT | S | ~20k | 4 | ~70 |
-| 29 | Badge-Zahl (Overdue) + Interaktive Frist-Notifications | ERLEDIGT | M | ~50-70k | 3-4 | ~150-200 |
+| ~~29~~ | ~~Badge-Zahl (Overdue) + Interaktive Frist-Notifications~~ | ERLEDIGT | M | ~50-70k | 3-4 | ~150-200 |
+| ~~Bug 63~~ | ~~Kategorie-Zuweisung bei wiederkehrenden Events~~ | ERLEDIGT | M | ~40k | 6 | ~100 |
+| ~~Bug 64~~ | ~~Kategorie-Icon auf Kalender-Events zu klein~~ | ERLEDIGT | XS | ~5k | 1 | ~10 |
+| ~~Bug 65~~ | ~~Listendarstellung iOS vs macOS divergiert~~ | ERLEDIGT | M | ~40k | 1 | ~80 |
+| ~~Bug 66~~ | ~~macOS FocusBlock MenuBar + Sync-Deadlock~~ | ERLEDIGT | M | ~40k | 4 | ~100 |
 | ~~Bug 67~~ | ~~Tab-Labels Deutsch→English~~ | ERLEDIGT | XS | ~5k | 5 | ~10 |
-| Bug 68 | FocusBlock View-Umbau — Full-Screen Sheet mit 3 Sektionen | ERLEDIGT | M | ~40-60k | 4 | ~100 |
-| Bug 69 | FocusBlock Sync — Architektur-Analyse (EventKit→SwiftData?) | P2 | L-XL | ~80-120k | Analyse | TBD |
-| Bug 70 | Drag & Drop Blocks auf Timeline (iOS+macOS) → erweitert #13 | P2 | XL | ~100-150k | 3-4 | ~250 |
-| Bug 72 | macOS — FocusBlock Gear-Icon fehlt (Edit-Sheet nicht erreichbar) | P2 | XS | ~5k | 1 | ~10 |
+| ~~Bug 68~~ | ~~FocusBlock View-Umbau — Full-Screen Sheet~~ | ERLEDIGT | M | ~40-60k | 4 | ~100 |
+| ~~Bug 69~~ | ~~FocusBlock Sync — EKEventStoreChangedNotification~~ | ERLEDIGT | M | ~40k | 5 | ~80 |
+| Bug 70 | ~~70a-d ERLEDIGT~~ — offen: 70c-2 Block Resize per Drag | P2 | M | ~40-60k | 2-3 | ~100 |
+| ~~Bug 71~~ | ~~Urgency-Keywords nicht aus Titel entfernt~~ | ERLEDIGT | S | ~20k | 2 | ~40 |
+| ~~Bug 72~~ | ~~macOS — FocusBlock Gear-Icon fehlt~~ | ERLEDIGT | XS | ~5k | 1 | ~12 |
 | 30 | ~~App Icon Liquid Glass (iOS 26) — Two Rings + Dot~~ | ERLEDIGT | M | ~40-60k | 4 | ~100 |
 
 **Komplexitaet:** XS = halbe Stunde | S = 1 Session | M = 2-3 Sessions | L = halber Tag | XL = ganzer Tag+
 
-**Guenstigster Quick Win:** #7 Kalender-App Deep Link (M)
-**Teuerste Items:** #17 OrganizeMyDay (~150k), Bug 70/~~#13~~ Drag & Drop (~150k), #14 NC Widget (~120k)
+**Guenstigster Quick Win:** Bug 70c-2 Block Resize (M) oder #7 Kalender Deep Link (M)
+**Teuerste Items:** #17 OrganizeMyDay (~150k), #14 NC Widget (~120k), #12 Enhanced Quick Capture (~120k)
 **WARTEND (Apple-Abhaengigkeit):** #20 ITB-F — Developer-APIs verfuegbar, wartet auf Siri On-Screen Awareness (iOS 26.5/27)
-**Zuletzt erledigt:** #30 App Icon Liquid Glass — Two Rings + Dot (alle Plattformen)
-**Naechstes:** Bug 70 (D&D, XL) oder #7 Kalender Deep Link (M)
-**Neu (User Story):** #22-26 Contextual Task Capture — siehe `docs/project/stories/contextual-task-capture.md`
+**Zuletzt erledigt:** Bug 72 macOS Gear-Icon (XS)
+**Naechstes:** Bug 70c-2 Block Resize (M), #7 Kalender Deep Link (M), oder #11 Emotionales Aufladen (L)
 
 > **Dies ist das EINZIGE Backlog.** macOS-Features (MAC-xxx) stehen hier mit Verweis auf ihre Specs in `docs/specs/macos/`. Kein zweites Backlog.
 
@@ -343,13 +347,13 @@
 ### Bundle C: Erinnerungen & Verknuepfungen
 - ~~Push Notifications bei Frist~~ ERLEDIGT
 - Kalender-App Deep Link
-- **#29 Badge-Zahl (Overdue) + Interaktive Frist-Notifications** — App-Icon Badge zeigt Anzahl ueberfaelliger Tasks, Frist-Notifications bieten 3 Buttons: NextUp, Verschieben (+1 Tag), Erledigt
+- ~~**#29 Badge-Zahl (Overdue) + Interaktive Frist-Notifications**~~ ERLEDIGT
 
 ### Bundle D: Erfolge feiern
 - Emotionales Aufladen im Report
 
 ### Bundle E: macOS Native Experience (P2/P3)
-- MAC-020 Drag & Drop Planung
+- ~~MAC-020 Drag & Drop Planung~~ → Bug 70 (70a-d ERLEDIGT, 70c-2 Resize offen)
 - MAC-026 Enhanced Quick Capture
 - MAC-030 Shortcuts.app
 - MAC-031 Focus Mode Integration
@@ -380,7 +384,7 @@
 **Empfohlene Reihenfolge:**
 1. ~~CTC-1 (TaskTitleEngine)~~ ERLEDIGT — Zentraler KI-Service fuer intelligente Titel (Foundation Models, Shared Code)
 2. ~~CTC-2 (sourceURL)~~ ERLEDIGT — Share Extension speichert Quell-URL (Safari-Link etc.)
-3. CTC-3 (macOS Share Extension) — Neues Target, gleiche Funktionalitaet wie iOS
+3. ~~CTC-3 (macOS Share Extension)~~ ERLEDIGT
 4. ~~CTC-4 (Clipboard → Task)~~ ERLEDIGT — Paste-Button in QuickCaptureView (iOS+macOS)
 5. ~~CTC-5 (Watch-Diktat)~~ ERLEDIGT — needsTitleImprovement Flag im Watch-Model + saveTask()
 6. ~~CTC-6 (Smart Interpretation)~~ ERLEDIGT — Floskel-Erkennung ("Erinnere mich...") + Similar-Task-Lernen (Attribute von aehnlichen Tasks uebernehmen)
@@ -489,14 +493,14 @@
 - **Dateien:** FocusBlock.swift, EventKitRepository.swift, MockEventKitRepository.swift, BlockPlanningView.swift, MacPlanningView.swift
 - **Tests:** 4 Unit Tests (FocusBlockTitleUpdateTests), 2 UI Tests (FocusBlockDropIndicatorUITests), alle GREEN
 
-### Bug 72: macOS — FocusBlock-Eigenschaften nicht editierbar (Gear-Icon fehlt)
-- **Status:** OFFEN
+### Bug 72: macOS — FocusBlock Gear-Icon fehlt (ERLEDIGT)
+- **Status:** ERLEDIGT
 - **Plattform:** macOS
-- **Symptom:** Auf macOS gibt es keine Moeglichkeit, die Eigenschaften eines FocusBlocks (Start/End-Zeit, Loeschen) anzupassen. Auf iOS oeffnet ein Gear-Icon das `EditFocusBlockSheet` — auf macOS fehlt dieses UI-Element komplett.
-- **Analyse:** Der Code ist vorbereitet — `FocusBlockView` (MacTimelineView.swift:400-491) hat einen `onTapEdit`-Callback, `MacPlanningView` verdrahtet das Sheet korrekt. Aber in der macOS `FocusBlockView` wird **kein Button gerendert** der den Callback ausloest. Der User hat keinen Weg zum Sheet.
-- **iOS-Referenz:** `TimelineFocusBlockRow` in BlockPlanningView.swift (Zeile 1103-1115) — Gear-Icon (`systemImage: "gearshape"`) mit `.ultraThinMaterial` Hintergrund
-- **Fix-Ansatz:** Gear-Icon Button in macOS `FocusBlockView` hinzufuegen (analog iOS), der `onTapEdit()` aufruft. Sheet-Verdrahtung existiert bereits.
-- **Aufwand:** XS (1 Button hinzufuegen, Sheet-Logik existiert)
+- **Symptom:** Kein Button um EditFocusBlockSheet auf macOS zu oeffnen (iOS hatte Gear-Icon, macOS nicht)
+- **Root Cause:** `FocusBlockView` hatte `onTapEdit`-Callback definiert und verdrahtet, aber kein UI-Element zum Ausloesen
+- **Fix:** Gear-Icon Button ("gearshape") in FocusBlockView HStack eingefuegt. Immer sichtbar, bei Hover hervorgehoben (opacity 0.6 → 1.0). accessibilityIdentifier: `focusBlockEditButton_{blockID}`
+- **Dateien:** FocusBloxMac/MacTimelineView.swift (1 Datei, ~12 LoC)
+- **Tests:** 25 macOS Unit Tests GREEN, Build OK (iOS + macOS)
 
 ### Bug 66: macOS FocusBlock nicht sichtbar in MenuBar + Sync-Deadlock (ERLEDIGT)
 - **Status:** ERLEDIGT
@@ -591,7 +595,7 @@
 
 ### Verbleibende Tech-Debts (dokumentiert in `docs/context/tech-debt-analysis.md`)
 - **TD-01:** God-Views (BlockPlanningView 1400 LoC, BacklogView 1181 LoC) — Aufwand: L
-- **TD-02:** iOS/macOS View-Duplikation (~9000 LoC) — Aufwand: XL, strategische Entscheidung
+- **TD-02:** iOS/macOS View-Duplikation — Paket 1-3 ERLEDIGT (Badges, Sheets, Header: ~412 LoC eliminiert). Verbleibend: ~7500 LoC, Aufwand: XL
 - **TD-03:** 3 Services ohne Unit Tests (NotificationService, FocusBlockActionService, GapFinder) — Aufwand: M *(TaskPriorityScoringService: 30 Tests, vollstaendige Abdeckung)*
 
 ### ~~BACKLOG-010: Deferred Sort Logik dupliziert (iOS vs macOS)~~ ERLEDIGT
