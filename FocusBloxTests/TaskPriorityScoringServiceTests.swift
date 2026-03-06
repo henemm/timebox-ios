@@ -17,12 +17,28 @@ final class TaskPriorityScoringServiceTests: XCTestCase {
         XCTAssertEqual(TaskPriorityScoringService.eisenhowerScore(importance: 2, urgency: "urgent"), 35)
     }
 
+    func test_eisenhowerScore_importance1_urgent_returns30() {
+        XCTAssertEqual(TaskPriorityScoringService.eisenhowerScore(importance: 1, urgency: "urgent"), 30)
+    }
+
+    func test_eisenhowerScore_importance2_notUrgent_returns20() {
+        XCTAssertEqual(TaskPriorityScoringService.eisenhowerScore(importance: 2, urgency: "not_urgent"), 20)
+    }
+
     func test_eisenhowerScore_importance1_notUrgent_returns10() {
         XCTAssertEqual(TaskPriorityScoringService.eisenhowerScore(importance: 1, urgency: "not_urgent"), 10)
     }
 
+    func test_eisenhowerScore_onlyImportance_returns15() {
+        XCTAssertEqual(TaskPriorityScoringService.eisenhowerScore(importance: 2, urgency: nil), 15)
+    }
+
     func test_eisenhowerScore_onlyUrgent_returns25() {
         XCTAssertEqual(TaskPriorityScoringService.eisenhowerScore(importance: nil, urgency: "urgent"), 25)
+    }
+
+    func test_eisenhowerScore_onlyNotUrgent_returns8() {
+        XCTAssertEqual(TaskPriorityScoringService.eisenhowerScore(importance: nil, urgency: "not_urgent"), 8)
     }
 
     func test_eisenhowerScore_neitherSet_returns0() {
@@ -48,10 +64,22 @@ final class TaskPriorityScoringServiceTests: XCTestCase {
         XCTAssertEqual(TaskPriorityScoringService.deadlineScore(dueDate: tomorrow, now: now), 22)
     }
 
+    func test_deadlineScore_3daysOut_returns18() {
+        let now = Date()
+        let threeDays = Calendar.current.date(byAdding: .day, value: 3, to: now)!
+        XCTAssertEqual(TaskPriorityScoringService.deadlineScore(dueDate: threeDays, now: now), 18)
+    }
+
     func test_deadlineScore_5daysOut_returns12() {
         let now = Date()
         let fiveDays = Calendar.current.date(byAdding: .day, value: 5, to: now)!
         XCTAssertEqual(TaskPriorityScoringService.deadlineScore(dueDate: fiveDays, now: now), 12)
+    }
+
+    func test_deadlineScore_10daysOut_returns6() {
+        let now = Date()
+        let tenDays = Calendar.current.date(byAdding: .day, value: 10, to: now)!
+        XCTAssertEqual(TaskPriorityScoringService.deadlineScore(dueDate: tenDays, now: now), 6)
     }
 
     func test_deadlineScore_noDueDate_returns0() {
@@ -163,6 +191,10 @@ final class TaskPriorityScoringServiceTests: XCTestCase {
 
     func test_priorityTier_score40_isPlanSoon() {
         XCTAssertEqual(TaskPriorityScoringService.PriorityTier.from(score: 40), .planSoon)
+    }
+
+    func test_priorityTier_score20_isEventually() {
+        XCTAssertEqual(TaskPriorityScoringService.PriorityTier.from(score: 20), .eventually)
     }
 
     func test_priorityTier_score5_isSomeday() {
