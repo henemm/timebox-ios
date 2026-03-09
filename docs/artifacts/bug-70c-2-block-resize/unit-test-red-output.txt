@@ -1,0 +1,17 @@
+TDD RED: FocusBlockResizeTests — 7 tests, 11 compilation errors
+
+Errors:
+- type 'FocusBlock' has no member 'minDurationMinutes' (×4)
+- type 'FocusBlock' has no member 'resizedEndDate' (×7)
+
+Tests:
+1. testMinDurationMinutes_is15
+2. testResize_dragDown30px_extends30Minutes
+3. testResize_dragUp30px_shortens30Minutes
+4. testResize_snapsTo15MinBoundaries
+5. testResize_enforces15MinMinimum
+6. testResize_extremeNegativeDrag_clipsToMinimum
+7. testResize_zeroDrag_noChange
+8. testResize_endDateAlwaysAfterStartDate
+
+** TEST FAILED **

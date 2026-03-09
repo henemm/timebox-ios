@@ -326,7 +326,7 @@
 | ~~Bug 67~~ | ~~Tab-Labels Deutsch→English~~ | ERLEDIGT | XS | ~5k | 5 | ~10 |
 | ~~Bug 68~~ | ~~FocusBlock View-Umbau — Full-Screen Sheet~~ | ERLEDIGT | M | ~40-60k | 4 | ~100 |
 | ~~Bug 69~~ | ~~FocusBlock Sync — EKEventStoreChangedNotification~~ | ERLEDIGT | M | ~40k | 5 | ~80 |
-| Bug 70 | ~~70a-d ERLEDIGT~~ — offen: 70c-2 Block Resize per Drag | P2 | M | ~40-60k | 2-3 | ~100 |
+| ~~Bug 70~~ | ~~70a-d + 70c-2 Block Resize per Drag~~ | ERLEDIGT | M | ~40-60k | 2-3 | ~100 |
 | ~~Bug 71~~ | ~~Urgency-Keywords nicht aus Titel entfernt~~ | ERLEDIGT | S | ~20k | 2 | ~40 |
 | ~~Bug 72~~ | ~~macOS — FocusBlock Gear-Icon fehlt~~ | ERLEDIGT | XS | ~5k | 1 | ~12 |
 | ~~Bug 74~~ | ~~Sheet dismiss nach Speichern (Create Task)~~ | ERLEDIGT | XS | ~5k | 1 | ~11 |
@@ -341,12 +341,12 @@
 
 **Komplexitaet:** XS = halbe Stunde | S = 1 Session | M = 2-3 Sessions | L = halber Tag | XL = ganzer Tag+
 
-**Guenstigster Quick Win:** Bug 70c-2 Block Resize (M)
+**Guenstigster Quick Win:** #7 Kalender Deep Link (M)
 **Kritisch:** keine offenen kritischen Bugs
 **Teuerste Items:** #17 OrganizeMyDay (~150k), #14 NC Widget (~120k), #12 Enhanced Quick Capture (~120k)
 **WARTEND (Apple-Abhaengigkeit):** #20 ITB-F — Developer-APIs verfuegbar, wartet auf Siri On-Screen Awareness (iOS 26.5/27)
-**Zuletzt erledigt:** Bug 79+80 Kalender-Kategorie Labels + Sync (XS+S)
-**Naechstes:** Bug 70c-2 Block Resize (M), #7 Kalender Deep Link (M), Bug 75 macOS Icon (XS)
+**Zuletzt erledigt:** Bug 70c-2 Block Resize per Drag (M)
+**Naechstes:** #7 Kalender Deep Link (M), #8 Enhanced Liquid Glass (M)
 
 > **Dies ist das EINZIGE Backlog.** macOS-Features (MAC-xxx) stehen hier mit Verweis auf ihre Specs in `docs/specs/macos/`. Kein zweites Backlog.
 
@@ -373,7 +373,7 @@
 - Emotionales Aufladen im Report
 
 ### Bundle E: macOS Native Experience (P2/P3)
-- ~~MAC-020 Drag & Drop Planung~~ → Bug 70 (70a-d ERLEDIGT, 70c-2 Resize offen)
+- ~~MAC-020 Drag & Drop Planung~~ → Bug 70 (70a-d + 70c-2 KOMPLETT ERLEDIGT)
 - MAC-026 Enhanced Quick Capture
 - MAC-030 Shortcuts.app
 - MAC-031 Focus Mode Integration
@@ -487,7 +487,7 @@
 - **Ziel:** TimelineLayout + Collision Detection aus FocusBloxMac/ nach Sources/ extrahieren fuer Cross-Platform Sharing
 - **Dateien:** Sources/Layouts/TimelineLayout.swift (NEU), Sources/Models/TimelineItem.swift (NEU), FocusBloxMac/TimelineLayout.swift (GELOESCHT), FocusBloxMac/MacTimelineView.swift (private Typen entfernt)
 - **Tests:** 14 Unit Tests (TimelineCollisionTests) — 8 Collision Detection + 6 Layout Math, alle GREEN
-- **Naechster Schritt:** Bug 70c-2 (Resize Drag)
+- **Naechster Schritt:** keiner (Bug 70 komplett)
 
 ### Bug 70c-1b: iOS Timeline Canvas Rebuild (ERLEDIGT)
 - **Status:** ERLEDIGT
@@ -495,7 +495,13 @@
 - **Ziel:** List-basierte Timeline (TimelineHourRow per Stunde) durch Canvas-basierte Timeline (TimelineLayout + Collision Detection) ersetzen — Paritaet mit macOS
 - **Dateien:** Sources/Models/TimelineItem.swift (PositionedFocusBlock + TimelineLocationCalculator als Shared-Types), Sources/Views/BlockPlanningView.swift (Canvas-Rendering), FocusBloxMac/MacTimelineView.swift (private Duplikat entfernt)
 - **Tests:** 8 Unit (IOSTimelineCanvasTests) + 5 UI (IOSTimelineCanvasUITests) — alle GREEN
-- **Naechster Schritt:** Bug 70c-2 (Resize per Drag am unteren Rand)
+
+### Bug 70c-2: Block Resize per Drag (ERLEDIGT)
+- **Status:** ERLEDIGT
+- **Plattform:** beide (iOS + macOS)
+- **Ziel:** User kann Block-Dauer aendern per Drag am unteren Rand — 15-Min-Snapping, Min-Dauer 15 Min
+- **Dateien:** Sources/Models/FocusBlock.swift (resizedEndDate + minDurationMinutes), Sources/Views/BlockPlanningView.swift (iOS Resize Handle + Gesture), FocusBloxMac/MacTimelineView.swift (macOS Resize Handle + Gesture + Cursor), FocusBloxMac/MacPlanningView.swift (resizeFocusBlock Handler)
+- **Tests:** 8 Unit Tests (FocusBlockResizeTests) — alle GREEN
 
 ### Bug 70d: FocusBlock Drag-Indicator + Titel-Update bei Verschieben (ERLEDIGT)
 - **Status:** ERLEDIGT

@@ -182,6 +182,9 @@ struct MacPlanningView: View {
                 },
                 onMoveFocusBlock: { blockID, newStart in
                     moveFocusBlock(blockID: blockID, to: newStart)
+                },
+                onResizeBlock: { block, newEndDate in
+                    resizeFocusBlock(block, newEndDate: newEndDate)
                 }
             )
         }
@@ -461,6 +464,11 @@ struct MacPlanningView: View {
         let duration = block.endDate.timeIntervalSince(block.startDate)
         let newEnd = newStart.addingTimeInterval(duration)
         updateBlockTime(block: block, start: newStart, end: newEnd)
+    }
+
+    private func resizeFocusBlock(_ block: FocusBlock, newEndDate: Date) {
+        guard block.isFuture else { return }
+        updateBlockTime(block: block, start: block.startDate, end: newEndDate)
     }
 
     private func updateBlockTime(block: FocusBlock, start: Date, end: Date) {

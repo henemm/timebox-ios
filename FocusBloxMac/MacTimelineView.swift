@@ -24,6 +24,7 @@ struct MacTimelineView: View {
     var onTapFreeSlot: ((TimeSlot) -> Void)?
     var onTapEvent: ((CalendarEvent) -> Void)?
     var onMoveFocusBlock: ((String, Date) -> Void)?
+    var onResizeBlock: ((FocusBlock, Date) -> Void)?
 
     // Timeline configuration
     private let startHour = 6
@@ -70,6 +71,7 @@ struct MacTimelineView: View {
                         ForEach(positionedFocusBlocks) { positioned in
                             FocusBlockView(
                                 block: positioned.block,
+                                hourHeight: hourHeight,
                                 onAddTask: { taskID in
                                     onAddTaskToBlock?(positioned.block.id, taskID)
                                 },
@@ -78,6 +80,9 @@ struct MacTimelineView: View {
                                 },
                                 onTapEdit: {
                                     onTapEditBlock?(positioned.block)
+                                },
+                                onResize: { newEndDate in
+                                    onResizeBlock?(positioned.block, newEndDate)
                                 }
                             )
                             .timelinePosition(
@@ -400,12 +405,16 @@ struct EventBlockView: View {
 /// Supports tap, hover, and drag & drop because place() sets correct hit-areas
 struct FocusBlockView: View {
     let block: FocusBlock
+    let hourHeight: CGFloat
     var onAddTask: ((String) -> Void)?
     var onTapBlock: (() -> Void)?
     var onTapEdit: (() -> Void)?
+    var onResize: ((_ newEndDate: Date) -> Void)?
 
     @State private var isDropTargeted = false
     @State private var isHovered = false
+    @State private var resizeDragOffset: CGFloat = 0
+    @State private var isResizing = false
 
     private var timeRange: String {
         let formatter = DateFormatter()
@@ -414,52 +423,92 @@ struct FocusBlockView: View {
     }
 
     var body: some View {
-        // Same structure as EventBlockView that works
-        VStack(alignment: .leading, spacing: 2) {
-            // Header row with icon + edit button
-            HStack(spacing: 4) {
-                Image(systemName: "target")
-                    .font(.system(size: 10, weight: .bold))
-                Text(block.title)
-                    .font(.system(size: 11, weight: .bold))
-                    .lineLimit(1)
-                Spacer(minLength: 0)
-                Button {
-                    onTapEdit?()
-                } label: {
-                    Image(systemName: "gearshape")
-                        .font(.system(size: 10))
-                        .foregroundStyle(.white.opacity(isHovered ? 1 : 0.6))
-                        .padding(3)
-                        .background(Circle().fill(.white.opacity(isHovered ? 0.25 : 0.1)))
+        ZStack(alignment: .bottom) {
+            // Same structure as EventBlockView that works
+            VStack(alignment: .leading, spacing: 2) {
+                // Header row with icon + edit button
+                HStack(spacing: 4) {
+                    Image(systemName: "target")
+                        .font(.system(size: 10, weight: .bold))
+                    Text(block.title)
+                        .font(.system(size: 11, weight: .bold))
+                        .lineLimit(1)
+                    Spacer(minLength: 0)
+                    Button {
+                        onTapEdit?()
+                    } label: {
+                        Image(systemName: "gearshape")
+                            .font(.system(size: 10))
+                            .foregroundStyle(.white.opacity(isHovered ? 1 : 0.6))
+                            .padding(3)
+                            .background(Circle().fill(.white.opacity(isHovered ? 0.25 : 0.1)))
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("Block bearbeiten")
+                    .accessibilityIdentifier("focusBlockEditButton_\(block.id)")
                 }
-                .buttonStyle(.plain)
-                .accessibilityLabel("Block bearbeiten")
-                .accessibilityIdentifier("focusBlockEditButton_\(block.id)")
+                .foregroundStyle(.white)
+
+                // Time range
+                Text(timeRange)
+                    .font(.system(size: 10))
+                    .foregroundStyle(.white.opacity(0.8))
+
+                // Task count
+                Text("\(block.taskIDs.count) Tasks")
+                    .font(.system(size: 10))
+                    .foregroundStyle(.white.opacity(0.7))
+
+                // Drop indicator
+                if isDropTargeted {
+                    Label("Ablegen", systemImage: "plus.circle.fill")
+                        .font(.system(size: 10, weight: .medium))
+                        .foregroundStyle(.white)
+                }
+
+                Spacer(minLength: 0)
             }
-            .foregroundStyle(.white)
+            .padding(.horizontal, 6)
+            .padding(.vertical, 4)
 
-            // Time range
-            Text(timeRange)
-                .font(.system(size: 10))
-                .foregroundStyle(.white.opacity(0.8))
-
-            // Task count
-            Text("\(block.taskIDs.count) Tasks")
-                .font(.system(size: 10))
-                .foregroundStyle(.white.opacity(0.7))
-
-            // Drop indicator
-            if isDropTargeted {
-                Label("Ablegen", systemImage: "plus.circle.fill")
-                    .font(.system(size: 10, weight: .medium))
-                    .foregroundStyle(.white)
+            // Resize handle at bottom edge (only for future blocks)
+            if block.isFuture, onResize != nil {
+                RoundedRectangle(cornerRadius: 1)
+                    .fill(isResizing ? Color.white : Color.white.opacity(isHovered ? 0.5 : 0))
+                    .frame(height: 3)
+                    .frame(maxWidth: .infinity)
+                    .padding(.horizontal, 8)
+                    .padding(.bottom, 2)
+                    .contentShape(Rectangle().size(width: 1000, height: 16).offset(y: -6))
+                    .gesture(
+                        DragGesture(minimumDistance: 4)
+                            .onChanged { value in
+                                isResizing = true
+                                resizeDragOffset = value.translation.height
+                            }
+                            .onEnded { _ in
+                                let newEnd = FocusBlock.resizedEndDate(
+                                    startDate: block.startDate,
+                                    originalEndDate: block.endDate,
+                                    dragOffsetY: resizeDragOffset,
+                                    hourHeight: hourHeight
+                                )
+                                onResize?(newEnd)
+                                resizeDragOffset = 0
+                                isResizing = false
+                            }
+                    )
+                    .onHover { hovering in
+                        if hovering {
+                            NSCursor.resizeUpDown.push()
+                        } else {
+                            NSCursor.pop()
+                        }
+                    }
+                    .accessibilityLabel("Block-Dauer aendern")
+                    .accessibilityIdentifier("focusBlockResizeHandle_\(block.id)")
             }
-
-            Spacer(minLength: 0)
         }
-        .padding(.horizontal, 6)
-        .padding(.vertical, 4)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .background(
             RoundedRectangle(cornerRadius: 6)
@@ -467,7 +516,7 @@ struct FocusBlockView: View {
         )
         .overlay(
             RoundedRectangle(cornerRadius: 6)
-                .strokeBorder(.white.opacity(isDropTargeted ? 0.5 : 0.2), lineWidth: isDropTargeted ? 2 : 1)
+                .strokeBorder(.white.opacity(isDropTargeted ? 0.5 : (isResizing ? 0.6 : 0.2)), lineWidth: isDropTargeted || isResizing ? 2 : 1)
         )
         .shadow(color: blockColor.opacity(0.3), radius: isDropTargeted ? 8 : 4, y: 2)
         .contentShape(Rectangle())

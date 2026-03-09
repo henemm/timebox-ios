@@ -164,8 +164,12 @@ struct BlockPlanningView: View {
                     ForEach(positionedFocusBlocks) { positioned in
                         TimelineFocusBlockRow(
                             block: positioned.block,
+                            hourHeight: hourHeight,
                             onTapBlock: { blockForTasks = positioned.block },
-                            onTapEdit: { blockToEdit = positioned.block }
+                            onTapEdit: { blockToEdit = positioned.block },
+                            onResize: { newEndDate in
+                                resizeFocusBlock(positioned.block, newEndDate: newEndDate)
+                            }
                         )
                         .frame(maxHeight: .infinity)
                         .timelinePosition(
@@ -469,6 +473,11 @@ struct BlockPlanningView: View {
         let duration = block.endDate.timeIntervalSince(block.startDate)
         let newEnd = newStart.addingTimeInterval(duration)
         updateBlock(block, startDate: newStart, endDate: newEnd)
+    }
+
+    private func resizeFocusBlock(_ block: FocusBlock, newEndDate: Date) {
+        guard block.isFuture else { return }
+        updateBlock(block, startDate: block.startDate, endDate: newEndDate)
     }
 
     private func updateEventCategory(event: CalendarEvent, category: String?) {
@@ -936,8 +945,13 @@ struct CalendarEventRow: View {
 /// A focus block displayed in the timeline
 struct TimelineFocusBlockRow: View {
     let block: FocusBlock
+    let hourHeight: CGFloat
     let onTapBlock: () -> Void
     let onTapEdit: () -> Void
+    var onResize: ((_ newEndDate: Date) -> Void)?
+
+    @State private var resizeDragOffset: CGFloat = 0
+    @State private var isResizing = false
 
     private let timeFormatter: DateFormatter = {
         let f = DateFormatter()
@@ -946,59 +960,92 @@ struct TimelineFocusBlockRow: View {
     }()
 
     var body: some View {
-        HStack {
-            // Tappable content area (opens Tasks Sheet)
-            VStack(alignment: .leading, spacing: 2) {
-                Text(block.title)
-                    .font(.subheadline.weight(.medium))
-                    .lineLimit(1)
+        ZStack(alignment: .bottom) {
+            HStack {
+                // Tappable content area (opens Tasks Sheet)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(block.title)
+                        .font(.subheadline.weight(.medium))
+                        .lineLimit(1)
 
-                HStack(spacing: 8) {
-                    Text("\(timeFormatter.string(from: block.startDate)) - \(timeFormatter.string(from: block.endDate))")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-
-                    if !block.taskIDs.isEmpty {
-                        Text("\(block.taskIDs.count) Tasks")
-                            .font(.caption2)
+                    HStack(spacing: 8) {
+                        Text("\(timeFormatter.string(from: block.startDate)) - \(timeFormatter.string(from: block.endDate))")
+                            .font(.caption)
                             .foregroundStyle(.secondary)
-                            .padding(.horizontal, 6)
-                            .padding(.vertical, 2)
-                            .background(Capsule().fill(.blue.opacity(0.15)))
+
+                        if !block.taskIDs.isEmpty {
+                            Text("\(block.taskIDs.count) Tasks")
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 2)
+                                .background(Capsule().fill(.blue.opacity(0.15)))
+                        }
                     }
                 }
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .contentShape(Rectangle())
-            .onTapGesture {
-                onTapBlock()
-            }
-            .accessibilityAddTraits(.isButton)
-            .accessibilityLabel("Tasks anzeigen")
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .contentShape(Rectangle())
+                .onTapGesture {
+                    onTapBlock()
+                }
+                .accessibilityAddTraits(.isButton)
+                .accessibilityLabel("Tasks anzeigen")
 
-            // Edit button (gear) - opens Edit Sheet
-            Button {
-                onTapEdit()
-            } label: {
-                Image(systemName: "gearshape")
-                    .font(.body)
-                    .foregroundStyle(.secondary)
-                    .padding(8)
-                    .background(Circle().fill(.ultraThinMaterial))
+                // Edit button (gear) - opens Edit Sheet
+                Button {
+                    onTapEdit()
+                } label: {
+                    Image(systemName: "gearshape")
+                        .font(.body)
+                        .foregroundStyle(.secondary)
+                        .padding(8)
+                        .background(Circle().fill(.ultraThinMaterial))
+                }
+                .buttonStyle(.borderless)
+                .accessibilityLabel("Block bearbeiten")
+                .accessibilityIdentifier("focusBlockEditButton_\(block.id)")
             }
-            .buttonStyle(.borderless)
-            .accessibilityLabel("Block bearbeiten")
-            .accessibilityIdentifier("focusBlockEditButton_\(block.id)")
+            .padding(.vertical, 8)
+            .padding(.horizontal, 12)
+
+            // Resize handle at bottom edge (only for future blocks)
+            if block.isFuture, onResize != nil {
+                RoundedRectangle(cornerRadius: 2)
+                    .fill(isResizing ? Color.blue : Color.blue.opacity(0.4))
+                    .frame(height: 4)
+                    .frame(maxWidth: .infinity)
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 2)
+                    .contentShape(Rectangle().size(width: 1000, height: 20).offset(y: -8))
+                    .gesture(
+                        DragGesture(minimumDistance: 4)
+                            .onChanged { value in
+                                isResizing = true
+                                resizeDragOffset = value.translation.height
+                            }
+                            .onEnded { _ in
+                                let newEnd = FocusBlock.resizedEndDate(
+                                    startDate: block.startDate,
+                                    originalEndDate: block.endDate,
+                                    dragOffsetY: resizeDragOffset,
+                                    hourHeight: hourHeight
+                                )
+                                onResize?(newEnd)
+                                resizeDragOffset = 0
+                                isResizing = false
+                            }
+                    )
+                    .accessibilityLabel("Block-Dauer aendern")
+                    .accessibilityIdentifier("focusBlockResizeHandle_\(block.id)")
+            }
         }
-        .padding(.vertical, 8)
-        .padding(.horizontal, 12)
         .background(
             RoundedRectangle(cornerRadius: 8)
                 .fill(.blue.opacity(0.15))
         )
         .overlay(
             RoundedRectangle(cornerRadius: 8)
-                .strokeBorder(.blue.opacity(0.3), lineWidth: 1)
+                .strokeBorder(isResizing ? .blue : .blue.opacity(0.3), lineWidth: isResizing ? 2 : 1)
         )
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("focusBlock_\(block.id)")

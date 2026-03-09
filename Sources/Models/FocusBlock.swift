@@ -74,6 +74,46 @@ extension FocusBlock {
     }
 }
 
+// MARK: - Resize
+
+extension FocusBlock {
+    /// Minimum block duration in minutes
+    static let minDurationMinutes = 15
+
+    /// Calculate new end date from a resize drag gesture.
+    /// - Parameters:
+    ///   - startDate: The block's fixed start date
+    ///   - originalEndDate: The block's end date before resize started
+    ///   - dragOffsetY: Vertical drag offset in points (positive = down = longer)
+    ///   - hourHeight: Points per hour on the timeline
+    /// - Returns: New end date, snapped to 15-min boundaries, clamped to minimum duration
+    static func resizedEndDate(
+        startDate: Date,
+        originalEndDate: Date,
+        dragOffsetY: CGFloat,
+        hourHeight: CGFloat
+    ) -> Date {
+        // Convert pixel offset to minutes
+        let minutesPerPoint = 60.0 / hourHeight
+        let deltaMinutes = Double(dragOffsetY) * minutesPerPoint
+
+        // Calculate raw new end date
+        let rawEnd = originalEndDate.addingTimeInterval(deltaMinutes * 60)
+
+        // Snap to nearest 15-minute boundary
+        let snappedEnd = snapToQuarterHour(rawEnd)
+
+        // Enforce minimum duration
+        let minEnd = startDate.addingTimeInterval(Double(minDurationMinutes) * 60)
+        let clampedEnd = snapToQuarterHour(minEnd)
+
+        if snappedEnd <= clampedEnd {
+            return clampedEnd
+        }
+        return snappedEnd
+    }
+}
+
 // MARK: - Date Normalization
 
 extension FocusBlock {
