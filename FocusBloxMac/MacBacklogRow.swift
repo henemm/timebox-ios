@@ -33,11 +33,12 @@ struct MacBacklogRow: View {
             .buttonStyle(.plain)
             .accessibilityIdentifier("completeButton_\(task.id)")
 
-            // Title + Metadata
+            // Title + Metadata (fills available width, like iOS BacklogRow contentSection)
             VStack(alignment: .leading, spacing: 4) {
                 // Title (italic if TBD)
                 Text(task.title)
-                    .lineLimit(1)
+                    .lineLimit(2)
+                    .truncationMode(.tail)
                     .strikethrough(task.isCompleted)
                     .foregroundStyle(task.isCompleted ? .secondary : (task.isTbd ? .secondary : .primary))
                     .italic(task.isTbd)
@@ -45,8 +46,7 @@ struct MacBacklogRow: View {
                 // Metadata Row (aligned with iOS)
                 metadataRow
             }
-
-            Spacer()
+            .frame(maxWidth: .infinity, alignment: .leading)
 
             // TBD Indicator
             if task.isTbd {

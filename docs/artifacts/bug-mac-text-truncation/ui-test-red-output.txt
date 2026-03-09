@@ -1,0 +1,13 @@
+TDD RED — macOS Text Truncation UI Tests (Bug 86)
+Date: 2026-03-09
+
+Test Results:
+- test_sidebarFilterLabel_hasSufficientWidth: FAILED
+  XCTAssertGreaterThan failed: ("74.0") is not greater than ("80.0")
+  Sidebar label 'Wiederkehrend' width is only 74px — label is truncated
+
+- test_taskTitleWidth_notCompressedByLayout: PASSED (regression guard)
+  Title width sufficient at default 1000px window width.
+  Truncation manifests at smaller window sizes or with inspector open.
+
+RED confirmed for sidebar truncation. Title test serves as regression guard.

@@ -437,11 +437,18 @@ extension FocusBloxMacApp {
         let task3 = LocalTask(title: "Mock Task 3 #45min", importance: 1, estimatedDuration: 45, urgency: "not_urgent")
         task3.isNextUp = true
 
-        // Backlog tasks
-        let backlogTask1 = LocalTask(title: "Backlog Task 1", importance: 2, estimatedDuration: 25, urgency: "urgent")
+        // Long-title Next Up task for truncation testing (Bug 86)
+        let longTitleTask = LocalTask(title: "Startups anschreiben wegen Kapitalerhöhung", importance: 3, estimatedDuration: 30, urgency: "urgent")
+        longTitleTask.isNextUp = true
+        longTitleTask.taskType = "essentials"
+        longTitleTask.dueDate = Date()
+
+        // Badge-overflow backlog task: ALL badges set for truncation testing (Bug 86)
+        let backlogTask1 = LocalTask(title: "Lohnsteuererklärung Amazon Deutschland einreichen", importance: 2, estimatedDuration: 25, urgency: "urgent")
         backlogTask1.tags = ["work", "urgent"]
         backlogTask1.taskType = "deep_work"
         backlogTask1.dueDate = Date()
+        backlogTask1.recurrencePattern = "weekly"
 
         let backlogTask2 = LocalTask(title: "Backlog Task 2", importance: 1, estimatedDuration: 15, urgency: "not_urgent")
         backlogTask2.taskType = "shallow_work"
@@ -469,7 +476,7 @@ extension FocusBloxMacApp {
         completed.isCompleted = true
         completed.completedAt = Date()
 
-        for task in [task1, task2, task3, backlogTask1, backlogTask2, tmpl1, child1, tmpl2, child2, tmpl3, child3, completed] {
+        for task in [task1, task2, task3, longTitleTask, backlogTask1, backlogTask2, tmpl1, child1, tmpl2, child2, tmpl3, child3, completed] {
             context.insert(task)
         }
         try? context.save()

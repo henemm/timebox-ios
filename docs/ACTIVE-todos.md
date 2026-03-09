@@ -710,6 +710,19 @@
 - **Tests:** 5 Unit Tests (NotificationSnoozeTests) — alle gruen
 - **Analyse:** `docs/artifacts/bug-85-reminder-time-display/analysis.md`
 
+### Bug 86: macOS Text-Truncation in Backlog + Sidebar (ERLEDIGT)
+- **Status:** ERLEDIGT
+- **Plattform:** macOS
+- **Symptom:** Task-Titel werden mit "..." abgeschnitten obwohl Platz vorhanden. Sidebar-Labels ("Ueberf...", "Wiede...", "Erle...") ebenso.
+- **Root Cause:** (1) MacBacklogRow VStack ohne `.frame(maxWidth: .infinity)` — iOS hat das, macOS fehlte es. (2) NavigationSplitView Sidebar ohne explizite Spaltenbreite — Default ~200px zu schmal fuer Labels + Badge.
+- **Fix (2 Dateien):**
+  1. `MacBacklogRow.swift`: `.frame(maxWidth: .infinity, alignment: .leading)` auf VStack, `.lineLimit(2)` + `.truncationMode(.tail)` auf Titel, `Spacer()` entfernt
+  2. `ContentView.swift`: `.navigationSplitViewColumnWidth(min: 180, ideal: 220, max: 280)` auf SidebarView
+- **Blast Radius:** 7 weitere macOS Views mit identischem Pattern → BACKLOG-013
+- **Dateien:** MacBacklogRow.swift, ContentView.swift (2 Dateien, ~5 LoC)
+- **Tests:** 2 macOS UI Tests (MacTextTruncationUITests) — alle gruen
+- **Analyse:** `docs/artifacts/bug-mac-text-truncation/analysis.md`
+
 ### Bug 84: App-Icon Badge zaehlt NextUp/FocusBlock-Tasks mit (ERLEDIGT)
 - **Status:** ERLEDIGT
 - **Plattform:** iOS (Badge) + macOS (Sidebar-Badge)

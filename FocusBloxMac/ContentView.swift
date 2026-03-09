@@ -169,6 +169,7 @@ struct ContentView: View {
                     completedCount: completedCount,
                     recurringCount: recurringCount
                 )
+                .navigationSplitViewColumnWidth(min: 180, ideal: 220, max: 280)
             } else {
                 // Empty sidebar for other sections
                 List {
