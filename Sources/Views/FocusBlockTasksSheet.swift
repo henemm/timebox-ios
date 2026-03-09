@@ -130,7 +130,11 @@ struct FocusBlockTasksSheet: View {
         }
     }
 
-    // MARK: - Alle Tasks Section (Expandable)
+    // MARK: - Alle Tasks Section (Expandable, sorted by priority)
+
+    private var allTasksSortedByPriority: [PlanItem] {
+        allTasks.sorted { $0.priorityScore > $1.priorityScore }
+    }
 
     private var allTasksSection: some View {
         Section {
@@ -159,9 +163,9 @@ struct FocusBlockTasksSheet: View {
             .accessibilityElement(children: .combine)
             .accessibilityIdentifier("allTasksDisclosure")
 
-            // Expanded content
+            // Expanded content (sorted by priority score, highest first)
             if isAllTasksExpanded {
-                ForEach(allTasks) { task in
+                ForEach(allTasksSortedByPriority) { task in
                     SheetNextUpRow(task: task, identifierPrefix: "assignAllTask") {
                         onAssignTask(task.id)
                     }
@@ -196,14 +200,21 @@ struct SheetNextUpRow: View {
     var body: some View {
         HStack(spacing: 12) {
             // Task info
-            VStack(alignment: .leading, spacing: 2) {
+            VStack(alignment: .leading, spacing: 4) {
                 Text(task.title)
                     .font(.body)
                     .lineLimit(2)
 
-                Label("\(task.effectiveDuration) min", systemImage: "clock")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                // Priority badges (read-only, reusing shared components)
+                HStack(spacing: 6) {
+                    ImportanceBadge(importance: task.importance, taskId: task.id)
+                    UrgencyBadge(urgency: task.urgency, taskId: task.id)
+                    PriorityScoreBadge(score: task.priorityScore, tier: task.priorityTier, taskId: task.id)
+
+                    Label("\(task.effectiveDuration) min", systemImage: "clock")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
             }
 
             Spacer()

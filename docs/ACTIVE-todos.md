@@ -319,7 +319,7 @@
 | ~~Bug 71~~ | ~~Urgency-Keywords nicht aus Titel entfernt~~ | ERLEDIGT | S | ~20k | 2 | ~40 |
 | ~~Bug 72~~ | ~~macOS — FocusBlock Gear-Icon fehlt~~ | ERLEDIGT | XS | ~5k | 1 | ~12 |
 | ~~Bug 74~~ | ~~Sheet dismiss nach Speichern (Create Task)~~ | ERLEDIGT | XS | ~5k | 1 | ~11 |
-| Bug 73 | Tasks-Dialog ohne Prioritaets-Info | OFFEN | M | ~40-60k | 3 | ~100 |
+| Bug 73 | Tasks-Dialog ohne Prioritaets-Info | ERLEDIGT | S | ~5k | 1 | ~30 |
 | Bug 75 | macOS App-Icon falsch | ERLEDIGT | XS | ~2k | 1 | ~10 |
 | Bug 76 | macOS Task verschwindet nach Anlegen | ERLEDIGT | S | ~2k | 1 | ~10 |
 | Bug 77 | macOS Orange Umrandung zu eng | ERLEDIGT | XS | ~2k | 1 | ~10 |
@@ -555,14 +555,15 @@
 - **Tests:** 8 Unit Tests (MacBacklogSectionsTests), 3 UI Tests (MacBacklogSectionsUITests)
 - **Analyse:** `docs/artifacts/bug-65-mac-sections/analysis.md`
 
-### Bug 73: "Tasks hinzufuegen"-Dialog — keine Prioritaets-Info, schlechte Sortierung
-- **Status:** OFFEN (Backlog)
-- **Plattform:** iOS + macOS
-- **Symptom:** Im Dialog "Tasks im Block" → Sektion "Alle Tasks" (32 Tasks) fehlt jede Prioritaets-Information. Tasks sind nur nach Dauer sortiert — man kann nicht erkennen welche Tasks wichtig/dringend sind. Entscheidung welche Task in den FocusBlock soll ist reine Raterei.
-- **Gewuenschtes Verhalten:** Entweder (A) Prioritaets-View (Badges fuer Wichtigkeit/Dringlichkeit, Tier-Sektionen) in diesem Dialog einblenden, oder (B) zumindest nach Prioritaets-Score sortieren statt nach Dauer. Option A bevorzugt.
-- **Betroffene Views:** `FocusBlockTasksSheet` (Shared), `BlockPlanningView` (iOS), `MacPlanningView` (macOS)
-- **Aufwand:** Mittel (Priority-View = umfangreicher, Sortierung = kleiner)
-- **Screenshot:** `docs/artifacts/bug-73-task-dialog-priority/screenshot.png`
+### Bug 73: "Tasks hinzufuegen"-Dialog — keine Prioritaets-Info, schlechte Sortierung (ERLEDIGT)
+- **Status:** ERLEDIGT
+- **Plattform:** iOS + macOS (Shared View)
+- **Symptom:** "Alle Tasks"-Sektion zeigte nur Titel+Dauer, keine Priority-Badges, unsortiert.
+- **Root Cause:** `SheetNextUpRow` nutzte keine der vorhandenen Shared Badge Components. `allTasks` wurde unsortiert uebergeben.
+- **Fix:** (1) Shared Badges (`ImportanceBadge`, `UrgencyBadge`, `PriorityScoreBadge`) in `SheetNextUpRow` eingebaut (read-only). (2) `allTasksSortedByPriority` sortiert nach `priorityScore` absteigend.
+- **Geaenderte Dateien:** `FocusBlockTasksSheet.swift` (1 Datei, Shared = beide Plattformen)
+- **Tests:** 3 Unit Tests (`FocusBlockTasksSheetTests`)
+- **Spec:** `docs/specs/bugs/bug-73-task-dialog-priority.md`
 
 ### Bug 74: Sheet dismiss nach Speichern — Create Task (ERLEDIGT)
 - **Status:** ERLEDIGT
