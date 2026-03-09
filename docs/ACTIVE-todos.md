@@ -362,8 +362,8 @@
 **Kritisch:** keine offenen kritischen Bugs
 **Teuerste Items:** #17 OrganizeMyDay (~150k), #14 NC Widget (~120k), #12 Enhanced Quick Capture (~120k)
 **WARTEND (Apple-Abhaengigkeit):** #20 ITB-F — Developer-APIs verfuegbar, wartet auf Siri On-Screen Awareness (iOS 26.5/27)
-**Zuletzt erledigt:** Bug 85-A Uhrzeit bei Faelligkeitsdatum anzeigen (XS)
-**Naechstes:** Bug 85-B Notification Snooze-Optionen (S)
+**Zuletzt erledigt:** Bug 85-B Notification Snooze-Optionen (S)
+**Naechstes:** Bug 85-C Kontextmenue Verschieben-Optionen (S)
 
 > **Dies ist das EINZIGE Backlog.** macOS-Features (MAC-xxx) stehen hier mit Verweis auf ihre Specs in `docs/specs/macos/`. Kein zweites Backlog.
 
@@ -696,6 +696,20 @@
 - **Tests:** 10 neue Unit Tests (DueDateTimeDisplayTests) + 12 bestehende (DueDateFormattingTests) — alle gruen
 - **Analyse:** `docs/artifacts/bug-85-reminder-time-display/analysis.md`
 
+### Bug 85-B: Notification Snooze-Optionen (ERLEDIGT)
+- **Status:** ERLEDIGT
+- **Plattform:** iOS + macOS + watchOS (alle gefixt)
+- **Symptom:** Notification-Aktionen bieten nur "Morgen" (+1 Tag) an. Apple Reminders bietet multiple Snooze-Optionen (Morgen, Naechste Woche).
+- **Root Cause:** NotificationService registrierte nur 3 Aktionen (Next Up, Morgen, Erledigt). Kein +7-Tage-Handler existierte.
+- **Fix (3 Dateien):**
+  1. `NotificationService.swift`: `actionPostponeTomorrow` + `actionPostponeNextWeek` Konstanten, `registerDueDateActions()` mit 4 Aktionen
+  2. `NotificationActionDelegate.swift`: Neue Cases fuer Tomorrow (+1) und NextWeek (+7), `postponeTask` Helper mit Notification-Rescheduling. Predicate-Fix: `$0.uuid == taskUUID` statt computed `$0.id` (SwiftData-Bug)
+  3. `WatchNotificationDelegate.swift`: Gleiche Konstanten + Handler + 4 Aktionen
+- **Bonus-Fix:** NotificationActionDelegate nutzte `$0.id == taskID` in #Predicate — `id` ist computed Property, SwiftData kann das nicht querien. Auf stored `uuid` Property gewechselt (wie Watch-Delegate).
+- **Dateien:** NotificationService.swift, NotificationActionDelegate.swift, WatchNotificationDelegate.swift (3 Dateien, ~20 LoC)
+- **Tests:** 5 Unit Tests (NotificationSnoozeTests) — alle gruen
+- **Analyse:** `docs/artifacts/bug-85-reminder-time-display/analysis.md`
+
 ### Bug 84: App-Icon Badge zaehlt NextUp/FocusBlock-Tasks mit (ERLEDIGT)
 - **Status:** ERLEDIGT
 - **Plattform:** iOS (Badge) + macOS (Sidebar-Badge)
@@ -769,7 +783,13 @@
 - **Loesung:** Wrapper entfernen, Aufrufer direkt auf `regularFilteredTasks` umstellen.
 - **Aufwand:** XS
 
-### BACKLOG-013: calculateScore() wird mit 8 identischen Parametern an 6+ Stellen aufgerufen
+### BACKLOG-013: macOS Text-Truncation in 7 weiteren Views (Blast Radius Bug 86)
+- **Problem:** MacBacklogRow-Fix (`.frame(maxWidth: .infinity)` + `.lineLimit(2)`) muss auf 7 weitere macOS Views uebertragen werden, die dasselbe HStack-Pattern ohne Breitenangabe nutzen.
+- **Betroffene Views:** NextUpTaskRow (MacPlanningView), MacTaskInBlockRow (MacAssignView), MacDraggableTaskRow (MacAssignView), TaskQueueRow (MacFocusView), MacReviewTaskRow (MacFocusView), MenuBarView (3 Instanzen), MacTimelineView
+- **Analyse:** `docs/artifacts/bug-mac-text-truncation/analysis.md`
+- **Aufwand:** S
+
+### BACKLOG-014: calculateScore() wird mit 8 identischen Parametern an 6+ Stellen aufgerufen
 - **Problem:** `TaskPriorityScoringService.calculateScore(importance:urgency:dueDate:createdAt:rescheduleCount:estimatedDuration:taskType:isNextUp:)` — Copy-paste-anfaellig, schwer wartbar.
 - **Loesung:** Extension auf `LocalTask` (und/oder `PlanItem`): `task.priorityScore` als berechnete Property. Einmal definiert, ueberall genutzt.
 - **Aufwand:** S

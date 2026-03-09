@@ -13,7 +13,9 @@ final class WatchNotificationDelegate: NSObject, @preconcurrency UNUserNotificat
 
     // Action identifiers must match iOS NotificationService constants
     static let actionNextUp = "ACTION_NEXT_UP"
-    static let actionPostpone = "ACTION_POSTPONE"
+    static let actionPostpone = "ACTION_POSTPONE_TOMORROW"
+    static let actionPostponeTomorrow = "ACTION_POSTPONE_TOMORROW"
+    static let actionPostponeNextWeek = "ACTION_POSTPONE_NEXT_WEEK"
     static let actionComplete = "ACTION_COMPLETE"
     static let dueDateCategory = "DUE_DATE_INTERACTIVE"
 
@@ -24,12 +26,13 @@ final class WatchNotificationDelegate: NSObject, @preconcurrency UNUserNotificat
     /// Register notification categories so watchOS can display interactive actions.
     static func registerActions() {
         let nextUp = UNNotificationAction(identifier: actionNextUp, title: "Next Up", options: [])
-        let postpone = UNNotificationAction(identifier: actionPostpone, title: "Morgen", options: [])
+        let postponeTomorrow = UNNotificationAction(identifier: actionPostponeTomorrow, title: "Morgen", options: [])
+        let postponeNextWeek = UNNotificationAction(identifier: actionPostponeNextWeek, title: "Nächste Woche", options: [])
         let complete = UNNotificationAction(identifier: actionComplete, title: "Erledigt", options: [.destructive])
 
         let category = UNNotificationCategory(
             identifier: dueDateCategory,
-            actions: [nextUp, postpone, complete],
+            actions: [nextUp, postponeTomorrow, postponeNextWeek, complete],
             intentIdentifiers: []
         )
         UNUserNotificationCenter.current().setNotificationCategories([category])
@@ -84,9 +87,14 @@ final class WatchNotificationDelegate: NSObject, @preconcurrency UNUserNotificat
             ).first?.nextUpSortOrder) ?? 0
             task.nextUpSortOrder = maxOrder + 1
 
-        case Self.actionPostpone:
+        case Self.actionPostponeTomorrow:
             if let currentDue = task.dueDate {
                 task.dueDate = Calendar.current.date(byAdding: .day, value: 1, to: currentDue)
+            }
+
+        case Self.actionPostponeNextWeek:
+            if let currentDue = task.dueDate {
+                task.dueDate = Calendar.current.date(byAdding: .day, value: 7, to: currentDue)
             }
 
         case Self.actionComplete:

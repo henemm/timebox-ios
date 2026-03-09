@@ -1,0 +1,10 @@
+TEST GREEN - All 5 NotificationSnoozeTests PASSED
+- actionPostpone_renamedToTomorrow: PASSED
+- actionPostponeNextWeek_constantValue: PASSED
+- postponeNextWeek_advancesDueDateBySevenDays: PASSED
+- postponeNextWeek_withoutDueDate_doesNotCrash: PASSED
+- postponeTomorrow_newActionID_advancesByOneDay: PASSED
+
+Fix: NotificationActionDelegate predicate used computed property id (uuid.uuidString).
+SwiftData #Predicate can't query computed properties. Changed to stored uuid property.
+

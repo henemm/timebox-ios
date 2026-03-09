@@ -13,7 +13,9 @@ enum NotificationService {
 
     private static let dueDateInteractiveCategory = "DUE_DATE_INTERACTIVE"
     static let actionNextUp = "ACTION_NEXT_UP"
-    static let actionPostpone = "ACTION_POSTPONE"
+    static let actionPostpone = "ACTION_POSTPONE_TOMORROW"
+    static let actionPostponeTomorrow = "ACTION_POSTPONE_TOMORROW"
+    static let actionPostponeNextWeek = "ACTION_POSTPONE_NEXT_WEEK"
     static let actionComplete = "ACTION_COMPLETE"
 
     /// Register notification category with 3 interactive actions for due date notifications.
@@ -21,8 +23,11 @@ enum NotificationService {
         let nextUp = UNNotificationAction(
             identifier: actionNextUp, title: "Next Up", options: []
         )
-        let postpone = UNNotificationAction(
-            identifier: actionPostpone, title: "Morgen", options: []
+        let postponeTomorrow = UNNotificationAction(
+            identifier: actionPostponeTomorrow, title: "Morgen", options: []
+        )
+        let postponeNextWeek = UNNotificationAction(
+            identifier: actionPostponeNextWeek, title: "Nächste Woche", options: []
         )
         let complete = UNNotificationAction(
             identifier: actionComplete, title: "Erledigt", options: .destructive
@@ -30,7 +35,7 @@ enum NotificationService {
 
         let category = UNNotificationCategory(
             identifier: dueDateInteractiveCategory,
-            actions: [nextUp, postpone, complete],
+            actions: [nextUp, postponeTomorrow, postponeNextWeek, complete],
             intentIdentifiers: [],
             options: []
         )

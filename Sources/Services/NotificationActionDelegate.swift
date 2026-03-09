@@ -41,8 +41,9 @@ final class NotificationActionDelegate: NSObject, @preconcurrency UNUserNotifica
 
     private func handleAction(_ actionID: String, taskID: String) {
         let context = container.mainContext
+        guard let taskUUID = UUID(uuidString: taskID) else { return }
         let descriptor = FetchDescriptor<LocalTask>(
-            predicate: #Predicate { $0.id == taskID }
+            predicate: #Predicate { $0.uuid == taskUUID }
         )
         guard let task = try? context.fetch(descriptor).first else { return }
 
@@ -57,15 +58,11 @@ final class NotificationActionDelegate: NSObject, @preconcurrency UNUserNotifica
             ).first?.nextUpSortOrder) ?? 0
             task.nextUpSortOrder = maxOrder + 1
 
-        case NotificationService.actionPostpone:
-            if let currentDue = task.dueDate {
-                let newDue = Calendar.current.date(byAdding: .day, value: 1, to: currentDue)!
-                task.dueDate = newDue
-                NotificationService.cancelDueDateNotifications(taskID: taskID)
-                NotificationService.scheduleDueDateNotifications(
-                    taskID: taskID, title: task.title, dueDate: newDue
-                )
-            }
+        case NotificationService.actionPostponeTomorrow:
+            postponeTask(task, taskID: taskID, byDays: 1)
+
+        case NotificationService.actionPostponeNextWeek:
+            postponeTask(task, taskID: taskID, byDays: 7)
 
         case NotificationService.actionComplete:
             task.isCompleted = true
@@ -84,5 +81,23 @@ final class NotificationActionDelegate: NSObject, @preconcurrency UNUserNotifica
         #if !os(macOS)
         NotificationService.updateOverdueBadge(container: container)
         #endif
+    }
+
+    private func postponeTask(_ task: LocalTask, taskID: String, byDays days: Int) {
+        if let currentDue = task.dueDate {
+            let newDue = Calendar.current.date(byAdding: .day, value: days, to: currentDue)!
+            task.dueDate = newDue
+            NotificationService.cancelDueDateNotifications(taskID: taskID)
+            NotificationService.scheduleDueDateNotifications(
+                taskID: taskID, title: task.title, dueDate: newDue
+            )
+        }
+    }
+
+    // MARK: - Testing Support
+
+    /// Exposes handleAction for unit tests.
+    func handleActionForTesting(_ actionID: String, taskID: String) {
+        handleAction(actionID, taskID: taskID)
     }
 }
