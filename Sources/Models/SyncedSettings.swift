@@ -20,6 +20,7 @@ final class SyncedSettings {
         static let warningEnabled = "sync_warningEnabled"
         static let warningTimingRaw = "sync_warningTimingRaw"
         static let defaultTaskDuration = "sync_defaultTaskDuration"
+        static let eventCategories = "sync_eventCategories"
     }
 
     // MARK: - Local Keys (UserDefaults)
@@ -33,6 +34,7 @@ final class SyncedSettings {
         static let warningEnabled = "warningEnabled"
         static let warningTimingRaw = "warningTiming"
         static let defaultTaskDuration = "defaultTaskDuration"
+        static let eventCategories = "calendarEventCategories"
     }
 
     // MARK: - Init
@@ -80,6 +82,11 @@ final class SyncedSettings {
         cloud.set(defaults.integer(forKey: LocalKey.warningTimingRaw), forKey: CloudKey.warningTimingRaw)
         cloud.set(defaults.integer(forKey: LocalKey.defaultTaskDuration), forKey: CloudKey.defaultTaskDuration)
 
+        // Event-Kategorien: Dictionary direkt kopieren (calendarItemIdentifier ist geraetuebergreifend stabil)
+        if let catDict = defaults.dictionary(forKey: LocalKey.eventCategories) as? [String: String] {
+            cloud.set(catDict, forKey: CloudKey.eventCategories)
+        }
+
         cloud.synchronize()
     }
 
@@ -122,6 +129,31 @@ final class SyncedSettings {
         defaults.set(cloud.bool(forKey: CloudKey.warningEnabled), forKey: LocalKey.warningEnabled)
         defaults.set(cloud.object(forKey: CloudKey.warningTimingRaw) as? Int ?? 0, forKey: LocalKey.warningTimingRaw)
         defaults.set(cloud.object(forKey: CloudKey.defaultTaskDuration) as? Int ?? 15, forKey: LocalKey.defaultTaskDuration)
+
+        // Event-Kategorien: Remote-Dict mit lokalem mergen (Remote gewinnt bei Konflikten)
+        if let remoteDict = cloud.dictionary(forKey: CloudKey.eventCategories) as? [String: String] {
+            var localDict = defaults.dictionary(forKey: LocalKey.eventCategories) as? [String: String] ?? [:]
+            localDict.merge(remoteDict) { _, remote in remote }
+            defaults.set(localDict, forKey: LocalKey.eventCategories)
+        }
+    }
+
+    // MARK: - Event Category Sync (Bug 80)
+
+    /// Push lokale Event-Kategorien nach iCloud
+    func pushEventCategoriesToCloud() {
+        if let catDict = defaults.dictionary(forKey: LocalKey.eventCategories) as? [String: String] {
+            cloud.set(catDict, forKey: CloudKey.eventCategories)
+            cloud.synchronize()
+        }
+    }
+
+    /// Merge remote Event-Kategorien in lokale UserDefaults.
+    /// Remote gewinnt bei Konflikten (neueste Aenderung vom anderen Geraet).
+    static func mergeEventCategories(local: [String: String], remote: [String: String]) -> [String: String] {
+        var merged = local
+        merged.merge(remote) { _, remote in remote }
+        return merged
     }
 
     // MARK: - Calendar Name Resolution

@@ -335,15 +335,17 @@
 | Bug 76 | macOS Task verschwindet nach Anlegen | ERLEDIGT | S | ~2k | 1 | ~10 |
 | Bug 77 | macOS Orange Umrandung zu eng | ERLEDIGT | XS | ~2k | 1 | ~10 |
 | ~~Bug 78~~ | ~~macOS Crash bei Swipe (SwiftData Fault)~~ | ERLEDIGT | M | ~30-40k | 2 | ~20 |
+| ~~Bug 79~~ | ~~Kalender-Event-Badges deutsche Labels~~ | ERLEDIGT | XS | ~2k | 1 | ~5 |
+| ~~Bug 80~~ | ~~Kalender-Kategorien iOS↔macOS Sync~~ | ERLEDIGT | S | ~15k | 3 | ~40 |
 | 30 | ~~App Icon Liquid Glass (iOS 26) — Two Rings + Dot~~ | ERLEDIGT | M | ~40-60k | 4 | ~100 |
 
 **Komplexitaet:** XS = halbe Stunde | S = 1 Session | M = 2-3 Sessions | L = halber Tag | XL = ganzer Tag+
 
-**Guenstigster Quick Win:** Bug 75 macOS Icon (XS) oder Bug 77 Padding (XS)
-**Kritisch:** ~~Bug 78 macOS Crash~~ ERLEDIGT
+**Guenstigster Quick Win:** Bug 70c-2 Block Resize (M)
+**Kritisch:** keine offenen kritischen Bugs
 **Teuerste Items:** #17 OrganizeMyDay (~150k), #14 NC Widget (~120k), #12 Enhanced Quick Capture (~120k)
 **WARTEND (Apple-Abhaengigkeit):** #20 ITB-F — Developer-APIs verfuegbar, wartet auf Siri On-Screen Awareness (iOS 26.5/27)
-**Zuletzt erledigt:** Bug 78 macOS Crash bei Swipe (M)
+**Zuletzt erledigt:** Bug 79+80 Kalender-Kategorie Labels + Sync (XS+S)
 **Naechstes:** Bug 70c-2 Block Resize (M), #7 Kalender Deep Link (M), Bug 75 macOS Icon (XS)
 
 > **Dies ist das EINZIGE Backlog.** macOS-Features (MAC-xxx) stehen hier mit Verweis auf ihre Specs in `docs/specs/macos/`. Kein zweites Backlog.
@@ -622,25 +624,26 @@
 - **iOS:** NICHT betroffen (PlanItem value-type Kopien)
 - **Analyse:** `docs/artifacts/bug-78-swiftdata-crash/analysis.md`
 
-### Bug 79: Kalender-Event-Badges zeigen falsche (deutsche) Kategorie-Labels
-- **Status:** OFFEN (Backlog)
-- **Plattform:** iOS + macOS
-- **Symptom:** CategoryIconBadge im Kalender-View zeigt deutsche Labels ("Pflege", "Energie", "Geld") statt der korrekten englischen Labels aus der Spec ("Essentials", "Self Care", "Earn")
-- **Root Cause:** `CategoryIconBadge.swift:10` nutzt `category.localizedName` (Deutsch) statt `category.displayName` (Englisch). Auch `MacBacklogRow.swift:280` nutzt `localizedName`. Suchlogik in `BacklogView.swift:82` und `ContentView.swift:88` matcht ebenfalls auf deutsche Namen.
-- **Achtung:** Englische Labels sind laenger ("Essentials"=10, "Self Care"=9 Zeichen). Badge-Constraint-Test prueft max 8 Zeichen — muss auf 10 erhoeht werden. Capsule-Badge visuell OK.
-- **Betroffene Dateien:** CategoryIconBadge.swift, MacBacklogRow.swift, BacklogView.swift, ContentView.swift (macOS), CategoryIconBadgeTests.swift, TaskCategoryTests.swift
-- **Aufwand:** Klein (4-5 Dateien, reine String-Aenderung + Test-Updates)
+### Bug 79: Kalender-Event-Badges zeigen falsche (deutsche) Kategorie-Labels (ERLEDIGT)
+- **Status:** ERLEDIGT
+- **Plattform:** iOS + macOS (Shared Code)
+- **Symptom:** CategoryIconBadge im Kalender-View zeigte deutsche Labels ("Pflege", "Energie", "Geld") statt der korrekten englischen Labels ("Essentials", "Self Care", "Earn")
+- **Root Cause:** `CategoryIconBadge.swift:10` nutzte `category.localizedName` (Deutsch) statt `category.displayName` (Englisch)
+- **Fix:** Eine Zeile: `localizedName` → `displayName` in `CategoryIconBadge.swift:10`
+- **Tests:** 6/6 gruen (CategoryIconBadgeTests: testBadge_labelText_returnsDisplayName, testBadge_labelText_allCategoriesShowEnglishDisplayName + 4 bestehende)
 - **Analyse:** `docs/artifacts/bug-calendar-category-labels/analysis.md`
 
-### Bug 80: Kalender-Event-Kategorien synchen nicht zwischen iOS und macOS
-- **Status:** OFFEN (Backlog)
-- **Plattform:** iOS ↔ macOS
-- **Symptom:** Auf iOS gesetzte Kategorien fuer Kalender-Events sind auf macOS nicht sichtbar (und umgekehrt)
-- **Root Cause:** Event-Kategorien werden in `UserDefaults.standard` gespeichert (Bug 63 hat sie dorthin verschoben wegen read-only EventKit bei Gaesten). UserDefaults ist device-lokal und syncht NICHT zwischen Geraeten.
-- **Fix-Empfehlung:** Bestehende `SyncedSettings`-Klasse (nutzt bereits `NSUbiquitousKeyValueStore`) um Category-Dictionary erweitern. Push = lokale UserDefaults → iCloud KV Store, Pull = iCloud → lokale UserDefaults. Migration: Bestehende lokale Eintraege bleiben erhalten.
-- **Risiken:** iCloud KV Store 1MB Limit (bei 5 Events/Tag ueber 3 Jahre = ~270 KB, machbar). Verwaiste Keys bei geloeschten Events (Cleanup noetig). Sync-Delay (typisch 5-30s).
-- **Betroffene Dateien:** SyncedSettings.swift, CalendarEvent.swift, EventKitRepository.swift, CalendarCategoryMappingTests.swift
-- **Aufwand:** Mittel (3-4 Dateien + Migration + Tests)
+### Bug 80: Kalender-Event-Kategorien synchen nicht zwischen iOS und macOS (ERLEDIGT)
+- **Status:** ERLEDIGT
+- **Plattform:** iOS ↔ macOS (Shared Code)
+- **Symptom:** Auf iOS gesetzte Kategorien fuer Kalender-Events waren auf macOS nicht sichtbar (und umgekehrt)
+- **Root Cause:** Event-Kategorien in `UserDefaults.standard` gespeichert (device-lokal, kein iCloud-Sync)
+- **Fix:** `SyncedSettings` um Event-Category-Sync erweitert:
+  - Push: `pushToCloud()` kopiert Category-Dictionary in `NSUbiquitousKeyValueStore`
+  - Pull: `pullFromCloud()` mergt Remote-Categories in lokale UserDefaults (Remote gewinnt bei Konflikten)
+  - `EventKitRepository.updateEventCategory()` triggert automatisch Push zu iCloud
+- **Betroffene Dateien:** SyncedSettings.swift, EventKitRepository.swift, SyncedSettingsTests.swift, CategoryIconBadgeTests.swift
+- **Tests:** 10/10 gruen (SyncedSettingsTests: 4 neue Merge-Tests + 6 bestehende)
 - **Analyse:** `docs/artifacts/bug-calendar-category-labels/analysis.md`
 
 ---

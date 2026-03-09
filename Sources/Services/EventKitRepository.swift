@@ -272,6 +272,11 @@ final class EventKitRepository: EventKitRepositoryProtocol, @unchecked Sendable 
             dict.removeValue(forKey: calendarItemID)
         }
         UserDefaults.standard.set(dict, forKey: key)
+
+        // Bug 80: Push to iCloud for cross-device sync
+        Task { @MainActor in
+            SyncedSettings().pushToCloud()
+        }
     }
 
     // MARK: - Focus Block Methods

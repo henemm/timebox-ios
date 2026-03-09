@@ -36,22 +36,42 @@ final class CategoryIconBadgeTests: XCTestCase {
 
     // MARK: - Two-line badge with label
 
+    /// Bug 79: CategoryIconBadge should use displayName (English) not localizedName (German)
     /// GIVEN: CategoryIconBadge for .income
     /// WHEN: Accessing labelText
-    /// THEN: Returns the localized category name for display
-    func testBadge_labelText_returnsLocalizedName() {
+    /// THEN: Returns the English display name ("Earn"), not German ("Geld")
+    /// BREAKS: labelText currently returns localizedName ("Geld")
+    func testBadge_labelText_returnsDisplayName() {
         let badge = CategoryIconBadge(category: .income)
-        XCTAssertEqual(badge.labelText, "Geld")
+        XCTAssertEqual(badge.labelText, "Earn",
+            "Bug 79: Badge should show English displayName, not German localizedName")
+    }
+
+    /// Bug 79: All categories should show English displayName on badges
+    /// BREAKS: All currently show German localizedName
+    func testBadge_labelText_allCategoriesShowEnglishDisplayName() {
+        let expectedLabels: [(TaskCategory, String)] = [
+            (.income, "Earn"),
+            (.essentials, "Essentials"),
+            (.selfCare, "Self Care"),
+            (.learn, "Learn"),
+            (.social, "Social"),
+        ]
+        for (category, expectedLabel) in expectedLabels {
+            let badge = CategoryIconBadge(category: category)
+            XCTAssertEqual(badge.labelText, expectedLabel,
+                "Bug 79: \(category.rawValue) badge should show '\(expectedLabel)'")
+        }
     }
 
     /// GIVEN: CategoryIconBadge for all categories
     /// WHEN: Accessing labelText
-    /// THEN: All labels are short enough for a badge (max 8 chars)
+    /// THEN: All labels are short enough for a badge (max 10 chars for "Essentials")
     func testBadge_labelText_allCategoriesAreBadgeFriendly() {
         for category in TaskCategory.allCases {
             let badge = CategoryIconBadge(category: category)
             XCTAssertLessThanOrEqual(
-                badge.labelText.count, 8,
+                badge.labelText.count, 10,
                 "\(category.rawValue) label '\(badge.labelText)' too long for badge"
             )
         }

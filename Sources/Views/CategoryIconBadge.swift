@@ -6,8 +6,8 @@ import SwiftUI
 struct CategoryIconBadge: View {
     let category: TaskCategory
 
-    /// The displayed label text (localized category name).
-    var labelText: String { category.localizedName }
+    /// The displayed label text (English display name, matching selection UI).
+    var labelText: String { category.displayName }
 
     var body: some View {
         VStack(spacing: 1) {

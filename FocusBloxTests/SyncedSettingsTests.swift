@@ -50,4 +50,59 @@ final class SyncedSettingsTests: XCTestCase {
         let result = settings.resolveCalendarID(byName: "NonExistentCalendar_XYZ_12345")
         XCTAssertNil(result)
     }
+
+    // MARK: - Bug 80: Event Category Merge Logic
+
+    /// Bug 80: mergeEventCategories should merge two dictionaries
+    /// GIVEN: Local and remote category dictionaries
+    /// WHEN: mergeEventCategories is called
+    /// THEN: Both entries are present in the result
+    func testMergeEventCategories_combinesBothSources() {
+        let local: [String: String] = ["item-1": "income"]
+        let remote: [String: String] = ["item-2": "learning"]
+
+        let result = SyncedSettings.mergeEventCategories(local: local, remote: remote)
+
+        XCTAssertEqual(result["item-1"], "income", "Local entries should be preserved")
+        XCTAssertEqual(result["item-2"], "learning", "Remote entries should be added")
+        XCTAssertEqual(result.count, 2)
+    }
+
+    /// Bug 80: Remote should win on conflict
+    /// GIVEN: Same key exists in local and remote with different values
+    /// WHEN: mergeEventCategories is called
+    /// THEN: Remote value wins
+    func testMergeEventCategories_remoteWinsOnConflict() {
+        let local: [String: String] = ["shared-item": "income"]
+        let remote: [String: String] = ["shared-item": "learning"]
+
+        let result = SyncedSettings.mergeEventCategories(local: local, remote: remote)
+
+        XCTAssertEqual(result["shared-item"], "learning",
+            "Bug 80: Remote category should overwrite local on conflict")
+    }
+
+    /// Bug 80: Empty remote should preserve local
+    /// GIVEN: Local has entries, remote is empty
+    /// WHEN: mergeEventCategories is called
+    /// THEN: Local entries are preserved
+    func testMergeEventCategories_emptyRemotePreservesLocal() {
+        let local: [String: String] = ["item-1": "income", "item-2": "maintenance"]
+        let remote: [String: String] = [:]
+
+        let result = SyncedSettings.mergeEventCategories(local: local, remote: remote)
+
+        XCTAssertEqual(result.count, 2)
+        XCTAssertEqual(result["item-1"], "income")
+        XCTAssertEqual(result["item-2"], "maintenance")
+    }
+
+    /// Bug 80: pushEventCategoriesToCloud method should exist and not crash
+    /// GIVEN: SyncedSettings instance
+    /// WHEN: pushEventCategoriesToCloud() is called
+    /// THEN: No crash (iCloud KV Store may not work in tests, but method should exist)
+    func testPushEventCategoriesToCloud_doesNotCrash() {
+        let settings = SyncedSettings()
+        settings.pushEventCategoriesToCloud()
+    }
 }
