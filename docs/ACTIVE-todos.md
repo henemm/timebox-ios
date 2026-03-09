@@ -355,6 +355,7 @@
 | 30 | ~~App Icon Liquid Glass (iOS 26) — Two Rings + Dot~~ | ERLEDIGT | M | ~40-60k | 4 | ~100 |
 | ~~Bug 81~~ | ~~FocusBlock Task-Zuweisung verliert ersten Task~~ | ERLEDIGT | M | ~40k | 4 | ~290 |
 | ~~Bug 82~~ | ~~Erledigte Tasks — Suche funktioniert nicht~~ | ERLEDIGT | XS | ~5k | 1 | ~10 |
+| ~~Bug 87~~ | ~~QuickCapture Dialog schliesst nicht nach Speichern~~ | ERLEDIGT | XS | ~5k | 1 | ~15 |
 
 **Komplexitaet:** XS = halbe Stunde | S = 1 Session | M = 2-3 Sessions | L = halber Tag | XL = ganzer Tag+
 
@@ -600,6 +601,16 @@
 - **Geaenderte Dateien:** `FocusBlockTasksSheet.swift` (1 Datei, Shared = beide Plattformen)
 - **Tests:** 3 Unit Tests (`FocusBlockTasksSheetTests`)
 - **Spec:** `docs/specs/bugs/bug-73-task-dialog-priority.md`
+
+### Bug 87: QuickCapture Dialog schliesst nicht nach Speichern (ERLEDIGT)
+- **Status:** ERLEDIGT
+- **Plattform:** iOS
+- **Symptom:** Schnellspeichern-Dialog (QuickCaptureView) schliesst nicht wenn man auf "Speichern" klickt.
+- **Root Cause:** Exakt dasselbe Problem wie Bug 74: `dismiss()` wurde innerhalb eines async `Task {}` aufgerufen, nach 600ms `Task.sleep()` fuer Success-Animation. Auf iOS 26 wird die `@Environment(\.dismiss)` Referenz ungueltig wenn die View durch `showSuccess = true` re-rendert.
+- **Fix:** `dismiss()` synchron VOR dem async Task-Block aufrufen. View-Properties vorher in lokale Variablen capturen. Success-Animation entfernt (haptisches Feedback bleibt).
+- **Geaenderte Dateien:** `Sources/Views/QuickCaptureView.swift`, `FocusBloxUITests/QuickCaptureUITests.swift`
+- **Tests:** 12 UI Tests (QuickCaptureUITests) — alle gruen
+- **Analyse:** `docs/artifacts/bug-quick-save-dialog-close/analysis.md`
 
 ### Bug 74: Sheet dismiss nach Speichern — Create Task (ERLEDIGT)
 - **Status:** ERLEDIGT

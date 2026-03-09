@@ -67,8 +67,9 @@ final class QuickCaptureUITests: XCTestCase {
 
     /// GIVEN: QuickCaptureView with text entered
     /// WHEN: User taps Save
-    /// THEN: Success checkmark should appear, then auto-dismiss
-    func testSaveShowsSuccessAndAutoDismisses() throws {
+    /// THEN: Sheet should dismiss immediately (synchronous dismiss, no async delay)
+    ///       Success feedback via haptics only, no visual checkmark animation
+    func testSaveDismissesSheetImmediately() throws {
         let textField = app.textFields["quickCaptureTextField"]
 
         XCTAssertTrue(textField.waitForExistence(timeout: 3),
@@ -83,18 +84,14 @@ final class QuickCaptureUITests: XCTestCase {
         XCTAssertTrue(saveButton.isEnabled, "Save button should be enabled after entering text")
         saveButton.tap()
 
-        // Success checkmark should appear
+        // CRITICAL: Sheet must dismiss — text field must disappear
+        XCTAssertTrue(textField.waitForNonExistence(timeout: 3),
+                      "BUG: QuickCaptureView must dismiss after save. Sheet stays open due to async dismiss pattern.")
+
+        // Success icon should NOT appear (dismiss is synchronous, no animation delay)
         let successIcon = app.images["quickCaptureSuccessIcon"]
-        XCTAssertTrue(successIcon.waitForExistence(timeout: 2),
-                      "Success checkmark should appear after save")
-
-        // Text field and save button should be gone (replaced by checkmark)
-        XCTAssertFalse(textField.exists,
-                       "Text field should be hidden during success animation")
-
-        // View should auto-dismiss after ~600ms - check that quickCaptureTextField is gone
-        XCTAssertTrue(textField.waitForNonExistence(timeout: 5),
-                      "QuickCaptureView should auto-dismiss after success animation")
+        XCTAssertFalse(successIcon.exists,
+                       "Success icon should not appear — dismiss should be immediate")
     }
 
     /// GIVEN: QuickCaptureView is displayed
@@ -295,8 +292,8 @@ final class QuickCaptureUITests: XCTestCase {
 
     /// GIVEN: QuickCaptureView with text and metadata set
     /// WHEN: User saves
-    /// THEN: Success icon should appear
-    func testSaveWithMetadata() throws {
+    /// THEN: Sheet should dismiss immediately
+    func testSaveWithMetadata_dismissesSheet() throws {
         let textField = app.textFields["quickCaptureTextField"]
         XCTAssertTrue(textField.waitForExistence(timeout: 3),
                       "Quick capture text field should exist")
@@ -330,10 +327,9 @@ final class QuickCaptureUITests: XCTestCase {
         XCTAssertTrue(saveButton.isEnabled, "Save button should be enabled")
         saveButton.tap()
 
-        // Success icon should appear
-        let successIcon = app.images["quickCaptureSuccessIcon"]
-        XCTAssertTrue(successIcon.waitForExistence(timeout: 2),
-                      "Success icon should appear after saving task with metadata")
+        // Sheet must dismiss — text field should disappear
+        XCTAssertTrue(textField.waitForNonExistence(timeout: 3),
+                      "BUG: QuickCaptureView must dismiss after save with metadata")
     }
 }
 
@@ -383,10 +379,9 @@ final class QuickCaptureCCTriggerTests: XCTestCase {
         let saveButton = app.buttons["quickCaptureSaveButton"]
         saveButton.tap()
 
-        // Should show success and auto-dismiss
-        let successIcon = app.images["quickCaptureSuccessIcon"]
-        XCTAssertTrue(successIcon.waitForExistence(timeout: 2),
-                      "Success icon should appear after save")
+        // Sheet should dismiss immediately — text field gone
+        XCTAssertTrue(textField.waitForNonExistence(timeout: 3),
+                      "BUG: QuickCaptureView must dismiss after save")
 
         let backlogNav = app.navigationBars["FocusBlox"]
         XCTAssertTrue(backlogNav.waitForExistence(timeout: 5),
@@ -499,12 +494,11 @@ final class QuickCaptureURLSchemeTests: XCTestCase {
         XCTAssertTrue(saveButton.isEnabled, "Save should be enabled")
         saveButton.tap()
 
-        // Should show success checkmark
-        let successIcon = app.images["quickCaptureSuccessIcon"]
-        XCTAssertTrue(successIcon.waitForExistence(timeout: 2),
-                      "Success icon should appear after save")
+        // Sheet should dismiss immediately — text field gone
+        XCTAssertTrue(textField.waitForNonExistence(timeout: 3),
+                      "BUG: QuickCaptureView must dismiss after save")
 
-        // Should auto-dismiss and return to Backlog
+        // Should return to Backlog
         let backlogNav = app.navigationBars["FocusBlox"]
         XCTAssertTrue(backlogNav.waitForExistence(timeout: 5),
                       "Should return to Backlog after saving via URL scheme")

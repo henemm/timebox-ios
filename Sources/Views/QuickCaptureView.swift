@@ -37,7 +37,6 @@ struct QuickCaptureView: View {
 
     @State private var title = ""
     @State private var isSaving = false
-    @State private var showSuccess = false
     @FocusState private var isFocused: Bool
 
     // Metadata state
@@ -57,14 +56,6 @@ struct QuickCaptureView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 16) {
-                if showSuccess {
-                    // Success feedback before auto-dismiss
-                    Image(systemName: "checkmark.circle.fill")
-                        .accessibilityIdentifier("quickCaptureSuccessIcon")
-                        .font(.system(size: 48))
-                        .foregroundStyle(.green)
-                        .transition(.scale.combined(with: .opacity))
-                } else {
                     TextField("Was gibt es zu tun?", text: $title)
                         .accessibilityIdentifier("quickCaptureTextField")
                         .focused($isFocused)
@@ -99,13 +90,11 @@ struct QuickCaptureView: View {
                     .controlSize(.large)
                     .sensoryFeedback(.impact, trigger: isSaving)
                     .disabled(title.trimmingCharacters(in: .whitespaces).isEmpty || isSaving)
-                }
             }
             .padding(.horizontal, 20)
             .padding(.top, 24)
         }
         .scrollDismissesKeyboard(.interactively)
-        .animation(.spring, value: showSuccess)
         .presentationDetents([.medium])
         .presentationDragIndicator(.visible)
         .presentationBackground(.ultraThinMaterial)
@@ -348,42 +337,42 @@ struct QuickCaptureView: View {
         guard !trimmedTitle.isEmpty else { return }
 
         isSaving = true
+
+        // Capture values before dismiss invalidates the view
+        let capturedImportance = importance
+        let capturedDuration = estimatedDuration
+        let capturedUrgency = urgency
+        let capturedTaskType = taskType
+        let capturedContext = modelContext
         let shouldMarkNextUp = isNextUp
 
+        // Dismiss synchronously FIRST — async dismiss inside Task{} breaks on iOS 26
+        dismiss()
+
+        // Create task in background after sheet is dismissed
         Task {
             do {
-                let taskSource = LocalTaskSource(modelContext: modelContext)
+                let taskSource = LocalTaskSource(modelContext: capturedContext)
                 let task = try await taskSource.createTask(
                     title: trimmedTitle,
-                    importance: importance,
-                    estimatedDuration: estimatedDuration,
-                    urgency: urgency,
-                    taskType: taskType
+                    importance: capturedImportance,
+                    estimatedDuration: capturedDuration,
+                    urgency: capturedUrgency,
+                    taskType: capturedTaskType
                 )
 
                 if shouldMarkNextUp {
                     task.isNextUp = true
                     task.nextUpSortOrder = Int.max
-                    try? modelContext.save()
+                    try? capturedContext.save()
                 }
 
                 // ITB-G1: Donate intent so Siri learns task creation patterns
                 let donationIntent = CreateTaskIntent()
                 donationIntent.taskTitle = trimmedTitle
                 try? await IntentDonationManager.shared.donate(intent: donationIntent)
-
-                await MainActor.run {
-                    showSuccess = true
-                    isNextUp = false
-                }
-
-                // Auto-dismiss after short success animation
-                try? await Task.sleep(for: .milliseconds(600))
-                await MainActor.run {
-                    dismiss()
-                }
             } catch {
-                isSaving = false
+                // Task creation failed — sheet already dismissed
             }
         }
     }
