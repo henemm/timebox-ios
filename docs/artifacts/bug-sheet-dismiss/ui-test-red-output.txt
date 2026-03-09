@@ -1,0 +1,16 @@
+    export TREAT_MISSING_BASELINES_AS_TEST_FAILURES\=NO
+2026-03-08 22:14:06.453 appintentsmetadataprocessor[90274:37017227] warning: Metadata extraction skipped. No AppIntents.framework dependency found.
+/Users/hem/Developer/my-daily-sprints/FocusBloxUITests/SheetDismissUITests.swift:213: -[FocusBloxUITests.SheetDismissUITests testCreateFocusBlockSheet_dismissesAfterCreate] : Test skipped - No free time slots found — calendar may be fully booked in mock
+Test Case '-[FocusBloxUITests.SheetDismissUITests testCreateFocusBlockSheet_dismissesAfterCreate]' skipped (13.373 seconds).
+Test Case '-[FocusBloxUITests.SheetDismissUITests testCreateTaskSheet_dismissesAfterCancel]' passed (13.502 seconds).
+/Users/hem/Developer/my-daily-sprints/FocusBloxUITests/SheetDismissUITests.swift:96: error: -[FocusBloxUITests.SheetDismissUITests testCreateTaskSheet_dismissesAfterSave] : XCTAssertTrue failed - BUG: Create Task sheet is still visible after tapping Speichern. Sheet must dismiss after save.
+Test Case '-[FocusBloxUITests.SheetDismissUITests testCreateTaskSheet_dismissesAfterSave]' failed (21.345 seconds).
+Test Case '-[FocusBloxUITests.SheetDismissUITests testEditFocusBlockSheet_dismissesAfterSave]' passed (13.799 seconds).
+Test Case '-[FocusBloxUITests.SheetDismissUITests testEditTaskSheet_dismissesAfterSave]' passed (15.494 seconds).
+Test Suite 'SheetDismissUITests' failed at 2026-03-08 22:15:32.826.
+	 Executed 5 tests, with 1 test skipped and 1 failure (0 unexpected) in 77.514 (77.517) seconds
+Test Suite 'FocusBloxUITests.xctest' failed at 2026-03-08 22:15:32.826.
+	 Executed 5 tests, with 1 test skipped and 1 failure (0 unexpected) in 77.514 (77.517) seconds
+Test Suite 'Selected tests' failed at 2026-03-08 22:15:32.827.
+	 Executed 5 tests, with 1 test skipped and 1 failure (0 unexpected) in 77.514 (77.518) seconds
+** TEST FAILED **

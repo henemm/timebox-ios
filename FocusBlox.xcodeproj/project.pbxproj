@@ -164,9 +164,6 @@
 		DE5811F4F48BE79B9EB7C818 /* PlanningViewUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C40AFBB545C0FA15517B9CE4 /* PlanningViewUITests.swift */; };
 		DEFSORT01BUILD0001 /* DeferredSortUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEFSORT01FILE00001 /* DeferredSortUITests.swift */; };
 		DFSRT01BUILD00001 /* DeferredSortControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFSRT01FILEREF001 /* DeferredSortControllerTests.swift */; };
-		TSKBDG01BUILD0001 /* TaskBadgesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = TSKBDG01FILE00001 /* TaskBadgesTests.swift */; };
-		SHRBDG01BUILD0001 /* SharedBadgesUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = SHRBDG01FILE00001 /* SharedBadgesUITests.swift */; };
-		SHRSHT01BUILD0001 /* SharedSheetsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = SHRSHT01FILE00001 /* SharedSheetsUITests.swift */; };
 		DFSRT02BUILD00001 /* DeferredSortController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFSRT02FILEREF001 /* DeferredSortController.swift */; };
 		DFSRT03BUILD00001 /* DeferredSortController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFSRT02FILEREF001 /* DeferredSortController.swift */; };
 		DSGNSYS01BUILD0001 /* DesignSystemTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DSGNSYS01FILE00001 /* DesignSystemTests.swift */; };
@@ -196,7 +193,6 @@
 		FBRND002BUILDFILE0001 /* FocusBloxRebrandTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBRND002FILEREF00001 /* FocusBloxRebrandTests.swift */; };
 		FBSNOT01BUILD0001 /* FocusBlockStartNotificationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBSNOT01FILE00001 /* FocusBlockStartNotificationTests.swift */; };
 		FCC11A29B4F2AF8988F782D3 /* FocusBloxTests/WatchEnrichmentGapTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1950589463657F7EB526D130 /* FocusBloxTests/WatchEnrichmentGapTests.swift */; };
-		TPSCT01BUILD00001 /* TaskPriorityScoringServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = TPSCT01FILEREF001 /* TaskPriorityScoringServiceTests.swift */; };
 		INTENT01BUILD00001 /* TaskEnums.swift in Sources */ = {isa = PBXBuildFile; fileRef = INTENT01FILEREF0001 /* TaskEnums.swift */; };
 		INTENT02BUILD00001 /* TaskEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = INTENT02FILEREF0001 /* TaskEntity.swift */; };
 		INTENT03BUILD00001 /* CreateTaskIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = INTENT03FILEREF0001 /* CreateTaskIntent.swift */; };
@@ -279,16 +275,17 @@
 		RVWSTAT02BUILD00001 /* ReviewStatsCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = RVWSTAT01FILEREF0001 /* ReviewStatsCalculator.swift */; };
 		SCROLL001BUILDFILE0001 /* ScrollingUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = SCROLL001FILEREF00001 /* ScrollingUITests.swift */; };
 		SETCMP01BUILD00001 /* SettingsComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = SETCMP01FILE000001 /* SettingsComponents.swift */; };
-		TSKBDG02BUILD0001 /* TaskBadges.swift in Sources */ = {isa = PBXBuildFile; fileRef = TSKBDG02FILE00001 /* TaskBadges.swift */; };
-		TSKBDG03BUILD0001 /* TaskBadges.swift in Sources */ = {isa = PBXBuildFile; fileRef = TSKBDG02FILE00001 /* TaskBadges.swift */; };
-		SHRSHT02BUILD0001 /* SharedSheets.swift in Sources */ = {isa = PBXBuildFile; fileRef = SHRSHT02FILE00001 /* SharedSheets.swift */; };
-		SHRSHT03BUILD0001 /* SharedSheets.swift in Sources */ = {isa = PBXBuildFile; fileRef = SHRSHT02FILE00001 /* SharedSheets.swift */; };
 		SETCMP02BUILD00001 /* SettingsComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = SETCMP01FILE000001 /* SettingsComponents.swift */; };
 		SETCMP03BUILD00001 /* SettingsComponentsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = SETCMP03FILE000001 /* SettingsComponentsTests.swift */; };
 		SGAP001F48BE79B9EB7C818 /* SmartGapsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = SGAP002545C0FA15517B9CE4 /* SmartGapsUITests.swift */; };
 		SHARE01BUILD00001 /* LocalTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A27D4BE199FA040FC61FFD6 /* LocalTask.swift */; };
 		SHARE01BUILD00002 /* TaskMetadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42790F5402B3E1F632874F5A /* TaskMetadata.swift */; };
 		SHARE01BUILD00003 /* TaskSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 414BC475930C1DCDA3E9033B /* TaskSource.swift */; };
+		SHRBDG01BUILD0001 /* SharedBadgesUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = SHRBDG01FILE00001 /* SharedBadgesUITests.swift */; };
+		SHRSHT01BUILD0001 /* SharedSheetsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = SHRSHT01FILE00001 /* SharedSheetsUITests.swift */; };
+		SHRDIS01BUILD0001 /* SheetDismissUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = SHRDIS01FILE00001 /* SheetDismissUITests.swift */; };
+		SHRSHT02BUILD0001 /* SharedSheets.swift in Sources */ = {isa = PBXBuildFile; fileRef = SHRSHT02FILE00001 /* SharedSheets.swift */; };
+		SHRSHT03BUILD0001 /* SharedSheets.swift in Sources */ = {isa = PBXBuildFile; fileRef = SHRSHT02FILE00001 /* SharedSheets.swift */; };
 		SKIPLOOP01BUILD001 /* SkipTaskLoopUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = SKIPLOOP01FILE0001 /* SkipTaskLoopUITests.swift */; };
 		SMARTENR00BUILD001 /* SmartTaskEnrichmentService.swift in Sources */ = {isa = PBXBuildFile; fileRef = SMARTENR00FILE0001 /* SmartTaskEnrichmentService.swift */; };
 		SMARTENR00BUILD002 /* SmartTaskEnrichmentService.swift in Sources */ = {isa = PBXBuildFile; fileRef = SMARTENR00FILE0001 /* SmartTaskEnrichmentService.swift */; };
@@ -322,6 +319,10 @@
 		TMRCALC01BUILD00002 /* TimerCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = TMRCALC01FILEREF001 /* TimerCalculator.swift */; };
 		TPSCORING0BUILD001 /* TaskPriorityScoringService.swift in Sources */ = {isa = PBXBuildFile; fileRef = TPSCORING0FILE0001 /* TaskPriorityScoringService.swift */; };
 		TPSCORING0BUILD002 /* TaskPriorityScoringService.swift in Sources */ = {isa = PBXBuildFile; fileRef = TPSCORING0FILE0001 /* TaskPriorityScoringService.swift */; };
+		TPSCT01BUILD00001 /* TaskPriorityScoringServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = TPSCT01FILEREF001 /* TaskPriorityScoringServiceTests.swift */; };
+		TSKBDG01BUILD0001 /* TaskBadgesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = TSKBDG01FILE00001 /* TaskBadgesTests.swift */; };
+		TSKBDG02BUILD0001 /* TaskBadges.swift in Sources */ = {isa = PBXBuildFile; fileRef = TSKBDG02FILE00001 /* TaskBadges.swift */; };
+		TSKBDG03BUILD0001 /* TaskBadges.swift in Sources */ = {isa = PBXBuildFile; fileRef = TSKBDG02FILE00001 /* TaskBadges.swift */; };
 		TSKCAT01BUILD00001 /* TaskCategoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = TSKCAT01FILE000001 /* TaskCategoryTests.swift */; };
 		TSKDTL01BUILDFILE0001 /* TaskDetailSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = TSKDTL01FILEREF00001 /* TaskDetailSheet.swift */; };
 		TSKDTUI1BUILDFILE001 /* TaskDetailUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = TSKDTUI1FILEREF0001 /* TaskDetailUITests.swift */; };
@@ -534,7 +535,6 @@
 		14E16E8941781A7134CBEE3A /* SyncEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncEngineTests.swift; sourceTree = "<group>"; };
 		16DB1BDF5EBAC3B508866AAF /* EditRedesignUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = EditRedesignUITests.swift; sourceTree = "<group>"; };
 		1950589463657F7EB526D130 /* FocusBloxTests/WatchEnrichmentGapTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = FocusBloxTests/WatchEnrichmentGapTests.swift; sourceTree = SOURCE_ROOT; };
-		TPSCT01FILEREF001 /* TaskPriorityScoringServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskPriorityScoringServiceTests.swift; sourceTree = "<group>"; };
 		1A27D4BE199FA040FC61FFD6 /* LocalTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalTask.swift; sourceTree = "<group>"; };
 		20D808247CA55763ACF23BC5 /* BlockPlanningView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockPlanningView.swift; sourceTree = "<group>"; };
 		2224B7322726CC9CD1E9C9E3 /* WidgetRelevanceCalculator.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WidgetRelevanceCalculator.swift; sourceTree = "<group>"; };
@@ -668,9 +668,6 @@
 		DF402517A33C6BA497EFE1AC /* DurationEditingUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DurationEditingUITests.swift; sourceTree = "<group>"; };
 		DFD460F955B924EB6F6C5B94 /* TaskFormTbdUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TaskFormTbdUITests.swift; sourceTree = "<group>"; };
 		DFSRT01FILEREF001 /* DeferredSortControllerTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DeferredSortControllerTests.swift; sourceTree = "<group>"; };
-		TSKBDG01FILE00001 /* TaskBadgesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskBadgesTests.swift; sourceTree = "<group>"; };
-		SHRBDG01FILE00001 /* SharedBadgesUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedBadgesUITests.swift; sourceTree = "<group>"; };
-		SHRSHT01FILE00001 /* SharedSheetsUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedSheetsUITests.swift; sourceTree = "<group>"; };
 		DFSRT02FILEREF001 /* DeferredSortController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeferredSortController.swift; sourceTree = "<group>"; };
 		DSGNSYS01FILE00001 /* DesignSystemTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignSystemTests.swift; sourceTree = "<group>"; };
 		DSGNSYS02FILE00001 /* DesignSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignSystem.swift; sourceTree = "<group>"; };
@@ -754,10 +751,12 @@
 		RVWSTAT01FILEREF0001 /* ReviewStatsCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewStatsCalculator.swift; sourceTree = "<group>"; };
 		SCROLL001FILEREF00001 /* ScrollingUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollingUITests.swift; sourceTree = "<group>"; };
 		SETCMP01FILE000001 /* SettingsComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsComponents.swift; sourceTree = "<group>"; };
-		TSKBDG02FILE00001 /* TaskBadges.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskBadges.swift; sourceTree = "<group>"; };
-		SHRSHT02FILE00001 /* SharedSheets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedSheets.swift; sourceTree = "<group>"; };
 		SETCMP03FILE000001 /* SettingsComponentsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsComponentsTests.swift; sourceTree = "<group>"; };
 		SGAP002545C0FA15517B9CE4 /* SmartGapsUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartGapsUITests.swift; sourceTree = "<group>"; };
+		SHRBDG01FILE00001 /* SharedBadgesUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedBadgesUITests.swift; sourceTree = "<group>"; };
+		SHRSHT01FILE00001 /* SharedSheetsUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedSheetsUITests.swift; sourceTree = "<group>"; };
+		SHRDIS01FILE00001 /* SheetDismissUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SheetDismissUITests.swift; sourceTree = "<group>"; };
+		SHRSHT02FILE00001 /* SharedSheets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedSheets.swift; sourceTree = "<group>"; };
 		SKIPLOOP01FILE0001 /* SkipTaskLoopUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkipTaskLoopUITests.swift; sourceTree = "<group>"; };
 		SMARTENR00FILE0001 /* SmartTaskEnrichmentService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartTaskEnrichmentService.swift; sourceTree = "<group>"; };
 		SMARTGAPS001FILEREF000001 /* SmartGapsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartGapsTests.swift; sourceTree = "<group>"; };
@@ -782,6 +781,9 @@
 		TMPDEDUP01FILE001 /* TemplateDedupTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemplateDedupTests.swift; sourceTree = "<group>"; };
 		TMRCALC01FILEREF001 /* TimerCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerCalculator.swift; sourceTree = "<group>"; };
 		TPSCORING0FILE0001 /* TaskPriorityScoringService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskPriorityScoringService.swift; sourceTree = "<group>"; };
+		TPSCT01FILEREF001 /* TaskPriorityScoringServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskPriorityScoringServiceTests.swift; sourceTree = "<group>"; };
+		TSKBDG01FILE00001 /* TaskBadgesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskBadgesTests.swift; sourceTree = "<group>"; };
+		TSKBDG02FILE00001 /* TaskBadges.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskBadges.swift; sourceTree = "<group>"; };
 		TSKCAT01FILE000001 /* TaskCategoryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskCategoryTests.swift; sourceTree = "<group>"; };
 		TSKDTL01FILEREF00001 /* TaskDetailSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskDetailSheet.swift; sourceTree = "<group>"; };
 		TSKDTUI1FILEREF0001 /* TaskDetailUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskDetailUITests.swift; sourceTree = "<group>"; };
@@ -1030,6 +1032,7 @@
 				3C256CDC6B3B5BA25279A4AA /* IOSTimelineCanvasUITests.swift */,
 				SHRBDG01FILE00001 /* SharedBadgesUITests.swift */,
 				SHRSHT01FILE00001 /* SharedSheetsUITests.swift */,
+				SHRDIS01FILE00001 /* SheetDismissUITests.swift */,
 			);
 			path = FocusBloxUITests;
 			sourceTree = "<group>";
@@ -2122,6 +2125,7 @@
 				81BCAC999D5EB4584FF50D12 /* IOSTimelineCanvasUITests.swift in Sources */,
 				SHRBDG01BUILD0001 /* SharedBadgesUITests.swift in Sources */,
 				SHRSHT01BUILD0001 /* SharedSheetsUITests.swift in Sources */,
+			SHRDIS01BUILD0001 /* SheetDismissUITests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

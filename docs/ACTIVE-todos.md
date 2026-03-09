@@ -318,6 +318,7 @@
 | Bug 70 | ~~70a-d ERLEDIGT~~ — offen: 70c-2 Block Resize per Drag | P2 | M | ~40-60k | 2-3 | ~100 |
 | ~~Bug 71~~ | ~~Urgency-Keywords nicht aus Titel entfernt~~ | ERLEDIGT | S | ~20k | 2 | ~40 |
 | ~~Bug 72~~ | ~~macOS — FocusBlock Gear-Icon fehlt~~ | ERLEDIGT | XS | ~5k | 1 | ~12 |
+| ~~Bug 74~~ | ~~Sheet dismiss nach Speichern (Create Task)~~ | ERLEDIGT | XS | ~5k | 1 | ~11 |
 | 30 | ~~App Icon Liquid Glass (iOS 26) — Two Rings + Dot~~ | ERLEDIGT | M | ~40-60k | 4 | ~100 |
 
 **Komplexitaet:** XS = halbe Stunde | S = 1 Session | M = 2-3 Sessions | L = halber Tag | XL = ganzer Tag+
@@ -325,7 +326,7 @@
 **Guenstigster Quick Win:** Bug 70c-2 Block Resize (M) oder #7 Kalender Deep Link (M)
 **Teuerste Items:** #17 OrganizeMyDay (~150k), #14 NC Widget (~120k), #12 Enhanced Quick Capture (~120k)
 **WARTEND (Apple-Abhaengigkeit):** #20 ITB-F — Developer-APIs verfuegbar, wartet auf Siri On-Screen Awareness (iOS 26.5/27)
-**Zuletzt erledigt:** Bug 72 macOS Gear-Icon (XS)
+**Zuletzt erledigt:** Bug 74 Sheet Dismiss (XS)
 **Naechstes:** Bug 70c-2 Block Resize (M), #7 Kalender Deep Link (M), oder #11 Emotionales Aufladen (L)
 
 > **Dies ist das EINZIGE Backlog.** macOS-Features (MAC-xxx) stehen hier mit Verweis auf ihre Specs in `docs/specs/macos/`. Kein zweites Backlog.
@@ -547,6 +548,25 @@
 - **Dateien:** FocusBloxMac/ContentView.swift (1 Datei)
 - **Tests:** 8 Unit Tests (MacBacklogSectionsTests), 3 UI Tests (MacBacklogSectionsUITests)
 - **Analyse:** `docs/artifacts/bug-65-mac-sections/analysis.md`
+
+### Bug 73: "Tasks hinzufuegen"-Dialog — keine Prioritaets-Info, schlechte Sortierung
+- **Status:** OFFEN (Backlog)
+- **Plattform:** iOS + macOS
+- **Symptom:** Im Dialog "Tasks im Block" → Sektion "Alle Tasks" (32 Tasks) fehlt jede Prioritaets-Information. Tasks sind nur nach Dauer sortiert — man kann nicht erkennen welche Tasks wichtig/dringend sind. Entscheidung welche Task in den FocusBlock soll ist reine Raterei.
+- **Gewuenschtes Verhalten:** Entweder (A) Prioritaets-View (Badges fuer Wichtigkeit/Dringlichkeit, Tier-Sektionen) in diesem Dialog einblenden, oder (B) zumindest nach Prioritaets-Score sortieren statt nach Dauer. Option A bevorzugt.
+- **Betroffene Views:** `FocusBlockTasksSheet` (Shared), `BlockPlanningView` (iOS), `MacPlanningView` (macOS)
+- **Aufwand:** Mittel (Priority-View = umfangreicher, Sortierung = kleiner)
+- **Screenshot:** `docs/artifacts/bug-73-task-dialog-priority/screenshot.png`
+
+### Bug 74: Sheet dismiss nach Speichern — Create Task (ERLEDIGT)
+- **Status:** ERLEDIGT
+- **Plattform:** iOS
+- **Symptom:** Beim Erstellen eines neuen Tasks schliesst sich das Sheet nicht nach Tippen auf "Speichern".
+- **Root Cause:** `dismiss()` wurde im Create-Mode innerhalb eines async `Task { await MainActor.run { dismiss() } }` aufgerufen. Auf iOS 26 funktioniert async dismiss in Sheets mit NavigationStack nicht zuverlaessig.
+- **Fix:** `dismiss()` synchron VOR dem async Task-Block aufrufen (wie im funktionierenden Edit-Mode). Alle benoetigten View-Properties vorher in lokale Variablen capturen.
+- **Geaenderte Datei:** `Sources/Views/TaskFormSheet.swift`
+- **Tests:** 5 UI Tests (SheetDismissUITests) — Create+Edit+Cancel+FocusBlock
+- **Analyse:** `docs/artifacts/bug-sheet-dismiss/analysis.md`
 
 ---
 

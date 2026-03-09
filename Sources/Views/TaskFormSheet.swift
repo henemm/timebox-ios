@@ -413,18 +413,33 @@ struct TaskFormSheet: View {
             let monthDayValue: Int? = recurrencePattern.requiresCustomConfig ? customBasePatternCode : (recurrencePattern.requiresMonthDay ? monthDay : nil)
             let intervalValue: Int? = recurrencePattern.requiresCustomConfig ? customInterval : nil
 
+            // Capture values before dismiss invalidates the view
+            let trimmedTitle = title.trimmingCharacters(in: .whitespaces)
+            let capturedTags = tags
+            let capturedPriority = priority
+            let capturedDuration = duration
+            let capturedUrgency = urgency
+            let capturedTaskType = taskType
+            let capturedRecurrence = recurrencePattern.rawValue
+            let capturedContext = modelContext
+
+            // Dismiss synchronously FIRST — async dismiss inside Task{} breaks on iOS 26
+            onCreateComplete?()
+            dismiss()
+
+            // Create task in background after sheet is dismissed
             Task {
                 do {
-                    let taskSource = LocalTaskSource(modelContext: modelContext)
+                    let taskSource = LocalTaskSource(modelContext: capturedContext)
                     let newTask = try await taskSource.createTask(
-                        title: title.trimmingCharacters(in: .whitespaces),
-                        tags: tags,
+                        title: trimmedTitle,
+                        tags: capturedTags,
                         dueDate: finalDueDate,
-                        importance: priority,
-                        estimatedDuration: duration,
-                        urgency: urgency,
-                        taskType: taskType,
-                        recurrencePattern: recurrencePattern.rawValue,
+                        importance: capturedPriority,
+                        estimatedDuration: capturedDuration,
+                        urgency: capturedUrgency,
+                        taskType: capturedTaskType,
+                        recurrencePattern: capturedRecurrence,
                         recurrenceWeekdays: weekdays,
                         recurrenceMonthDay: monthDayValue,
                         recurrenceInterval: intervalValue,
@@ -444,13 +459,8 @@ struct TaskFormSheet: View {
                     let donationIntent = CreateTaskIntent()
                     donationIntent.taskTitle = newTask.title
                     try? await IntentDonationManager.shared.donate(intent: donationIntent)
-
-                    await MainActor.run {
-                        onCreateComplete?()
-                        dismiss()
-                    }
                 } catch {
-                    isSaving = false
+                    print("[TaskFormSheet] Create task failed: \(error)")
                 }
             }
 
