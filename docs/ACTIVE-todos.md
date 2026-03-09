@@ -353,6 +353,8 @@
 | ~~Bug 79~~ | ~~Kalender-Event-Badges deutsche Labels~~ | ERLEDIGT | XS | ~2k | 1 | ~5 |
 | ~~Bug 80~~ | ~~Kalender-Kategorien iOS↔macOS Sync~~ | ERLEDIGT | S | ~15k | 3 | ~40 |
 | 30 | ~~App Icon Liquid Glass (iOS 26) — Two Rings + Dot~~ | ERLEDIGT | M | ~40-60k | 4 | ~100 |
+| ~~Bug 81~~ | ~~FocusBlock Task-Zuweisung verliert ersten Task~~ | ERLEDIGT | M | ~40k | 4 | ~290 |
+| Bug 82 | Erledigte Tasks — Suche funktioniert nicht | OFFEN | XS | ~5k | 1 | ~10 |
 
 **Komplexitaet:** XS = halbe Stunde | S = 1 Session | M = 2-3 Sessions | L = halber Tag | XL = ganzer Tag+
 
@@ -360,8 +362,8 @@
 **Kritisch:** keine offenen kritischen Bugs
 **Teuerste Items:** #17 OrganizeMyDay (~150k), #14 NC Widget (~120k), #12 Enhanced Quick Capture (~120k)
 **WARTEND (Apple-Abhaengigkeit):** #20 ITB-F — Developer-APIs verfuegbar, wartet auf Siri On-Screen Awareness (iOS 26.5/27)
-**Zuletzt erledigt:** Bug 70c-2 Block Resize per Drag (M)
-**Naechstes:** #7 Kalender Deep Link (M), #8 Enhanced Liquid Glass (M)
+**Zuletzt erledigt:** Bug 81 FocusBlock Task-Zuweisung (M)
+**Naechstes:** Bug 82 Erledigte-Tasks-Suche (XS)
 
 > **Dies ist das EINZIGE Backlog.** macOS-Features (MAC-xxx) stehen hier mit Verweis auf ihre Specs in `docs/specs/macos/`. Kein zweites Backlog.
 
@@ -666,6 +668,20 @@
 - **Betroffene Dateien:** SyncedSettings.swift, EventKitRepository.swift, SyncedSettingsTests.swift, CategoryIconBadgeTests.swift
 - **Tests:** 10/10 gruen (SyncedSettingsTests: 4 neue Merge-Tests + 6 bestehende)
 - **Analyse:** `docs/artifacts/bug-calendar-category-labels/analysis.md`
+
+### Bug 81: FocusBlock Task-Zuweisung verliert ersten Task (ERLEDIGT)
+- **Status:** ERLEDIGT
+- **Plattform:** iOS + macOS (beide gefixt)
+- **Symptom:** Im FocusBlock-Edit-Sheet: Task zuweisen → zweiten Task zuweisen → erster Task verschwindet. Tasks werden unsichtbar (nicht mehr im Backlog, nicht mehr im Block).
+- **Root Cause:** `.sheet(item: $blockForTasks) { block in ... }` fängt `FocusBlock` (value-type struct) als Snapshot. Jede Zuweisung liest `block.taskIDs` vom Snapshot statt vom aktuellen State. Zweite Zuweisung überschreibt erste. Tasks landen im LIMBO (assignedFocusBlockID gesetzt, aber nicht in block.taskIDs).
+- **Fix (3 Teile):**
+  1. `assignTaskToBlock` liest von `focusBlocks.first { $0.id == block.id }` statt stale `block`
+  2. Nach `loadData()`: `blockForTasks = refreshedBlock` damit Sheet neu rendert
+  3. `FocusBlockTasksSheet`: `.onChange(of: tasks.map(\.id))` aktualisiert `taskOrder`
+- **Recovery:** `SyncEngine.cleanOrphanedBlockAssignments()` findet Tasks mit assignedFocusBlockID die in keinem Block gelistet sind und setzt sie frei
+- **Dateien:** BlockPlanningView.swift, MacPlanningView.swift, FocusBlockTasksSheet.swift, SyncEngine.swift
+- **Tests:** 3 Unit Tests (FocusBlockAssignmentTests), 1 UI Test (Bug81StaleBlockAssignmentUITests)
+- **Analyse:** `docs/artifacts/bug-81-82-focusblock-search/analysis.md`
 
 ---
 
