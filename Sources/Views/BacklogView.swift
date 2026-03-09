@@ -696,6 +696,41 @@ struct BacklogView: View {
         }
     }
 
+    // MARK: - Postpone Context Menu (Bug 85-C)
+
+    @ViewBuilder
+    private func postponeMenu(for item: PlanItem) -> some View {
+        Menu {
+            Button {
+                postponeTask(item, byDays: 1)
+            } label: {
+                Label("Morgen", systemImage: "sun.max")
+            }
+            Button {
+                postponeTask(item, byDays: 7)
+            } label: {
+                Label("Nächste Woche", systemImage: "calendar.badge.plus")
+            }
+        } label: {
+            Label("Verschieben", systemImage: "calendar.badge.clock")
+        }
+    }
+
+    private func postponeTask(_ item: PlanItem, byDays days: Int) {
+        guard let taskUUID = UUID(uuidString: item.id) else { return }
+        let descriptor = FetchDescriptor<LocalTask>(
+            predicate: #Predicate<LocalTask> { $0.uuid == taskUUID }
+        )
+        guard let task = try? modelContext.fetch(descriptor).first else { return }
+        if let newDue = LocalTask.postpone(task, byDays: days, context: modelContext) {
+            NotificationService.cancelDueDateNotifications(taskID: task.id)
+            NotificationService.scheduleDueDateNotifications(
+                taskID: task.id, title: task.title, dueDate: newDue
+            )
+        }
+        Task { await loadTasks() }
+    }
+
     private func completeTask(_ item: PlanItem) {
         do {
             let taskSource = LocalTaskSource(modelContext: modelContext)
@@ -788,6 +823,11 @@ struct BacklogView: View {
                         }
                         .tint(.blue)
                     }
+                    .contextMenu {
+                        if item.dueDate != nil {
+                            postponeMenu(for: item)
+                        }
+                    }
                 }
             } header: {
                 HStack {
@@ -846,6 +886,11 @@ struct BacklogView: View {
                 Label("Bearbeiten", systemImage: "pencil")
             }
             .tint(.blue)
+        }
+        .contextMenu {
+            if item.dueDate != nil {
+                postponeMenu(for: item)
+            }
         }
     }
 

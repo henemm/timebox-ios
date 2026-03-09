@@ -171,6 +171,24 @@ final class LocalTask {
     }
 }
 
+// MARK: - Postpone Helper (Bug 85-C)
+
+extension LocalTask {
+    /// Verschiebt das Faelligkeitsdatum um N Tage und speichert.
+    /// Caller muss Notifications reschedeln (NotificationService ist nicht in allen Targets verfuegbar).
+    /// No-op wenn dueDate nil ist.
+    @discardableResult
+    static func postpone(_ task: LocalTask, byDays days: Int, context: ModelContext) -> Date? {
+        guard let currentDue = task.dueDate else { return nil }
+        let newDue = Calendar.current.date(byAdding: .day, value: days, to: currentDue)!
+        task.dueDate = newDue
+        task.modifiedAt = Date()
+        task.rescheduleCount += 1
+        try? context.save()
+        return newDue
+    }
+}
+
 // MARK: - TaskSourceData Conformance
 
 extension LocalTask: TaskSourceData {

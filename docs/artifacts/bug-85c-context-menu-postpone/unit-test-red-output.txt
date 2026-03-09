@@ -1,0 +1,8 @@
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/TaskPostponeTests.swift:38:30: error: missing argument for parameter 'title' in call
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/TaskPostponeTests.swift:57:19: error: type 'LocalTask' has no member 'postpone'
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/TaskPostponeTests.swift:77:19: error: type 'LocalTask' has no member 'postpone'
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/TaskPostponeTests.swift:99:19: error: type 'LocalTask' has no member 'postpone'
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/TaskPostponeTests.swift:118:19: error: type 'LocalTask' has no member 'postpone'
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/TaskPostponeTests.swift:133:19: error: type 'LocalTask' has no member 'postpone'
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/TaskPostponeTests.swift:153:19: error: type 'LocalTask' has no member 'postpone'
+TEST FAILED: 6 compile errors - LocalTask has no member postpone

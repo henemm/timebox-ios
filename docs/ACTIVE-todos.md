@@ -363,8 +363,8 @@
 **Kritisch:** keine offenen kritischen Bugs
 **Teuerste Items:** #17 OrganizeMyDay (~150k), #14 NC Widget (~120k), #12 Enhanced Quick Capture (~120k)
 **WARTEND (Apple-Abhaengigkeit):** #20 ITB-F — Developer-APIs verfuegbar, wartet auf Siri On-Screen Awareness (iOS 26.5/27)
-**Zuletzt erledigt:** Bug 85-B Notification Snooze-Optionen (S)
-**Naechstes:** Bug 85-C Kontextmenue Verschieben-Optionen (S)
+**Zuletzt erledigt:** Bug 85-C Kontextmenue Verschieben-Optionen (S)
+**Naechstes:** (offen)
 
 > **Dies ist das EINZIGE Backlog.** macOS-Features (MAC-xxx) stehen hier mit Verweis auf ihre Specs in `docs/specs/macos/`. Kein zweites Backlog.
 
@@ -706,6 +706,18 @@
 - **Dateien:** Date+DueDate.swift, TaskInspector.swift (2 Dateien, ~15 LoC)
 - **Tests:** 10 neue Unit Tests (DueDateTimeDisplayTests) + 12 bestehende (DueDateFormattingTests) — alle gruen
 - **Analyse:** `docs/artifacts/bug-85-reminder-time-display/analysis.md`
+
+### Bug 85-C: Kontextmenue Verschieben-Optionen (ERLEDIGT)
+- **Status:** ERLEDIGT
+- **Plattform:** iOS + macOS (beide gefixt)
+- **Symptom:** Kein "Verschieben"-Menue in Kontextmenues. User konnten Fristen nur ueber Edit-Sheet aendern.
+- **Fix (4 Dateien):**
+  1. `LocalTask.swift`: Shared `postpone(_:byDays:context:)` Extension — dueDate + N Tage, modifiedAt, rescheduleCount++, save()
+  2. `BacklogView.swift`: `.contextMenu` mit "Verschieben"-Menu (Morgen/Naechste Woche) fuer Next Up + Backlog Rows
+  3. `ContentView.swift` (macOS): "Verschieben"-Menu im `.contextMenu(forSelectionType:)` (nur Einzelselektion + dueDate)
+  4. `NotificationActionDelegate.swift`: Refactored auf shared `LocalTask.postpone()` (alter private Helper entfernt)
+- **Tests:** 6 Unit Tests (TaskPostponeTests) — alle gruen
+- **Analyse:** `docs/artifacts/bug-85c-context-menu-postpone/analysis.md`
 
 ### Bug 85-B: Notification Snooze-Optionen (ERLEDIGT)
 - **Status:** ERLEDIGT

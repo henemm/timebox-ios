@@ -59,10 +59,20 @@ final class NotificationActionDelegate: NSObject, @preconcurrency UNUserNotifica
             task.nextUpSortOrder = maxOrder + 1
 
         case NotificationService.actionPostponeTomorrow:
-            postponeTask(task, taskID: taskID, byDays: 1)
+            if let newDue = LocalTask.postpone(task, byDays: 1, context: context) {
+                NotificationService.cancelDueDateNotifications(taskID: taskID)
+                NotificationService.scheduleDueDateNotifications(
+                    taskID: taskID, title: task.title, dueDate: newDue
+                )
+            }
 
         case NotificationService.actionPostponeNextWeek:
-            postponeTask(task, taskID: taskID, byDays: 7)
+            if let newDue = LocalTask.postpone(task, byDays: 7, context: context) {
+                NotificationService.cancelDueDateNotifications(taskID: taskID)
+                NotificationService.scheduleDueDateNotifications(
+                    taskID: taskID, title: task.title, dueDate: newDue
+                )
+            }
 
         case NotificationService.actionComplete:
             task.isCompleted = true
@@ -81,17 +91,6 @@ final class NotificationActionDelegate: NSObject, @preconcurrency UNUserNotifica
         #if !os(macOS)
         NotificationService.updateOverdueBadge(container: container)
         #endif
-    }
-
-    private func postponeTask(_ task: LocalTask, taskID: String, byDays days: Int) {
-        if let currentDue = task.dueDate {
-            let newDue = Calendar.current.date(byAdding: .day, value: days, to: currentDue)!
-            task.dueDate = newDue
-            NotificationService.cancelDueDateNotifications(taskID: taskID)
-            NotificationService.scheduleDueDateNotifications(
-                taskID: taskID, title: task.title, dueDate: newDue
-            )
-        }
     }
 
     // MARK: - Testing Support

@@ -479,6 +479,17 @@ struct ContentView: View {
                         removeFromNextUp(selection)
                     }
 
+                    // Show "Verschieben" for single task with dueDate (Bug 85-C)
+                    if selection.count == 1,
+                       let taskId = selection.first,
+                       let task = tasks.first(where: { $0.uuid == taskId }),
+                       task.dueDate != nil {
+                        Menu("Verschieben") {
+                            Button("Morgen") { postponeTask(task, byDays: 1) }
+                            Button("Nächste Woche") { postponeTask(task, byDays: 7) }
+                        }
+                    }
+
                     // Show "Serie bearbeiten" for single recurring task
                     if selection.count == 1,
                        let taskId = selection.first,
@@ -786,6 +797,17 @@ struct ContentView: View {
             }
         }
         try? modelContext.save()
+    }
+
+    // MARK: - Postpone (Bug 85-C)
+
+    private func postponeTask(_ task: LocalTask, byDays days: Int) {
+        if let newDue = LocalTask.postpone(task, byDays: days, context: modelContext) {
+            NotificationService.cancelDueDateNotifications(taskID: task.id)
+            NotificationService.scheduleDueDateNotifications(
+                taskID: task.id, title: task.title, dueDate: newDue
+            )
+        }
     }
 
     private func deleteTasksByIds(_ ids: Set<UUID>) {
