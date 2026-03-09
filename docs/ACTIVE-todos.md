@@ -568,6 +568,37 @@
 - **Tests:** 5 UI Tests (SheetDismissUITests) — Create+Edit+Cancel+FocusBlock
 - **Analyse:** `docs/artifacts/bug-sheet-dismiss/analysis.md`
 
+### Bug 75: macOS — App-Icon wird nicht korrekt angezeigt
+- **Status:** OFFEN (Backlog)
+- **Plattform:** macOS
+- **Symptom:** Im Dock wird ein generisches/falsches Icon angezeigt statt des FocusBlox App-Icons
+- **Aufwand:** Klein
+- **Screenshot:** `docs/artifacts/bug-75-78-mac-bugs/icon-screenshot.png`
+
+### Bug 76: macOS — Neuer Task verschwindet nach Anlegen (Fokus fehlt)
+- **Status:** OFFEN (Backlog)
+- **Plattform:** macOS
+- **Symptom:** Im Backlog-View einen Task ueber den Eingabeschlitz anlegen + "+" klicken → Task "verschwindet". Er wird angelegt, aber nicht in der Liste selektiert. Gewuenscht: Fokus folgt dem neu angelegten Task, damit man direkt erweiterte Attribute setzen kann.
+- **Betroffene Views:** `ContentView` (macOS), Task-Erstellung + Selektion
+- **Aufwand:** Klein-Mittel
+
+### Bug 77: macOS — Orange Umrandung bei geaendertem Task zu eng am Inhalt
+- **Status:** OFFEN (Backlog)
+- **Plattform:** macOS
+- **Symptom:** Die orangene Umrandung (frozenSortSnapshot / pendingResort-Indikator) nach Aenderung von Wichtigkeit/Dringlichkeit ist optisch zu knapp am Inhalt — zu wenig Padding zwischen Border und Content.
+- **Betroffene Views:** `ContentView` (macOS), Task-Row-Darstellung
+- **Aufwand:** Klein (Padding anpassen)
+- **Screenshot:** `docs/artifacts/bug-75-78-mac-bugs/border-screenshot.png`
+
+### Bug 78: macOS — Crash bei Swipe-Aktionen (SwiftData Fault)
+- **Status:** OFFEN (Backlog) — **KRITISCH**
+- **Plattform:** macOS
+- **Symptom:** App stuerzt ab bei Swipe-Aktion (editieren/loeschen) auf einer Task-Row
+- **Fehlermeldung:** `Fatal error: This backing data was detached from a context without resolving attribute faults: PersistentIdentifier(...) - \LocalTask.tags`
+- **Vermutliche Ursache:** SwiftData-Objekt wird aus dem ModelContext entfernt/detached bevor alle Attribute (hier: `tags`) aufgeloest werden. Typisch bei Swipe-Actions die ein Objekt loeschen waehrend die View noch auf Attribute zugreift.
+- **Betroffene Views:** `ContentView` (macOS), Swipe-Actions auf Task-Rows
+- **Aufwand:** Mittel (SwiftData Lifecycle-Problem)
+
 ---
 
 ## Backlog (Technical Debt)
