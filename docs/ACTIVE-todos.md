@@ -322,7 +322,7 @@
 | Bug 73 | Tasks-Dialog ohne Prioritaets-Info | OFFEN | M | ~40-60k | 3 | ~100 |
 | Bug 75 | macOS App-Icon falsch | ERLEDIGT | XS | ~2k | 1 | ~10 |
 | Bug 76 | macOS Task verschwindet nach Anlegen | OFFEN | S | ~15-20k | 1-2 | ~30 |
-| Bug 77 | macOS Orange Umrandung zu eng | OFFEN | XS | ~5k | 1 | ~10 |
+| Bug 77 | macOS Orange Umrandung zu eng | ERLEDIGT | XS | ~2k | 1 | ~10 |
 | ~~Bug 78~~ | ~~macOS Crash bei Swipe (SwiftData Fault)~~ | ERLEDIGT | M | ~30-40k | 2 | ~20 |
 | 30 | ~~App Icon Liquid Glass (iOS 26) — Two Rings + Dot~~ | ERLEDIGT | M | ~40-60k | 4 | ~100 |
 
@@ -589,12 +589,12 @@
 - **Betroffene Views:** `ContentView` (macOS), Task-Erstellung + Selektion
 - **Aufwand:** Klein-Mittel
 
-### Bug 77: macOS — Orange Umrandung bei geaendertem Task zu eng am Inhalt
-- **Status:** OFFEN (Backlog)
+### Bug 77: macOS — Orange Umrandung bei geaendertem Task zu eng am Inhalt (ERLEDIGT)
+- **Status:** ERLEDIGT
 - **Plattform:** macOS
-- **Symptom:** Die orangene Umrandung (frozenSortSnapshot / pendingResort-Indikator) nach Aenderung von Wichtigkeit/Dringlichkeit ist optisch zu knapp am Inhalt — zu wenig Padding zwischen Border und Content.
-- **Betroffene Views:** `ContentView` (macOS), Task-Row-Darstellung
-- **Aufwand:** Klein (Padding anpassen)
+- **Symptom:** Die orangene Umrandung (pendingResort-Indikator) war optisch zu knapp am Inhalt.
+- **Root Cause:** `MacBacklogRow` hatte nur `.padding(.vertical, 4)` ohne horizontales Padding (iOS BacklogRow hat `.padding(12)` auf allen Seiten).
+- **Fix:** Padding auf `.padding(.vertical, 6).padding(.horizontal, 8)` erweitert.
 - **Screenshot:** `docs/artifacts/bug-75-78-mac-bugs/border-screenshot.png`
 
 ### Bug 78: macOS — Crash bei Swipe-Aktionen (SwiftData Fault) (ERLEDIGT)

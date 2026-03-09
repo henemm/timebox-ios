@@ -62,7 +62,8 @@ struct MacBacklogRow: View {
                     .font(.system(size: 14))
             }
         }
-        .padding(.vertical, 4)
+        .padding(.vertical, 6)
+        .padding(.horizontal, 8)
         .overlay {
             if isPendingResort {
                 RoundedRectangle(cornerRadius: 8)
