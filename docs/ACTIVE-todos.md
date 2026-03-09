@@ -321,7 +321,7 @@
 | ~~Bug 74~~ | ~~Sheet dismiss nach Speichern (Create Task)~~ | ERLEDIGT | XS | ~5k | 1 | ~11 |
 | Bug 73 | Tasks-Dialog ohne Prioritaets-Info | OFFEN | M | ~40-60k | 3 | ~100 |
 | Bug 75 | macOS App-Icon falsch | ERLEDIGT | XS | ~2k | 1 | ~10 |
-| Bug 76 | macOS Task verschwindet nach Anlegen | OFFEN | S | ~15-20k | 1-2 | ~30 |
+| Bug 76 | macOS Task verschwindet nach Anlegen | ERLEDIGT | S | ~2k | 1 | ~10 |
 | Bug 77 | macOS Orange Umrandung zu eng | ERLEDIGT | XS | ~2k | 1 | ~10 |
 | ~~Bug 78~~ | ~~macOS Crash bei Swipe (SwiftData Fault)~~ | ERLEDIGT | M | ~30-40k | 2 | ~20 |
 | 30 | ~~App Icon Liquid Glass (iOS 26) — Two Rings + Dot~~ | ERLEDIGT | M | ~40-60k | 4 | ~100 |
@@ -582,12 +582,13 @@
 - **Fix:** Alle 10 Icons aus iOS-Quelle (1024x1024, korrekt) per `sips` in korrekte Groessen resized. DPI 72, kein Alpha.
 - **Screenshot:** `docs/artifacts/bug-75-78-mac-bugs/icon-screenshot.png`
 
-### Bug 76: macOS — Neuer Task verschwindet nach Anlegen (Fokus fehlt)
-- **Status:** OFFEN (Backlog)
+### Bug 76: macOS — Neuer Task verschwindet nach Anlegen (Fokus fehlt) (ERLEDIGT)
+- **Status:** ERLEDIGT
 - **Plattform:** macOS
-- **Symptom:** Im Backlog-View einen Task ueber den Eingabeschlitz anlegen + "+" klicken → Task "verschwindet". Er wird angelegt, aber nicht in der Liste selektiert. Gewuenscht: Fokus folgt dem neu angelegten Task, damit man direkt erweiterte Attribute setzen kann.
-- **Betroffene Views:** `ContentView` (macOS), Task-Erstellung + Selektion
-- **Aufwand:** Klein-Mittel
+- **Symptom:** Task ueber Eingabeschlitz anlegen → Task nicht selektiert, scheint zu verschwinden.
+- **Root Cause:** `addTask()` verwarf den Rueckgabewert von `createTask()` (`_ = try?`). `selectedTasks` wurde nie auf die UUID des neuen Tasks gesetzt.
+- **Fix:** Rueckgabewert nutzen und `selectedTasks = [newTask.uuid]` setzen (1 Zeile).
+- **Betroffene Views:** `ContentView.swift:767` (macOS)
 
 ### Bug 77: macOS — Orange Umrandung bei geaendertem Task zu eng am Inhalt (ERLEDIGT)
 - **Status:** ERLEDIGT

@@ -771,7 +771,9 @@ struct ContentView: View {
 
         Task {
             let taskSource = LocalTaskSource(modelContext: modelContext)
-            _ = try? await taskSource.createTask(title: title, taskType: "")
+            if let newTask = try? await taskSource.createTask(title: title, taskType: "") {
+                selectedTasks = [newTask.uuid]
+            }
         }
     }
 
