@@ -362,8 +362,8 @@
 **Kritisch:** keine offenen kritischen Bugs
 **Teuerste Items:** #17 OrganizeMyDay (~150k), #14 NC Widget (~120k), #12 Enhanced Quick Capture (~120k)
 **WARTEND (Apple-Abhaengigkeit):** #20 ITB-F — Developer-APIs verfuegbar, wartet auf Siri On-Screen Awareness (iOS 26.5/27)
-**Zuletzt erledigt:** Bug 81 FocusBlock Task-Zuweisung (M)
-**Naechstes:** Bug 82 Erledigte-Tasks-Suche (XS)
+**Zuletzt erledigt:** Bug 85-A Uhrzeit bei Faelligkeitsdatum anzeigen (XS)
+**Naechstes:** Bug 85-B Notification Snooze-Optionen (S)
 
 > **Dies ist das EINZIGE Backlog.** macOS-Features (MAC-xxx) stehen hier mit Verweis auf ihre Specs in `docs/specs/macos/`. Kein zweites Backlog.
 
@@ -682,6 +682,19 @@
 - **Dateien:** BlockPlanningView.swift, MacPlanningView.swift, FocusBlockTasksSheet.swift, SyncEngine.swift
 - **Tests:** 3 Unit Tests (FocusBlockAssignmentTests), 1 UI Test (Bug81StaleBlockAssignmentUITests)
 - **Analyse:** `docs/artifacts/bug-81-82-focusblock-search/analysis.md`
+
+### Bug 85-A: Uhrzeit bei Faelligkeitsdatum ueberall anzeigen (ERLEDIGT)
+- **Status:** ERLEDIGT
+- **Plattform:** iOS + macOS (beide gefixt)
+- **Symptom:** Uhrzeit wird im DatePicker gespeichert aber nirgendwo angezeigt. Alle Frist-Anzeigen zeigen nur "Heute", "Morgen" oder Datum ohne Uhrzeit. macOS TaskInspector erlaubt keine Uhrzeit-Eingabe.
+- **Root Cause:** `Date+DueDate.swift` nutzte `timeStyle = .none` im Datum-Pfad, und Early-Returns fuer "Heute"/"Morgen" gaben pure Strings ohne Uhrzeit zurueck. TaskInspector hatte `displayedComponents: .date` (ohne Uhrzeit).
+- **Fix (2 Dateien):**
+  1. `Date+DueDate.swift`: Neue `dueDateTimeSuffix` Property — appended ", HH:mm" wenn Uhrzeit != 00:00. Alle 4 Code-Pfade (Heute/Morgen/Wochentag/Datum) nutzen den Suffix.
+  2. `TaskInspector.swift`: DatePicker von `.date` auf `[.date, .hourAndMinute]` geaendert.
+- **Logik:** 00:00 = "keine Uhrzeit gesetzt" (keine Anzeige). Alle anderen Uhrzeiten werden als ", HH:mm" angehaengt.
+- **Dateien:** Date+DueDate.swift, TaskInspector.swift (2 Dateien, ~15 LoC)
+- **Tests:** 10 neue Unit Tests (DueDateTimeDisplayTests) + 12 bestehende (DueDateFormattingTests) — alle gruen
+- **Analyse:** `docs/artifacts/bug-85-reminder-time-display/analysis.md`
 
 ### Bug 84: App-Icon Badge zaehlt NextUp/FocusBlock-Tasks mit (ERLEDIGT)
 - **Status:** ERLEDIGT

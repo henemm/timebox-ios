@@ -102,7 +102,7 @@ struct TaskInspector: View {
                                            get: { task.dueDate ?? Date() },
                                            set: { task.dueDate = $0 }
                                        ),
-                                       displayedComponents: .date)
+                                       displayedComponents: [.date, .hourAndMinute])
                                 .labelsHidden()
 
                             Button {
