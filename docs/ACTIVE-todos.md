@@ -319,15 +319,21 @@
 | ~~Bug 71~~ | ~~Urgency-Keywords nicht aus Titel entfernt~~ | ERLEDIGT | S | ~20k | 2 | ~40 |
 | ~~Bug 72~~ | ~~macOS — FocusBlock Gear-Icon fehlt~~ | ERLEDIGT | XS | ~5k | 1 | ~12 |
 | ~~Bug 74~~ | ~~Sheet dismiss nach Speichern (Create Task)~~ | ERLEDIGT | XS | ~5k | 1 | ~11 |
+| Bug 73 | Tasks-Dialog ohne Prioritaets-Info | OFFEN | M | ~40-60k | 3 | ~100 |
+| Bug 75 | macOS App-Icon falsch | OFFEN | XS | ~5k | 1 | ~10 |
+| Bug 76 | macOS Task verschwindet nach Anlegen | OFFEN | S | ~15-20k | 1-2 | ~30 |
+| Bug 77 | macOS Orange Umrandung zu eng | OFFEN | XS | ~5k | 1 | ~10 |
+| ~~Bug 78~~ | ~~macOS Crash bei Swipe (SwiftData Fault)~~ | ERLEDIGT | M | ~30-40k | 2 | ~20 |
 | 30 | ~~App Icon Liquid Glass (iOS 26) — Two Rings + Dot~~ | ERLEDIGT | M | ~40-60k | 4 | ~100 |
 
 **Komplexitaet:** XS = halbe Stunde | S = 1 Session | M = 2-3 Sessions | L = halber Tag | XL = ganzer Tag+
 
-**Guenstigster Quick Win:** Bug 70c-2 Block Resize (M) oder #7 Kalender Deep Link (M)
+**Guenstigster Quick Win:** Bug 75 macOS Icon (XS) oder Bug 77 Padding (XS)
+**Kritisch:** ~~Bug 78 macOS Crash~~ ERLEDIGT
 **Teuerste Items:** #17 OrganizeMyDay (~150k), #14 NC Widget (~120k), #12 Enhanced Quick Capture (~120k)
 **WARTEND (Apple-Abhaengigkeit):** #20 ITB-F — Developer-APIs verfuegbar, wartet auf Siri On-Screen Awareness (iOS 26.5/27)
-**Zuletzt erledigt:** Bug 74 Sheet Dismiss (XS)
-**Naechstes:** Bug 70c-2 Block Resize (M), #7 Kalender Deep Link (M), oder #11 Emotionales Aufladen (L)
+**Zuletzt erledigt:** Bug 78 macOS Crash bei Swipe (M)
+**Naechstes:** Bug 70c-2 Block Resize (M), #7 Kalender Deep Link (M), Bug 75 macOS Icon (XS)
 
 > **Dies ist das EINZIGE Backlog.** macOS-Features (MAC-xxx) stehen hier mit Verweis auf ihre Specs in `docs/specs/macos/`. Kein zweites Backlog.
 
@@ -590,14 +596,38 @@
 - **Aufwand:** Klein (Padding anpassen)
 - **Screenshot:** `docs/artifacts/bug-75-78-mac-bugs/border-screenshot.png`
 
-### Bug 78: macOS — Crash bei Swipe-Aktionen (SwiftData Fault)
-- **Status:** OFFEN (Backlog) — **KRITISCH**
+### Bug 78: macOS — Crash bei Swipe-Aktionen (SwiftData Fault) (ERLEDIGT)
+- **Status:** ERLEDIGT
 - **Plattform:** macOS
 - **Symptom:** App stuerzt ab bei Swipe-Aktion (editieren/loeschen) auf einer Task-Row
 - **Fehlermeldung:** `Fatal error: This backing data was detached from a context without resolving attribute faults: PersistentIdentifier(...) - \LocalTask.tags`
-- **Vermutliche Ursache:** SwiftData-Objekt wird aus dem ModelContext entfernt/detached bevor alle Attribute (hier: `tags`) aufgeloest werden. Typisch bei Swipe-Actions die ein Objekt loeschen waehrend die View noch auf Attribute zugreift.
-- **Betroffene Views:** `ContentView` (macOS), Swipe-Actions auf Task-Rows
-- **Aufwand:** Mittel (SwiftData Lifecycle-Problem)
+- **Root Cause:** macOS nutzt `@Query` (direkte SwiftData-Referenzen), iOS nutzt `PlanItem` (value-type Kopien). Wenn ein Task-Objekt detached wird (Delete, CloudKit-Sync), halten Views stale Referenzen. Beim naechsten State-Change (Edit- oder Delete-Swipe) werden computed properties re-evaluiert → `.tags`-Zugriff auf detachtem Objekt → Crash.
+- **Fix:** `task.modelContext != nil` Guard an 7 Stellen: `matchesSearch()`, `visibleTasks`, `filteredTasks` (2x), `regularFilteredTasks` (2x), `MacBacklogRow.tags`-Zugriff
+- **Dateien:** ContentView.swift (macOS, 6 Guards), MacBacklogRow.swift (1 Guard + SwiftData import)
+- **Tests:** 5 Unit Tests (DetachedTaskGuardTests), Build OK (iOS + macOS)
+- **iOS:** NICHT betroffen (PlanItem value-type Kopien)
+- **Analyse:** `docs/artifacts/bug-78-swiftdata-crash/analysis.md`
+
+### Bug 79: Kalender-Event-Badges zeigen falsche (deutsche) Kategorie-Labels
+- **Status:** OFFEN (Backlog)
+- **Plattform:** iOS + macOS
+- **Symptom:** CategoryIconBadge im Kalender-View zeigt deutsche Labels ("Pflege", "Energie", "Geld") statt der korrekten englischen Labels aus der Spec ("Essentials", "Self Care", "Earn")
+- **Root Cause:** `CategoryIconBadge.swift:10` nutzt `category.localizedName` (Deutsch) statt `category.displayName` (Englisch). Auch `MacBacklogRow.swift:280` nutzt `localizedName`. Suchlogik in `BacklogView.swift:82` und `ContentView.swift:88` matcht ebenfalls auf deutsche Namen.
+- **Achtung:** Englische Labels sind laenger ("Essentials"=10, "Self Care"=9 Zeichen). Badge-Constraint-Test prueft max 8 Zeichen — muss auf 10 erhoeht werden. Capsule-Badge visuell OK.
+- **Betroffene Dateien:** CategoryIconBadge.swift, MacBacklogRow.swift, BacklogView.swift, ContentView.swift (macOS), CategoryIconBadgeTests.swift, TaskCategoryTests.swift
+- **Aufwand:** Klein (4-5 Dateien, reine String-Aenderung + Test-Updates)
+- **Analyse:** `docs/artifacts/bug-calendar-category-labels/analysis.md`
+
+### Bug 80: Kalender-Event-Kategorien synchen nicht zwischen iOS und macOS
+- **Status:** OFFEN (Backlog)
+- **Plattform:** iOS ↔ macOS
+- **Symptom:** Auf iOS gesetzte Kategorien fuer Kalender-Events sind auf macOS nicht sichtbar (und umgekehrt)
+- **Root Cause:** Event-Kategorien werden in `UserDefaults.standard` gespeichert (Bug 63 hat sie dorthin verschoben wegen read-only EventKit bei Gaesten). UserDefaults ist device-lokal und syncht NICHT zwischen Geraeten.
+- **Fix-Empfehlung:** Bestehende `SyncedSettings`-Klasse (nutzt bereits `NSUbiquitousKeyValueStore`) um Category-Dictionary erweitern. Push = lokale UserDefaults → iCloud KV Store, Pull = iCloud → lokale UserDefaults. Migration: Bestehende lokale Eintraege bleiben erhalten.
+- **Risiken:** iCloud KV Store 1MB Limit (bei 5 Events/Tag ueber 3 Jahre = ~270 KB, machbar). Verwaiste Keys bei geloeschten Events (Cleanup noetig). Sync-Delay (typisch 5-30s).
+- **Betroffene Dateien:** SyncedSettings.swift, CalendarEvent.swift, EventKitRepository.swift, CalendarCategoryMappingTests.swift
+- **Aufwand:** Mittel (3-4 Dateien + Migration + Tests)
+- **Analyse:** `docs/artifacts/bug-calendar-category-labels/analysis.md`
 
 ---
 

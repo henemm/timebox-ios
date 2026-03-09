@@ -1,0 +1,9 @@
+Bug 78: DetachedTaskGuardTests - 5/5 Tests GREEN
+Date: Mo.  9 März 2026 09:08:13 CET
+Tests:
+  1. testValidTaskHasModelContext - PASSED
+  2. testDeletedTaskHasNilModelContext - PASSED
+  3. testGuardPatternSkipsDetachedTaskInFilter - PASSED
+  4. testMatchesSearchGuardSkipsDetachedTask - PASSED
+  5. testTagsAccessOnValidTaskWorks - PASSED
+Result: All 5 tests validate the guard pattern for Bug 78 fix.

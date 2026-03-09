@@ -80,6 +80,7 @@ struct ContentView: View {
 
     // MARK: - Search Filter
     private func matchesSearch(_ task: LocalTask) -> Bool {
+        guard task.modelContext != nil else { return false }  // Bug 78: skip detached objects
         guard !searchText.isEmpty else { return true }
         let query = searchText
         if task.title.localizedCaseInsensitiveContains(query) { return true }
@@ -91,7 +92,7 @@ struct ContentView: View {
 
     // Base filter: exclude future-dated recurring tasks (same logic as iOS LocalTaskSource)
     private var visibleTasks: [LocalTask] {
-        tasks.filter { !$0.isCompleted && $0.isVisibleInBacklog }
+        tasks.filter { $0.modelContext != nil && !$0.isCompleted && $0.isVisibleInBacklog }  // Bug 78: skip detached
     }
 
     // Computed properties for sidebar badges
@@ -144,9 +145,9 @@ struct ContentView: View {
                 return dueDate < startOfToday
             }.sorted { ($0.dueDate ?? .distantFuture) < ($1.dueDate ?? .distantFuture) }
         case .completed:
-            base = tasks.filter { $0.isCompleted }
+            base = tasks.filter { $0.modelContext != nil && $0.isCompleted }  // Bug 78: skip detached
         case .recurring:
-            base = tasks.filter { $0.isTemplate && !$0.isCompleted }
+            base = tasks.filter { $0.modelContext != nil && $0.isTemplate && !$0.isCompleted }  // Bug 78
         }
         return searchText.isEmpty ? base : base.filter { matchesSearch($0) }
     }
@@ -265,9 +266,9 @@ struct ContentView: View {
                 return dueDate < startOfToday
             }.sorted { ($0.dueDate ?? .distantFuture) < ($1.dueDate ?? .distantFuture) }
         case .completed:
-            base = tasks.filter { $0.isCompleted }
+            base = tasks.filter { $0.modelContext != nil && $0.isCompleted }  // Bug 78
         case .recurring:
-            base = tasks.filter { $0.isTemplate && !$0.isCompleted }
+            base = tasks.filter { $0.modelContext != nil && $0.isTemplate && !$0.isCompleted }  // Bug 78
         }
         return searchText.isEmpty ? base : base.filter { matchesSearch($0) }
     }

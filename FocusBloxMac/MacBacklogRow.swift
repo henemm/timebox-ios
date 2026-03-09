@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 /// Compact task row optimized for macOS list display
 /// Aligned with iOS BacklogRow styling and functionality
@@ -111,8 +112,8 @@ struct MacBacklogRow: View {
                 RecurrenceBadge(pattern: task.recurrencePattern, taskId: task.id)
             }
 
-            // 5. Tags
-            if !task.tags.isEmpty {
+            // 5. Tags (Bug 78: guard against detached SwiftData objects)
+            if task.modelContext != nil, !task.tags.isEmpty {
                 TagsBadge(tags: task.tags, taskId: task.id)
             }
 
