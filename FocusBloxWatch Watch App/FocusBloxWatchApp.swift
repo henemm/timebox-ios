@@ -1,9 +1,11 @@
 import SwiftUI
 import SwiftData
+import UserNotifications
 
 @main
 struct FocusBloxWatch_Watch_AppApp: App {
     private static let appGroupID = "group.com.henning.focusblox"
+    @State private var notificationDelegate: WatchNotificationDelegate?
 
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
@@ -49,6 +51,12 @@ struct FocusBloxWatch_Watch_AppApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .onAppear {
+                    WatchNotificationDelegate.registerActions()
+                    let delegate = WatchNotificationDelegate(container: sharedModelContainer)
+                    UNUserNotificationCenter.current().delegate = delegate
+                    notificationDelegate = delegate
+                }
         }
         .modelContainer(sharedModelContainer)
     }

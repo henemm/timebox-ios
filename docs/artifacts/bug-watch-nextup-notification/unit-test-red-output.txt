@@ -1,0 +1,25 @@
+TDD RED: WatchNotificationDelegateTests — 8 test methods, ALL FAIL (compilation error)
+
+Error: Cannot find 'WatchNotificationDelegate' in scope (8 occurrences)
+
+Tests:
+1. nextUpAction_setsIsNextUpTrue — FAIL (WatchNotificationDelegate not found)
+2. nextUpAction_calculatesNextUpSortOrder — FAIL (WatchNotificationDelegate not found)
+3. nextUpAction_setsModifiedAt — FAIL (WatchNotificationDelegate not found)
+4. postponeAction_advancesDueDateByOneDay — FAIL (WatchNotificationDelegate not found)
+5. postponeAction_withoutDueDate_doesNothing — FAIL (WatchNotificationDelegate not found)
+6. completeAction_marksTaskCompleted — FAIL (WatchNotificationDelegate not found)
+7. unknownAction_doesNotModifyTask — FAIL (WatchNotificationDelegate not found)
+8. missingTask_doesNotCrash — FAIL (WatchNotificationDelegate not found)
+
+Build output:
+/Users/hem/Developer/my-daily-sprints/FocusBloxWatch Watch AppTests/WatchNotificationDelegateTests.swift:23:24: error: cannot find 'WatchNotificationDelegate' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxWatch Watch AppTests/WatchNotificationDelegateTests.swift:45:24: error: cannot find 'WatchNotificationDelegate' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxWatch Watch AppTests/WatchNotificationDelegateTests.swift:63:24: error: cannot find 'WatchNotificationDelegate' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxWatch Watch AppTests/WatchNotificationDelegateTests.swift:82:24: error: cannot find 'WatchNotificationDelegate' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxWatch Watch AppTests/WatchNotificationDelegateTests.swift:99:24: error: cannot find 'WatchNotificationDelegate' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxWatch Watch AppTests/WatchNotificationDelegateTests.swift:117:24: error: cannot find 'WatchNotificationDelegate' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxWatch Watch AppTests/WatchNotificationDelegateTests.swift:136:24: error: cannot find 'WatchNotificationDelegate' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxWatch Watch AppTests/WatchNotificationDelegateTests.swift:148:24: error: cannot find 'WatchNotificationDelegate' in scope
+
+** TEST FAILED **

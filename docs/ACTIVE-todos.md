@@ -37,6 +37,17 @@
 
 ---
 
+## ERLEDIGT: Bug — Watch Notification Actions wirkungslos (NextUp/Postpone/Complete)
+
+- **Symptom:** User klickt "NextUp" in Watch-Notification → Task erscheint auf keiner Plattform in NextUp
+- **Root Cause:** Watch App hatte keinen `UNUserNotificationCenterDelegate` registriert. Notification-Actions wurden still ignoriert.
+- **Fix:** `WatchNotificationDelegate.swift` (neuer Watch-spezifischer Handler) + Registrierung in `FocusBloxWatchApp.swift`
+- **Blast Radius:** Alle 3 Watch-Notification-Actions betroffen (NextUp, Postpone, Complete) — alle gefixt
+- **Tests:** 8 Unit Tests gruen (WatchNotificationDelegateTests)
+- **Dateien:** 1 neue + 1 geaenderte im Watch-Target
+
+---
+
 ## ERLEDIGT: Bug — Watch-Tasks ohne Enrichment (? ? (?) ? im Backlog)
 
 - **Symptom:** Via Apple Watch erstellte Tasks zeigen auf iPhone `? ? (?) ?` und Score 0
