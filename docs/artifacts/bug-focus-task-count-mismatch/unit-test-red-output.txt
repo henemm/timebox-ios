@@ -1,0 +1,11 @@
+    export TREAT_MISSING_BASELINES_AS_TEST_FAILURES\=NO
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/FocusBlockTaskCountTests.swift:33:27: error: value of type 'FocusBlock' has no member 'resolvedTaskCount'
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/FocusBlockTaskCountTests.swift:48:27: error: value of type 'FocusBlock' has no member 'resolvedTaskCount'
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/FocusBlockTaskCountTests.swift:60:27: error: value of type 'FocusBlock' has no member 'resolvedTaskCount'
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/FocusBlockTaskCountTests.swift:74:31: error: value of type 'FocusBlock' has no member 'resolvedCompletedCount'
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/FocusBlockTaskCountTests.swift:91:27: error: value of type 'FocusBlock' has no member 'resolvedTaskCount'
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/FocusBlockTaskCountTests.swift:92:31: error: value of type 'FocusBlock' has no member 'resolvedCompletedCount'
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/FocusBlockTaskCountTests.swift:107:30: error: value of type 'FocusBlock' has no member 'resolvedTaskCount'
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/FocusBlockTaskCountTests.swift:108:30: error: value of type 'FocusBlock' has no member 'resolvedCompletedCount'
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/FocusBlockTaskCountTests.swift:117:31: error: value of type 'FocusBlock' has no member 'resolvedCompletedCount'
+** TEST FAILED **

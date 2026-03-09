@@ -401,16 +401,18 @@ struct BlockPlanningView: View {
     private func assignTaskToBlock(taskID: String, block: FocusBlock) {
         Task {
             do {
-                var updatedTaskIDs = block.taskIDs
+                // Bug 81 Fix: Read CURRENT block from focusBlocks, not stale sheet snapshot
+                let currentBlock = focusBlocks.first { $0.id == block.id } ?? block
+                var updatedTaskIDs = currentBlock.taskIDs
                 if !updatedTaskIDs.contains(taskID) {
                     updatedTaskIDs.append(taskID)
                 }
 
                 try eventKitRepo.updateFocusBlock(
-                    eventID: block.id,
+                    eventID: currentBlock.id,
                     taskIDs: updatedTaskIDs,
-                    completedTaskIDs: block.completedTaskIDs,
-                    taskTimes: block.taskTimes
+                    completedTaskIDs: currentBlock.completedTaskIDs,
+                    taskTimes: currentBlock.taskTimes
                 )
 
                 // Remove from Next Up and set assignedFocusBlockID
@@ -420,6 +422,10 @@ struct BlockPlanningView: View {
                 try syncEngine.updateAssignedFocusBlock(itemID: taskID, focusBlockID: block.id)
 
                 await loadData()
+                // Bug 81 Fix: Update sheet binding so it re-renders with current block
+                if let refreshedBlock = focusBlocks.first(where: { $0.id == block.id }) {
+                    blockForTasks = refreshedBlock
+                }
                 assignmentFeedback.toggle()
             } catch {
                 errorMessage = "Task konnte nicht zugeordnet werden."
@@ -517,6 +523,13 @@ struct BlockPlanningView: View {
             let taskSource = LocalTaskSource(modelContext: modelContext)
             let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
             allTasks = try await syncEngine.sync()
+
+            // Bug 81 Recovery: Clean orphaned block assignments (tasks with
+            // assignedFocusBlockID set but not listed in any block's taskIDs)
+            let cleaned = try syncEngine.cleanOrphanedBlockAssignments(focusBlocks: focusBlocks)
+            if cleaned > 0 {
+                allTasks = try await syncEngine.sync() // Refresh to show recovered tasks
+            }
         } catch {
             errorMessage = error.localizedDescription
         }

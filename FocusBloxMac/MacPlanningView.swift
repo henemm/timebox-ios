@@ -339,15 +339,17 @@ struct MacPlanningView: View {
     private func assignTaskToBlockFromSheet(taskID: String, block: FocusBlock) {
         Task {
             do {
-                var updatedTaskIDs = block.taskIDs
+                // Bug 81 Fix: Read CURRENT block from focusBlocks, not stale sheet snapshot
+                let currentBlock = focusBlocks.first { $0.id == block.id } ?? block
+                var updatedTaskIDs = currentBlock.taskIDs
                 if !updatedTaskIDs.contains(taskID) {
                     updatedTaskIDs.append(taskID)
                 }
                 try eventKitRepo.updateFocusBlock(
-                    eventID: block.id,
+                    eventID: currentBlock.id,
                     taskIDs: updatedTaskIDs,
-                    completedTaskIDs: block.completedTaskIDs,
-                    taskTimes: block.taskTimes
+                    completedTaskIDs: currentBlock.completedTaskIDs,
+                    taskTimes: currentBlock.taskTimes
                 )
                 let taskSource = LocalTaskSource(modelContext: modelContext)
                 let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
@@ -355,6 +357,10 @@ struct MacPlanningView: View {
                 try syncEngine.updateAssignedFocusBlock(itemID: taskID, focusBlockID: block.id)
                 await loadCalendarEvents(showSpinner: false)
                 await loadPlanItems()
+                // Bug 81 Fix: Update sheet binding so it re-renders with current block
+                if let refreshedBlock = focusBlocks.first(where: { $0.id == block.id }) {
+                    blockForTasks = refreshedBlock
+                }
             } catch {
                 errorMessage = "Task konnte nicht zugeordnet werden."
             }

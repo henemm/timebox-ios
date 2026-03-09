@@ -17,7 +17,7 @@ final class LiveActivityManager: Sendable {
     }
 
     /// Start a new Live Activity for a Focus Block
-    func startActivity(for block: FocusBlock, currentTask: String?) async throws {
+    func startActivity(for block: FocusBlock, currentTask: String?, knownTaskIDs: Set<String> = []) async throws {
         // End any existing activity first
         endActivity()
 
@@ -37,7 +37,7 @@ final class LiveActivityManager: Sendable {
             blockTitle: block.title,
             startDate: block.startDate,
             endDate: block.endDate,
-            totalTaskCount: block.taskIDs.count
+            totalTaskCount: knownTaskIDs.isEmpty ? block.taskIDs.count : block.resolvedTaskCount(knownTaskIDs: knownTaskIDs)
         )
 
         let initialState = FocusBlockActivityAttributes.ContentState(

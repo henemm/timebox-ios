@@ -56,6 +56,21 @@ struct FocusBlock: Identifiable, Sendable {
     }
 }
 
+// MARK: - Resolved Task Counts (Bug 83)
+
+extension FocusBlock {
+    /// Count of taskIDs that actually exist in the provided known set.
+    /// Prevents orphan IDs (deleted tasks) from inflating the total count.
+    func resolvedTaskCount(knownTaskIDs: Set<String>) -> Int {
+        taskIDs.filter { knownTaskIDs.contains($0) }.count
+    }
+
+    /// Count of completed tasks that both exist AND are in taskIDs.
+    func resolvedCompletedCount(knownTaskIDs: Set<String>) -> Int {
+        taskIDs.filter { knownTaskIDs.contains($0) && completedTaskIDs.contains($0) }.count
+    }
+}
+
 // MARK: - Formatting
 
 extension FocusBlock {

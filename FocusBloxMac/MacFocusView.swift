@@ -187,7 +187,11 @@ struct MacFocusView: View {
 
                 Spacer()
 
-                Text("\(tasksForBlock(block).filter { block.completedTaskIDs.contains($0.id) }.count)/\(block.taskIDs.count) Tasks")
+                Text({
+                    let resolved = tasksForBlock(block)
+                    let knownIDs = Set(resolved.map(\.id))
+                    return "\(block.resolvedCompletedCount(knownTaskIDs: knownIDs))/\(block.resolvedTaskCount(knownTaskIDs: knownIDs)) Tasks"
+                }())
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }

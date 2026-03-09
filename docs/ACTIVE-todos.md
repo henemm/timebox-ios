@@ -6,6 +6,21 @@
 
 ---
 
+## ERLEDIGT: Bug 83 — Focus View Task Count Widerspruch (iOS + macOS)
+
+- **Symptom:** Focus View zeigt "2/3 Tasks" im Header aber "Alle Tasks erledigt!" im Content gleichzeitig
+- **Root Cause:** Counter-Denominator nutzte `block.taskIDs.count` (EventKit, inkl. verwaister IDs), waehrend "Alle erledigt" Check `tasksForBlock()` nutzte (SwiftData, nur existierende Tasks). Wenn ein Task geloescht wird aber die ID in EventKit bleibt, divergieren die beiden Anzeigen.
+- **Fix:** Neue Helper `resolvedTaskCount(knownTaskIDs:)` / `resolvedCompletedCount(knownTaskIDs:)` auf FocusBlock. Alle Counter nutzen jetzt nur noch existierende Tasks.
+- **Aenderungen:**
+  - `Sources/Models/FocusBlock.swift`: 2 neue Helper-Methoden (+15 LoC)
+  - `Sources/Views/FocusLiveView.swift`: Counter + Notification nutzen resolved Counts
+  - `FocusBloxMac/MacFocusView.swift`: Counter nutzt resolved Counts
+  - `Sources/Services/LiveActivityManager.swift`: `knownTaskIDs` Parameter fuer Live Activity
+- **Tests:** 7 Unit Tests gruen (FocusBlockTaskCountTests)
+- **Beide Plattformen:** iOS + macOS gefixt
+
+---
+
 ## ERLEDIGT: Bug — Ueberlappende Timeline-Events falsch dargestellt (iOS + macOS)
 
 - **Symptom:** Langes Event (z.B. 08:00-12:00) + mehrere kuerzere Events → jedes Event bekommt eigene Spalte (1/4 Breite statt 1/2). Events die sich nicht direkt ueberlappen werden unnoetig nebeneinander gezeigt.

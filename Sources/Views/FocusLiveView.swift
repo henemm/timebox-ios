@@ -154,7 +154,8 @@ struct FocusLiveView: View {
             do {
                 try await liveActivityManager.startActivity(
                     for: block,
-                    currentTask: currentTask?.title
+                    currentTask: currentTask?.title,
+                    knownTaskIDs: Set(allTasks.map(\.id))
                 )
                 liveActivityStarted = true
                 // Immediately update with task-level end date
@@ -283,7 +284,11 @@ struct FocusLiveView: View {
                         .foregroundStyle(.orange)
                 }
                 Spacer()
-                Text("\(tasksForBlock(block).filter { block.completedTaskIDs.contains($0.id) }.count)/\(block.taskIDs.count) Tasks")
+                Text({
+                    let resolved = tasksForBlock(block)
+                    let knownIDs = Set(resolved.map(\.id))
+                    return "\(block.resolvedCompletedCount(knownTaskIDs: knownIDs))/\(block.resolvedTaskCount(knownTaskIDs: knownIDs)) Tasks"
+                }())
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -604,8 +609,8 @@ struct FocusLiveView: View {
             blockID: block.id,
             blockTitle: block.title,
             endDate: block.endDate,
-            completedCount: block.completedTaskIDs.count,
-            totalCount: block.taskIDs.count
+            completedCount: block.resolvedCompletedCount(knownTaskIDs: Set(allTasks.map(\.id))),
+            totalCount: block.resolvedTaskCount(knownTaskIDs: Set(allTasks.map(\.id)))
         )
     }
     /// Check if current task is overdue and play reminder every 2 minutes

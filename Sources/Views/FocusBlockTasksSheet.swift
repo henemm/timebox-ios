@@ -42,6 +42,9 @@ struct FocusBlockTasksSheet: View {
         .onAppear {
             taskOrder = tasks
         }
+        .onChange(of: tasks.map(\.id)) { _, _ in
+            taskOrder = tasks
+        }
     }
 
     // MARK: - Platform-Specific Layout

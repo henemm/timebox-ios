@@ -217,6 +217,32 @@ final class SyncEngine {
         try modelContext.save()
     }
 
+    /// Bug 81 Recovery: Clean up tasks with assignedFocusBlockID pointing to blocks
+    /// that no longer list them. These "orphaned" tasks are invisible in all views.
+    func cleanOrphanedBlockAssignments(focusBlocks: [FocusBlock]) throws -> Int {
+        // Collect all task IDs that are actually listed in any FocusBlock
+        let allBlockTaskIDs = Set(focusBlocks.flatMap { $0.taskIDs })
+
+        // Find tasks with assignedFocusBlockID set but NOT in any block's taskIDs
+        let descriptor = FetchDescriptor<LocalTask>(
+            predicate: #Predicate { $0.assignedFocusBlockID != nil && !$0.isCompleted }
+        )
+        let assignedTasks = try modelContext.fetch(descriptor)
+
+        var cleanedCount = 0
+        for task in assignedTasks {
+            if !allBlockTaskIDs.contains(task.uuid.uuidString) {
+                task.assignedFocusBlockID = nil
+                cleanedCount += 1
+            }
+        }
+
+        if cleanedCount > 0 {
+            try modelContext.save()
+        }
+        return cleanedCount
+    }
+
     private func findTask(byID id: String) throws -> LocalTask? {
         guard let uuid = UUID(uuidString: id) else { return nil }
         let descriptor = FetchDescriptor<LocalTask>(
