@@ -354,7 +354,7 @@
 | ~~Bug 80~~ | ~~Kalender-Kategorien iOS↔macOS Sync~~ | ERLEDIGT | S | ~15k | 3 | ~40 |
 | 30 | ~~App Icon Liquid Glass (iOS 26) — Two Rings + Dot~~ | ERLEDIGT | M | ~40-60k | 4 | ~100 |
 | ~~Bug 81~~ | ~~FocusBlock Task-Zuweisung verliert ersten Task~~ | ERLEDIGT | M | ~40k | 4 | ~290 |
-| Bug 82 | Erledigte Tasks — Suche funktioniert nicht | OFFEN | XS | ~5k | 1 | ~10 |
+| ~~Bug 82~~ | ~~Erledigte Tasks — Suche funktioniert nicht~~ | ERLEDIGT | XS | ~5k | 1 | ~10 |
 
 **Komplexitaet:** XS = halbe Stunde | S = 1 Session | M = 2-3 Sessions | L = halber Tag | XL = ganzer Tag+
 

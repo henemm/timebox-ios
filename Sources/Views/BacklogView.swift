@@ -1066,7 +1066,7 @@ struct BacklogView: View {
                 .listRowBackground(Color.clear)
                 .listRowSeparator(.hidden)
             } else {
-                ForEach(completedTasks) { item in
+                ForEach(completedTasks.filter { matchesSearch($0) }) { item in
                     CompletedTaskRow(
                         item: item,
                         onUncomplete: { uncompleteTask(item) },
