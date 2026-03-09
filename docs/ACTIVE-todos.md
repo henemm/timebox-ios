@@ -683,6 +683,16 @@
 - **Tests:** 3 Unit Tests (FocusBlockAssignmentTests), 1 UI Test (Bug81StaleBlockAssignmentUITests)
 - **Analyse:** `docs/artifacts/bug-81-82-focusblock-search/analysis.md`
 
+### Bug 84: App-Icon Badge zaehlt NextUp/FocusBlock-Tasks mit (ERLEDIGT)
+- **Status:** ERLEDIGT
+- **Plattform:** iOS (Badge) + macOS (Sidebar-Badge)
+- **Symptom:** Badge zeigte (8) obwohl nur 4 ueberfaellige Tasks in "Ueberfaellig"-Ansicht sichtbar. 4 weitere waren in NextUp oder FocusBlocks zugewiesen.
+- **Root Cause:** `NotificationService.updateOverdueBadge()` filterte `!isNextUp` und `assignedFocusBlockID == nil` NICHT — zahlte alle ueberfaelligen Tasks inkl. NextUp + FocusBlock-zugewiesener. BacklogView filtert diese korrekt aus.
+- **Fix:** (1) Testbare `countOverdueBadgeTasks(context:)` Funktion extrahiert mit korrekten Filtern. (2) macOS `ContentView.overdueCount` analog angepasst.
+- **Geaenderte Dateien:** `NotificationService.swift`, `ContentView.swift` (2 Dateien, ~10 LoC)
+- **Tests:** 6 Unit Tests (BadgeCountFilterTests) — alle gruen
+- **Analyse:** `docs/artifacts/bug-badge-count/analysis.md`
+
 ---
 
 ## Backlog (Technical Debt)

@@ -1,0 +1,6 @@
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/BadgeCountFilterTests.swift:36:41: error: type 'NotificationService' has no member 'countOverdueBadgeTasks'
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/BadgeCountFilterTests.swift:56:41: error: type 'NotificationService' has no member 'countOverdueBadgeTasks'
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/BadgeCountFilterTests.swift:77:41: error: type 'NotificationService' has no member 'countOverdueBadgeTasks'
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/BadgeCountFilterTests.swift:95:41: error: type 'NotificationService' has no member 'countOverdueBadgeTasks'
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/BadgeCountFilterTests.swift:111:41: error: type 'NotificationService' has no member 'countOverdueBadgeTasks'
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/BadgeCountFilterTests.swift:166:41: error: type 'NotificationService' has no member 'countOverdueBadgeTasks'

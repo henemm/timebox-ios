@@ -100,7 +100,7 @@ struct ContentView: View {
         let startOfToday = Calendar.current.startOfDay(for: Date())
         return visibleTasks.filter { task in
             guard let dueDate = task.dueDate else { return false }
-            return dueDate < startOfToday
+            return dueDate < startOfToday && !task.isNextUp && task.assignedFocusBlockID == nil
         }.count
     }
 
