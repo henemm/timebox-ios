@@ -1,0 +1,21 @@
+TDD RED: TaskDependencyTests - All 9 tests FAILED (compile errors)
+Date: 2026-03-10
+
+Errors (14 total):
+- Value of type 'LocalTask' has no member 'blockerTaskID' (6x)
+- Value of type 'PlanItem' has no member 'blockerTaskID' (1x)
+- Value of type 'PlanItem' has no member 'isBlocked' (2x)
+- Extra argument 'dependentTaskCount' in call (6x) - TaskPriorityScoringService
+
+Tests that failed:
+1. test_localTask_blockerTaskID_defaultsToNil
+2. test_localTask_blockerTaskID_canBeSet
+3. test_planItem_blockerTaskID_copiedFromLocalTask
+4. test_planItem_isBlocked_trueWhenBlockerSet
+5. test_planItem_isBlocked_falseWhenNoBlocker
+6. test_scoring_blockerBonus_zeroWhenNoDependents
+7. test_scoring_blockerBonus_addsThreePerDependent
+8. test_scoring_blockerBonus_cappedAtNine
+9. test_scoring_blockerBonus_respectsMaxScore100
+
+Result: ** TEST FAILED ** - Testing cancelled because the build failed.

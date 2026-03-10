@@ -1,0 +1,18 @@
+TDD GREEN: TaskDependencyTests - All 9 tests PASSED
+Date: 2026-03-10
+
+Test Suite 'TaskDependencyTests' passed
+  Executed 9 tests, with 0 failures (0 unexpected) in 0.232 seconds
+
+Tests passed:
+1. test_localTask_blockerTaskID_defaultsToNil - PASSED
+2. test_localTask_blockerTaskID_canBeSet - PASSED
+3. test_planItem_blockerTaskID_copiedFromLocalTask - PASSED
+4. test_planItem_isBlocked_trueWhenBlockerSet - PASSED
+5. test_planItem_isBlocked_falseWhenNoBlocker - PASSED
+6. test_scoring_blockerBonus_zeroWhenNoDependents - PASSED
+7. test_scoring_blockerBonus_addsThreePerDependent - PASSED
+8. test_scoring_blockerBonus_cappedAtNine - PASSED
+9. test_scoring_blockerBonus_respectsMaxScore100 - PASSED
+
+Result: ** TEST SUCCEEDED **

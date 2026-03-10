@@ -54,6 +54,12 @@ struct PlanItem: Identifiable, Sendable {
     /// Timestamp when task was last modified (for "Zuletzt" sort)
     let modifiedAt: Date?
 
+    /// ID of the task that blocks this one (nil = no blocker)
+    let blockerTaskID: String?
+
+    /// Whether this task is blocked by another task
+    var isBlocked: Bool { blockerTaskID != nil }
+
     /// Task is incomplete (missing importance, urgency, or duration)
     var isTbd: Bool {
         importance == nil || urgency == nil || estimatedDuration == nil
@@ -129,6 +135,7 @@ struct PlanItem: Identifiable, Sendable {
         self.isTemplate = false
 
         self.modifiedAt = nil
+        self.blockerTaskID = nil
     }
 
     init(localTask: LocalTask) {
@@ -176,6 +183,7 @@ struct PlanItem: Identifiable, Sendable {
         self.isTemplate = localTask.isTemplate
 
         self.modifiedAt = localTask.modifiedAt
+        self.blockerTaskID = localTask.blockerTaskID
     }
 
     private static func resolveDuration(manual: Int?, title: String?) -> (Int, DurationSource) {

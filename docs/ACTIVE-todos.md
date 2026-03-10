@@ -6,6 +6,24 @@
 
 ---
 
+## IN PROGRESS: Feature — Task-Abhaengigkeiten (Blocker)
+
+- **Anforderung:** Tasks koennen eine Finish-to-Start Abhaengigkeit bekommen. Task B kann erst bearbeitet werden wenn Task A (Blocker) erledigt ist. Blockierte Tasks werden eingerueckt + dimmed dargestellt. Blocker-Tasks bekommen Ranking-Boost.
+- **Phase 1 (Daten-Layer + Scoring) — ERLEDIGT:**
+  - `LocalTask.blockerTaskID: String?` — neues Property fuer Abhaengigkeit
+  - `PlanItem.blockerTaskID` + `isBlocked` computed property
+  - `TaskPriorityScoringService`: +3 Score pro abhaengigem Task (max +9)
+  - 9 Unit Tests (alle GREEN), keine Regression
+- **Phase 2 (View-Aenderungen) — OFFEN:**
+  - BacklogView: Grouping (blockierte Tasks unter Blocker anzeigen)
+  - BacklogRow: Einrueckung + Dimming fuer blockierte Tasks
+  - macOS Views analog
+- **Phase 3 (Erstellungs-UI) — OFFEN:**
+  - TaskFormSheet: "Abhaengig von..." Picker
+- **Spec:** `openspec/changes/sub-tasks/proposal.md`
+
+---
+
 ## ERLEDIGT: Bug — AI Title Improvement entfernt Doppelpunkt-Prefixe
 
 - **Symptom:** Task-Titel "Lohnsteuererklaerung: Rechnungsuebersicht erstellen" wird nach Erstellung zu "Rechnungsuebersicht erstellen" — das Prefix vor dem Doppelpunkt verschwindet.

@@ -44,7 +44,8 @@ struct TaskPriorityScoringService {
         estimatedDuration: Int?,
         taskType: String,
         isNextUp: Bool,
-        now: Date = Date()
+        now: Date = Date(),
+        dependentTaskCount: Int = 0
     ) -> Int {
         let eisenhower = eisenhowerScore(importance: importance, urgency: urgency)
         let deadline = deadlineScore(dueDate: dueDate, now: now)
@@ -56,8 +57,9 @@ struct TaskPriorityScoringService {
             taskType: taskType
         )
         let nextUp = nextUpBonus(isNextUp: isNextUp)
+        let blocker = blockerBonus(dependentTaskCount: dependentTaskCount)
 
-        return min(100, eisenhower + deadline + neglect + completeness + nextUp)
+        return min(100, eisenhower + deadline + neglect + completeness + nextUp + blocker)
     }
 
     // MARK: - Eisenhower Matrix (0-50)
@@ -137,5 +139,13 @@ struct TaskPriorityScoringService {
 
     static func nextUpBonus(isNextUp: Bool) -> Int {
         isNextUp ? 5 : 0
+    }
+
+    // MARK: - Blocker Bonus (0-9)
+
+    /// Tasks that block other tasks get a priority boost.
+    /// +3 per dependent task, capped at +9 (3 dependents).
+    static func blockerBonus(dependentTaskCount: Int) -> Int {
+        min(9, dependentTaskCount * 3)
     }
 }

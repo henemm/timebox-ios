@@ -97,6 +97,13 @@ final class LocalTask {
     /// Timestamp when task was last modified (for "Zuletzt" sort)
     var modifiedAt: Date?
 
+    // MARK: - Task Dependencies
+
+    /// ID of the task that blocks this one (Finish-to-Start dependency).
+    /// This task cannot be completed until the blocker is done.
+    /// nil = no blocker, task is freely actionable.
+    var blockerTaskID: String?
+
     // MARK: - AI Task Scoring (Apple Intelligence)
 
     /// AI-generated composite score (0-100, higher = more important/urgent)
