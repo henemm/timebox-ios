@@ -1036,7 +1036,9 @@ struct ContentView: View {
             isPendingResort: deferredSort.isPending(task.id),
             isCompletionPending: deferredCompletion.isPending(task.id),
             isBlocked: isBlocked,
-            dependentCount: dependentCount(for: task.id)
+            dependentCount: dependentCount(for: task.id),
+            effectiveScore: scoreFor(task),
+            effectiveTier: TaskPriorityScoringService.PriorityTier.from(score: scoreFor(task))
         )
     }
 

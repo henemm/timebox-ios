@@ -973,10 +973,8 @@
 ### ~~BACKLOG-010: Deferred Sort Logik dupliziert (iOS vs macOS)~~ ERLEDIGT
 - **Loesung:** Shared `DeferredSortController` in `Sources/Services/` extrahiert. Beide Plattformen nutzen `@Environment(DeferredSortController.self)`. Duplizierter Code entfernt. Bonus: fehlender `freeze()`-Call bei Kategorie-Aenderung (iOS) gefixt.
 
-### BACKLOG-011: macOS hat 3 parallele Sortier-Pfade
-- **Problem:** `filteredTasks`, `regularFilteredTasks` und `scoreFor()` berechnen Priority-Scores unabhaengig voneinander. Nur 2 von 3 nutzen frozen Scores. Fehleranfaellig bei kuenftigen Aenderungen.
-- **Loesung:** Eine einzige `scoreFor()`-Funktion als Single Source of Truth. `filteredTasks` und `regularFilteredTasks` nutzen `scoreFor()` statt eigener `calculateScore()`-Aufrufe.
-- **Aufwand:** S
+### ~~BACKLOG-011: MacBacklogRow berechnet Score direkt (umgeht frozen Scores)~~ ERLEDIGT
+- **Loesung:** `MacBacklogRow` bekommt `effectiveScore`/`effectiveTier` als Parameter vom Parent (`ContentView.makeBacklogRow`). Parent berechnet via `scoreFor()` → `deferredSort.effectiveScore()`. Badge zeigt jetzt frozen Score waehrend Deferred Sort. Fallback auf `calculateScore()` wenn kein effectiveScore uebergeben (Preview).
 
 ### ~~BACKLOG-012: displayedRegularTasks ist toter Wrapper (macOS)~~ ERLEDIGT
 - Bereits entfernt in Commit `cdad7c9` (2026-03-05) als Teil von BACKLOG-010 (Shared DeferredSortController)
@@ -986,10 +984,8 @@
 - **Geaenderte Dateien:** MacPlanningView, MacAssignView, MacFocusView, MenuBarView, MacTimelineView (5 Dateien, +9 LoC)
 - **Tests:** 3 macOS UI Tests (MacTextTruncationBlastRadiusUITests) — alle gruen
 
-### BACKLOG-014: calculateScore() wird mit 8 identischen Parametern an 6+ Stellen aufgerufen
-- **Problem:** `TaskPriorityScoringService.calculateScore(importance:urgency:dueDate:createdAt:rescheduleCount:estimatedDuration:taskType:isNextUp:)` — Copy-paste-anfaellig, schwer wartbar.
-- **Loesung:** Extension auf `LocalTask` (und/oder `PlanItem`): `task.priorityScore` als berechnete Property. Einmal definiert, ueberall genutzt.
-- **Aufwand:** S
+### ~~BACKLOG-014: calculateScore() wird mit 8 identischen Parametern an 6+ Stellen aufgerufen~~ ERLEDIGT
+- `PlanItem.priorityScore` existiert als Computed Property (PlanItem.swift:75-86) und wird in 15+ Stellen genutzt. Die 2 verbliebenen direkten Aufrufe in macOS Views (ContentView.scoreFor, MacBacklogRow) sind architekturbedingt (LocalTask vs PlanItem).
 
 ---
 

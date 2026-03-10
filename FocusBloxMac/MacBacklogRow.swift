@@ -21,6 +21,8 @@ struct MacBacklogRow: View {
     var isCompletionPending: Bool = false  // Deferred completion: shows filled checkbox before task disappears
     var isBlocked: Bool = false  // Task is blocked by another task (dimmed + indented + checkbox disabled)
     var dependentCount: Int = 0  // DEP-3: Number of tasks depending on this one (for score boost)
+    var effectiveScore: Int?  // BACKLOG-011: Frozen score from DeferredSortController (nil = compute live)
+    var effectiveTier: TaskPriorityScoringService.PriorityTier?  // BACKLOG-011: Frozen tier
     @State private var pendingPulse = false
 
     var body: some View {
@@ -132,8 +134,8 @@ struct MacBacklogRow: View {
             // 6. Duration Badge (macOS Menu Picker)
             durationBadge
 
-            // 7. Priority Score Badge
-            let score = TaskPriorityScoringService.calculateScore(
+            // 7. Priority Score Badge (BACKLOG-011: uses effective/frozen score from parent)
+            let score = effectiveScore ?? TaskPriorityScoringService.calculateScore(
                 importance: task.importance, urgency: task.urgency, dueDate: task.dueDate,
                 createdAt: task.createdAt, rescheduleCount: task.rescheduleCount,
                 estimatedDuration: task.estimatedDuration, taskType: task.taskType,
@@ -142,7 +144,7 @@ struct MacBacklogRow: View {
             )
             PriorityScoreBadge(
                 score: score,
-                tier: TaskPriorityScoringService.PriorityTier.from(score: score),
+                tier: effectiveTier ?? TaskPriorityScoringService.PriorityTier.from(score: score),
                 taskId: task.id
             )
 

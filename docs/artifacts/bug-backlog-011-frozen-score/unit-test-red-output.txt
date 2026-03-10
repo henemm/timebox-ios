@@ -1,0 +1,10 @@
+/Users/hem/Developer/my-daily-sprints/FocusBloxMacTests/MacBacklogRowScoreTests.swift:25:32: error: extra arguments at positions #2, #3 in call
+/Users/hem/Developer/my-daily-sprints/FocusBloxMacTests/MacBacklogRowScoreTests.swift:53:32: error: extra arguments at positions #2, #3 in call
+/Users/hem/Developer/my-daily-sprints/FocusBloxMacTests/MacBacklogRowScoreTests.swift:56:29: error: cannot infer contextual base in reference to member 'critical'
+Testing failed:
+	Extra arguments at positions #2, #3 in call
+	Extra arguments at positions #2, #3 in call
+	Cannot infer contextual base in reference to member 'critical'
+	Testing cancelled because the build failed.
+The following build commands failed:
+(3 failures)
