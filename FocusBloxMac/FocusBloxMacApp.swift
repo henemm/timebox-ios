@@ -337,6 +337,9 @@ struct FocusBloxMacApp: App {
         guard url.scheme == "focusblox" else { return }
         if url.host == "add" {
             quickCapture.showPanel()
+        } else if FocusBlock.eventID(from: url) != nil {
+            // Deep link from Calendar — app comes to foreground automatically
+            NSApp.activate(ignoringOtherApps: true)
         }
     }
 

@@ -205,3 +205,23 @@ extension FocusBlock {
         Self.serializeToNotes(taskIDs: taskIDs, completedTaskIDs: completedTaskIDs, taskTimes: taskTimes)
     }
 }
+
+// MARK: - Deep Link Support
+
+extension FocusBlock {
+    /// Generate a deep link URL for a FocusBlock event ID.
+    /// Format: focusblox://focus-block/{eventID}
+    static func deepLinkURL(for eventID: String) -> URL? {
+        guard !eventID.isEmpty else { return nil }
+        guard let encoded = eventID.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) else { return nil }
+        return URL(string: "focusblox://focus-block/\(encoded)")
+    }
+
+    /// Extract the event ID from a focusblox://focus-block/{id} URL.
+    static func eventID(from url: URL) -> String? {
+        guard url.scheme == "focusblox", url.host == "focus-block" else { return nil }
+        let path = url.path.trimmingCharacters(in: CharacterSet(charactersIn: "/"))
+        guard !path.isEmpty else { return nil }
+        return path.removingPercentEncoding ?? path
+    }
+}

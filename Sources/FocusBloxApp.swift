@@ -15,6 +15,7 @@ struct FocusBloxApp: App {
     @Environment(\.scenePhase) private var scenePhase
     @State private var showQuickCapture = false
     @State private var quickCaptureTitle = ""
+    @State private var selectedTab: AppTab = .backlog
     @State private var permissionRequested = false
     @State private var syncMonitor = CloudKitSyncMonitor()
     @State private var deferredSort = DeferredSortController()
@@ -243,7 +244,7 @@ struct FocusBloxApp: App {
     var body: some Scene {
         WindowGroup {
             ZStack {
-                ContentView()
+                ContentView(selectedTab: $selectedTab)
                     .environment(\.eventKitRepository, eventKitRepository)
                     .environment(syncMonitor)
                     .environment(deferredSort)
@@ -308,6 +309,8 @@ struct FocusBloxApp: App {
                 if url.host == "create-task" {
                     quickCaptureTitle = ""
                     showQuickCapture = true
+                } else if FocusBlock.eventID(from: url) != nil {
+                    selectedTab = .blox
                 }
             }
             .onReceive(NotificationCenter.default.publisher(for: .quickCaptureRequested)) { _ in
@@ -574,6 +577,13 @@ struct FocusBloxApp: App {
         context.insert(fbTask1)
         context.insert(fbTask2)
         context.insert(fbTask3)
+
+        // Long-title task for truncation testing (Bug 86)
+        let longTitleTask = LocalTask(title: "Lohnsteuererklärung Amazon Deutschland einreichen", importance: 3, estimatedDuration: 30, urgency: "urgent")
+        longTitleTask.isNextUp = true
+        longTitleTask.taskType = "essentials"
+        longTitleTask.dueDate = Date()
+        context.insert(longTitleTask)
 
         // Badge-overflow task: ALL badges set to demonstrate FlowLayout wrapping
         let badgeOverflowTask = LocalTask(title: "Badge Overflow Demo", importance: 3, estimatedDuration: 120, urgency: "urgent")

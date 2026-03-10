@@ -296,6 +296,13 @@ final class EventKitRepository: EventKitRepositoryProtocol, @unchecked Sendable 
         event.notes = FocusBlock.serializeToNotes(taskIDs: [], completedTaskIDs: [])
 
         try eventStore.save(event, span: .thisEvent)
+
+        // Set deep link URL after save (eventIdentifier is only available after save)
+        if let id = event.eventIdentifier {
+            event.url = FocusBlock.deepLinkURL(for: id)
+            try eventStore.save(event, span: .thisEvent)
+        }
+
         return event.eventIdentifier ?? ""
     }
 
@@ -308,6 +315,10 @@ final class EventKitRepository: EventKitRepositoryProtocol, @unchecked Sendable 
         }
 
         event.notes = FocusBlock.serializeToNotes(taskIDs: taskIDs, completedTaskIDs: completedTaskIDs, taskTimes: taskTimes)
+        // Backfill deep link URL for blocks created before this feature
+        if event.url == nil {
+            event.url = FocusBlock.deepLinkURL(for: eventID)
+        }
         try eventStore.save(event, span: .thisEvent)
     }
 

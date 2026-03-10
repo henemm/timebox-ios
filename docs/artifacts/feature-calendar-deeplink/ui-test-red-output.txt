@@ -1,0 +1,10 @@
+UI Test: Calendar Deep Link
+
+UI test not applicable:
+- Deep link opens app from native Calendar via URL scheme
+- XCUITest cannot simulate tapping a URL in Apple Calendar
+- The URL is set on EKEvent.url which is shown in Calendar app natively
+- Unit tests verify URL generation (deepLinkURL) and parsing (eventID(from:))
+- Integration verified via unit tests on FocusBlock static methods
+
+** TEST FAILED ** (unit tests failed: 6 compile errors)

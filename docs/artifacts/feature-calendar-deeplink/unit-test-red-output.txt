@@ -1,0 +1,11 @@
+TDD RED: CalendarDeepLinkTests — 6 compile errors
+
+CalendarDeepLinkTests.swift:13:30: error: type 'FocusBlock' has no member 'deepLinkURL'
+CalendarDeepLinkTests.swift:27:30: error: type 'FocusBlock' has no member 'deepLinkURL'
+CalendarDeepLinkTests.swift:39:30: error: type 'FocusBlock' has no member 'deepLinkURL'
+CalendarDeepLinkTests.swift:52:34: error: type 'FocusBlock' has no member 'eventID'
+CalendarDeepLinkTests.swift:63:34: error: type 'FocusBlock' has no member 'eventID'
+CalendarDeepLinkTests.swift:74:34: error: type 'FocusBlock' has no member 'eventID'
+
+** TEST FAILED **
+Testing cancelled because the build failed.
