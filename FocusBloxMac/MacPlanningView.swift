@@ -556,6 +556,7 @@ struct NextUpTaskRow: View {
                     CategoryBadge(taskType: task.taskType)
                 }
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
 
             Spacer()
 

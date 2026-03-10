@@ -614,6 +614,7 @@ struct TaskQueueRow: View {
                 .lineLimit(1)
                 .strikethrough(status == .completed)
                 .foregroundStyle(status == .completed ? .secondary : .primary)
+                .frame(maxWidth: .infinity, alignment: .leading)
 
             Spacer()
 
@@ -973,6 +974,7 @@ private struct MacReviewTaskRow: View {
                     }
                 }
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
 
             Spacer()
         }

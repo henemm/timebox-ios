@@ -140,6 +140,7 @@ struct MenuBarView: View {
                     .font(.callout.weight(.semibold))
                     .lineLimit(1)
                     .accessibilityIdentifier("menubar_blockName")
+                    .frame(maxWidth: .infinity, alignment: .leading)
                 Spacer()
                 Text(blockRemainingText(block: block))
                     .font(.caption.monospacedDigit())
@@ -185,6 +186,7 @@ struct MenuBarView: View {
                     .font(.callout)
                     .lineLimit(1)
                     .accessibilityIdentifier("menubar_currentTaskName")
+                    .frame(maxWidth: .infinity, alignment: .leading)
                 Spacer()
                 Text(MenuBarTimerFormatter.format(seconds: remainingSec))
                     .font(.callout.monospacedDigit().weight(.medium))
@@ -466,6 +468,7 @@ struct MenuBarTaskRow: View {
             Text(task.title)
                 .lineLimit(1)
                 .strikethrough(task.isCompleted)
+                .frame(maxWidth: .infinity, alignment: .leading)
 
             Spacer()
 

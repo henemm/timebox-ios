@@ -386,6 +386,7 @@ struct MacTaskInBlockRow: View {
             Text(task.title)
                 .font(.subheadline)
                 .lineLimit(1)
+                .frame(maxWidth: .infinity, alignment: .leading)
 
             Spacer()
 
@@ -439,6 +440,7 @@ struct MacDraggableTaskRow: View {
                     }
                 }
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
 
             Spacer()
 

@@ -433,6 +433,7 @@ struct FocusBlockView: View {
                     Text(block.title)
                         .font(.system(size: 11, weight: .bold))
                         .lineLimit(1)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                     Spacer(minLength: 0)
                     Button {
                         onTapEdit?()

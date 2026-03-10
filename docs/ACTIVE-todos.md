@@ -819,11 +819,10 @@
 - **Loesung:** Wrapper entfernen, Aufrufer direkt auf `regularFilteredTasks` umstellen.
 - **Aufwand:** XS
 
-### BACKLOG-013: macOS Text-Truncation in 7 weiteren Views (Blast Radius Bug 86)
-- **Problem:** MacBacklogRow-Fix (`.frame(maxWidth: .infinity)` + `.lineLimit(2)`) muss auf 7 weitere macOS Views uebertragen werden, die dasselbe HStack-Pattern ohne Breitenangabe nutzen.
-- **Betroffene Views:** NextUpTaskRow (MacPlanningView), MacTaskInBlockRow (MacAssignView), MacDraggableTaskRow (MacAssignView), TaskQueueRow (MacFocusView), MacReviewTaskRow (MacFocusView), MenuBarView (3 Instanzen), MacTimelineView
-- **Analyse:** `docs/artifacts/bug-mac-text-truncation/analysis.md`
-- **Aufwand:** S
+### ~~BACKLOG-013: macOS Text-Truncation in 7 weiteren Views (Blast Radius Bug 86)~~ ERLEDIGT
+- **Loesung:** `.frame(maxWidth: .infinity, alignment: .leading)` auf 9 Stellen in 5 Dateien angewandt (identisches Pattern wie Bug 86 Fix).
+- **Geaenderte Dateien:** MacPlanningView, MacAssignView, MacFocusView, MenuBarView, MacTimelineView (5 Dateien, +9 LoC)
+- **Tests:** 3 macOS UI Tests (MacTextTruncationBlastRadiusUITests) — alle gruen
 
 ### BACKLOG-014: calculateScore() wird mit 8 identischen Parametern an 6+ Stellen aufgerufen
 - **Problem:** `TaskPriorityScoringService.calculateScore(importance:urgency:dueDate:createdAt:rescheduleCount:estimatedDuration:taskType:isNextUp:)` — Copy-paste-anfaellig, schwer wartbar.
