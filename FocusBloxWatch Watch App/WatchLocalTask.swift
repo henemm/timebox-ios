@@ -39,6 +39,7 @@ final class LocalTask {
     var needsTitleImprovement: Bool = false
     var sourceURL: String?
     var modifiedAt: Date?
+    var blockerTaskID: String?
 
     /// String id for compatibility
     var id: String { uuid.uuidString }

@@ -540,4 +540,70 @@ final class TaskDependencyTests: XCTestCase {
             "DEP-5: Self-blocking must be detected"
         )
     }
+
+    // MARK: - DEP-4b: Blocked tasks cannot be completed via alternative paths
+
+    func test_syncEngine_completeTask_rejectsBlockedTask() throws {
+        let context = container.mainContext
+        let source = LocalTaskSource(modelContext: context)
+        let syncEngine = SyncEngine(taskSource: source, modelContext: context)
+
+        let blocker = LocalTask(title: "Blocker")
+        let blocked = LocalTask(title: "Blocked")
+        context.insert(blocker)
+        context.insert(blocked)
+        blocked.blockerTaskID = blocker.id
+        try context.save()
+
+        // Try to complete the blocked task — should be rejected
+        try syncEngine.completeTask(itemID: blocked.id)
+
+        XCTAssertFalse(blocked.isCompleted,
+                       "DEP-4b: SyncEngine must reject completion of blocked tasks")
+    }
+
+    func test_syncEngine_completeTask_allowsUnblockedTask() throws {
+        let context = container.mainContext
+        let source = LocalTaskSource(modelContext: context)
+        let syncEngine = SyncEngine(taskSource: source, modelContext: context)
+
+        let task = LocalTask(title: "Free Task")
+        context.insert(task)
+        try context.save()
+
+        try syncEngine.completeTask(itemID: task.id)
+
+        XCTAssertTrue(task.isCompleted,
+                      "DEP-4b: Unblocked tasks must remain completable")
+    }
+
+    func test_notificationDelegate_rejectsBlockedCompletion() throws {
+        let blocker = LocalTask(title: "Blocker")
+        let blocked = LocalTask(title: "Blocked")
+        container.mainContext.insert(blocker)
+        container.mainContext.insert(blocked)
+        blocked.blockerTaskID = blocker.id
+        try container.mainContext.save()
+
+        let delegate = NotificationActionDelegate(container: container)
+        delegate.handleActionForTesting(NotificationService.actionComplete, taskID: blocked.id)
+
+        XCTAssertFalse(blocked.isCompleted,
+                       "DEP-4b: Notification action must not complete blocked tasks")
+    }
+
+    func test_notificationDelegate_freesDependentsOnCompletion() throws {
+        let blocker = LocalTask(title: "Blocker")
+        let dep = LocalTask(title: "Dependent")
+        container.mainContext.insert(blocker)
+        container.mainContext.insert(dep)
+        dep.blockerTaskID = blocker.id
+        try container.mainContext.save()
+
+        let delegate = NotificationActionDelegate(container: container)
+        delegate.handleActionForTesting(NotificationService.actionComplete, taskID: blocker.id)
+
+        XCTAssertNil(dep.blockerTaskID,
+                     "DEP-4b: Notification completion must free dependents (missing freeDependents)")
+    }
 }

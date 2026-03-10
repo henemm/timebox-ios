@@ -75,10 +75,11 @@ final class NotificationActionDelegate: NSObject, @preconcurrency UNUserNotifica
             }
 
         case NotificationService.actionComplete:
-            task.isCompleted = true
-            task.completedAt = Date()
-            task.assignedFocusBlockID = nil
-            task.isNextUp = false
+            // DEP-4b: Blocked tasks cannot be completed
+            guard task.blockerTaskID == nil else { break }
+            let taskSource = LocalTaskSource(modelContext: context)
+            let syncEngine = SyncEngine(taskSource: taskSource, modelContext: context)
+            try? syncEngine.completeTask(itemID: task.id)
             NotificationService.cancelDueDateNotifications(taskID: taskID)
 
         default:

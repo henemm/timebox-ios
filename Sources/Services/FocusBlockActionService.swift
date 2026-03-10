@@ -25,6 +25,14 @@ enum FocusBlockActionService {
         eventKitRepo: any EventKitRepositoryProtocol,
         modelContext: ModelContext
     ) throws -> TaskActionResult {
+        // DEP-4b: Check if task is blocked before any changes
+        let blockCheckDescriptor = FetchDescriptor<LocalTask>()
+        if let allTasks = try? modelContext.fetch(blockCheckDescriptor),
+           let localTask = allTasks.first(where: { $0.id == taskID }),
+           localTask.blockerTaskID != nil {
+            return .completed  // Silently skip — blocked task stays incomplete
+        }
+
         var updatedCompletedIDs = block.completedTaskIDs
         if !updatedCompletedIDs.contains(taskID) {
             updatedCompletedIDs.append(taskID)
@@ -50,6 +58,15 @@ enum FocusBlockActionService {
             localTask.isCompleted = true
             localTask.completedAt = Date()
             localTask.assignedFocusBlockID = nil  // Bug 52: Clear block assignment on complete
+            localTask.isNextUp = false
+
+            // DEP-4b: Free dependents when completing a blocker
+            let depDescriptor = FetchDescriptor<LocalTask>(
+                predicate: #Predicate { $0.blockerTaskID == taskID }
+            )
+            if let deps = try? modelContext.fetch(depDescriptor) {
+                for dep in deps { dep.blockerTaskID = nil }
+            }
 
             // Generate next instance for recurring tasks
             if localTask.recurrencePattern != "none" {

@@ -27,20 +27,14 @@ struct CompleteTaskIntent: AppIntent {
             throw IntentError.taskNotFound
         }
 
-        localTask.isCompleted = true
-        localTask.completedAt = Date()
-        localTask.assignedFocusBlockID = nil
-        localTask.isNextUp = false
-
-        // Generate next instance for recurring tasks
-        if localTask.recurrencePattern != "none" {
-            RecurrenceService.createNextInstance(from: localTask, in: context)
+        // DEP-4b: Blocked tasks cannot be completed
+        if localTask.blockerTaskID != nil {
+            return .result(dialog: "Task '\(task.title)' ist blockiert und kann nicht erledigt werden.")
         }
 
-        try context.save()
-
-        // ITB-G1: Donate intent so Siri learns completion patterns
-        try? await IntentDonationManager.shared.donate(intent: self)
+        let taskSource = LocalTaskSource(modelContext: context)
+        let syncEngine = SyncEngine(taskSource: taskSource, modelContext: context)
+        try syncEngine.completeTask(itemID: localTask.id)
 
         return .result(dialog: "Task '\(task.title)' erledigt.")
     }

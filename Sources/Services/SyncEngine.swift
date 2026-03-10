@@ -150,6 +150,9 @@ final class SyncEngine {
         // Templates cannot be completed — they represent the series, not an instance
         if task.isTemplate { return }
 
+        // DEP-4b: Blocked tasks cannot be completed
+        if task.blockerTaskID != nil { return }
+
         // Capture state for undo BEFORE modifying
         TaskCompletionUndoService.capture(
             taskID: task.id,

@@ -53,10 +53,11 @@
 - **Dateien:** TaskInspector.swift, BacklogView.swift, ContentView.swift, TaskAssignmentView.swift, PlanItem.swift
 - **Tests:** 4 neue Unit Tests (22 gesamt), alle GREEN
 
-### BUG-DEP-4b: Siri/Shortcuts + Keyboard Shortcut koennen blockierte Tasks erledigen
-- **Symptom:** CompleteTaskIntent (Siri) und Keyboard Shortcut (Cmd) haben keinen blockerTaskID-Guard
-- **Fix:** Guard in CompleteTaskIntent.perform() und ContentView.completeSelectedTasks()
-- **Prioritaet:** Niedrig (Edge Case, separates Ticket)
+### BUG-DEP-4b: Siri/Shortcuts + Notification koennen blockierte Tasks erledigen — ERLEDIGT
+- **Symptom:** CompleteTaskIntent (Siri), Notification-Actions, FocusBlock-UI hatten keinen blockerTaskID-Guard. Zusaetzlich fehlte freeDependents in allen Pfaden ausser SyncEngine.
+- **Fix:** Defense-in-Depth: Guard in SyncEngine.completeTask() (zentral), CompleteTaskIntent + NotificationActionDelegate durch SyncEngine geleitet, WatchNotificationDelegate + FocusBlockActionService mit inline Guard + freeDependents
+- **Dateien:** SyncEngine.swift, CompleteTaskIntent.swift, NotificationActionDelegate.swift, WatchNotificationDelegate.swift, FocusBlockActionService.swift, WatchLocalTask.swift (blockerTaskID hinzugefuegt)
+- **Tests:** 4 neue Unit Tests (30 gesamt), alle GREEN
 
 ### BUG-DEP-5: 3-Wege zirkulaere Abhaengigkeiten moeglich — ERLEDIGT
 - **Fix:** `LocalTask.wouldCreateCycle()` prueft transitive Blocker-Kette. Beide Picker (iOS TaskFormSheet + macOS TaskInspector) nutzen diese Methode statt 1-Level Check.

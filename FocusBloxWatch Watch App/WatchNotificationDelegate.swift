@@ -110,10 +110,19 @@ final class WatchNotificationDelegate: NSObject, @preconcurrency UNUserNotificat
             }
 
         case Self.actionComplete:
+            // DEP-4b: Blocked tasks cannot be completed
+            guard task.blockerTaskID == nil else { break }
             task.isCompleted = true
             task.completedAt = Date()
             task.assignedFocusBlockID = nil
             task.isNextUp = false
+            // DEP-4b: Free dependents when completing a blocker
+            let depDescriptor = FetchDescriptor<LocalTask>(
+                predicate: #Predicate { $0.blockerTaskID == taskID }
+            )
+            if let deps = try? context.fetch(depDescriptor) {
+                for dep in deps { dep.blockerTaskID = nil }
+            }
 
         default:
             break
