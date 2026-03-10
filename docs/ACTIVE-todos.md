@@ -54,14 +54,8 @@
 - **Fix:** Transitive Pruefung in `blockerCandidates`
 - **Prioritaet:** Niedrig (Edge Case, nur 1 Ebene erlaubt laut Spec)
 
-### BUG-DEP-6: Swipe-Gesten in iOS Backlog kaputt (KRITISCH)
-- **Symptom:** Swipe-Gesten funktionieren nicht mehr in ALLEN iOS Backlog-Views (Priority, Tier, Recent, Overdue). Next Up, Completed und Recurring sind NICHT betroffen.
-- **Root Cause:** Commit `cc567bf` (Phase 2 iOS Views) hat `ForEach(blockedTasks)` zwischen `BacklogRow` und `.swipeActions()` in `backlogRowWithSwipe()` eingefuegt. In SwiftUI haengen Modifier in einem `@ViewBuilder` am letzten Ausdruck — also am `ForEach`, nicht am `BacklogRow`. Betrifft ALLE Tasks (auch ohne Dependencies), weil `ForEach([])` trotzdem die letzte View ist.
-- **Zusaetzlicher Schaden:** Nicht nur `.swipeActions` fehlt am BacklogRow, sondern auch `.listRowInsets`, `.listRowBackground`, `.listRowSeparator` — Layout koennte ebenfalls falsch sein.
-- **Fix:** In `backlogRowWithSwipe()` die Modifier-Kette aufteilen: `.swipeActions`, `.contextMenu`, `.listRowInsets`, `.listRowBackground`, `.listRowSeparator` direkt an `BacklogRow` haengen. `ForEach` fuer blocked Rows bekommt eigene Row-Modifier.
-- **Dateien:** `Sources/Views/BacklogView.swift` (nur `backlogRowWithSwipe()`, ~Zeile 863-912)
-- **Prioritaet:** SHOWSTOPPER — Swipe ist primaere Interaktion im Backlog
-- **Analyse:** `docs/artifacts/bug-swipe-gesture-broken/analysis.md`
+### BUG-DEP-6: Swipe-Gesten in iOS Backlog kaputt — ERLEDIGT
+- **Fix:** Modifier-Kette korrekt aufgeteilt: `.swipeActions`/`.contextMenu`/`.listRowInsets` direkt am BacklogRow, `ForEach(blockedTasks)` als separater @ViewBuilder-Rueckgabewert
 
 ---
 
