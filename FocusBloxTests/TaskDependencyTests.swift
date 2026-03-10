@@ -214,6 +214,35 @@ final class TaskDependencyTests: XCTestCase {
         XCTAssertTrue(dependents.isEmpty, "Free task should have no dependents")
     }
 
+    // MARK: - Phase 3: createTask with blockerTaskID
+
+    func test_createTask_withBlockerTaskID_setsBlocker() async throws {
+        let context = container.mainContext
+        let blocker = LocalTask(title: "Blocker Task")
+        context.insert(blocker)
+        try context.save()
+
+        let source = LocalTaskSource(modelContext: context)
+        let dependent = try await source.createTask(
+            title: "Dependent Task",
+            blockerTaskID: blocker.id
+        )
+
+        XCTAssertEqual(dependent.blockerTaskID, blocker.id,
+                       "createTask with blockerTaskID should set the dependency")
+    }
+
+    func test_createTask_withoutBlockerTaskID_hasNilBlocker() async throws {
+        let context = container.mainContext
+        let source = LocalTaskSource(modelContext: context)
+        let task = try await source.createTask(title: "Free Task")
+
+        XCTAssertNil(task.blockerTaskID,
+                     "createTask without blockerTaskID should default to nil")
+    }
+
+    // MARK: - Score cap
+
     func test_scoring_blockerBonus_respectsMaxScore100() {
         // High base score + blocker bonus should not exceed 100
         let score = TaskPriorityScoringService.calculateScore(

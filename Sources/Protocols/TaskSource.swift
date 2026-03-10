@@ -86,7 +86,8 @@ protocol TaskSourceWritable: TaskSource {
         recurrenceWeekdays: [Int]?,
         recurrenceMonthDay: Int?,
         recurrenceInterval: Int?,
-        description: String?
+        description: String?,
+        blockerTaskID: String?
     ) async throws -> TaskData
 
     /// Update an existing task

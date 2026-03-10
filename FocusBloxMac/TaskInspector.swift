@@ -14,6 +14,10 @@ struct TaskInspector: View {
     @Environment(\.modelContext) private var modelContext
     var onDelete: (() -> Void)?
 
+    // Available tasks for blocker picker (non-completed, non-template)
+    @Query(filter: #Predicate<LocalTask> { !$0.isCompleted && !$0.isTemplate })
+    private var availableTasks: [LocalTask]
+
     @State private var showDeleteConfirmation = false
 
     var body: some View {
@@ -162,6 +166,31 @@ struct TaskInspector: View {
                 .padding()
                 .background(RoundedRectangle(cornerRadius: 10).fill(.quaternary))
 
+                // MARK: - Dependency Section
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Abhängigkeit")
+                        .font(.headline)
+                        .foregroundStyle(.secondary)
+
+                    Picker("Abhängig von", selection: blockerBinding) {
+                        Text("Keine").tag(String?.none)
+                        ForEach(blockerCandidates, id: \.id) { candidate in
+                            Text(candidate.title)
+                                .lineLimit(1)
+                                .tag(Optional(candidate.id))
+                        }
+                    }
+                    .accessibilityIdentifier("blockerPicker")
+
+                    if task.blockerTaskID != nil {
+                        Text("Kann erst bearbeitet werden, wenn der übergeordnete Task erledigt ist.")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+                .padding()
+                .background(RoundedRectangle(cornerRadius: 10).fill(.quaternary))
+
                 // MARK: - Status Section
                 VStack(alignment: .leading, spacing: 12) {
                     Text("Status")
@@ -217,6 +246,24 @@ struct TaskInspector: View {
         } message: {
             Text("Diese Aktion kann nicht rückgängig gemacht werden.")
         }
+    }
+
+    // MARK: - Blocker Helpers
+
+    private var blockerCandidates: [LocalTask] {
+        availableTasks.filter { candidate in
+            candidate.id != task.id && candidate.blockerTaskID != task.id
+        }
+    }
+
+    private var blockerBinding: Binding<String?> {
+        Binding(
+            get: { task.blockerTaskID },
+            set: { newValue in
+                task.blockerTaskID = newValue
+                try? modelContext.save()
+            }
+        )
     }
 
     // MARK: - Recurrence Section

@@ -96,7 +96,8 @@ final class LocalTaskSource: @preconcurrency TaskSource, @preconcurrency TaskSou
         recurrenceWeekdays: [Int]? = nil,
         recurrenceMonthDay: Int? = nil,
         recurrenceInterval: Int? = nil,
-        description: String? = nil
+        description: String? = nil,
+        blockerTaskID: String? = nil
     ) async throws -> LocalTask {
         let nextSortOrder = try await getNextSortOrder()
         let cleanedTitle = TaskTitleEngine.stripKeywords(title)
@@ -117,6 +118,7 @@ final class LocalTaskSource: @preconcurrency TaskSource, @preconcurrency TaskSou
             taskDescription: description,
             sourceSystem: "local"
         )
+        task.blockerTaskID = blockerTaskID
         modelContext.insert(task)
         try modelContext.save()
 

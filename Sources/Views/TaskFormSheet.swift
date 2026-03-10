@@ -40,6 +40,13 @@ struct TaskFormSheet: View {
     @State private var taskDescription: String = ""
     @State private var isSaving = false
 
+    // Dependency State
+    @State private var blockerTaskID: String? = nil
+
+    // Available tasks for blocker picker (non-completed, non-template)
+    @Query(filter: #Predicate<LocalTask> { !$0.isCompleted && !$0.isTemplate })
+    private var availableTasks: [LocalTask]
+
     // Recurrence State
     @State private var recurrencePattern: RecurrencePattern = .none
     @State private var selectedWeekdays: Set<Int> = []
@@ -76,6 +83,9 @@ struct TaskFormSheet: View {
         _hasDueDate = State(initialValue: task.dueDate != nil)
         _dueDate = State(initialValue: task.dueDate ?? Date())
         _taskDescription = State(initialValue: task.taskDescription ?? "")
+
+        // Initialize dependency state from task
+        _blockerTaskID = State(initialValue: task.blockerTaskID)
 
         // Initialize recurrence state from task
         _recurrencePattern = State(initialValue: RecurrencePattern(rawValue: task.recurrencePattern ?? "none") ?? .none)
@@ -280,6 +290,26 @@ struct TaskFormSheet: View {
                         }
                     }
 
+                    // MARK: - Dependency (Blocker)
+                    glassCardSection(id: "dependency", header: "Abhängigkeit") {
+                        Picker("Abhängig von", selection: $blockerTaskID) {
+                            Text("Keine").tag(String?.none)
+                            ForEach(blockerCandidates, id: \.id) { task in
+                                Text(task.title)
+                                    .lineLimit(1)
+                                    .tag(Optional(task.id))
+                            }
+                        }
+                        .pickerStyle(.menu)
+                        .accessibilityIdentifier("blockerPicker")
+
+                        if blockerTaskID != nil {
+                            Text("Dieser Task kann erst bearbeitet werden, wenn der übergeordnete Task erledigt ist.")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+
                     // MARK: - Description
                     glassCardSection(id: "description", header: "Beschreibung (optional)") {
                         TextEditor(text: $taskDescription)
@@ -348,6 +378,20 @@ struct TaskFormSheet: View {
 
     private var urgencyLabel: String {
         UrgencyUI.label(for: urgency)
+    }
+
+    // MARK: - Blocker Candidates (exclude self + tasks blocked by self)
+
+    private var blockerCandidates: [LocalTask] {
+        let editID: String?
+        if case .edit(let task) = mode { editID = task.id } else { editID = nil }
+        return availableTasks.filter { task in
+            // Don't show self as blocker candidate
+            if task.id == editID { return false }
+            // Don't allow circular: if task is blocked by us, can't be our blocker
+            if task.blockerTaskID == editID { return false }
+            return true
+        }
     }
 
     // MARK: - Custom Recurrence Helper
@@ -421,6 +465,7 @@ struct TaskFormSheet: View {
             let capturedUrgency = urgency
             let capturedTaskType = taskType
             let capturedRecurrence = recurrencePattern.rawValue
+            let capturedBlockerTaskID = blockerTaskID
             let capturedContext = modelContext
 
             // Dismiss synchronously FIRST — async dismiss inside Task{} breaks on iOS 26
@@ -443,7 +488,8 @@ struct TaskFormSheet: View {
                         recurrenceWeekdays: weekdays,
                         recurrenceMonthDay: monthDayValue,
                         recurrenceInterval: intervalValue,
-                        description: finalDescription
+                        description: finalDescription,
+                        blockerTaskID: capturedBlockerTaskID
                     )
 
                     // Schedule due date notifications
@@ -464,11 +510,18 @@ struct TaskFormSheet: View {
                 }
             }
 
-        case .edit:
+        case .edit(let editTask):
             // Prepare recurrence data
             let weekdays: [Int]? = recurrencePattern.requiresWeekdays ? Array(selectedWeekdays).sorted() : nil
             let monthDayValue: Int? = recurrencePattern.requiresCustomConfig ? customBasePatternCode : (recurrencePattern.requiresMonthDay ? monthDay : nil)
             let intervalValue: Int? = recurrencePattern.requiresCustomConfig ? customInterval : nil
+
+            // Save blocker dependency directly (not part of callback chain)
+            let editID = editTask.id
+            let descriptor = FetchDescriptor<LocalTask>(predicate: #Predicate<LocalTask> { $0.id == editID })
+            if let localTask = try? modelContext.fetch(descriptor).first {
+                localTask.blockerTaskID = blockerTaskID
+            }
 
             onSave?(
                 title.trimmingCharacters(in: .whitespaces),

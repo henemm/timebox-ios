@@ -24,8 +24,11 @@
   - ContentView: Grouping (blockierte Tasks unter Blocker, keine Swipe-Actions)
   - blockedDependents(of:) Helper, regularFilteredTasks/overdueTasks filtern blockerTaskID==nil
   - 2 Dateien, +27/-11 LoC, alle 12 Tests GREEN
-- **Phase 3 (Erstellungs-UI) — OFFEN:**
-  - TaskFormSheet: "Abhaengig von..." Picker
+- **Phase 3 (Erstellungs-UI) — ERLEDIGT:**
+  - iOS TaskFormSheet: "Abhaengig von..." Picker (Menu-Style, filtert Self + zirkulaere Abhaengigkeiten)
+  - macOS TaskInspector: "Abhaengigkeit" Sektion mit Picker + Binding
+  - LocalTaskSource.createTask: blockerTaskID Parameter hinzugefuegt
+  - 2 neue Unit Tests (14 gesamt, alle GREEN)
 - **Spec:** `openspec/changes/sub-tasks/proposal.md`
 
 ---
