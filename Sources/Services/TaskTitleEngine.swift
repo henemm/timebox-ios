@@ -47,6 +47,35 @@ final class TaskTitleEngine {
         return cleaned.trimmingCharacters(in: .whitespaces)
     }
 
+    // MARK: - Safety Guard
+
+    /// Checks whether the AI-improved title should be accepted.
+    /// Rejects aggressive shortening where the AI removed user content
+    /// that isn't a known removable pattern (email artifacts, urgency, intro phrases).
+    static func shouldAcceptImprovedTitle(original: String, improved: String) -> Bool {
+        let originalLen = original.count
+        let improvedLen = improved.count
+        guard originalLen > 0 else { return true }
+
+        // If less than 30% was removed, always accept (minor cleanup)
+        let removedRatio = 1.0 - Double(improvedLen) / Double(originalLen)
+        if removedRatio <= 0.3 { return true }
+
+        // More than 30% was removed — check if the removed content was a known pattern
+        let lower = original.lowercased()
+        let knownPatterns = [
+            "re:", "fwd:", "aw:", "wg:", "fw:",
+            "erinnere mich", "ich muss noch", "vergiss nicht", "denk daran",
+            "dringend", "urgent", "asap", "sofort", "eilig",
+            "heute erledigen", "bitte"
+        ]
+        let hasKnownPattern = knownPatterns.contains { lower.contains($0) }
+        if hasKnownPattern { return true }
+
+        // Significant content removed without known pattern — reject
+        return false
+    }
+
     // MARK: - Date Helper
 
     /// Maps relative date strings from AI output to actual dates.
@@ -99,7 +128,7 @@ final class TaskTitleEngine {
     @available(iOS 26.0, macOS 26.0, *)
     @Generable
     struct ImprovedTask {
-        @Guide(description: "Cleaned task title (max 80 chars). Keep ALL original words, names, and abbreviations exactly as they are. Remove: email artifacts (Re:, Fwd:, AW:, WG:), urgency/deadline phrases (heute, dringend, ASAP, sofort), and introductory phrases like 'Erinnere mich daran', 'Ich muss noch', 'Vergiss nicht'. The title should describe the ACTION, not the reminder. Example: 'Erinnere mich heute daran Herrn Mueller anzurufen' → 'Herrn Mueller anrufen'. Start with verb in infinitive form. Keep the language of the input.")
+        @Guide(description: "Cleaned task title (max 80 chars). Keep ALL original words, names, and abbreviations exactly as they are. NEVER remove text before colons unless it is a known email artifact (Re:, Fwd:, AW:, WG:). Remove ONLY: email artifacts, urgency phrases (dringend, ASAP, sofort), and intro phrases (Erinnere mich daran, Ich muss noch, Vergiss nicht). Example: 'Lohnsteuererklaerung: Rechnungsuebersicht erstellen' stays unchanged. Example: 'Erinnere mich heute daran Herrn Mueller anzurufen' becomes 'Herrn Mueller anrufen'. Start with verb in infinitive form. Keep input language.")
         let title: String
 
         @Guide(description: "Relative due date extracted from the text. Return 'heute' for heute/today/sofort, 'morgen' for morgen/tomorrow, 'uebermorgen' for uebermorgen/day after tomorrow, 'naechste woche' for naechste Woche/next week, or a weekday name like 'montag'/'freitag' if mentioned (e.g. 'bis Freitag' → 'freitag'). Return nil if no date mentioned.")
@@ -168,11 +197,13 @@ final class TaskTitleEngine {
                 "Du bereinigst Task-Titel und extrahierst Metadaten. Regeln:"
                 "- KEINE Woerter, Abkuerzungen oder Namen aendern — Originalwoerter beibehalten"
                 "- Nur kuerzen durch Weglassen, NICHT durch Umschreiben"
-                "- Entferne E-Mail-Artefakte (Re:, Fwd:, AW:, WG:)"
+                "- Entferne NUR diese bekannten Artefakte: E-Mail-Prefixe (Re:, Fwd:, AW:, WG:)"
                 "- Entferne Dringlichkeits-Hinweise aus dem Titel (heute erledigen, dringend, ASAP, sofort)"
                 "- Entferne Einleitungsfloskeln: 'Erinnere mich daran', 'Ich muss noch', 'Vergiss nicht', 'Denk daran'"
+                "- WICHTIG: Text vor Doppelpunkten ist IMMER Teil des Titels und darf NICHT entfernt werden, ausser es ist ein bekanntes E-Mail-Artefakt (Re:, Fwd:, AW:, WG:)"
+                "- Beispiel: 'Lohnsteuererklaerung: Rechnungsuebersicht erstellen' → title='Lohnsteuererklaerung: Rechnungsuebersicht erstellen' (KEINE Aenderung!)"
+                "- Beispiel: 'Projekt: Dokumentation schreiben' → title='Projekt: Dokumentation schreiben' (KEINE Aenderung!)"
                 "- Extrahiere Zeitangaben aus Floskeln: 'heute', 'morgen', 'naechste Woche', 'bis Freitag', 'uebermorgen'"
-                "- Der bereinigte Titel soll die AKTION beschreiben, nicht die Erinnerung"
                 "- Beispiel: 'Erinnere mich heute daran Herrn Mueller anzurufen' → title='Herrn Mueller anrufen', dueDate='heute'"
                 "- Beispiel: 'Ich muss morgen noch Steuern machen' → title='Steuern machen', dueDate='morgen'"
                 "- Beginne mit Verb im Infinitiv wenn moeglich"
@@ -185,7 +216,7 @@ final class TaskTitleEngine {
             let result = response.content
             let improved = result.title.trimmingCharacters(in: .whitespacesAndNewlines)
 
-            if !improved.isEmpty {
+            if !improved.isEmpty && Self.shouldAcceptImprovedTitle(original: task.title, improved: improved) {
                 task.title = String(improved.prefix(200))
             }
             if task.dueDate == nil, let date = Self.relativeDateFrom(result.dueDateRelative) {

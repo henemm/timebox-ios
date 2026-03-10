@@ -6,6 +6,21 @@
 
 ---
 
+## ERLEDIGT: Bug — AI Title Improvement entfernt Doppelpunkt-Prefixe
+
+- **Symptom:** Task-Titel "Lohnsteuererklaerung: Rechnungsuebersicht erstellen" wird nach Erstellung zu "Rechnungsuebersicht erstellen" — das Prefix vor dem Doppelpunkt verschwindet.
+- **Root Cause:** `TaskTitleEngine.performImprovement()` sendet den Titel an Apple Intelligence. Die AI interpretiert "Lohnsteuererklaerung:" als entfernbares Prefix (wie "Re:", "Fwd:") und gibt nur den Action-Teil zurueck. Der Code uebernimmt das AI-Ergebnis ohne Pruefung.
+- **Fix:** Dreifach-Schutz:
+  1. **Safety Guard** `shouldAcceptImprovedTitle()`: Lehnt AI-Output ab wenn >30% des Titels entfernt ohne bekannte Muster (E-Mail-Artefakte, Urgency, Floskeln)
+  2. **AI-Instruktionen verschaerft**: Explizite Regel "Text vor Doppelpunkten ist IMMER Teil des Titels" + Negativbeispiele
+  3. **@Guide verschaerft**: "NEVER remove text before colons unless email artifact"
+- **Aenderungen:**
+  - `Sources/Services/TaskTitleEngine.swift`: `shouldAcceptImprovedTitle()` (+22 LoC), Guard in `performImprovement()`, AI-Prompt-Updates
+- **Tests:** 7 neue Tests (alle GREEN), 34 gesamt
+- **Beide Plattformen:** Fix in Shared-Code (Sources/), wirkt auf iOS + macOS
+
+---
+
 ## ERLEDIGT: Feature — Deferred Task Completion (3-Sekunden Delay)
 
 - **Anforderung:** Wenn Tasks abgehakt werden (beliebige Liste, beliebiges OS) muss zuerst der gefuellte Punkt dargestellt werden und erst danach verschwindet der Task. Delay von ca. 3 Sekunden, aehnlich wie bei der Umsortierung.

@@ -1,0 +1,17 @@
+TDD RED Output - bug-title-prefix-removed
+Date: 2026-03-10
+
+2 tests FAILED as expected:
+- test_shouldAcceptImprovedTitle_rejectsAggressiveShortening: XCTAssertFalse failed — stub returns true
+- test_shouldAcceptImprovedTitle_rejectsProjektPrefixRemoval: XCTAssertFalse failed — stub returns true
+
+4 tests PASSED (allow cases):
+- test_shouldAcceptImprovedTitle_allowsKnownPatternRemoval
+- test_shouldAcceptImprovedTitle_allowsIntroPhrasesRemoval
+- test_shouldAcceptImprovedTitle_allowsMinorChanges
+- test_shouldAcceptImprovedTitle_allowsUrgencyRemoval
+
+1 test PASSED (existing):
+- test_stripKeywords_preservesCategoryColonPrefix
+
+Total: 34 tests, 2 failures

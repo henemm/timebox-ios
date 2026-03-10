@@ -393,4 +393,80 @@ final class TaskTitleEngineTests: XCTestCase {
         let result = TaskTitleEngine.stripKeywords("Flüge (dringend) für Retreat buchen")
         XCTAssertEqual(result, "Flüge für Retreat buchen")
     }
+
+    /// Verhalten: stripKeywords laesst Titel mit Doppelpunkt-Prefix unveraendert
+    /// Bricht wenn: stripKeywords() Doppelpunkt-Prefixe generisch entfernt
+    func test_stripKeywords_preservesCategoryColonPrefix() {
+        let result = TaskTitleEngine.stripKeywords("Lohnsteuererklärung: Rechnungsübersicht erstellen")
+        XCTAssertEqual(result, "Lohnsteuererklärung: Rechnungsübersicht erstellen",
+                       "Category-style colon prefixes must NOT be stripped")
+    }
+
+    // MARK: - Safety Guard: shouldAcceptImprovedTitle (Bug: Title prefix removed)
+
+    /// Verhalten: AI-Output das signifikant kuerzer ist OHNE bekannte Muster wird abgelehnt
+    /// Bricht wenn: shouldAcceptImprovedTitle() nicht existiert oder immer true liefert
+    func test_shouldAcceptImprovedTitle_rejectsAggressiveShortening() {
+        let accepted = TaskTitleEngine.shouldAcceptImprovedTitle(
+            original: "Lohnsteuererklärung: Rechnungsübersicht erstellen",
+            improved: "Rechnungsübersicht erstellen"
+        )
+        XCTAssertFalse(accepted,
+                       "Should reject when AI removes significant content without known removable patterns")
+    }
+
+    /// Verhalten: AI-Output das bekannte Artefakte entfernt wird akzeptiert (auch wenn viel kuerzer)
+    /// Bricht wenn: shouldAcceptImprovedTitle() E-Mail-Artefakt-Entfernung blockiert
+    func test_shouldAcceptImprovedTitle_allowsKnownPatternRemoval() {
+        let accepted = TaskTitleEngine.shouldAcceptImprovedTitle(
+            original: "Re: Fwd: AW: WG: Quarterly Budget Review",
+            improved: "Quarterly Budget Review"
+        )
+        XCTAssertTrue(accepted,
+                      "Should accept when removed content is known email artifacts")
+    }
+
+    /// Verhalten: AI-Output das Einleitungsfloskeln entfernt wird akzeptiert
+    /// Bricht wenn: shouldAcceptImprovedTitle() Floskel-Entfernung blockiert
+    func test_shouldAcceptImprovedTitle_allowsIntroPhrasesRemoval() {
+        let accepted = TaskTitleEngine.shouldAcceptImprovedTitle(
+            original: "Erinnere mich daran Herrn Mueller anzurufen",
+            improved: "Herrn Mueller anrufen"
+        )
+        XCTAssertTrue(accepted,
+                      "Should accept when removed content is intro phrases")
+    }
+
+    /// Verhalten: Minimale Aenderungen werden immer akzeptiert
+    /// Bricht wenn: shouldAcceptImprovedTitle() minimale Aenderungen blockiert
+    func test_shouldAcceptImprovedTitle_allowsMinorChanges() {
+        let accepted = TaskTitleEngine.shouldAcceptImprovedTitle(
+            original: "Einkaufen gehen ",
+            improved: "Einkaufen gehen"
+        )
+        XCTAssertTrue(accepted,
+                      "Should accept minor whitespace changes")
+    }
+
+    /// Verhalten: Titel mit "Projekt:" Prefix wird geschuetzt
+    /// Bricht wenn: Safety Guard beliebige Doppelpunkt-Prefixe nicht erkennt
+    func test_shouldAcceptImprovedTitle_rejectsProjektPrefixRemoval() {
+        let accepted = TaskTitleEngine.shouldAcceptImprovedTitle(
+            original: "Projekt: Aufgabe erledigen",
+            improved: "Aufgabe erledigen"
+        )
+        XCTAssertFalse(accepted,
+                       "Should reject removal of 'Projekt:' prefix — it's user content, not metadata")
+    }
+
+    /// Verhalten: AI-Output das Urgency-Keywords entfernt wird akzeptiert
+    /// Bricht wenn: shouldAcceptImprovedTitle() Urgency-Entfernung blockiert
+    func test_shouldAcceptImprovedTitle_allowsUrgencyRemoval() {
+        let accepted = TaskTitleEngine.shouldAcceptImprovedTitle(
+            original: "Dringend: Server-Problem fixen ASAP!",
+            improved: "Server-Problem fixen"
+        )
+        XCTAssertTrue(accepted,
+                      "Should accept when removed content is urgency keywords")
+    }
 }
