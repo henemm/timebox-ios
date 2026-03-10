@@ -57,6 +57,9 @@ struct PlanItem: Identifiable, Sendable {
     /// ID of the task that blocks this one (nil = no blocker)
     let blockerTaskID: String?
 
+    /// Number of tasks that depend on this task (populated externally)
+    var dependentCount: Int = 0
+
     /// Whether this task is blocked by another task
     var isBlocked: Bool { blockerTaskID != nil }
 
@@ -75,7 +78,8 @@ struct PlanItem: Identifiable, Sendable {
             rescheduleCount: rescheduleCount,
             estimatedDuration: estimatedDuration,
             taskType: taskType,
-            isNextUp: isNextUp
+            isNextUp: isNextUp,
+            dependentTaskCount: dependentCount
         )
     }
 
@@ -222,6 +226,17 @@ extension Array where Element == PlanItem {
     /// Tasks that depend on the given blocker task ID.
     func dependents(of blockerID: String) -> [PlanItem] {
         filter { $0.blockerTaskID == blockerID }
+    }
+
+    /// Populates dependentCount on each item based on blocker relationships.
+    mutating func populateDependentCounts() {
+        var counts: [String: Int] = [:]
+        for item in self where item.blockerTaskID != nil {
+            counts[item.blockerTaskID!, default: 0] += 1
+        }
+        for i in indices {
+            self[i].dependentCount = counts[self[i].id] ?? 0
+        }
     }
 }
 

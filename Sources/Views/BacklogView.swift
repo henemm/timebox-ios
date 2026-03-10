@@ -376,6 +376,7 @@ struct BacklogView: View {
             let taskSource = LocalTaskSource(modelContext: modelContext)
             let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
             planItems = try await syncEngine.sync()
+            planItems.populateDependentCounts()
             allRecurringItems = try await syncEngine.syncRecurringTasks()
             completedTasks = try await syncEngine.syncCompletedTasks(days: 7)
         } catch {
@@ -445,6 +446,7 @@ struct BacklogView: View {
             let taskSource = LocalTaskSource(modelContext: modelContext)
             let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
             planItems = try await syncEngine.sync()
+            planItems.populateDependentCounts()
             allRecurringItems = try await syncEngine.syncRecurringTasks()
 
             // Enrich remote tasks (Watch, Share Extension, Siri) that arrived without attributes
@@ -452,6 +454,7 @@ struct BacklogView: View {
             let enriched = await enrichment.enrichAllTbdTasks()
             if enriched > 0 {
                 planItems = try await syncEngine.sync()
+                planItems.populateDependentCounts()
             }
 
             print("[CloudKit Debug] refreshLocalTasks() DONE - new planItems: \(planItems.count), enriched: \(enriched)")
@@ -876,10 +879,6 @@ struct BacklogView: View {
             isPendingResort: deferredSort.isPending(item.id),
             isCompletionPending: deferredCompletion.isPending(item.id)
         )
-        // Render blocked dependents directly after this task
-        ForEach(blockedTasks(for: item.id)) { blocked in
-            blockedRow(blocked)
-        }
         .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
         .listRowBackground(Color.clear)
         .listRowSeparator(.hidden)
@@ -908,6 +907,10 @@ struct BacklogView: View {
             if item.dueDate != nil {
                 postponeMenu(for: item)
             }
+        }
+        // Render blocked dependents directly after this task
+        ForEach(blockedTasks(for: item.id)) { blocked in
+            blockedRow(blocked)
         }
     }
 

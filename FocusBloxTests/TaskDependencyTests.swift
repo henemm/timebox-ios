@@ -356,4 +356,33 @@ final class TaskDependencyTests: XCTestCase {
         XCTAssertEqual(scoreWithBonus - scoreWithout, 6,
                        "DEP-3: 2 dependents should add +6 to score")
     }
+
+    // MARK: - DEP-3b: populateDependentCounts wires through priorityScore
+
+    func test_populateDependentCounts_boostsPriorityScore() throws {
+        let blocker = LocalTask(title: "Blocker", importance: 1)
+        let dep1 = LocalTask(title: "Dep 1")
+        let dep2 = LocalTask(title: "Dep 2")
+        let free = LocalTask(title: "Free")
+        container.mainContext.insert(blocker)
+        container.mainContext.insert(dep1)
+        container.mainContext.insert(dep2)
+        container.mainContext.insert(free)
+        dep1.blockerTaskID = blocker.id
+        dep2.blockerTaskID = blocker.id
+
+        // Before populateDependentCounts: dependentCount defaults to 0
+        var items = [blocker, dep1, dep2, free].map { PlanItem(localTask: $0) }
+        let scoreBefore = items.first { $0.id == blocker.id }!.priorityScore
+
+        // After populateDependentCounts: blocker gets +6 (2 deps * 3)
+        items.populateDependentCounts()
+        let scoreAfter = items.first { $0.id == blocker.id }!.priorityScore
+        let freeScore = items.first { $0.id == free.id }!
+
+        XCTAssertEqual(scoreAfter - scoreBefore, 6,
+                       "DEP-3b: populateDependentCounts must boost priorityScore by +6 for 2 dependents")
+        XCTAssertEqual(freeScore.dependentCount, 0,
+                       "Free task should have 0 dependents")
+    }
 }

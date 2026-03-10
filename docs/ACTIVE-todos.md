@@ -40,12 +40,9 @@
 - **Fix:** `SyncEngine.freeDependents(of:)` in `deleteTask()` vor dem Delete
 - **Test:** `test_deleteTask_clearsDependentsBlockerTaskID` GREEN
 
-### BUG-DEP-3: Ranking-Boost ist toter Code (KRITISCH)
-- **Symptom:** Blocker-Tasks bekommen KEINEN Ranking-Boost, obwohl `blockerBonus()` existiert und Tests gruen sind
-- **Root Cause:** `dependentTaskCount` wird an KEINER Produktions-Call-Site uebergeben (Default = 0). Betrifft: `PlanItem.priorityScore`, `ContentView.scoreFor()`, `MacBacklogRow.metadataRow`, alle `calculateScore()`-Aufrufe
-- **Fix:** An allen Call-Sites `dependentTaskCount` berechnen (Anzahl Tasks mit `blockerTaskID == task.id`)
-- **Dateien:** Mehrere — PlanItem.swift, ContentView.swift, MacBacklogRow.swift, BacklogView.swift
-- **Prioritaet:** Feature unvollstaendig
+### BUG-DEP-3: Ranking-Boost ist toter Code — ERLEDIGT
+- **Fix:** `PlanItem.dependentCount` Feld + `populateDependentCounts()` auf Array-Extension. iOS: BacklogView ruft nach jedem sync() auf. macOS: ContentView.scoreFor() + MacBacklogRow nutzen `dependentCount(for:)` Helper.
+- **Test:** `test_populateDependentCounts_boostsPriorityScore` GREEN
 
 ### BUG-DEP-4: Blockierte Tasks nicht vor Aktionen geschuetzt
 - **Symptom:** Blockierte Tasks koennen via Swipe zu Next Up, via Inspector als erledigt markiert, oder FocusBlocks zugewiesen werden

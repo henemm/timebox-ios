@@ -20,6 +20,7 @@ struct MacBacklogRow: View {
     var isPendingResort: Bool = false  // Deferred sort: shows border when item changed but not yet re-sorted
     var isCompletionPending: Bool = false  // Deferred completion: shows filled checkbox before task disappears
     var isBlocked: Bool = false  // Task is blocked by another task (dimmed + indented + checkbox disabled)
+    var dependentCount: Int = 0  // DEP-3: Number of tasks depending on this one (for score boost)
     @State private var pendingPulse = false
 
     var body: some View {
@@ -136,7 +137,8 @@ struct MacBacklogRow: View {
                 importance: task.importance, urgency: task.urgency, dueDate: task.dueDate,
                 createdAt: task.createdAt, rescheduleCount: task.rescheduleCount,
                 estimatedDuration: task.estimatedDuration, taskType: task.taskType,
-                isNextUp: task.isNextUp
+                isNextUp: task.isNextUp,
+                dependentTaskCount: dependentCount
             )
             PriorityScoreBadge(
                 score: score,

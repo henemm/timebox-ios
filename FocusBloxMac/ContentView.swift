@@ -119,19 +119,7 @@ struct ContentView: View {
         switch selectedFilter {
         case .priority:
             base = visibleTasks
-                .sorted {
-                    TaskPriorityScoringService.calculateScore(
-                        importance: $0.importance, urgency: $0.urgency, dueDate: $0.dueDate,
-                        createdAt: $0.createdAt, rescheduleCount: $0.rescheduleCount,
-                        estimatedDuration: $0.estimatedDuration, taskType: $0.taskType,
-                        isNextUp: $0.isNextUp
-                    ) > TaskPriorityScoringService.calculateScore(
-                        importance: $1.importance, urgency: $1.urgency, dueDate: $1.dueDate,
-                        createdAt: $1.createdAt, rescheduleCount: $1.rescheduleCount,
-                        estimatedDuration: $1.estimatedDuration, taskType: $1.taskType,
-                        isNextUp: $1.isNextUp
-                    )
-                }
+                .sorted { scoreFor($0) > scoreFor($1) }
         case .recent:
             base = visibleTasks
                 .sorted { a, b in
@@ -280,6 +268,11 @@ struct ContentView: View {
         visibleTasks.filter { $0.blockerTaskID == blockerID && !$0.isNextUp }
     }
 
+    /// Number of incomplete tasks that depend on the given task
+    private func dependentCount(for taskID: String) -> Int {
+        visibleTasks.filter { $0.blockerTaskID == taskID }.count
+    }
+
     // Show Next Up section in all views except Completed
     private var showNextUpSection: Bool {
         selectedFilter != .completed && selectedFilter != .recurring && !nextUpTasks.isEmpty
@@ -293,7 +286,8 @@ struct ContentView: View {
             importance: task.importance, urgency: task.urgency, dueDate: task.dueDate,
             createdAt: task.createdAt, rescheduleCount: task.rescheduleCount,
             estimatedDuration: task.estimatedDuration, taskType: task.taskType,
-            isNextUp: task.isNextUp
+            isNextUp: task.isNextUp,
+            dependentTaskCount: dependentCount(for: task.id)
         )
         return deferredSort.effectiveScore(id: task.id, liveScore: liveScore)
     }
@@ -1041,7 +1035,8 @@ struct ContentView: View {
             },
             isPendingResort: deferredSort.isPending(task.id),
             isCompletionPending: deferredCompletion.isPending(task.id),
-            isBlocked: isBlocked
+            isBlocked: isBlocked,
+            dependentCount: dependentCount(for: task.id)
         )
     }
 
@@ -1049,12 +1044,7 @@ struct ContentView: View {
 
     private func freezeSortOrder() {
         deferredSort.freeze(scores: Dictionary(uniqueKeysWithValues: visibleTasks.filter { !$0.isNextUp }.map {
-            ($0.id, TaskPriorityScoringService.calculateScore(
-                importance: $0.importance, urgency: $0.urgency, dueDate: $0.dueDate,
-                createdAt: $0.createdAt, rescheduleCount: $0.rescheduleCount,
-                estimatedDuration: $0.estimatedDuration, taskType: $0.taskType,
-                isNextUp: $0.isNextUp
-            ))
+            ($0.id, scoreFor($0))
         }))
     }
 }
