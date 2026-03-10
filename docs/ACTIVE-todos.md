@@ -19,7 +19,7 @@
   - `FocusBloxMac/MacBacklogRow.swift`: isCompletionPending Visual State
   - `Sources/FocusBloxApp.swift`: @State + .environment() + scenePhase Background Flush
   - `FocusBloxMac/FocusBloxMacApp.swift`: @State + .environment() + scenePhase Background Flush
-- **Tests:** 7 Unit Tests gruen (DeferredCompletionControllerTests)
+- **Tests:** 7 Unit Tests + 7 UI Tests gruen (DeferredCompletionControllerTests + DeferredCompletionUITests + BacklogCompletionUITests)
 - **Beide Plattformen:** iOS + macOS
 
 ---

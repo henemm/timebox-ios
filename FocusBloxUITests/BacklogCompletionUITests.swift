@@ -54,7 +54,7 @@ final class BacklogCompletionUITests: XCTestCase {
         }
     }
 
-    /// Test that tapping completion button marks task as complete
+    /// Test that tapping completion button marks task as complete (after deferred delay)
     func testTapCompletionButtonCompletesTask() throws {
         navigateToBacklog()
         sleep(2)
@@ -70,22 +70,15 @@ final class BacklogCompletionUITests: XCTestCase {
         let firstButton = completeButtons.element(boundBy: 0)
         let buttonId = firstButton.identifier
 
-        // Get task count before
-        let countBefore = completeButtons.count
-
         // Tap the completion button
         firstButton.tap()
 
-        // Wait for animation/update
-        sleep(1)
-
-        // Task should be removed from list (completed tasks are filtered)
-        let countAfter = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH 'completeButton_'")).count
-
-        XCTAssertEqual(countAfter, countBefore - 1, "One task should be removed after completion")
-
-        // The specific button should no longer exist
-        let sameButton = app.buttons[buttonId]
-        XCTAssertFalse(sameButton.exists, "Completed task's button should no longer exist")
+        // Task should disappear after the 3-second deferred completion delay + animation
+        let buttonGone = XCTNSPredicateExpectation(
+            predicate: NSPredicate(format: "exists == false"),
+            object: app.buttons[buttonId]
+        )
+        let result = XCTWaiter.wait(for: [buttonGone], timeout: 6)
+        XCTAssertEqual(result, .completed, "Completed task should disappear after deferred delay")
     }
 }
