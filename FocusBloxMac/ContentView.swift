@@ -247,15 +247,15 @@ struct ContentView: View {
             .sorted { ($0.nextUpSortOrder ?? Int.max) < ($1.nextUpSortOrder ?? Int.max) }
     }
 
-    // Regular tasks (non-Next Up, filtered + search)
+    // Regular tasks (non-Next Up, top-level only — blocked tasks rendered inline under their blocker)
     private var regularFilteredTasks: [LocalTask] {
         let base: [LocalTask]
         switch selectedFilter {
         case .priority:
-            base = visibleTasks.filter { !$0.isNextUp }
+            base = visibleTasks.filter { !$0.isNextUp && $0.blockerTaskID == nil }
                 .sorted { scoreFor($0) > scoreFor($1) }
         case .recent:
-            base = visibleTasks.filter { !$0.isNextUp }
+            base = visibleTasks.filter { !$0.isNextUp && $0.blockerTaskID == nil }
                 .sorted { a, b in
                     let aDate = max(a.createdAt, a.modifiedAt ?? .distantPast)
                     let bDate = max(b.createdAt, b.modifiedAt ?? .distantPast)
@@ -264,7 +264,7 @@ struct ContentView: View {
         case .overdue:
             let startOfToday = Calendar.current.startOfDay(for: Date())
             base = visibleTasks.filter { task in
-                guard !task.isNextUp, let dueDate = task.dueDate else { return false }
+                guard !task.isNextUp, task.blockerTaskID == nil, let dueDate = task.dueDate else { return false }
                 return dueDate < startOfToday
             }.sorted { ($0.dueDate ?? .distantFuture) < ($1.dueDate ?? .distantFuture) }
         case .completed:
@@ -273,6 +273,11 @@ struct ContentView: View {
             base = tasks.filter { $0.modelContext != nil && $0.isTemplate && !$0.isCompleted }  // Bug 78
         }
         return searchText.isEmpty ? base : base.filter { matchesSearch($0) }
+    }
+
+    // Tasks blocked by a given blocker task
+    private func blockedDependents(of blockerID: String) -> [LocalTask] {
+        visibleTasks.filter { $0.blockerTaskID == blockerID && !$0.isNextUp }
     }
 
     // Show Next Up section in all views except Completed
@@ -293,11 +298,11 @@ struct ContentView: View {
         return deferredSort.effectiveScore(id: task.id, liveScore: liveScore)
     }
 
-    // Overdue tasks (non-NextUp, dueDate before today)
+    // Overdue tasks (non-NextUp, non-blocked, dueDate before today)
     private var overdueTasks: [LocalTask] {
         let startOfToday = Calendar.current.startOfDay(for: Date())
         return visibleTasks.filter { task in
-            guard !task.isNextUp, let dueDate = task.dueDate else { return false }
+            guard !task.isNextUp, task.blockerTaskID == nil, let dueDate = task.dueDate else { return false }
             return dueDate < startOfToday && matchesSearch(task)
         }.sorted { ($0.dueDate ?? .distantFuture) < ($1.dueDate ?? .distantFuture) }
     }
@@ -984,12 +989,18 @@ struct ContentView: View {
                 }
                 .tint(.blue)
             }
+
+        // Blocked dependents (no swipe actions — cannot be actioned until blocker is done)
+        ForEach(blockedDependents(of: task.id), id: \.uuid) { blockedTask in
+            makeBacklogRow(task: blockedTask, isBlocked: true)
+                .tag(blockedTask.uuid)
+        }
     }
 
     // MARK: - Row Builder
 
     @ViewBuilder
-    private func makeBacklogRow(task: LocalTask) -> some View {
+    private func makeBacklogRow(task: LocalTask, isBlocked: Bool = false) -> some View {
         MacBacklogRow(
             task: task,
             onToggleComplete: {
@@ -1029,7 +1040,8 @@ struct ContentView: View {
                 deferredSort.scheduleDeferredResort(id: task.id)
             },
             isPendingResort: deferredSort.isPending(task.id),
-            isCompletionPending: deferredCompletion.isPending(task.id)
+            isCompletionPending: deferredCompletion.isPending(task.id),
+            isBlocked: isBlocked
         )
     }
 

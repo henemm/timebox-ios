@@ -19,8 +19,11 @@
   - BacklogRow: isBlocked → Einrueckung (24pt) + Dimming (0.5) + Lock-Icon + Checkbox disabled
   - PlanItem: topLevelTasks + dependents(of:) Grouping-Helpers
   - 3 neue Unit Tests (12 gesamt, alle GREEN)
-- **Phase 2b (macOS View-Aenderungen) — OFFEN:**
-  - macOS Views analog (ContentView + MacBacklogRow)
+- **Phase 2b (macOS View-Aenderungen) — ERLEDIGT:**
+  - MacBacklogRow: isBlocked → Dimming (0.5) + Indent (20pt) + Lock-Icon + Checkbox disabled
+  - ContentView: Grouping (blockierte Tasks unter Blocker, keine Swipe-Actions)
+  - blockedDependents(of:) Helper, regularFilteredTasks/overdueTasks filtern blockerTaskID==nil
+  - 2 Dateien, +27/-11 LoC, alle 12 Tests GREEN
 - **Phase 3 (Erstellungs-UI) — OFFEN:**
   - TaskFormSheet: "Abhaengig von..." Picker
 - **Spec:** `openspec/changes/sub-tasks/proposal.md`

@@ -19,23 +19,25 @@ struct MacBacklogRow: View {
     var onDurationSelect: ((Int?) -> Void)?    // Direct duration selection (macOS Menu)
     var isPendingResort: Bool = false  // Deferred sort: shows border when item changed but not yet re-sorted
     var isCompletionPending: Bool = false  // Deferred completion: shows filled checkbox before task disappears
+    var isBlocked: Bool = false  // Task is blocked by another task (dimmed + indented + checkbox disabled)
     @State private var pendingPulse = false
 
     var body: some View {
         HStack(spacing: 10) {
             // Completion Toggle
             Button {
-                if !isCompletionPending {
+                if !isCompletionPending && !isBlocked {
                     onToggleComplete?()
                 }
             } label: {
                 let showCompleted = task.isCompleted || isCompletionPending
-                Image(systemName: showCompleted ? "checkmark.circle.fill" : "circle")
-                    .foregroundStyle(showCompleted ? .green : .secondary)
+                Image(systemName: showCompleted ? "checkmark.circle.fill" : (isBlocked ? "lock.circle" : "circle"))
+                    .foregroundStyle(showCompleted ? .green : (isBlocked ? Color.secondary.opacity(0.5) : .secondary))
                     .font(.system(size: 16))
                     .animation(.smooth(duration: 0.2), value: isCompletionPending)
             }
             .buttonStyle(.plain)
+            .disabled(isBlocked)
             .accessibilityIdentifier("completeButton_\(task.id)")
 
             // Title + Metadata (fills available width, like iOS BacklogRow contentSection)
@@ -89,6 +91,8 @@ struct MacBacklogRow: View {
                 pendingPulse = false
             }
         }
+        .opacity(isBlocked ? 0.5 : 1.0)
+        .padding(.leading, isBlocked ? 20 : 0)
         .userActivity("com.henning.focusblox.viewTask", isActive: !task.isCompleted) { activity in
             activity.title = task.title
             activity.isEligibleForSearch = true
