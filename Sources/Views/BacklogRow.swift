@@ -14,6 +14,7 @@ struct BacklogRow: View {
     var onTitleSave: ((String) -> Void)?  // Inline title edit callback
     var isPendingResort: Bool = false  // Deferred sort: shows border when item changed but not yet re-sorted
     var isCompletionPending: Bool = false  // Deferred completion: shows filled checkbox before task disappears
+    var isBlocked: Bool = false  // Task is blocked by another task (dimmed + indented + checkbox disabled)
 
     // State for inline title editing (double-tap)
     @State private var isEditingTitle = false
@@ -27,17 +28,18 @@ struct BacklogRow: View {
         HStack(spacing: 12) {
             // Completion Checkbox
             Button {
-                if !isCompletionPending {
+                if !isCompletionPending && !isBlocked {
                     onComplete?()
                 }
             } label: {
-                Image(systemName: isCompletionPending ? "checkmark.circle.fill" : "circle")
+                Image(systemName: isCompletionPending ? "checkmark.circle.fill" : (isBlocked ? "lock.circle" : "circle"))
                     .font(.system(size: 22))
-                    .foregroundStyle(isCompletionPending ? .green : .secondary)
+                    .foregroundStyle(isCompletionPending ? Color.green : (isBlocked ? Color.secondary.opacity(0.5) : Color.secondary))
             }
             .buttonStyle(.plain)
+            .disabled(isBlocked)
             .accessibilityIdentifier("completeButton_\(item.id)")
-            .accessibilityLabel(isCompletionPending ? "Erledigt" : "Als erledigt markieren")
+            .accessibilityLabel(isBlocked ? "Blockiert" : (isCompletionPending ? "Erledigt" : "Als erledigt markieren"))
             .animation(.smooth(duration: 0.2), value: isCompletionPending)
 
             // Content (Title + Metadata) - full width, no right column
@@ -71,6 +73,8 @@ struct BacklogRow: View {
                 pendingPulse = false
             }
         }
+        .opacity(isBlocked ? 0.5 : 1.0)
+        .padding(.leading, isBlocked ? 24 : 0)
         .contentShape(Rectangle())
         .userActivity(TaskEntity.activityType, isActive: !item.isCompleted) { activity in
             activity.title = item.title

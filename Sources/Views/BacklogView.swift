@@ -89,9 +89,19 @@ struct BacklogView: View {
         planItems.filter { $0.isNextUp && !$0.isCompleted && !$0.isTemplate && matchesSearch($0) }
     }
 
-    private var backlogTasks: [PlanItem] {
-        // Filter: nicht erledigt, nicht Next Up, nicht einem FocusBlock zugeordnet
+    /// All non-completed backlog tasks (including blocked ones for grouping)
+    private var allBacklogTasks: [PlanItem] {
         planItems.filter { !$0.isCompleted && !$0.isNextUp && $0.assignedFocusBlockID == nil && matchesSearch($0) }
+    }
+
+    private var backlogTasks: [PlanItem] {
+        // Top-level only: exclude blocked tasks (they appear under their blocker)
+        allBacklogTasks.topLevelTasks
+    }
+
+    /// Blocked tasks that depend on the given blocker task ID
+    private func blockedTasks(for blockerID: String) -> [PlanItem] {
+        allBacklogTasks.dependents(of: blockerID)
     }
 
     // MARK: - Recurring Tasks (only templates = series overview)
@@ -866,6 +876,10 @@ struct BacklogView: View {
             isPendingResort: deferredSort.isPending(item.id),
             isCompletionPending: deferredCompletion.isPending(item.id)
         )
+        // Render blocked dependents directly after this task
+        ForEach(blockedTasks(for: item.id)) { blocked in
+            blockedRow(blocked)
+        }
         .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
         .listRowBackground(Color.clear)
         .listRowSeparator(.hidden)
@@ -895,6 +909,19 @@ struct BacklogView: View {
                 postponeMenu(for: item)
             }
         }
+    }
+
+    // MARK: - Blocked Row (no swipe actions, dimmed + indented)
+    private func blockedRow(_ item: PlanItem) -> some View {
+        BacklogRow(
+            item: item,
+            onEditTap: { handleEditTap(item) },
+            onTitleSave: { newTitle in saveTitleEdit(for: item, title: newTitle) },
+            isBlocked: true
+        )
+        .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
+        .listRowBackground(Color.clear)
+        .listRowSeparator(.hidden)
     }
 
     // MARK: - Priority View (with overdue section at top)

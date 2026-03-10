@@ -63,6 +63,7 @@
 		88ED9B394FA2293A587D7952 /* LocalTaskSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 999C0690FA25D74051BA1C6F /* LocalTaskSource.swift */; };
 		88FB3AEEAE86741E5EA6AC42 /* FocusBloxApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 407BE145C7716D6B1A1BB67F /* FocusBloxApp.swift */; };
 		94EC1D85A0F4B53160332751 /* PlanItemTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32E6EA75FACA340867827895 /* PlanItemTests.swift */; };
+		TSKDEP01BUILD000001 /* TaskDependencyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = TSKDEP01FILEREF0001 /* TaskDependencyTests.swift */; };
 		968A3087301F055E331E560C /* EventKitRepositoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DC26C4D8FDC4B811001FD2C /* EventKitRepositoryTests.swift */; };
 		96DD4A471C3F159FE2C19462 /* TaskFormTbdUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFD460F955B924EB6F6C5B94 /* TaskFormTbdUITests.swift */; };
 		991544877FDF4CD72B4F2DE4 /* SprintReviewSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = B31CB18EF0C80E62953F34D6 /* SprintReviewSheet.swift */; };
@@ -557,6 +558,7 @@
 		301796C3380CA4E06D1EF41B /* TaskCompletionUndoServiceTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TaskCompletionUndoServiceTests.swift; sourceTree = "<group>"; };
 		31904CA661DB113E1D4F523F /* FocusBloxUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FocusBloxUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		32E6EA75FACA340867827895 /* PlanItemTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanItemTests.swift; sourceTree = "<group>"; };
+		TSKDEP01FILEREF0001 /* TaskDependencyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskDependencyTests.swift; sourceTree = "<group>"; };
 		339BBA1A3799CB0C6CF5897A /* BacklogViewUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BacklogViewUITests.swift; sourceTree = "<group>"; };
 		34D186C26C7135F80A5E3B0B /* SyncEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncEngine.swift; sourceTree = "<group>"; };
 		350DD1256F45268992636DEA /* NotificationService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
@@ -1379,6 +1381,7 @@
 				01F676CC7EA20C97ACDD9D18 /* LocalTaskTests.swift */,
 				37586E91853A38D88E035A33 /* MockEventKitRepositoryTests.swift */,
 				32E6EA75FACA340867827895 /* PlanItemTests.swift */,
+				TSKDEP01FILEREF0001 /* TaskDependencyTests.swift */,
 				14E16E8941781A7134CBEE3A /* SyncEngineTests.swift */,
 				76296762878DC5D17EA4E12A /* TaskSourceTests.swift */,
 				SNDSVC01FILEREF00001 /* SoundServiceTests.swift */,
@@ -2330,6 +2333,7 @@
 				6B6843B1FA16372D73DF9402 /* LocalTaskTests.swift in Sources */,
 				2F7184DE552C8D322971EDED /* MockEventKitRepositoryTests.swift in Sources */,
 				94EC1D85A0F4B53160332751 /* PlanItemTests.swift in Sources */,
+				TSKDEP01BUILD000001 /* TaskDependencyTests.swift in Sources */,
 				B7B87F202F1BCD900069B457 /* EisenhowerMatrixTests.swift in Sources */,
 				B703FF51FE4B31A1D059A453 /* NextUpTests.swift in Sources */,
 				SMARTGAPS001BUILDFILE00001 /* SmartGapsTests.swift in Sources */,

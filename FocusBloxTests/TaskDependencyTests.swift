@@ -162,6 +162,58 @@ final class TaskDependencyTests: XCTestCase {
                        "Blocker bonus should be capped at +9 (3 dependents max)")
     }
 
+    // MARK: - Grouping: tasksWithDependents
+
+    func test_grouping_blockedTasksExcludedFromTopLevel() throws {
+        let blocker = LocalTask(title: "Blocker")
+        let dependent = LocalTask(title: "Dependent")
+        let free = LocalTask(title: "Free")
+        container.mainContext.insert(blocker)
+        container.mainContext.insert(dependent)
+        container.mainContext.insert(free)
+        dependent.blockerTaskID = blocker.id
+
+        let items = [blocker, dependent, free].map { PlanItem(localTask: $0) }
+        let topLevel = items.topLevelTasks
+
+        XCTAssertEqual(topLevel.count, 2, "Blocked tasks should not appear in top-level")
+        XCTAssertTrue(topLevel.contains(where: { $0.id == blocker.id }))
+        XCTAssertTrue(topLevel.contains(where: { $0.id == free.id }))
+        XCTAssertFalse(topLevel.contains(where: { $0.id == dependent.id }))
+    }
+
+    func test_grouping_dependentsForBlocker() throws {
+        let blocker = LocalTask(title: "Blocker")
+        let dep1 = LocalTask(title: "Dep 1")
+        let dep2 = LocalTask(title: "Dep 2")
+        let free = LocalTask(title: "Free")
+        container.mainContext.insert(blocker)
+        container.mainContext.insert(dep1)
+        container.mainContext.insert(dep2)
+        container.mainContext.insert(free)
+        dep1.blockerTaskID = blocker.id
+        dep2.blockerTaskID = blocker.id
+
+        let items = [blocker, dep1, dep2, free].map { PlanItem(localTask: $0) }
+        let dependents = items.dependents(of: blocker.id)
+
+        XCTAssertEqual(dependents.count, 2, "Should find 2 dependents for blocker")
+        XCTAssertTrue(dependents.contains(where: { $0.id == dep1.id }))
+        XCTAssertTrue(dependents.contains(where: { $0.id == dep2.id }))
+    }
+
+    func test_grouping_noDependentsForFreeTask() throws {
+        let free1 = LocalTask(title: "Free 1")
+        let free2 = LocalTask(title: "Free 2")
+        container.mainContext.insert(free1)
+        container.mainContext.insert(free2)
+
+        let items = [free1, free2].map { PlanItem(localTask: $0) }
+        let dependents = items.dependents(of: free1.id)
+
+        XCTAssertTrue(dependents.isEmpty, "Free task should have no dependents")
+    }
+
     func test_scoring_blockerBonus_respectsMaxScore100() {
         // High base score + blocker bonus should not exceed 100
         let score = TaskPriorityScoringService.calculateScore(

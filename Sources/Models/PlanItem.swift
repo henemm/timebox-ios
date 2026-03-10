@@ -211,6 +211,20 @@ struct PlanItem: Identifiable, Sendable {
     }
 }
 
+// MARK: - Dependency Grouping Helpers
+
+extension Array where Element == PlanItem {
+    /// Tasks that are NOT blocked by another task (top-level items).
+    var topLevelTasks: [PlanItem] {
+        filter { $0.blockerTaskID == nil }
+    }
+
+    /// Tasks that depend on the given blocker task ID.
+    func dependents(of blockerID: String) -> [PlanItem] {
+        filter { $0.blockerTaskID == blockerID }
+    }
+}
+
 enum DurationSource: Sendable {
     case manual
     case parsed
