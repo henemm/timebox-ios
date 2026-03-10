@@ -6,7 +6,7 @@ import XCTest
 /// TDD GREEN: Screenshot proves TBD title IS italic (bug fixed)
 ///
 /// Mock data: tbdTask in FocusBloxApp.seedUITestData()
-/// - title: "TBD Task - Unvollständig"
+/// - title: "[MOCK] TBD Task - Unvollstaendig"
 /// - importance: nil, urgency: nil, estimatedDuration: nil
 /// - isTbd: true → should render italic + secondary color
 final class TbdItalicUITests: XCTestCase {

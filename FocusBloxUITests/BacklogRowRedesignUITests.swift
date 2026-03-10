@@ -292,7 +292,7 @@ final class BacklogRowRedesignUITests: XCTestCase {
     // MARK: - Test 9: Task Title Exists
 
     /// Test: Task title is displayed
-    /// Mock data: "Backlog Task 1", "Backlog Task 2"
+    /// Mock data: "[MOCK] Backlog Task 1", "[MOCK] Backlog Task 2"
     func testTaskTitleExists() throws {
         navigateToBacklogList()
 

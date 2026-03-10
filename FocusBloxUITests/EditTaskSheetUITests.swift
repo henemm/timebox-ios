@@ -29,7 +29,7 @@ final class EditTaskSheetUITests: XCTestCase {
 
         // Find a backlog task by looking for the specific text
         // The backlog tasks have isNextUp = false and appear in the list
-        let backlogTask = app.staticTexts["Backlog Task 1"]
+        let backlogTask = app.staticTexts["[MOCK] Backlog Task 1"]
         if backlogTask.waitForExistence(timeout: 5) {
             backlogTask.tap()
         } else {

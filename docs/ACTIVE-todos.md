@@ -6,6 +6,23 @@
 
 ---
 
+## ERLEDIGT: Bug — macOS UI Tests leaken Mock-Daten in echte Datenbank
+
+- **Symptom:** Nach macOS Tests tauchen zahlreiche Mock-Tasks ("UI Test Task XXXX", "Badge Test Task XXXX" etc.) in der echten App-Datenbank auf und werden nicht geloescht.
+- **Root Cause:** 5 macOS UI Test-Dateien starteten die App OHNE `-UITesting` Flag. Ohne dieses Flag nutzt die App den persistenten Store statt In-Memory. Tasks die waehrend der Tests via UI erstellt werden, bleiben permanent gespeichert.
+- **Fix:**
+  1. `-UITesting` und `-MockData` zu allen 5 betroffenen Dateien hinzugefuegt
+  2. Einmalige Cleanup-Funktion `cleanupLeakedTestData()` loescht bestehende Test-Tasks beim naechsten App-Start
+- **Betroffene Dateien:**
+  - `FocusBloxMacUITests/FocusBloxMacUITests.swift` (Launch-Args gefixt)
+  - `FocusBloxMacUITests/MacSyncUIAlignmentUITests.swift` (Launch-Args gefixt)
+  - `FocusBloxMacUITests/MacBacklogTagsUITests.swift` (falscher `-UITestMode` → `-UITesting`)
+  - `FocusBloxMacUITests/RemindersSyncUITests.swift` (Launch-Args gefixt)
+  - `FocusBloxMacUITests/FocusBloxMacUITestsLaunchTests.swift` (Launch-Args hinzugefuegt)
+  - `FocusBloxMac/FocusBloxMacApp.swift` (Cleanup-Funktion)
+
+---
+
 ## ERLEDIGT: Bug 83 — Focus View Task Count Widerspruch (iOS + macOS)
 
 - **Symptom:** Focus View zeigt "2/3 Tasks" im Header aber "Alle Tasks erledigt!" im Content gleichzeitig

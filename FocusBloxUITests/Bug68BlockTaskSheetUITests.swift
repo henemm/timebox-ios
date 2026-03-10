@@ -112,8 +112,8 @@ final class Bug68BlockTaskSheetUITests: XCTestCase {
         app.swipeUp()
 
         // Should show backlog tasks (not NextUp, not assigned)
-        // Mock data has "Backlog Task 1" and "Backlog Task 2" with isNextUp=false
-        let backlogTask = app.staticTexts["Backlog Task 1"]
+        // Mock data has "[MOCK] Backlog Task 1" and "[MOCK] Backlog Task 2" with isNextUp=false
+        let backlogTask = app.staticTexts["[MOCK] Backlog Task 1"]
         XCTAssertTrue(backlogTask.waitForExistence(timeout: 5),
                        "Backlog tasks should appear in 'Alle Tasks' section")
     }

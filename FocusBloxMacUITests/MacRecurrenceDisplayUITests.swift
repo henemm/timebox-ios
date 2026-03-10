@@ -42,7 +42,7 @@ final class MacRecurrenceDisplayUITests: XCTestCase {
 
         // Look for any mock task to verify seed data loaded
         // Use staticTexts which is safer than descendants(matching: .any)
-        let mockTask = app.staticTexts["Mock Task 1 #30min"]
+        let mockTask = app.staticTexts["[MOCK] Task 1 #30min"]
         XCTAssertTrue(
             mockTask.waitForExistence(timeout: 5),
             "Mock data must be seeded — 'Mock Task 1 #30min' should be visible"

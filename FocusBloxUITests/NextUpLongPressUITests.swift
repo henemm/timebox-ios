@@ -37,7 +37,7 @@ final class NextUpLongPressUITests: XCTestCase {
         if others.count > 0 { return others.firstMatch }
 
         // Fallback: find by known mock task title
-        let mockTitle = app.staticTexts["Mock Task 1 #30min"]
+        let mockTitle = app.staticTexts["[MOCK] Task 1 #30min"]
         if mockTitle.exists { return mockTitle }
 
         return nil

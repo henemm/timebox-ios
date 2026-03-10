@@ -37,7 +37,7 @@ final class NextUpSwipeActionsUITests: XCTestCase {
         if others.count > 0 { return others.firstMatch }
 
         // Try finding by the known mock task title within Next Up section
-        let mockTitle = app.staticTexts["Mock Task 1 #30min"]
+        let mockTitle = app.staticTexts["[MOCK] Task 1 #30min"]
         if mockTitle.exists { return mockTitle }
 
         return nil

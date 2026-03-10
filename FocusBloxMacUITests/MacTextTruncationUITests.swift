@@ -44,7 +44,7 @@ final class MacTextTruncationUITests: XCTestCase {
         // gets compressed by the wide metadataRow HStack and truncated with "…".
         // After fix: VStack expands to fill available width.
 
-        let longTitle = "Lohnsteuererklärung Amazon Deutschland einreichen"
+        let longTitle = "[MOCK] Lohnsteuererklaerung einreichen"
         let titleText = app.staticTexts[longTitle]
         guard titleText.waitForExistence(timeout: 8) else {
             XCTFail("Could not find '\(longTitle)' task title in backlog")

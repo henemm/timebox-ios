@@ -142,8 +142,8 @@ final class OverdueUITests: XCTestCase {
             "'min geschätzt' duration label should be visible in current task view"
         )
 
-        // Task title "Focus Task 1" should be visible (first mock task)
-        let taskTitle = app.staticTexts["Focus Task 1"]
+        // Task title "[MOCK] Focus Task 1" should be visible (first mock task)
+        let taskTitle = app.staticTexts["[MOCK] Focus Task 1"]
         XCTAssertTrue(
             taskTitle.waitForExistence(timeout: 3),
             "First mock task title 'Focus Task 1' should be visible"

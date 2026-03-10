@@ -123,6 +123,7 @@ struct FocusBloxMacApp: App {
     @State private var showShortcuts = false
     @State private var syncMonitor = CloudKitSyncMonitor()
     @State private var deferredSort = DeferredSortController()
+    @State private var deferredCompletion = DeferredCompletionController()
     @FocusedValue(\.taskActions) private var taskActions
     @State private var showUndoAlert = false
     @State private var undoResultMessage = ""
@@ -183,6 +184,7 @@ struct FocusBloxMacApp: App {
                 .environment(\.eventKitRepository, eventKitRepository)
                 .environment(syncMonitor)
                 .environment(deferredSort)
+                .environment(deferredCompletion)
                 .sheet(isPresented: $showShortcuts) {
                     KeyboardShortcutsView()
                 }
@@ -193,6 +195,8 @@ struct FocusBloxMacApp: App {
                         NSApplication.shared.activate(ignoringOtherApps: true)
                         NSApplication.shared.windows.first?.makeKeyAndOrderFront(nil)
                     }
+                    // One-time cleanup: Remove leaked test data from persistent store
+                    Self.cleanupLeakedTestData(in: container.mainContext)
                     // Bug 38: Force CloudKit to sync all extended attribute fields
                     MacModelContainer.forceCloudKitFieldSync(in: container.mainContext)
                     // Repair orphaned recurring series (missing successors)
@@ -240,6 +244,9 @@ struct FocusBloxMacApp: App {
                     if newPhase == .active {
                         syncMonitor.triggerSync()
                         syncedSettings.pushToCloud()
+                    }
+                    if newPhase == .background {
+                        Task { await deferredCompletion.flushAll() }
                     }
                 }
         }
@@ -425,57 +432,110 @@ enum MacModelContainer {
     }
 }
 
+// MARK: - Test Data Cleanup
+
+extension FocusBloxMacApp {
+    /// One-time cleanup of test data that leaked into the persistent store
+    /// from macOS UI tests that were missing the -UITesting flag.
+    static func cleanupLeakedTestData(in context: ModelContext) {
+        let key = "hasCleanedLeakedTestData_v2"
+        guard !UserDefaults.standard.bool(forKey: key) else { return }
+
+        let descriptor = FetchDescriptor<LocalTask>()
+        guard let allTasks = try? context.fetch(descriptor) else { return }
+
+        // Exact titles from seedUITestData (both iOS + macOS)
+        let exactMockTitles: Set<String> = [
+            "Mock Task 1 #30min", "Mock Task 2 #15min", "Mock Task 3 #45min",
+            "Backlog Task 1", "Backlog Task 2",
+            "TBD Task - Unvollständig", "Badge Overflow Demo",
+            "Assigned Task #20min",
+            "Focus Task 1", "Focus Task 2", "Focus Task 3",
+            "Erledigte Aufgabe", "Erledigte Backlog-Aufgabe",
+            "Startups anschreiben wegen Kapitalerhöhung",
+            "Lohnsteuererklärung Amazon Deutschland einreichen",
+            "Taeglich lesen", "Wochenreview", "Zweiwochentlich aufraeumen",
+        ]
+
+        // Prefix patterns from UI tests that created tasks via the UI
+        let testPrefixes = [
+            "UI Test Task ", "Badge Test Task ", "Inspector Test Task ",
+            "Category Grid Test ", "Test Task ",
+        ]
+
+        var deletedCount = 0
+        for task in allTasks {
+            let shouldDelete =
+                exactMockTitles.contains(task.title) ||
+                testPrefixes.contains(where: { task.title.hasPrefix($0) }) ||
+                (task.recurrenceGroupID?.hasPrefix("uitest-") == true)
+
+            if shouldDelete {
+                context.delete(task)
+                deletedCount += 1
+            }
+        }
+
+        if deletedCount > 0 {
+            try? context.save()
+            print("[Cleanup] Deleted \(deletedCount) leaked test tasks from persistent store")
+        }
+
+        UserDefaults.standard.set(true, forKey: key)
+    }
+}
+
 // MARK: - UI Test Mock Data
 
 extension FocusBloxMacApp {
     static func seedUITestData(into context: ModelContext) {
-        let descriptor = FetchDescriptor<LocalTask>(predicate: #Predicate { $0.title == "Mock Task 1 #30min" })
+        let descriptor = FetchDescriptor<LocalTask>(predicate: #Predicate { $0.title == "[MOCK] Task 1 #30min" })
         guard (try? context.fetch(descriptor))?.isEmpty ?? true else { return }
 
         // Next Up tasks
-        let task1 = LocalTask(title: "Mock Task 1 #30min", importance: 3, estimatedDuration: 30, urgency: "urgent")
+        let task1 = LocalTask(title: "[MOCK] Task 1 #30min", importance: 3, estimatedDuration: 30, urgency: "urgent")
         task1.isNextUp = true
-        let task2 = LocalTask(title: "Mock Task 2 #15min", importance: 2, estimatedDuration: 15, urgency: "not_urgent")
+        let task2 = LocalTask(title: "[MOCK] Task 2 #15min", importance: 2, estimatedDuration: 15, urgency: "not_urgent")
         task2.isNextUp = true
-        let task3 = LocalTask(title: "Mock Task 3 #45min", importance: 1, estimatedDuration: 45, urgency: "not_urgent")
+        let task3 = LocalTask(title: "[MOCK] Task 3 #45min", importance: 1, estimatedDuration: 45, urgency: "not_urgent")
         task3.isNextUp = true
 
         // Long-title Next Up task for truncation testing (Bug 86)
-        let longTitleTask = LocalTask(title: "Startups anschreiben wegen Kapitalerhöhung", importance: 3, estimatedDuration: 30, urgency: "urgent")
+        let longTitleTask = LocalTask(title: "[MOCK] Startups anschreiben wegen Kapitalerhoehung", importance: 3, estimatedDuration: 30, urgency: "urgent")
         longTitleTask.isNextUp = true
         longTitleTask.taskType = "essentials"
         longTitleTask.dueDate = Date()
 
         // Badge-overflow backlog task: ALL badges set for truncation testing (Bug 86)
-        let backlogTask1 = LocalTask(title: "Lohnsteuererklärung Amazon Deutschland einreichen", importance: 2, estimatedDuration: 25, urgency: "urgent")
+        let backlogTask1 = LocalTask(title: "[MOCK] Lohnsteuererklaerung einreichen", importance: 2, estimatedDuration: 25, urgency: "urgent")
         backlogTask1.tags = ["work", "urgent"]
         backlogTask1.taskType = "deep_work"
         backlogTask1.dueDate = Date()
         backlogTask1.recurrencePattern = "weekly"
 
-        let backlogTask2 = LocalTask(title: "Backlog Task 2", importance: 1, estimatedDuration: 15, urgency: "not_urgent")
+        let backlogTask2 = LocalTask(title: "[MOCK] Backlog Task 2", importance: 1, estimatedDuration: 15, urgency: "not_urgent")
         backlogTask2.taskType = "shallow_work"
 
         // Recurring: daily template + child
         let group1 = "uitest-recurring-group-1"
-        let tmpl1 = LocalTask(title: "Taeglich lesen", importance: 2, tags: ["learning"], estimatedDuration: 15, recurrencePattern: "daily", recurrenceGroupID: group1)
+        let tmpl1 = LocalTask(title: "[MOCK] Taeglich lesen", importance: 2, tags: ["learning"], estimatedDuration: 15, recurrencePattern: "daily", recurrenceGroupID: group1)
         tmpl1.isTemplate = true
-        let child1 = LocalTask(title: "Taeglich lesen", importance: 2, tags: ["learning"], dueDate: Date(), estimatedDuration: 15, recurrencePattern: "daily", recurrenceGroupID: group1)
+        let child1 = LocalTask(title: "[MOCK] Taeglich lesen", importance: 2, tags: ["learning"], dueDate: Date(), estimatedDuration: 15, recurrencePattern: "daily", recurrenceGroupID: group1)
 
         // Recurring: weekly template + child
         let group2 = "uitest-recurring-group-2"
-        let tmpl2 = LocalTask(title: "Wochenreview", importance: 3, tags: ["planning"], estimatedDuration: 30, recurrencePattern: "weekly", recurrenceWeekdays: [5], recurrenceGroupID: group2)
+        let tmpl2 = LocalTask(title: "[MOCK] Wochenreview", importance: 3, tags: ["planning"], estimatedDuration: 30, recurrencePattern: "weekly", recurrenceWeekdays: [5], recurrenceGroupID: group2)
         tmpl2.isTemplate = true
-        let child2 = LocalTask(title: "Wochenreview", importance: 3, tags: ["planning"], dueDate: Date(), estimatedDuration: 30, recurrencePattern: "weekly", recurrenceWeekdays: [5], recurrenceGroupID: group2)
+        let child2 = LocalTask(title: "[MOCK] Wochenreview", importance: 3, tags: ["planning"], dueDate: Date(), estimatedDuration: 30, recurrencePattern: "weekly", recurrenceWeekdays: [5], recurrenceGroupID: group2)
 
         // Recurring: biweekly template + child (for recurrence display test)
         let group3 = "uitest-recurring-group-3"
-        let tmpl3 = LocalTask(title: "Zweiwochentlich aufraeumen", importance: 1, tags: ["maintenance"], estimatedDuration: 45, recurrencePattern: "biweekly", recurrenceGroupID: group3)
+        let tmpl3 = LocalTask(title: "[MOCK] Zweiwochentlich aufraeumen", importance: 1, tags: ["maintenance"], estimatedDuration: 45, recurrencePattern: "biweekly", recurrenceGroupID: group3)
         tmpl3.isTemplate = true
-        let child3 = LocalTask(title: "Zweiwochentlich aufraeumen", importance: 1, tags: ["maintenance"], dueDate: Date(), estimatedDuration: 45, recurrencePattern: "biweekly", recurrenceGroupID: group3)
+        let child3 = LocalTask(title: "[MOCK] Zweiwochentlich aufraeumen", importance: 1, tags: ["maintenance"], dueDate: Date(), estimatedDuration: 45, recurrencePattern: "biweekly", recurrenceGroupID: group3)
 
         // Completed task
-        let completed = LocalTask(title: "Erledigte Aufgabe", importance: 2, estimatedDuration: 20, urgency: "not_urgent")
+        let completed = LocalTask(title: "[MOCK] Erledigte Aufgabe", importance: 2, estimatedDuration: 20, urgency: "not_urgent")
         completed.isCompleted = true
         completed.completedAt = Date()
 

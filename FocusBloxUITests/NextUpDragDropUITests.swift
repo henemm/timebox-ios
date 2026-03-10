@@ -70,15 +70,15 @@ final class NextUpDragDropUITests: XCTestCase {
 
         // Verify each mock task title is shown
         XCTAssertTrue(
-            app.staticTexts["Mock Task 1 #30min"].waitForExistence(timeout: 3),
+            app.staticTexts["[MOCK] Task 1 #30min"].waitForExistence(timeout: 3),
             "Mock Task 1 should be visible in Next Up"
         )
         XCTAssertTrue(
-            app.staticTexts["Mock Task 2 #15min"].exists,
+            app.staticTexts["[MOCK] Task 2 #15min"].exists,
             "Mock Task 2 should be visible in Next Up"
         )
         XCTAssertTrue(
-            app.staticTexts["Mock Task 3 #45min"].exists,
+            app.staticTexts["[MOCK] Task 3 #45min"].exists,
             "Mock Task 3 should be visible in Next Up"
         )
 
@@ -125,9 +125,9 @@ final class NextUpDragDropUITests: XCTestCase {
         }
 
         // All 3 tasks present
-        XCTAssertTrue(app.staticTexts["Mock Task 1 #30min"].waitForExistence(timeout: 3))
-        XCTAssertTrue(app.staticTexts["Mock Task 2 #15min"].exists)
-        XCTAssertTrue(app.staticTexts["Mock Task 3 #45min"].exists)
+        XCTAssertTrue(app.staticTexts["[MOCK] Task 1 #30min"].waitForExistence(timeout: 3))
+        XCTAssertTrue(app.staticTexts["[MOCK] Task 2 #15min"].exists)
+        XCTAssertTrue(app.staticTexts["[MOCK] Task 3 #45min"].exists)
 
         let beforeScreenshot = XCTAttachment(screenshot: app.screenshot())
         beforeScreenshot.name = "Task1-BeforeRemove-3Tasks"
@@ -179,9 +179,9 @@ final class NextUpDragDropUITests: XCTestCase {
         }
 
         // All content present
-        XCTAssertTrue(app.staticTexts["Mock Task 1 #30min"].exists, "Task 1 title")
-        XCTAssertTrue(app.staticTexts["Mock Task 2 #15min"].exists, "Task 2 title")
-        XCTAssertTrue(app.staticTexts["Mock Task 3 #45min"].exists, "Task 3 title")
+        XCTAssertTrue(app.staticTexts["[MOCK] Task 1 #30min"].exists, "Task 1 title")
+        XCTAssertTrue(app.staticTexts["[MOCK] Task 2 #15min"].exists, "Task 2 title")
+        XCTAssertTrue(app.staticTexts["[MOCK] Task 3 #45min"].exists, "Task 3 title")
         XCTAssertTrue(app.staticTexts["30 min"].exists, "Duration 1")
         XCTAssertTrue(app.staticTexts["15 min"].exists, "Duration 2")
         XCTAssertTrue(app.staticTexts["45 min"].exists, "Duration 3")

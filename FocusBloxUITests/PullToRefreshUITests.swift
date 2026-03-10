@@ -44,7 +44,7 @@ final class PullToRefreshUITests: XCTestCase {
         XCTAssertTrue(nextUpHeader.waitForExistence(timeout: 5), "Next Up section should be visible")
 
         // Verify mock tasks exist below Next Up
-        let mockTask1 = app.staticTexts["Mock Task 1 #30min"]
+        let mockTask1 = app.staticTexts["[MOCK] Task 1 #30min"]
         XCTAssertTrue(mockTask1.waitForExistence(timeout: 3), "Mock tasks should be visible in backlog")
 
         // Both elements should have Y positions showing NextUp is above task list

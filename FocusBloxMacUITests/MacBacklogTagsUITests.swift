@@ -13,7 +13,7 @@ final class MacBacklogTagsUITests: XCTestCase {
     override func setUpWithError() throws {
         continueAfterFailure = false
         app = XCUIApplication()
-        app.launchArguments = ["-ApplePersistenceIgnoreState", "YES", "-UITestMode", "YES"]
+        app.launchArguments = ["-UITesting", "-MockData", "-ApplePersistenceIgnoreState", "YES"]
         app.launch()
 
         // Wait for window to appear

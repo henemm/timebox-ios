@@ -63,13 +63,13 @@ final class RecurringTemplateUITests: XCTestCase {
         navigateToRecurring()
 
         // Templates should be visible
-        let template1 = app.staticTexts["Taeglich lesen"]
+        let template1 = app.staticTexts["[MOCK] Taeglich lesen"]
         XCTAssertTrue(
             template1.waitForExistence(timeout: 5),
             "Template 'Taeglich lesen' should be visible in Wiederkehrend view"
         )
 
-        let template2 = app.staticTexts["Wochenreview"]
+        let template2 = app.staticTexts["[MOCK] Wochenreview"]
         XCTAssertTrue(
             template2.waitForExistence(timeout: 3),
             "Template 'Wochenreview' should be visible in Wiederkehrend view"
@@ -82,7 +82,7 @@ final class RecurringTemplateUITests: XCTestCase {
         navigateToRecurring()
 
         // Wait for content to load
-        let template1 = app.staticTexts["Taeglich lesen"]
+        let template1 = app.staticTexts["[MOCK] Taeglich lesen"]
         guard template1.waitForExistence(timeout: 5) else {
             XCTFail("No recurring templates found — seed data missing?")
             return
@@ -91,7 +91,7 @@ final class RecurringTemplateUITests: XCTestCase {
         // Count how many times each title appears.
         // If children are also shown, we'd see duplicates.
         let taeglich = app.staticTexts.matching(
-            NSPredicate(format: "label == %@", "Taeglich lesen")
+            NSPredicate(format: "label == %@", "[MOCK] Taeglich lesen")
         )
         XCTAssertEqual(
             taeglich.count, 1,
@@ -99,7 +99,7 @@ final class RecurringTemplateUITests: XCTestCase {
         )
 
         let wochenreview = app.staticTexts.matching(
-            NSPredicate(format: "label == %@", "Wochenreview")
+            NSPredicate(format: "label == %@", "[MOCK] Wochenreview")
         )
         XCTAssertEqual(
             wochenreview.count, 1,
@@ -116,7 +116,7 @@ final class RecurringTemplateUITests: XCTestCase {
 
         // The badge overflow task is a non-template recurring task — it should NOT appear
         // in "Wiederkehrend" because it's not a template
-        let nonTemplate = app.staticTexts["Badge Overflow Demo"]
+        let nonTemplate = app.staticTexts["[MOCK] Badge Overflow Demo"]
         XCTAssertFalse(
             nonTemplate.exists,
             "Non-template recurring tasks should NOT appear in Wiederkehrend view"

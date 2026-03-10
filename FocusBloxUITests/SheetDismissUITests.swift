@@ -120,8 +120,8 @@ final class SheetDismissUITests: XCTestCase {
     func testEditTaskSheet_dismissesAfterSave() throws {
         navigateToBacklog()
 
-        // Find "Backlog Task 1" from mock data
-        let taskCell = app.staticTexts["Backlog Task 1"]
+        // Find "[MOCK] Backlog Task 1" from mock data
+        let taskCell = app.staticTexts["[MOCK] Backlog Task 1"]
         XCTAssertTrue(taskCell.waitForExistence(timeout: 5),
                       "Mock task 'Backlog Task 1' must exist in backlog")
 

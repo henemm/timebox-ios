@@ -19,6 +19,7 @@ struct FocusBloxApp: App {
     @State private var permissionRequested = false
     @State private var syncMonitor = CloudKitSyncMonitor()
     @State private var deferredSort = DeferredSortController()
+    @State private var deferredCompletion = DeferredCompletionController()
     @State private var notificationDelegate: NotificationActionDelegate?
 
     private static let appGroupID = "group.com.henning.focusblox"
@@ -248,6 +249,7 @@ struct FocusBloxApp: App {
                     .environment(\.eventKitRepository, eventKitRepository)
                     .environment(syncMonitor)
                     .environment(deferredSort)
+                    .environment(deferredCompletion)
 
                 // Hidden indicator for UI testing that permission was requested
                 if permissionRequested {
@@ -262,6 +264,7 @@ struct FocusBloxApp: App {
                 // Migrate reminders-sourced tasks to local (one-time, idempotent)
                 // Then run existing dedup cleanup
                 if !ProcessInfo.processInfo.arguments.contains("-UITesting") {
+                    Self.cleanupLeakedTestData(in: sharedModelContainer.mainContext)
                     RemindersImportService.migrateRemindersToLocal(in: sharedModelContainer.mainContext)
                     Self.cleanupRemindersDuplicates(in: sharedModelContainer.mainContext)
                     Self.cleanupOrphanedBlockAssignments(in: sharedModelContainer.mainContext)
@@ -303,6 +306,9 @@ struct FocusBloxApp: App {
                     syncedSettings.pushToCloud()
                     rescheduleDueDateNotifications()
                     NotificationService.updateOverdueBadge(container: sharedModelContainer)
+                }
+                if newPhase == .background {
+                    Task { await deferredCompletion.flushAll() }
                 }
             }
             .onOpenURL { url in
@@ -491,48 +497,94 @@ struct FocusBloxApp: App {
         UserDefaults.standard.synchronize()
     }
 
+    /// One-time cleanup of test data that leaked into the persistent store
+    private static func cleanupLeakedTestData(in context: ModelContext) {
+        let key = "hasCleanedLeakedTestData_v2"
+        guard !UserDefaults.standard.bool(forKey: key) else { return }
+
+        let descriptor = FetchDescriptor<LocalTask>()
+        guard let allTasks = try? context.fetch(descriptor) else { return }
+
+        let exactMockTitles: Set<String> = [
+            "Mock Task 1 #30min", "Mock Task 2 #15min", "Mock Task 3 #45min",
+            "Backlog Task 1", "Backlog Task 2",
+            "TBD Task - Unvollständig", "Badge Overflow Demo",
+            "Assigned Task #20min",
+            "Focus Task 1", "Focus Task 2", "Focus Task 3",
+            "Erledigte Aufgabe", "Erledigte Backlog-Aufgabe",
+            "Startups anschreiben wegen Kapitalerhöhung",
+            "Lohnsteuererklärung Amazon Deutschland einreichen",
+            "Taeglich lesen", "Wochenreview", "Zweiwochentlich aufraeumen",
+        ]
+
+        let testPrefixes = [
+            "UI Test Task ", "Badge Test Task ", "Inspector Test Task ",
+            "Category Grid Test ", "Test Task ",
+        ]
+
+        var deletedCount = 0
+        for task in allTasks {
+            let shouldDelete =
+                exactMockTitles.contains(task.title) ||
+                testPrefixes.contains(where: { task.title.hasPrefix($0) }) ||
+                (task.recurrenceGroupID?.hasPrefix("uitest-") == true)
+
+            if shouldDelete {
+                context.delete(task)
+                deletedCount += 1
+            }
+        }
+
+        if deletedCount > 0 {
+            try? context.save()
+            print("[Cleanup] Deleted \(deletedCount) leaked test tasks from persistent store")
+        }
+
+        UserDefaults.standard.set(true, forKey: key)
+    }
+
     /// Seed mock data for UI testing
     /// Static so it can be called from the model container initializer (before views load)
     private static func seedUITestData(into context: ModelContext) {
         // Check if already seeded (avoid duplicates on re-render)
-        let descriptor = FetchDescriptor<LocalTask>(predicate: #Predicate { $0.title == "Mock Task 1 #30min" })
+        let descriptor = FetchDescriptor<LocalTask>(predicate: #Predicate { $0.title == "[MOCK] Task 1 #30min" })
         let existingTasks = (try? context.fetch(descriptor)) ?? []
         guard existingTasks.isEmpty else { return }
 
         // Create mock tasks with isNextUp = true (vollständig - nicht TBD)
-        let task1 = LocalTask(title: "Mock Task 1 #30min", importance: 3, estimatedDuration: 30, urgency: "urgent")
+        let task1 = LocalTask(title: "[MOCK] Task 1 #30min", importance: 3, estimatedDuration: 30, urgency: "urgent")
         task1.isNextUp = true
 
-        let task2 = LocalTask(title: "Mock Task 2 #15min", importance: 2, estimatedDuration: 15, urgency: "not_urgent")
+        let task2 = LocalTask(title: "[MOCK] Task 2 #15min", importance: 2, estimatedDuration: 15, urgency: "not_urgent")
         task2.isNextUp = true
 
-        let task3 = LocalTask(title: "Mock Task 3 #45min", importance: 1, estimatedDuration: 45, urgency: "not_urgent")
+        let task3 = LocalTask(title: "[MOCK] Task 3 #45min", importance: 1, estimatedDuration: 45, urgency: "not_urgent")
         task3.isNextUp = true
 
         // Create a mock task that's already assigned to a Focus Block
         let assignedTask = LocalTask(uuid: UUID(uuidString: "00000000-0000-0000-0000-000000000001") ?? UUID(),
-                                     title: "Assigned Task #20min",
+                                     title: "[MOCK] Assigned Task #20min",
                                      importance: 2,
                                      estimatedDuration: 20,
                                      urgency: "not_urgent")
         assignedTask.isNextUp = false  // Not in Next Up because it's assigned
 
         // Create backlog tasks (isNextUp = false) for testing EditTaskSheet
-        let backlogTask1 = LocalTask(title: "Backlog Task 1", importance: 2, estimatedDuration: 25, urgency: "urgent")
+        let backlogTask1 = LocalTask(title: "[MOCK] Backlog Task 1", importance: 2, estimatedDuration: 25, urgency: "urgent")
         backlogTask1.isNextUp = false
         backlogTask1.tags = ["work", "urgent"]
         backlogTask1.taskType = "deep_work"
         backlogTask1.dueDate = Date()
         backlogTask1.taskDescription = "This is a test description"
 
-        let backlogTask2 = LocalTask(title: "Backlog Task 2", importance: 1, estimatedDuration: 15, urgency: "not_urgent")
+        let backlogTask2 = LocalTask(title: "[MOCK] Backlog Task 2", importance: 1, estimatedDuration: 15, urgency: "not_urgent")
         backlogTask2.isNextUp = false
         backlogTask2.tags = []
         backlogTask2.taskType = "shallow_work"
 
         // TBD Task (missing importance, urgency, duration) - should show italic title
         // sortOrder = -1 to appear at top of backlog list
-        let tbdTask = LocalTask(title: "TBD Task - Unvollständig", importance: nil, estimatedDuration: nil, urgency: nil)
+        let tbdTask = LocalTask(title: "[MOCK] TBD Task - Unvollstaendig", importance: nil, estimatedDuration: nil, urgency: nil)
         tbdTask.isNextUp = false
         tbdTask.taskType = "maintenance"
         tbdTask.sortOrder = -1  // Appear first in backlog
@@ -549,7 +601,7 @@ struct FocusBloxApp: App {
         // These match the taskIDs in FocusLiveView.createMockRepository()
         let fbTask1 = LocalTask(
             uuid: UUID(uuidString: "AAAAAAAA-0000-0000-0000-000000000001")!,
-            title: "Focus Task 1",
+            title: "[MOCK] Focus Task 1",
             importance: 3,
             estimatedDuration: 10,
             urgency: "urgent"
@@ -558,7 +610,7 @@ struct FocusBloxApp: App {
 
         let fbTask2 = LocalTask(
             uuid: UUID(uuidString: "AAAAAAAA-0000-0000-0000-000000000002")!,
-            title: "Focus Task 2",
+            title: "[MOCK] Focus Task 2",
             importance: 2,
             estimatedDuration: 10,
             urgency: "not_urgent"
@@ -567,7 +619,7 @@ struct FocusBloxApp: App {
 
         let fbTask3 = LocalTask(
             uuid: UUID(uuidString: "AAAAAAAA-0000-0000-0000-000000000003")!,
-            title: "Focus Task 3",
+            title: "[MOCK] Focus Task 3",
             importance: 1,
             estimatedDuration: 10,
             urgency: "not_urgent"
@@ -579,14 +631,14 @@ struct FocusBloxApp: App {
         context.insert(fbTask3)
 
         // Long-title task for truncation testing (Bug 86)
-        let longTitleTask = LocalTask(title: "Lohnsteuererklärung Amazon Deutschland einreichen", importance: 3, estimatedDuration: 30, urgency: "urgent")
+        let longTitleTask = LocalTask(title: "[MOCK] Lohnsteuererklaerung einreichen", importance: 3, estimatedDuration: 30, urgency: "urgent")
         longTitleTask.isNextUp = true
         longTitleTask.taskType = "essentials"
         longTitleTask.dueDate = Date()
         context.insert(longTitleTask)
 
         // Badge-overflow task: ALL badges set to demonstrate FlowLayout wrapping
-        let badgeOverflowTask = LocalTask(title: "Badge Overflow Demo", importance: 3, estimatedDuration: 120, urgency: "urgent")
+        let badgeOverflowTask = LocalTask(title: "[MOCK] Badge Overflow Demo", importance: 3, estimatedDuration: 120, urgency: "urgent")
         badgeOverflowTask.isNextUp = false
         badgeOverflowTask.taskType = "learning"
         badgeOverflowTask.tags = ["design", "research", "project"]
@@ -598,7 +650,7 @@ struct FocusBloxApp: App {
         // Series 1: Daily — template + open child
         let recurringGroupID1 = "uitest-recurring-group-1"
         let recurringTemplate1 = LocalTask(
-            title: "Taeglich lesen",
+            title: "[MOCK] Taeglich lesen",
             importance: 2,
             tags: ["learning"],
             estimatedDuration: 15,
@@ -610,7 +662,7 @@ struct FocusBloxApp: App {
         context.insert(recurringTemplate1)
 
         let recurringChild1 = LocalTask(
-            title: "Taeglich lesen",
+            title: "[MOCK] Taeglich lesen",
             importance: 2,
             tags: ["learning"],
             dueDate: Date(),
@@ -624,7 +676,7 @@ struct FocusBloxApp: App {
         // Series 2: Weekly — template + open child
         let recurringGroupID2 = "uitest-recurring-group-2"
         let recurringTemplate2 = LocalTask(
-            title: "Wochenreview",
+            title: "[MOCK] Wochenreview",
             importance: 3,
             tags: ["planning"],
             estimatedDuration: 30,
@@ -637,7 +689,7 @@ struct FocusBloxApp: App {
         context.insert(recurringTemplate2)
 
         let recurringChild2 = LocalTask(
-            title: "Wochenreview",
+            title: "[MOCK] Wochenreview",
             importance: 3,
             tags: ["planning"],
             dueDate: Date(),
@@ -652,7 +704,7 @@ struct FocusBloxApp: App {
         // Series 3: Biweekly — template + open child (for recurrence display consistency test)
         let recurringGroupID3 = "uitest-recurring-group-3"
         let recurringTemplate3 = LocalTask(
-            title: "Zweiwochentlich aufraeumen",
+            title: "[MOCK] Zweiwochentlich aufraeumen",
             importance: 1,
             tags: ["maintenance"],
             estimatedDuration: 45,
@@ -664,7 +716,7 @@ struct FocusBloxApp: App {
         context.insert(recurringTemplate3)
 
         let recurringChild3 = LocalTask(
-            title: "Zweiwochentlich aufraeumen",
+            title: "[MOCK] Zweiwochentlich aufraeumen",
             importance: 1,
             tags: ["maintenance"],
             dueDate: Date(),
@@ -676,7 +728,7 @@ struct FocusBloxApp: App {
         context.insert(recurringChild3)
 
         // Completed task outside any FocusBlock (for Review tab testing)
-        let completedOutsideBlock = LocalTask(title: "Erledigte Backlog-Aufgabe", importance: 2, estimatedDuration: 20, urgency: "not_urgent")
+        let completedOutsideBlock = LocalTask(title: "[MOCK] Erledigte Backlog-Aufgabe", importance: 2, estimatedDuration: 20, urgency: "not_urgent")
         completedOutsideBlock.isNextUp = false
         completedOutsideBlock.isCompleted = true
         completedOutsideBlock.completedAt = Date()

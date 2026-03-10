@@ -72,18 +72,18 @@ final class MacTextTruncationBlastRadiusUITests: XCTestCase {
 
     /// NextUp tasks visible in Planning and Assign views
     private let nextUpTitles = [
-        "Mock Task 1 #30min",
-        "Mock Task 2 #15min",
-        "Mock Task 3 #45min",
-        "Lohnsteuererklärung Amazon Deutschland einreichen"
+        "[MOCK] Task 1 #30min",
+        "[MOCK] Task 2 #15min",
+        "[MOCK] Task 3 #45min",
+        "[MOCK] Lohnsteuererklaerung einreichen"
     ]
 
     /// Focus tasks visible in Focus view (if sprint active)
     private let focusTitles = [
-        "Focus Task 1",
-        "Focus Task 2",
-        "Focus Task 3",
-        "Mock Task 1 #30min"
+        "[MOCK] Focus Task 1",
+        "[MOCK] Focus Task 2",
+        "[MOCK] Focus Task 3",
+        "[MOCK] Task 1 #30min"
     ]
 
     // MARK: - Test 1: Planning View (NextUpTaskRow)
