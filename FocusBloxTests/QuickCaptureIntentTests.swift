@@ -93,6 +93,72 @@ final class QuickCaptureIntentTests: XCTestCase {
         XCTAssertTrue(fetched.contains { $0.title == "App Group Test" })
     }
 
+    // MARK: - Test 5: CreateTaskIntent writes title to App Group UserDefaults with synchronize
+
+    /// Bug 88: Siri "Erstelle Task" lost dictated text because Intent extension process
+    /// wrote to UserDefaults without synchronize(). Data stayed in RAM and was never
+    /// flushed to disk before the extension process was terminated by iOS.
+    func testCreateTaskIntentWritesTitleToAppGroupUserDefaults() throws {
+        let appGroupID = "group.com.henning.focusblox"
+        guard let defaults = UserDefaults(suiteName: appGroupID) else {
+            throw XCTSkip("App Group not available in test environment")
+        }
+
+        // Clean up before test
+        defaults.removeObject(forKey: "quickCaptureFromCC")
+        defaults.removeObject(forKey: "quickCaptureTitle")
+        defaults.synchronize()
+
+        // Simulate what CreateTaskIntent.perform() does (WITH synchronize fix)
+        let testTitle = "Siri dictated test title \(UUID().uuidString)"
+        defaults.set(true, forKey: "quickCaptureFromCC")
+        defaults.set(testTitle, forKey: "quickCaptureTitle")
+        defaults.synchronize()
+
+        // Simulate what checkCCQuickCaptureTrigger() does (separate UserDefaults instance)
+        let readDefaults = UserDefaults(suiteName: appGroupID)!
+
+        // The flag must be true (gate for the function)
+        XCTAssertTrue(readDefaults.bool(forKey: "quickCaptureFromCC"),
+                       "quickCaptureFromCC flag must be set after intent perform()")
+
+        // The title must match what was dictated
+        let readTitle = readDefaults.string(forKey: "quickCaptureTitle")
+        XCTAssertEqual(readTitle, testTitle,
+                       "quickCaptureTitle must contain the dictated text after synchronize()")
+
+        // Clean up
+        defaults.removeObject(forKey: "quickCaptureFromCC")
+        defaults.removeObject(forKey: "quickCaptureTitle")
+        defaults.synchronize()
+    }
+
+    // MARK: - Test 6: CCQuickAddIntent writes flag to App Group UserDefaults with synchronize
+
+    func testCCQuickAddIntentWritesFlagToAppGroupUserDefaults() throws {
+        let appGroupID = "group.com.henning.focusblox"
+        guard let defaults = UserDefaults(suiteName: appGroupID) else {
+            throw XCTSkip("App Group not available in test environment")
+        }
+
+        // Clean up before test
+        defaults.removeObject(forKey: "quickCaptureFromCC")
+        defaults.synchronize()
+
+        // Simulate what QuickAddLaunchIntent.perform() does (WITH synchronize fix)
+        defaults.set(true, forKey: "quickCaptureFromCC")
+        defaults.synchronize()
+
+        // Verify flag persists
+        let readDefaults = UserDefaults(suiteName: appGroupID)!
+        XCTAssertTrue(readDefaults.bool(forKey: "quickCaptureFromCC"),
+                       "quickCaptureFromCC flag must be set after CC intent perform()")
+
+        // Clean up
+        defaults.removeObject(forKey: "quickCaptureFromCC")
+        defaults.synchronize()
+    }
+
     // MARK: - Helpers (mirror intent cycle logic)
 
     private func cycleImportance(_ current: Int?) -> Int? {

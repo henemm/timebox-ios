@@ -14,6 +14,7 @@ struct QuickAddLaunchIntent: AppIntent {
         // Flag in App Group UserDefaults setzen - App liest es beim Aktivieren
         if let defaults = UserDefaults(suiteName: "group.com.henning.focusblox") {
             defaults.set(true, forKey: "quickCaptureFromCC")
+            defaults.synchronize()
         }
         return .result()
     }

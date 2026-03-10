@@ -17,6 +17,7 @@ struct CreateTaskIntent: AppIntent {
         if let defaults = UserDefaults(suiteName: "group.com.henning.focusblox") {
             defaults.set(true, forKey: "quickCaptureFromCC")
             defaults.set(taskTitle, forKey: "quickCaptureTitle")
+            defaults.synchronize()
         }
         return .result(dialog: "Öffne FocusBlox...")
     }

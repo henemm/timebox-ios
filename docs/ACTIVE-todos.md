@@ -288,6 +288,16 @@
 
 ---
 
+## ERLEDIGT: Bug 88 — Siri "Erstelle Task" verliert diktierten Text
+
+- **Symptom:** User sagt "Erstelle Task in FocusBlox", diktiert Text, tippt "FocusBlox oeffnen" — App zeigt normalen Hauptbildschirm, kein QuickCapture, diktierter Text verloren
+- **Root Cause:** `CreateTaskIntent.perform()` laeuft in einem Extension-Prozess und schreibt in App Group UserDefaults OHNE `synchronize()`. iOS beendet den Extension-Prozess sofort nach perform() — UserDefaults-Daten nur im RAM, nie auf Disk geschrieben. App-Prozess liest von Disk → leer.
+- **Fix:** `defaults.synchronize()` nach UserDefaults-Writes in `CreateTaskIntent.swift` und `CCQuickAddIntents.swift`
+- **Blast Radius:** Nur CreateTaskIntent betroffen (Siri "Erstelle Task"). Alle anderen Flows (CC, Snippet, Widget, Share) nutzen andere Mechanismen.
+- **Tests:** 2 Unit Tests in QuickCaptureIntentTests (UserDefaults round-trip Verifikation)
+
+---
+
 ## ERLEDIGT: Bug — Siri-Shortcuts nicht funktional + SiriTipView nicht persistent
 
 - **Symptom:** Siri-Tipps erscheinen in der App (ContentView, SettingsView), Siri-Kommandos funktionieren nicht auf echtem Geraet, SiriTipView erscheint bei jedem App-Start neu
