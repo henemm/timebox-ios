@@ -193,8 +193,8 @@ struct TaskAssignmentView: View {
             let syncedTasks = try await syncEngine.sync()
             // Store all tasks for block display
             allTasks = syncedTasks.filter { !$0.isCompleted }
-            // Only show Next Up tasks in the backlog section
-            unscheduledTasks = syncedTasks.filter { $0.isNextUp && !$0.isCompleted }
+            // Only show Next Up tasks in the backlog section (DEP-4: exclude blocked tasks)
+            unscheduledTasks = syncedTasks.filter { $0.isNextUp && !$0.isCompleted && !$0.isBlocked }
 
         } catch {
             errorMessage = error.localizedDescription

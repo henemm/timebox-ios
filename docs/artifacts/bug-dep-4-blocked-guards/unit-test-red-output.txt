@@ -1,0 +1,15 @@
+Testing failed:
+  Value of type '[PlanItem]' has no member 'nextUpActionableTasks'
+  Value of type '[PlanItem]' has no member 'nextUpActionableTasks'
+  Value of type '[PlanItem]' has no member 'assignableToFocusBlock'
+  Value of type 'PlanItem' has no member 'isActionable'
+  Value of type 'PlanItem' has no member 'isActionable'
+  Testing cancelled because the build failed.
+
+** TEST FAILED **
+
+5 compile errors in TaskDependencyTests.swift
+4 new tests: test_nextUpActionableTasks_excludesBlockedTasks,
+  test_nextUpActionableTasks_excludesCompletedAndTemplates,
+  test_assignableTasks_excludesBlockedTasks,
+  test_isActionable_falseWhenBlocked

@@ -44,16 +44,14 @@
 - **Fix:** `PlanItem.dependentCount` Feld + `populateDependentCounts()` auf Array-Extension. iOS: BacklogView ruft nach jedem sync() auf. macOS: ContentView.scoreFor() + MacBacklogRow nutzen `dependentCount(for:)` Helper.
 - **Test:** `test_populateDependentCounts_boostsPriorityScore` GREEN
 
-### BUG-DEP-4: Blockierte Tasks nicht vor Aktionen geschuetzt — IN PROGRESS
-- **Symptom:** Blockierte Tasks koennen via Inspector als erledigt/Next Up markiert, via Context Menu (macOS), oder FocusBlocks zugewiesen werden
-- **Analyse:** 6 ungeschuetzte Pfade identifiziert, 4 im Scope:
-  1. macOS TaskInspector "Erledigt" + "Next Up" Chips (HOCH)
-  2. Next Up Section zeigt blockierte Tasks mit Swipes (iOS + macOS) (HOCH)
-  3. macOS Context Menu "Als erledigt markieren" + "Zu Next Up" (HOCH)
-  4. FocusBlock-Zuweisung filtert blockierte Tasks nicht (MITTEL)
-- **Fix:** Guards in TaskInspector, nextUpTasks-Filter, Context Menu, TaskAssignmentView
-- **Dateien:** TaskInspector.swift, BacklogView.swift, ContentView.swift, TaskAssignmentView.swift
-- **Prioritaet:** Mittel
+### BUG-DEP-4: Blockierte Tasks nicht vor Aktionen geschuetzt — ERLEDIGT
+- **Fix:** 4 Guards implementiert:
+  1. macOS TaskInspector: "Erledigt" + "Next Up" Chips `.disabled()` wenn blockiert
+  2. iOS + macOS: `nextUpTasks` Filter schliesst blockierte Tasks aus (`!isBlocked` / `blockerTaskID == nil`)
+  3. macOS Context Menu: `markTasksCompleted()` + `addToNextUp()` pruefen `blockerTaskID == nil`
+  4. iOS FocusBlock-Zuweisung: `unscheduledTasks` Filter schliesst blockierte Tasks aus
+- **Dateien:** TaskInspector.swift, BacklogView.swift, ContentView.swift, TaskAssignmentView.swift, PlanItem.swift
+- **Tests:** 4 neue Unit Tests (22 gesamt), alle GREEN
 
 ### BUG-DEP-4b: Siri/Shortcuts + Keyboard Shortcut koennen blockierte Tasks erledigen
 - **Symptom:** CompleteTaskIntent (Siri) und Keyboard Shortcut (Cmd) haben keinen blockerTaskID-Guard

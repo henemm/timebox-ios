@@ -63,6 +63,9 @@ struct PlanItem: Identifiable, Sendable {
     /// Whether this task is blocked by another task
     var isBlocked: Bool { blockerTaskID != nil }
 
+    /// Whether this task can receive actions (complete, move to Next Up, assign to block)
+    var isActionable: Bool { !isBlocked }
+
     /// Task is incomplete (missing importance, urgency, or duration)
     var isTbd: Bool {
         importance == nil || urgency == nil || estimatedDuration == nil
@@ -226,6 +229,16 @@ extension Array where Element == PlanItem {
     /// Tasks that depend on the given blocker task ID.
     func dependents(of blockerID: String) -> [PlanItem] {
         filter { $0.blockerTaskID == blockerID }
+    }
+
+    /// Next Up tasks that are actionable (not blocked, completed, or template).
+    var nextUpActionableTasks: [PlanItem] {
+        filter { $0.isNextUp && !$0.isCompleted && !$0.isTemplate && !$0.isBlocked }
+    }
+
+    /// Tasks that can be assigned to a FocusBlock (not blocked).
+    var assignableToFocusBlock: [PlanItem] {
+        filter { !$0.isBlocked }
     }
 
     /// Populates dependentCount on each item based on blocker relationships.

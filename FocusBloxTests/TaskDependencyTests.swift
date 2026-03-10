@@ -385,4 +385,89 @@ final class TaskDependencyTests: XCTestCase {
         XCTAssertEqual(freeScore.dependentCount, 0,
                        "Free task should have 0 dependents")
     }
+
+    // MARK: - DEP-4: Blocked tasks excluded from actionable lists
+
+    func test_nextUpActionableTasks_excludesBlockedTasks() throws {
+        let blocker = LocalTask(title: "Blocker Task")
+        let blocked = LocalTask(title: "Blocked Task")
+        let freeNextUp = LocalTask(title: "Free Next Up")
+        container.mainContext.insert(blocker)
+        container.mainContext.insert(blocked)
+        container.mainContext.insert(freeNextUp)
+
+        blocked.blockerTaskID = blocker.id
+        blocked.isNextUp = true
+        freeNextUp.isNextUp = true
+
+        let items = [blocker, blocked, freeNextUp].map { PlanItem(localTask: $0) }
+
+        let actionable = items.nextUpActionableTasks
+
+        XCTAssertEqual(actionable.count, 1,
+                       "DEP-4: Blocked tasks must be excluded from Next Up actionable list")
+        XCTAssertEqual(actionable.first?.title, "Free Next Up")
+    }
+
+    func test_nextUpActionableTasks_excludesCompletedAndTemplates() throws {
+        let completed = LocalTask(title: "Done")
+        let template = LocalTask(title: "Template")
+        let active = LocalTask(title: "Active")
+        container.mainContext.insert(completed)
+        container.mainContext.insert(template)
+        container.mainContext.insert(active)
+
+        completed.isNextUp = true
+        completed.isCompleted = true
+        template.isNextUp = true
+        template.isTemplate = true
+        active.isNextUp = true
+
+        let items = [completed, template, active].map { PlanItem(localTask: $0) }
+
+        let actionable = items.nextUpActionableTasks
+
+        XCTAssertEqual(actionable.count, 1,
+                       "DEP-4: Completed and template tasks must be excluded from Next Up")
+        XCTAssertEqual(actionable.first?.title, "Active")
+    }
+
+    func test_assignableTasks_excludesBlockedTasks() throws {
+        let blocker = LocalTask(title: "Blocker")
+        let blocked = LocalTask(title: "Blocked")
+        let free = LocalTask(title: "Free Task")
+        container.mainContext.insert(blocker)
+        container.mainContext.insert(blocked)
+        container.mainContext.insert(free)
+
+        blocked.blockerTaskID = blocker.id
+
+        let items = [blocker, blocked, free].map { PlanItem(localTask: $0) }
+
+        let assignable = items.assignableToFocusBlock
+
+        XCTAssertFalse(assignable.contains { $0.title == "Blocked" },
+                       "DEP-4: Blocked tasks must not be assignable to FocusBlocks")
+        XCTAssertTrue(assignable.contains { $0.title == "Free Task" },
+                      "Free tasks should be assignable")
+        XCTAssertTrue(assignable.contains { $0.title == "Blocker" },
+                      "Blocker tasks should be assignable")
+    }
+
+    func test_isActionable_falseWhenBlocked() throws {
+        let blocker = LocalTask(title: "Blocker")
+        let blocked = LocalTask(title: "Blocked")
+        container.mainContext.insert(blocker)
+        container.mainContext.insert(blocked)
+
+        blocked.blockerTaskID = blocker.id
+
+        let blockedItem = PlanItem(localTask: blocked)
+        let blockerItem = PlanItem(localTask: blocker)
+
+        XCTAssertFalse(blockedItem.isActionable,
+                       "DEP-4: Blocked task must not be actionable")
+        XCTAssertTrue(blockerItem.isActionable,
+                      "Blocker task itself should be actionable")
+    }
 }

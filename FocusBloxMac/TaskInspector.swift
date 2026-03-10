@@ -213,11 +213,13 @@ struct TaskInspector: View {
                             }
                             try? modelContext.save()
                         }
+                        .disabled(task.blockerTaskID != nil)
 
                         statusChip("Next Up", "arrow.up.circle.fill", task.isNextUp, .blue) {
                             task.isNextUp.toggle()
                             try? modelContext.save()
                         }
+                        .disabled(task.blockerTaskID != nil)
                     }
                 }
                 .padding()

@@ -231,7 +231,7 @@ struct ContentView: View {
 
     // Next Up tasks (sorted by nextUpSortOrder, search-filtered)
     private var nextUpTasks: [LocalTask] {
-        tasks.filter { $0.isNextUp && !$0.isCompleted && !$0.isTemplate && matchesSearch($0) }
+        tasks.filter { $0.isNextUp && !$0.isCompleted && !$0.isTemplate && $0.blockerTaskID == nil && matchesSearch($0) }
             .sorted { ($0.nextUpSortOrder ?? Int.max) < ($1.nextUpSortOrder ?? Int.max) }
     }
 
@@ -861,7 +861,7 @@ struct ContentView: View {
 
     private func markTasksCompleted(_ ids: Set<UUID>) {
         for id in ids {
-            if let task = tasks.first(where: { $0.uuid == id }) {
+            if let task = tasks.first(where: { $0.uuid == id }), task.blockerTaskID == nil {
                 deferredCompletion.scheduleCompletion(id: task.id) { [modelContext] in
                     let taskSource = LocalTaskSource(modelContext: modelContext)
                     let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
@@ -908,7 +908,7 @@ struct ContentView: View {
         let taskSource = LocalTaskSource(modelContext: modelContext)
         let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
         for id in ids {
-            if let task = tasks.first(where: { $0.uuid == id }) {
+            if let task = tasks.first(where: { $0.uuid == id }), task.blockerTaskID == nil {
                 try? syncEngine.updateNextUp(itemID: task.id, isNextUp: true)
             }
         }
