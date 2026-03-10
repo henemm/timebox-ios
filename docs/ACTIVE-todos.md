@@ -495,6 +495,7 @@
 | ~~Bug 82~~ | ~~Erledigte Tasks — Suche funktioniert nicht~~ | ERLEDIGT | XS | ~5k | 1 | ~10 |
 | ~~Bug 87~~ | ~~QuickCapture Dialog schliesst nicht nach Speichern~~ | ERLEDIGT | XS | ~5k | 1 | ~15 |
 | ~~Bug 88~~ | ~~macOS MenuBar Timer zeigt Block-Dauer statt Task-Dauer~~ | ERLEDIGT | S | ~10k | 3 | ~30 |
+| ~~Bug 89~~ | ~~Kategorie-Aenderung erst nach Verschieben sichtbar (iOS)~~ | ERLEDIGT | XS | ~5k | 1 | ~10 |
 
 **Komplexitaet:** XS = halbe Stunde | S = 1 Session | M = 2-3 Sessions | L = halber Tag | XL = ganzer Tag+
 
@@ -977,10 +978,8 @@
 - **Loesung:** Eine einzige `scoreFor()`-Funktion als Single Source of Truth. `filteredTasks` und `regularFilteredTasks` nutzen `scoreFor()` statt eigener `calculateScore()`-Aufrufe.
 - **Aufwand:** S
 
-### BACKLOG-012: displayedRegularTasks ist toter Wrapper (macOS)
-- **Problem:** Nach Entfernung von `displaySnapshot` gibt `displayedRegularTasks` nur noch `regularFilteredTasks` zurueck — kein Mehrwert.
-- **Loesung:** Wrapper entfernen, Aufrufer direkt auf `regularFilteredTasks` umstellen.
-- **Aufwand:** XS
+### ~~BACKLOG-012: displayedRegularTasks ist toter Wrapper (macOS)~~ ERLEDIGT
+- Bereits entfernt in Commit `cdad7c9` (2026-03-05) als Teil von BACKLOG-010 (Shared DeferredSortController)
 
 ### ~~BACKLOG-013: macOS Text-Truncation in 7 weiteren Views (Blast Radius Bug 86)~~ ERLEDIGT
 - **Loesung:** `.frame(maxWidth: .infinity, alignment: .leading)` auf 9 Stellen in 5 Dateien angewandt (identisches Pattern wie Bug 86 Fix).
@@ -991,6 +990,17 @@
 - **Problem:** `TaskPriorityScoringService.calculateScore(importance:urgency:dueDate:createdAt:rescheduleCount:estimatedDuration:taskType:isNextUp:)` — Copy-paste-anfaellig, schwer wartbar.
 - **Loesung:** Extension auf `LocalTask` (und/oder `PlanItem`): `task.priorityScore` als berechnete Property. Einmal definiert, ueberall genutzt.
 - **Aufwand:** S
+
+---
+
+### Bug 89: Kategorie-Aenderung erst nach Verschieben sichtbar (iOS) — ERLEDIGT
+
+- **Symptom:** Kategorie im Quick-Edit (CategoryPicker) aendern → BacklogRow zeigt weiterhin alte Kategorie bis Task per Drag verschoben wird
+- **Root Cause:** `BacklogView.updateCategory()` speicherte via SyncEngine in die DB, aktualisierte aber NICHT das in-memory `planItems`-Array. `updateImportance()` und `updateUrgency()` hatten `planItems[index] = PlanItem(localTask: task)` — `updateCategory()` nicht.
+- **Fix:** `updateCategory()` analog zu `updateImportance()` umgeschrieben: Fetch LocalTask → Property setzen → save → planItems-Array aktualisieren. 1 Datei, ~10 LoC.
+- **Geaenderte Datei:** `Sources/Views/BacklogView.swift` (Zeile 571-585)
+- **macOS:** Nicht betroffen (nutzt @Query + direkte Mutation)
+- **Tests:** `CategoryUpdateRefreshTests` (4 Tests, alle gruen)
 
 ---
 

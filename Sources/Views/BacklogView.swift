@@ -570,10 +570,16 @@ struct BacklogView: View {
 
     private func updateCategory(for item: PlanItem, category: String) {
         do {
-            let taskSource = LocalTaskSource(modelContext: modelContext)
-            let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
-            try syncEngine.updateTask(itemID: item.id, title: item.title, importance: item.importance, duration: item.estimatedDuration, tags: item.tags, urgency: item.urgency, taskType: category, dueDate: item.dueDate, description: item.taskDescription)
+            guard let itemUUID = UUID(uuidString: item.id) else { return }
+            let descriptor = FetchDescriptor<LocalTask>(predicate: #Predicate { $0.uuid == itemUUID })
+            guard let task = try modelContext.fetch(descriptor).first else { return }
+            task.taskType = category
+            task.modifiedAt = Date()
+            try modelContext.save()
             freezeSortOrder()
+            if let index = planItems.firstIndex(where: { $0.id == item.id }) {
+                planItems[index] = PlanItem(localTask: task)
+            }
             scheduleDeferredResort(for: item.id)
         } catch {
             errorMessage = "Kategorie konnte nicht aktualisiert werden."
