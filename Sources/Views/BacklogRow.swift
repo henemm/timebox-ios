@@ -13,6 +13,7 @@ struct BacklogRow: View {
     var onDeleteTap: (() -> Void)?
     var onTitleSave: ((String) -> Void)?  // Inline title edit callback
     var isPendingResort: Bool = false  // Deferred sort: shows border when item changed but not yet re-sorted
+    var isCompletionPending: Bool = false  // Deferred completion: shows filled checkbox before task disappears
 
     // State for inline title editing (double-tap)
     @State private var isEditingTitle = false
@@ -26,20 +27,25 @@ struct BacklogRow: View {
         HStack(spacing: 12) {
             // Completion Checkbox
             Button {
-                onComplete?()
+                if !isCompletionPending {
+                    onComplete?()
+                }
             } label: {
-                Image(systemName: "circle")
+                Image(systemName: isCompletionPending ? "checkmark.circle.fill" : "circle")
                     .font(.system(size: 22))
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(isCompletionPending ? .green : .secondary)
             }
             .buttonStyle(.plain)
             .accessibilityIdentifier("completeButton_\(item.id)")
-            .accessibilityLabel("Als erledigt markieren")
+            .accessibilityLabel(isCompletionPending ? "Erledigt" : "Als erledigt markieren")
+            .animation(.smooth(duration: 0.2), value: isCompletionPending)
 
             // Content (Title + Metadata) - full width, no right column
             // Swipe actions handle Next Up (right) and Edit/Delete (left)
             contentSection
                 .frame(maxWidth: .infinity, alignment: .leading)
+                .opacity(isCompletionPending ? 0.5 : 1.0)
+                .strikethrough(isCompletionPending)
         }
         .padding(12)
         .background(

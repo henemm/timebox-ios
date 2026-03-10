@@ -18,17 +18,22 @@ struct MacBacklogRow: View {
     var onCategorySelect: ((String) -> Void)?  // Direct category selection (macOS Menu)
     var onDurationSelect: ((Int?) -> Void)?    // Direct duration selection (macOS Menu)
     var isPendingResort: Bool = false  // Deferred sort: shows border when item changed but not yet re-sorted
+    var isCompletionPending: Bool = false  // Deferred completion: shows filled checkbox before task disappears
     @State private var pendingPulse = false
 
     var body: some View {
         HStack(spacing: 10) {
             // Completion Toggle
             Button {
-                onToggleComplete?()
+                if !isCompletionPending {
+                    onToggleComplete?()
+                }
             } label: {
-                Image(systemName: task.isCompleted ? "checkmark.circle.fill" : "circle")
-                    .foregroundStyle(task.isCompleted ? .green : .secondary)
+                let showCompleted = task.isCompleted || isCompletionPending
+                Image(systemName: showCompleted ? "checkmark.circle.fill" : "circle")
+                    .foregroundStyle(showCompleted ? .green : .secondary)
                     .font(.system(size: 16))
+                    .animation(.smooth(duration: 0.2), value: isCompletionPending)
             }
             .buttonStyle(.plain)
             .accessibilityIdentifier("completeButton_\(task.id)")
@@ -39,8 +44,9 @@ struct MacBacklogRow: View {
                 Text(task.title)
                     .lineLimit(2)
                     .truncationMode(.tail)
-                    .strikethrough(task.isCompleted)
-                    .foregroundStyle(task.isCompleted ? .secondary : (task.isTbd ? .secondary : .primary))
+                    .strikethrough(task.isCompleted || isCompletionPending)
+                    .foregroundStyle((task.isCompleted || isCompletionPending) ? .secondary : (task.isTbd ? .secondary : .primary))
+                    .opacity(isCompletionPending ? 0.5 : 1.0)
                     .italic(task.isTbd)
 
                 // Metadata Row (aligned with iOS)

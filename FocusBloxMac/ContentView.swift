@@ -65,6 +65,7 @@ struct ContentView: View {
     // CloudKit sync monitor
     @Environment(CloudKitSyncMonitor.self) private var cloudKitMonitor
     @Environment(DeferredSortController.self) private var deferredSort
+    @Environment(DeferredCompletionController.self) private var deferredCompletion
 
     // Quick Add
     @State private var newTaskTitle = ""
@@ -860,11 +861,13 @@ struct ContentView: View {
     }
 
     private func markTasksCompleted(_ ids: Set<UUID>) {
-        let taskSource = LocalTaskSource(modelContext: modelContext)
-        let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
         for id in ids {
             if let task = tasks.first(where: { $0.uuid == id }) {
-                try? syncEngine.completeTask(itemID: task.id)
+                deferredCompletion.scheduleCompletion(id: task.id) { [modelContext] in
+                    let taskSource = LocalTaskSource(modelContext: modelContext)
+                    let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
+                    try? syncEngine.completeTask(itemID: task.id)
+                }
             }
         }
     }
@@ -994,9 +997,11 @@ struct ContentView: View {
                 if task.isTemplate {
                     taskToEndSeries = task
                 } else {
-                    let taskSource = LocalTaskSource(modelContext: modelContext)
-                    let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
-                    try? syncEngine.completeTask(itemID: task.id)
+                    deferredCompletion.scheduleCompletion(id: task.id) { [modelContext] in
+                        let taskSource = LocalTaskSource(modelContext: modelContext)
+                        let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
+                        try? syncEngine.completeTask(itemID: task.id)
+                    }
                 }
             },
             onImportanceCycle: { newValue in
@@ -1023,7 +1028,8 @@ struct ContentView: View {
                 try? modelContext.save()
                 deferredSort.scheduleDeferredResort(id: task.id)
             },
-            isPendingResort: deferredSort.isPending(task.id)
+            isPendingResort: deferredSort.isPending(task.id),
+            isCompletionPending: deferredCompletion.isPending(task.id)
         )
     }
 

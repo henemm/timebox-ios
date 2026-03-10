@@ -6,6 +6,24 @@
 
 ---
 
+## ERLEDIGT: Feature — Deferred Task Completion (3-Sekunden Delay)
+
+- **Anforderung:** Wenn Tasks abgehakt werden (beliebige Liste, beliebiges OS) muss zuerst der gefuellte Punkt dargestellt werden und erst danach verschwindet der Task. Delay von ca. 3 Sekunden, aehnlich wie bei der Umsortierung.
+- **Loesung:** `DeferredCompletionController` — neuer `@Observable` Service mit per-Task Timern. Checkbox wird sofort gruen gefuellt, Titel bekommt Durchstreichung + 50% Opacity. Nach 3 Sekunden wird `SyncEngine.completeTask()` aufgerufen und der Task verschwindet animiert.
+- **Design-Entscheidung:** Delayed Data Write (isCompleted wird erst nach 3s gesetzt) statt sofortigem Write + UI-Overlay. Dadurch zero Blast Radius auf CloudKit Sync, @Query Predicates, Recurring Task Generation, Counter und Undo Service.
+- **Aenderungen:**
+  - `Sources/Services/DeferredCompletionController.swift` (NEU, 92 LoC): Shared Service
+  - `Sources/Views/BacklogView.swift`: Environment + scheduleCompletion statt direktem completeTask
+  - `Sources/Views/BacklogRow.swift`: isCompletionPending Visual State
+  - `FocusBloxMac/ContentView.swift`: Environment + scheduleCompletion + Batch-Completion
+  - `FocusBloxMac/MacBacklogRow.swift`: isCompletionPending Visual State
+  - `Sources/FocusBloxApp.swift`: @State + .environment() + scenePhase Background Flush
+  - `FocusBloxMac/FocusBloxMacApp.swift`: @State + .environment() + scenePhase Background Flush
+- **Tests:** 7 Unit Tests gruen (DeferredCompletionControllerTests)
+- **Beide Plattformen:** iOS + macOS
+
+---
+
 ## ERLEDIGT: Bug — macOS UI Tests leaken Mock-Daten in echte Datenbank
 
 - **Symptom:** Nach macOS Tests tauchen zahlreiche Mock-Tasks ("UI Test Task XXXX", "Badge Test Task XXXX" etc.) in der echten App-Datenbank auf und werden nicht geloescht.

@@ -43,6 +43,7 @@ struct BacklogView: View {
     @Environment(\.eventKitRepository) private var eventKitRepo
     @Environment(CloudKitSyncMonitor.self) private var cloudKitMonitor
     @Environment(DeferredSortController.self) private var deferredSort
+    @Environment(DeferredCompletionController.self) private var deferredCompletion
     @AppStorage("backlogViewMode") private var selectedMode: ViewMode = .priority
     @AppStorage("remindersSyncEnabled") private var remindersSyncEnabled: Bool = false
     @AppStorage("remindersMarkCompleteOnImport") private var remindersMarkCompleteOnImport: Bool = true
@@ -732,17 +733,17 @@ struct BacklogView: View {
     }
 
     private func completeTask(_ item: PlanItem) {
-        do {
-            let taskSource = LocalTaskSource(modelContext: modelContext)
-            let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
-            try syncEngine.completeTask(itemID: item.id)
-            completeFeedback.toggle()
+        completeFeedback.toggle()
 
-            Task {
+        deferredCompletion.scheduleCompletion(id: item.id) { [modelContext] in
+            do {
+                let taskSource = LocalTaskSource(modelContext: modelContext)
+                let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
+                try syncEngine.completeTask(itemID: item.id)
                 await loadTasks()
+            } catch {
+                errorMessage = "Task konnte nicht als erledigt markiert werden."
             }
-        } catch {
-            errorMessage = "Task konnte nicht als erledigt markiert werden."
         }
     }
 
@@ -797,7 +798,8 @@ struct BacklogView: View {
                         onEditTap: { taskToEditDirectly = item },
                         onDeleteTap: { deleteTask(item) },
                         onTitleSave: { newTitle in saveTitleEdit(for: item, title: newTitle) },
-                        isPendingResort: deferredSort.isPending(item.id)
+                        isPendingResort: deferredSort.isPending(item.id),
+                        isCompletionPending: deferredCompletion.isPending(item.id)
                     )
                     .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
                     .listRowBackground(Color.clear)
@@ -861,7 +863,8 @@ struct BacklogView: View {
             onEditTap: { handleEditTap(item) },
             onDeleteTap: { deleteTask(item) },
             onTitleSave: { newTitle in saveTitleEdit(for: item, title: newTitle) },
-            isPendingResort: deferredSort.isPending(item.id)
+            isPendingResort: deferredSort.isPending(item.id),
+            isCompletionPending: deferredCompletion.isPending(item.id)
         )
         .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
         .listRowBackground(Color.clear)
@@ -1060,7 +1063,8 @@ struct BacklogView: View {
                     onTitleSave: { newTitle in
                         saveTitleEdit(for: item, title: newTitle)
                     },
-                    isPendingResort: deferredSort.isPending(item.id)
+                    isPendingResort: deferredSort.isPending(item.id),
+                    isCompletionPending: deferredCompletion.isPending(item.id)
                 )
                 .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
                 .listRowBackground(Color.clear)
