@@ -89,12 +89,24 @@ final class WatchNotificationDelegate: NSObject, @preconcurrency UNUserNotificat
 
         case Self.actionPostponeTomorrow:
             if let currentDue = task.dueDate {
-                task.dueDate = Calendar.current.date(byAdding: .day, value: 1, to: currentDue)
+                let today = Calendar.current.startOfDay(for: Date())
+                let targetDay = Calendar.current.date(byAdding: .day, value: 1, to: today)!
+                let time = Calendar.current.dateComponents([.hour, .minute, .second], from: currentDue)
+                task.dueDate = Calendar.current.date(bySettingHour: time.hour ?? 0,
+                                                     minute: time.minute ?? 0,
+                                                     second: time.second ?? 0,
+                                                     of: targetDay)
             }
 
         case Self.actionPostponeNextWeek:
             if let currentDue = task.dueDate {
-                task.dueDate = Calendar.current.date(byAdding: .day, value: 7, to: currentDue)
+                let today = Calendar.current.startOfDay(for: Date())
+                let targetDay = Calendar.current.date(byAdding: .day, value: 7, to: today)!
+                let time = Calendar.current.dateComponents([.hour, .minute, .second], from: currentDue)
+                task.dueDate = Calendar.current.date(bySettingHour: time.hour ?? 0,
+                                                     minute: time.minute ?? 0,
+                                                     second: time.second ?? 0,
+                                                     of: targetDay)
             }
 
         case Self.actionComplete:

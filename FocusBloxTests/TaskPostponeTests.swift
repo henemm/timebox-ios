@@ -154,4 +154,67 @@ final class TaskPostponeTests: XCTestCase {
         XCTAssertEqual(resultComponents.hour, 14, "Hour should be preserved")
         XCTAssertEqual(resultComponents.minute, 30, "Minute should be preserved")
     }
+
+    // MARK: - Overdue task postponed (Bug: falsches Ursprungsdatum)
+
+    /// GIVEN: Task was due 5 days ago
+    /// WHEN: postpone by 1 day ("Morgen")
+    /// THEN: dueDate is TOMORROW (not original + 1 = still 4 days overdue)
+    /// BREAKS WHEN: postpone() adds days to original dueDate instead of today
+    func test_postpone_overdueTask_byOneDay_setsDueDateToTomorrow() {
+        let fiveDaysAgo = Calendar.current.date(byAdding: .day, value: -5, to: Calendar.current.startOfDay(for: Date()))!
+        let task = makeTask(dueDate: fiveDaysAgo)
+
+        LocalTask.postpone(task, byDays: 1, context: context)
+
+        let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: Calendar.current.startOfDay(for: Date()))!
+        XCTAssertEqual(
+            Calendar.current.startOfDay(for: task.dueDate!),
+            tomorrow,
+            "Overdue task postponed by 1 day should be TOMORROW, not original+1"
+        )
+    }
+
+    /// GIVEN: Task was due 10 days ago
+    /// WHEN: postpone by 7 days ("Naechste Woche")
+    /// THEN: dueDate is 7 days from TODAY (not original + 7 = still 3 days overdue)
+    /// BREAKS WHEN: postpone() adds days to original dueDate instead of today
+    func test_postpone_overdueTask_bySevenDays_setsDueDateToNextWeek() {
+        let tenDaysAgo = Calendar.current.date(byAdding: .day, value: -10, to: Calendar.current.startOfDay(for: Date()))!
+        let task = makeTask(dueDate: tenDaysAgo)
+
+        LocalTask.postpone(task, byDays: 7, context: context)
+
+        let nextWeek = Calendar.current.date(byAdding: .day, value: 7, to: Calendar.current.startOfDay(for: Date()))!
+        XCTAssertEqual(
+            Calendar.current.startOfDay(for: task.dueDate!),
+            nextWeek,
+            "Overdue task postponed by 7 days should be NEXT WEEK from today, not original+7"
+        )
+    }
+
+    /// GIVEN: Task was due 3 days ago at 14:30
+    /// WHEN: postpone by 1 day
+    /// THEN: dueDate is TOMORROW at 14:30 (day from today, time preserved from original)
+    /// BREAKS WHEN: postpone() adds days to original date OR loses time component
+    func test_postpone_overdueTask_preservesTimeComponent() {
+        let threeDaysAgo = Calendar.current.date(byAdding: .day, value: -3, to: Calendar.current.startOfDay(for: Date()))!
+        var components = Calendar.current.dateComponents([.year, .month, .day], from: threeDaysAgo)
+        components.hour = 14
+        components.minute = 30
+        let overdueWithTime = Calendar.current.date(from: components)!
+        let task = makeTask(dueDate: overdueWithTime)
+
+        LocalTask.postpone(task, byDays: 1, context: context)
+
+        let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: Calendar.current.startOfDay(for: Date()))!
+        XCTAssertEqual(
+            Calendar.current.startOfDay(for: task.dueDate!),
+            tomorrow,
+            "Day should be tomorrow, not 2-days-ago"
+        )
+        let resultComponents = Calendar.current.dateComponents([.hour, .minute], from: task.dueDate!)
+        XCTAssertEqual(resultComponents.hour, 14, "Hour should be preserved from original")
+        XCTAssertEqual(resultComponents.minute, 30, "Minute should be preserved from original")
+    }
 }

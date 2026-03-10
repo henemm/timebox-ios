@@ -398,7 +398,7 @@
 **Kritisch:** keine offenen kritischen Bugs
 **Teuerste Items:** #17 OrganizeMyDay (~150k), #14 NC Widget (~120k), #12 Enhanced Quick Capture (~120k)
 **WARTEND (Apple-Abhaengigkeit):** #20 ITB-F — Developer-APIs verfuegbar, wartet auf Siri On-Screen Awareness (iOS 26.5/27)
-**Zuletzt erledigt:** Bug 85-C Kontextmenue Verschieben-Optionen (S)
+**Zuletzt erledigt:** Bug 85-D Postpone falsches Ursprungsdatum (XS)
 **Naechstes:** (offen)
 
 > **Dies ist das EINZIGE Backlog.** macOS-Features (MAC-xxx) stehen hier mit Verweis auf ihre Specs in `docs/specs/macos/`. Kein zweites Backlog.
@@ -741,6 +741,18 @@
 - **Dateien:** Date+DueDate.swift, TaskInspector.swift (2 Dateien, ~15 LoC)
 - **Tests:** 10 neue Unit Tests (DueDateTimeDisplayTests) + 12 bestehende (DueDateFormattingTests) — alle gruen
 - **Analyse:** `docs/artifacts/bug-85-reminder-time-display/analysis.md`
+
+### Bug 85-D: Postpone falsches Ursprungsdatum (ERLEDIGT)
+- **Status:** ERLEDIGT
+- **Plattform:** iOS + macOS + watchOS (alle gefixt)
+- **Symptom:** "Verschieben auf morgen" rechnete ab Original-Faelligkeitsdatum statt ab heute. Ueberfaellige Tasks blieben ueberfaellig.
+- **Root Cause:** `LocalTask.postpone()` addierte Tage zu `task.dueDate` statt zu `Date()`.
+- **Fix (2 Dateien, +1 Tests):**
+  1. `LocalTask.swift`: Basis auf `startOfDay(for: Date())` geaendert, Uhrzeit aus Original-Datum erhalten
+  2. `WatchNotificationDelegate.swift`: Gleicher Fix fuer Watch-Inline-Implementation
+  3. `TaskPostponeTests.swift`: 3 neue Overdue-Testcases (vorher nur Today-Tests)
+- **Tests:** 9 Unit Tests (TaskPostponeTests) — alle gruen
+- **Analyse:** `docs/artifacts/bug-postpone-wrong-date/analysis.md`
 
 ### Bug 85-C: Kontextmenue Verschieben-Optionen (ERLEDIGT)
 - **Status:** ERLEDIGT

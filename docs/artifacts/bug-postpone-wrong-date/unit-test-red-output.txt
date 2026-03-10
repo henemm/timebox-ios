@@ -1,0 +1,27 @@
+    export TREAT_MISSING_BASELINES_AS_TEST_FAILURES\=NO
+Test Case '-[FocusBloxTests.TaskPostponeTests test_postpone_byOneDay_advancesDueDateByOneDay]' started.
+Test Case '-[FocusBloxTests.TaskPostponeTests test_postpone_byOneDay_advancesDueDateByOneDay]' passed (0.023 seconds).
+Test Case '-[FocusBloxTests.TaskPostponeTests test_postpone_bySevenDays_advancesDueDateBySevenDays]' started.
+Test Case '-[FocusBloxTests.TaskPostponeTests test_postpone_bySevenDays_advancesDueDateBySevenDays]' passed (0.019 seconds).
+2026-03-10 08:17:44.476956+0100 FocusBlox[70537:40325860] [CloudKit] CoreData+CloudKit: -[NSCloudKitMirroringDelegate tearDown:]_block_invoke(797): <NSCloudKitMirroringDelegate: 0x600003b5ca80>: Told to tear downTest Case '-[FocusBloxTests.TaskPostponeTests test_postpone_incrementsRescheduleCount]' started.
+Test Case '-[FocusBloxTests.TaskPostponeTests test_postpone_incrementsRescheduleCount]' passed (0.021 seconds).
+Test Case '-[FocusBloxTests.TaskPostponeTests test_postpone_overdueTask_byOneDay_setsDueDateToTomorrow]' started.
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/TaskPostponeTests.swift:171: error: -[FocusBloxTests.TaskPostponeTests test_postpone_overdueTask_byOneDay_setsDueDateToTomorrow] : XCTAssertEqual failed: ("2026-03-05 23:00:00 +0000") is not equal to ("2026-03-10 23:00:00 +0000") - Overdue task postponed by 1 day should be TOMORROW, not original+1
+Test Case '-[FocusBloxTests.TaskPostponeTests test_postpone_overdueTask_byOneDay_setsDueDateToTomorrow]' failed (0.314 seconds).
+Test Case '-[FocusBloxTests.TaskPostponeTests test_postpone_overdueTask_bySevenDays_setsDueDateToNextWeek]' started.
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/TaskPostponeTests.swift:189: error: -[FocusBloxTests.TaskPostponeTests test_postpone_overdueTask_bySevenDays_setsDueDateToNextWeek] : XCTAssertEqual failed: ("2026-03-06 23:00:00 +0000") is not equal to ("2026-03-16 23:00:00 +0000") - Overdue task postponed by 7 days should be NEXT WEEK from today, not original+7
+Test Case '-[FocusBloxTests.TaskPostponeTests test_postpone_overdueTask_bySevenDays_setsDueDateToNextWeek]' failed (0.019 seconds).
+Test Case '-[FocusBloxTests.TaskPostponeTests test_postpone_overdueTask_preservesTimeComponent]' started.
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/TaskPostponeTests.swift:211: error: -[FocusBloxTests.TaskPostponeTests test_postpone_overdueTask_preservesTimeComponent] : XCTAssertEqual failed: ("2026-03-07 23:00:00 +0000") is not equal to ("2026-03-10 23:00:00 +0000") - Day should be tomorrow, not 2-days-ago
+Test Case '-[FocusBloxTests.TaskPostponeTests test_postpone_overdueTask_preservesTimeComponent]' failed (0.017 seconds).
+2026-03-10 08:17:44.848893+0100 FocusBlox[70537:40325859] [CloudKit] CoreData+CloudKit: -[NSCloudKitMirroringDelegate tearDown:]_block_invoke(797): <NSCloudKitMirroringDelegate: 0x600003b6b480>: Told to tear down witTest Case '-[FocusBloxTests.TaskPostponeTests test_postpone_preservesTimeComponent]' started.
+Error Domain=NSCocoaErrorDomain Code=134407 "Request 'A0B432B0-BB62-4150-848F-2C97ECF577B9' was cancelled because the store was removed from the coordinator." UserInfo={NSLocalizedFailureReason=Request 'A0B432B0-BB62-4150-848F-2C97ECF577B9' was cancelledTest Case '-[FocusBloxTests.TaskPostponeTests test_postpone_preservesTimeComponent]' passed (0.018 seconds).
+Test Case '-[FocusBloxTests.TaskPostponeTests test_postpone_updatesModifiedAt]' started.
+Test Case '-[FocusBloxTests.TaskPostponeTests test_postpone_updatesModifiedAt]' passed (0.017 seconds).
+Test Case '-[FocusBloxTests.TaskPostponeTests test_postpone_withoutDueDate_doesNothing]' started.
+Test Case '-[FocusBloxTests.TaskPostponeTests test_postpone_withoutDueDate_doesNothing]' passed (0.016 seconds).
+Test Suite 'TaskPostponeTests' failed at 2026-03-10 08:17:44.900.
+Test Suite 'FocusBloxTests.xctest' failed at 2026-03-10 08:17:44.900.
+Test Suite 'Selected tests' failed at 2026-03-10 08:17:44.900.
+[CloudKit Sync] Setup FAILED: The operation couldn’t be completed. (Cocoa error 134400.)
+** TEST FAILED **

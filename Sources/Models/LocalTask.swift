@@ -180,7 +180,13 @@ extension LocalTask {
     @discardableResult
     static func postpone(_ task: LocalTask, byDays days: Int, context: ModelContext) -> Date? {
         guard let currentDue = task.dueDate else { return nil }
-        let newDue = Calendar.current.date(byAdding: .day, value: days, to: currentDue)!
+        let today = Calendar.current.startOfDay(for: Date())
+        let targetDay = Calendar.current.date(byAdding: .day, value: days, to: today)!
+        let time = Calendar.current.dateComponents([.hour, .minute, .second], from: currentDue)
+        let newDue = Calendar.current.date(bySettingHour: time.hour ?? 0,
+                                           minute: time.minute ?? 0,
+                                           second: time.second ?? 0,
+                                           of: targetDay)!
         task.dueDate = newDue
         task.modifiedAt = Date()
         task.rescheduleCount += 1
