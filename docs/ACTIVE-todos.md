@@ -311,7 +311,7 @@
 | 4b | ~~List-Views Cleanup (ViewModes 9→5)~~ | ERLEDIGT | M | ~50-70k | 6 | ~-270 |
 | 5 | ~~MAC-022 Spotlight Integration~~ | ERLEDIGT | S | ~15-25k | 4 | ~20 |
 | 6 | ~~Recurring Tasks Phase 1B/2 (inkl. Sichtbarkeit + Edit/Delete Dialog)~~ | ERLEDIGT | M-L | ~60-100k | 5-6 | ~200 |
-| 7 | Kalender-App Deep Link (iOS+macOS) | MITTEL | M | ~40-50k | 3-4 | ~100 |
+| 7 | ~~Kalender-App Deep Link (iOS+macOS)~~ | ERLEDIGT | XS | ~5k | 3 | ~30 |
 | 8 | ~~Push Notifications bei Frist~~ | ERLEDIGT | M | ~60-80k | 9 | ~180 |
 | 9 | MAC-031 Focus Mode Integration | P3 | M | ~50-70k | 2-3 | ~100 |
 | 10 | MAC-030 Shortcuts.app | P3 | L | ~60-80k | 2-3 | ~150 |
@@ -359,7 +359,7 @@
 
 **Komplexitaet:** XS = halbe Stunde | S = 1 Session | M = 2-3 Sessions | L = halber Tag | XL = ganzer Tag+
 
-**Guenstigster Quick Win:** #7 Kalender Deep Link (M)
+**Guenstigster Quick Win:** #10 Background Refresh (S)
 **Kritisch:** keine offenen kritischen Bugs
 **Teuerste Items:** #17 OrganizeMyDay (~150k), #14 NC Widget (~120k), #12 Enhanced Quick Capture (~120k)
 **WARTEND (Apple-Abhaengigkeit):** #20 ITB-F — Developer-APIs verfuegbar, wartet auf Siri On-Screen Awareness (iOS 26.5/27)
@@ -384,7 +384,7 @@
 
 ### Bundle C: Erinnerungen & Verknuepfungen
 - ~~Push Notifications bei Frist~~ ERLEDIGT
-- Kalender-App Deep Link
+- ~~Kalender-App Deep Link~~ ERLEDIGT
 - ~~**#29 Badge-Zahl (Overdue) + Interaktive Frist-Notifications**~~ ERLEDIGT
 
 ### Bundle D: Erfolge feiern

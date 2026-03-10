@@ -1,5 +1,10 @@
 import Foundation
 @preconcurrency import EventKit
+#if canImport(UIKit)
+import UIKit
+#elseif canImport(AppKit)
+import AppKit
+#endif
 
 struct CalendarEvent: Identifiable, Sendable {
     let id: String
@@ -61,6 +66,24 @@ struct CalendarEvent: Identifiable, Sendable {
     var category: String? {
         let dict = UserDefaults.standard.dictionary(forKey: Self.categoryMappingKey) as? [String: String] ?? [:]
         return dict[calendarItemIdentifier]
+    }
+
+    // MARK: - Calendar App Deep Link
+
+    /// URL to open the native Calendar app on the day of this event.
+    /// Uses `calshow:` URL scheme (works on iOS and macOS).
+    var calendarAppURL: URL? {
+        URL(string: "calshow:\(startDate.timeIntervalSinceReferenceDate)")
+    }
+
+    /// Opens the native Calendar app on the day of this event.
+    func openInCalendarApp() {
+        guard let url = calendarAppURL else { return }
+        #if os(macOS)
+        NSWorkspace.shared.open(url)
+        #else
+        UIApplication.shared.open(url)
+        #endif
     }
 
     // MARK: - Focus Block Support

@@ -1,0 +1,12 @@
+UI Test RED: Calendar Deep Link
+
+UI test not applicable for this feature:
+- The "In Kalender oeffnen" button calls UIApplication.shared.open() which opens Calendar.app
+- XCUITest cannot verify that an external app opened correctly
+- The button presence is verified through unit tests on calendarAppURL property
+- The actual button will be in EventCategorySheet (SharedSheets.swift) which is shared code
+
+Unit tests cover:
+1. calendarAppURL returns correct calshow: URL with timestamp
+2. calendarAppURL works for all-day events
+3. isFocusBlock correctly identifies FocusBlock vs external events (prerequisite for UI filter)
