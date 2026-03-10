@@ -30,6 +30,38 @@
   - LocalTaskSource.createTask: blockerTaskID Parameter hinzugefuegt
   - 2 neue Unit Tests (14 gesamt, alle GREEN)
 - **Spec:** `openspec/changes/sub-tasks/proposal.md`
+- **BEKANNTE BUGS (aus kritischer Analyse):**
+
+### BUG-DEP-1: Blocker erledigt → Dependents verschwinden (KRITISCH)
+- **Symptom:** Wenn Task A (Blocker) erledigt wird, verschwindet Task B (Dependent) komplett aus der UI
+- **Root Cause:** `SyncEngine.completeTask()` setzt `blockerTaskID` auf Dependents NICHT auf nil. Task B wird aus Top-Level gefiltert (`blockerTaskID != nil`) UND aus Dependent-Liste (Blocker ist erledigt = nicht in `allBacklogTasks`). Silent Data Loss.
+- **Fix:** In `SyncEngine.completeTask()`: Alle Tasks mit `blockerTaskID == completedTaskID` finden und `blockerTaskID = nil` setzen.
+- **Dateien:** `Sources/Services/SyncEngine.swift`
+- **Prioritaet:** SHOWSTOPPER — Feature ist ohne diesen Fix kaputt
+
+### BUG-DEP-2: Blocker geloescht → Dependents permanent gelockt (KRITISCH)
+- **Symptom:** Wenn ein Blocker-Task geloescht wird, bleiben Dependents mit orphaned `blockerTaskID` permanent gelockt und unsichtbar
+- **Root Cause:** `SyncEngine.deleteTask()` / `modelContext.delete()` bereinigt keine Referenzen
+- **Fix:** Analog zu BUG-DEP-1: Vor dem Loeschen `blockerTaskID = nil` auf allen Dependents setzen
+- **Dateien:** `Sources/Services/SyncEngine.swift`
+- **Prioritaet:** SHOWSTOPPER
+
+### BUG-DEP-3: Ranking-Boost ist toter Code (KRITISCH)
+- **Symptom:** Blocker-Tasks bekommen KEINEN Ranking-Boost, obwohl `blockerBonus()` existiert und Tests gruen sind
+- **Root Cause:** `dependentTaskCount` wird an KEINER Produktions-Call-Site uebergeben (Default = 0). Betrifft: `PlanItem.priorityScore`, `ContentView.scoreFor()`, `MacBacklogRow.metadataRow`, alle `calculateScore()`-Aufrufe
+- **Fix:** An allen Call-Sites `dependentTaskCount` berechnen (Anzahl Tasks mit `blockerTaskID == task.id`)
+- **Dateien:** Mehrere — PlanItem.swift, ContentView.swift, MacBacklogRow.swift, BacklogView.swift
+- **Prioritaet:** Feature unvollstaendig
+
+### BUG-DEP-4: Blockierte Tasks nicht vor Aktionen geschuetzt
+- **Symptom:** Blockierte Tasks koennen via Swipe zu Next Up, via Inspector als erledigt markiert, oder FocusBlocks zugewiesen werden
+- **Fix:** Guards in Swipe-Actions, TaskInspector Status-Chips, FocusBlock-Zuweisung
+- **Prioritaet:** Mittel
+
+### BUG-DEP-5: 3-Wege zirkulaere Abhaengigkeiten moeglich
+- **Symptom:** A→B→C→A ist moeglich, weil Picker nur 1-Level Zirkularitaet prueft
+- **Fix:** Transitive Pruefung in `blockerCandidates`
+- **Prioritaet:** Niedrig (Edge Case, nur 1 Ebene erlaubt laut Spec)
 
 ---
 
