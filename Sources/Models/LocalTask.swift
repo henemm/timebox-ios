@@ -104,6 +104,21 @@ final class LocalTask {
     /// nil = no blocker, task is freely actionable.
     var blockerTaskID: String?
 
+    /// Checks if setting `blockerID` as blocker of `taskID` would create a cycle.
+    /// Walks the blocker chain from `blockerID` upward; if it reaches `taskID`, it's a cycle.
+    static func wouldCreateCycle(settingBlocker blockerID: String, on taskID: String, allTasks: [LocalTask]) -> Bool {
+        if blockerID == taskID { return true }
+        let lookup = Dictionary(uniqueKeysWithValues: allTasks.map { ($0.id, $0.blockerTaskID) })
+        var current: String? = blockerID
+        var visited: Set<String> = []
+        while let id = current {
+            if id == taskID { return true }
+            if !visited.insert(id).inserted { break }  // infinite loop guard
+            current = lookup[id] ?? nil
+        }
+        return false
+    }
+
     // MARK: - AI Task Scoring (Apple Intelligence)
 
     /// AI-generated composite score (0-100, higher = more important/urgent)

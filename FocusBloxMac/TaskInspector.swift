@@ -254,7 +254,7 @@ struct TaskInspector: View {
 
     private var blockerCandidates: [LocalTask] {
         availableTasks.filter { candidate in
-            candidate.id != task.id && candidate.blockerTaskID != task.id
+            !LocalTask.wouldCreateCycle(settingBlocker: candidate.id, on: task.id, allTasks: availableTasks)
         }
     }
 

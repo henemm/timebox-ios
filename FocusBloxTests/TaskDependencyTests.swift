@@ -470,4 +470,74 @@ final class TaskDependencyTests: XCTestCase {
         XCTAssertTrue(blockerItem.isActionable,
                       "Blocker task itself should be actionable")
     }
+
+    // MARK: - DEP-5: Transitive circularity detection
+
+    func test_wouldCreateCycle_directCycle_detected() throws {
+        // A blocks B. Setting B as blocker of A should be detected.
+        let a = LocalTask(title: "A")
+        let b = LocalTask(title: "B")
+        container.mainContext.insert(a)
+        container.mainContext.insert(b)
+
+        b.blockerTaskID = a.id  // A → B
+
+        let allTasks = [a, b]
+
+        // If we try to set A.blockerTaskID = B.id → B→A cycle
+        XCTAssertTrue(
+            LocalTask.wouldCreateCycle(settingBlocker: b.id, on: a.id, allTasks: allTasks),
+            "DEP-5: Direct cycle A→B→A must be detected"
+        )
+    }
+
+    func test_wouldCreateCycle_transitiveCycle_detected() throws {
+        // A → B → C. Setting C as blocker of A should be detected.
+        let a = LocalTask(title: "A")
+        let b = LocalTask(title: "B")
+        let c = LocalTask(title: "C")
+        container.mainContext.insert(a)
+        container.mainContext.insert(b)
+        container.mainContext.insert(c)
+
+        b.blockerTaskID = a.id  // A → B
+        c.blockerTaskID = b.id  // B → C
+
+        let allTasks = [a, b, c]
+
+        // If we try to set A.blockerTaskID = C.id → C→B→A→C cycle
+        XCTAssertTrue(
+            LocalTask.wouldCreateCycle(settingBlocker: c.id, on: a.id, allTasks: allTasks),
+            "DEP-5: 3-way cycle A→B→C→A must be detected"
+        )
+    }
+
+    func test_wouldCreateCycle_noCycle_allowed() throws {
+        // A → B. Setting C as blocker of A is fine (no cycle).
+        let a = LocalTask(title: "A")
+        let b = LocalTask(title: "B")
+        let c = LocalTask(title: "C")
+        container.mainContext.insert(a)
+        container.mainContext.insert(b)
+        container.mainContext.insert(c)
+
+        b.blockerTaskID = a.id  // A → B
+
+        let allTasks = [a, b, c]
+
+        XCTAssertFalse(
+            LocalTask.wouldCreateCycle(settingBlocker: c.id, on: a.id, allTasks: allTasks),
+            "DEP-5: Non-cyclic dependency should be allowed"
+        )
+    }
+
+    func test_wouldCreateCycle_selfBlock_detected() throws {
+        let a = LocalTask(title: "A")
+        container.mainContext.insert(a)
+
+        XCTAssertTrue(
+            LocalTask.wouldCreateCycle(settingBlocker: a.id, on: a.id, allTasks: [a]),
+            "DEP-5: Self-blocking must be detected"
+        )
+    }
 }

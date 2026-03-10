@@ -385,12 +385,9 @@ struct TaskFormSheet: View {
     private var blockerCandidates: [LocalTask] {
         let editID: String?
         if case .edit(let task) = mode { editID = task.id } else { editID = nil }
-        return availableTasks.filter { task in
-            // Don't show self as blocker candidate
-            if task.id == editID { return false }
-            // Don't allow circular: if task is blocked by us, can't be our blocker
-            if task.blockerTaskID == editID { return false }
-            return true
+        guard let editID else { return availableTasks }
+        return availableTasks.filter { candidate in
+            !LocalTask.wouldCreateCycle(settingBlocker: candidate.id, on: editID, allTasks: availableTasks)
         }
     }
 

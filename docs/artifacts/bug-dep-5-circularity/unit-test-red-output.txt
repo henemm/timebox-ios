@@ -1,0 +1,11 @@
+Testing failed:
+  type 'LocalTask' has no member 'wouldCreateCycle' (4x)
+  Testing cancelled because the build failed.
+
+** TEST FAILED **
+
+4 compile errors in TaskDependencyTests.swift
+4 new tests: test_wouldCreateCycle_directCycle_detected,
+  test_wouldCreateCycle_transitiveCycle_detected,
+  test_wouldCreateCycle_noCycle_allowed,
+  test_wouldCreateCycle_selfBlock_detected

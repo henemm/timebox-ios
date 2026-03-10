@@ -58,10 +58,10 @@
 - **Fix:** Guard in CompleteTaskIntent.perform() und ContentView.completeSelectedTasks()
 - **Prioritaet:** Niedrig (Edge Case, separates Ticket)
 
-### BUG-DEP-5: 3-Wege zirkulaere Abhaengigkeiten moeglich
-- **Symptom:** A→B→C→A ist moeglich, weil Picker nur 1-Level Zirkularitaet prueft
-- **Fix:** Transitive Pruefung in `blockerCandidates`
-- **Prioritaet:** Niedrig (Edge Case, nur 1 Ebene erlaubt laut Spec)
+### BUG-DEP-5: 3-Wege zirkulaere Abhaengigkeiten moeglich — ERLEDIGT
+- **Fix:** `LocalTask.wouldCreateCycle()` prueft transitive Blocker-Kette. Beide Picker (iOS TaskFormSheet + macOS TaskInspector) nutzen diese Methode statt 1-Level Check.
+- **Dateien:** LocalTask.swift, TaskInspector.swift, TaskFormSheet.swift
+- **Tests:** 4 neue Unit Tests (26 gesamt), alle GREEN
 
 ### BUG-DEP-6: Swipe-Gesten in iOS Backlog kaputt — ERLEDIGT
 - **Symptom:** Swipe-Gesten funktionierten nicht mehr in allen iOS Backlog-Views (Priority, Tier, Recent, Overdue)
