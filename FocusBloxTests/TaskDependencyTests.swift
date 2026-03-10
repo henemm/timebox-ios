@@ -260,4 +260,100 @@ final class TaskDependencyTests: XCTestCase {
         XCTAssertLessThanOrEqual(score, 100,
                                   "Score should never exceed 100 even with blocker bonus")
     }
+
+    // MARK: - DEP-1: completeTask clears blockerTaskID on dependents
+
+    func test_completeTask_clearsDependentsBlockerTaskID() async throws {
+        let context = container.mainContext
+        let source = LocalTaskSource(modelContext: context)
+        let syncEngine = SyncEngine(taskSource: source, modelContext: context)
+
+        let blocker = LocalTask(title: "Blocker")
+        let dep1 = LocalTask(title: "Dep 1")
+        let dep2 = LocalTask(title: "Dep 2")
+        context.insert(blocker)
+        context.insert(dep1)
+        context.insert(dep2)
+        dep1.blockerTaskID = blocker.id
+        dep2.blockerTaskID = blocker.id
+        try context.save()
+
+        // Complete the blocker
+        try syncEngine.completeTask(itemID: blocker.id)
+
+        XCTAssertNil(dep1.blockerTaskID,
+                     "DEP-1: Completing blocker must clear blockerTaskID on dependents")
+        XCTAssertNil(dep2.blockerTaskID,
+                     "DEP-1: All dependents must be freed when blocker is completed")
+        XCTAssertTrue(blocker.isCompleted)
+    }
+
+    // MARK: - DEP-2: deleteTask clears blockerTaskID on dependents
+
+    func test_deleteTask_clearsDependentsBlockerTaskID() throws {
+        let context = container.mainContext
+        let source = LocalTaskSource(modelContext: context)
+        let syncEngine = SyncEngine(taskSource: source, modelContext: context)
+
+        let blocker = LocalTask(title: "Blocker")
+        let dep = LocalTask(title: "Dependent")
+        context.insert(blocker)
+        context.insert(dep)
+        dep.blockerTaskID = blocker.id
+        try context.save()
+
+        let blockerID = blocker.id
+
+        // Delete the blocker
+        try syncEngine.deleteTask(itemID: blockerID)
+
+        XCTAssertNil(dep.blockerTaskID,
+                     "DEP-2: Deleting blocker must clear blockerTaskID on dependents")
+    }
+
+    // MARK: - DEP-3: PlanItem.priorityScore includes dependentTaskCount
+
+    func test_planItem_priorityScore_includesBlockerBonus() throws {
+        let blocker = LocalTask(title: "Blocker", importance: 1)
+        let dep1 = LocalTask(title: "Dep 1")
+        let dep2 = LocalTask(title: "Dep 2")
+        container.mainContext.insert(blocker)
+        container.mainContext.insert(dep1)
+        container.mainContext.insert(dep2)
+        dep1.blockerTaskID = blocker.id
+        dep2.blockerTaskID = blocker.id
+
+        let allItems = [blocker, dep1, dep2].map { PlanItem(localTask: $0) }
+        let blockerItem = allItems.first { $0.id == blocker.id }!
+        let dependentCount = allItems.dependents(of: blockerItem.id).count
+
+        let scoreWithBonus = TaskPriorityScoringService.calculateScore(
+            importance: blockerItem.importance,
+            urgency: blockerItem.urgency,
+            dueDate: blockerItem.dueDate,
+            createdAt: blockerItem.createdAt,
+            rescheduleCount: blockerItem.rescheduleCount,
+            estimatedDuration: blockerItem.estimatedDuration,
+            taskType: blockerItem.taskType,
+            isNextUp: blockerItem.isNextUp,
+            dependentTaskCount: dependentCount
+        )
+
+        let scoreWithout = TaskPriorityScoringService.calculateScore(
+            importance: blockerItem.importance,
+            urgency: blockerItem.urgency,
+            dueDate: blockerItem.dueDate,
+            createdAt: blockerItem.createdAt,
+            rescheduleCount: blockerItem.rescheduleCount,
+            estimatedDuration: blockerItem.estimatedDuration,
+            taskType: blockerItem.taskType,
+            isNextUp: blockerItem.isNextUp,
+            dependentTaskCount: 0
+        )
+
+        XCTAssertGreaterThan(scoreWithBonus, scoreWithout,
+                             "DEP-3: Blocker with 2 dependents must have higher score than without")
+        XCTAssertEqual(scoreWithBonus - scoreWithout, 6,
+                       "DEP-3: 2 dependents should add +6 to score")
+    }
 }

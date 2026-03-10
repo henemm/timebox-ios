@@ -98,6 +98,8 @@ final class SyncEngine {
         guard let task = try findTask(byID: itemID) else {
             return
         }
+        // DEP-2: Free all tasks that depend on this blocker before deleting
+        try freeDependents(of: task.id)
         modelContext.delete(task)
         try modelContext.save()
     }
@@ -160,6 +162,9 @@ final class SyncEngine {
         // Clear assignment when completing
         task.assignedFocusBlockID = nil
         task.isNextUp = false
+
+        // DEP-1: Free all tasks that depend on this blocker
+        try freeDependents(of: task.id)
 
         // Generate next instance for recurring tasks
         var newInstanceID: String?
@@ -241,6 +246,18 @@ final class SyncEngine {
             try modelContext.save()
         }
         return cleanedCount
+    }
+
+    /// Clears blockerTaskID on all tasks that depend on the given task.
+    /// Called when a blocker is completed or deleted to free its dependents.
+    private func freeDependents(of blockerID: String) throws {
+        let descriptor = FetchDescriptor<LocalTask>(
+            predicate: #Predicate { $0.blockerTaskID == blockerID }
+        )
+        let dependents = try modelContext.fetch(descriptor)
+        for dep in dependents {
+            dep.blockerTaskID = nil
+        }
     }
 
     private func findTask(byID id: String) throws -> LocalTask? {

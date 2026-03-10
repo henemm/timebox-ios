@@ -32,19 +32,13 @@
 - **Spec:** `openspec/changes/sub-tasks/proposal.md`
 - **BEKANNTE BUGS (aus kritischer Analyse):**
 
-### BUG-DEP-1: Blocker erledigt → Dependents verschwinden (KRITISCH)
-- **Symptom:** Wenn Task A (Blocker) erledigt wird, verschwindet Task B (Dependent) komplett aus der UI
-- **Root Cause:** `SyncEngine.completeTask()` setzt `blockerTaskID` auf Dependents NICHT auf nil. Task B wird aus Top-Level gefiltert (`blockerTaskID != nil`) UND aus Dependent-Liste (Blocker ist erledigt = nicht in `allBacklogTasks`). Silent Data Loss.
-- **Fix:** In `SyncEngine.completeTask()`: Alle Tasks mit `blockerTaskID == completedTaskID` finden und `blockerTaskID = nil` setzen.
-- **Dateien:** `Sources/Services/SyncEngine.swift`
-- **Prioritaet:** SHOWSTOPPER — Feature ist ohne diesen Fix kaputt
+### BUG-DEP-1: Blocker erledigt → Dependents verschwinden — ERLEDIGT
+- **Fix:** `SyncEngine.freeDependents(of:)` in `completeTask()` — setzt `blockerTaskID = nil` auf allen Dependents
+- **Test:** `test_completeTask_clearsDependentsBlockerTaskID` GREEN
 
-### BUG-DEP-2: Blocker geloescht → Dependents permanent gelockt (KRITISCH)
-- **Symptom:** Wenn ein Blocker-Task geloescht wird, bleiben Dependents mit orphaned `blockerTaskID` permanent gelockt und unsichtbar
-- **Root Cause:** `SyncEngine.deleteTask()` / `modelContext.delete()` bereinigt keine Referenzen
-- **Fix:** Analog zu BUG-DEP-1: Vor dem Loeschen `blockerTaskID = nil` auf allen Dependents setzen
-- **Dateien:** `Sources/Services/SyncEngine.swift`
-- **Prioritaet:** SHOWSTOPPER
+### BUG-DEP-2: Blocker geloescht → Dependents permanent gelockt — ERLEDIGT
+- **Fix:** `SyncEngine.freeDependents(of:)` in `deleteTask()` vor dem Delete
+- **Test:** `test_deleteTask_clearsDependentsBlockerTaskID` GREEN
 
 ### BUG-DEP-3: Ranking-Boost ist toter Code (KRITISCH)
 - **Symptom:** Blocker-Tasks bekommen KEINEN Ranking-Boost, obwohl `blockerBonus()` existiert und Tests gruen sind
@@ -62,6 +56,15 @@
 - **Symptom:** A→B→C→A ist moeglich, weil Picker nur 1-Level Zirkularitaet prueft
 - **Fix:** Transitive Pruefung in `blockerCandidates`
 - **Prioritaet:** Niedrig (Edge Case, nur 1 Ebene erlaubt laut Spec)
+
+### BUG-DEP-6: Swipe-Gesten in iOS Backlog kaputt (KRITISCH)
+- **Symptom:** Swipe-Gesten funktionieren nicht mehr in ALLEN iOS Backlog-Views (Priority, Tier, Recent, Overdue). Next Up, Completed und Recurring sind NICHT betroffen.
+- **Root Cause:** Commit `cc567bf` (Phase 2 iOS Views) hat `ForEach(blockedTasks)` zwischen `BacklogRow` und `.swipeActions()` in `backlogRowWithSwipe()` eingefuegt. In SwiftUI haengen Modifier in einem `@ViewBuilder` am letzten Ausdruck — also am `ForEach`, nicht am `BacklogRow`. Betrifft ALLE Tasks (auch ohne Dependencies), weil `ForEach([])` trotzdem die letzte View ist.
+- **Zusaetzlicher Schaden:** Nicht nur `.swipeActions` fehlt am BacklogRow, sondern auch `.listRowInsets`, `.listRowBackground`, `.listRowSeparator` — Layout koennte ebenfalls falsch sein.
+- **Fix:** In `backlogRowWithSwipe()` die Modifier-Kette aufteilen: `.swipeActions`, `.contextMenu`, `.listRowInsets`, `.listRowBackground`, `.listRowSeparator` direkt an `BacklogRow` haengen. `ForEach` fuer blocked Rows bekommt eigene Row-Modifier.
+- **Dateien:** `Sources/Views/BacklogView.swift` (nur `backlogRowWithSwipe()`, ~Zeile 863-912)
+- **Prioritaet:** SHOWSTOPPER — Swipe ist primaere Interaktion im Backlog
+- **Analyse:** `docs/artifacts/bug-swipe-gesture-broken/analysis.md`
 
 ---
 

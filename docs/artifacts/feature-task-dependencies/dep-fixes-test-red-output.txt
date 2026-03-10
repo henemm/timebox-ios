@@ -1,0 +1,2 @@
+DEP-1 FAILED: completeTask does not clear blockerTaskID on dependents
+DEP-2 FAILED: deleteTask does not clear blockerTaskID on dependents
