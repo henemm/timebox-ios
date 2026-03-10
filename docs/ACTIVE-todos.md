@@ -27,6 +27,17 @@
 
 ---
 
+## ERLEDIGT: Bug — Recurring Tasks erscheinen nach Loeschen wieder ("Zombie-Schleife")
+
+- **Symptom:** Wiederkehrender Task "Zehnagel" erscheint nach Loeschen bei jedem App-Start wieder
+- **Root Cause:** `repairOrphanedRecurringSeries()` erstellt neue Instanzen aus erledigten Tasks, ohne zu pruefen ob die Serie bewusst beendet wurde (Template geloescht)
+- **Fix:** Template-Check in `repairOrphanedRecurringSeries()` — nur reparieren wenn Template fuer die Serie noch existiert. Kein Template = Serie beendet = nicht reparieren.
+- **Dateien:** `Sources/Services/RecurrenceService.swift` (2 Zeilen geaendert)
+- **Tests:** 4 Repair-Tests GREEN (1 neuer Zombie-Prevention-Test)
+- **Blast Radius:** Betrifft ALLE recurring Tasks, nicht nur "Zehnagel". Fix gilt fuer iOS + macOS (Shared Code).
+
+---
+
 ## ERLEDIGT: Bug — AI Title Improvement entfernt Doppelpunkt-Prefixe
 
 - **Symptom:** Task-Titel "Lohnsteuererklaerung: Rechnungsuebersicht erstellen" wird nach Erstellung zu "Rechnungsuebersicht erstellen" — das Prefix vor dem Doppelpunkt verschwindet.

@@ -584,6 +584,15 @@ final class RecurrenceServiceTests: XCTestCase {
         let context = container.mainContext
         let groupID = "orphaned-series"
 
+        // Template exists (series is active)
+        let template = LocalTask(
+            title: "1 Blink lesen",
+            recurrencePattern: "daily",
+            recurrenceGroupID: groupID
+        )
+        template.isTemplate = true
+        context.insert(template)
+
         // Completed recurring task — NO open successor exists
         let completed = LocalTask(
             title: "1 Blink lesen",
@@ -596,18 +605,18 @@ final class RecurrenceServiceTests: XCTestCase {
         context.insert(completed)
         try context.save()
 
-        // Verify: no open tasks exist
+        // Verify: no open tasks exist (template doesn't count as "open" for repair purposes)
         let beforeOpen = try context.fetch(FetchDescriptor<LocalTask>(
-            predicate: #Predicate { !$0.isCompleted }
+            predicate: #Predicate { !$0.isCompleted && !$0.isTemplate }
         ))
-        XCTAssertEqual(beforeOpen.count, 0, "No open tasks should exist before repair")
+        XCTAssertEqual(beforeOpen.count, 0, "No open instance tasks should exist before repair")
 
         // Run repair
         let repaired = RecurrenceService.repairOrphanedRecurringSeries(in: context)
 
-        // Verify: new open task created
+        // Verify: new open instance created (excluding template)
         let afterOpen = try context.fetch(FetchDescriptor<LocalTask>(
-            predicate: #Predicate { !$0.isCompleted }
+            predicate: #Predicate { !$0.isCompleted && !$0.isTemplate }
         ))
         XCTAssertEqual(repaired, 1, "Should repair exactly 1 orphaned series")
         XCTAssertEqual(afterOpen.count, 1, "One open successor should exist after repair")
@@ -640,6 +649,43 @@ final class RecurrenceServiceTests: XCTestCase {
 
         let allOpen = try context.fetch(FetchDescriptor<LocalTask>(predicate: #Predicate { !$0.isCompleted }))
         XCTAssertEqual(allOpen.count, 1, "Still exactly one open task")
+    }
+
+    /// Bug: "Zehnagel" resurrection — completed recurring task WITHOUT template
+    /// should NOT be repaired (user deliberately ended the series).
+    /// Bricht wenn: repairOrphanedRecurringSeries() erstellt Instanz ohne Template-Check.
+    @MainActor
+    func test_repairOrphaned_skipsSeriesWithDeletedTemplate() throws {
+        let container = try ModelContainer(for: LocalTask.self, configurations: .init(isStoredInMemoryOnly: true))
+        let context = container.mainContext
+        let groupID = "ended-series"
+
+        // Completed recurring task — NO template exists (user ended the series)
+        let completed = LocalTask(
+            title: "Zehnagel",
+            dueDate: Calendar.current.startOfDay(for: Date()),
+            recurrencePattern: "weekly",
+            recurrenceGroupID: groupID
+        )
+        completed.isCompleted = true
+        completed.completedAt = Date()
+        context.insert(completed)
+        try context.save()
+
+        // Verify: no template exists for this series
+        let template = RecurrenceService.findTemplate(groupID: groupID, in: context)
+        XCTAssertNil(template, "No template should exist (series was ended)")
+
+        // Run repair
+        let repaired = RecurrenceService.repairOrphanedRecurringSeries(in: context)
+
+        // Verify: NO new instance created (series was deliberately ended)
+        XCTAssertEqual(repaired, 0, "Should NOT repair series without template (user ended it)")
+
+        let openTasks = try context.fetch(FetchDescriptor<LocalTask>(
+            predicate: #Predicate { !$0.isCompleted }
+        ))
+        XCTAssertEqual(openTasks.count, 0, "No zombie task should be created")
     }
 
     /// Non-recurring completed tasks should be ignored.

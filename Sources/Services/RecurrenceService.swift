@@ -387,9 +387,9 @@ enum RecurrenceService {
         let recurringCompleted = completedTasks.filter { $0.recurrencePattern != "none" }
         guard !recurringCompleted.isEmpty else { return 0 }
 
-        // 2. Fetch all open tasks to find existing successors
+        // 2. Fetch all open instance tasks (excluding templates) to find existing successors
         let openDescriptor = FetchDescriptor<LocalTask>(
-            predicate: #Predicate<LocalTask> { !$0.isCompleted }
+            predicate: #Predicate<LocalTask> { !$0.isCompleted && !$0.isTemplate }
         )
         let openTasks = (try? modelContext.fetch(openDescriptor)) ?? []
 
@@ -412,6 +412,10 @@ enum RecurrenceService {
             seenGroupIDs.insert(groupID)
 
             guard !openGroupIDs.contains(groupID) else { continue }
+
+            // Only repair series that still have a template.
+            // If no template exists, user deliberately ended the series — don't resurrect.
+            guard findTemplate(groupID: groupID, in: modelContext) != nil else { continue }
 
             if let _ = createNextInstance(from: task, in: modelContext) {
                 repaired += 1
