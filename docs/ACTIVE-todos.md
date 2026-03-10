@@ -44,10 +44,21 @@
 - **Fix:** `PlanItem.dependentCount` Feld + `populateDependentCounts()` auf Array-Extension. iOS: BacklogView ruft nach jedem sync() auf. macOS: ContentView.scoreFor() + MacBacklogRow nutzen `dependentCount(for:)` Helper.
 - **Test:** `test_populateDependentCounts_boostsPriorityScore` GREEN
 
-### BUG-DEP-4: Blockierte Tasks nicht vor Aktionen geschuetzt
-- **Symptom:** Blockierte Tasks koennen via Swipe zu Next Up, via Inspector als erledigt markiert, oder FocusBlocks zugewiesen werden
-- **Fix:** Guards in Swipe-Actions, TaskInspector Status-Chips, FocusBlock-Zuweisung
+### BUG-DEP-4: Blockierte Tasks nicht vor Aktionen geschuetzt — IN PROGRESS
+- **Symptom:** Blockierte Tasks koennen via Inspector als erledigt/Next Up markiert, via Context Menu (macOS), oder FocusBlocks zugewiesen werden
+- **Analyse:** 6 ungeschuetzte Pfade identifiziert, 4 im Scope:
+  1. macOS TaskInspector "Erledigt" + "Next Up" Chips (HOCH)
+  2. Next Up Section zeigt blockierte Tasks mit Swipes (iOS + macOS) (HOCH)
+  3. macOS Context Menu "Als erledigt markieren" + "Zu Next Up" (HOCH)
+  4. FocusBlock-Zuweisung filtert blockierte Tasks nicht (MITTEL)
+- **Fix:** Guards in TaskInspector, nextUpTasks-Filter, Context Menu, TaskAssignmentView
+- **Dateien:** TaskInspector.swift, BacklogView.swift, ContentView.swift, TaskAssignmentView.swift
 - **Prioritaet:** Mittel
+
+### BUG-DEP-4b: Siri/Shortcuts + Keyboard Shortcut koennen blockierte Tasks erledigen
+- **Symptom:** CompleteTaskIntent (Siri) und Keyboard Shortcut (Cmd) haben keinen blockerTaskID-Guard
+- **Fix:** Guard in CompleteTaskIntent.perform() und ContentView.completeSelectedTasks()
+- **Prioritaet:** Niedrig (Edge Case, separates Ticket)
 
 ### BUG-DEP-5: 3-Wege zirkulaere Abhaengigkeiten moeglich
 - **Symptom:** A→B→C→A ist moeglich, weil Picker nur 1-Level Zirkularitaet prueft
@@ -55,7 +66,11 @@
 - **Prioritaet:** Niedrig (Edge Case, nur 1 Ebene erlaubt laut Spec)
 
 ### BUG-DEP-6: Swipe-Gesten in iOS Backlog kaputt — ERLEDIGT
-- **Fix:** Modifier-Kette korrekt aufgeteilt: `.swipeActions`/`.contextMenu`/`.listRowInsets` direkt am BacklogRow, `ForEach(blockedTasks)` als separater @ViewBuilder-Rueckgabewert
+- **Symptom:** Swipe-Gesten funktionierten nicht mehr in allen iOS Backlog-Views (Priority, Tier, Recent, Overdue)
+- **Root Cause:** `ForEach(blockedTasks)` stand zwischen BacklogRow und .swipeActions — Modifier haengen in @ViewBuilder am letzten Ausdruck
+- **Fix:** Modifier-Kette direkt an BacklogRow, ForEach danach. UI-Test-Richtungen korrigiert (swipeLeft/Right waren vertauscht).
+- **Dateien:** `Sources/Views/BacklogView.swift`, `FocusBloxUITests/BacklogSwipeActionsUITests.swift`
+- **Tests:** 4 UI Tests GREEN
 
 ---
 
