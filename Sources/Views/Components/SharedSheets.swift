@@ -253,30 +253,5 @@ struct EventCategorySheet: View {
             .buttonStyle(.plain)
             #endif
         }
-
-        if !event.isFocusBlock {
-            #if os(macOS)
-            Divider()
-            #endif
-            Button {
-                event.openInCalendarApp()
-                dismiss()
-            } label: {
-                HStack {
-                    Image(systemName: "calendar")
-                        .foregroundStyle(.blue)
-                        #if os(iOS)
-                        .frame(width: 30)
-                        #endif
-
-                    Text("In Kalender öffnen")
-                        .foregroundStyle(.primary)
-                }
-            }
-            .accessibilityIdentifier("openInCalendarButton")
-            #if os(macOS)
-            .buttonStyle(.plain)
-            #endif
-        }
     }
 }

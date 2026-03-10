@@ -85,11 +85,6 @@ struct PlanningView: View {
                             unscheduleEvent(event)
                         }
                     }
-                    if !event.isFocusBlock {
-                        Button("In Kalender öffnen") {
-                            event.openInCalendarApp()
-                        }
-                    }
                     Button("Löschen", role: .destructive) {
                         deleteEvent(event)
                     }

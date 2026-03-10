@@ -1,7 +1,0 @@
-TDD RED: CalendarDeepLinkTests — 2 compile errors
-
-CalendarDeepLinkTests.swift:22:25: error: value of type 'CalendarEvent' has no member 'calendarAppURL'
-CalendarDeepLinkTests.swift:47:25: error: value of type 'CalendarEvent' has no member 'calendarAppURL'
-
-** TEST FAILED **
-Testing cancelled because the build failed.
