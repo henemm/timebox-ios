@@ -479,6 +479,7 @@
 | ~~Bug 81~~ | ~~FocusBlock Task-Zuweisung verliert ersten Task~~ | ERLEDIGT | M | ~40k | 4 | ~290 |
 | ~~Bug 82~~ | ~~Erledigte Tasks — Suche funktioniert nicht~~ | ERLEDIGT | XS | ~5k | 1 | ~10 |
 | ~~Bug 87~~ | ~~QuickCapture Dialog schliesst nicht nach Speichern~~ | ERLEDIGT | XS | ~5k | 1 | ~15 |
+| ~~Bug 88~~ | ~~macOS MenuBar Timer zeigt Block-Dauer statt Task-Dauer~~ | ERLEDIGT | S | ~10k | 3 | ~30 |
 
 **Komplexitaet:** XS = halbe Stunde | S = 1 Session | M = 2-3 Sessions | L = halber Tag | XL = ganzer Tag+
 
@@ -486,7 +487,7 @@
 **Kritisch:** keine offenen kritischen Bugs
 **Teuerste Items:** #17 OrganizeMyDay (~150k), #14 NC Widget (~120k), #12 Enhanced Quick Capture (~120k)
 **WARTEND (Apple-Abhaengigkeit):** #20 ITB-F — Developer-APIs verfuegbar, wartet auf Siri On-Screen Awareness (iOS 26.5/27)
-**Zuletzt erledigt:** Bug 85-D Postpone falsches Ursprungsdatum (XS)
+**Zuletzt erledigt:** Bug 88 macOS MenuBar Timer zeigt Block-Dauer statt Task-Dauer (S)
 **Naechstes:** (offen)
 
 > **Dies ist das EINZIGE Backlog.** macOS-Features (MAC-xxx) stehen hier mit Verweis auf ihre Specs in `docs/specs/macos/`. Kein zweites Backlog.
@@ -682,6 +683,18 @@
 - **Dateien:** MenuBarIconState.swift (NEU), FocusBloxMacApp.swift, MenuBarView.swift, project.pbxproj
 - **Tests:** 10 Unit Tests (MenuBarIconStateTests), UI Test nicht anwendbar (NSStatusItem = SystemUIServer)
 - **Analyse:** `docs/artifacts/bug-mac-focusblock-menubar/analysis.md`
+
+### Bug 88: macOS MenuBar Timer zeigt Block-Dauer statt Task-Dauer (ERLEDIGT)
+- **Status:** ERLEDIGT
+- **Plattform:** macOS (nur MenuBar StatusItem)
+- **Symptom:** Timer in der Menuleiste zeigte die Restzeit des gesamten FocusBlocks (z.B. 40:00) statt der Restzeit des aktuellen Tasks (z.B. 5:00). iOS LiveActivity und macOS Popover zeigten bereits korrekt die Task-Restzeit.
+- **Root Cause:** `MenuBarIconState.from()` berechnete `block.endDate - now` (Block-Restzeit). `MenuBarController` hatte keinen SwiftData-Zugriff fuer Task-Dauern.
+- **Fix:**
+  - `MenuBarIconState.from()` erweitert um optionalen `taskEndDate: Date?` Parameter
+  - `MenuBarController` speichert `ModelContainer`, cached Task-Dauern alle 15s, berechnet Task-Endzeit via `TimerCalculator.plannedTaskEndDate()`
+- **Dateien:** MenuBarIconState.swift, FocusBloxMacApp.swift, MenuBarIconStateTests.swift (3 Dateien, ~30 LoC)
+- **Tests:** 13/13 gruen (3 neue Tests fuer taskEndDate-Parameter)
+- **Analyse:** `docs/artifacts/bug-menubar-timer-wrong/analysis.md`
 
 ### Bug 64: Kategorie-Icon auf Kalender-Events zu klein (ERLEDIGT)
 - **Status:** ERLEDIGT

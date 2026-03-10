@@ -11,7 +11,8 @@ enum MenuBarIconState: Equatable {
     /// - Parameters:
     ///   - block: The active FocusBlock (nil if no block active)
     ///   - now: Current timestamp (injected for testability)
-    static func from(block: FocusBlock?, now: Date) -> MenuBarIconState {
+    ///   - taskEndDate: Planned end date for the current task (nil = fall back to block end)
+    static func from(block: FocusBlock?, now: Date, taskEndDate: Date? = nil) -> MenuBarIconState {
         guard let block = block else { return .idle }
 
         // Check if block is currently active (now is between start and end)
@@ -23,8 +24,9 @@ enum MenuBarIconState: Equatable {
             return .allDone
         }
 
-        // Active with remaining time
-        let remaining = block.endDate.timeIntervalSince(now)
+        // Active with remaining time — use task end date if available, else block end
+        let endDate = taskEndDate ?? block.endDate
+        let remaining = endDate.timeIntervalSince(now)
         let seconds = max(0, Int(remaining))
         return .active(formatTimer(seconds))
     }

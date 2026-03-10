@@ -22,8 +22,10 @@ final class MenuBarController: NSObject {
     private var statusItem: NSStatusItem?
     private var popover: NSPopover?
     private var eventKitRepo: (any EventKitRepositoryProtocol)?
+    private var container: ModelContainer?
     private var iconTimer: Timer?
     private var cachedBlock: FocusBlock?
+    private var cachedTaskDurations: [(id: String, durationMinutes: Int)] = []
     private var lastFetchTime = Date.distantPast
     private static let fetchInterval: TimeInterval = 15
 
@@ -41,6 +43,7 @@ final class MenuBarController: NSObject {
 
     func setup(container: ModelContainer, eventKitRepository: any EventKitRepositoryProtocol) {
         self.eventKitRepo = eventKitRepository
+        self.container = container
 
         // Pre-set visible position on first launch so menu bar managers
         // (e.g. Hidden Bar) don't hide the icon in an unreachable tier.
@@ -84,9 +87,10 @@ final class MenuBarController: NSObject {
             lastFetchTime = now
             let blocks = try? eventKitRepo?.fetchFocusBlocks(for: now)
             cachedBlock = blocks?.first { $0.isActive }
+            refreshTaskDurations()
         }
 
-        let state = MenuBarIconState.from(block: cachedBlock, now: now)
+        let state = MenuBarIconState.from(block: cachedBlock, now: now, taskEndDate: currentTaskEndDate(now: now))
         guard let button = statusItem?.button else { return }
 
         switch state {
@@ -100,6 +104,36 @@ final class MenuBarController: NSObject {
             button.title = ""
             button.image = Self.allDoneImage
         }
+    }
+
+    private func refreshTaskDurations() {
+        guard let block = cachedBlock, let container else {
+            cachedTaskDurations = []
+            return
+        }
+        let context = ModelContext(container)
+        let descriptor = FetchDescriptor<LocalTask>()
+        guard let allTasks = try? context.fetch(descriptor) else {
+            cachedTaskDurations = []
+            return
+        }
+        cachedTaskDurations = block.taskIDs.compactMap { taskID in
+            guard let task = allTasks.first(where: { $0.id == taskID }) else { return nil }
+            return (id: taskID, durationMinutes: task.estimatedDuration ?? 15)
+        }
+    }
+
+    private func currentTaskEndDate(now: Date) -> Date? {
+        guard let block = cachedBlock, !cachedTaskDurations.isEmpty else { return nil }
+        guard let currentTaskID = block.taskIDs.first(where: { !block.completedTaskIDs.contains($0) }) else {
+            return nil
+        }
+        return TimerCalculator.plannedTaskEndDate(
+            blockStartDate: block.startDate,
+            blockEndDate: block.endDate,
+            taskDurations: cachedTaskDurations,
+            currentTaskID: currentTaskID
+        )
     }
 
     @objc private func togglePopover() {

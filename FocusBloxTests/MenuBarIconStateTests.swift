@@ -113,6 +113,75 @@ final class MenuBarIconStateTests: XCTestCase {
         }
     }
 
+    // MARK: - Task End Date Tests (Bug: MenuBar shows block time instead of task time)
+
+    /// Verhalten: taskEndDate angegeben → Timer zeigt Task-Restzeit, nicht Block-Restzeit
+    /// Bricht wenn: MenuBarIconState.from() den taskEndDate-Parameter ignoriert
+    func test_iconState_withTaskEndDate_showsTaskRemainingTime() {
+        let now = Date()
+        let block = FocusBlock(
+            id: "multi-task",
+            title: "Multi Task Block",
+            startDate: now.addingTimeInterval(-600),  // started 10 min ago
+            endDate: now.addingTimeInterval(2400),     // ends in 40 min
+            taskIDs: ["t1", "t2", "t3"],
+            completedTaskIDs: []
+        )
+        // Task ends in 5 minutes (not 40 like the block)
+        let taskEndDate = now.addingTimeInterval(300)
+
+        let state = MenuBarIconState.from(block: block, now: now, taskEndDate: taskEndDate)
+        if case .active(let text) = state {
+            XCTAssertEqual(text, "5:00", "Should show task remaining (5 min), not block remaining (40 min)")
+        } else {
+            XCTFail("Expected .active state, got \(state)")
+        }
+    }
+
+    /// Verhalten: taskEndDate nil → Fallback auf Block-Restzeit (Rueckwaertskompatibilitaet)
+    /// Bricht wenn: nil-Handling fuer taskEndDate fehlt
+    func test_iconState_withoutTaskEndDate_showsBlockRemainingTime() {
+        let now = Date()
+        let block = FocusBlock(
+            id: "fallback",
+            title: "Fallback Block",
+            startDate: now.addingTimeInterval(-600),
+            endDate: now.addingTimeInterval(600),
+            taskIDs: ["t1"],
+            completedTaskIDs: []
+        )
+
+        let state = MenuBarIconState.from(block: block, now: now, taskEndDate: nil)
+        if case .active(let text) = state {
+            XCTAssertEqual(text, "10:00", "Without taskEndDate, should fall back to block remaining (10 min)")
+        } else {
+            XCTFail("Expected .active state, got \(state)")
+        }
+    }
+
+    /// Verhalten: taskEndDate in Vergangenheit → Timer zeigt 0:00 (Task ueberfaellig)
+    /// Bricht wenn: Negative Werte nicht geclamped werden
+    func test_iconState_withOverdueTaskEndDate_showsZero() {
+        let now = Date()
+        let block = FocusBlock(
+            id: "overdue",
+            title: "Overdue Block",
+            startDate: now.addingTimeInterval(-1800),
+            endDate: now.addingTimeInterval(600),
+            taskIDs: ["t1", "t2"],
+            completedTaskIDs: []
+        )
+        // Task end date is 2 min in the past (overdue)
+        let taskEndDate = now.addingTimeInterval(-120)
+
+        let state = MenuBarIconState.from(block: block, now: now, taskEndDate: taskEndDate)
+        if case .active(let text) = state {
+            XCTAssertEqual(text, "0:00", "Overdue task should show 0:00")
+        } else {
+            XCTFail("Expected .active state, got \(state)")
+        }
+    }
+
     // MARK: - Timer Formatter Tests
 
     /// Bricht wenn: formatTimer Logik aendert sich

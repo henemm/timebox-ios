@@ -1,0 +1,12 @@
+TDD RED: MenuBarIconState tests fail because taskEndDate parameter does not exist yet.
+
+Build errors:
+- Extra argument 'taskEndDate' in call (3x)
+- 'nil' requires a contextual type
+
+Tests:
+- test_iconState_withTaskEndDate_showsTaskRemainingTime: COMPILE ERROR
+- test_iconState_withoutTaskEndDate_showsBlockRemainingTime: COMPILE ERROR
+- test_iconState_withOverdueTaskEndDate_showsZero: COMPILE ERROR
+
+Date: 2026-03-10 15:30:50
