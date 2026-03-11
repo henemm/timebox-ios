@@ -17,6 +17,8 @@ struct DailyReviewView: View {
     @State private var calendarEvents: [CalendarEvent] = []
     @State private var isLoading = true
     @State private var reviewMode: ReviewMode = .today
+    @State private var monsterCoach = MonsterCoach.load()
+    @AppStorage("coachModeEnabled") private var coachModeEnabled: Bool = false
     private let statsCalculator = ReviewStatsCalculator()
 
     // MARK: - Computed Properties
@@ -156,6 +158,11 @@ struct DailyReviewView: View {
                     .pickerStyle(.segmented)
                     .padding(.horizontal)
                     .padding(.top, 8)
+
+                    if coachModeEnabled {
+                        MonsterStatusView(coach: monsterCoach)
+                            .padding(.horizontal)
+                    }
 
                     if isLoading {
                         ProgressView()

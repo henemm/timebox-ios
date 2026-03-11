@@ -28,6 +28,7 @@ struct SettingsView: View {
     @State private var writableCalendars: [EKCalendar] = []
     @State private var allReminderLists: [ReminderListInfo] = []
     @AppStorage("siriTipCompleteTaskVisible") private var showCompleteTaskTip = true
+    @AppStorage("coachModeEnabled") private var coachModeEnabled: Bool = false
 
     var body: some View {
         NavigationStack {
@@ -150,6 +151,16 @@ struct SettingsView: View {
                     } footer: {
                         Text("Ergänzt fehlende Task-Attribute (Wichtigkeit, Dringlichkeit, Kategorie) automatisch aus dem Titel.")
                     }
+                }
+
+                // Section: Monster Coach
+                Section {
+                    Toggle("Monster Coach", isOn: $coachModeEnabled)
+                        .accessibilityIdentifier("coachModeToggle")
+                } header: {
+                    Text("Monster Coach")
+                } footer: {
+                    Text("Aktiviert deinen persönlichen Monster-Trainingspartner im Review-Tab.")
                 }
 
                 // Section 1: Target Calendar

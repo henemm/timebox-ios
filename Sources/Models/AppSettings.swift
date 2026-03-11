@@ -51,4 +51,9 @@ final class AppSettings: ObservableObject {
 
     /// Whether AI-powered task scoring is enabled
     @AppStorage("aiScoringEnabled") var aiScoringEnabled: Bool = true
+
+    // MARK: - Monster Coach
+
+    /// Whether Monster Coach mode is enabled
+    @AppStorage("coachModeEnabled") var coachModeEnabled: Bool = false
 }

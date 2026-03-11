@@ -6,6 +6,20 @@
 
 ---
 
+## ERLEDIGT: Feature — Monster Coach Phase 1 (Foundation)
+
+- **Anforderung:** Daten-Foundation fuer den Monster Coach als emotionalen Begleiter
+- **Umfang:**
+  - `Discipline` Enum (4 Disziplinen: Konsequenz, Ausdauer, Mut, Fokus) mit classify-Heuristik
+  - `MonsterCoach` Model (XP pro Disziplin, Evolution-Level 0-4, UserDefaults-Persistenz)
+  - `MonsterStatusView` (kompakte Karte mit Monster-Icon, XP-Balken, Evolution-Level)
+  - Coach-Modus Toggle in Settings (`coachModeEnabled` in AppSettings)
+  - Integration im Review-Tab (oberhalb Content, nur wenn Coach aktiviert)
+- **Tests:** 7 Unit Tests + 3 UI Tests (alle GREEN)
+- **Dateien:** 3 neue (Discipline.swift, MonsterCoach.swift, MonsterStatusView.swift) + 3 geaendert (AppSettings, SettingsView, DailyReviewView)
+
+---
+
 ## IN PROGRESS: Feature — Task-Abhaengigkeiten (Blocker)
 
 - **Anforderung:** Tasks koennen eine Finish-to-Start Abhaengigkeit bekommen. Task B kann erst bearbeitet werden wenn Task A (Blocker) erledigt ist. Blockierte Tasks werden eingerueckt + dimmed dargestellt. Blocker-Tasks bekommen Ranking-Boost.
