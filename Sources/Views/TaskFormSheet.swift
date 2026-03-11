@@ -514,10 +514,12 @@ struct TaskFormSheet: View {
             let intervalValue: Int? = recurrencePattern.requiresCustomConfig ? customInterval : nil
 
             // Save blocker dependency directly (not part of callback chain)
-            let editID = editTask.id
-            let descriptor = FetchDescriptor<LocalTask>(predicate: #Predicate<LocalTask> { $0.id == editID })
-            if let localTask = try? modelContext.fetch(descriptor).first {
-                localTask.blockerTaskID = blockerTaskID
+            // Use stored $0.uuid property (not computed $0.id) for SwiftData predicate
+            if let editUUID = UUID(uuidString: editTask.id) {
+                let descriptor = FetchDescriptor<LocalTask>(predicate: #Predicate { $0.uuid == editUUID })
+                if let localTask = try? modelContext.fetch(descriptor).first {
+                    localTask.blockerTaskID = blockerTaskID
+                }
             }
 
             onSave?(

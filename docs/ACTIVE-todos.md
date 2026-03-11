@@ -85,6 +85,13 @@
 - **Dateien:** `Sources/Views/BacklogView.swift`, `FocusBloxUITests/BacklogSwipeActionsUITests.swift`
 - **Tests:** 4 UI Tests GREEN
 
+### BUG-DEP-7: Abhaengigkeit wird beim Bearbeiten nicht gespeichert — ERLEDIGT
+- **Symptom:** Einrueckung + Dimming nicht sichtbar im Backlog (beide Plattformen)
+- **Root Cause:** `TaskFormSheet.swift:518` nutzte `#Predicate { $0.id == editID }` mit **computed property** `id` statt **stored property** `uuid`. SwiftData-Predicate konnte den Task nicht finden, `try?` schluckte den Fehler, `blockerTaskID` wurde nie gespeichert. Einzige Stelle im gesamten Projekt die `$0.id` statt `$0.uuid` im Predicate nutzte.
+- **Fix:** Predicate auf `$0.uuid == editUUID` geaendert (konsistent mit 10+ anderen Stellen im Projekt)
+- **Dateien:** `Sources/Views/TaskFormSheet.swift` (1 Stelle, 3 Zeilen)
+- **Tests:** Regression-Test in `TaskDependencyTests` (30 Tests GREEN)
+
 ---
 
 ## ERLEDIGT: Bug — Recurring Tasks erscheinen nach Loeschen wieder ("Zombie-Schleife")

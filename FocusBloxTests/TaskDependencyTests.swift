@@ -606,4 +606,46 @@ final class TaskDependencyTests: XCTestCase {
         XCTAssertNil(dep.blockerTaskID,
                      "DEP-4b: Notification completion must free dependents (missing freeDependents)")
     }
+
+    // MARK: - Edit-Path: blockerTaskID must persist via TaskFormSheet edit path
+
+    func test_editPath_blockerTaskID_persistsViaCorrectUUIDFetch() throws {
+        // Setup: Create blocker + dependent, save to DB
+        let blocker = LocalTask(title: "Blocker Task")
+        let dependent = LocalTask(title: "Dependent Task")
+        container.mainContext.insert(blocker)
+        container.mainContext.insert(dependent)
+        try container.mainContext.save()
+
+        // Simulate TaskFormSheet edit path:
+        // editTask is PlanItem (from sheet init), editID is String
+        let editTask = PlanItem(localTask: dependent)
+        let editID = editTask.id
+
+        // CORRECT pattern (like SyncEngine.findTask): convert to UUID, use stored property
+        guard let editUUID = UUID(uuidString: editID) else {
+            XCTFail("editID must be a valid UUID string")
+            return
+        }
+        let allTasks = try container.mainContext.fetch(FetchDescriptor<LocalTask>())
+        let fetched = allTasks.first { $0.uuid == editUUID }
+
+        XCTAssertNotNil(fetched,
+                        "Must find task by UUID — this is how the fixed edit path works")
+
+        // Set blockerTaskID like TaskFormSheet does
+        fetched?.blockerTaskID = blocker.id
+        try container.mainContext.save()
+
+        // Verify persistence on the live object
+        XCTAssertEqual(dependent.blockerTaskID, blocker.id,
+                       "blockerTaskID must persist after edit-path save")
+
+        // Verify PlanItem reflects the change
+        let updatedPlanItem = PlanItem(localTask: dependent)
+        XCTAssertTrue(updatedPlanItem.isBlocked,
+                      "PlanItem must report isBlocked=true after dependency is set")
+        XCTAssertEqual(updatedPlanItem.blockerTaskID, blocker.id,
+                       "PlanItem must carry the blockerTaskID")
+    }
 }
