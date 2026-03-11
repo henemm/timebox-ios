@@ -37,8 +37,9 @@ struct TaskActions {
 // MARK: - Content View (Three-Column Layout)
 
 struct ContentView: View {
-    @Query(sort: \LocalTask.createdAt, order: .reverse)
-    private var tasks: [LocalTask]
+    // Bug 90: @Query doesn't reliably refresh after CloudKit imports.
+    // Using @State + manual fetch (same pattern as iOS BacklogView).
+    @State private var tasks: [LocalTask] = []
 
     @Environment(\.modelContext) private var modelContext
 
@@ -78,6 +79,23 @@ struct ContentView: View {
     @State private var editSeriesMode: Bool = false
     @State private var taskToEndSeries: LocalTask?
 
+
+    // MARK: - Data Refresh (Bug 90: replaces @Query for reliable CloudKit sync)
+
+    /// Fetches all tasks from the persistent store, forcing context merge first.
+    /// Called on initial load, after CloudKit sync, and after local add/delete.
+    private func refreshTasks() {
+        do {
+            // Force context merge with persistent store (Bug 38 pattern)
+            try modelContext.save()
+            let descriptor = FetchDescriptor<LocalTask>(
+                sortBy: [SortDescriptor(\LocalTask.createdAt, order: .reverse)]
+            )
+            tasks = try modelContext.fetch(descriptor)
+        } catch {
+            print("[ContentView] refreshTasks failed: \(error)")
+        }
+    }
 
     // MARK: - Search Filter
     private func matchesSearch(_ task: LocalTask) -> Bool {
@@ -564,18 +582,18 @@ struct ContentView: View {
             }
         }
         .task {
+            refreshTasks()
             cloudKitMonitor.triggerSync()
         }
         .onChange(of: cloudKitMonitor.remoteChangeCount) { _, _ in
-            // Bug 38 pattern: Force context merge after CloudKit import.
-            // @Query reads from ModelContext cache which is stale after remote import.
-            // save() with no pending changes invalidates the cache and merges persistent store.
+            // Bug 90: Manual re-fetch after CloudKit import (replaces unreliable @Query).
             Task {
                 try? await Task.sleep(for: .milliseconds(200))
-                try? modelContext.save()
+                refreshTasks()
                 // Enrich remote tasks (Watch, Share Extension, Siri) that arrived without attributes
                 let enrichment = SmartTaskEnrichmentService(modelContext: modelContext)
-                _ = await enrichment.enrichAllTbdTasks()
+                let enriched = await enrichment.enrichAllTbdTasks()
+                if enriched > 0 { refreshTasks() }
             }
         }
         .confirmationDialog(
@@ -743,6 +761,7 @@ struct ContentView: View {
 
             logger.info("Done — \(result.imported.count) imported, \(result.skippedDuplicates) skipped, \(result.enrichedRecurrence) enriched, \(result.markedComplete) marked complete, \(result.markCompleteFailures) mark-complete failures")
 
+            refreshTasks()
             importStatusMessage = importFeedbackMessage(from: result)
         } catch {
             logger.error("Failed: \(error.localizedDescription)")
@@ -784,6 +803,7 @@ struct ContentView: View {
         Task {
             let taskSource = LocalTaskSource(modelContext: modelContext)
             if let newTask = try? await taskSource.createTask(title: title, taskType: "") {
+                refreshTasks()
                 selectedTasks = [newTask.uuid]
             }
         }
@@ -827,12 +847,14 @@ struct ContentView: View {
             }
         }
         try? modelContext.save()
+        refreshTasks()
         selectedTasks.removeAll()
     }
 
     private func deleteSingleTask(_ task: LocalTask) {
         modelContext.delete(task)
         try? modelContext.save()
+        refreshTasks()
         selectedTasks.removeAll()
     }
 
@@ -847,6 +869,7 @@ struct ContentView: View {
             }
         }
         try? modelContext.save()
+        refreshTasks()
         selectedTasks.removeAll()
     }
 
@@ -856,6 +879,7 @@ struct ContentView: View {
         let taskSource = LocalTaskSource(modelContext: modelContext)
         let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
         try? syncEngine.deleteRecurringTemplate(groupID: groupID)
+        refreshTasks()
         selectedTasks.removeAll()
     }
 

@@ -185,10 +185,11 @@
 - **Symptom:** User klickt "NextUp" in Watch-Notification → Task erscheint auf keiner Plattform in NextUp. iOS/macOS zeigen unterschiedliche NextUp-Tasks (Timing-Problem, loest sich nach Refresh).
 - **Root Cause (1. Fix, Commit 5202817):** Watch App hatte keinen `UNUserNotificationCenterDelegate` registriert.
 - **Root Cause (2. Fix, Bug 90):** Delegate wurde in `.onAppear` registriert statt in `init()`. Wenn watchOS die App fuer eine Notification-Action startet, wird `didReceive` aufgerufen BEVOR SwiftUI die View rendert → Delegate war nil → Action still verworfen. Gleicher Bug auf iOS (funktionierte nur zufaellig wegen schnellerem App-Start).
-- **Fix:** Delegate-Registrierung von `.onAppear` nach `init()` verschoben (Watch + iOS). Error-Logging in WatchNotificationDelegate (statt try? stilles Schlucken). Postpone-Test gefixt (falscher Action-Identifier).
-- **Blast Radius:** Alle Watch-Notification-Actions + iOS-Notification-Actions betroffen
+- **Fix (Symptom A):** Delegate-Registrierung von `.onAppear` nach `init()` verschoben (Watch + iOS). Error-Logging in WatchNotificationDelegate (statt try? stilles Schlucken). Postpone-Test gefixt (falscher Action-Identifier).
+- **Fix (Symptom B):** macOS ContentView: `@Query` durch `@State` + manuelles `refreshTasks()` ersetzt. `@Query` aktualisiert sich nicht zuverlaessig nach CloudKit-Imports. Dasselbe Pattern wie iOS BacklogView, wo CloudKit-Sync nachweislich funktioniert.
+- **Blast Radius:** Alle Watch-Notification-Actions + iOS-Notification-Actions + macOS CloudKit-Sync betroffen
 - **Tests:** 8 Unit Tests gruen (WatchNotificationDelegateTests), Postpone-Test korrigiert
-- **Dateien:** FocusBloxWatchApp.swift, WatchNotificationDelegate.swift, FocusBloxApp.swift, WatchNotificationDelegateTests.swift
+- **Dateien:** FocusBloxWatchApp.swift, WatchNotificationDelegate.swift, FocusBloxApp.swift, WatchNotificationDelegateTests.swift, ContentView.swift (macOS)
 
 ---
 
