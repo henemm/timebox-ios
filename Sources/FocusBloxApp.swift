@@ -30,6 +30,15 @@ struct FocusBloxApp: App {
     init() {
         // Register shared state for Interactive Snippets (iOS 26)
         AppDependencyManager.shared.add(dependency: QuickCaptureState())
+
+        // Register notification delegate in init() — BEFORE any notification action is dispatched.
+        // Apple docs: "You must assign your delegate before your app finishes launching."
+        // Using .onAppear was too late when iOS launched the app for a notification action.
+        let container = sharedModelContainer
+        NotificationService.registerDueDateActions()
+        let delegate = NotificationActionDelegate(container: container)
+        UNUserNotificationCenter.current().delegate = delegate
+        _notificationDelegate = State(initialValue: delegate)
     }
 
     var sharedModelContainer: ModelContainer = {
@@ -284,11 +293,7 @@ struct FocusBloxApp: App {
                 }
                 // Register App Shortcuts with Siri so voice commands are discoverable
                 FocusBloxShortcuts.updateAppShortcutParameters()
-                // Register interactive notification actions + delegate
-                NotificationService.registerDueDateActions()
-                let delegate = NotificationActionDelegate(container: sharedModelContainer)
-                UNUserNotificationCenter.current().delegate = delegate
-                notificationDelegate = delegate
+                // Notification delegate already registered in init()
                 // Request calendar/reminders permission on app launch (Bug 8 fix)
                 requestPermissionsOnLaunch()
                 // Check for CC trigger (App Group flag)

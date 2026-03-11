@@ -5,6 +5,7 @@ import UserNotifications
 @main
 struct FocusBloxWatch_Watch_AppApp: App {
     private static let appGroupID = "group.com.henning.focusblox"
+    /// Strong reference keeps delegate alive (UNUserNotificationCenter.delegate is weak)
     @State private var notificationDelegate: WatchNotificationDelegate?
 
     var sharedModelContainer: ModelContainer = {
@@ -48,15 +49,22 @@ struct FocusBloxWatch_Watch_AppApp: App {
         }
     }()
 
+    // Register notification delegate in init() — BEFORE any notification action is dispatched.
+    // Apple docs: "You must assign your delegate before your app finishes launching."
+    // Using .onAppear is too late: when watchOS launches the app for a notification action,
+    // didReceive is called before SwiftUI renders the view.
+    init() {
+        let container = sharedModelContainer
+        WatchNotificationDelegate.registerActions()
+        let delegate = WatchNotificationDelegate(container: container)
+        UNUserNotificationCenter.current().delegate = delegate
+        _notificationDelegate = State(initialValue: delegate)
+        print("[Watch] Notification delegate registered in init()")
+    }
+
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .onAppear {
-                    WatchNotificationDelegate.registerActions()
-                    let delegate = WatchNotificationDelegate(container: sharedModelContainer)
-                    UNUserNotificationCenter.current().delegate = delegate
-                    notificationDelegate = delegate
-                }
         }
         .modelContainer(sharedModelContainer)
     }

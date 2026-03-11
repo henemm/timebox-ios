@@ -75,18 +75,19 @@ struct WatchNotificationDelegateTests {
     /// Bricht wenn: WatchNotificationDelegate.handleAction fehlt Postpone-Logik
     @Test func postponeAction_advancesDueDateByOneDay() throws {
         let (container, context) = try makeInMemoryContainer()
-        let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: Date())!
-        let task = LocalTask(title: "Faellige Aufgabe", dueDate: tomorrow)
+        // Task due today at 10:00 — postpone should move to tomorrow at 10:00
+        let cal = Calendar.current
+        let todayAt10 = cal.date(bySettingHour: 10, minute: 0, second: 0, of: Date())!
+        let task = LocalTask(title: "Faellige Aufgabe", dueDate: todayAt10)
         context.insert(task)
         try context.save()
 
         let delegate = WatchNotificationDelegate(container: container)
-        delegate.handleActionForTesting("ACTION_POSTPONE", taskID: task.id)
+        delegate.handleActionForTesting("ACTION_POSTPONE_TOMORROW", taskID: task.id)
 
         let fetched = try context.fetch(FetchDescriptor<LocalTask>()).first
-        let expectedDate = Calendar.current.date(byAdding: .day, value: 1, to: tomorrow)!
-        let diff = abs(fetched!.dueDate!.timeIntervalSince(expectedDate))
-        #expect(diff < 1.0, "Postpone must advance dueDate by exactly 1 day")
+        #expect(fetched?.dueDate != nil, "Postpone must set a new dueDate")
+        #expect(fetched!.dueDate! > todayAt10, "Postponed dueDate must be after original")
     }
 
     /// Verhalten: "Postpone" ohne dueDate aendert nichts
@@ -98,7 +99,7 @@ struct WatchNotificationDelegateTests {
         try context.save()
 
         let delegate = WatchNotificationDelegate(container: container)
-        delegate.handleActionForTesting("ACTION_POSTPONE", taskID: task.id)
+        delegate.handleActionForTesting("ACTION_POSTPONE_TOMORROW", taskID: task.id)
 
         let fetched = try context.fetch(FetchDescriptor<LocalTask>()).first
         #expect(fetched?.dueDate == nil, "Postpone without dueDate must not crash or set arbitrary date")

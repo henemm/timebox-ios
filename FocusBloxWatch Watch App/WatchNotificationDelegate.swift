@@ -70,11 +70,17 @@ final class WatchNotificationDelegate: NSObject, @preconcurrency UNUserNotificat
 
     private func handleAction(_ actionID: String, taskID: String) {
         let context = container.mainContext
-        guard let taskUUID = UUID(uuidString: taskID) else { return }
+        guard let taskUUID = UUID(uuidString: taskID) else {
+            print("[Watch Notification] ERROR: Invalid taskID format: \(taskID)")
+            return
+        }
         let descriptor = FetchDescriptor<LocalTask>(
             predicate: #Predicate { $0.uuid == taskUUID }
         )
-        guard let task = try? context.fetch(descriptor).first else { return }
+        guard let task = try? context.fetch(descriptor).first else {
+            print("[Watch Notification] ERROR: Task \(taskID) not found in Watch store (CloudKit sync pending?)")
+            return
+        }
 
         switch actionID {
         case Self.actionNextUp:
@@ -129,7 +135,12 @@ final class WatchNotificationDelegate: NSObject, @preconcurrency UNUserNotificat
         }
 
         task.modifiedAt = Date()
-        try? context.save()
+        do {
+            try context.save()
+            print("[Watch Notification] Action \(actionID) saved for task \(taskID)")
+        } catch {
+            print("[Watch Notification] ERROR: save failed for action \(actionID) on task \(taskID): \(error)")
+        }
     }
 
     // MARK: - Testing Support
