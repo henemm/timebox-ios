@@ -80,13 +80,16 @@
 - **Tests:** 10 Unit Tests + 6 UI Tests — alle GRUEN
 - **Spec:** `openspec/changes/monster-coach-phase3a/proposal.md`
 
-### Phase 3b: Smart Notifications — Tagesbegleitung (Must)
-- **Abhaengigkeit:** Braucht `IntentionEvaluationService` aus Phase 3c (gleiche Logik: "Ist die Intention erfuellt?")
-- Notifications feuern NUR bei Luecken zwischen Intention und Handlung (Details: User Story Section "Smart Notifications")
-- Stille-Regel: Sobald Intention erfuellt → keine weiteren Notifications
+### Phase 3b: Smart Notifications — Tagesbegleitung (Must) — ERLEDIGT ✓
+- Notifications feuern NUR bei Luecken zwischen Intention und Handlung
+- Stille-Regel: Sobald Intention erfuellt → keine weiteren Notifications (Foreground-Check)
 - Survival = absolute Ruhe (keine Nudges, niemals)
-- Settings: An/Aus, Max pro Tag (1/2/3), Zeitfenster (von/bis Picker)
-- **Dateien (geschaetzt):** NotificationService (Scheduling), IntentionEvaluationService (aus 3c), SettingsView (neue Controls)
+- Settings: An/Aus Toggle, Max pro Tag (1/2/3 Segmented Picker), Zeitfenster (Von/Bis DatePicker)
+- Neuer `IntentionEvaluationService` (stateless, pure functions) — wird auch von Phase 3c gebraucht
+- 7 Gap-Typen mit deutschen Nudge-Texten
+- **Geaenderte Dateien:** IntentionEvaluationService.swift (NEU), NotificationService.swift, AppSettings.swift, SettingsView.swift, MorningIntentionView.swift, FocusBloxApp.swift
+- **Tests:** 27 Unit Tests + 5 UI Tests — alle GRUEN
+- **Spec:** `openspec/changes/monster-coach-phase3b/proposal.md`
 
 ### Phase 3c: Abend-Spiegel mit automatischer Auswertung (Must)
 - Karte im Review-Tab (`DailyReviewView`) ab 18 Uhr, oberhalb der bestehenden Stats

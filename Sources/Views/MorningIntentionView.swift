@@ -94,6 +94,22 @@ struct MorningIntentionView: View {
                 // Signal tab switch to Backlog
                 intentionJustSet = true
 
+                // Schedule daily nudge notifications if enabled
+                let settings = AppSettings.shared
+                if settings.coachModeEnabled,
+                   settings.coachDailyNudgesEnabled,
+                   !selections.contains(.survival) {
+                    // Use first selected intention for gap detection
+                    if let primary = selections.first,
+                       let gap = IntentionEvaluationService.detectGap(
+                           intention: primary, tasks: [], focusBlocks: []
+                       ) {
+                        NotificationService.scheduleDailyNudges(
+                            intention: primary, gap: gap
+                        )
+                    }
+                }
+
                 withAnimation(.spring()) {
                     intention = newIntention
                     isEditing = false

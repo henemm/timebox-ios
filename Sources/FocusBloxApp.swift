@@ -327,6 +327,8 @@ struct FocusBloxApp: App {
                     } else {
                         NotificationService.cancelIntentionReminder()
                     }
+                    // Cancel daily nudges if intention fulfilled
+                    checkAndCancelFulfilledNudges()
                 }
                 if newPhase == .background {
                     Task { await deferredCompletion.flushAll() }
@@ -381,6 +383,28 @@ struct FocusBloxApp: App {
             NotificationService.rescheduleAllDueDateNotifications(tasks: tasksWithDueDate)
         } catch {
             print("Failed to fetch tasks for due date notifications: \(error)")
+        }
+    }
+
+    /// Cancel daily nudges if the today's intention is already fulfilled.
+    private func checkAndCancelFulfilledNudges() {
+        guard settings.coachModeEnabled, settings.coachDailyNudgesEnabled else { return }
+        let intention = DailyIntention.load()
+        guard intention.isSet, let primary = intention.selections.first else { return }
+        guard primary != .survival else { return }
+
+        let context = sharedModelContainer.mainContext
+        do {
+            let tasks = try context.fetch(FetchDescriptor<LocalTask>())
+            // FocusBlocks require calendar access — use empty array for lightweight check.
+            // Full block evaluation can be added when CalendarService is accessible here.
+            if IntentionEvaluationService.isFulfilled(
+                intention: primary, tasks: tasks, focusBlocks: []
+            ) {
+                NotificationService.cancelDailyNudges()
+            }
+        } catch {
+            print("Failed to check intention fulfillment: \(error)")
         }
     }
 

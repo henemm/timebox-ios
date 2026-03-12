@@ -32,6 +32,10 @@ struct SettingsView: View {
     @AppStorage("coachIntentionReminderEnabled") private var coachIntentionReminderEnabled: Bool = true
     @AppStorage("coachIntentionReminderHour") private var coachIntentionReminderHour: Int = 7
     @AppStorage("coachIntentionReminderMinute") private var coachIntentionReminderMinute: Int = 0
+    @AppStorage("coachDailyNudgesEnabled") private var coachDailyNudgesEnabled: Bool = true
+    @AppStorage("coachDailyNudgesMaxCount") private var coachDailyNudgesMaxCount: Int = 2
+    @AppStorage("coachNudgeWindowStartHour") private var coachNudgeWindowStartHour: Int = 10
+    @AppStorage("coachNudgeWindowEndHour") private var coachNudgeWindowEndHour: Int = 18
 
     var body: some View {
         NavigationStack {
@@ -173,11 +177,40 @@ struct SettingsView: View {
                             )
                             .accessibilityIdentifier("intentionTimePicker")
                         }
+
+                        Toggle("Tages-Erinnerungen", isOn: $coachDailyNudgesEnabled)
+                            .accessibilityIdentifier("coachDailyNudgesToggle")
+
+                        if coachDailyNudgesEnabled {
+                            Picker("Max. Erinnerungen", selection: $coachDailyNudgesMaxCount) {
+                                Text("1").tag(1)
+                                Text("2").tag(2)
+                                Text("3").tag(3)
+                            }
+                            .pickerStyle(.segmented)
+                            .accessibilityIdentifier("coachNudgesMaxCountPicker")
+
+                            DatePicker(
+                                "Von",
+                                selection: nudgeWindowStartBinding,
+                                displayedComponents: .hourAndMinute
+                            )
+                            .accessibilityIdentifier("coachNudgeWindowStartPicker")
+
+                            DatePicker(
+                                "Bis",
+                                selection: nudgeWindowEndBinding,
+                                displayedComponents: .hourAndMinute
+                            )
+                            .accessibilityIdentifier("coachNudgeWindowEndPicker")
+                        }
                     }
                 } header: {
                     Text("Monster Coach")
                 } footer: {
-                    if coachModeEnabled {
+                    if coachModeEnabled && coachDailyNudgesEnabled {
+                        Text("Erinnert dich tagsüber, wenn deine Intention noch nicht gelebt wird.")
+                    } else if coachModeEnabled {
                         Text("Erinnert dich morgens daran, deine Tages-Intention zu setzen.")
                     } else {
                         Text("Aktiviert deinen persönlichen Monster-Trainingspartner im Review-Tab.")
@@ -295,6 +328,36 @@ struct SettingsView: View {
                 let comps = Calendar.current.dateComponents([.hour, .minute], from: newDate)
                 coachIntentionReminderHour = comps.hour ?? 7
                 coachIntentionReminderMinute = comps.minute ?? 0
+            }
+        )
+    }
+
+    private var nudgeWindowStartBinding: Binding<Date> {
+        Binding(
+            get: {
+                var comps = DateComponents()
+                comps.hour = coachNudgeWindowStartHour
+                comps.minute = 0
+                return Calendar.current.date(from: comps) ?? Date()
+            },
+            set: { newDate in
+                let comps = Calendar.current.dateComponents([.hour], from: newDate)
+                coachNudgeWindowStartHour = comps.hour ?? 10
+            }
+        )
+    }
+
+    private var nudgeWindowEndBinding: Binding<Date> {
+        Binding(
+            get: {
+                var comps = DateComponents()
+                comps.hour = coachNudgeWindowEndHour
+                comps.minute = 0
+                return Calendar.current.date(from: comps) ?? Date()
+            },
+            set: { newDate in
+                let comps = Calendar.current.dateComponents([.hour], from: newDate)
+                coachNudgeWindowEndHour = comps.hour ?? 18
             }
         )
     }

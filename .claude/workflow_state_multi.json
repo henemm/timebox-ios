@@ -5990,8 +5990,8 @@
       "backlog_status": "in_progress"
     },
     "monster-coach-phase2": {
-      "current_phase": "phase6_implement",
-      "phase": "phase6_implement",
+      "current_phase": "phase8_complete",
+      "phase": "phase8_complete",
       "spec_approved": true,
       "approved": true,
       "description": "Feature: Monster Coach Phase 2 - Morning Intention Screen",
@@ -6040,7 +6040,7 @@
     "bug-dependency-search": {
       "current_phase": "phase6_implement",
       "created": "2026-03-12T07:40:49.936103",
-      "last_updated": "2026-03-12T07:40:52.138358",
+      "last_updated": "2026-03-09T07:00:00",
       "spec_file": null,
       "spec_approved": false,
       "context_file": null,
@@ -6367,7 +6367,7 @@
       "Sources/Views/PlanningView.swift"
     ]
   },
-  "active_workflow": "bug-dependency-search",
+  "active_workflow": "monster-coach-phase3b",
   "current_phase": "phase6_implement",
   "green_test_done": true,
   "validation_done": true

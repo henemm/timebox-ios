@@ -7,6 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		IEVS01BUILD0000001 /* IntentionEvaluationServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = IEVS01FILEREF00001 /* IntentionEvaluationServiceTests.swift */; };
+		NDNG01BUILD0000001 /* NotificationDailyNudgeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = NDNG01FILEREF00001 /* NotificationDailyNudgeTests.swift */; };
+		CNSU01BUILD0000001 /* CoachNotificationSettingsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CNSU01FILEREF00001 /* CoachNotificationSettingsUITests.swift */; };
+		IEVS02BUILD0000001 /* IntentionEvaluationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = IEVS02FILEREF00001 /* IntentionEvaluationService.swift */; };
+		IEVS03BUILD0000001 /* IntentionEvaluationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = IEVS02FILEREF00001 /* IntentionEvaluationService.swift */; };
 		03A94D15FBA2530D8C629546 /* BacklogRowRedesignUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54C8A326C1D84FA7A3BD27A8 /* BacklogRowRedesignUITests.swift */; };
 		062C2C62A78FAAB837F02EA6 /* EventKitRepositoryEnvironment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F276F67582A827E523D8ED6 /* EventKitRepositoryEnvironment.swift */; };
 		0B30790C22063E68AD1A34AE /* SpotlightIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E693153139C30E62D300D923 /* SpotlightIntegrationTests.swift */; };
@@ -711,6 +716,10 @@
 		DFSRT02FILEREF001 /* DeferredSortController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeferredSortController.swift; sourceTree = "<group>"; };
 		DISC01FILEREF00001 /* Discipline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Discipline.swift; sourceTree = "<group>"; };
 		DSCT01FILEREF00001 /* DisciplineTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DisciplineTests.swift; sourceTree = "<group>"; };
+		IEVS01FILEREF00001 /* IntentionEvaluationServiceTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = IntentionEvaluationServiceTests.swift; sourceTree = "<group>"; };
+		NDNG01FILEREF00001 /* NotificationDailyNudgeTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NotificationDailyNudgeTests.swift; sourceTree = "<group>"; };
+		CNSU01FILEREF00001 /* CoachNotificationSettingsUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CoachNotificationSettingsUITests.swift; sourceTree = "<group>"; };
+		IEVS02FILEREF00001 /* IntentionEvaluationService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = IntentionEvaluationService.swift; sourceTree = "<group>"; };
 		DSGNSYS01FILE00001 /* DesignSystemTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignSystemTests.swift; sourceTree = "<group>"; };
 		DSGNSYS02FILE00001 /* DesignSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignSystem.swift; sourceTree = "<group>"; };
 		DUEDN01FILE0000001 /* DueDateNotificationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DueDateNotificationTests.swift; sourceTree = "<group>"; };
@@ -1230,6 +1239,7 @@
 				F9BA59D11A5C274B3D9F4469 /* BlockerPickerSearchUITests.swift */,
 				DE59459EB563B50137F303E8 /* DependencyIndentUITests.swift */,
 				FAD0E9CA71F3D40E44246594 /* IntentionFilterUITests.swift */,
+				CNSU01FILEREF00001 /* CoachNotificationSettingsUITests.swift */,
 			);
 			path = FocusBloxUITests;
 			sourceTree = "<group>";
@@ -1486,6 +1496,8 @@
 				DSCT01FILEREF00001 /* DisciplineTests.swift */,
 				MINT03FILEREF00001 /* MorningIntentionTests.swift */,
 				1DF9F4F40D442421734251AE /* IntentionFilterTests.swift */,
+				IEVS01FILEREF00001 /* IntentionEvaluationServiceTests.swift */,
+				NDNG01FILEREF00001 /* NotificationDailyNudgeTests.swift */,
 			);
 			path = FocusBloxTests;
 			sourceTree = SOURCE_ROOT;
@@ -1528,6 +1540,7 @@
 				CKSM02FILE000001 /* CloudKitSyncMonitor.swift */,
 				76D00C9F307A1EC64537A9C7 /* TaskSources */,
 				350DD1256F45268992636DEA /* NotificationService.swift */,
+				IEVS02FILEREF00001 /* IntentionEvaluationService.swift */,
 				NOTIFACT01FREF001 /* NotificationActionDelegate.swift */,
 				RECRSVC02FILE0001 /* RecurrenceService.swift */,
 				60DE55FC2A796A308478E2B9 /* MenuBarIconState.swift */,
@@ -2238,6 +2251,7 @@
 				TSKDTL01BUILDFILE0001 /* TaskDetailSheet.swift in Sources */,
 				1800BB7020E3D6044A62475A /* DailyReviewView.swift in Sources */,
 				A4A8AF1E9B1B715FE913F6F4 /* NotificationService.swift in Sources */,
+				IEVS02BUILD0000001 /* IntentionEvaluationService.swift in Sources */,
 				NOTIFACT01BUILD001 /* NotificationActionDelegate.swift in Sources */,
 				INTENT01BUILD00001 /* TaskEnums.swift in Sources */,
 				INTENT02BUILD00001 /* TaskEntity.swift in Sources */,
@@ -2353,6 +2367,7 @@
 				9BE17D13495121E5FCD4665B /* BlockerPickerSearchUITests.swift in Sources */,
 				4D87251CF1F054F848940F82 /* DependencyIndentUITests.swift in Sources */,
 				324335EAD3A707ABE5F3BEFE /* IntentionFilterUITests.swift in Sources */,
+				CNSU01BUILD0000001 /* CoachNotificationSettingsUITests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2448,6 +2463,8 @@
 				DSCT01BUILD0000001 /* DisciplineTests.swift in Sources */,
 				MINT03BUILD0000001 /* MorningIntentionTests.swift in Sources */,
 				E8B70B017D973054B649FFE7 /* IntentionFilterTests.swift in Sources */,
+				IEVS01BUILD0000001 /* IntentionEvaluationServiceTests.swift in Sources */,
+				NDNG01BUILD0000001 /* NotificationDailyNudgeTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2554,6 +2571,7 @@
 				SMARTENR00BUILD002 /* SmartTaskEnrichmentService.swift in Sources */,
 				CTC1SERV0BUILD0002 /* TaskTitleEngine.swift in Sources */,
 				NOTIF02BUILD000001 /* NotificationService.swift in Sources */,
+				IEVS03BUILD0000001 /* IntentionEvaluationService.swift in Sources */,
 				NOTIFACT01BUILD002 /* NotificationActionDelegate.swift in Sources */,
 				MAC024BUILD00000001 /* EditFocusBlockSheet.swift in Sources */,
 				MAC024BUILD00000002 /* FocusBlockTasksSheet.swift in Sources */,

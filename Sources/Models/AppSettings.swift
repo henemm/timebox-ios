@@ -65,4 +65,16 @@ final class AppSettings: ObservableObject {
 
     /// Minute for morning intention reminder (0-59)
     @AppStorage("coachIntentionReminderMinute") var coachIntentionReminderMinute: Int = 0
+
+    /// Whether daily intention nudge notifications are enabled
+    @AppStorage("coachDailyNudgesEnabled") var coachDailyNudgesEnabled: Bool = true
+
+    /// Maximum number of daily nudge notifications (1, 2 or 3)
+    @AppStorage("coachDailyNudgesMaxCount") var coachDailyNudgesMaxCount: Int = 2
+
+    /// Hour for nudge window start (0-23)
+    @AppStorage("coachNudgeWindowStartHour") var coachNudgeWindowStartHour: Int = 10
+
+    /// Hour for nudge window end (0-23)
+    @AppStorage("coachNudgeWindowEndHour") var coachNudgeWindowEndHour: Int = 18
 }

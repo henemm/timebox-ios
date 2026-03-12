@@ -450,6 +450,127 @@ enum NotificationService {
             .removePendingNotificationRequests(withIdentifiers: [intentionReminderID])
     }
 
+    // MARK: - Coach Daily Nudges
+
+    private static nonisolated(unsafe) let dailyNudgePrefix = "coach-nudge-"
+
+    /// Build notification requests for daily intention nudges.
+    /// Distributes maxCount notifications evenly within the time window.
+    /// Returns empty array for survival or if window has passed.
+    nonisolated static func buildDailyNudgeRequests(
+        intention: IntentionOption,
+        gap: IntentionGap,
+        windowStart: Date,
+        windowEnd: Date,
+        maxCount: Int,
+        now: Date = Date()
+    ) -> [UNNotificationRequest] {
+        guard intention != .survival else { return [] }
+        guard windowEnd > now else { return [] }
+
+        let bodyText = nudgeText(for: gap)
+        let effectiveStart = max(windowStart, now)
+        let windowDuration = windowEnd.timeIntervalSince(effectiveStart)
+        guard windowDuration > 0 else { return [] }
+
+        let spacing = windowDuration / Double(maxCount + 1)
+        var requests: [UNNotificationRequest] = []
+
+        for i in 0..<maxCount {
+            let fireDate = effectiveStart.addingTimeInterval(spacing * Double(i + 1))
+            guard fireDate > now else { continue }
+
+            let content = UNMutableNotificationContent()
+            content.title = intention.label
+            content.body = bodyText
+            content.sound = .default
+
+            let trigger = UNTimeIntervalNotificationTrigger(
+                timeInterval: fireDate.timeIntervalSince(now),
+                repeats: false
+            )
+
+            let request = UNNotificationRequest(
+                identifier: "\(dailyNudgePrefix)\(i)",
+                content: content,
+                trigger: trigger
+            )
+            requests.append(request)
+        }
+
+        return requests
+    }
+
+    /// Schedule daily nudge notifications based on current settings.
+    static func scheduleDailyNudges(intention: IntentionOption, gap: IntentionGap) {
+        let settings = AppSettings.shared
+        let cal = Calendar.current
+        let now = Date()
+
+        let startComps = DateComponents(
+            hour: settings.coachNudgeWindowStartHour, minute: 0
+        )
+        let endComps = DateComponents(
+            hour: settings.coachNudgeWindowEndHour, minute: 0
+        )
+
+        guard let windowStart = cal.nextDate(
+            after: cal.startOfDay(for: now),
+            matching: startComps, matchingPolicy: .nextTime
+        ),
+        let windowEnd = cal.nextDate(
+            after: cal.startOfDay(for: now),
+            matching: endComps, matchingPolicy: .nextTime
+        ) else { return }
+
+        let requests = buildDailyNudgeRequests(
+            intention: intention,
+            gap: gap,
+            windowStart: windowStart,
+            windowEnd: windowEnd,
+            maxCount: settings.coachDailyNudgesMaxCount,
+            now: now
+        )
+
+        let center = UNUserNotificationCenter.current()
+        for request in requests {
+            center.add(request)
+        }
+    }
+
+    /// Cancel all pending daily nudge notifications.
+    static func cancelDailyNudges() {
+        let center = UNUserNotificationCenter.current()
+        center.getPendingNotificationRequests { requests in
+            let nudgeIDs = requests
+                .filter { $0.identifier.hasPrefix(dailyNudgePrefix) }
+                .map(\.identifier)
+            if !nudgeIDs.isEmpty {
+                center.removePendingNotificationRequests(withIdentifiers: nudgeIDs)
+            }
+        }
+    }
+
+    /// Notification body text for each gap type.
+    nonisolated private static func nudgeText(for gap: IntentionGap) -> String {
+        switch gap {
+        case .noBhagBlockCreated:
+            return "Du wolltest das grosse Ding anpacken. Wann legst du los?"
+        case .bhagTaskNotStarted:
+            return "Dein BHAG wartet noch."
+        case .noFocusBlockPlanned:
+            return "Kein Block geplant. Du wolltest fokussiert bleiben."
+        case .tasksOutsideBlocks:
+            return "Tasks ohne Block erledigt. Willst du einen erstellen?"
+        case .onlySingleCategory:
+            return "Bisher nur Arbeit. Wie waer's mit was fuer dich?"
+        case .noLearningTask:
+            return "Du wolltest was Neues lernen. Hast du schon was im Auge?"
+        case .noConnectionTask:
+            return "Du wolltest fuer andere da sein heute."
+        }
+    }
+
     // MARK: - Cancel All
 
     /// Cancel all task notifications
