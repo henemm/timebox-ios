@@ -17,7 +17,6 @@ struct DailyReviewView: View {
     @State private var calendarEvents: [CalendarEvent] = []
     @State private var isLoading = true
     @State private var reviewMode: ReviewMode = .today
-    @State private var monsterCoach = MonsterCoach.load()
     @AppStorage("coachModeEnabled") private var coachModeEnabled: Bool = false
     private let statsCalculator = ReviewStatsCalculator()
 
@@ -161,11 +160,6 @@ struct DailyReviewView: View {
 
                     if coachModeEnabled && reviewMode == .today {
                         MorningIntentionView()
-                            .padding(.horizontal)
-                    }
-
-                    if coachModeEnabled {
-                        MonsterStatusView(coach: monsterCoach)
                             .padding(.horizontal)
                     }
 

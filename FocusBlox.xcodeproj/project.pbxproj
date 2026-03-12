@@ -19,6 +19,7 @@
 		1D22359BADEDFEF0CE024E7B /* RemindersQuickEditUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6010F2B272B933C827183F0A /* RemindersQuickEditUITests.swift */; };
 		1F8A2A35834A2A5AFFB0D683 /* TimelineCollisionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D1A9F10EFE384592B5CDA71 /* TimelineCollisionTests.swift */; };
 		22AA189C61A4045FE2B36B64 /* DurationBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDD319A3F7DEE05F6A8885FC /* DurationBadge.swift */; };
+		25CC4B80B3B8983B7FC4CF9C /* BlockerPickerSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8323E8E3E49804475266E66A /* BlockerPickerSheet.swift */; };
 		262C4B292E1B067D9A637C1C /* ITB_G_SiriTipUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB1AD4FECCC4DD0F13D886B5 /* ITB_G_SiriTipUITests.swift */; };
 		2D85A50AEA4DE4D67F40EA5D /* SpotlightIndexingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FEFD473342A7BED5A2A93AF /* SpotlightIndexingService.swift */; };
 		2EF5DE158DB80CCCB409F66F /* SiriTipPersistenceUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAED8A7A7959F354879F7615 /* SiriTipPersistenceUITests.swift */; };
@@ -187,6 +188,7 @@
 		DUEDT03BUILD000001 /* DueDateFormattingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DUEDT03FILE0000001 /* DueDateFormattingTests.swift */; };
 		DUEDT04BUILD000001 /* DueDateTimeDisplayTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DUEDT04FILE0000001 /* DueDateTimeDisplayTests.swift */; };
 		DYNISLD01BUILD0001 /* DynamicIslandUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DYNISLD01FILE00001 /* DynamicIslandUITests.swift */; };
+		E338397EBDBBEEA357D5A910 /* BlockerPickerSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8323E8E3E49804475266E66A /* BlockerPickerSheet.swift */; };
 		E388ADA5C322C89B3687240F /* FocusBlockTaskCountTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EABF765F6113A4B974211ACE /* FocusBlockTaskCountTests.swift */; };
 		E6DF69A28B0DB868B330DADD /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5F22CE94E29A523114817BF /* ContentView.swift */; };
 		E907CB03C20C1B55A48C4B1B /* BacklogRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92133F2683BB9B90566D7646 /* BacklogRow.swift */; };
@@ -247,12 +249,7 @@
 		MINT04BUILD0000001 /* MorningIntentionUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = MINT04FILEREF00001 /* MorningIntentionUITests.swift */; };
 		MIVW01BUILD0000001 /* MorningIntentionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = MIVW01FILEREF00001 /* MorningIntentionView.swift */; };
 		MIVW02BUILD0000001 /* MorningIntentionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = MIVW01FILEREF00001 /* MorningIntentionView.swift */; };
-		MNCO01BUILD0000001 /* MonsterCoach.swift in Sources */ = {isa = PBXBuildFile; fileRef = MNCO01FILEREF00001 /* MonsterCoach.swift */; };
-		MNCO02BUILD0000001 /* MonsterCoach.swift in Sources */ = {isa = PBXBuildFile; fileRef = MNCO01FILEREF00001 /* MonsterCoach.swift */; };
-		MNSTR01BUILD00001 /* MonsterCoachTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = MNSTR01FILE000001 /* MonsterCoachTests.swift */; };
-		MNSTR02BUILD00001 /* MonsterCoachUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = MNSTR02FILE000001 /* MonsterCoachUITests.swift */; };
-		MNSV01BUILD0000001 /* MonsterStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = MNSV01FILEREF00001 /* MonsterStatusView.swift */; };
-		MNSV02BUILD0000001 /* MonsterStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = MNSV01FILEREF00001 /* MonsterStatusView.swift */; };
+		DSCT01BUILD0000001 /* DisciplineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DSCT01FILEREF00001 /* DisciplineTests.swift */; };
 		NOTIF02BUILD000001 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 350DD1256F45268992636DEA /* NotificationService.swift */; };
 		NOTIFACT01BUILD001 /* NotificationActionDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = NOTIFACT01FREF001 /* NotificationActionDelegate.swift */; };
 		NOTIFACT01BUILD002 /* NotificationActionDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = NOTIFACT01FREF001 /* NotificationActionDelegate.swift */; };
@@ -606,6 +603,7 @@
 		781B8F9B8D98DCC35B898300 /* WidgetRelevanceTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WidgetRelevanceTests.swift; sourceTree = "<group>"; };
 		7D81A830A7874C023E289830 /* NextUpTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NextUpTests.swift; sourceTree = "<group>"; };
 		821E6E3E951900DF99190196 /* HourRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HourRow.swift; sourceTree = "<group>"; };
+		8323E8E3E49804475266E66A /* BlockerPickerSheet.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BlockerPickerSheet.swift; sourceTree = "<group>"; };
 		8459789309884DC1920AC464 /* EventStoreChangeNotificationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventStoreChangeNotificationTests.swift; sourceTree = "<group>"; };
 		84C370C5BEDCC25CA912E79F /* GapFinder.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GapFinder.swift; sourceTree = "<group>"; };
 		8537E6312F33871F310A843F /* PlanningView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanningView.swift; sourceTree = "<group>"; };
@@ -756,10 +754,7 @@
 		MINT03FILEREF00001 /* MorningIntentionTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MorningIntentionTests.swift; sourceTree = "<group>"; };
 		MINT04FILEREF00001 /* MorningIntentionUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MorningIntentionUITests.swift; sourceTree = "<group>"; };
 		MIVW01FILEREF00001 /* MorningIntentionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MorningIntentionView.swift; sourceTree = "<group>"; };
-		MNCO01FILEREF00001 /* MonsterCoach.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonsterCoach.swift; sourceTree = "<group>"; };
-		MNSTR01FILE000001 /* MonsterCoachTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MonsterCoachTests.swift; sourceTree = "<group>"; };
-		MNSTR02FILE000001 /* MonsterCoachUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MonsterCoachUITests.swift; sourceTree = "<group>"; };
-		MNSV01FILEREF00001 /* MonsterStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonsterStatusView.swift; sourceTree = "<group>"; };
+		DSCT01FILEREF00001 /* DisciplineTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DisciplineTests.swift; sourceTree = "<group>"; };
 		NOTIFACT01FREF001 /* NotificationActionDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationActionDelegate.swift; sourceTree = "<group>"; };
 		NOTSNZ01FILE00001 /* NotificationSnoozeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationSnoozeTests.swift; sourceTree = "<group>"; };
 		NXLP01PVREF0001 /* TaskPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskPreviewView.swift; sourceTree = "<group>"; };
@@ -1225,7 +1220,8 @@
 				3BE6C24124E626E4489ECDFA /* Bug81StaleBlockAssignmentUITests.swift */,
 				DEFCMP01FILE00001 /* DeferredCompletionUITests.swift */,
 				BKGCMP01FILE00001 /* BacklogCompletionUITests.swift */,
-				MNSTR02FILE000001 /* MonsterCoachUITests.swift */,
+
+
 				MINT04FILEREF00001 /* MorningIntentionUITests.swift */,
 				F9BA59D11A5C274B3D9F4469 /* BlockerPickerSearchUITests.swift */,
 			);
@@ -1311,7 +1307,8 @@
 				RECRPAT02FILE0001 /* RecurrencePattern.swift */,
 				TLI01FILEREF00001 /* TimelineItem.swift */,
 				DISC01FILEREF00001 /* Discipline.swift */,
-				MNCO01FILEREF00001 /* MonsterCoach.swift */,
+
+
 				MINT01FILEREF00001 /* DailyIntention.swift */,
 			);
 			path = Models;
@@ -1355,8 +1352,10 @@
 				74598614EAF4B9965981C7CB /* FocusBlockTasksSheet.swift */,
 				SETCMP01GROUP00001 /* Components */,
 				14CEC8C14442ABE7F65B5EE8 /* ShakeGestureModifier.swift */,
-				MNSV01FILEREF00001 /* MonsterStatusView.swift */,
+
+
 				MIVW01FILEREF00001 /* MorningIntentionView.swift */,
+				8323E8E3E49804475266E66A /* BlockerPickerSheet.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -1482,7 +1481,7 @@
 				F4564A875E99AE5CFAB35875 /* FocusBlockAssignmentTests.swift */,
 				EABF765F6113A4B974211ACE /* FocusBlockTaskCountTests.swift */,
 				8B1F5BC646304B206E7A16D1 /* CalendarDeepLinkTests.swift */,
-				MNSTR01FILE000001 /* MonsterCoachTests.swift */,
+				DSCT01FILEREF00001 /* DisciplineTests.swift */,
 				MINT03FILEREF00001 /* MorningIntentionTests.swift */,
 			);
 			path = FocusBloxTests;
@@ -2187,8 +2186,10 @@
 				C2ED3FE95B938EB35CB3C24C /* LocalTask.swift in Sources */,
 				TASKCAT02BUILD00001 /* TaskCategory.swift in Sources */,
 				DISC01BUILD0000001 /* Discipline.swift in Sources */,
-				MNCO01BUILD0000001 /* MonsterCoach.swift in Sources */,
-				MNSV01BUILD0000001 /* MonsterStatusView.swift in Sources */,
+
+
+
+
 				MINT01BUILD0000001 /* DailyIntention.swift in Sources */,
 				MIVW01BUILD0000001 /* MorningIntentionView.swift in Sources */,
 				RVWSTAT01BUILD00001 /* ReviewStatsCalculator.swift in Sources */,
@@ -2259,6 +2260,7 @@
 				2D85A50AEA4DE4D67F40EA5D /* SpotlightIndexingService.swift in Sources */,
 				7F3072E8F964D76F3A908E76 /* WidgetRelevanceCalculator.swift in Sources */,
 				0ED7EC4A998FAB585C67F8E6 /* MenuBarIconState.swift in Sources */,
+				E338397EBDBBEEA357D5A910 /* BlockerPickerSheet.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2348,7 +2350,8 @@
 				AAF3C0B9F1D9D79682D3680F /* Bug81StaleBlockAssignmentUITests.swift in Sources */,
 				DEFCMP01BUILD0001 /* DeferredCompletionUITests.swift in Sources */,
 				BKGCMP01BUILD0001 /* BacklogCompletionUITests.swift in Sources */,
-				MNSTR02BUILD00001 /* MonsterCoachUITests.swift in Sources */,
+
+
 				MINT04BUILD0000001 /* MorningIntentionUITests.swift in Sources */,
 				9BE17D13495121E5FCD4665B /* BlockerPickerSearchUITests.swift in Sources */,
 			);
@@ -2443,7 +2446,7 @@
 				36D240E1BAF93B48AAE8A9BC /* FocusBlockAssignmentTests.swift in Sources */,
 				E388ADA5C322C89B3687240F /* FocusBlockTaskCountTests.swift in Sources */,
 				5155F66E588A8366FE0E6D38 /* CalendarDeepLinkTests.swift in Sources */,
-				MNSTR01BUILD00001 /* MonsterCoachTests.swift in Sources */,
+				DSCT01BUILD0000001 /* DisciplineTests.swift in Sources */,
 				MINT03BUILD0000001 /* MorningIntentionTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2510,8 +2513,10 @@
 				TLL01MACBLD00001 /* TimelineLayout.swift in Sources */,
 				TASKCAT01BUILD00001 /* TaskCategory.swift in Sources */,
 				DISC02BUILD0000001 /* Discipline.swift in Sources */,
-				MNCO02BUILD0000001 /* MonsterCoach.swift in Sources */,
-				MNSV02BUILD0000001 /* MonsterStatusView.swift in Sources */,
+
+
+
+
 				MINT02BUILD0000001 /* DailyIntention.swift in Sources */,
 				MIVW02BUILD0000001 /* MorningIntentionView.swift in Sources */,
 				CATBDG02BUILD0002 /* CategoryIconBadge.swift in Sources */,
@@ -2564,6 +2569,7 @@
 				AD52DB9608DDF4562B67279F /* MenuBarIconState.swift in Sources */,
 				99A9D9F812F3D5E2E99489C1 /* SpotlightIndexingService.swift in Sources */,
 				A056E12CD65C0F6401860BDB /* CalendarEventTransfer.swift in Sources */,
+				25CC4B80B3B8983B7FC4CF9C /* BlockerPickerSheet.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

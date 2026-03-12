@@ -149,17 +149,26 @@ Haugs Vier-in-einem-Perspektive teilt das Leben in gleichwertige Bereiche. Focus
 
 ## Abgeleitete Features
 
-| Feature | Priorität | Status |
+| Feature | Prioritaet | Status |
 |---------|-----------|--------|
-| Morning Intention Screen | Must | Backlog |
-| Monster Character System | Must | Backlog |
-| Coach-Modus Toggle | Must | Backlog |
-| Task-Disziplin-Zuordnung (Grün/Grau/Rot/Blau) | Must | Backlog |
+| Morning Intention Screen | Must | ERLEDIGT (Phase 2) |
+| Coach-Modus Toggle | Must | ERLEDIGT (Phase 1) |
+| Task-Disziplin-Zuordnung (Konsequenz/Ausdauer/Mut/Fokus) | Must | ERLEDIGT (Phase 1) |
 | Evening Reflection Screen (Abend-Spiegel) | Must | Backlog |
-| Monster Evolution über Zeit | Should | Backlog |
+| Monster Character System (Persoenlichkeit, Verhalten) | Must | Backlog |
 | Lebensbalance-Visualisierung (Haug 4-in-1) | Should | Backlog |
-| Disziplin-Wachstums-Tracking | Could | Backlog |
 | Balance-Erinnerungen | Could | Backlog |
+
+## Implementierungs-Notizen
+
+### Phase 1 XP/Evolution-System — ENTFERNT (2026-03-12)
+
+Phase 1 hat ein Gamification-System implementiert (XP-Punkte pro Disziplin, Evolution-Levels Ei→Baby→Junior→Erwachsen→Meister, MonsterStatusView mit XP-Balken) das den Anti-Patterns dieser User Story direkt widerspricht ("keine XP, Levels, Achievements").
+
+Henning hat das im Dialog korrigiert: "Es geht nicht um XP sondern darum, dass ich abends gelobt werde und worauf ich mit Stolz zurueckblicken kann." Das System wurde entfernt.
+
+**Was bleibt:** Discipline Enum (Task-Klassifizierung), Coach-Modus Toggle, Morning Intention.
+**Was entfernt wurde:** MonsterCoach Model (XP/Evolution), MonsterStatusView (XP-Balken).
 
 ---
 *Ermittelt im JTBD-Dialog am 2026-03-11*

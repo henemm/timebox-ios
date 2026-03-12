@@ -21,17 +21,39 @@
 
 ---
 
-## ERLEDIGT: Feature — Monster Coach Phase 1 (Foundation)
+## ERLEDIGT: Cleanup — XP/Evolution-System entfernt (widersprach User Story)
 
-- **Anforderung:** Daten-Foundation fuer den Monster Coach als emotionalen Begleiter
-- **Umfang:**
-  - `Discipline` Enum (4 Disziplinen: Konsequenz, Ausdauer, Mut, Fokus) mit classify-Heuristik
-  - `MonsterCoach` Model (XP pro Disziplin, Evolution-Level 0-4, UserDefaults-Persistenz)
-  - `MonsterStatusView` (kompakte Karte mit Monster-Icon, XP-Balken, Evolution-Level)
-  - Coach-Modus Toggle in Settings (`coachModeEnabled` in AppSettings)
-  - Integration im Review-Tab (oberhalb Content, nur wenn Coach aktiviert)
-- **Tests:** 7 Unit Tests + 3 UI Tests (alle GREEN)
-- **Dateien:** 3 neue (Discipline.swift, MonsterCoach.swift, MonsterStatusView.swift) + 3 geaendert (AppSettings, SettingsView, DailyReviewView)
+- **Grund:** Phase 1 hat ein Gamification-System gebaut (XP, Levels, Evolution Ei→Meister) das der User Story explizit widerspricht: "Keine XP, Levels, Achievements". Henning: "Es geht nicht um XP sondern darum, dass ich abends gelobt werde und worauf ich mit Stolz zurueckblicken kann."
+- **Was BLEIBT:**
+  - `Discipline.swift` — Task-Klassifizierung (Konsequenz, Ausdauer, Mut, Fokus) ist gewollt
+  - `coachModeEnabled` Toggle + Morning Intention + Reminder — alles Phase 2, korrekt
+  - "Mein Tag" Tab-Name bei aktivem Coach
+- **Was WEG muss (Code):**
+  - [ ] `MonsterCoach.swift` — LOESCHEN (XP-Dict, Evolution-Levels, Persistence)
+  - [ ] `MonsterStatusView.swift` — LOESCHEN (XP-Balken, Evolution-Anzeige)
+  - [ ] `MonsterCoachTests.swift` — LOESCHEN (Tests fuer XP/Evolution)
+  - [ ] `MonsterCoachUITests.swift` — LOESCHEN (UI Tests fuer MonsterStatusView)
+  - [ ] `DailyReviewView.swift` — `monsterCoach` State + `MonsterStatusView` Block entfernen
+  - [ ] `project.pbxproj` — Geloeschte Files aus Build-Targets entfernen
+- **Was WEG muss (Docs):**
+  - [ ] `ACTIVE-todos.md` — Phase 1 Eintrag korrigieren (als ENTFERNT markieren)
+  - [ ] `monster-coach.md` User Story — Feature-Tabelle aktualisieren (Monster Evolution → entfernt)
+  - [ ] `MEMORY.md` — Falls XP/Evolution erwaehnt wird, aktualisieren
+- **Dateien:** 4 loeschen + 2 modifizieren + 3 Docs aktualisieren
+- **Tests:** Discipline-Tests aus MonsterCoachTests.swift in eigene Datei extrahieren (6 Tests behalten)
+
+---
+
+## ENTFERNT: Feature — Monster Coach Phase 1 (Foundation) ⚠️ XP/Evolution WIDERSPRICHT User Story
+
+- **Problem:** Hat XP-Punkte, Evolution-Levels (Ei→Meister) und Gamification gebaut — obwohl die User Story explizit sagt: "Keine XP, Levels, Achievements"
+- **Was entfernt wird:** MonsterCoach Model, MonsterStatusView, zugehoerige Tests
+- **Was bleibt:** Discipline Enum (Task-Klassifizierung), Coach-Modus Toggle, Settings-Integration
+- **Urspruenglicher Umfang:**
+  - `Discipline` Enum (4 Disziplinen) ← BLEIBT
+  - `MonsterCoach` Model (XP, Evolution) ← WIRD ENTFERNT
+  - `MonsterStatusView` (XP-Balken) ← WIRD ENTFERNT
+  - Coach-Modus Toggle in Settings ← BLEIBT
 
 ---
 
@@ -1039,6 +1061,14 @@
 ---
 
 ## Erledigte Features & Bugs (Archiv)
+
+### 2026-03-12: XP/Evolution-System entfernt (widersprach User Story)
+- Commit: `refactor: XP/Evolution-System entfernt — widerspricht User Story Anti-Pattern "keine XP, Levels, Achievements"`
+- Geloescht: MonsterCoach.swift, MonsterStatusView.swift, MonsterCoachTests.swift, MonsterCoachUITests.swift
+- Behalten: Discipline.swift (Task-Klassifizierung), Coach-Modus Toggle, Morning Intention
+- Extrahiert: DisciplineTests.swift (4 Classify-Tests aus MonsterCoachTests)
+- Files: 4 geloescht + 1 neu + 3 modifiziert
+- Tests: 4 Discipline + 16 MorningIntention + 6 UI = 26 Tests, alle GREEN
 
 ### 2026-03-12: Monster Coach Phase 2 — Morning Intention Screen
 - Commit: `feat: Monster Coach Phase 2 — Morning Intention Screen mit 6 Tages-Intentionen`
