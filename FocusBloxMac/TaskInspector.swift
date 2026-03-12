@@ -19,6 +19,7 @@ struct TaskInspector: View {
     private var availableTasks: [LocalTask]
 
     @State private var showDeleteConfirmation = false
+    @State private var showBlockerPicker = false
 
     var body: some View {
         ScrollView {
@@ -172,15 +173,20 @@ struct TaskInspector: View {
                         .font(.headline)
                         .foregroundStyle(.secondary)
 
-                    Picker("Abhängig von", selection: blockerBinding) {
-                        Text("Keine").tag(String?.none)
-                        ForEach(blockerCandidates, id: \.id) { candidate in
-                            Text(candidate.title)
-                                .lineLimit(1)
-                                .tag(Optional(candidate.id))
+                    Button {
+                        showBlockerPicker = true
+                    } label: {
+                        HStack {
+                            Text("Abhängig von")
+                            Spacer()
+                            Text(blockerDisplayName)
+                                .foregroundStyle(.secondary)
+                            Image(systemName: "chevron.right")
+                                .font(.caption)
+                                .foregroundStyle(.tertiary)
                         }
                     }
-                    .accessibilityIdentifier("blockerPicker")
+                    .accessibilityIdentifier("blockerPickerButton")
 
                     if task.blockerTaskID != nil {
                         Text("Kann erst bearbeitet werden, wenn der übergeordnete Task erledigt ist.")
@@ -190,6 +196,12 @@ struct TaskInspector: View {
                 }
                 .padding()
                 .background(RoundedRectangle(cornerRadius: 10).fill(.quaternary))
+                .sheet(isPresented: $showBlockerPicker) {
+                    BlockerPickerSheet(
+                        candidates: blockerCandidates,
+                        selectedBlockerID: blockerBinding
+                    )
+                }
 
                 // MARK: - Status Section
                 VStack(alignment: .leading, spacing: 12) {
@@ -251,6 +263,11 @@ struct TaskInspector: View {
     }
 
     // MARK: - Blocker Helpers
+
+    private var blockerDisplayName: String {
+        guard let id = task.blockerTaskID else { return "Keine" }
+        return blockerCandidates.first(where: { $0.id == id })?.title ?? "Keine"
+    }
 
     private var blockerCandidates: [LocalTask] {
         availableTasks.filter { candidate in

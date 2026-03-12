@@ -1063,50 +1063,22 @@
 
 ---
 
-## OFFEN: Feature — Blocker-Picker mit Suchfunktion
+## ERLEDIGT: Feature — Blocker-Picker mit Suchfunktion
 
 - **Anforderung:** Der Auswahldialog fuer abhaengige Tasks (Blocker) soll statt eines langen Dropdown-Menues ein Searchable Sheet mit alphabetischer Sortierung zeigen.
 - **Plattformen:** iOS + macOS
-- **Aktueller Stand:** Implementation FERTIG, UI Tests SCHEITERN am Simulator
+- **Status:** DONE — 4/4 UI Tests GRUEN
 
-### Was bereits implementiert ist (Code gebaut, kompiliert auf beiden Plattformen):
-- `Sources/Views/BlockerPickerSheet.swift` — Neue shared Komponente (Searchable List + "Keine"-Option + Checkmarks)
+### Implementierte Dateien:
+- `Sources/Views/BlockerPickerSheet.swift` — Shared Komponente (Searchable List + "Keine"-Option + Checkmarks)
 - `Sources/Views/TaskFormSheet.swift` — Picker durch Button + Sheet ersetzt (iOS)
 - `FocusBloxMac/TaskInspector.swift` — Picker durch Button + Sheet ersetzt (macOS)
-- `FocusBloxUITests/BlockerPickerSearchUITests.swift` — 4 UI Tests + 1 Diagnostik-Test
+- `FocusBloxUITests/BlockerPickerSearchUITests.swift` — 4 UI Tests
 
-### Problem: UI Tests scheitern (Simulator-Infrastruktur)
-- **Symptom:** `app.buttons["tab-backlog"]` wird nicht gefunden — der allererste Schritt im Test
-- **Beweis:** Screenshot zeigt App laeuft korrekt, Tab-Bar ist sichtbar
-- **Beweis:** ALLE UI Tests scheitern (auch vorher funktionierende wie `TaskFormGlassCardUITests`)
-- **Bekanntes Xcode 26 Problem:** Simulator-Clones ("Clone 1 of FocusBlox") crashen mit "ipc/mig server died"
-- **Quellen:**
-  - Apple Dev Forums: "XCode 26.2 not running UItests" (https://developer.apple.com/forums/thread/817089)
-  - Bekanntes Problem: Buttons im Element Tree nicht verfuegbar nach iOS 26 Upgrade
-  - Accessibility Inspector zeigt View-Hierarchie nicht an fuer iOS 26+ mit Xcode 26.2
-
-### Diagnose-Ergebnis (2026-03-12):
-
-**Simulator ist NICHT das Problem.** Analyse hat gezeigt:
-- Simulator bootet und startet die App korrekt
-- Build kompiliert (nach Simulator-Boot)
-- `TaskFormGlassCardUITests/testFormUsesScrollView` laeuft, scheitert aber an **falschem Test-Code**:
-  - `app.buttons["tab-backlog"]` statt `app.tabBars.buttons["Backlog"]`
-  - `sleep(1)` statt `waitForExistence(timeout:)`
-
-**Root Cause:** UI Tests wurden mit falschen IDs und Anti-Patterns geschrieben — kein Simulator/Xcode-Problem.
-
-### Verbesserungen umgesetzt:
-- Hook `ui_test_preflight.py` blockiert jetzt `sleep()` und falsche Tab-Zugriffe in UI Tests
-- `/inspect-ui` ist Pflicht vor jedem UI-Test-Edit (Hook erzwingt das)
-- Simulator-ID ueberall korrigiert auf `1EC79950-6704-47D0-BDF8-2C55236B4B40`
-
-### Naechster Schritt: Bestehende UI Tests reparieren
-- Alle Tests mit `/inspect-ui` → verifizierte IDs umschreiben
-- Pro Test: erst Accessibility Tree lesen, dann IDs korrigieren
-
-### Analyse-Dokument
-- `docs/artifacts/bug-dependency-search/analysis.md`
+### Behobene Test-Probleme (Learnings):
+- Native `TabView`-Buttons haben keine custom IDs → `app.tabBars.buttons["Backlog"]` statt `app.buttons["tab-backlog"]`
+- `glassCardSection` ID ueberschreibt Kind-IDs (SwiftUI-Gotcha) → `app.buttons["taskFormSection_dependency"]` statt `app.buttons["blockerPickerButton"]`
+- Sheet-Suchfeld vs. Backlog-Suchfeld → spezifisch per Prompt-Text matchen
 
 ---
 

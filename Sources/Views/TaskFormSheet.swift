@@ -42,6 +42,7 @@ struct TaskFormSheet: View {
 
     // Dependency State
     @State private var blockerTaskID: String? = nil
+    @State private var showBlockerPicker = false
 
     // Available tasks for blocker picker (non-completed, non-template)
     @Query(filter: #Predicate<LocalTask> { !$0.isCompleted && !$0.isTemplate })
@@ -292,22 +293,33 @@ struct TaskFormSheet: View {
 
                     // MARK: - Dependency (Blocker)
                     glassCardSection(id: "dependency", header: "Abhängigkeit") {
-                        Picker("Abhängig von", selection: $blockerTaskID) {
-                            Text("Keine").tag(String?.none)
-                            ForEach(blockerCandidates, id: \.id) { task in
-                                Text(task.title)
-                                    .lineLimit(1)
-                                    .tag(Optional(task.id))
+                        Button {
+                            showBlockerPicker = true
+                        } label: {
+                            HStack {
+                                Text("Abhängig von")
+                                Spacer()
+                                Text(blockerDisplayName)
+                                    .foregroundStyle(.secondary)
+                                Image(systemName: "chevron.right")
+                                    .font(.caption)
+                                    .foregroundStyle(.tertiary)
                             }
                         }
-                        .pickerStyle(.menu)
-                        .accessibilityIdentifier("blockerPicker")
+                        .accessibilityIdentifier("blockerPickerButton")
 
                         if blockerTaskID != nil {
                             Text("Dieser Task kann erst bearbeitet werden, wenn der übergeordnete Task erledigt ist.")
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                         }
+                    }
+                    .sheet(isPresented: $showBlockerPicker) {
+                        BlockerPickerSheet(
+                            candidates: blockerCandidates,
+                            selectedBlockerID: $blockerTaskID
+                        )
+                        .presentationDetents([.medium, .large])
                     }
 
                     // MARK: - Description
@@ -378,6 +390,13 @@ struct TaskFormSheet: View {
 
     private var urgencyLabel: String {
         UrgencyUI.label(for: urgency)
+    }
+
+    // MARK: - Blocker Display Name
+
+    private var blockerDisplayName: String {
+        guard let id = blockerTaskID else { return "Keine" }
+        return blockerCandidates.first(where: { $0.id == id })?.title ?? "Keine"
     }
 
     // MARK: - Blocker Candidates (exclude self + tasks blocked by self)
@@ -519,6 +538,7 @@ struct TaskFormSheet: View {
                 let descriptor = FetchDescriptor<LocalTask>(predicate: #Predicate { $0.uuid == editUUID })
                 if let localTask = try? modelContext.fetch(descriptor).first {
                     localTask.blockerTaskID = blockerTaskID
+                    try? modelContext.save()
                 }
             }
 
