@@ -56,4 +56,13 @@ final class AppSettings: ObservableObject {
 
     /// Whether Monster Coach mode is enabled
     @AppStorage("coachModeEnabled") var coachModeEnabled: Bool = false
+
+    /// Whether morning intention reminder is enabled
+    @AppStorage("coachIntentionReminderEnabled") var coachIntentionReminderEnabled: Bool = true
+
+    /// Hour for morning intention reminder (0-23)
+    @AppStorage("coachIntentionReminderHour") var coachIntentionReminderHour: Int = 7
+
+    /// Minute for morning intention reminder (0-59)
+    @AppStorage("coachIntentionReminderMinute") var coachIntentionReminderMinute: Int = 0
 }

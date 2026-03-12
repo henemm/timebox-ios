@@ -6,6 +6,7 @@ enum AppTab: Hashable {
 
 struct MainTabView: View {
     @Binding var selectedTab: AppTab
+    @AppStorage("coachModeEnabled") private var coachModeEnabled: Bool = false
 
     var body: some View {
         TabView(selection: $selectedTab) {
@@ -29,7 +30,8 @@ struct MainTabView: View {
 
             DailyReviewView()
                 .tabItem {
-                    Label("Review", systemImage: "chart.bar")
+                    Label(coachModeEnabled ? "Mein Tag" : "Review",
+                          systemImage: coachModeEnabled ? "sun.and.horizon" : "chart.bar")
                 }
                 .tag(AppTab.review)
         }

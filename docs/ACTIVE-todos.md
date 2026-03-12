@@ -6,6 +6,21 @@
 
 ---
 
+## ERLEDIGT: Feature — Monster Coach Phase 2 (Morning Intention)
+
+- **Anforderung:** Morning Intention Screen — die taegliche Frage "Wie wird dein Tag?" mit 6 waehlbaren Intentionen (Mehrfach-Auswahl)
+- **Umfang:**
+  - `DailyIntention` Model + `IntentionOption` Enum (6 Cases: survival, fokus, bhag, balance, growth, connection)
+  - `MorningIntentionView` — Zwei-Zustand View (Selection Grid mit 6 Chips / kompakte Zusammenfassung)
+  - Review-Tab zeigt "Mein Tag" statt "Review" wenn Coach aktiviert
+  - Konfigurierbare Push-Notification Morgen-Erinnerung ("Guten Morgen — Was soll heute zaehlen?")
+  - Settings: Morgen-Erinnerung Toggle + Uhrzeit-Picker im Monster Coach Bereich
+  - UserDefaults-Persistenz (pro Tag ein Key: `dailyIntention_YYYY-MM-DD`)
+- **Tests:** 16 Unit Tests + 6 UI Tests (alle GREEN)
+- **Dateien:** 2 neue (DailyIntention.swift, MorningIntentionView.swift) + 6 geaendert (DailyReviewView, MainTabView, AppSettings, NotificationService, SettingsView, FocusBloxApp)
+
+---
+
 ## ERLEDIGT: Feature — Monster Coach Phase 1 (Foundation)
 
 - **Anforderung:** Daten-Foundation fuer den Monster Coach als emotionalen Begleiter
@@ -1024,6 +1039,15 @@
 ---
 
 ## Erledigte Features & Bugs (Archiv)
+
+### 2026-03-12: Monster Coach Phase 2 — Morning Intention Screen
+- Commit: `feat: Monster Coach Phase 2 — Morning Intention Screen mit 6 Tages-Intentionen`
+- DailyIntention Model + IntentionOption Enum (survival, fokus, bhag, balance, growth, connection)
+- MorningIntentionView: Selection Grid (6 Chips) → kompakte Zusammenfassung nach Setzen
+- Review-Tab → "Mein Tag" Rename bei aktivem Coach
+- Konfigurierbare Push-Notification Morgen-Erinnerung in Settings
+- Files: 2 neue + 6 geaenderte Dateien (~250 LoC)
+- Tests: 16 Unit Tests + 6 UI Tests, alle GREEN
 
 ### 2026-03-04: Stop-Lock + API-Guard
 - Stop-Lock: User tippt "stopp" → alle Edit/Write/Bash gesperrt bis "weiter"

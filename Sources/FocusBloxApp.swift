@@ -17,6 +17,7 @@ struct FocusBloxApp: App {
     @State private var quickCaptureTitle = ""
     @State private var selectedTab: AppTab = .backlog
     @State private var permissionRequested = false
+    private let settings = AppSettings.shared
     @State private var syncMonitor = CloudKitSyncMonitor()
     @State private var deferredSort = DeferredSortController()
     @State private var deferredCompletion = DeferredCompletionController()
@@ -311,6 +312,14 @@ struct FocusBloxApp: App {
                     syncedSettings.pushToCloud()
                     rescheduleDueDateNotifications()
                     NotificationService.updateOverdueBadge(container: sharedModelContainer)
+                    // Coach intention reminder
+                    if settings.coachModeEnabled && settings.coachIntentionReminderEnabled {
+                        NotificationService.scheduleIntentionReminder(
+                            hour: settings.coachIntentionReminderHour,
+                            minute: settings.coachIntentionReminderMinute)
+                    } else {
+                        NotificationService.cancelIntentionReminder()
+                    }
                 }
                 if newPhase == .background {
                     Task { await deferredCompletion.flushAll() }
@@ -496,6 +505,18 @@ struct FocusBloxApp: App {
 
     /// Reset UserDefaults for UI test isolation
     private func resetUserDefaultsIfNeeded() {
+        // Coach mode via launch argument (UI testing)
+        if ProcessInfo.processInfo.arguments.contains("-UITesting") {
+            if ProcessInfo.processInfo.arguments.contains("-CoachModeEnabled") {
+                UserDefaults.standard.set(true, forKey: "coachModeEnabled")
+            } else {
+                UserDefaults.standard.set(false, forKey: "coachModeEnabled")
+            }
+            // Clear daily intention to avoid test state leakage
+            let todayKey = DailyIntention.todayKey()
+            UserDefaults.standard.removeObject(forKey: todayKey)
+        }
+
         guard ProcessInfo.processInfo.arguments.contains("-ResetUserDefaults") else { return }
         UserDefaults.standard.set(false, forKey: "remindersSyncEnabled")
         UserDefaults.standard.removeObject(forKey: "visibleReminderListIDs")

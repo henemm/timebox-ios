@@ -159,6 +159,11 @@ struct DailyReviewView: View {
                     .padding(.horizontal)
                     .padding(.top, 8)
 
+                    if coachModeEnabled && reviewMode == .today {
+                        MorningIntentionView()
+                            .padding(.horizontal)
+                    }
+
                     if coachModeEnabled {
                         MonsterStatusView(coach: monsterCoach)
                             .padding(.horizontal)
@@ -199,7 +204,7 @@ struct DailyReviewView: View {
                     }
                 }
             }
-            .navigationTitle("Review")
+            .navigationTitle(coachModeEnabled ? "Mein Tag" : "Review")
             .withSettingsToolbar()
         }
         .task {

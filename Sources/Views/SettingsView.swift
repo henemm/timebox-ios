@@ -29,6 +29,9 @@ struct SettingsView: View {
     @State private var allReminderLists: [ReminderListInfo] = []
     @AppStorage("siriTipCompleteTaskVisible") private var showCompleteTaskTip = true
     @AppStorage("coachModeEnabled") private var coachModeEnabled: Bool = false
+    @AppStorage("coachIntentionReminderEnabled") private var coachIntentionReminderEnabled: Bool = true
+    @AppStorage("coachIntentionReminderHour") private var coachIntentionReminderHour: Int = 7
+    @AppStorage("coachIntentionReminderMinute") private var coachIntentionReminderMinute: Int = 0
 
     var body: some View {
         NavigationStack {
@@ -157,10 +160,28 @@ struct SettingsView: View {
                 Section {
                     Toggle("Monster Coach", isOn: $coachModeEnabled)
                         .accessibilityIdentifier("coachModeToggle")
+
+                    if coachModeEnabled {
+                        Toggle("Morgen-Erinnerung", isOn: $coachIntentionReminderEnabled)
+                            .accessibilityIdentifier("intentionReminderToggle")
+
+                        if coachIntentionReminderEnabled {
+                            DatePicker(
+                                "Uhrzeit",
+                                selection: intentionTimeBinding,
+                                displayedComponents: .hourAndMinute
+                            )
+                            .accessibilityIdentifier("intentionTimePicker")
+                        }
+                    }
                 } header: {
                     Text("Monster Coach")
                 } footer: {
-                    Text("Aktiviert deinen persönlichen Monster-Trainingspartner im Review-Tab.")
+                    if coachModeEnabled {
+                        Text("Erinnert dich morgens daran, deine Tages-Intention zu setzen.")
+                    } else {
+                        Text("Aktiviert deinen persönlichen Monster-Trainingspartner im Review-Tab.")
+                    }
                 }
 
                 // Section 1: Target Calendar
@@ -261,6 +282,22 @@ struct SettingsView: View {
         }
     }
 
+
+    private var intentionTimeBinding: Binding<Date> {
+        Binding(
+            get: {
+                var comps = DateComponents()
+                comps.hour = coachIntentionReminderHour
+                comps.minute = coachIntentionReminderMinute
+                return Calendar.current.date(from: comps) ?? Date()
+            },
+            set: { newDate in
+                let comps = Calendar.current.dateComponents([.hour, .minute], from: newDate)
+                coachIntentionReminderHour = comps.hour ?? 7
+                coachIntentionReminderMinute = comps.minute ?? 0
+            }
+        )
+    }
 
     private var morningTimeBinding: Binding<Date> {
         Binding(

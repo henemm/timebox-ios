@@ -411,6 +411,45 @@ enum NotificationService {
         }
     }
 
+    // MARK: - Coach Intention Reminder
+
+    private static let intentionReminderID = "coach-intention-reminder"
+
+    /// Build a daily repeating notification request for the morning intention (testable).
+    static func buildIntentionReminderRequest(hour: Int, minute: Int) -> UNNotificationRequest {
+        let content = UNMutableNotificationContent()
+        content.title = "Guten Morgen"
+        content.body = "Was soll heute zaehlen?"
+        content.sound = .default
+
+        var dateComponents = DateComponents()
+        dateComponents.hour = hour
+        dateComponents.minute = minute
+
+        let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: true)
+
+        return UNNotificationRequest(
+            identifier: intentionReminderID,
+            content: content,
+            trigger: trigger
+        )
+    }
+
+    /// Schedule the daily morning intention reminder.
+    static func scheduleIntentionReminder(hour: Int, minute: Int) {
+        let center = UNUserNotificationCenter.current()
+        center.removePendingNotificationRequests(withIdentifiers: [intentionReminderID])
+
+        let request = buildIntentionReminderRequest(hour: hour, minute: minute)
+        center.add(request)
+    }
+
+    /// Cancel the morning intention reminder.
+    static func cancelIntentionReminder() {
+        UNUserNotificationCenter.current()
+            .removePendingNotificationRequests(withIdentifiers: [intentionReminderID])
+    }
+
     // MARK: - Cancel All
 
     /// Cancel all task notifications
