@@ -1082,34 +1082,45 @@
   - Bekanntes Problem: Buttons im Element Tree nicht verfuegbar nach iOS 26 Upgrade
   - Accessibility Inspector zeigt View-Hierarchie nicht an fuer iOS 26+ mit Xcode 26.2
 
-### Plan fuer naechste Session (schrittweise, Analysis-First):
+### Diagnose-Ergebnis (2026-03-12):
 
-**Schritt 1: Simulator-Umgebung stabilisieren**
-- `xcrun simctl erase` des Test-Simulators
-- `xcodebuild clean` + DerivedData loeschen
-- Simulator neu booten, warten bis stabil
-- EINEN bekannten Test laufen lassen (`TaskFormGlassCardUITests/testFormUsesScrollView`)
-- `-parallel-testing-enabled NO` verwenden (vermeidet Clone-Problem)
-- Wenn dieser Test NICHT geht: Problem liegt am Simulator/Xcode, nicht an unserem Code
+**Simulator ist NICHT das Problem.** Analyse hat gezeigt:
+- Simulator bootet und startet die App korrekt
+- Build kompiliert (nach Simulator-Boot)
+- `TaskFormGlassCardUITests/testFormUsesScrollView` laeuft, scheitert aber an **falschem Test-Code**:
+  - `app.buttons["tab-backlog"]` statt `app.tabBars.buttons["Backlog"]`
+  - `sleep(1)` statt `waitForExistence(timeout:)`
 
-**Schritt 2: Falls Simulator funktioniert — Blocker-Tests laufen lassen**
-- `BlockerPickerSearchUITests/test_blockerSection_showsButtonThatOpensSheet` einzeln ausfuehren
-- Bei Failure: `print(app.debugDescription)` in Test einbauen um Element-Tree zu sehen
-- Element-Tree analysieren: Welche Buttons/IDs existieren tatsaechlich?
+**Root Cause:** UI Tests wurden mit falschen IDs und Anti-Patterns geschrieben — kein Simulator/Xcode-Problem.
 
-**Schritt 3: Falls Simulator NICHT funktioniert — Workaround**
-- Xcode 26.0 testen (Berichte sagen: "worked in 26.0, broke in 26.1/26.2")
-- Alternativ: `xcodebuild build-for-testing` + `test-without-building` (separater 2-Schritt-Prozess)
-- Alternativ: Neuen Simulator erstellen statt den alten zu reparieren
-- Alternativ: Test auf physischem Device laufen lassen
+### Verbesserungen umgesetzt:
+- Hook `ui_test_preflight.py` blockiert jetzt `sleep()` und falsche Tab-Zugriffe in UI Tests
+- `/inspect-ui` ist Pflicht vor jedem UI-Test-Edit (Hook erzwingt das)
+- Simulator-ID ueberall korrigiert auf `1EC79950-6704-47D0-BDF8-2C55236B4B40`
 
-**Schritt 4: Tests GREEN machen**
-- Nach stabilem Simulator: Tests anpassen falls Element-IDs sich geaendert haben
-- Alle 4 Tests muessen GREEN sein
-- Danach: Validate + Commit
+### Naechster Schritt: Bestehende UI Tests reparieren
+- Alle Tests mit `/inspect-ui` → verifizierte IDs umschreiben
+- Pro Test: erst Accessibility Tree lesen, dann IDs korrigieren
 
 ### Analyse-Dokument
 - `docs/artifacts/bug-dependency-search/analysis.md`
+
+---
+
+### Bug 92: Dependency-Sync iOS → macOS pruefen
+- **Status:** OFFEN (Backlog)
+- **Plattform:** iOS → macOS
+- **Symptom:** Unklar ob Tasks mit Abhaengigkeiten (Blocker), die auf iOS erstellt werden, korrekt auf macOS synchronisiert werden inkl. der Dependency-Beziehung.
+- **Pruefung noetig:** Task auf iOS erstellen, Blocker setzen, auf macOS pruefen ob (a) der Task ankommt und (b) die Abhaengigkeit korrekt angezeigt wird.
+- **Risiko:** Falls Dependency-Felder nicht im CloudKit-Schema synchronisiert werden, gehen Abhaengigkeiten beim Sync verloren.
+
+### Bug 93: Swipe-Gesten bei eingerueckten Tasks funktionieren nicht (iOS)
+- **Status:** OFFEN (Backlog)
+- **Plattform:** iOS (mindestens), macOS ggf. auch betroffen
+- **Symptom:** Tasks die als Abhaengigkeit eingerueckt dargestellt werden, reagieren nicht auf Swipe-Gesten. Dadurch koennen eingerueckte Tasks weder bearbeitet, geloescht noch ihre Abhaengigkeit entfernt werden.
+- **Auswirkung:** Eine einmal gesetzte Abhaengigkeit kann nicht mehr rueckgaengig gemacht werden. Der Task ist effektiv "gefangen" — kein Edit, kein Delete, kein Dependency-Remove moeglich.
+- **Erwartetes Verhalten:** Eingerueckte Tasks muessen mindestens diese Swipe-Aktionen unterstuetzen: (1) Abhaengigkeit entfernen, (2) Bearbeiten, (3) Loeschen.
+- **Vermutung:** Die Einrueckung (Indent) via `.padding(.leading)` oder aehnlichem koennte den Swipe-Gesture-Recognizer blockieren, oder `.swipeActions` fehlt auf der eingerueckten Row-Variante.
 
 ---
 

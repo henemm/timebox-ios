@@ -1,13 +1,176 @@
 ---
 name: ui-test-patterns
-description: XCUITest Best Practices fuer Xcode 26.2. Claude laedt diesen Skill automatisch beim Schreiben oder Debuggen von UI Tests.
+description: XCUITest Best Practices fuer Xcode 26.3. Claude laedt diesen Skill automatisch beim Schreiben oder Debuggen von UI Tests.
 user-invocable: false
 disable-model-invocation: false
 ---
 
-# XCUITest Best Practices (Xcode 26.2 / Swift 26)
+# XCUITest Best Practices (Xcode 26.3 / Swift 26)
 
-## Neue APIs in Xcode 26.2
+## PFLICHT: Pre-Flight vor jedem UI Test
+
+**BEVOR du einen UI Test schreibst oder aenderst:**
+1. View-Datei lesen → alle `.accessibilityIdentifier()` notieren
+2. `/inspect-ui` ausfuehren fuer den Ziel-Screen
+3. Identifier-Mapping erstellen: Element → Actual ID → Type
+4. Erst DANN Test schreiben mit verifizierten IDs
+5. NIEMALS IDs raten oder aus Gedaechtnis verwenden
+
+---
+
+## AccessibilityIdentifier Konventionen
+
+| Element-Typ | Konvention | Beispiel |
+|-------------|-----------|----------|
+| Button | camelCase + Button | `addTaskButton`, `saveButton` |
+| Toggle | camelCase + Toggle | `remindersSyncToggle` |
+| Picker | camelCase + Picker | `priorityPicker` |
+| TextField | camelCase + Field | `taskTitleField` |
+| Dynamische Row | prefix_\<uuid\> | `taskTitle_\<id\>` |
+| Container mit ID | + `.accessibilityElement(children: .contain)` | auf VStack/HStack |
+| Tab-Navigation | Label-basiert via `app.tabBars.buttons["Label"]` | `app.tabBars.buttons["Backlog"]` |
+
+---
+
+## SwiftUI Control → XCUIElement Type Mapping
+
+**KRITISCH:** SwiftUI Controls rendern als unterschiedliche XCUIElement-Typen. NIEMALS raten!
+
+| SwiftUI Control | XCUIElement Type | Test-Zugriff |
+|-----------------|-----------------|--------------|
+| `Button` | `buttons` | `app.buttons["id"]` |
+| `Toggle` | `switches` | `app.switches["id"]` |
+| `Picker(.segmented)` | `segmentedControls` | `app.segmentedControls["id"]` |
+| `Picker(.wheel)` | `pickerWheels` | `app.pickerWheels` |
+| `Picker(.menu)` / `Picker()` | `buttons` (popUp) | `app.buttons["id"]` |
+| `DatePicker` | `datePickers` | `app.datePickers["id"]` |
+| `Stepper` | `steppers` | `app.steppers["id"]` |
+| `TextField` | `textFields` | `app.textFields["id"]` |
+| `SecureField` | `secureTextFields` | `app.secureTextFields["id"]` |
+| `TextEditor` | `textViews` | `app.textViews["id"]` |
+| `Slider` | `sliders` | `app.sliders["id"]` |
+| `NavigationLink` | `buttons` | `app.buttons["id"]` |
+
+**Haeufigster Fehler:** `Picker(.segmented)` ist NICHT `buttons` und NICHT `otherElements` — es ist `segmentedControls`! Segmented-Optionen sind `picker.buttons["1"]`.
+
+---
+
+## SwiftUI Form/List: Lazy Rendering
+
+**WARNUNG:** SwiftUI `Form` und `List` rendern Zellen **LAZY**. Elemente ausserhalb des sichtbaren Bereichs existieren **NICHT** im Accessibility Tree!
+
+```
+Konsequenzen:
+- allElementsBoundByIndex liefert NUR aktuell sichtbare Zellen
+- exists/waitForExistence gibt false fuer off-screen Elemente
+- /inspect-ui zeigt nur was gerade gerendert ist
+```
+
+**Pattern: Erst scrollen, dann asserten:**
+```swift
+// FALSCH — Element existiert nicht weil off-screen:
+XCTAssertTrue(app.switches["settingAtBottom"].exists)
+
+// RICHTIG — erst in den sichtbaren Bereich scrollen:
+scrollToElement(app.switches["settingAtBottom"])
+XCTAssertTrue(app.switches["settingAtBottom"].waitForExistence(timeout: 3))
+```
+
+**Fuer /inspect-ui:** Wenn ein erwartetes Element im Hierarchy-Dump fehlt, ist es vermutlich off-screen. Scrollen und erneut dumpen!
+
+---
+
+## Flexibler Element-Zugriff
+
+Wenn unklar ist ob ein Element Button, StaticText oder anderer Typ ist:
+
+```swift
+// STABIL: Sucht in ALLEN Element-Typen
+let element = app.descendants(matching: .any)["myIdentifier"]
+XCTAssertTrue(element.waitForExistence(timeout: 5))
+```
+
+**Performance-Hinweis:** `descendants(matching: .any)` erstellt einen vollstaendigen Snapshot — nur gezielt verwenden, nicht in Schleifen. Fuer bekannte Typen weiterhin `app.buttons["id"]` etc. bevorzugen.
+
+---
+
+## XCUIAutomation Framework (Neu in Xcode 26)
+
+### Recording + Replay
+```swift
+// Xcode 26 kann UI-Interaktionen aufnehmen und als Test-Code generieren
+// WWDC25 Session 344: "Automate your UI tests with XCUIAutomation"
+// → Nutze Recording im Xcode Test Navigator fuer initiale Test-Erstellung
+```
+
+### Video-Recording von Test-Runs
+```swift
+// Test-Runs koennen als Video aufgezeichnet werden fuer Debugging
+// Aktivierung: Edit Scheme → Test → Options → "Capture video on failure"
+```
+
+### XCTHitchMetric (UI-Responsiveness)
+```swift
+// Misst UI-Hitches (Frame-Drops) waehrend Test-Ausfuehrung
+let metric = XCTHitchMetric()
+measure(metrics: [metric]) {
+    // UI-Interaktionen hier
+    app.buttons["addTaskButton"].tap()
+}
+```
+
+---
+
+## Xcode 26.3 Testing-Aenderungen
+
+### Runtime Issue Detection
+- Main Thread Checker laeuft automatisch in Tests
+- Data Race Detection via Thread Sanitizer (wenn aktiviert)
+
+### Issue Warnings (Non-Failing)
+```swift
+// Swift Testing: Issues mit severity parameter
+#expect(condition, "message", severity: .warning)  // Warnt, failt aber nicht
+```
+
+### Attachments fuer Diagnostik (Swift Testing)
+```swift
+// Diagnostische Daten an Test-Ergebnisse anhaengen
+import Testing
+@Test func myTest() {
+    // ... test code ...
+    Attachment(data: screenshotData, named: "failure-screenshot.png")
+}
+```
+
+---
+
+## Diagnose-Entscheidungsbaum bei Fehlern
+
+```
+Test fehlgeschlagen?
+├── Exit Code 64 (EX_USAGE)
+│   → Simulator/Scheme/Destination pruefen, NICHT am Test-Code aendern
+├── Exit Code 70 (EX_SOFTWARE)
+│   → Build-Fehler im Code, kompiliert nicht
+├── Exit Code 65 (EX_DATAERR) — Test-Assertions
+│   ├── "Element not found"
+│   │   → PFLICHT: /inspect-ui ausfuehren
+│   │   → Identifier in View-Datei verifizieren
+│   │   → Element-Typ pruefen (Button vs StaticText vs Cell)
+│   ├── "not hittable"
+│   │   → Element verdeckt → scrollen oder Sheet abwarten
+│   ├── "Multiple matches"
+│   │   → Identifier ist nicht eindeutig → UUID-basiert machen
+│   └── "Assertion failed"
+│       → Logik-Fehler im Test oder im Code
+└── Max 2 Versuche mit gleichem Ansatz
+    → Danach: Strategie wechseln oder ui-test-debugger Agent
+```
+
+---
+
+## Neue APIs in Xcode 26.2+
 
 ### waitForNonExistence (NEU)
 ```swift
@@ -112,18 +275,41 @@ XCTAssertTrue(sheet.waitForExistence(timeout: 3))
 
 ### 3. Scrolling bevor Element sichtbar
 
-**SYMPTOM:** Element existiert, ist aber nicht hittable
+**SYMPTOM:** Element existiert nicht oder ist nicht hittable
 
-**LOESUNG:**
+**LOESUNG A — Einfache Views (NICHT in Sheets):**
 ```swift
 let element = app.buttons["hiddenButton"]
-
-// Scroll bis sichtbar:
 while !element.isHittable {
     app.swipeUp()
 }
 element.tap()
 ```
+
+**LOESUNG B — Forms in Sheets (PFLICHT bei presented Sheets):**
+
+⚠️ `app.swipeUp()` scrollt in presented Sheets oft den **falschen Container** (den Sheet-Hintergrund statt den Form-Inhalt). Coordinate-based Scrolling ist zuverlaessiger:
+
+```swift
+/// Scrollt sanft bis Element sichtbar und hittable wird.
+/// Funktioniert zuverlaessig in Forms, Sheets, und normalen Views.
+private func scrollToElement(_ element: XCUIElement) {
+    for _ in 0..<20 {
+        if element.exists && element.isHittable { return }
+        let start = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.7))
+        let end = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.3))
+        start.press(forDuration: 0.05, thenDragTo: end)
+    }
+}
+```
+
+**Wann welche Methode:**
+| Kontext | Methode |
+|---------|---------|
+| Normaler Screen, List/ScrollView | `app.swipeUp()` reicht |
+| Form in Sheet (.sheet/.fullScreenCover) | `scrollToElement()` PFLICHT |
+| Settings-Screen (ist ein Sheet) | `scrollToElement()` PFLICHT |
+| Unsicher | `scrollToElement()` — funktioniert ueberall |
 
 ### 4. Mock-Daten erscheinen nicht
 
@@ -433,9 +619,9 @@ Bei fehlschlagendem UI Test in dieser Reihenfolge pruefen:
 
 **0. Exit Code pruefen** → Exit 64 = Syntax-Problem, nicht Test-Problem!
 
-1. **Launch-Argument pruefen** → `app.launchArguments` muss `-UITesting` enthalten
+1. **Launch-Argument pruefen** → `app.launchArguments` muss `-UITesting` enthalten (NICHT `--uitesting`!)
 2. **Wait statt direkter Zugriff** → `waitForExistence(timeout:)` verwenden
-3. **Element-Typ pruefen** → Button? StaticText? Cell? (Picker sind Buttons!)
+3. **Element-Typ pruefen** → Siehe "SwiftUI Control → XCUIElement Type Mapping" oben! Segmented Picker ≠ Buttons!
 4. **Container-Propagation** → Identifier auf Leaf-Element, nicht Container
 5. **Animation abwarten** → Nach Sheet/Navigation auf NavBar warten
 6. **EnvironmentKey pruefen** → Default darf nicht RealService sein
@@ -455,14 +641,14 @@ print("DEBUG: \(app.buttons.allElementsBoundByIndex.map { $0.identifier.isEmpty 
 ```bash
 killall "Simulator" 2>/dev/null
 xcrun simctl shutdown all 2>/dev/null
-xcrun simctl boot 6364A54B-5048-4346-899E-FFB67E630D53 2>/dev/null
-xcrun simctl bootstatus 6364A54B-5048-4346-899E-FFB67E630D53 -b
+xcrun simctl boot 1EC79950-6704-47D0-BDF8-2C55236B4B40 2>/dev/null
+xcrun simctl bootstatus 1EC79950-6704-47D0-BDF8-2C55236B4B40 -b
 ```
 
 **Stabile Test-Ausfuehrung:**
 ```bash
 xcodebuild test -project FocusBlox.xcodeproj -scheme FocusBlox \
-  -destination 'id=6364A54B-5048-4346-899E-FFB67E630D53' \
+  -destination 'id=1EC79950-6704-47D0-BDF8-2C55236B4B40' \
   -only-testing:FocusBloxUITests/[TestClass]/[testMethod] \
   -parallel-testing-enabled NO \
   -disable-concurrent-destination-testing \
@@ -487,4 +673,4 @@ xcodebuild test -project FocusBlox.xcodeproj -scheme FocusBlox \
 
 ---
 
-Aktualisiert: 2026-02-21 (System-Permission-Dialoge, Simulator-ID korrigiert)
+Aktualisiert: 2026-03-12 (Element-Type-Mapping, Lazy Rendering Warnung, Coordinate-based Scrolling fuer Sheets, Launch-Argument Warnung)

@@ -261,6 +261,8 @@ def create_workflow(name: str) -> dict:
         # Backlog status (v2.1) - separate from phase
         # open | spec_ready | in_progress | done | blocked
         "backlog_status": "open",
+        # Adversary verdict (v2.3) - must be "VERIFIED:<reason>" to allow commit
+        "adversary_verdict": None,
     }
 
 
@@ -910,7 +912,7 @@ if __name__ == "__main__":
 
     if len(sys.argv) < 2:
         print("Usage: workflow_state_multi.py <command> [args]")
-        print("Commands: status, list, start <name>, switch <name>, advance, phase <phase>, backlog <status>, pause")
+        print("Commands: status, list, start <name>, switch <name>, advance, phase <phase>, backlog <status>, set-field <field> <value>, pause")
         sys.exit(1)
 
     cmd = sys.argv[1]
@@ -939,15 +941,23 @@ if __name__ == "__main__":
         state = load_state()
         active = state.get("active_workflow")
         if active:
-            # Check for --force flag
-            force = "--force" in sys.argv
-            success, message = set_phase(active, sys.argv[2], force=force)
-            if success:
-                # Sync backlog status when phase changes
-                sync_backlog_status_from_phase(active)
-                print(f"Set phase to: {sys.argv[2]}")
+            target_phase = sys.argv[2]
+            # Use complete_workflow() for phase8_complete to ensure proper cleanup
+            if target_phase == "phase8_complete":
+                if complete_workflow(active):
+                    print(f"Workflow '{active}' completed and archived.")
+                else:
+                    print(f"Failed to complete workflow '{active}'")
             else:
-                print(f"BLOCKED: {message}")
+                # Check for --force flag
+                force = "--force" in sys.argv
+                success, message = set_phase(active, target_phase, force=force)
+                if success:
+                    # Sync backlog status when phase changes
+                    sync_backlog_status_from_phase(active)
+                    print(f"Set phase to: {target_phase}")
+                else:
+                    print(f"BLOCKED: {message}")
         else:
             print(f"No active workflow")
     elif cmd == "backlog" and len(sys.argv) > 2:
@@ -957,6 +967,23 @@ if __name__ == "__main__":
         else:
             print(f"Failed to set backlog status: {status}")
             print(f"Valid options: {', '.join(BACKLOG_STATUSES)}")
+    elif cmd == "set-field" and len(sys.argv) > 3:
+        field_name = sys.argv[2]
+        # adversary_verdict can ONLY be set via adversary_gate.py (requires test proof)
+        if field_name == "adversary_verdict":
+            print("BLOCKED: adversary_verdict cannot be set via set-field.")
+            print("Use: python3 .claude/hooks/adversary_gate.py <test-output-file>")
+            sys.exit(1)
+        field_value = sys.argv[3]
+        state = load_state()
+        active = state.get("active_workflow")
+        if active and active in state.get("workflows", {}):
+            state["workflows"][active][field_name] = field_value
+            state["workflows"][active]["last_updated"] = datetime.now().isoformat()
+            save_state(state)
+            print(f"Set {field_name} = {field_value} on workflow {active}")
+        else:
+            print("No active workflow")
     elif cmd == "pause":
         success, message = pause_workflow()
         print(message)
