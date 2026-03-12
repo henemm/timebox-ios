@@ -1,0 +1,9 @@
+UI Tests cannot be compiled separately — they will fail at runtime because filter chip elements (intentionFilterChip_*, removeIntentionFilter_*) don't exist yet and tab-switch after intention doesn't happen.
+
+Expected failures:
+- test_settingIntention_switchesToBacklogTab: App stays on Review tab (no tab-switch logic)
+- test_fokusIntention_showsFilterChipInBacklog: intentionFilterChip_fokus doesn't exist
+- test_filterChip_canBeDismissed: removeIntentionFilter_fokus doesn't exist
+- test_survivalIntention_showsNoFilterChips: Tab doesn't switch
+- test_fokusFilter_hidesBacklogSection: Filter logic doesn't exist
+- test_removingAllChips_hidesChipBar: Filter chip UI doesn't exist

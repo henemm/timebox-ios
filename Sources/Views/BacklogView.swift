@@ -47,6 +47,7 @@ struct BacklogView: View {
     @AppStorage("backlogViewMode") private var selectedMode: ViewMode = .priority
     @AppStorage("remindersSyncEnabled") private var remindersSyncEnabled: Bool = false
     @AppStorage("remindersMarkCompleteOnImport") private var remindersMarkCompleteOnImport: Bool = true
+    @AppStorage("intentionFilterOptions") private var intentionFilterOptions: String = ""
     @State private var planItems: [PlanItem] = []
     @State private var allRecurringItems: [PlanItem] = []
     @State private var errorMessage: String?
@@ -73,6 +74,31 @@ struct BacklogView: View {
     @State private var undoResultMessage = ""
 
 
+    // MARK: - Intention Filter
+
+    /// Active intention filter options parsed from AppStorage.
+    private var activeIntentionFilters: [IntentionOption] {
+        guard !intentionFilterOptions.isEmpty else { return [] }
+        return intentionFilterOptions.split(separator: ",").compactMap {
+            IntentionOption(rawValue: String($0))
+        }
+    }
+
+    /// Whether any intention filter is actively narrowing tasks.
+    private var hasActiveIntentionFilter: Bool {
+        let filters = activeIntentionFilters
+        guard !filters.isEmpty else { return false }
+        // Survival means "no filter"
+        return !filters.contains(.survival)
+    }
+
+    /// Removes one intention option from the active filters.
+    private func removeIntentionFilter(_ option: IntentionOption) {
+        var current = activeIntentionFilters
+        current.removeAll { $0 == option }
+        intentionFilterOptions = current.map(\.rawValue).joined(separator: ",")
+    }
+
     // MARK: - Search Filter
     private func matchesSearch(_ item: PlanItem) -> Bool {
         guard !searchText.isEmpty else { return true }
@@ -96,7 +122,10 @@ struct BacklogView: View {
 
     private var backlogTasks: [PlanItem] {
         // Top-level only: exclude blocked tasks (they appear under their blocker)
-        allBacklogTasks.topLevelTasks
+        let tasks = allBacklogTasks.topLevelTasks
+        let filters = activeIntentionFilters
+        guard !filters.isEmpty, !filters.contains(.survival) else { return tasks }
+        return tasks.filter { IntentionOption.matchesFilter(activeOptions: filters, task: $0) }
     }
 
     /// Blocked tasks that depend on the given blocker task ID
@@ -162,6 +191,11 @@ struct BacklogView: View {
                 }
             }
             .navigationBarTitleDisplayMode(.inline)
+            .safeAreaInset(edge: .top) {
+                if !activeIntentionFilters.isEmpty && !activeIntentionFilters.contains(.survival) {
+                    intentionFilterChips
+                }
+            }
             .toolbar {
                 ToolbarItemGroup(placement: .topBarTrailing) {
                     Button {
@@ -931,6 +965,42 @@ struct BacklogView: View {
         .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
         .listRowBackground(Color.clear)
         .listRowSeparator(.hidden)
+    }
+
+    // MARK: - Intention Filter Chips
+
+    private var intentionFilterChips: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
+                ForEach(activeIntentionFilters, id: \.self) { option in
+                    Button {
+                        withAnimation(.spring()) {
+                            removeIntentionFilter(option)
+                        }
+                    } label: {
+                        HStack(spacing: 4) {
+                            Image(systemName: option.icon)
+                                .font(.caption2)
+                            Text(option.label)
+                                .font(.caption)
+                                .lineLimit(1)
+                            Image(systemName: "xmark.circle.fill")
+                                .font(.caption2)
+                                .foregroundStyle(option.color.opacity(0.6))
+                        }
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 6)
+                        .background(Capsule().fill(option.color.opacity(0.15)))
+                        .overlay(Capsule().stroke(option.color.opacity(0.3), lineWidth: 1))
+                    }
+                    .foregroundStyle(option.color)
+                    .accessibilityIdentifier("removeIntentionFilter_\(option.rawValue)")
+                }
+            }
+            .padding(.horizontal)
+            .padding(.vertical, 6)
+        }
+        .background(.ultraThinMaterial)
     }
 
     // MARK: - Priority View (with overdue section at top)

@@ -64,18 +64,134 @@ Ergänzend zur Morgen-Intention kategorisieren die Disziplinen die einzelnen Tas
 | Mut | Rot | Emotionale Stärke | Das Unangenehme angehen |
 | Fokus | Blau | Zeitmanagement & Klarheit | Sich nicht verzetteln |
 
+## Der komplette Tagesbogen
+
+Die Morgen-Frage allein reicht nicht. Ohne Brücke zum Rest des Tages verpufft die Intention. Der Tagesbogen verbindet Morgen, Tag und Abend zu einem durchgängigen Erlebnis.
+
+### Drei Beispiel-Tage
+
+**Tag 1: BHAG — "Das große hässliche Ding geschafft"**
+
+*Morgens:* Anna wählt BHAG. Das Monster wird energisch: "Na dann zeig mal." Die App wechselt zum Backlog, gefiltert auf Tasks mit Wichtigkeit 3 und lang verschobene Tasks. Anna sieht die Steuererklärung ganz oben. Sie markiert sie als NextUp.
+
+*Tagsüber:* Um 11 Uhr hat Anna drei kleine Tasks erledigt, aber die Steuererklärung nicht angefasst. Die App merkt: kein Focus Block mit dem BHAG-Task erstellt. Eine Notification: "Du wolltest das große Ding anpacken. Wann legst du los?" Anna erstellt einen 90-Minuten-Block.
+
+*Abends:* Um 15:23 war die Steuererklärung erledigt. Ab 18 Uhr zeigt der Review-Tab eine leuchtende Karte. Das Monster (via Foundation Models): "Du hast dir heute Morgen vorgenommen, das große Ding anzupacken — die Steuererklärung. Um 15:23 war sie erledigt. Das war der schwerste Task seit zwei Wochen. Stark."
+
+**Tag 2: Fokus — "Stolz: nicht verzettelt"**
+
+*Morgens:* Ben wählt Fokus. Das Monster wird wachsam. Die App zeigt den Backlog gefiltert auf seine aktuellen NextUp-Tasks: "Bleib bei deinem Plan." Ben sieht seine drei geplanten Tasks und erstellt Focus Blocks dafür.
+
+*Tagsüber:* Ben erledigt zwei Blocks sauber. Ein dritter Task kommt dazwischen, ohne Block. Notification: "Tasks ohne Block erledigt. Willst du einen erstellen?" Ben ignoriert es — er weiß was er tut. Keine weitere Notification (Stille-Regel).
+
+*Abends:* Block-Completion bei 75%. Gedämpft-warme Karte: "Drei Blocks geplant, zwei durchgezogen. Der dritte kam dazwischen — passiert. 75% Fokus ist ein solider Tag."
+
+**Tag 3: Balance — "In allen Bereichen gelebt"**
+
+*Morgens:* Clara wählt Balance. Die App zeigt den Backlog gruppiert nach Kategorie und hebt hervor wo Lücken sind. Clara sieht: viel Arbeit, wenig für sich selbst. Sie markiert einen Yoga-Task und einen Anruf bei ihrer Mutter als NextUp.
+
+*Tagsüber:* Bis 15 Uhr hat Clara nur Arbeits-Tasks erledigt. Notification: "Bisher nur Arbeit. Wie wär's mit was für dich?" Clara macht ihren Yoga-Block.
+
+*Abends:* Tasks in 3 Kategorien erledigt (Arbeit, Selbstfürsorge, Soziales). Warme, ausgewogene Karte: "Arbeit, Yoga, und deine Mutter angerufen — drei Farben heute. Was für ein runder Tag."
+
+## Nach der Morgen-Auswahl: Gefilterter Backlog
+
+Die Intention darf nicht in der Luft hängen. Direkt nach der Morgen-Auswahl wechselt die App zum Backlog-Tab — aber gefiltert passend zur Intention.
+
+| Intention | Backlog-Filter |
+|-----------|---------------|
+| Survival | Kein Filter — nimm was du schaffst |
+| Fokus | Zeigt aktuelle NextUp-Tasks ("Bleib bei deinem Plan") |
+| BHAG | Tasks mit Wichtigkeit 3 + oft verschobene Tasks |
+| Balance | Gruppiert nach Kategorie, hebt Lücken hervor |
+| Wachstum | Filtert auf Kategorie "Lernen" |
+| Verbundenheit | Filtert auf Kategorie "Geben" |
+
+**Flow:** Intention wählen → App wechselt zum Backlog-Tab mit aktivem Filter-Chip → User markiert Tasks als NextUp → weiter zum Blöcke-Tab.
+
+Der Filter-Chip ist sichtbar und abschaltbar. Der User kann jederzeit zum normalen Backlog wechseln. Die Intention ist ein Vorschlag, kein Zwang.
+
+## Smart Notifications (Tagesbegleitung)
+
+**Kernprinzip:** Notifications feuern nur bei LÜCKEN zwischen Intention und Handlung. Wer tut was er sich vorgenommen hat, hört nichts.
+
+| Intention | Bedingung für Notification | Beispiel-Text |
+|-----------|---------------------------|---------------|
+| BHAG | Kein Focus Block mit BHAG-Task erstellt | "Du wolltest das große Ding anpacken. Wann legst du los?" |
+| BHAG | BHAG-Task noch nicht begonnen (nachmittags) | "Dein BHAG wartet noch." |
+| Fokus | Kein Focus Block geplant | "Kein Block geplant. Du wolltest fokussiert bleiben." |
+| Fokus | Tasks außerhalb von Blocks erledigt | "Tasks ohne Block erledigt. Willst du einen erstellen?" |
+| Balance | Nur 1-2 Kategorien aktiv (nachmittags) | "Bisher nur Arbeit. Wie wär's mit was für dich?" |
+| Wachstum | Kein "Lernen"-Task erledigt | "Du wolltest was Neues lernen. Hast du schon was im Auge?" |
+| Verbundenheit | Kein "Geben"-Task erledigt | "Du wolltest für andere da sein heute." |
+| Survival | **Keine Nudges.** Survival = "Lass mich in Ruhe." | — |
+
+**Stille-Regel:** Sobald die Intention erfüllt ist → keine weiteren Notifications. Das Monster schweigt wenn alles läuft.
+
+**User-Konfiguration (Settings):**
+
+| Setting | Optionen | Default |
+|---------|----------|---------|
+| Tages-Erinnerungen | An / Aus | An |
+| Max. Erinnerungen pro Tag | 1 / 2 / 3 | 2 |
+| Zeitfenster von | Time Picker | 10:00 |
+| Zeitfenster bis | Time Picker | 18:00 |
+
+Der Inhalt der Notifications wird von der Intention bestimmt, nicht vom User konfiguriert. Die Texte kommen vom Monster — sie sind persönlich, nicht generisch.
+
 ## Der Abend-Spiegel
 
-Das Monster hält am Ende des Tages den Spiegel hoch — kontextabhängig in Intensität:
+Das Monster hält am Ende des Tages den Spiegel hoch — automatisch, ohne dass der User etwas bewerten muss.
 
-| Intention | Erfüllt | Monster sagt... |
-|-----------|---------|-----------------|
-| Survival | Überlebt | "Du hast es geschafft. Auch das zählt." |
-| Fokus | Gehalten | "Du bist bei der Sache geblieben. Stark." |
-| BHAG | Geschafft | "DU HAST ES GETAN! Weißt du was das bedeutet?!" |
-| Balance | Gelebt | "Was für ein runder Tag." |
-| Wachstum | Gelernt | "Du bist heute klüger als gestern." |
-| Verbundenheit | Gegeben | "Du hast jemandem den Tag besser gemacht." |
+### Wann und Wo
+
+Ab 18 Uhr als **Karte im Review-Tab** (oberhalb der Stats). Kein Extra-Screen, kein Zwang — einfach da wenn man hinschaut.
+
+Optional: Push-Notification um 20:00 (konfigurierbar). Nur wenn Coach-Modus aktiv UND Morgen-Intention gesetzt.
+
+### Automatische Auswertung
+
+Die Bewertung kommt komplett aus den Task-Daten — kein User-Input nötig:
+
+| Intention | Erfüllt | Teilweise | Nicht erfüllt |
+|-----------|---------|-----------|---------------|
+| Survival | ≥1 Task erledigt | — | 0 Tasks |
+| Fokus | Block-Completion ≥70% | 40-69% | <40% oder keine Blocks |
+| BHAG | Task mit Wichtigkeit 3 erledigt | Tasks erledigt, aber nicht das große Ding | Nichts Nennenswertes |
+| Balance | Tasks in ≥3 Kategorien | 2 Kategorien | ≤1 Kategorie |
+| Wachstum | "Lernen"-Task erledigt | — | Kein "Lernen"-Task |
+| Verbundenheit | "Geben"-Task erledigt | — | Kein "Geben"-Task |
+
+### Monster-Stimme (Foundation Models)
+
+Foundation Models (On-Device AI) generiert den persönlichen Abend-Text basierend auf:
+
+- Gesetzte Intention
+- Erledigte Tasks (mit Namen!)
+- Erfüllungsgrad (erfüllt / teilweise / nicht erfüllt)
+- Tageskontext (wie viele Blocks, welche Kategorien, Zeitpunkte)
+
+**Beispiel-Prompt an Foundation Models:**
+> Du bist ein sympathisches Monster, Trainingspartner des Users. Die heutige Intention war "BHAG". Der User hat die Steuererklärung (Wichtigkeit 3) um 15:23 erledigt, plus 4 weitere Tasks. Schreib 2-3 persönliche Sätze. Nie toxisch positiv, nie schuldzuweisend. Bezieh dich auf konkrete Tasks.
+
+**Fallback** für ältere Geräte ohne Apple Intelligence: Handgeschriebene Template-Sprüche pro Intention und Erfüllungsgrad.
+
+| Intention | Erfüllt | Monster sagt (Fallback)... |
+|-----------|---------|---------------------------|
+| Survival | Ja | "Du hast es geschafft. Auch das zählt." |
+| Fokus | Ja | "Du bist bei der Sache geblieben. Stark." |
+| BHAG | Ja | "DU HAST ES GETAN! Weißt du was das bedeutet?!" |
+| Balance | Ja | "Was für ein runder Tag." |
+| Wachstum | Ja | "Du bist heute klüger als gestern." |
+| Verbundenheit | Ja | "Du hast jemandem den Tag besser gemacht." |
+
+### Stimmung und Farbe der Karte
+
+| Erfüllungsgrad | Visuell | Ton |
+|----------------|---------|-----|
+| Erfüllt | Warm, leuchtend, Intentionsfarbe | Stolz, feiernd |
+| Teilweise | Gedämpft, sanft | Ermutigend, anerkennend |
+| Nicht erfüllt | Sanft grau/blau | Verständnisvoll, nie verurteilend |
 
 **Intensität:** Sanft bei kleinen Tagen, groß bei großen Herausforderungen. Nie toxisch positiv, nie schuldzuweisend.
 
@@ -95,20 +211,35 @@ Haugs Vier-in-einem-Perspektive teilt das Leben in gleichwertige Bereiche. Focus
 1. **Sichtbar machen:** Visualisierung wie die Zeit auf Lebensbereiche verteilt ist — ohne zu urteilen
 2. **Sanft erinnern:** Wenn ein Bereich zu kurz kommt, erinnert das Monster daran ("Du hast diese Woche noch nichts für dich getan")
 
+## Apple Intelligence Integration
+
+| Technologie | Einsatz |
+|------------|---------|
+| Foundation Models | Persönliche Abend-Reflexionstexte on-device generieren |
+| App Intents / Siri | "Hey Siri, wie war mein Tag?" / "Setz meine Intention auf Fokus" |
+| Smart Notification Timing | Interruption Levels passend zur Situation |
+
+**Foundation Models ist der Game-Changer:** Statt generischer Template-Sprüche wie "Du hast es geschafft. Auch das zählt." schreibt das On-Device-Modell persönliche Texte die konkrete Tasks beim Namen nennen und den Tagesverlauf kennen.
+
+**Datenschutz:** Alles on-device. Keine Task-Daten verlassen das Gerät. Foundation Models läuft lokal.
+
 ## Dimensionen
 
 ### Funktional
 - Morgen-Intention-Screen mit der zentralen Frage
+- Intention-basierter Backlog-Filter nach der Morgen-Auswahl
 - Monster-Charakter mit kontextabhängigem Verhalten
 - Task-Disziplin-Zuordnung (Konsequenz, Ausdauer, Mut, Fokus)
-- Abend-Reflexions-Screen mit Spiegel-Funktion
+- Smart Notifications bei Lücken zwischen Intention und Handlung
+- Abend-Spiegel mit automatischer Auswertung und AI-generiertem Text
 - Modus-Toggle (Focus ↔ Coach)
 - Lebensbalance-Tracking und -Visualisierung
 
 ### Emotional
 - **Morgens:** Intentionalität — "Ich entscheide bewusst, was für ein Tag das wird"
-- **Tagsüber:** Begleitung — "Ich bin nicht allein, mein Monster fordert mich heraus"
-- **Abends:** Stolz, Zufriedenheit, Energie — "Ich bin gewachsen"
+- **Morgens → Backlog:** Handlung — "Ich weiß genau welche Tasks zu meiner Intention passen"
+- **Tagsüber:** Begleitung — "Mein Monster meldet sich nur wenn ich Hilfe brauche"
+- **Abends:** Stolz, Zufriedenheit, Energie — "Ich sehe schwarz auf weiß was ich geschafft habe"
 - **Über Zeit:** Entwicklung — "Ich sehe wie mein Monster und ich zusammen gewachsen sind"
 
 ### Sozial
@@ -134,13 +265,18 @@ Haugs Vier-in-einem-Perspektive teilt das Leben in gleichwertige Bereiche. Focus
 - **Keine toxische Positivität** — ehrlich, nicht aufgesetzt
 - **Kein Vergleich mit anderen** — rein persönliches Wachstum
 - **Kein Gamification-Overkill** — keine XP, Levels, Achievements
+- **Keine Notification-Flut** — Stille-Regel, konfigurierbar, Survival = Ruhe
 
 ## Erfolgskriterien
 
 - [ ] Morgens: Die Frage "Wie willst du dich abends fühlen?" setzt bewusst die Tages-Intention
+- [ ] Nach der Intention: Der Backlog zeigt gefiltert die passenden Tasks
+- [ ] Tagsüber: Smart Notifications melden sich nur bei Lücken — Stille wenn alles läuft
+- [ ] Survival = absolute Ruhe — keine Nudges, keine Bewertung
 - [ ] Mein Monster begleitet mich passend zur Intention durch den Tag
 - [ ] Tasks fühlen sich an wie Training in einer Disziplin, nicht wie Abhaken einer Liste
-- [ ] Abends: Der Spiegel zeigt mir ob ich bekommen habe was ich mir morgens gewünscht habe
+- [ ] Abends: Der Spiegel zeigt automatisch ob ich bekommen habe was ich mir morgens gewünscht habe
+- [ ] Abend-Text ist persönlich und nennt konkrete Tasks beim Namen (via Foundation Models)
 - [ ] Ich sehe über die Zeit an welchen Disziplinen ich gewachsen bin
 - [ ] Mein Monster wächst/entwickelt sich mit mir
 - [ ] Die App erkennt wenn ein Lebensbereich zu kurz kommt und erinnert sanft
@@ -154,7 +290,12 @@ Haugs Vier-in-einem-Perspektive teilt das Leben in gleichwertige Bereiche. Focus
 | Morning Intention Screen | Must | ERLEDIGT (Phase 2) |
 | Coach-Modus Toggle | Must | ERLEDIGT (Phase 1) |
 | Task-Disziplin-Zuordnung (Konsequenz/Ausdauer/Mut/Fokus) | Must | ERLEDIGT (Phase 1) |
-| Evening Reflection Screen (Abend-Spiegel) | Must | Backlog |
+| **Intention-basierter Backlog-Filter** | **Must** | **ERLEDIGT (Phase 3a)** |
+| **Smart Notifications (Tagesbegleitung)** | **Must** | **Backlog** |
+| **Abend-Spiegel (Evaluation + Karte)** | **Must** | **Backlog** |
+| **Foundation Models Abend-Text** | **Must** | **Backlog** |
+| **Abend Push-Notification** | **Should** | **Backlog** |
+| **Siri Integration (App Intents)** | **Should** | **Backlog** |
 | Monster Character System (Persoenlichkeit, Verhalten) | Must | Backlog |
 | Lebensbalance-Visualisierung (Haug 4-in-1) | Should | Backlog |
 | Balance-Erinnerungen | Could | Backlog |
@@ -165,11 +306,22 @@ Haugs Vier-in-einem-Perspektive teilt das Leben in gleichwertige Bereiche. Focus
 
 Phase 1 hat ein Gamification-System implementiert (XP-Punkte pro Disziplin, Evolution-Levels Ei→Baby→Junior→Erwachsen→Meister, MonsterStatusView mit XP-Balken) das den Anti-Patterns dieser User Story direkt widerspricht ("keine XP, Levels, Achievements").
 
-Henning hat das im Dialog korrigiert: "Es geht nicht um XP sondern darum, dass ich abends gelobt werde und worauf ich mit Stolz zurueckblicken kann." Das System wurde entfernt.
+Henning hat das im Dialog korrigiert: "Es geht nicht um XP sondern darum, dass ich abends gelobt werde und worauf ich mit Stolz zurückblicken kann." Das System wurde entfernt.
 
 **Was bleibt:** Discipline Enum (Task-Klassifizierung), Coach-Modus Toggle, Morning Intention.
 **Was entfernt wurde:** MonsterCoach Model (XP/Evolution), MonsterStatusView (XP-Balken).
 
+### Phase 3 Tagesbogen — Spezifiziert (2026-03-12)
+
+Im Dialog mit Henning wurde der komplette Tagesbogen ausgearbeitet: Was passiert NACH der Morgen-Intention? Wie begleitet die App durch den Tag? Was passiert abends?
+
+**Kern-Entscheidungen:**
+- Abend-Bewertung ist automatisch (aus Task-Daten) — kein User-Input nötig
+- Task-Kategorie dient als Proxy für schwierige Intentionen (Growth → "Lernen", Connection → "Geben")
+- Notifications nur bei Lücken — wer seine Intention lebt, hört nichts
+- Foundation Models für persönliche Abend-Texte — Fallback-Templates für ältere Geräte
+
 ---
 *Ermittelt im JTBD-Dialog am 2026-03-11*
+*Tagesbogen konkretisiert am 2026-03-12*
 *Wissenschaftliche Fundierung: Dweck, Amabile, Deci & Ryan, Haug, Covey, Hayes, Gollwitzer*

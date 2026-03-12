@@ -71,17 +71,14 @@
 - Coach-Toggle: `AppSettings.coachModeEnabled` (UserDefaults)
 - Tab-Steuerung: `MainTabView` mit `@State var selectedTab` (programmatischer Tab-Wechsel moeglich)
 
-### Phase 3a: Intention-basierter Backlog-Filter (Must)
-- Nach Morgen-Auswahl → App wechselt zum Backlog-Tab (via `selectedTab` Binding) mit aktivem Filter-Chip
-- 6 Filter-Mappings (Details: User Story Section "Nach der Morgen-Auswahl"):
-  - Survival → kein Filter
-  - Fokus → nur Tasks mit `isNextUp == true`
-  - BHAG → Tasks mit `importance == 3` (hoechste Stufe). "Oft verschoben" = Tasks mit `deferCount > 0` (Feld existiert auf LocalTask)
-  - Balance → Backlog gruppiert nach `category`, Kategorien ohne Tasks hervorheben
-  - Growth → nur Tasks mit `category == .lernen`
-  - Connection → nur Tasks mit `category == .geben`
-- Filter-Chip oben im Backlog sichtbar, per Tap abschaltbar
-- **Dateien (geschaetzt):** BacklogView (Filter-Logik + Chip), MorningIntentionView (Tab-Wechsel nach Auswahl), MainTabView (selectedTab Binding durchreichen)
+### Phase 3a: Intention-basierter Backlog-Filter (Must) — ERLEDIGT ✓
+- Nach Morgen-Auswahl → App wechselt automatisch zum Backlog-Tab mit aktivem Filter-Chip
+- 6 Filter-Mappings implementiert (Survival=kein Filter, Fokus=NextUp, BHAG=importance 3 oder rescheduleCount≥2, Balance=alle Tasks, Growth=category "learning", Connection=category "giving_back")
+- Filter-Chips sichtbar als Capsule-Buttons, per Tap einzeln abschaltbar
+- Multi-Select: UNION-Logik, Survival ueberstimmt alles
+- **Geaenderte Dateien:** `DailyIntention.swift` (matchesFilter), `BacklogView.swift` (Filter-UI + Logik), `MorningIntentionView.swift` (AppStorage-Writes), `FocusBloxApp.swift` (Tab-Switch)
+- **Tests:** 10 Unit Tests + 6 UI Tests — alle GRUEN
+- **Spec:** `openspec/changes/monster-coach-phase3a/proposal.md`
 
 ### Phase 3b: Smart Notifications — Tagesbegleitung (Must)
 - **Abhaengigkeit:** Braucht `IntentionEvaluationService` aus Phase 3c (gleiche Logik: "Ist die Intention erfuellt?")
@@ -1060,6 +1057,59 @@
 - **Geaenderte Dateien:** `NotificationService.swift`, `ContentView.swift` (2 Dateien, ~10 LoC)
 - **Tests:** 6 Unit Tests (BadgeCountFilterTests) — alle gruen
 - **Analyse:** `docs/artifacts/bug-badge-count/analysis.md`
+
+---
+
+## OFFEN: Feature — Blocker-Picker mit Suchfunktion
+
+- **Anforderung:** Der Auswahldialog fuer abhaengige Tasks (Blocker) soll statt eines langen Dropdown-Menues ein Searchable Sheet mit alphabetischer Sortierung zeigen.
+- **Plattformen:** iOS + macOS
+- **Aktueller Stand:** Implementation FERTIG, UI Tests SCHEITERN am Simulator
+
+### Was bereits implementiert ist (Code gebaut, kompiliert auf beiden Plattformen):
+- `Sources/Views/BlockerPickerSheet.swift` — Neue shared Komponente (Searchable List + "Keine"-Option + Checkmarks)
+- `Sources/Views/TaskFormSheet.swift` — Picker durch Button + Sheet ersetzt (iOS)
+- `FocusBloxMac/TaskInspector.swift` — Picker durch Button + Sheet ersetzt (macOS)
+- `FocusBloxUITests/BlockerPickerSearchUITests.swift` — 4 UI Tests + 1 Diagnostik-Test
+
+### Problem: UI Tests scheitern (Simulator-Infrastruktur)
+- **Symptom:** `app.buttons["tab-backlog"]` wird nicht gefunden — der allererste Schritt im Test
+- **Beweis:** Screenshot zeigt App laeuft korrekt, Tab-Bar ist sichtbar
+- **Beweis:** ALLE UI Tests scheitern (auch vorher funktionierende wie `TaskFormGlassCardUITests`)
+- **Bekanntes Xcode 26 Problem:** Simulator-Clones ("Clone 1 of FocusBlox") crashen mit "ipc/mig server died"
+- **Quellen:**
+  - Apple Dev Forums: "XCode 26.2 not running UItests" (https://developer.apple.com/forums/thread/817089)
+  - Bekanntes Problem: Buttons im Element Tree nicht verfuegbar nach iOS 26 Upgrade
+  - Accessibility Inspector zeigt View-Hierarchie nicht an fuer iOS 26+ mit Xcode 26.2
+
+### Plan fuer naechste Session (schrittweise, Analysis-First):
+
+**Schritt 1: Simulator-Umgebung stabilisieren**
+- `xcrun simctl erase` des Test-Simulators
+- `xcodebuild clean` + DerivedData loeschen
+- Simulator neu booten, warten bis stabil
+- EINEN bekannten Test laufen lassen (`TaskFormGlassCardUITests/testFormUsesScrollView`)
+- `-parallel-testing-enabled NO` verwenden (vermeidet Clone-Problem)
+- Wenn dieser Test NICHT geht: Problem liegt am Simulator/Xcode, nicht an unserem Code
+
+**Schritt 2: Falls Simulator funktioniert — Blocker-Tests laufen lassen**
+- `BlockerPickerSearchUITests/test_blockerSection_showsButtonThatOpensSheet` einzeln ausfuehren
+- Bei Failure: `print(app.debugDescription)` in Test einbauen um Element-Tree zu sehen
+- Element-Tree analysieren: Welche Buttons/IDs existieren tatsaechlich?
+
+**Schritt 3: Falls Simulator NICHT funktioniert — Workaround**
+- Xcode 26.0 testen (Berichte sagen: "worked in 26.0, broke in 26.1/26.2")
+- Alternativ: `xcodebuild build-for-testing` + `test-without-building` (separater 2-Schritt-Prozess)
+- Alternativ: Neuen Simulator erstellen statt den alten zu reparieren
+- Alternativ: Test auf physischem Device laufen lassen
+
+**Schritt 4: Tests GREEN machen**
+- Nach stabilem Simulator: Tests anpassen falls Element-IDs sich geaendert haben
+- Alle 4 Tests muessen GREEN sein
+- Danach: Validate + Commit
+
+### Analyse-Dokument
+- `docs/artifacts/bug-dependency-search/analysis.md`
 
 ---
 

@@ -43,6 +43,37 @@ enum IntentionOption: String, Codable, CaseIterable {
     }
 }
 
+// MARK: - Intention Filter Logic
+
+extension IntentionOption {
+    /// Determines if a task should be visible given the active intention filters.
+    /// - Survival overrides everything (all tasks pass).
+    /// - Empty activeOptions means no filter (all tasks pass).
+    /// - Multiple options use OR logic (task passes if it matches ANY option).
+    /// - Balance has no task-level filter (only changes UI grouping).
+    static func matchesFilter(activeOptions: [IntentionOption], task: PlanItem) -> Bool {
+        guard !activeOptions.isEmpty else { return true }
+        if activeOptions.contains(.survival) { return true }
+
+        return activeOptions.contains { option in
+            switch option {
+            case .survival:
+                return true
+            case .fokus:
+                return task.isNextUp
+            case .bhag:
+                return task.importance == 3 || task.rescheduleCount >= 2
+            case .balance:
+                return true // No task-level filter — UI handles grouping
+            case .growth:
+                return task.taskType == "learning"
+            case .connection:
+                return task.taskType == "giving_back"
+            }
+        }
+    }
+}
+
 /// Daily intention stored per day in UserDefaults.
 struct DailyIntention: Codable, Equatable {
     var date: String

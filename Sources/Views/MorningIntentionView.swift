@@ -6,6 +6,8 @@ struct MorningIntentionView: View {
     @State private var intention = DailyIntention.load()
     @State private var selectedOptions: Set<IntentionOption> = []
     @State private var isEditing = false
+    @AppStorage("intentionFilterOptions") private var intentionFilterOptions: String = ""
+    @AppStorage("intentionJustSet") private var intentionJustSet: Bool = false
 
     private let columns = [
         GridItem(.flexible(), spacing: 12),
@@ -80,11 +82,18 @@ struct MorningIntentionView: View {
             }
 
             Button {
+                let selections = Array(selectedOptions)
                 var newIntention = DailyIntention(
                     date: intention.date,
-                    selections: Array(selectedOptions)
+                    selections: selections
                 )
                 newIntention.save()
+
+                // Write active filter options for BacklogView
+                intentionFilterOptions = selections.map(\.rawValue).joined(separator: ",")
+                // Signal tab switch to Backlog
+                intentionJustSet = true
+
                 withAnimation(.spring()) {
                     intention = newIntention
                     isEditing = false

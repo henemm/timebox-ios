@@ -17,6 +17,7 @@ struct FocusBloxApp: App {
     @State private var quickCaptureTitle = ""
     @State private var selectedTab: AppTab = .backlog
     @State private var permissionRequested = false
+    @AppStorage("intentionJustSet") private var intentionJustSet: Bool = false
     private let settings = AppSettings.shared
     @State private var syncMonitor = CloudKitSyncMonitor()
     @State private var deferredSort = DeferredSortController()
@@ -305,6 +306,12 @@ struct FocusBloxApp: App {
                     showQuickCapture = true
                 }
             }
+            .onChange(of: intentionJustSet) { _, newValue in
+                if newValue {
+                    selectedTab = .backlog
+                    intentionJustSet = false
+                }
+            }
             .onChange(of: scenePhase) { _, newPhase in
                 if newPhase == .active {
                     syncMonitor.triggerSync()
@@ -512,9 +519,11 @@ struct FocusBloxApp: App {
             } else {
                 UserDefaults.standard.set(false, forKey: "coachModeEnabled")
             }
-            // Clear daily intention to avoid test state leakage
+            // Clear daily intention and filter state to avoid test state leakage
             let todayKey = DailyIntention.todayKey()
             UserDefaults.standard.removeObject(forKey: todayKey)
+            UserDefaults.standard.removeObject(forKey: "intentionFilterOptions")
+            UserDefaults.standard.removeObject(forKey: "intentionJustSet")
         }
 
         guard ProcessInfo.processInfo.arguments.contains("-ResetUserDefaults") else { return }
@@ -662,6 +671,22 @@ struct FocusBloxApp: App {
         longTitleTask.taskType = "essentials"
         longTitleTask.dueDate = Date()
         context.insert(longTitleTask)
+
+        // MARK: - Dependency Mock Data (blocked task with indent + dimming)
+        let blockerTask = LocalTask(title: "[MOCK] Blocker: API fertigstellen", importance: 3, estimatedDuration: 60, urgency: "urgent")
+        blockerTask.isNextUp = false
+        blockerTask.taskType = "deep_work"
+        context.insert(blockerTask)
+
+        let blockedTask1 = LocalTask(title: "[MOCK] Abhaengig: Frontend anpassen", importance: 2, estimatedDuration: 30, urgency: "not_urgent")
+        blockedTask1.isNextUp = false
+        blockedTask1.blockerTaskID = blockerTask.id
+        context.insert(blockedTask1)
+
+        let blockedTask2 = LocalTask(title: "[MOCK] Abhaengig: Tests schreiben", importance: 2, estimatedDuration: 20, urgency: "not_urgent")
+        blockedTask2.isNextUp = false
+        blockedTask2.blockerTaskID = blockerTask.id
+        context.insert(blockedTask2)
 
         // Badge-overflow task: ALL badges set to demonstrate FlowLayout wrapping
         let badgeOverflowTask = LocalTask(title: "[MOCK] Badge Overflow Demo", importance: 3, estimatedDuration: 120, urgency: "urgent")
