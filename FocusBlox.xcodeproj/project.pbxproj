@@ -76,6 +76,7 @@
 		991544877FDF4CD72B4F2DE4 /* SprintReviewSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = B31CB18EF0C80E62953F34D6 /* SprintReviewSheet.swift */; };
 		99A9D9F812F3D5E2E99489C1 /* SpotlightIndexingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FEFD473342A7BED5A2A93AF /* SpotlightIndexingService.swift */; };
 		9BE17D13495121E5FCD4665B /* BlockerPickerSearchUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9BA59D11A5C274B3D9F4469 /* BlockerPickerSearchUITests.swift */; };
+		DAB4DDD8310009E970BE32D4 /* BlockedTaskSwipeUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10CA990CA8C940567199502A /* BlockedTaskSwipeUITests.swift */; };
 		9E4DE0DFDA16F42B8D28D6CD /* ManualBlockCreationUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41F2A36E471937592F06F0C9 /* ManualBlockCreationUITests.swift */; };
 		9F9185F5A9BD5A8CFF79DECA /* ErrorStateUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B596C16F99039490702E0B7 /* ErrorStateUITests.swift */; };
 		9FA22769CF0B14E779B904FA /* FocusBlockDropIndicatorUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC7B2E12D270CC49B824429F /* FocusBlockDropIndicatorUITests.swift */; };
@@ -258,6 +259,9 @@
 		MINT04BUILD0000001 /* MorningIntentionUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = MINT04FILEREF00001 /* MorningIntentionUITests.swift */; };
 		MIVW01BUILD0000001 /* MorningIntentionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = MIVW01FILEREF00001 /* MorningIntentionView.swift */; };
 		MIVW02BUILD0000001 /* MorningIntentionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = MIVW01FILEREF00001 /* MorningIntentionView.swift */; };
+		EVRC01BUILD0000001 /* EveningReflectionCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = EVRC01FILEREF00001 /* EveningReflectionCard.swift */; };
+		EVRC02BUILD0000001 /* EveningReflectionCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = EVRC01FILEREF00001 /* EveningReflectionCard.swift */; };
+		EVRC03BUILD0000001 /* EveningReflectionCardUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EVRC03FILEREF00001 /* EveningReflectionCardUITests.swift */; };
 		NOTIF02BUILD000001 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 350DD1256F45268992636DEA /* NotificationService.swift */; };
 		NOTIFACT01BUILD001 /* NotificationActionDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = NOTIFACT01FREF001 /* NotificationActionDelegate.swift */; };
 		NOTIFACT01BUILD002 /* NotificationActionDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = NOTIFACT01FREF001 /* NotificationActionDelegate.swift */; };
@@ -742,6 +746,7 @@
 		F7B0BE54BB8E4DC5B9F85C28 /* CalendarEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarEvent.swift; sourceTree = "<group>"; };
 		F91103B45CFB1388E6B12F3C /* DurationPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DurationPicker.swift; sourceTree = "<group>"; };
 		F9BA59D11A5C274B3D9F4469 /* BlockerPickerSearchUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BlockerPickerSearchUITests.swift; sourceTree = "<group>"; };
+		10CA990CA8C940567199502A /* BlockedTaskSwipeUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockedTaskSwipeUITests.swift; sourceTree = "<group>"; };
 		FAD0E9CA71F3D40E44246594 /* IntentionFilterUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = IntentionFilterUITests.swift; sourceTree = "<group>"; };
 		FBACTSVC01FILEREF001 /* FocusBlockActionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusBlockActionService.swift; sourceTree = "<group>"; };
 		FBENTITY01FILE001 /* FocusBlockEntityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusBlockEntityTests.swift; sourceTree = "<group>"; };
@@ -770,6 +775,8 @@
 		MINT03FILEREF00001 /* MorningIntentionTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MorningIntentionTests.swift; sourceTree = "<group>"; };
 		MINT04FILEREF00001 /* MorningIntentionUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MorningIntentionUITests.swift; sourceTree = "<group>"; };
 		MIVW01FILEREF00001 /* MorningIntentionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MorningIntentionView.swift; sourceTree = "<group>"; };
+		EVRC01FILEREF00001 /* EveningReflectionCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EveningReflectionCard.swift; sourceTree = "<group>"; };
+		EVRC03FILEREF00001 /* EveningReflectionCardUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = EveningReflectionCardUITests.swift; sourceTree = "<group>"; };
 		NOTIFACT01FREF001 /* NotificationActionDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationActionDelegate.swift; sourceTree = "<group>"; };
 		NOTSNZ01FILE00001 /* NotificationSnoozeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationSnoozeTests.swift; sourceTree = "<group>"; };
 		NXLP01PVREF0001 /* TaskPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskPreviewView.swift; sourceTree = "<group>"; };
@@ -1237,9 +1244,11 @@
 				BKGCMP01FILE00001 /* BacklogCompletionUITests.swift */,
 				MINT04FILEREF00001 /* MorningIntentionUITests.swift */,
 				F9BA59D11A5C274B3D9F4469 /* BlockerPickerSearchUITests.swift */,
+				10CA990CA8C940567199502A /* BlockedTaskSwipeUITests.swift */,
 				DE59459EB563B50137F303E8 /* DependencyIndentUITests.swift */,
 				FAD0E9CA71F3D40E44246594 /* IntentionFilterUITests.swift */,
 				CNSU01FILEREF00001 /* CoachNotificationSettingsUITests.swift */,
+				EVRC03FILEREF00001 /* EveningReflectionCardUITests.swift */,
 			);
 			path = FocusBloxUITests;
 			sourceTree = "<group>";
@@ -1367,6 +1376,7 @@
 				SETCMP01GROUP00001 /* Components */,
 				14CEC8C14442ABE7F65B5EE8 /* ShakeGestureModifier.swift */,
 				MIVW01FILEREF00001 /* MorningIntentionView.swift */,
+				EVRC01FILEREF00001 /* EveningReflectionCard.swift */,
 				8323E8E3E49804475266E66A /* BlockerPickerSheet.swift */,
 			);
 			path = Views;
@@ -2204,6 +2214,7 @@
 				DISC01BUILD0000001 /* Discipline.swift in Sources */,
 				MINT01BUILD0000001 /* DailyIntention.swift in Sources */,
 				MIVW01BUILD0000001 /* MorningIntentionView.swift in Sources */,
+				EVRC01BUILD0000001 /* EveningReflectionCard.swift in Sources */,
 				RVWSTAT01BUILD00001 /* ReviewStatsCalculator.swift in Sources */,
 				88ED9B394FA2293A587D7952 /* LocalTaskSource.swift in Sources */,
 				C89E9F957213671FF1B0DC91 /* MainTabView.swift in Sources */,
@@ -2365,9 +2376,11 @@
 				BKGCMP01BUILD0001 /* BacklogCompletionUITests.swift in Sources */,
 				MINT04BUILD0000001 /* MorningIntentionUITests.swift in Sources */,
 				9BE17D13495121E5FCD4665B /* BlockerPickerSearchUITests.swift in Sources */,
+				DAB4DDD8310009E970BE32D4 /* BlockedTaskSwipeUITests.swift in Sources */,
 				4D87251CF1F054F848940F82 /* DependencyIndentUITests.swift in Sources */,
 				324335EAD3A707ABE5F3BEFE /* IntentionFilterUITests.swift in Sources */,
 				CNSU01BUILD0000001 /* CoachNotificationSettingsUITests.swift in Sources */,
+				EVRC03BUILD0000001 /* EveningReflectionCardUITests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2532,6 +2545,7 @@
 				DISC02BUILD0000001 /* Discipline.swift in Sources */,
 				MINT02BUILD0000001 /* DailyIntention.swift in Sources */,
 				MIVW02BUILD0000001 /* MorningIntentionView.swift in Sources */,
+				EVRC02BUILD0000001 /* EveningReflectionCard.swift in Sources */,
 				CATBDG02BUILD0002 /* CategoryIconBadge.swift in Sources */,
 				RVWSTAT02BUILD00001 /* ReviewStatsCalculator.swift in Sources */,
 				TAGINP02BUILD000001 /* TagInputView.swift in Sources */,

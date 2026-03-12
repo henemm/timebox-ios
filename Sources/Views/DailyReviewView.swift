@@ -14,6 +14,7 @@ struct DailyReviewView: View {
     @State private var eventKitRepo = EventKitRepository()
     @State private var blocks: [FocusBlock] = []
     @State private var allTasks: [PlanItem] = []
+    @State private var allLocalTasks: [LocalTask] = []
     @State private var calendarEvents: [CalendarEvent] = []
     @State private var isLoading = true
     @State private var reviewMode: ReviewMode = .today
@@ -21,6 +22,14 @@ struct DailyReviewView: View {
     private let statsCalculator = ReviewStatsCalculator()
 
     // MARK: - Computed Properties
+
+    /// Show evening reflection card after 18:00 or when forced via launch arg.
+    private var showEveningReflection: Bool {
+        if ProcessInfo.processInfo.arguments.contains("-ForceEveningReflection") {
+            return true
+        }
+        return Calendar.current.component(.hour, from: Date()) >= 18
+    }
 
     private var todayBlocks: [FocusBlock] {
         let calendar = Calendar.current
@@ -161,6 +170,16 @@ struct DailyReviewView: View {
                     if coachModeEnabled && reviewMode == .today {
                         MorningIntentionView()
                             .padding(.horizontal)
+
+                        // Evening reflection card (Phase 3c)
+                        if showEveningReflection && DailyIntention.load().isSet {
+                            EveningReflectionCard(
+                                intentions: DailyIntention.load().selections,
+                                tasks: allLocalTasks,
+                                focusBlocks: todayBlocks
+                            )
+                            .padding(.horizontal)
+                        }
                     }
 
                     if isLoading {
@@ -599,6 +618,7 @@ struct DailyReviewView: View {
             let descriptor = FetchDescriptor<LocalTask>()
             let localTasks = try modelContext.fetch(descriptor)
             allTasks = localTasks.map { PlanItem(localTask: $0) }
+            allLocalTasks = localTasks
         } catch {
             allTasks = []
         }

@@ -270,4 +270,276 @@ final class IntentionEvaluationServiceTests: XCTestCase {
         )
         XCTAssertEqual(result.count, 1, "Only today's completed task should be returned")
     }
+
+    // MARK: - evaluateFulfillment: Survival
+
+    /// Verhalten: Survival + ≥1 Task erledigt → .fulfilled
+    /// Bricht wenn: evaluateFulfillment() den survival-Case nicht als fulfilled behandelt wenn Tasks vorhanden.
+    func test_evaluateFulfillment_survival_fulfilled() {
+        let task = makeTask(isCompleted: true, completedAt: today)
+        let result = IntentionEvaluationService.evaluateFulfillment(
+            intention: .survival, tasks: [task], focusBlocks: []
+        )
+        XCTAssertEqual(result, .fulfilled, "Survival with completed tasks should be fulfilled")
+    }
+
+    /// Verhalten: Survival + 0 Tasks erledigt → .notFulfilled
+    /// Bricht wenn: survival immer .fulfilled zurueckgibt ohne Task-Pruefung.
+    func test_evaluateFulfillment_survival_notFulfilled() {
+        let result = IntentionEvaluationService.evaluateFulfillment(
+            intention: .survival, tasks: [], focusBlocks: []
+        )
+        XCTAssertEqual(result, .notFulfilled, "Survival with no tasks should be notFulfilled")
+    }
+
+    // MARK: - evaluateFulfillment: Fokus
+
+    /// Verhalten: Fokus + Block-Completion ≥70% → .fulfilled
+    /// Bricht wenn: blockCompletionPercentage-Schwelle nicht bei 0.7 liegt.
+    func test_evaluateFulfillment_fokus_fulfilled() {
+        // 3 von 4 Tasks completed = 75%
+        let block = makeBlock(
+            taskIDs: ["t1", "t2", "t3", "t4"],
+            completedTaskIDs: ["t1", "t2", "t3"]
+        )
+        let result = IntentionEvaluationService.evaluateFulfillment(
+            intention: .fokus, tasks: [], focusBlocks: [block]
+        )
+        XCTAssertEqual(result, .fulfilled, "Fokus with 75% block completion should be fulfilled")
+    }
+
+    /// Verhalten: Fokus + Block-Completion 40-69% → .partial
+    /// Bricht wenn: partial-Schwelle nicht bei [0.4, 0.7) liegt.
+    func test_evaluateFulfillment_fokus_partial() {
+        // 2 von 4 Tasks completed = 50%
+        let block = makeBlock(
+            taskIDs: ["t1", "t2", "t3", "t4"],
+            completedTaskIDs: ["t1", "t2"]
+        )
+        let result = IntentionEvaluationService.evaluateFulfillment(
+            intention: .fokus, tasks: [], focusBlocks: [block]
+        )
+        XCTAssertEqual(result, .partial, "Fokus with 50% block completion should be partial")
+    }
+
+    /// Verhalten: Fokus + Block-Completion <40% → .notFulfilled
+    /// Bricht wenn: notFulfilled-Schwelle nicht unter 0.4 liegt.
+    func test_evaluateFulfillment_fokus_notFulfilled_lowCompletion() {
+        // 1 von 4 Tasks = 25%
+        let block = makeBlock(
+            taskIDs: ["t1", "t2", "t3", "t4"],
+            completedTaskIDs: ["t1"]
+        )
+        let result = IntentionEvaluationService.evaluateFulfillment(
+            intention: .fokus, tasks: [], focusBlocks: [block]
+        )
+        XCTAssertEqual(result, .notFulfilled, "Fokus with 25% block completion should be notFulfilled")
+    }
+
+    /// Verhalten: Fokus + keine Blocks → .notFulfilled
+    /// Bricht wenn: leere Blocks faelschlicherweise als partial/fulfilled behandelt werden.
+    func test_evaluateFulfillment_fokus_notFulfilled_noBlocks() {
+        let result = IntentionEvaluationService.evaluateFulfillment(
+            intention: .fokus, tasks: [], focusBlocks: []
+        )
+        XCTAssertEqual(result, .notFulfilled, "Fokus with no blocks should be notFulfilled")
+    }
+
+    // MARK: - evaluateFulfillment: BHAG
+
+    /// Verhalten: BHAG + importance-3 Task erledigt → .fulfilled
+    /// Bricht wenn: importance==3 Pruefung in evaluateFulfillment fehlt.
+    func test_evaluateFulfillment_bhag_fulfilled() {
+        let task = makeTask(importance: 3, isCompleted: true, completedAt: today)
+        let result = IntentionEvaluationService.evaluateFulfillment(
+            intention: .bhag, tasks: [task], focusBlocks: []
+        )
+        XCTAssertEqual(result, .fulfilled, "BHAG with importance-3 task completed should be fulfilled")
+    }
+
+    /// Verhalten: BHAG + Tasks erledigt aber keiner mit importance=3 → .partial
+    /// Bricht wenn: partial-Logik zwischen "Tasks erledigt" und "kein BHAG-Task" fehlt.
+    func test_evaluateFulfillment_bhag_partial() {
+        let task = makeTask(importance: 2, isCompleted: true, completedAt: today)
+        let result = IntentionEvaluationService.evaluateFulfillment(
+            intention: .bhag, tasks: [task], focusBlocks: []
+        )
+        XCTAssertEqual(result, .partial, "BHAG with tasks but no importance-3 should be partial")
+    }
+
+    /// Verhalten: BHAG + keine Tasks erledigt → .notFulfilled
+    /// Bricht wenn: leere Task-Liste nicht als notFulfilled behandelt wird.
+    func test_evaluateFulfillment_bhag_notFulfilled() {
+        let result = IntentionEvaluationService.evaluateFulfillment(
+            intention: .bhag, tasks: [], focusBlocks: []
+        )
+        XCTAssertEqual(result, .notFulfilled, "BHAG with no tasks should be notFulfilled")
+    }
+
+    // MARK: - evaluateFulfillment: Balance
+
+    /// Verhalten: Balance + Tasks in ≥3 Kategorien → .fulfilled
+    /// Bricht wenn: Kategorie-Zaehlung oder >=3 Schwelle in evaluateFulfillment fehlt.
+    func test_evaluateFulfillment_balance_fulfilled() {
+        let tasks = [
+            makeTask(isCompleted: true, completedAt: today, taskType: "income"),
+            makeTask(isCompleted: true, completedAt: today, taskType: "learning"),
+            makeTask(isCompleted: true, completedAt: today, taskType: "giving_back"),
+        ]
+        let result = IntentionEvaluationService.evaluateFulfillment(
+            intention: .balance, tasks: tasks, focusBlocks: []
+        )
+        XCTAssertEqual(result, .fulfilled, "Balance with 3 categories should be fulfilled")
+    }
+
+    /// Verhalten: Balance + Tasks in genau 2 Kategorien → .partial
+    /// Bricht wenn: Unterscheidung zwischen 2 und ≥3 Kategorien fehlt.
+    func test_evaluateFulfillment_balance_partial() {
+        let tasks = [
+            makeTask(isCompleted: true, completedAt: today, taskType: "income"),
+            makeTask(isCompleted: true, completedAt: today, taskType: "learning"),
+        ]
+        let result = IntentionEvaluationService.evaluateFulfillment(
+            intention: .balance, tasks: tasks, focusBlocks: []
+        )
+        XCTAssertEqual(result, .partial, "Balance with exactly 2 categories should be partial")
+    }
+
+    /// Verhalten: Balance + Tasks in ≤1 Kategorie → .notFulfilled
+    /// Bricht wenn: ≤1 Kategorie nicht als notFulfilled erkannt wird.
+    func test_evaluateFulfillment_balance_notFulfilled() {
+        let tasks = [
+            makeTask(isCompleted: true, completedAt: today, taskType: "income"),
+        ]
+        let result = IntentionEvaluationService.evaluateFulfillment(
+            intention: .balance, tasks: tasks, focusBlocks: []
+        )
+        XCTAssertEqual(result, .notFulfilled, "Balance with 1 category should be notFulfilled")
+    }
+
+    // MARK: - evaluateFulfillment: Growth
+
+    /// Verhalten: Growth + "learning" Task erledigt → .fulfilled
+    /// Bricht wenn: taskType=="learning" Pruefung in evaluateFulfillment fehlt.
+    func test_evaluateFulfillment_growth_fulfilled() {
+        let task = makeTask(isCompleted: true, completedAt: today, taskType: "learning")
+        let result = IntentionEvaluationService.evaluateFulfillment(
+            intention: .growth, tasks: [task], focusBlocks: []
+        )
+        XCTAssertEqual(result, .fulfilled, "Growth with learning task should be fulfilled")
+    }
+
+    /// Verhalten: Growth + kein "learning" Task → .notFulfilled
+    /// Bricht wenn: fehlender learning-Task als partial/fulfilled behandelt wird.
+    func test_evaluateFulfillment_growth_notFulfilled() {
+        let task = makeTask(isCompleted: true, completedAt: today, taskType: "income")
+        let result = IntentionEvaluationService.evaluateFulfillment(
+            intention: .growth, tasks: [task], focusBlocks: []
+        )
+        XCTAssertEqual(result, .notFulfilled, "Growth without learning task should be notFulfilled")
+    }
+
+    // MARK: - evaluateFulfillment: Connection
+
+    /// Verhalten: Connection + "giving_back" Task erledigt → .fulfilled
+    /// Bricht wenn: taskType=="giving_back" Pruefung fehlt.
+    func test_evaluateFulfillment_connection_fulfilled() {
+        let task = makeTask(isCompleted: true, completedAt: today, taskType: "giving_back")
+        let result = IntentionEvaluationService.evaluateFulfillment(
+            intention: .connection, tasks: [task], focusBlocks: []
+        )
+        XCTAssertEqual(result, .fulfilled, "Connection with giving_back task should be fulfilled")
+    }
+
+    /// Verhalten: Connection + kein "giving_back" Task → .notFulfilled
+    /// Bricht wenn: fehlender giving_back-Task als fulfilled behandelt wird.
+    func test_evaluateFulfillment_connection_notFulfilled() {
+        let result = IntentionEvaluationService.evaluateFulfillment(
+            intention: .connection, tasks: [], focusBlocks: []
+        )
+        XCTAssertEqual(result, .notFulfilled, "Connection without giving_back task should be notFulfilled")
+    }
+
+    // MARK: - blockCompletionPercentage
+
+    /// Verhalten: Alle Tasks in Blocks erledigt → 1.0 (100%)
+    /// Bricht wenn: completedTaskIDs/taskIDs Ratio-Berechnung fehlt.
+    func test_blockCompletionPercentage_allCompleted() {
+        let block = makeBlock(
+            taskIDs: ["t1", "t2", "t3"],
+            completedTaskIDs: ["t1", "t2", "t3"]
+        )
+        let result = IntentionEvaluationService.blockCompletionPercentage(
+            focusBlocks: [block]
+        )
+        XCTAssertEqual(result, 1.0, accuracy: 0.01, "All tasks completed should be 100%")
+    }
+
+    /// Verhalten: Teilweise erledigt → korrekte Ratio
+    /// Bricht wenn: Zaehlung von completedTaskIDs oder taskIDs falsch ist.
+    func test_blockCompletionPercentage_partial() {
+        let block = makeBlock(
+            taskIDs: ["t1", "t2", "t3", "t4"],
+            completedTaskIDs: ["t1", "t2"]
+        )
+        let result = IntentionEvaluationService.blockCompletionPercentage(
+            focusBlocks: [block]
+        )
+        XCTAssertEqual(result, 0.5, accuracy: 0.01, "2 of 4 should be 50%")
+    }
+
+    /// Verhalten: Keine Blocks → 0.0
+    /// Bricht wenn: leere Block-Liste nicht als 0.0 behandelt wird.
+    func test_blockCompletionPercentage_noBlocks() {
+        let result = IntentionEvaluationService.blockCompletionPercentage(
+            focusBlocks: []
+        )
+        XCTAssertEqual(result, 0.0, accuracy: 0.01, "No blocks should be 0%")
+    }
+
+    /// Verhalten: Blocks ohne Tasks → 0.0
+    /// Bricht wenn: Division durch 0 bei leeren taskIDs.
+    func test_blockCompletionPercentage_emptyBlocks() {
+        let block = makeBlock(taskIDs: [], completedTaskIDs: [])
+        let result = IntentionEvaluationService.blockCompletionPercentage(
+            focusBlocks: [block]
+        )
+        XCTAssertEqual(result, 0.0, accuracy: 0.01, "Blocks with no tasks should be 0%")
+    }
+
+    // MARK: - Fallback Templates
+
+    /// Verhalten: Jede Intention + fulfilled hat einen nicht-leeren Template-Text.
+    /// Bricht wenn: fallbackTemplate() fuer eine Intention keinen Text zurueckgibt.
+    func test_fallbackTemplate_allIntentions_fulfilled() {
+        for intention in IntentionOption.allCases {
+            let text = IntentionEvaluationService.fallbackTemplate(
+                intention: intention, level: .fulfilled
+            )
+            XCTAssertFalse(text.isEmpty, "\(intention) fulfilled should have a template")
+        }
+    }
+
+    /// Verhalten: Jede Intention + notFulfilled hat einen nicht-leeren Template-Text.
+    /// Bricht wenn: fallbackTemplate() fuer notFulfilled keinen Text zurueckgibt.
+    func test_fallbackTemplate_allIntentions_notFulfilled() {
+        for intention in IntentionOption.allCases {
+            let text = IntentionEvaluationService.fallbackTemplate(
+                intention: intention, level: .notFulfilled
+            )
+            XCTAssertFalse(text.isEmpty, "\(intention) notFulfilled should have a template")
+        }
+    }
+
+    /// Verhalten: Intentionen mit partial-Stufe haben nicht-leeren Template-Text.
+    /// Bricht wenn: fallbackTemplate() fuer partial-Stufen keinen Text liefert.
+    func test_fallbackTemplate_partialIntentions() {
+        let partialIntentions: [IntentionOption] = [.fokus, .bhag, .balance]
+        for intention in partialIntentions {
+            let text = IntentionEvaluationService.fallbackTemplate(
+                intention: intention, level: .partial
+            )
+            XCTAssertFalse(text.isEmpty, "\(intention) partial should have a template")
+        }
+    }
 }

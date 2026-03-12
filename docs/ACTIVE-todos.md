@@ -31,12 +31,12 @@
 - **Commit:** (wird nach Commit ergaenzt)
 
 ### Bug 93: Swipe-Gesten bei eingerueckten Tasks funktionieren nicht (iOS)
-- **Status:** OFFEN
-- **Plattform:** iOS (mindestens), macOS ggf. auch betroffen
-- **Symptom:** Tasks die als Abhaengigkeit eingerueckt dargestellt werden, reagieren nicht auf Swipe-Gesten. Dadurch koennen eingerueckte Tasks weder bearbeitet, geloescht noch ihre Abhaengigkeit entfernt werden.
-- **Auswirkung:** Eine einmal gesetzte Abhaengigkeit kann nicht mehr rueckgaengig gemacht werden. Der Task ist effektiv "gefangen" — kein Edit, kein Delete, kein Dependency-Remove moeglich.
-- **Erwartetes Verhalten:** Eingerueckte Tasks muessen mindestens diese Swipe-Aktionen unterstuetzen: (1) Abhaengigkeit entfernen, (2) Bearbeiten, (3) Loeschen.
-- **Vermutung:** Die Einrueckung (Indent) via `.padding(.leading)` oder aehnlichem koennte den Swipe-Gesture-Recognizer blockieren, oder `.swipeActions` fehlt auf der eingerueckten Row-Variante.
+- **Status:** ERLEDIGT
+- **Plattform:** iOS + macOS
+- **Root Cause:** `blockedRow()` hatte absichtlich keine `.swipeActions` — blockierte Tasks waren "gefangen".
+- **Fix:** Swipe-Aktionen zu `blockedRow()` hinzugefuegt: Bearbeiten, Loeschen, Freigeben (Abhaengigkeit entfernen). macOS: Kontextmenue-Eintrag "Abhaengigkeit entfernen".
+- **Tests:** 4 UI Tests gruen (BlockedTaskSwipeUITests)
+- **Dateien:** BacklogView.swift (iOS), ContentView.swift (macOS)
 
 ---
 
@@ -54,13 +54,12 @@
 - Phase 3a (Backlog-Filter) ERLEDIGT
 - Phase 3b (Smart Notifications) ERLEDIGT
 
-### Phase 3c: Abend-Spiegel mit automatischer Auswertung (Must)
-- Karte im Review-Tab (`DailyReviewView`) ab 18 Uhr, oberhalb der bestehenden Stats
-- Automatische Bewertung aus Task-Daten — kein User-Input noetig
-- 3 Stufen pro Intention mit konkreten Kriterien (Details: User Story Section "Der Abend-Spiegel")
-- Stimmungs-Farbe: erfuellt=warm+Intentionsfarbe, teilweise=gedaempft, nicht erfuellt=grau-blau
-- Fallback-Templates fuer Geraete ohne Apple Intelligence
-- **Dateien (geschaetzt):** EveningReflectionCard (NEU), IntentionEvaluationService (erweitern), DailyReviewView (Card einbetten)
+### Phase 3c: Abend-Spiegel mit automatischer Auswertung (Must) — ERLEDIGT
+- Karte im Review-Tab (`DailyReviewView`) ab 18 Uhr
+- FulfillmentLevel (fulfilled/partial/notFulfilled) + evaluateFulfillment() in IntentionEvaluationService
+- EveningReflectionCard mit Stimmungs-Farbe, Badge, Fallback-Templates
+- 40 Unit Tests + 5 UI Tests gruen
+- **Dateien:** EveningReflectionCard.swift (NEU), IntentionEvaluationService.swift, DailyReviewView.swift
 
 ### Phase 3d: Foundation Models Abend-Text (Must)
 - On-Device AI generiert persoenlichen Text der konkrete Tasks beim Namen nennt
