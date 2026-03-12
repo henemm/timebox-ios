@@ -134,9 +134,9 @@ struct QuickCaptureView: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            Image(systemName: "cube.fill")
-                .font(.title2)
-                .foregroundStyle(.blue)
+            Image(nsImage: MenuBarController.makeMenuBarIcon(from: NSApp.applicationIconImage!, size: NSSize(width: 24, height: 24)))
+                .resizable()
+                .frame(width: 24, height: 24)
 
             TextField("Add task...", text: $taskTitle)
                 .textFieldStyle(.plain)

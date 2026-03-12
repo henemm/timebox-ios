@@ -237,8 +237,9 @@ struct MenuBarView: View {
 
     private var header: some View {
         HStack {
-            Image(systemName: "cube.fill")
-                .foregroundStyle(.blue)
+            Image(nsImage: MenuBarController.makeMenuBarIcon(from: NSApp.applicationIconImage!, size: NSSize(width: 20, height: 20)))
+                .resizable()
+                .frame(width: 20, height: 20)
             Text("FocusBlox")
                 .font(.headline)
             Spacer()

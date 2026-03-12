@@ -57,7 +57,79 @@
 
 ---
 
-## IN PROGRESS: Feature — Task-Abhaengigkeiten (Blocker)
+## BACKLOG: Feature — Monster Coach Phase 3 "Der Tagesbogen"
+
+- **User Story:** `docs/project/stories/monster-coach.md` — Sections "Der komplette Tagesbogen", "Nach der Morgen-Auswahl", "Smart Notifications", "Der Abend-Spiegel", "Apple Intelligence Integration"
+- **Vision:** Nach der Morgen-Intention passiert bisher NICHTS. Phase 3 schliesst die Luecke: Morgen → Tag → Abend als durchgaengiges Erlebnis.
+
+**Was Phase 1+2 gebaut hat (Grundlage fuer Phase 3):**
+- `Sources/Models/DailyIntention.swift` — Model mit `IntentionOption` Enum (survival, fokus, bhag, balance, growth, connection)
+- `Sources/Views/MorningIntentionView.swift` — Selection Grid (6 Chips) + kompakte Zusammenfassung
+- `Sources/Views/DailyReviewView.swift` — Review-Tab, zeigt "Mein Tag" bei aktivem Coach
+- `Sources/Models/Discipline.swift` — Task-Disziplin Enum (konsequenz, ausdauer, mut, fokus)
+- Intention-Persistenz: `UserDefaults` Key `dailyIntention_YYYY-MM-DD`
+- Coach-Toggle: `AppSettings.coachModeEnabled` (UserDefaults)
+- Tab-Steuerung: `MainTabView` mit `@State var selectedTab` (programmatischer Tab-Wechsel moeglich)
+
+### Phase 3a: Intention-basierter Backlog-Filter (Must)
+- Nach Morgen-Auswahl → App wechselt zum Backlog-Tab (via `selectedTab` Binding) mit aktivem Filter-Chip
+- 6 Filter-Mappings (Details: User Story Section "Nach der Morgen-Auswahl"):
+  - Survival → kein Filter
+  - Fokus → nur Tasks mit `isNextUp == true`
+  - BHAG → Tasks mit `importance == 3` (hoechste Stufe). "Oft verschoben" = Tasks mit `deferCount > 0` (Feld existiert auf LocalTask)
+  - Balance → Backlog gruppiert nach `category`, Kategorien ohne Tasks hervorheben
+  - Growth → nur Tasks mit `category == .lernen`
+  - Connection → nur Tasks mit `category == .geben`
+- Filter-Chip oben im Backlog sichtbar, per Tap abschaltbar
+- **Dateien (geschaetzt):** BacklogView (Filter-Logik + Chip), MorningIntentionView (Tab-Wechsel nach Auswahl), MainTabView (selectedTab Binding durchreichen)
+
+### Phase 3b: Smart Notifications — Tagesbegleitung (Must)
+- **Abhaengigkeit:** Braucht `IntentionEvaluationService` aus Phase 3c (gleiche Logik: "Ist die Intention erfuellt?")
+- Notifications feuern NUR bei Luecken zwischen Intention und Handlung (Details: User Story Section "Smart Notifications")
+- Stille-Regel: Sobald Intention erfuellt → keine weiteren Notifications
+- Survival = absolute Ruhe (keine Nudges, niemals)
+- Settings: An/Aus, Max pro Tag (1/2/3), Zeitfenster (von/bis Picker)
+- **Dateien (geschaetzt):** NotificationService (Scheduling), IntentionEvaluationService (aus 3c), SettingsView (neue Controls)
+
+### Phase 3c: Abend-Spiegel mit automatischer Auswertung (Must)
+- Karte im Review-Tab (`DailyReviewView`) ab 18 Uhr, oberhalb der bestehenden Stats
+- Automatische Bewertung aus Task-Daten — kein User-Input noetig
+- 3 Stufen pro Intention mit konkreten Kriterien (Details: User Story Section "Der Abend-Spiegel" → "Automatische Auswertung"):
+  - z.B. Fokus: Block-Completion ≥70% = erfuellt, 40-69% = teilweise, <40% = nicht erfuellt
+  - z.B. Balance: Tasks in ≥3 Kategorien = erfuellt, 2 = teilweise, ≤1 = nicht erfuellt
+- Stimmungs-Farbe: erfuellt=warm+Intentionsfarbe, teilweise=gedaempft, nicht erfuellt=grau-blau
+- Fallback-Templates fuer Geraete ohne Apple Intelligence (statische Sprueche pro Intention+Stufe)
+- **Dateien (geschaetzt):** EveningReflectionCard (NEU, SwiftUI View), IntentionEvaluationService (NEU, berechnet Erfuellungsgrad), DailyReviewView (Card einbetten)
+
+### Phase 3d: Foundation Models Abend-Text (Must)
+- On-Device AI generiert persoenlichen Text der konkrete Tasks beim Namen nennt
+- Prompt-Input: Intention, erledigte Task-Titel, Erfuellungsgrad, Tageskontext (Blocks, Kategorien)
+- Fallback auf handgeschriebene Template-Sprueche wenn Foundation Models nicht verfuegbar
+- **Abhaengigkeit:** Apple Intelligence / Foundation Models Framework (iOS 26+), Phase 3c (EveningReflectionCard als Host)
+- **Dateien (geschaetzt):** MonsterVoiceService (NEU, Foundation Models Prompt), EveningReflectionCard (Text-Integration)
+
+### Phase 3e: Abend Push-Notification (Should)
+- Optional, konfigurierbar (Default: 20:00 Uhr)
+- Nur wenn `coachModeEnabled == true` UND heutige Intention gesetzt
+- **Dateien (geschaetzt):** NotificationService (neuer Notification-Typ)
+
+### Phase 3f: Siri Integration / App Intents (Should)
+- "Hey Siri, wie war mein Tag?" → liest Abend-Spiegel Auswertung vor
+- "Setz meine Intention auf Fokus" → setzt DailyIntention
+- **Abhaengigkeit:** Phase 3c (IntentionEvaluationService fuer "wie war mein Tag")
+- **Dateien (geschaetzt):** AppIntents (NEU)
+
+### Empfohlene Reihenfolge
+1. **3a** (Backlog-Filter) — baut direkt auf MorningIntentionView auf, kein neuer Service noetig
+2. **3c** (Abend-Spiegel) — Kern-Feature, erstellt IntentionEvaluationService den 3b+3d+3f brauchen
+3. **3b** (Smart Notifications) — nutzt IntentionEvaluationService aus 3c
+4. **3d** (Foundation Models) — Enhancement fuer 3c, eigener Service
+5. **3e** (Abend Push) — kleiner Zusatz zu NotificationService
+6. **3f** (Siri) — eigenstaendig, kann jederzeit nach 3c
+
+---
+
+## ERLEDIGT: Feature — Task-Abhaengigkeiten (Blocker)
 
 - **Anforderung:** Tasks koennen eine Finish-to-Start Abhaengigkeit bekommen. Task B kann erst bearbeitet werden wenn Task A (Blocker) erledigt ist. Blockierte Tasks werden eingerueckt + dimmed dargestellt. Blocker-Tasks bekommen Ranking-Boost.
 - **Phase 1 (Daten-Layer + Scoring) — ERLEDIGT:**
@@ -771,6 +843,15 @@
 - **Dateien:** MenuBarIconState.swift, FocusBloxMacApp.swift, MenuBarIconStateTests.swift (3 Dateien, ~30 LoC)
 - **Tests:** 13/13 gruen (3 neue Tests fuer taskEndDate-Parameter)
 - **Analyse:** `docs/artifacts/bug-menubar-timer-wrong/analysis.md`
+
+### Bug 91: macOS Menuleisten-Icon zeigt App-Icon statt cube.fill (ERLEDIGT)
+- **Status:** ERLEDIGT
+- **Plattform:** macOS
+- **Symptom:** Menuleisten-Icon war generisches SF Symbol (cube.fill) statt dem eigenen App-Icon
+- **Fix:** App-Icon wird geladen, Hintergrund weggeschnitten (innere 60%), kreisfoermig maskiert und als Graustufen gerendert
+- **Dateien:** FocusBloxMacApp.swift (1 Datei geaendert), MenuBarIdleIconTests.swift (neu)
+- **Tests:** 2/2 gruen + alle bestehenden MenuBar-Tests gruen
+- **Analyse:** `docs/artifacts/bug-menubar-icon-template/analysis.md`
 
 ### Bug 64: Kategorie-Icon auf Kalender-Events zu klein (ERLEDIGT)
 - **Status:** ERLEDIGT

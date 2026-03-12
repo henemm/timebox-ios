@@ -32,10 +32,43 @@ final class MenuBarController: NSObject {
     private static let autosaveName = "com.focusblox.menubar"
     private static let positionKey = "NSStatusItem Preferred Position \(autosaveName)"
 
-    private static let idleImage = NSImage(
-        systemSymbolName: "cube.fill",
-        accessibilityDescription: "FocusBlox"
-    )
+    private var idleImage: NSImage?
+
+    /// Extracts the center of the app icon (the concentric circles),
+    /// crops away the rounded-rect background, and renders as grayscale.
+    static func makeMenuBarIcon(from source: NSImage, size: NSSize) -> NSImage {
+        // Step 1: Crop inner 60% to remove rounded-rect background
+        let sourceSize = source.size
+        let inset = sourceSize.width * 0.2
+        let cropRect = NSRect(
+            x: inset, y: inset,
+            width: sourceSize.width - inset * 2,
+            height: sourceSize.height - inset * 2
+        )
+
+        // Step 2: Draw cropped + circular mask at target size
+        let result = NSImage(size: size, flipped: false) { rect in
+            // Circular clip to remove any remaining background corners
+            NSBezierPath(ovalIn: rect).addClip()
+            source.draw(in: rect, from: cropRect, operation: .sourceOver, fraction: 1.0)
+            return true
+        }
+
+        // Step 3: Convert to grayscale
+        guard let tiff = result.tiffRepresentation,
+              let ciImage = CIImage(data: tiff),
+              let filter = CIFilter(name: "CIColorMonochrome") else {
+            return result
+        }
+        filter.setValue(ciImage, forKey: kCIInputImageKey)
+        filter.setValue(CIColor(color: .gray)!, forKey: "inputColor")
+        filter.setValue(1.0, forKey: "inputIntensity")
+        guard let output = filter.outputImage else { return result }
+        let rep = NSCIImageRep(ciImage: output)
+        let grayscale = NSImage(size: size)
+        grayscale.addRepresentation(rep)
+        return grayscale
+    }
     private static let allDoneImage = NSImage(
         systemSymbolName: "checkmark.circle.fill",
         accessibilityDescription: "FocusBlox — alle Tasks erledigt"
@@ -44,6 +77,11 @@ final class MenuBarController: NSObject {
     func setup(container: ModelContainer, eventKitRepository: any EventKitRepositoryProtocol) {
         self.eventKitRepo = eventKitRepository
         self.container = container
+
+        // Use app icon in grayscale for menu bar
+        if let appIcon = NSApp.applicationIconImage {
+            idleImage = Self.makeMenuBarIcon(from: appIcon, size: NSSize(width: 18, height: 18))
+        }
 
         // Pre-set visible position on first launch so menu bar managers
         // (e.g. Hidden Bar) don't hide the icon in an unreachable tier.
@@ -55,7 +93,7 @@ final class MenuBarController: NSObject {
         item.autosaveName = Self.autosaveName
 
         if let button = item.button {
-            button.image = Self.idleImage
+            button.image = idleImage
             button.action = #selector(togglePopover)
             button.target = self
         }
@@ -96,7 +134,7 @@ final class MenuBarController: NSObject {
         switch state {
         case .idle:
             button.title = ""
-            button.image = Self.idleImage
+            button.image = idleImage
         case .active(let timerText):
             button.image = nil
             button.title = timerText
