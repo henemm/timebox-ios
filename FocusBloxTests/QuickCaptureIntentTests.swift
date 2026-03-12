@@ -93,7 +93,43 @@ final class QuickCaptureIntentTests: XCTestCase {
         XCTAssertTrue(fetched.contains { $0.title == "App Group Test" })
     }
 
-    // MARK: - Test 5: CreateTaskIntent writes title to App Group UserDefaults with synchronize
+    // MARK: - Test 5: CreateTaskIntent must NOT open the app
+
+    /// Bug: Apple Shortcut opens FocusBlox fully instead of running in background.
+    /// Root Cause: Commit 382a5a1 set openAppWhenRun=true as workaround.
+    /// Fix: openAppWhenRun=false + save directly via SwiftData.
+    func testCreateTaskIntentDoesNotOpenApp() {
+        XCTAssertFalse(CreateTaskIntent.openAppWhenRun,
+                       "CreateTaskIntent must NOT open the app — should run in background")
+    }
+
+    // MARK: - Test 6: CreateTaskIntent saves task directly via SwiftData
+
+    /// After the fix, CreateTaskIntent should save the task directly to SwiftData
+    /// instead of passing the title via UserDefaults to the app.
+    func testCreateTaskIntentSavesDirectlyViaSwiftData() async throws {
+        let container = try SharedModelContainer.create()
+        let context = ModelContext(container)
+
+        // Count tasks before
+        let beforeCount = try context.fetch(FetchDescriptor<LocalTask>()).count
+
+        // Simulate what the fixed CreateTaskIntent.perform() should do:
+        // Save directly to SwiftData instead of UserDefaults
+        let testTitle = "Siri-Shortcut-Test \(UUID().uuidString)"
+        let intent = CreateTaskIntent()
+        intent.taskTitle = testTitle
+        _ = try await intent.perform()
+
+        // Verify: task was saved to SwiftData
+        let afterTasks = try context.fetch(FetchDescriptor<LocalTask>())
+        let saved = afterTasks.first { $0.title == testTitle }
+        XCTAssertNotNil(saved, "CreateTaskIntent should save task directly to SwiftData")
+        XCTAssertEqual(afterTasks.count, beforeCount + 1,
+                       "Exactly one new task should be created")
+    }
+
+    // MARK: - Test 7 (legacy): CreateTaskIntent writes title to App Group UserDefaults with synchronize
 
     /// Bug 88: Siri "Erstelle Task" lost dictated text because Intent extension process
     /// wrote to UserDefaults without synchronize(). Data stayed in RAM and was never

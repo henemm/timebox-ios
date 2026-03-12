@@ -2,24 +2,23 @@ import AppIntents
 import SwiftData
 
 /// Creates a new task in FocusBlox via Siri/Spotlight.
-/// iOS 26: Shows an Interactive Snippet with metadata buttons after title input.
+/// Saves directly to SwiftData without opening the app.
 struct CreateTaskIntent: AppIntent {
     static let title: LocalizedStringResource = "Task erstellen"
     static let description = IntentDescription("Erstellt einen neuen Task in FocusBlox.")
 
-    static let openAppWhenRun: Bool = true
+    static let openAppWhenRun: Bool = false
 
     @Parameter(title: "Titel")
     var taskTitle: String
 
     func perform() async throws -> some IntentResult & ProvidesDialog {
-        // Titel in App Group UserDefaults speichern - App liest und füllt vor
-        if let defaults = UserDefaults(suiteName: "group.com.henning.focusblox") {
-            defaults.set(true, forKey: "quickCaptureFromCC")
-            defaults.set(taskTitle, forKey: "quickCaptureTitle")
-            defaults.synchronize()
-        }
-        return .result(dialog: "Öffne FocusBlox...")
+        let container = try SharedModelContainer.create()
+        let context = ModelContext(container)
+        let task = LocalTask(title: taskTitle)
+        context.insert(task)
+        try context.save()
+        return .result(dialog: "Task '\(taskTitle)' erstellt.")
     }
 }
 
