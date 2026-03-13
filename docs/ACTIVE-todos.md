@@ -64,10 +64,13 @@
 - 40 Unit Tests + 5 UI Tests gruen
 - **Dateien:** EveningReflectionCard.swift (NEU), IntentionEvaluationService.swift, DailyReviewView.swift
 
-### Phase 3d: Foundation Models Abend-Text (Must)
-- On-Device AI generiert persoenlichen Text der konkrete Tasks beim Namen nennt
-- Fallback auf handgeschriebene Template-Sprueche
-- **Abhaengigkeit:** Phase 3c
+### Phase 3d: Foundation Models Abend-Text (Must) — ERLEDIGT
+- EveningReflectionTextService: On-Device AI (Foundation Models) generiert persoenlichen Abend-Text
+- buildPrompt() mit Intention, FulfillmentLevel, erledigten Tasks (max 5), FocusBlock-Stats
+- Fallback auf handgeschriebene Template-Sprueche wenn AI nicht verfuegbar
+- DailyReviewView laedt AI-Texte async, Card zeigt sofort Fallback bis AI fertig
+- 11 Unit Tests + 2 neue UI Tests gruen (gesamt 7/7 UI Tests)
+- **Dateien:** EveningReflectionTextService.swift (NEU), EveningReflectionCard.swift, DailyReviewView.swift
 
 ### Phase 3e: Abend Push-Notification (Should)
 - Optional, konfigurierbar (Default: 20:00 Uhr)
