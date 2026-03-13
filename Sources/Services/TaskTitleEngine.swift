@@ -92,11 +92,41 @@ final class TaskTitleEngine {
         return keywords.contains { lower.contains($0) }
     }
 
+    // MARK: - Deterministic Date Extraction (Bug 97)
+
+    /// Extracts a due date from a title using deterministic keyword matching.
+    /// No AI needed — uses keyword→date mapping directly.
+    /// Used by CreateTaskIntent for immediate date extraction without AI.
+    nonisolated static func extractDeterministicDueDate(from title: String) -> Date? {
+        let lower = title.lowercased()
+        // Order: longer/more specific keywords first to avoid partial matches
+        let mappings: [(keyword: String, relative: String)] = [
+            ("uebermorgen", "uebermorgen"), ("übermorgen", "übermorgen"),
+            ("naechste woche", "naechste woche"), ("nächste woche", "nächste woche"),
+            ("next week", "next week"),
+            ("heute", "heute"), ("today", "heute"),
+            ("morgen", "morgen"), ("tomorrow", "morgen"),
+            ("montag", "montag"), ("monday", "montag"),
+            ("dienstag", "dienstag"), ("tuesday", "dienstag"),
+            ("mittwoch", "mittwoch"), ("wednesday", "mittwoch"),
+            ("donnerstag", "donnerstag"), ("thursday", "donnerstag"),
+            ("freitag", "freitag"), ("friday", "freitag"),
+            ("samstag", "samstag"), ("saturday", "samstag"),
+            ("sonntag", "sonntag"), ("sunday", "sonntag"),
+        ]
+        for mapping in mappings {
+            if lower.contains(mapping.keyword) {
+                return relativeDateFrom(mapping.relative)
+            }
+        }
+        return nil
+    }
+
     // MARK: - Date Helper
 
     /// Maps relative date strings from AI output to actual dates.
     /// Accepts German and English variants, weekdays, and extended phrases.
-    static func relativeDateFrom(_ value: String?) -> Date? {
+    nonisolated static func relativeDateFrom(_ value: String?) -> Date? {
         let cal = Calendar.current
         let today = cal.startOfDay(for: Date())
 
@@ -130,7 +160,7 @@ final class TaskTitleEngine {
 
     /// Returns the next occurrence of the given weekday (1=Sun .. 7=Sat).
     /// Always returns a future date (never today).
-    private static func nextWeekday(_ weekday: Int, after date: Date) -> Date {
+    nonisolated private static func nextWeekday(_ weekday: Int, after date: Date) -> Date {
         let cal = Calendar.current
         let current = cal.component(.weekday, from: date)
         var daysAhead = weekday - current

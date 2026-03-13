@@ -528,6 +528,66 @@ final class TaskTitleEngineTests: XCTestCase {
                       "Title containing 'uebermorgen' should return true")
     }
 
+    // MARK: - Bug 97: Deterministic dueDate Extraction (Shortcut-Pfad)
+
+    /// Verhalten: Titel mit "heute" liefert deterministisch startOfDay(today)
+    /// Bricht wenn: extractDeterministicDueDate() "heute" nicht auf today mapped
+    func test_extractDeterministicDueDate_heute_returnsToday() {
+        let result = TaskTitleEngine.extractDeterministicDueDate(from: "Heute dringend LinkedIn Post verfassen")
+        let expected = Calendar.current.startOfDay(for: Date())
+        XCTAssertEqual(result, expected,
+                       "Title with 'Heute' should return start of today")
+    }
+
+    /// Verhalten: Titel mit "morgen" liefert deterministisch startOfDay(tomorrow)
+    /// Bricht wenn: extractDeterministicDueDate() "morgen" nicht auf tomorrow mapped
+    func test_extractDeterministicDueDate_morgen_returnsTomorrow() {
+        let result = TaskTitleEngine.extractDeterministicDueDate(from: "Morgen Zahnarzt")
+        let expected = Calendar.current.date(byAdding: .day, value: 1,
+                          to: Calendar.current.startOfDay(for: Date()))
+        XCTAssertEqual(result, expected,
+                       "Title with 'Morgen' should return start of tomorrow")
+    }
+
+    /// Verhalten: Generischer Titel ohne Keywords liefert nil
+    /// Bricht wenn: extractDeterministicDueDate() fuer generische Titel ein Datum liefert
+    func test_extractDeterministicDueDate_noKeyword_returnsNil() {
+        let result = TaskTitleEngine.extractDeterministicDueDate(from: "Einkaufen gehen")
+        XCTAssertNil(result,
+                     "Generic title should return nil (no date extraction)")
+    }
+
+    /// Verhalten: Titel mit Wochentag liefert naechsten Wochentag
+    /// Bricht wenn: extractDeterministicDueDate() Wochentage nicht erkennt
+    func test_extractDeterministicDueDate_freitag_returnsNextFriday() {
+        let result = TaskTitleEngine.extractDeterministicDueDate(from: "Bis Freitag Report abgeben")
+        XCTAssertNotNil(result, "Title with 'Freitag' should return a date")
+        // Verify it's a Friday (weekday 6 in Calendar)
+        if let date = result {
+            let weekday = Calendar.current.component(.weekday, from: date)
+            XCTAssertEqual(weekday, 6,
+                           "Should return a Friday (weekday 6)")
+        }
+    }
+
+    /// Verhalten: Case-insensitive — "HEUTE" funktioniert wie "heute"
+    /// Bricht wenn: extractDeterministicDueDate() case-sensitive matched
+    func test_extractDeterministicDueDate_caseInsensitive() {
+        let result = TaskTitleEngine.extractDeterministicDueDate(from: "HEUTE Arzt anrufen")
+        let expected = Calendar.current.startOfDay(for: Date())
+        XCTAssertEqual(result, expected,
+                       "Uppercase 'HEUTE' should still return today")
+    }
+
+    /// Verhalten: Englisches "today" funktioniert ebenfalls
+    /// Bricht wenn: extractDeterministicDueDate() englische Keywords nicht erkennt
+    func test_extractDeterministicDueDate_todayEnglish_returnsToday() {
+        let result = TaskTitleEngine.extractDeterministicDueDate(from: "Finish report today")
+        let expected = Calendar.current.startOfDay(for: Date())
+        XCTAssertEqual(result, expected,
+                       "English 'today' should return start of today")
+    }
+
     /// Verhalten: AI darf dueDate NICHT setzen wenn Titel kein Datum-Keyword enthaelt
     /// Bricht wenn: performImprovement() den titleContainsDateKeyword-Guard nicht hat
     func test_improveTitleIfNeeded_doesNotSetDueDate_forGenericTitle() async throws {

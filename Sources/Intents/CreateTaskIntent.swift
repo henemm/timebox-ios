@@ -16,6 +16,10 @@ struct CreateTaskIntent: AppIntent {
         let container = try SharedModelContainer.create()
         let context = ModelContext(container)
         let task = LocalTask(title: taskTitle)
+        // Bug 97: Deterministic date extraction from title keywords (no AI needed)
+        task.dueDate = TaskTitleEngine.extractDeterministicDueDate(from: taskTitle)
+        // Flag for deferred AI title cleanup on next app launch
+        task.needsTitleImprovement = true
         context.insert(task)
         try context.save()
         return .result(dialog: "Task '\(taskTitle)' erstellt.")

@@ -24,6 +24,16 @@
 - **Fix:** (1) Deterministische Keyword-Pruefung `titleContainsDateKeyword()` als Guard vor AI-dueDate-Akzeptanz, (2) Nil-Beispiel im AI-Prompt, (3) RecurrenceService Date()-Fallback entfernt.
 - **Commit:** (wird nach Commit ergaenzt)
 
+### Bug 97: Apple Shortcut — "heute" im Titel wird nicht als Datum erkannt
+- **Status:** ERLEDIGT
+- **Plattform:** iOS + macOS
+- **Symptom:** Tasks per Apple Shortcut/Siri mit "heute" im Titel bekamen kein Faelligkeitsdatum. Auch kein Title-Cleanup und keine Urgency-Erkennung.
+- **Root Cause:** `CreateTaskIntent.perform()` erstellte Tasks ohne `needsTitleImprovement = true` zu setzen und ohne deterministische Datum-Extraktion. Die TitleEngine-Pipeline wurde nie getriggert.
+- **Fix:** (1) Neue `extractDeterministicDueDate(from:)` Funktion fuer sofortige Datum-Extraktion aus Keywords (kein AI noetig), (2) `needsTitleImprovement = true` fuer spaeteres AI Title-Cleanup.
+- **Tests:** 6 Unit Tests gruen (TaskTitleEngineTests)
+- **Dateien:** CreateTaskIntent.swift, TaskTitleEngine.swift
+- **Commit:** (wird nach Commit ergaenzt)
+
 ### Bug 96: Apple Shortcut oeffnet FocusBlox komplett statt Hintergrund-Save
 - **Status:** ERLEDIGT
 - **Plattform:** iOS
@@ -72,9 +82,13 @@
 - 11 Unit Tests + 2 neue UI Tests gruen (gesamt 7/7 UI Tests)
 - **Dateien:** EveningReflectionTextService.swift (NEU), EveningReflectionCard.swift, DailyReviewView.swift
 
-### Phase 3e: Abend Push-Notification (Should)
-- Optional, konfigurierbar (Default: 20:00 Uhr)
-- Nur wenn `coachModeEnabled == true` UND heutige Intention gesetzt
+### Phase 3e: Abend Push-Notification (Should) — ERLEDIGT
+- Konfigurierbare Abend-Push-Notification (Default 20:00 Uhr)
+- Nur wenn coachModeEnabled UND Intention gesetzt (Dreifach-Guard in scenePhase)
+- Settings: Toggle "Abend-Erinnerung" + Uhrzeit-Picker im Monster Coach Bereich
+- Scheduling: Nach Intention-Save (MorningIntentionView) + bei App-Vordergrund (FocusBloxApp)
+- 8 Unit Tests + 3 UI Tests gruen (+ 12 bestehende Coach-Tests unveraendert)
+- **Dateien:** NotificationService.swift, AppSettings.swift, SettingsView.swift, MorningIntentionView.swift, FocusBloxApp.swift
 
 ### Phase 3f: Siri Integration / App Intents (Should)
 - "Hey Siri, wie war mein Tag?" → liest Abend-Spiegel Auswertung vor

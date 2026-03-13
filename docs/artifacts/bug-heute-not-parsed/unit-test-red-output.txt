@@ -1,0 +1,12 @@
+Testing failed:
+	Type 'TaskTitleEngine' has no member 'extractDeterministicDueDate'
+	Type 'TaskTitleEngine' has no member 'extractDeterministicDueDate'
+	Type 'TaskTitleEngine' has no member 'extractDeterministicDueDate'
+	Type 'TaskTitleEngine' has no member 'extractDeterministicDueDate'
+	Type 'TaskTitleEngine' has no member 'extractDeterministicDueDate'
+	Type 'TaskTitleEngine' has no member 'extractDeterministicDueDate'
+	Testing cancelled because the build failed.
+
+** TEST FAILED **
+
+6 tests fail to compile because extractDeterministicDueDate(from:) does not exist yet.
