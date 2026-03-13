@@ -81,7 +81,7 @@ enum RecurrenceService {
     ) -> LocalTask? {
         guard completedTask.recurrencePattern != "none" else { return nil }
 
-        let baseDate = completedTask.dueDate ?? Date()
+        guard let baseDate = completedTask.dueDate else { return nil }
         let newDueDate = nextDueDate(
             pattern: completedTask.recurrencePattern,
             weekdays: completedTask.recurrenceWeekdays,

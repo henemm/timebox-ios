@@ -705,6 +705,33 @@ final class RecurrenceServiceTests: XCTestCase {
         XCTAssertEqual(repaired, 0, "Non-recurring tasks should not be repaired")
     }
 
+    // MARK: - Bug 95: createNextInstance darf NICHT dueDate aus Date() fallback setzen
+
+    /// Verhalten: Recurring Task ohne dueDate darf bei Completion KEINEN Date()-Fallback verwenden
+    /// Bricht wenn: RecurrenceService.createNextInstance() Zeile 84 `dueDate ?? Date()` → dueDate auf nil prueft
+    @MainActor
+    func test_createNextInstance_returnsNil_whenNoDueDate() throws {
+        let container = try ModelContainer(for: LocalTask.self, configurations: .init(isStoredInMemoryOnly: true))
+        let context = container.mainContext
+
+        let original = LocalTask(
+            title: "Recurring Without DueDate",
+            recurrencePattern: "daily"
+        )
+        // dueDate is nil — kein Datum gesetzt
+        XCTAssertNil(original.dueDate, "Precondition: dueDate should be nil")
+        original.recurrenceGroupID = "no-due-group"
+        context.insert(original)
+        try context.save()
+
+        let instance = RecurrenceService.createNextInstance(from: original, in: context)
+
+        // Bug 95: Aktuell wird Date() als Fallback verwendet und eine Instanz mit dueDate=heute erstellt
+        // Nach Fix: Keine neue Instanz wenn kein baseDate vorhanden
+        XCTAssertNil(instance,
+                     "Bug 95: Should NOT create instance with Date() fallback when completed task has no dueDate")
+    }
+
     private var calendar: Calendar { Calendar.current }
 
     private func makeDate(_ year: Int, _ month: Int, _ day: Int) -> Date {

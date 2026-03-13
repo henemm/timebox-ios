@@ -76,6 +76,22 @@ final class TaskTitleEngine {
         return false
     }
 
+    // MARK: - Date Keyword Detection (Bug 95)
+
+    /// Deterministic check: does the title contain a known date keyword?
+    /// Used as guard before accepting AI-extracted dueDate to prevent hallucination.
+    static func titleContainsDateKeyword(_ title: String) -> Bool {
+        let lower = title.lowercased()
+        let keywords = [
+            "heute", "today", "morgen", "tomorrow", "uebermorgen", "übermorgen",
+            "naechste woche", "nächste woche", "next week",
+            "montag", "monday", "dienstag", "tuesday", "mittwoch", "wednesday",
+            "donnerstag", "thursday", "freitag", "friday", "samstag", "saturday",
+            "sonntag", "sunday"
+        ]
+        return keywords.contains { lower.contains($0) }
+    }
+
     // MARK: - Date Helper
 
     /// Maps relative date strings from AI output to actual dates.
@@ -187,6 +203,8 @@ final class TaskTitleEngine {
     #if canImport(FoundationModels)
     @available(iOS 26.0, macOS 26.0, *)
     private func performImprovement(_ task: LocalTask) async {
+        let originalTitle = task.title
+
         // Preserve original title in description (if description is empty)
         if task.taskDescription == nil || task.taskDescription?.isEmpty == true {
             task.taskDescription = task.title
@@ -206,6 +224,7 @@ final class TaskTitleEngine {
                 "- Extrahiere Zeitangaben aus Floskeln: 'heute', 'morgen', 'naechste Woche', 'bis Freitag', 'uebermorgen'"
                 "- Beispiel: 'Erinnere mich heute daran Herrn Mueller anzurufen' → title='Herrn Mueller anrufen', dueDate='heute'"
                 "- Beispiel: 'Ich muss morgen noch Steuern machen' → title='Steuern machen', dueDate='morgen'"
+                "- Beispiel: 'Einkaufen gehen' → title='Einkaufen gehen', dueDate=nil (KEIN Datum im Titel!)"
                 "- Beginne mit Verb im Infinitiv wenn moeglich"
                 "- Behalte die Sprache des Inputs bei"
                 "- Extrahiere Faelligkeit und Dringlichkeit separat"
@@ -219,7 +238,9 @@ final class TaskTitleEngine {
             if !improved.isEmpty && Self.shouldAcceptImprovedTitle(original: task.title, improved: improved) {
                 task.title = String(improved.prefix(200))
             }
-            if task.dueDate == nil, let date = Self.relativeDateFrom(result.dueDateRelative) {
+            if task.dueDate == nil,
+               Self.titleContainsDateKeyword(originalTitle),
+               let date = Self.relativeDateFrom(result.dueDateRelative) {
                 task.dueDate = date
             }
             if task.urgency == nil, result.isUrgent {

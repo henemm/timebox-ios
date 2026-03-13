@@ -469,4 +469,82 @@ final class TaskTitleEngineTests: XCTestCase {
         XCTAssertTrue(accepted,
                       "Should accept when removed content is urgency keywords")
     }
+
+    // MARK: - Bug 95: titleContainsDateKeyword (deterministische Keyword-Pruefung)
+
+    /// Verhalten: Generischer Titel ohne Datum-Keyword gibt false zurueck
+    /// Bricht wenn: TaskTitleEngine.titleContainsDateKeyword() nicht existiert oder bei generischem Titel true liefert
+    func test_titleContainsDateKeyword_returnsFalse_forGenericTitle() {
+        XCTAssertFalse(TaskTitleEngine.titleContainsDateKeyword("Einkaufen gehen"),
+                       "Generic title without date keyword should return false")
+    }
+
+    /// Verhalten: Generischer englischer Titel ohne Datum gibt false zurueck
+    /// Bricht wenn: titleContainsDateKeyword() bei "Buy groceries" true liefert
+    func test_titleContainsDateKeyword_returnsFalse_forEnglishGenericTitle() {
+        XCTAssertFalse(TaskTitleEngine.titleContainsDateKeyword("Buy groceries"),
+                       "English generic title should return false")
+    }
+
+    /// Verhalten: Titel mit "heute" gibt true zurueck
+    /// Bricht wenn: titleContainsDateKeyword() "heute" nicht erkennt
+    func test_titleContainsDateKeyword_returnsTrue_forHeuteTitle() {
+        XCTAssertTrue(TaskTitleEngine.titleContainsDateKeyword("Heute Arzt anrufen"),
+                      "Title containing 'heute' should return true")
+    }
+
+    /// Verhalten: Titel mit "morgen" gibt true zurueck
+    /// Bricht wenn: titleContainsDateKeyword() "morgen" nicht erkennt
+    func test_titleContainsDateKeyword_returnsTrue_forMorgenTitle() {
+        XCTAssertTrue(TaskTitleEngine.titleContainsDateKeyword("Morgen Steuern machen"),
+                      "Title containing 'morgen' should return true")
+    }
+
+    /// Verhalten: Titel mit Wochentag gibt true zurueck
+    /// Bricht wenn: titleContainsDateKeyword() Wochentage nicht erkennt
+    func test_titleContainsDateKeyword_returnsTrue_forWeekdayTitle() {
+        XCTAssertTrue(TaskTitleEngine.titleContainsDateKeyword("Bis Freitag Report abgeben"),
+                      "Title containing weekday should return true")
+    }
+
+    /// Verhalten: Titel mit "naechste Woche" gibt true zurueck
+    /// Bricht wenn: titleContainsDateKeyword() zusammengesetzte Phrasen nicht erkennt
+    func test_titleContainsDateKeyword_returnsTrue_forNaechsteWocheTitle() {
+        XCTAssertTrue(TaskTitleEngine.titleContainsDateKeyword("Naechste Woche Meeting planen"),
+                      "Title containing 'naechste woche' should return true")
+    }
+
+    /// Verhalten: Titel mit "today" (englisch) gibt true zurueck
+    /// Bricht wenn: titleContainsDateKeyword() englische Keywords nicht erkennt
+    func test_titleContainsDateKeyword_returnsTrue_forTodayTitle() {
+        XCTAssertTrue(TaskTitleEngine.titleContainsDateKeyword("Finish report today"),
+                      "Title containing 'today' should return true")
+    }
+
+    /// Verhalten: Titel mit "uebermorgen" gibt true zurueck
+    /// Bricht wenn: titleContainsDateKeyword() "uebermorgen" nicht erkennt
+    func test_titleContainsDateKeyword_returnsTrue_forUebermorgenTitle() {
+        XCTAssertTrue(TaskTitleEngine.titleContainsDateKeyword("Uebermorgen Zahnarzt"),
+                      "Title containing 'uebermorgen' should return true")
+    }
+
+    /// Verhalten: AI darf dueDate NICHT setzen wenn Titel kein Datum-Keyword enthaelt
+    /// Bricht wenn: performImprovement() den titleContainsDateKeyword-Guard nicht hat
+    func test_improveTitleIfNeeded_doesNotSetDueDate_forGenericTitle() async throws {
+        guard TaskTitleEngine.isAvailable else {
+            throw XCTSkip("Apple Intelligence not available")
+        }
+
+        let context = container.mainContext
+        let task = LocalTask(title: "Projekt Dokumentation schreiben")
+        task.needsTitleImprovement = true
+        context.insert(task)
+        try context.save()
+
+        let engine = TaskTitleEngine(modelContext: context)
+        await engine.improveTitleIfNeeded(task)
+
+        XCTAssertNil(task.dueDate,
+                     "Bug 95: Generic title must NOT get dueDate set by AI")
+    }
 }

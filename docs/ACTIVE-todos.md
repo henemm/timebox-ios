@@ -17,10 +17,12 @@
 - **Hinweis:** War bereits einmal "gefixt" worden — der Fix war wirkungslos, wurde aber nicht durch Tests aufgedeckt. Diesmal muessen die Tests den tatsaechlichen Scroll/Fokus-Zustand verifizieren, nicht nur die Existenz des Tasks.
 
 ### Bug 95: Neue Tasks bekommen immer Faelligkeitsdatum "heute"
-- **Status:** OFFEN
+- **Status:** ERLEDIGT
 - **Plattform:** iOS + macOS
 - **Symptom:** Alle neu erstellten Tasks erhalten automatisch das Faelligkeitsdatum "heute", unabhaengig vom Inhalt oder Kontext.
-- **Erwartetes Verhalten:** Neue Tasks sollten KEIN Default-Faelligkeitsdatum haben (nil/leer), ausser der Benutzer setzt explizit eines.
+- **Root Cause:** TaskTitleEngine AI-Enrichment setzte dueDate auf "heute" fuer generische Titel, weil der System-Prompt kein Nil-Beispiel hatte. Die AI halluzinierte Datum-Keywords.
+- **Fix:** (1) Deterministische Keyword-Pruefung `titleContainsDateKeyword()` als Guard vor AI-dueDate-Akzeptanz, (2) Nil-Beispiel im AI-Prompt, (3) RecurrenceService Date()-Fallback entfernt.
+- **Commit:** (wird nach Commit ergaenzt)
 
 ### Bug 96: Apple Shortcut oeffnet FocusBlox komplett statt Hintergrund-Save
 - **Status:** ERLEDIGT
