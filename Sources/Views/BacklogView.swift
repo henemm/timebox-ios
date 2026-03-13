@@ -669,6 +669,20 @@ struct BacklogView: View {
         }
     }
 
+    private func releaseDependency(_ task: PlanItem) {
+        do {
+            guard let itemUUID = UUID(uuidString: task.id) else { return }
+            let descriptor = FetchDescriptor<LocalTask>(predicate: #Predicate { $0.uuid == itemUUID })
+            if let localTask = try modelContext.fetch(descriptor).first {
+                localTask.blockerTaskID = nil
+                try modelContext.save()
+            }
+            Task { await loadTasks() }
+        } catch {
+            errorMessage = "Abhängigkeit konnte nicht entfernt werden."
+        }
+    }
+
     private func deleteRecurringSeries(_ task: PlanItem) {
         guard let groupID = task.recurrenceGroupID else { return }
         do {
@@ -954,7 +968,7 @@ struct BacklogView: View {
         }
     }
 
-    // MARK: - Blocked Row (no swipe actions, dimmed + indented)
+    // MARK: - Blocked Row (swipe: Edit + Delete + Freigeben)
     private func blockedRow(_ item: PlanItem) -> some View {
         BacklogRow(
             item: item,
@@ -965,6 +979,27 @@ struct BacklogView: View {
         .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
         .listRowBackground(Color.clear)
         .listRowSeparator(.hidden)
+        .swipeActions(edge: .leading, allowsFullSwipe: true) {
+            Button {
+                releaseDependency(item)
+            } label: {
+                Label("Freigeben", systemImage: "link.badge.plus")
+            }
+            .tint(.orange)
+        }
+        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+            Button(role: .destructive) {
+                deleteTask(item)
+            } label: {
+                Label("Löschen", systemImage: "trash")
+            }
+            Button {
+                handleEditTap(item)
+            } label: {
+                Label("Bearbeiten", systemImage: "pencil")
+            }
+            .tint(.blue)
+        }
     }
 
     // MARK: - Intention Filter Chips

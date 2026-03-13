@@ -1,0 +1,6 @@
+TDD RED — Bug 93: Blocked Task Swipe Actions
+Date: 2026-03-12T19:33:07Z
+Test: BlockedTaskSwipeUITests/test_blockedTask_swipeLeft_showsEditAction
+Failure: XCTAssertTrue failed - Swipe left on blocked task should reveal 'Bearbeiten' action
+Reason: blockedRow() in BacklogView.swift has no .swipeActions modifier (by design — line 957-968)
+xcresult: Test-FocusBlox-2026.03.12_20-29-15-+0100.xcresult

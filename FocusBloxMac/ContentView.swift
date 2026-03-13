@@ -51,6 +51,8 @@ struct ContentView: View {
     @State private var selectedSection: MainSection = .backlog
     @State private var selectedFilter: SidebarFilter = .priority
     @State private var selectedTasks: Set<UUID> = []
+    @State private var scrollToTaskID: UUID?  // Bug 94: Auto-scroll after task creation
+    @State private var inspectorOverrideTaskID: UUID?  // Bug 94: Inspector fallback when List resets selection
 
     // Shared state between Planen and Zuweisen tabs
     @State private var sharedDate = Date()
@@ -161,9 +163,15 @@ struct ContentView: View {
 
     // Selected task for inspector (single selection)
     private var selectedTask: LocalTask? {
-        guard selectedTasks.count == 1,
-              let taskId = selectedTasks.first else { return nil }
-        return tasks.first { $0.uuid == taskId }
+        // Bug 94: Try List selection first, then fall back to inspector override
+        if selectedTasks.count == 1, let taskId = selectedTasks.first {
+            return tasks.first { $0.uuid == taskId }
+        }
+        // Bug 94: Fallback — after task creation, NSTableView may reset selectedTasks
+        if let overrideId = inspectorOverrideTaskID {
+            return tasks.first { $0.uuid == overrideId }
+        }
+        return nil
     }
 
     var body: some View {
@@ -474,60 +482,17 @@ struct ContentView: View {
                 }
             }
             .contextMenu(forSelectionType: UUID.self) { selection in
-                if !selection.isEmpty {
-                    Button("Als erledigt markieren") {
-                        markTasksCompleted(selection)
-                    }
-
-                    Divider()
-
-                    Menu("Kategorie setzen") {
-                        Button("Geld verdienen") { setCategory("income", for: selection) }
-                        Button("Pflege") { setCategory("maintenance", for: selection) }
-                        Button("Energie") { setCategory("recharge", for: selection) }
-                        Button("Lernen") { setCategory("learning", for: selection) }
-                        Button("Weitergeben") { setCategory("giving_back", for: selection) }
-                    }
-
-                    Button("Zu Next Up hinzufügen") {
-                        addToNextUp(selection)
-                    }
-
-                    Button("Aus Next Up entfernen") {
-                        removeFromNextUp(selection)
-                    }
-
-                    // Show "Verschieben" for single task with dueDate (Bug 85-C)
-                    if selection.count == 1,
-                       let taskId = selection.first,
-                       let task = tasks.first(where: { $0.uuid == taskId }),
-                       task.dueDate != nil {
-                        Menu("Verschieben") {
-                            Button("Morgen") { postponeTask(task, byDays: 1) }
-                            Button("Nächste Woche") { postponeTask(task, byDays: 7) }
-                        }
-                    }
-
-                    // Show "Serie bearbeiten" for single recurring task
-                    if selection.count == 1,
-                       let taskId = selection.first,
-                       let task = tasks.first(where: { $0.uuid == taskId }),
-                       task.recurrencePattern != "none",
-                       task.recurrenceGroupID != nil {
-                        Divider()
-                        Button("Serie bearbeiten...") {
-                            taskToEditRecurring = task
-                        }
-                    }
-
-                    Divider()
-
-                    Button("Löschen", role: .destructive) {
-                        deleteTasksByIds(selection)
-                    }
-                }
+                backlogContextMenu(for: selection)
             } primaryAction: { selection in
                 // Double-click opens inspector (already selected)
+            }
+            // Bug 94: Auto-scroll to newly created task
+            .scrollPosition(id: $scrollToTaskID, anchor: .center)
+            // Bug 94: Clear inspector override when user manually selects a task
+            .onChange(of: selectedTasks) { _, newValue in
+                if !newValue.isEmpty {
+                    inspectorOverrideTaskID = nil
+                }
             }
         }
         .navigationTitle(filterTitle)
@@ -803,8 +768,11 @@ struct ContentView: View {
         Task {
             let taskSource = LocalTaskSource(modelContext: modelContext)
             if let newTask = try? await taskSource.createTask(title: title, taskType: "") {
+                // Bug 94: Show new task in Inspector immediately via override
+                // (NSTableView resets List selection binding, so we can't rely on it)
                 refreshTasks()
-                selectedTasks = [newTask.uuid]
+                inspectorOverrideTaskID = newTask.uuid
+                scrollToTaskID = newTask.uuid
             }
         }
     }
@@ -827,6 +795,73 @@ struct ContentView: View {
             NotificationService.scheduleDueDateNotifications(
                 taskID: task.id, title: task.title, dueDate: newDue
             )
+        }
+    }
+
+    private func releaseDependency(_ task: LocalTask) {
+        task.blockerTaskID = nil
+        try? modelContext.save()
+        refreshTasks()
+    }
+
+    @ViewBuilder
+    private func backlogContextMenu(for selection: Set<UUID>) -> some View {
+        if !selection.isEmpty {
+            Button("Als erledigt markieren") {
+                markTasksCompleted(selection)
+            }
+
+            Divider()
+
+            Menu("Kategorie setzen") {
+                Button("Geld verdienen") { setCategory("income", for: selection) }
+                Button("Pflege") { setCategory("maintenance", for: selection) }
+                Button("Energie") { setCategory("recharge", for: selection) }
+                Button("Lernen") { setCategory("learning", for: selection) }
+                Button("Weitergeben") { setCategory("giving_back", for: selection) }
+            }
+
+            Button("Zu Next Up hinzufügen") {
+                addToNextUp(selection)
+            }
+
+            Button("Aus Next Up entfernen") {
+                removeFromNextUp(selection)
+            }
+
+            singleTaskContextMenuItems(for: selection)
+
+            Divider()
+
+            Button("Löschen", role: .destructive) {
+                deleteTasksByIds(selection)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func singleTaskContextMenuItems(for selection: Set<UUID>) -> some View {
+        if selection.count == 1,
+           let taskId = selection.first,
+           let task = tasks.first(where: { $0.uuid == taskId }) {
+            if task.dueDate != nil {
+                Menu("Verschieben") {
+                    Button("Morgen") { postponeTask(task, byDays: 1) }
+                    Button("Nächste Woche") { postponeTask(task, byDays: 7) }
+                }
+            }
+            if task.blockerTaskID != nil {
+                Button("Abhängigkeit entfernen") {
+                    releaseDependency(task)
+                }
+            }
+            if task.recurrencePattern != "none",
+               task.recurrenceGroupID != nil {
+                Divider()
+                Button("Serie bearbeiten...") {
+                    taskToEditRecurring = task
+                }
+            }
         }
     }
 
@@ -977,6 +1012,7 @@ struct ContentView: View {
     @ViewBuilder
     private func taskRowWithSwipe(task: LocalTask) -> some View {
         makeBacklogRow(task: task)
+            .id(task.uuid)  // Bug 94: View identity for ScrollViewReader.scrollTo()
             .tag(task.uuid)
             .swipeActions(edge: .leading, allowsFullSwipe: true) {
                 Button {
