@@ -1,0 +1,25 @@
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/SiriIntentionTests.swift:82:24: error: cannot find 'IntentionOptionEnum' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/SiriIntentionTests.swift:87:42: error: cannot infer key path type from context; consider explicitly specifying a root type
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/SiriIntentionTests.swift:99:24: error: cannot find 'IntentionOptionEnum' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/SiriIntentionTests.swift:100:24: error: cannot find 'IntentionOptionEnum' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/SiriIntentionTests.swift:101:24: error: cannot find 'IntentionOptionEnum' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/SiriIntentionTests.swift:102:24: error: cannot find 'IntentionOptionEnum' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/SiriIntentionTests.swift:103:24: error: cannot find 'IntentionOptionEnum' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/SiriIntentionTests.swift:104:24: error: cannot find 'IntentionOptionEnum' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/SiriIntentionTests.swift:119:22: error: cannot find 'GetEveningSummaryIntent' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/SiriIntentionTests.swift:131:24: error: cannot find 'GetEveningSummaryIntent' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/SiriIntentionTests.swift:140:22: error: cannot find 'SetDailyIntentionIntent' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/SiriIntentionTests.swift:141:29: error: cannot infer contextual base in reference to member 'fokus'
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/SiriIntentionTests.swift:154:24: error: cannot find 'SetDailyIntentionIntent' in scope
+	Cannot find 'IntentionOptionEnum' in scope
+	Cannot find 'IntentionOptionEnum' in scope
+	Cannot find 'IntentionOptionEnum' in scope
+	Cannot find 'IntentionOptionEnum' in scope
+	Cannot find 'IntentionOptionEnum' in scope
+	Cannot find 'IntentionOptionEnum' in scope
+	Cannot find 'IntentionOptionEnum' in scope
+	Cannot find 'GetEveningSummaryIntent' in scope
+	Cannot find 'GetEveningSummaryIntent' in scope
+	Cannot find 'SetDailyIntentionIntent' in scope
+	Cannot find 'SetDailyIntentionIntent' in scope
+** TEST FAILED **

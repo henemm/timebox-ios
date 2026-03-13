@@ -45,6 +45,27 @@ struct FocusBloxShortcuts: AppShortcutsProvider {
             shortTitle: "Offene Tasks",
             systemImageName: "number"
         )
+
+        AppShortcut(
+            intent: GetEveningSummaryIntent(),
+            phrases: [
+                "Wie war mein Tag in \(.applicationName)",
+                "Tagesrueckblick in \(.applicationName)",
+                "Abend-Auswertung in \(.applicationName)"
+            ],
+            shortTitle: "Tagesrueckblick",
+            systemImageName: "moon.stars"
+        )
+
+        AppShortcut(
+            intent: SetDailyIntentionIntent(),
+            phrases: [
+                "Setz meine Intention auf \(\.$intention) in \(.applicationName)",
+                "Intention \(\.$intention) in \(.applicationName)"
+            ],
+            shortTitle: "Intention setzen",
+            systemImageName: "sunrise"
+        )
     }
 
     static let shortcutTileColor: ShortcutTileColor = .blue

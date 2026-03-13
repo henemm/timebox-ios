@@ -1,0 +1,9 @@
+** TEST SUCCEEDED **
+Test case 'SiriIntentionTests.test_dailyIntention_migrationFromStandard()' passed on 'Clone 1 of FocusBlox - FocusBlox (49928)' (0.009 seconds)
+Test case 'SiriIntentionTests.test_dailyIntention_savesAndLoadsFromAppGroup()' passed on 'Clone 1 of FocusBlox - FocusBlox (49928)' (0.002 seconds)
+Test case 'SiriIntentionTests.test_getEveningSummary_doesNotOpenApp()' passed on 'Clone 1 of FocusBlox - FocusBlox (49928)' (0.000 seconds)
+Test case 'SiriIntentionTests.test_getEveningSummary_noIntention_returnsNoIntentionDialog()' passed on 'Clone 1 of FocusBlox - FocusBlox (49928)' (0.022 seconds)
+Test case 'SiriIntentionTests.test_intentionOptionEnum_allCasesMapped()' passed on 'Clone 1 of FocusBlox - FocusBlox (49928)' (0.001 seconds)
+Test case 'SiriIntentionTests.test_intentionOptionEnum_convertsToIntentionOption()' passed on 'Clone 1 of FocusBlox - FocusBlox (49928)' (0.000 seconds)
+Test case 'SiriIntentionTests.test_setDailyIntention_doesNotOpenApp()' passed on 'Clone 1 of FocusBlox - FocusBlox (49928)' (0.000 seconds)
+Test case 'SiriIntentionTests.test_setDailyIntention_savesCorrectly()' passed on 'Clone 1 of FocusBlox - FocusBlox (49928)' (0.002 seconds)

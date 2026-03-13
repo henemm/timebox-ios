@@ -93,10 +93,13 @@
 - 8 Unit Tests + 3 UI Tests gruen (+ 12 bestehende Coach-Tests unveraendert)
 - **Dateien:** NotificationService.swift, AppSettings.swift, SettingsView.swift, MorningIntentionView.swift, FocusBloxApp.swift
 
-### Phase 3f: Siri Integration / App Intents (Should)
-- "Hey Siri, wie war mein Tag?" → liest Abend-Spiegel Auswertung vor
-- "Setz meine Intention auf Fokus" → setzt DailyIntention
-- **Abhaengigkeit:** Phase 3c
+### Phase 3f: Siri Integration / App Intents (Should) — ERLEDIGT
+- GetEveningSummaryIntent: "Wie war mein Tag?" — Siri liest Abend-Auswertung vor (fallbackTemplate-Texte)
+- SetDailyIntentionIntent: "Setz meine Intention auf Fokus" — setzt Tages-Intention per Sprache
+- DailyIntention UserDefaults-Migration auf App Group (Siri-Prozess kann Intention lesen/schreiben)
+- IntentionOptionEnum: AppEnum mit 6 deutschen Siri-Titeln
+- 8 Unit Tests gruen (+ 85 bestehende Intention-Tests unveraendert)
+- **Dateien:** DailyIntention.swift, IntentionOptionEnum.swift (NEU), GetEveningSummaryIntent.swift (NEU), SetDailyIntentionIntent.swift (NEU), FocusBloxShortcuts.swift
 
 ---
 

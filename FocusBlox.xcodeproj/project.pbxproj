@@ -12,6 +12,7 @@
 		0B30790C22063E68AD1A34AE /* SpotlightIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E693153139C30E62D300D923 /* SpotlightIntegrationTests.swift */; };
 		0ED7EC4A998FAB585C67F8E6 /* MenuBarIconState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60DE55FC2A796A308478E2B9 /* MenuBarIconState.swift */; };
 		109CE59305D35DA0570AB33E /* GapFinder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84C370C5BEDCC25CA912E79F /* GapFinder.swift */; };
+		15D8BC61C78C0CD05E5AB4D7 /* SiriIntentionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10E068FD9AC0347881CB233 /* SiriIntentionTests.swift */; };
 		170C6E63339A92E86F659F7E /* TaskFormGlassCardUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDB06B85B45AB03356A14914 /* TaskFormGlassCardUITests.swift */; };
 		1800BB7020E3D6044A62475A /* DailyReviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A36E40124EBA31D7428EAA80 /* DailyReviewView.swift */; };
 		186664F5A9219E0AC9A4588A /* ShakeGestureModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14CEC8C14442ABE7F65B5EE8 /* ShakeGestureModifier.swift */; };
@@ -46,6 +47,7 @@
 		56CCCE1A3FEE81C6B13F6262 /* BadgeOverdueUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB1D1EF0A6758E6B9B2921F /* BadgeOverdueUITests.swift */; };
 		58649A426A8AF17A4944DBCF /* NextUpSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B35F02DA57C64E51F6EC483 /* NextUpSection.swift */; };
 		586B7D1F1588622970BCEED8 /* MiniBacklogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1430133DDF6FA76E9E129534 /* MiniBacklogView.swift */; };
+		59119A75DC2E39304030D22D /* IntentionOptionEnum.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B06B47F3BE676BC267056D8 /* IntentionOptionEnum.swift */; };
 		60EF444FADDBAC17F14380E0 /* FocusLiveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 710817B02FE720EDA21132FA /* FocusLiveView.swift */; };
 		65B5E7020B61B9C1785BD378 /* SettingsToolbarModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26CD9467C8156E2C66B2DC9C /* SettingsToolbarModifier.swift */; };
 		66942B8D49A683A68B740C0A /* FocusBlockDragTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE21F83C52F46219D0186198 /* FocusBlockDragTests.swift */; };
@@ -66,6 +68,7 @@
 		87CA02C51045D666A48CBC84 /* TbdTasksTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8702D64FB57BA327C378D4F4 /* TbdTasksTests.swift */; };
 		88ED9B394FA2293A587D7952 /* LocalTaskSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 999C0690FA25D74051BA1C6F /* LocalTaskSource.swift */; };
 		88FB3AEEAE86741E5EA6AC42 /* FocusBloxApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 407BE145C7716D6B1A1BB67F /* FocusBloxApp.swift */; };
+		89FC6DF4B33B36C48FF1AC45 /* SetDailyIntentionIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 700EF7589E4DBA5C75513690 /* SetDailyIntentionIntent.swift */; };
 		94EC1D85A0F4B53160332751 /* PlanItemTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32E6EA75FACA340867827895 /* PlanItemTests.swift */; };
 		968A3087301F055E331E560C /* EventKitRepositoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DC26C4D8FDC4B811001FD2C /* EventKitRepositoryTests.swift */; };
 		96DD4A471C3F159FE2C19462 /* TaskFormTbdUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFD460F955B924EB6F6C5B94 /* TaskFormTbdUITests.swift */; };
@@ -197,6 +200,7 @@
 		DUEDT04BUILD000001 /* DueDateTimeDisplayTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DUEDT04FILE0000001 /* DueDateTimeDisplayTests.swift */; };
 		DYNISLD01BUILD0001 /* DynamicIslandUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DYNISLD01FILE00001 /* DynamicIslandUITests.swift */; };
 		E338397EBDBBEEA357D5A910 /* BlockerPickerSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8323E8E3E49804475266E66A /* BlockerPickerSheet.swift */; };
+		E35D96F57F11992DBAA5A97A /* GetEveningSummaryIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = F14500A9DA66E837CF6B2B08 /* GetEveningSummaryIntent.swift */; };
 		E388ADA5C322C89B3687240F /* FocusBlockTaskCountTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EABF765F6113A4B974211ACE /* FocusBlockTaskCountTests.swift */; };
 		E6DF69A28B0DB868B330DADD /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5F22CE94E29A523114817BF /* ContentView.swift */; };
 		E8B70B017D973054B649FFE7 /* IntentionFilterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DF9F4F40D442421734251AE /* IntentionFilterTests.swift */; };
@@ -609,11 +613,13 @@
 		515D3A83205F8E00941BD4D0 /* EditFocusBlockSheet.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = EditFocusBlockSheet.swift; sourceTree = "<group>"; };
 		548F5CBBB14618043F38ACE6 /* PlanItemTransfer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanItemTransfer.swift; sourceTree = "<group>"; };
 		54C8A326C1D84FA7A3BD27A8 /* BacklogRowRedesignUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BacklogRowRedesignUITests.swift; sourceTree = "<group>"; };
+		5B06B47F3BE676BC267056D8 /* IntentionOptionEnum.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = IntentionOptionEnum.swift; sourceTree = "<group>"; };
 		5D1F03B35977548B59D7269F /* CalendarEventTransfer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarEventTransfer.swift; sourceTree = "<group>"; };
 		5FEFD473342A7BED5A2A93AF /* SpotlightIndexingService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SpotlightIndexingService.swift; sourceTree = "<group>"; };
 		6010F2B272B933C827183F0A /* RemindersQuickEditUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RemindersQuickEditUITests.swift; sourceTree = "<group>"; };
 		60DE55FC2A796A308478E2B9 /* MenuBarIconState.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MenuBarIconState.swift; sourceTree = "<group>"; };
 		64C281ADBE9DA2AC381CB747 /* LocalTaskSourceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalTaskSourceTests.swift; sourceTree = "<group>"; };
+		700EF7589E4DBA5C75513690 /* SetDailyIntentionIntent.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SetDailyIntentionIntent.swift; sourceTree = "<group>"; };
 		710817B02FE720EDA21132FA /* FocusLiveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusLiveView.swift; sourceTree = "<group>"; };
 		71582A64B51A62129A2409B7 /* DebugLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugLogger.swift; sourceTree = "<group>"; };
 		74598614EAF4B9965981C7CB /* FocusBlockTasksSheet.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = FocusBlockTasksSheet.swift; sourceTree = "<group>"; };
@@ -655,6 +661,7 @@
 		APPSET01FILEREF00001 /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
 		ATBE0001FILEREF00001 /* AssignTabBlockEditUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssignTabBlockEditUITests.swift; sourceTree = "<group>"; };
 		ATTV0001FILEREF00001 /* AssignTabTaskVisibilityUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssignTabTaskVisibilityUITests.swift; sourceTree = "<group>"; };
+		B10E068FD9AC0347881CB233 /* SiriIntentionTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SiriIntentionTests.swift; sourceTree = "<group>"; };
 		B242DB168BAB2F3CF8A63404 /* UndoCompletionUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = UndoCompletionUITests.swift; sourceTree = "<group>"; };
 		B31CB18EF0C80E62953F34D6 /* SprintReviewSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SprintReviewSheet.swift; sourceTree = "<group>"; };
 		B77251F3B87AF26FD6473763 /* EventBlock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventBlock.swift; sourceTree = "<group>"; };
@@ -748,6 +755,7 @@
 		EFBUI001FILEREF00001 /* EditFocusBlockUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = EditFocusBlockUITests.swift; sourceTree = "<group>"; };
 		EVRC01FILEREF00001 /* EveningReflectionCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EveningReflectionCard.swift; sourceTree = "<group>"; };
 		EVRC03FILEREF00001 /* EveningReflectionCardUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = EveningReflectionCardUITests.swift; sourceTree = "<group>"; };
+		F14500A9DA66E837CF6B2B08 /* GetEveningSummaryIntent.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GetEveningSummaryIntent.swift; sourceTree = "<group>"; };
 		F1CCA00FEA15FD7BA149CDDE /* CalendarSelectionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarSelectionTests.swift; sourceTree = "<group>"; };
 		F364C9B1BB1D787792360427 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		F4564A875E99AE5CFAB35875 /* FocusBlockAssignmentTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = FocusBlockAssignmentTests.swift; sourceTree = "<group>"; };
@@ -1519,6 +1527,7 @@
 				NDNG01FILEREF00001 /* NotificationDailyNudgeTests.swift */,
 				9DF997703F1D10F16F84C026 /* EveningReflectionTextServiceTests.swift */,
 				8F5A8CD285199ADAFDD1BAF4 /* NotificationEveningReminderTests.swift */,
+				B10E068FD9AC0347881CB233 /* SiriIntentionTests.swift */,
 			);
 			path = FocusBloxTests;
 			sourceTree = SOURCE_ROOT;
@@ -1613,6 +1622,9 @@
 				INTENT06FILEREF0001 /* CountOpenTasksIntent.swift */,
 				INTENT07FILEREF0001 /* FocusBloxShortcuts.swift */,
 				BUG36CC01FILEREF001 /* CCQuickAddIntents.swift */,
+				5B06B47F3BE676BC267056D8 /* IntentionOptionEnum.swift */,
+				F14500A9DA66E837CF6B2B08 /* GetEveningSummaryIntent.swift */,
+				700EF7589E4DBA5C75513690 /* SetDailyIntentionIntent.swift */,
 			);
 			path = Intents;
 			sourceTree = "<group>";
@@ -2298,6 +2310,9 @@
 				0ED7EC4A998FAB585C67F8E6 /* MenuBarIconState.swift in Sources */,
 				E338397EBDBBEEA357D5A910 /* BlockerPickerSheet.swift in Sources */,
 				BC6DC6996EAE9F6635E15280 /* EveningReflectionTextService.swift in Sources */,
+				59119A75DC2E39304030D22D /* IntentionOptionEnum.swift in Sources */,
+				E35D96F57F11992DBAA5A97A /* GetEveningSummaryIntent.swift in Sources */,
+				89FC6DF4B33B36C48FF1AC45 /* SetDailyIntentionIntent.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2494,6 +2509,7 @@
 				NDNG01BUILD0000001 /* NotificationDailyNudgeTests.swift in Sources */,
 				7D269A2DC4F314C989CE50BF /* EveningReflectionTextServiceTests.swift in Sources */,
 				F92668D0D08597BDEC74CD21 /* NotificationEveningReminderTests.swift in Sources */,
+				15D8BC61C78C0CD05E5AB4D7 /* SiriIntentionTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

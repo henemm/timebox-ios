@@ -74,28 +74,48 @@ extension IntentionOption {
     }
 }
 
-/// Daily intention stored per day in UserDefaults.
+/// Daily intention stored per day in App Group UserDefaults.
 struct DailyIntention: Codable, Equatable {
     var date: String
     var selections: [IntentionOption]
 
     var isSet: Bool { !selections.isEmpty }
 
+    // MARK: - App Group
+
+    private static let appGroupID = "group.com.henning.focusblox"
+
+    private static var appGroupDefaults: UserDefaults {
+        UserDefaults(suiteName: appGroupID) ?? .standard
+    }
+
     // MARK: - Persistence
 
     func save(key: String? = nil) {
         let storageKey = key ?? "dailyIntention_\(date)"
         guard let data = try? JSONEncoder().encode(self) else { return }
-        UserDefaults.standard.set(data, forKey: storageKey)
+        Self.appGroupDefaults.set(data, forKey: storageKey)
     }
 
     static func load(key: String? = nil) -> DailyIntention {
         let storageKey = key ?? todayKey()
-        guard let data = UserDefaults.standard.data(forKey: storageKey),
-              let intention = try? JSONDecoder().decode(DailyIntention.self, from: data) else {
-            return DailyIntention(date: todayDateString(), selections: [])
+        let defaults = appGroupDefaults
+
+        // Try App Group first
+        if let data = defaults.data(forKey: storageKey),
+           let intention = try? JSONDecoder().decode(DailyIntention.self, from: data) {
+            return intention
         }
-        return intention
+
+        // Migrate from .standard if data exists there but not in App Group
+        if let standardData = UserDefaults.standard.data(forKey: storageKey),
+           let intention = try? JSONDecoder().decode(DailyIntention.self, from: standardData) {
+            defaults.set(standardData, forKey: storageKey)
+            UserDefaults.standard.removeObject(forKey: storageKey)
+            return intention
+        }
+
+        return DailyIntention(date: todayDateString(), selections: [])
     }
 
     static func todayKey() -> String {
