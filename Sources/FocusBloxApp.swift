@@ -327,6 +327,17 @@ struct FocusBloxApp: App {
                     } else {
                         NotificationService.cancelIntentionReminder()
                     }
+                    // Coach evening reminder
+                    if settings.coachModeEnabled,
+                       settings.coachEveningReminderEnabled,
+                       DailyIntention.load().isSet {
+                        NotificationService.scheduleEveningReminder(
+                            hour: settings.coachEveningReminderHour,
+                            minute: settings.coachEveningReminderMinute
+                        )
+                    } else {
+                        NotificationService.cancelEveningReminder()
+                    }
                     // Cancel daily nudges if intention fulfilled
                     checkAndCancelFulfilledNudges()
                 }
@@ -565,6 +576,7 @@ struct FocusBloxApp: App {
         // Prefix patterns that identify test/mock data
         let testPrefixes = [
             "[MOCK] ",
+            "[TEST] ",
             "Bug94 ", "Bug94Test", "Bug94Inspector", "Bug94Visible", "Bug94EmptyState",
             "Diagnose ",
             "UI Test Task ", "Badge Test Task ", "Inspector Test Task ",

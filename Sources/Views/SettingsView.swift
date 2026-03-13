@@ -36,6 +36,9 @@ struct SettingsView: View {
     @AppStorage("coachDailyNudgesMaxCount") private var coachDailyNudgesMaxCount: Int = 2
     @AppStorage("coachNudgeWindowStartHour") private var coachNudgeWindowStartHour: Int = 10
     @AppStorage("coachNudgeWindowEndHour") private var coachNudgeWindowEndHour: Int = 18
+    @AppStorage("coachEveningReminderEnabled") private var coachEveningReminderEnabled: Bool = true
+    @AppStorage("coachEveningReminderHour") private var coachEveningReminderHour: Int = 20
+    @AppStorage("coachEveningReminderMinute") private var coachEveningReminderMinute: Int = 0
 
     var body: some View {
         NavigationStack {
@@ -204,6 +207,18 @@ struct SettingsView: View {
                             )
                             .accessibilityIdentifier("coachNudgeWindowEndPicker")
                         }
+
+                        Toggle("Abend-Erinnerung", isOn: $coachEveningReminderEnabled)
+                            .accessibilityIdentifier("coachEveningReminderToggle")
+
+                        if coachEveningReminderEnabled {
+                            DatePicker(
+                                "Uhrzeit",
+                                selection: eveningReminderTimeBinding,
+                                displayedComponents: .hourAndMinute
+                            )
+                            .accessibilityIdentifier("coachEveningReminderTimePicker")
+                        }
                     }
                 } header: {
                     Text("Monster Coach")
@@ -358,6 +373,22 @@ struct SettingsView: View {
             set: { newDate in
                 let comps = Calendar.current.dateComponents([.hour], from: newDate)
                 coachNudgeWindowEndHour = comps.hour ?? 18
+            }
+        )
+    }
+
+    private var eveningReminderTimeBinding: Binding<Date> {
+        Binding(
+            get: {
+                var comps = DateComponents()
+                comps.hour = coachEveningReminderHour
+                comps.minute = coachEveningReminderMinute
+                return Calendar.current.date(from: comps) ?? Date()
+            },
+            set: { newDate in
+                let comps = Calendar.current.dateComponents([.hour, .minute], from: newDate)
+                coachEveningReminderHour = comps.hour ?? 20
+                coachEveningReminderMinute = comps.minute ?? 0
             }
         )
     }

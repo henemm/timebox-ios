@@ -1,0 +1,16 @@
+=== TDD GREEN — All Tests Passed ===
+
+Unit Tests (8/8 passed):
+  - test_buildRequest_returnsValidRequest_whenBeforeScheduledTime: PASSED
+  - test_buildRequest_returnsNil_whenTimeAlreadyPassed: PASSED
+  - test_buildRequest_returnsNil_whenExactTime: PASSED
+  - test_buildRequest_returnsRequest_oneMinuteBefore: PASSED
+  - test_buildRequest_hasCorrectIdentifier: PASSED
+  - test_buildRequest_hasCorrectContent: PASSED
+  - test_buildRequest_triggerIsCalendarWithCorrectTime: PASSED
+  - test_buildRequest_triggerRepeats: PASSED
+
+UI Tests (3/3 passed):
+  - test_eveningReminderToggle_visibleWhenCoachModeOn: PASSED
+  - test_eveningReminderTimePicker_visibleWhenEnabled: PASSED
+  - test_eveningReminderTimePicker_hiddenWhenDisabled: PASSED

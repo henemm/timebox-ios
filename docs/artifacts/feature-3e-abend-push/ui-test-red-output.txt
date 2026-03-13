@@ -1,0 +1,5 @@
+=== TDD RED — UI Test Build Failure ===
+Build failed due to unit test compile errors (NotificationEveningReminderTests.swift)
+UI tests target elements: coachEveningReminderToggle, coachEveningReminderTimePicker
+These elements do not exist in SettingsView yet — will fail at runtime after build is fixed.
+** TEST FAILED **

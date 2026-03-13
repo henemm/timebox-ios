@@ -10,11 +10,13 @@
 ## Bugs (offen)
 
 ### Bug 94: macOS — Neuer Task ueber Eingabeschlitz bekommt keinen Fokus
-- **Status:** OFFEN
+- **Status:** ERLEDIGT
 - **Plattform:** macOS
 - **Symptom:** Wenn man ueber den Eingabeschlitz einen neuen Task anlegt ("+"-Button), liegt der Fokus anschliessend NICHT auf dem neu erstellten Task. Man muss ihn manuell in der Liste suchen.
-- **Erwartetes Verhalten:** Nach dem Erstellen soll der neue Task automatisch fokussiert/sichtbar sein (Scroll + Selection).
-- **Hinweis:** War bereits einmal "gefixt" worden — der Fix war wirkungslos, wurde aber nicht durch Tests aufgedeckt. Diesmal muessen die Tests den tatsaechlichen Scroll/Fokus-Zustand verifizieren, nicht nur die Existenz des Tasks.
+- **Root Cause:** `addTask()` nutzte `await LocalTaskSource.createTask()` das AI-Enrichment + Title-Improvement (3-8 Sek.) blockierte BEVOR der Inspector-Override gesetzt wurde. Der User sah solange "Kein Task ausgewaehlt".
+- **Fix:** Task synchron erstellen (insert + save), Inspector-Override SOFORT setzen, AI-Enrichment im Hintergrund nachlaufen lassen.
+- **Tests:** 2 UI Tests stabil gruen (3x3 Durchlaeufe, 100% Passrate)
+- **Dateien:** ContentView.swift (macOS), Bug94FocusAfterAddUITests.swift, FocusBloxApp.swift
 
 ### Bug 95: Neue Tasks bekommen immer Faelligkeitsdatum "heute"
 - **Status:** ERLEDIGT

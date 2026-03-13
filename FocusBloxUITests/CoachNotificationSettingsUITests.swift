@@ -29,7 +29,8 @@ final class CoachNotificationSettingsUITests: XCTestCase {
         app.launchArguments = [
             "-UITesting",
             "-coachModeEnabled", "1",
-            "-coachDailyNudgesEnabled", nudgesEnabled ? "1" : "0"
+            "-coachDailyNudgesEnabled", nudgesEnabled ? "1" : "0",
+            "-coachEveningReminderEnabled", "0"
         ]
         app.launch()
     }
@@ -118,6 +119,74 @@ final class CoachNotificationSettingsUITests: XCTestCase {
         XCTAssertTrue(endPicker.waitForExistence(timeout: 3),
                        "Window end picker should be visible when nudges enabled")
     }
+
+    // MARK: - Evening Reminder Settings
+
+    private func relaunchWithCoachModeAndEvening(eveningEnabled: Bool = true) {
+        app.terminate()
+        app = XCUIApplication()
+        app.launchArguments = [
+            "-UITesting",
+            "-coachModeEnabled", "1",
+            "-coachDailyNudgesEnabled", "0",
+            "-coachEveningReminderEnabled", eveningEnabled ? "1" : "0"
+        ]
+        app.launch()
+    }
+
+    /// Verhalten: Abend-Erinnerung Toggle ist sichtbar wenn Coach Mode aktiv.
+    /// Bricht wenn: Toggle oder accessibilityIdentifier("coachEveningReminderToggle") nicht in SettingsView.
+    func test_eveningReminderToggle_visibleWhenCoachModeOn() throws {
+        relaunchWithCoachModeAndEvening()
+        navigateToSettings()
+        scrollToElement(app.switches["coachModeToggle"])
+
+        let eveningToggle = app.switches["coachEveningReminderToggle"]
+        scrollToElement(eveningToggle)
+        XCTAssertTrue(eveningToggle.waitForExistence(timeout: 5),
+                       "Evening reminder toggle should exist when coach mode is on")
+    }
+
+    /// Verhalten: TimePicker ist sichtbar wenn Evening Reminder aktiviert.
+    /// Bricht wenn: DatePicker nicht bedingt angezeigt oder Identifier fehlt.
+    func test_eveningReminderTimePicker_visibleWhenEnabled() throws {
+        relaunchWithCoachModeAndEvening(eveningEnabled: true)
+        navigateToSettings()
+        scrollToElement(app.switches["coachModeToggle"])
+
+        let eveningToggle = app.switches["coachEveningReminderToggle"]
+        scrollToElement(eveningToggle)
+        guard eveningToggle.waitForExistence(timeout: 5) else {
+            XCTFail("coachEveningReminderToggle not found")
+            return
+        }
+
+        let timePicker = app.datePickers["coachEveningReminderTimePicker"]
+        scrollToElement(timePicker)
+        XCTAssertTrue(timePicker.waitForExistence(timeout: 3),
+                       "Time picker should be visible when evening reminder is enabled")
+    }
+
+    /// Verhalten: TimePicker ist versteckt wenn Evening Reminder deaktiviert.
+    /// Bricht wenn: DatePicker immer sichtbar statt bedingt.
+    func test_eveningReminderTimePicker_hiddenWhenDisabled() throws {
+        relaunchWithCoachModeAndEvening(eveningEnabled: false)
+        navigateToSettings()
+        scrollToElement(app.switches["coachModeToggle"])
+
+        let eveningToggle = app.switches["coachEveningReminderToggle"]
+        scrollToElement(eveningToggle)
+        guard eveningToggle.waitForExistence(timeout: 5) else {
+            XCTFail("coachEveningReminderToggle not found")
+            return
+        }
+
+        let timePicker = app.datePickers["coachEveningReminderTimePicker"]
+        XCTAssertFalse(timePicker.exists,
+                        "Time picker should be hidden when evening reminder is disabled")
+    }
+
+    // MARK: - Nudge Max Count Picker
 
     /// Verhalten: Max-Picker hat drei Optionen: 1, 2, 3.
     func test_coachNudgesMaxCountPicker_hasThreeOptions() throws {

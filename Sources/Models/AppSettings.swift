@@ -77,4 +77,13 @@ final class AppSettings: ObservableObject {
 
     /// Hour for nudge window end (0-23)
     @AppStorage("coachNudgeWindowEndHour") var coachNudgeWindowEndHour: Int = 18
+
+    /// Whether evening reminder notification is enabled
+    @AppStorage("coachEveningReminderEnabled") var coachEveningReminderEnabled: Bool = true
+
+    /// Hour for evening reminder (0-23)
+    @AppStorage("coachEveningReminderHour") var coachEveningReminderHour: Int = 20
+
+    /// Minute for evening reminder (0-59)
+    @AppStorage("coachEveningReminderMinute") var coachEveningReminderMinute: Int = 0
 }

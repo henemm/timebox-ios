@@ -110,6 +110,15 @@ struct MorningIntentionView: View {
                     }
                 }
 
+                // Schedule evening reminder if enabled
+                if settings.coachModeEnabled,
+                   settings.coachEveningReminderEnabled {
+                    NotificationService.scheduleEveningReminder(
+                        hour: settings.coachEveningReminderHour,
+                        minute: settings.coachEveningReminderMinute
+                    )
+                }
+
                 withAnimation(.spring()) {
                     intention = newIntention
                     isEditing = false

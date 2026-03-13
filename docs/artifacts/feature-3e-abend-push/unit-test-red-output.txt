@@ -1,0 +1,4 @@
+=== TDD RED — Unit Test Build Failure ===
+8 compile errors: type 'NotificationService' has no member 'buildEveningReminderRequest'
+Testing cancelled because the build failed.
+** TEST FAILED **

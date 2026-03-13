@@ -450,6 +450,61 @@ enum NotificationService {
             .removePendingNotificationRequests(withIdentifiers: [intentionReminderID])
     }
 
+    // MARK: - Coach Evening Reminder
+
+    private static let eveningReminderID = "coach-evening-reminder"
+
+    /// Build request for evening reminder. Returns nil if scheduled time already passed today.
+    static func buildEveningReminderRequest(
+        hour: Int,
+        minute: Int,
+        now: Date = Date()
+    ) -> UNNotificationRequest? {
+        let calendar = Calendar.current
+        let currentHour = calendar.component(.hour, from: now)
+        let currentMinute = calendar.component(.minute, from: now)
+        if currentHour > hour || (currentHour == hour && currentMinute >= minute) {
+            return nil
+        }
+
+        let content = UNMutableNotificationContent()
+        content.title = "Dein Abend-Spiegel wartet"
+        content.body = "Wie war dein Tag? Schau kurz rein."
+        content.sound = .default
+
+        var dateComponents = DateComponents()
+        dateComponents.hour = hour
+        dateComponents.minute = minute
+
+        let trigger = UNCalendarNotificationTrigger(
+            dateMatching: dateComponents,
+            repeats: true
+        )
+
+        return UNNotificationRequest(
+            identifier: eveningReminderID,
+            content: content,
+            trigger: trigger
+        )
+    }
+
+    /// Schedule the daily evening reminder. Only replaces if a new request can be built.
+    /// If time already passed today, leaves existing repeating notification untouched.
+    static func scheduleEveningReminder(hour: Int, minute: Int) {
+        guard let request = buildEveningReminderRequest(hour: hour, minute: minute) else {
+            return // Time passed today — leave existing repeating notification alone
+        }
+        let center = UNUserNotificationCenter.current()
+        center.removePendingNotificationRequests(withIdentifiers: [eveningReminderID])
+        center.add(request)
+    }
+
+    /// Cancel the evening reminder.
+    static func cancelEveningReminder() {
+        UNUserNotificationCenter.current()
+            .removePendingNotificationRequests(withIdentifiers: [eveningReminderID])
+    }
+
     // MARK: - Coach Daily Nudges
 
     private static nonisolated(unsafe) let dailyNudgePrefix = "coach-nudge-"
