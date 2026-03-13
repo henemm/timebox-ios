@@ -7,100 +7,110 @@
 
 ---
 
-## 5a. Zusammenfassung der Agenten-Ergebnisse
+## 5a. Zusammenfassung der Agenten-Ergebnisse (Runde 2)
 
 ### Agent 1 (Wiederholungs-Check):
-- **Bug 76 Fix (Commit `92100f6`, 2026-03-09):** Fuegt `selectedTasks = [newTask.uuid]` hinzu. War korrekte Idee.
-- **Bug 90 Fix (Commit `c5a66f4`, 2026-03-11):** Fuegt `refreshTasks()` VOR `selectedTasks` ein (fuer CloudKit-Sync). Koennte Timing verschlechtert haben.
-- **Tests waren tautologisch:** Prueften nur "Task existiert in Liste", nicht "Task ist selektiert/sichtbar".
-- Bug 76 wurde als ERLEDIGT archiviert obwohl der Fix nicht verifiziert war.
+- **Bug 76 Fix (Commit `92100f6`, 2026-03-09):** `selectedTasks = [newTask.uuid]` — korrekte Idee, aber NSTableView scrollt nicht.
+- **Bug 90 Fix (Commit `c5a66f4`, 2026-03-11):** Fuegt `refreshTasks()` VOR Selection ein.
+- **Bug 94 Workarounds (Commit `71c349a`, 2026-03-13):** Fuegt `scrollToTaskID`, `inspectorOverrideTaskID`, `.scrollPosition()` hinzu.
+- **Tests waren tautologisch:** 3 neue Tests existieren, ALLE FAILING (TDD RED state).
+- **Dead Code:** `focusNewTaskField()` (Zeile 727-729) ist leere No-Op.
+- **Kritisch:** `selectedTasks` wird NICHT MEHR gesetzt nach Erstellung — nur override + scroll IDs.
 
 ### Agent 2 (Datenfluss-Trace):
-- `addTask()` in ContentView.swift:798-810 erstellt Task, ruft `refreshTasks()`, setzt `selectedTasks`
-- Die `List(selection: $selectedTasks)` hat keinen Scroll-Mechanismus
-- `selectedTasks` wird gesetzt, aber unklar ob die List den Task visuell hervorhebt UND dorthin scrollt
-- `focusNewTaskField()` (Zeile 727-729) ist eine **leere No-Op Funktion** — Dead Code
+- `addTask()` ContentView.swift:763-777: Async Task → `createTask()` → `refreshTasks()` → set overrides
+- `createTask()` in LocalTaskSource:87-142 ist async: AI-Enrichment + Title-Improvement + Spotlight = lange Laufzeit
+- `refreshTasks()` ersetzt `@State tasks` komplett → List rebuilt → NSTableView kann Selection resetten
+- `.scrollPosition(id: $scrollToTaskID, anchor: .center)` auf Line 490 — unklar ob das mit NSTableView-backed List funktioniert
+- Inspector-Fallback via `selectedTask` computed property (Lines 165-175) nutzt `inspectorOverrideTaskID`
 
 ### Agent 3 (Alle Schreiber):
-- Nur 1 Stelle setzt `selectedTasks` nach Add: ContentView.swift:807
-- MacAssignView hat ScrollViewReader + onChange + scrollTo — ABER nutzt ScrollView+LazyVStack, NICHT List
-- QuickCapturePanel schliesst Panel sofort — separates Problem
-- BacklogRow hat @FocusState nur fuer Inline-Edit, nicht fuer neue Tasks
+- **14+ Write-Stellen** fuer Selection/Scroll/Override State
+- `selectedTasks` wird NICHT in addTask() gesetzt (Lines 773-775 setzen nur override + scroll)
+- `onChange(of: selectedTasks)` auf Line 492-496 loescht `inspectorOverrideTaskID` bei manueller Selektion
+- QuickCapturePanel:181-198 — setzt WEDER scroll noch override (separates Problem, out of scope)
+- MacAssignView:87-112 nutzt `ScrollViewReader + proxy.scrollTo()` — alternatives Pattern das FUNKTIONIERT
 
-### Agent 4 (Alle Szenarien):
-- Race Condition zwischen refreshTasks() und Selection (SEHR HOCH)
-- Filter koennte neuen Task in "Someday"-Tier verstecken (HOCH)
-- NSTableView-Rendering auf macOS unterscheidet sich von iOS UITableView (MITTEL)
+### Agent 4 (Alle Szenarien — 9 bestaetigte):
+1. **Async Task Creation Timing Gap** — createTask() ist async, UI-Updates erst danach
+2. **@Query Rebuild in TaskInspector** — unabhaengig von ContentView.refreshTasks()
+3. **NSTableView Selection Reset** — List selection binding resettet bei Rebuild
+4. **Computed Property Re-Sorting** — Sorting invalidiert List Identity
+5. **List Identity Loss** — .tag() muss beim Render-Zeitpunkt vorhanden sein
+6. **FEHLENDE selectedTasks-Zuweisung** — addTask() setzt selectedTasks NICHT
+7. **Kein withAnimation/MainActor** — State-Updates werden gebootcht, koennte Fenster erzeugen
+8. **scrollTo vor Render** — scrollToTaskID gesetzt bevor Row existiert
+9. **Override-Clearing** — onChange loescht override bei jeder Selection-Aenderung
 
 ### Agent 5 (Blast Radius):
-- iOS nutzt Modal Sheet fuer Task-Erstellung — komplett anderes Pattern
-- macOS Inline-TextField ist einzigartig fuer ContentView
-- **Blast Radius ist MINIMAL** — Fix betrifft nur ContentView
+- **Scope: MINIMAL** — nur macOS ContentView betroffen
+- iOS nutzt Modal Sheet (komplett anderes Pattern)
+- macOS MenuBarView hat addTask() OHNE scroll/override (separater Pfad, nicht Bug 94)
+- MacAssignView hat funktionierendes ScrollViewReader-Pattern als Referenz
+- **Max 2 Dateien, ~50-100 LoC**
 
 ---
 
-## 5b. Hypothesen
+## 5b. Hypothesen (aktualisiert)
 
-### Hypothese 1: Default-Filter "Priority" sortiert neuen Task nach ganz unten (HOCH)
+### Hypothese 1: Neuer Task in "Someday"-Tier off-screen + kein Scroll (HOCH)
 
-**Beschreibung:** Default-Filter ist `.priority` (ContentView.swift:52). Neuer Task hat `importance=nil`, `urgency=nil` → Score ~0 → landet im Tier "Someday" am Ende der Liste. User muss bis ganz nach unten scrollen.
-
-**Beweis DAFUER:**
-- ContentView.swift:52 — `@State private var selectedFilter: SidebarFilter = .priority`
-- ContentView.swift:260-262 — `regularFilteredTasks` sortiert bei `.priority` nach `scoreFor()` absteigend
-- ContentView.swift:430-458 — Priority-Tiers: doNow, planSoon, eventually, someday
-- Neuer Task ohne Enrichment hat Score ~0 → Tier "someday" ganz unten
-- AI-Enrichment (`SmartTaskEnrichmentService`) laeuft NACH createTask() async — Score aendert sich erst spaeter
-
-**Beweis DAGEGEN:**
-- Wenn User Filter auf `.recent` gestellt hat, ist neuer Task an Position 0 (neuestes createdAt)
-- Wenn Liste kurz ist, ist "Someday" trotzdem sichtbar
-
-**Wahrscheinlichkeit:** HOCH — erklaert warum "suchen" noetig ist selbst wenn Selection funktioniert
-
-### Hypothese 2: .tag() auf @ViewBuilder-Fragment wird von List(selection:) nicht erkannt (HOCH)
-
-**Beschreibung:** `taskRowWithSwipe()` (Zeile 977-1016) ist ein `@ViewBuilder` der MEHRERE Top-Level-Views zurueckgibt: (1) den Haupt-Row mit `.tag(task.uuid)` und (2) einen `ForEach` der blocked dependents. Wenn `ForEach(tierTasks) { task in taskRowWithSwipe(task:) }` aufgerufen wird, produziert jede Iteration N+1 Views. SwiftUI `List(selection:)` erwartet `.tag()` auf dem DIREKTEN Kind des aeusseren ForEach — ob das bei einem @ViewBuilder-Fragment korrekt funktioniert, ist fraglich.
+**Beschreibung:** Default-Filter `.priority` (Line 52). Neuer Task hat `importance=nil, urgency=nil` → Score ~0 → Tier "Someday" (Score 0-9) ganz am Ende. `.scrollPosition(id:)` funktioniert moeglicherweise nicht mit NSTableView-backed List.
 
 **Beweis DAFUER:**
-- ContentView.swift:977-1016 — `taskRowWithSwipe()` gibt makeBacklogRow(task:).tag(task.uuid) + ForEach(blockedDependents) zurueck
-- ContentView.swift:440-441 — `ForEach(tierTasks, id: \.uuid) { task in taskRowWithSwipe(task: task) }` → N Views pro Iteration
-- SwiftUI List(selection:) basiert auf NSTableView auf macOS — Tag-Zuordnung bei Multi-View-@ViewBuilder ist undokumentiert
+- Line 52: `selectedFilter: SidebarFilter = .priority`
+- Line 268-270: `regularFilteredTasks` sortiert bei `.priority` nach `scoreFor()` absteigend
+- PriorityTier.from(score:): Score 0-9 = `.someday` = letzter Tier
+- Kein AI-Enrichment-Ergebnis zum Zeitpunkt der Anzeige (Enrichment ist async)
+- Tests FAILING beweisen dass Scroll nicht funktioniert
 
 **Beweis DAGEGEN:**
-- Das identische Pattern wird auch in der NextUp-Section (Zeile 361-386) verwendet und Selection funktioniert dort (per Swipe-Action Zeile 380)
-- SwiftUI koennte @ViewBuilder-Fragmente flachen und .tag() korrekt propagieren
+- Bei `.recent` Filter waere Task an Position 0
+- Bei kurzer Liste ist "Someday" sichtbar
 
-**Wahrscheinlichkeit:** HOCH — aber schwer zu beweisen ohne Laufzeit-Test
+**Wahrscheinlichkeit:** HOCH
 
-### Hypothese 3: List scrollt nicht zum selektierten Item (MITTEL-HOCH)
+### Hypothese 2: selectedTasks wird NICHT gesetzt → keine List-Selektion (HOCH)
 
-**Beschreibung:** macOS `List(selection:)` scrollt NICHT automatisch zum selektierten Item. Wenn der Task off-screen ist (z.B. in "Someday"-Tier), sieht der User keine Hervorhebung.
-
-**WICHTIG: MacAssignView ist KEIN valider Beweis!** MacAssignView nutzt `ScrollView + LazyVStack`, NICHT `List`. SwiftUI `List` auf macOS ist NSTableView-backed — NSTableView hat eigene Scroll-Logik die ScrollViewReader ignorieren koennte.
+**Beschreibung:** Im aktuellen Code (Line 773-775) wird `selectedTasks` NICHT gesetzt nach Erstellung. Nur `inspectorOverrideTaskID` und `scrollToTaskID`. Die List hat also keinen Grund, den neuen Task zu selektieren (blau hervorzuheben).
 
 **Beweis DAFUER:**
-- Kein `ScrollViewReader` in ContentView
-- macOS NSTableView scrollt nicht automatisch bei programmatischer Selection-Aenderung
-- Apple-Doku: `List(selection:)` garantiert kein Auto-Scroll
+- Line 773-775: Nur `inspectorOverrideTaskID` und `scrollToTaskID` — KEIN `selectedTasks = [newTask.uuid]`
+- Frueher (Bug 76 Fix) wurde selectedTasks gesetzt, wurde aber entfernt mit Kommentar "NSTableView resets List selection binding"
+- Ohne selectedTasks-Zuweisung: kein blaues Highlight, kein visueller Fokus in der Liste
 
 **Beweis DAGEGEN:**
-- Manche macOS-Versionen (14+) scrollen bei Selection-Aenderung
-- Wenn Task im sichtbaren Bereich ist, braucht man keinen Scroll
+- Inspector-Override zeigt den Task im Inspector an (rechte Spalte)
+- Aber Inspector-Anzeige ≠ List-Selektion
 
-**Wahrscheinlichkeit:** MITTEL-HOCH
+**Wahrscheinlichkeit:** HOCH — erklaert warum auch der Inspector-Override allein nicht reicht
 
-### Hypothese 4: Timing — refreshTasks() und selectedTasks in falscher Reihenfolge (MITTEL)
+### Hypothese 3: .scrollPosition(id:) funktioniert nicht mit macOS List (HOCH)
 
-**Beschreibung:** `refreshTasks()` (Zeile 806) ersetzt das gesamte `tasks` Array. SwiftUI re-rendert die List. Wenn `selectedTasks` (Zeile 807) gesetzt wird WAEHREND die List re-rendert, koennte die Selection verloren gehen.
+**Beschreibung:** `.scrollPosition(id:)` ist eine iOS 17+ / macOS 14+ API. macOS `List` ist NSTableView-backed. Es ist unklar ob `.scrollPosition()` mit NSTableView funktioniert — es ist primaer fuer ScrollView/LazyVStack gedacht.
 
 **Beweis DAFUER:**
-- Bug 90 hat `refreshTasks()` eingefuegt — vorher war nur `selectedTasks` (Bug 76 Fix)
-- `refreshTasks()` macht `modelContext.save()` + fetch → ersetzt `tasks` komplett
+- MacAssignView nutzt `ScrollViewReader { proxy in ScrollView { LazyVStack { ... } } }` und `proxy.scrollTo()` — das FUNKTIONIERT
+- ContentView nutzt `List(selection:)` mit `.scrollPosition()` — das FAILED (Tests beweisen es)
+- Apple-Doku: `.scrollPosition(id:)` ist in der ScrollView-Familie dokumentiert, nicht explizit fuer List
 
 **Beweis DAGEGEN:**
-- `refreshTasks()` ist synchron (kein await) — Zeile 87-98
-- Beides passiert im selben `Task {}` Block, sollte sequentiell sein
+- Einige Entwickler berichten dass es mit List funktioniert (iOS)
+- macOS 15+ koennte Unterstuetzung verbessert haben
+
+**Wahrscheinlichkeit:** HOCH — Tests beweisen dass es nicht scrollt
+
+### Hypothese 4: Race Condition — State-Updates vor View-Render (MITTEL)
+
+**Beschreibung:** `scrollToTaskID` wird gesetzt bevor die List den neuen Row gerendert hat. SwiftUI batched State-Updates — moeglicherweise wird scrollToTaskID VOR dem List-Update konsumiert und dann ignoriert.
+
+**Beweis DAFUER:**
+- Kein `withAnimation` oder `DispatchQueue.main.asyncAfter` fuer delayed scroll
+- refreshTasks() → sofort scrollToTaskID setzen → List rebuilt noch → scroll-target existiert noch nicht
+
+**Beweis DAGEGEN:**
+- SwiftUI sollte State-Batch in einem Render-Cycle zusammenfassen
+- scrollToTaskID ist @State, aendert sich → View update enthält beides
 
 **Wahrscheinlichkeit:** MITTEL
 
@@ -108,58 +118,99 @@
 
 ## 5c. Wahrscheinlichste Ursachen
 
-**Kombination von Hypothese 1 + 3 (Primaer) + moeglicherweise Hypothese 2:**
+**Kombination von Hypothese 1 + 2 + 3:**
 
-1. Default-Filter ist `.priority` → neuer Task landet in "Someday" ganz unten
-2. macOS List scrollt NICHT automatisch dorthin
-3. Resultat: Task ist selektiert aber unsichtbar → User muss suchen
+1. **Hypothese 2:** `selectedTasks` wird nicht gesetzt → Task hat kein blaues Highlight in der Liste
+2. **Hypothese 3:** `.scrollPosition(id:)` funktioniert nicht mit NSTableView-backed List → kein Auto-Scroll
+3. **Hypothese 1:** Default-Filter `.priority` sortiert Task nach "Someday" ganz unten → off-screen
 
-**Warum die anderen weniger wahrscheinlich:**
-- Hypothese 2 (tag-Problem) — wenn tags komplett nicht funktionieren wuerden, wuerde Selection generell nie funktionieren. Aber Selection per Klick funktioniert ja.
-- Hypothese 4 (Timing) — beide Operationen sind synchron im selben Block, Timing-Problem ist unwahrscheinlich.
+**Resultat:** Task wird erstellt, ist aber weder selektiert noch sichtbar. Inspector zeigt ihn via Override, aber der User sieht in der Liste nichts.
+
+**Warum Hypothese 4 weniger wahrscheinlich:**
+- Selbst wenn Timing perfekt waere, wuerden H2+H3 den Bug trotzdem verursachen
+- H4 ist nur relevant wenn H2+H3 gefixt sind
 
 ---
 
-## 5d. Debugging-Plan
+## 5d. Fix-Strategie (Empfehlung)
 
-### Hypothese 1+3 bestaetigen (Priority-Filter + kein Scroll):
-- **Test 1:** macOS App oeffnen mit .priority Filter, 20+ Tasks. Neuen Task ueber "+" anlegen.
-  - BEOBACHTEN: In welchem Tier landet der Task? (Erwartung: "Someday" ganz unten)
-  - BEOBACHTEN: Ist der Task blau hervorgehoben? (Selection vorhanden?)
-  - BEOBACHTEN: Scrollt die Liste automatisch? (Erwartung: NEIN)
-- **Test 2:** Filter auf `.recent` wechseln, dann neuen Task anlegen.
-  - BEOBACHTEN: Task sollte an Position 0 sein (neuestes createdAt) → sofort sichtbar
-- **Logging:** `print("[addTask] selectedTasks set to \(newTask.uuid)")` an Zeile 807
+### Kernproblem: macOS List + NSTableView = kein zuverlaessiger programmatischer Scroll
 
-### Hypothese 1+3 widerlegen:
-- Wenn der Task AUCH bei `.recent` Filter unsichtbar ist → Problem liegt nicht am Filter
-- Wenn der Task in "Someday" ist aber BLAU hervorgehoben → Selection funktioniert, nur Scroll fehlt
-- Wenn der Task in "Someday" ist und NICHT hervorgehoben → Hypothese 2 (tag-Problem) oder Hypothese 4 (Timing)
+**Loesung: Statt zu versuchen zum Task zu scrollen — den Task dorthin bringen wo der User hinschaut.**
 
-### Plattform: macOS
+### Ansatz A: Neuen Task als "Next Up" markieren (EMPFOHLEN)
+
+Nach Erstellung den Task temporaer in die "Next Up"-Sektion setzen:
+- Next Up ist IMMER oben in der Liste sichtbar (Line 365-420)
+- User sieht den Task sofort
+- Task kann dort bearbeitet werden (Importance, Urgency setzen)
+- Danach kann er aus Next Up entfernt werden → wandert in korrekten Tier
+
+**Vorteil:** Funktioniert unabhaengig von Scroll-API und Filter
+**Nachteil:** Aendert Semantik von "Next Up" leicht
+
+### Ansatz B: ScrollViewReader statt .scrollPosition() + selectedTasks setzen
+
+MacAssignView beweist: `ScrollViewReader { proxy in ... proxy.scrollTo(id) }` funktioniert mit ScrollView+LazyVStack.
+ABER: ContentView nutzt `List` (NSTableView), nicht ScrollView.
+
+**Option B1:** List durch ScrollView+LazyVStack ersetzen
+- Grosser Umbau, hohes Risiko, ausserhalb Scoping Limits
+
+**Option B2:** ScrollViewReader um List wrappen und testen
+- `.scrollTo()` koennte mit NSTableView funktionieren — muss getestet werden
+- Plus: `selectedTasks = [newTask.uuid]` WIEDER setzen (wurde faelschlich entfernt)
+- Plus: Delayed scroll via `DispatchQueue.main.asyncAfter(deadline: .now() + 0.1)`
+
+### Ansatz C: Nach Erstellung Filter temporaer auf ".recent" wechseln
+
+- Neuer Task hat neustes `createdAt` → ist Position 0 bei `.recent` Filter
+- Nach 5 Sekunden oder naechster Interaktion: Filter zurueck auf vorherige Auswahl
+
+**Vorteil:** Einfach, zuverlaessig
+**Nachteil:** Unerwarteter Filter-Wechsel kann User verwirren
 
 ---
 
 ## 5e. Blast Radius
 
 **Minimal:**
-- Nur `FocusBloxMac/ContentView.swift` betroffen
-- iOS hat komplett anderes Pattern (Modal Sheet)
-- QuickCapturePanel hat aehnliches Symptom aber andere Ursache (setzt nie selectedTasks)
-- **Achtung:** ScrollViewReader um eine macOS List wrappen koennte nicht funktionieren (NSTableView-Backend) — Alternative: `.scrollPosition(id:)` API (macOS 14+) oder `revealSelection()` verwenden
+- Nur `FocusBloxMac/ContentView.swift` betroffen (1 Datei fuer Fix)
+- iOS hat komplett anderes Pattern (Modal Sheet) — NICHT betroffen
+- QuickCapturePanel hat aehnliches Symptom aber anderen Scope
+- Max ~50-100 LoC Aenderung
 
 ---
 
-## 5f. Challenge-Ergebnisse (Devil's Advocate)
+## 5f. Challenge-Ergebnisse
 
-### Runde 1 — Verdict: LUECKEN
+### Runde 1 (vorherige Session) — Verdict: LUECKEN
+- MacAssignView ist kein valider Beweis fuer List-Scroll
+- taskRowWithSwipe() @ViewBuilder-Fragment-Thema identifiziert
+- Default-Filter .priority war unterschaetzt → hochgestuft
 
-Gefundene Luecken (eingearbeitet):
-1. **MacAssignView ist KEIN valider Beweis** — nutzt ScrollView+LazyVStack, nicht List
-2. **taskRowWithSwipe() @ViewBuilder-Fragment** — .tag() auf Multi-View @ViewBuilder koennte nicht funktionieren
-3. **Default-Filter .priority** — neuer Task ohne Score landet in "Someday" ganz unten (war vorher als "MITTEL" unterschaetzt)
-4. **Inspector-Check fehlt** — unklar ob Inspector (rechte Spalte) den neuen Task zeigt → wuerde Selection beweisen
+### Runde 2 — Verdict: LUECKEN
 
-### Offene Fragen:
-- Funktioniert `scrollTo()` oder `.scrollPosition(id:)` mit macOS SwiftUI `List`?
-- Zeigt der Inspector den neuen Task nach Erstellung? (Wuerde beweisen dass Selection funktioniert)
+Gefundene Luecken:
+1. **NSTableView-Reset-Behauptung unbewiesen:** Kein isolierter Test ob `selectedTasks = [newTask.uuid]` mit `DispatchQueue.main.async` nach refreshTasks() tatsaechlich resettet wird. Wurde nie einzeln getestet.
+2. **Test abgeschwaecht:** `testNewTaskIsVisibleInListAfterCreation` (TDD-RED) wurde durch `testNewTaskExistsInListAfterCreation` ersetzt — prueft nur Existenz, nicht Sichtbarkeit/Scroll.
+3. **Ansatz A (Next Up) hat Semantik-Problem:** "Next Up" = bewusst priorisiert. Automatisch jeden neuen Task dort einzusortieren widerspricht der Semantik. Ausserdem fehlt `nextUpSortOrder`.
+4. **Einfachste Loesung nie getestet:** `selectedTasks = [newTask.uuid]` mit async Delay wurde nie isoliert ausprobiert.
+5. **Filter-Edge-Cases:** `.overdue` und `.recurring` Filter wuerden neuen Task IMMER verstecken — kein Ansatz adressiert das.
+6. **QuickCapturePanel als Referenz:** Hat `isNextUp = true` als Workaround — beweist dass Scroll-Problem bekannt war.
+
+### Aktualisierte Fix-Strategie nach Challenge
+
+**Neuer Ansatz D (EMPFOHLEN): Minimaler Fix — selectedTasks + async Delay + ScrollViewReader**
+
+1. `selectedTasks = [newTask.uuid]` WIEDER setzen (war faelschlich entfernt)
+2. In `DispatchQueue.main.async {}` wrappen fuer 1 Render-Cycle Verzoegerung
+3. `ScrollViewReader` um die List wrappen (wie MacAssignView) + `proxy.scrollTo(newTask.uuid)`
+4. `inspectorOverrideTaskID` als Fallback BEHALTEN fuer den Fall dass NSTableView resettet
+5. Bei Overdue/Recurring Filter: nach Erstellung AUTOMATISCH auf `.recent` wechseln
+
+**Warum besser als Ansatz A-C:**
+- Einfachster Ansatz der nie isoliert getestet wurde
+- Kein Semantik-Problem mit "Next Up"
+- Kein grosser Umbau (kein ScrollView+LazyVStack noetig)
+- Adressiert alle 3 Hauptursachen: Selection (H2), Scroll (H3), Filter-Position (H1)

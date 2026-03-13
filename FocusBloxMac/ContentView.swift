@@ -8,6 +8,7 @@
 import SwiftUI
 import SwiftData
 import AppKit
+import CoreSpotlight
 import os
 
 private let logger = Logger(subsystem: "com.henning.focusblox", category: "RemindersImport")
@@ -765,14 +766,43 @@ struct ContentView: View {
         let title = newTaskTitle
         newTaskTitle = ""
 
+        // Bug 94 Fix: Task SOFORT erstellen + Inspector zeigen,
+        // AI-Enrichment laeuft im Hintergrund nach.
+        // Vorher: createTask() blockierte 3-8 Sek. fuer AI-Enrichment
+        // bevor der Inspector-Override gesetzt wurde.
+        let cleanedTitle = TaskTitleEngine.stripKeywords(title)
+        let nextSortOrder = (tasks.map(\.sortOrder).max() ?? 0) + 1
+        let newTask = LocalTask(
+            title: cleanedTitle,
+            sortOrder: nextSortOrder,
+            taskType: "",
+            sourceSystem: "local"
+        )
+        modelContext.insert(newTask)
+        try? modelContext.save()
+
+        // Inspector SOFORT setzen (vor AI-Enrichment)
+        // Nicht selectedTasks setzen — onChange(of: selectedTasks) wuerde
+        // inspectorOverrideTaskID sofort loeschen, und NSTableView resettet
+        // selectedTasks danach auf leer → beide nil → Empty State.
+        refreshTasks()
+        inspectorOverrideTaskID = newTask.uuid
+        scrollToTaskID = newTask.uuid
+
+        // AI-Enrichment im Hintergrund (aktualisiert Titel, Importance, etc.)
         Task {
-            let taskSource = LocalTaskSource(modelContext: modelContext)
-            if let newTask = try? await taskSource.createTask(title: title, taskType: "") {
-                // Bug 94: Show new task in Inspector immediately via override
-                // (NSTableView resets List selection binding, so we can't rely on it)
-                refreshTasks()
-                inspectorOverrideTaskID = newTask.uuid
-                scrollToTaskID = newTask.uuid
+            let enrichment = SmartTaskEnrichmentService(modelContext: modelContext)
+            await enrichment.enrichTask(newTask)
+            newTask.needsTitleImprovement = true
+            let titleEngine = TaskTitleEngine(modelContext: modelContext)
+            await titleEngine.improveTitleIfNeeded(newTask)
+            try? modelContext.save()
+            refreshTasks()
+
+            // Spotlight-Indexierung
+            if SpotlightIndexingService.shared.shouldIndex(newTask),
+               let item = try? SpotlightIndexingService.shared.buildSearchableItem(for: newTask) {
+                CSSearchableIndex.default().indexSearchableItems([item]) { _ in }
             }
         }
     }

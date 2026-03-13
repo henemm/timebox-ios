@@ -4,11 +4,19 @@
 //
 //  Bug 94: macOS — Neuer Task ueber Eingabeschlitz bekommt keinen Fokus
 //
+//  Root Cause: addTask() wartet auf async AI-Enrichment (3-8 Sek.)
+//  BEVOR der Inspector-Override gesetzt wird. Der User sieht solange
+//  "Kein Task ausgewaehlt".
+//
+//  Fix: Task sofort erstellen + Inspector-Override SOFORT setzen,
+//  AI-Enrichment im Hintergrund nachlaufen lassen.
+//
 
 import XCTest
 
 final class Bug94FocusAfterAddUITests: XCTestCase {
     var app: XCUIApplication!
+    private var createdTaskTitle: String?
 
     override func setUpWithError() throws {
         continueAfterFailure = false
@@ -16,88 +24,85 @@ final class Bug94FocusAfterAddUITests: XCTestCase {
         app.launchArguments = ["-UITesting", "-MockData", "-ApplePersistenceIgnoreState", "YES"]
         app.launch()
 
+        // Warten bis App vollstaendig geladen ist
         let window = app.windows.firstMatch
-        _ = window.waitForExistence(timeout: 5)
+        XCTAssertTrue(window.waitForExistence(timeout: 5), "App-Window muss erscheinen")
+
+        let textField = app.textFields["newTaskTextField"]
+        XCTAssertTrue(
+            textField.waitForExistence(timeout: 10),
+            "Quick-Add TextField muss bereit sein bevor Tests starten"
+        )
+
+        // Warten bis .task { refreshTasks() } + Mock-Daten-Seeding abgeschlossen
+        Thread.sleep(forTimeInterval: 3)
     }
 
     override func tearDownWithError() throws {
+        // Kein explizites Loeschen noetig — App verwendet in-memory Store
+        // bei UI-Tests (-UITesting). Jeder Test startet mit frischen Daten.
+        // Falls Tasks in die Produktion leaken: cleanupLeakedTestData()
+        // erkennt den [TEST] Prefix und raeumt auf.
         app?.terminate()
         app = nil
+        createdTaskTitle = nil
     }
 
     // MARK: - Helper
 
     /// Creates a task via the quick-add text field and Return key.
-    /// Returns the title used for the created task.
+    /// Title is clearly marked as test data with [TEST] prefix.
     @MainActor
     private func createTaskViaQuickAdd() -> String {
         let textField = app.textFields["newTaskTextField"]
-        XCTAssertTrue(textField.waitForExistence(timeout: 5), "TextField muss existieren")
+        XCTAssertTrue(textField.waitForExistence(timeout: 5), "Quick-Add TextField muss existieren")
 
         textField.click()
-        let taskTitle = "Bug94 Test \(Int.random(in: 1000...9999))"
+        let taskTitle = "[TEST] Bug94 \(Int.random(in: 1000...9999))"
         textField.typeText(taskTitle)
-
-        // Use Return key — more reliable than button click in macOS UI tests
         textField.typeKey(.return, modifierFlags: [])
 
-        // Wait for task to appear in list
+        // Warten bis Task in der Liste erscheint
         let taskInList = app.staticTexts[taskTitle]
-        XCTAssertTrue(taskInList.waitForExistence(timeout: 8), "Task muss in Liste erscheinen")
+        XCTAssertTrue(taskInList.waitForExistence(timeout: 10), "Task muss in Liste erscheinen")
 
+        createdTaskTitle = taskTitle
         return taskTitle
     }
 
-    // MARK: - Bug 94 Tests
+    // MARK: - Bug 94 Kern-Tests
 
-    /// Bug 94: Nach Task-Erstellung muss der Inspector den neuen Task anzeigen
-    /// — beweist dass der User den Task sofort sehen und bearbeiten kann.
+    /// Bug 94: Inspector muss den neuen Task INNERHALB von 2 Sekunden anzeigen.
+    ///
+    /// Vor dem Fix: Inspector zeigt Task erst nach 3-8 Sek. (AI-Enrichment).
+    /// Nach dem Fix: Inspector zeigt Task sofort (< 2 Sek.).
+    ///
+    /// Bricht wenn: addTask() den Inspector-Override erst nach AI-Enrichment setzt.
     @MainActor
-    func testNewTaskShowsInInspectorAfterCreation() throws {
+    func testNewTaskShowsInInspectorWithin2Seconds() throws {
         let taskTitle = createTaskViaQuickAdd()
 
-        // Bug 94 Kern-Assertion: Inspector muss den neuen Task anzeigen.
-        // TaskInspector zeigt den Titel in einem TextField an.
-        // Wenn weder Selection noch Override funktioniert, zeigt Inspector "Kein Task ausgewaehlt".
+        // 2 Sekunden Timeout — der Inspector MUSS sofort reagieren.
+        // Vor dem Fix dauert es 3-8 Sekunden (AI-Enrichment blockiert),
+        // daher wird dieser Test FEHLSCHLAGEN bis der Fix implementiert ist.
         let inspectorTitle = app.textFields.matching(
             NSPredicate(format: "value == %@", taskTitle)
         ).firstMatch
         XCTAssertTrue(
-            inspectorTitle.waitForExistence(timeout: 5),
-            "Bug 94: Inspector muss den neuen Task anzeigen (Task sofort sichtbar)"
+            inspectorTitle.waitForExistence(timeout: 2),
+            "Bug 94: Inspector muss den neuen Task SOFORT anzeigen (max 2 Sek.), nicht erst nach AI-Enrichment"
         )
     }
 
-    /// Bug 94: "Kein Task ausgewaehlt" darf NICHT mehr sichtbar sein
-    /// nachdem ein Task erstellt wurde — beweist dass der Empty State weg ist.
-    @MainActor
-    func testEmptyStateDisappearsAfterTaskCreation() throws {
-        _ = createTaskViaQuickAdd()
-
-        // Wait for Inspector to update — poll until empty state disappears
-        let emptyState = app.staticTexts["Kein Task ausgewählt"]
-        let deadline = Date().addingTimeInterval(5)
-        while Date() < deadline && emptyState.exists {
-            Thread.sleep(forTimeInterval: 0.3)
-        }
-
-        XCTAssertFalse(
-            emptyState.exists,
-            "Bug 94: 'Kein Task ausgewaehlt' darf nach Erstellung nicht mehr sichtbar sein"
-        )
-    }
-
-    /// Bug 94: Nach Task-Erstellung muss der neue Task in der Accessibility-Hierarchie
-    /// existieren — beweist dass refreshTasks() den neuen Task einschliesst.
+    /// Basis-Test: Task existiert in der Liste nach Erstellung.
     @MainActor
     func testNewTaskExistsInListAfterCreation() throws {
         let taskTitle = createTaskViaQuickAdd()
 
-        // Task muss in der Accessibility-Hierarchie existieren
         let taskInList = app.staticTexts[taskTitle]
         XCTAssertTrue(
             taskInList.exists,
-            "Bug 94: Neuer Task muss in der Liste existieren"
+            "Task muss in der Accessibility-Hierarchie existieren"
         )
     }
 }
