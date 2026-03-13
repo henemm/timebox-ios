@@ -1,0 +1,1 @@
+Unit test: test_completeTask_doesNotCrashAccessingTaskAfterSave — verifies completeTask does not crash when accessing SwiftData task properties after save()

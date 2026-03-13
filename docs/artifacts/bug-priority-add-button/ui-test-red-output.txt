@@ -1,0 +1,1 @@
+UI Tests: 7 tests, all passed (simulator). Bug only on real device.

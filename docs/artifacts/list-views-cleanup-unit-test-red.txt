@@ -1,0 +1,21 @@
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/ListViewsCleanupTests.swift:31:27: error: value of type 'LocalTask' has no member 'modifiedAt'
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/ListViewsCleanupTests.swift:41:14: error: value of type 'LocalTask' has no member 'modifiedAt'
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/ListViewsCleanupTests.swift:42:29: error: value of type 'LocalTask' has no member 'modifiedAt'
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/ListViewsCleanupTests.swift:53:32: error: extra arguments at positions #1, #2, #3, #4, #5, #6, #7, #8, #9, #10, #11, #12, #13, #14, #15, #16, #17, #18, #19, #20, #21, #22, #23, #24, #25, #26, #27 in call
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/ListViewsCleanupTests.swift:54:13: error: missing argument for parameter 'localTask' in call
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/ListViewsCleanupTests.swift:59:30: error: cannot infer contextual base in reference to member 'manual'
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/ListViewsCleanupTests.swift:65:22: error: 'nil' requires a contextual type
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/ListViewsCleanupTests.swift:66:30: error: 'nil' requires a contextual type
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/ListViewsCleanupTests.swift:67:32: error: 'nil' requires a contextual type
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/ListViewsCleanupTests.swift:68:33: error: 'nil' requires a contextual type
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/ListViewsCleanupTests.swift:69:33: error: 'nil' requires a contextual type
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/ListViewsCleanupTests.swift:70:33: error: 'nil' requires a contextual type
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/ListViewsCleanupTests.swift:71:32: error: 'nil' requires a contextual type
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/ListViewsCleanupTests.swift:72:22: error: 'nil' requires a contextual type
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/ListViewsCleanupTests.swift:73:28: error: 'nil' requires a contextual type
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/ListViewsCleanupTests.swift:76:30: error: 'nil' requires a contextual type
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/ListViewsCleanupTests.swift:77:35: error: 'nil' requires a contextual type
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/ListViewsCleanupTests.swift:78:26: error: 'nil' requires a contextual type
+Testing failed:
+	Testing cancelled because the build failed.
+The following build commands failed:

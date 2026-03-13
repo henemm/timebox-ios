@@ -324,6 +324,24 @@ final class SyncEngineTests: XCTestCase {
         XCTAssertTrue(allTasks.first!.isCompleted)
     }
 
+    func test_completeTask_doesNotCrashAccessingTaskAfterSave() throws {
+        let context = container.mainContext
+        let task = LocalTask(title: "Crash Test Task", recurrencePattern: "none")
+        context.insert(task)
+        try context.save()
+
+        let taskID = task.id
+
+        // completeTask must not crash when accessing task properties after save
+        try syncEngine.completeTask(itemID: taskID)
+
+        // If we get here without crash, the fix works
+        let allTasks = try context.fetch(FetchDescriptor<LocalTask>())
+        let completed = allTasks.first { $0.id == taskID }
+        XCTAssertNotNil(completed)
+        XCTAssertTrue(completed!.isCompleted)
+    }
+
     // MARK: - updateSortOrder Tests
 
     func test_updateSortOrder_updatesTasksSortOrder() async throws {

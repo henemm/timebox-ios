@@ -1,0 +1,24 @@
+=== Unit Tests ===
+11/11 PASSED
+
+test_isAvailable_returnsBool: PASSED
+test_generateText_returnsNilWhenAiDisabled: PASSED
+test_generateTexts_returnsEmptyWhenAiDisabled: PASSED
+test_buildPrompt_includesIntentionLabel: PASSED
+test_buildPrompt_includesCompletedTaskTitles: PASSED
+test_buildPrompt_limitsTasksToFive: PASSED
+test_buildPrompt_excludesYesterdayTasks: PASSED
+test_buildPrompt_includesFulfillmentLevel: PASSED
+test_buildPrompt_includesFocusBlockStats: PASSED
+test_buildPrompt_emptyTasksCase: PASSED
+test_buildPrompt_includesHighImportanceMarker: PASSED
+
+=== UI Tests ===
+7/7 PASSED (5 Phase 3c + 2 Phase 3d)
+test_eveningReflectionCard_visibleWhenCoachEnabled: PASSED
+test_eveningReflectionCard_hiddenWhenCoachDisabled: PASSED
+test_eveningReflectionCard_hiddenWhenNoIntention: PASSED
+test_eveningReflectionCard_showsFulfillmentBadge: PASSED
+test_eveningReflectionCard_showsReflectionText: PASSED
+test_eveningCard_showsFallbackWhenAiDisabled: PASSED (NEW Phase 3d)
+test_eveningCard_reflectionTextNotEmpty: PASSED (NEW Phase 3d)

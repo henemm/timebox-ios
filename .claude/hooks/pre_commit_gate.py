@@ -201,6 +201,91 @@ def check_todos_staged() -> tuple[bool, str]:
         return True, f"Could not check staged files: {e}"
 
 
+def check_adversary_verdict() -> tuple[bool, str]:
+    """
+    Check if the implementation-validator (adversary) has verified the fix.
+
+    The adversary agent's job is to TRY TO BREAK the fix.
+    Only if it FAILS to break it, the verdict is VERIFIED.
+
+    Verdict is stored in workflow state as adversary_verdict.
+    """
+    try:
+        state = load_workflow_state()
+        if not state:
+            return True, "No workflow state — skipping adversary check"
+
+        workflows = state.get("workflows", {})
+        active_name = state.get("active_workflow")
+        if not active_name or active_name not in workflows:
+            return True, "No active workflow — skipping adversary check"
+
+        workflow = workflows[active_name]
+        phase = workflow.get("current_phase", "phase0_idle")
+
+        # Only require adversary verdict for implementation/complete phases
+        if phase not in ("phase6_implement", "phase7_validate", "phase8_complete"):
+            return True, f"Phase {phase} doesn't require adversary verdict"
+
+        verdict = workflow.get("adversary_verdict")
+        if not verdict:
+            return False, f"""
+======================================================================
+  BLOCKED — Adversary Verification Missing
+======================================================================
+
+  Workflow: {active_name}
+  Phase: {phase}
+
+  Before committing, you MUST run the implementation-validator agent.
+  The agent's job is to PROVE YOUR FIX IS BROKEN.
+  Only if it FAILS to break it, you may commit.
+
+  Step 1: Run implementation-validator agent (Task subagent)
+    - Read analysis at docs/artifacts/{active_name}/analysis.md
+    - Read the diff, check edge cases
+    - Run xcodebuild tests, capture output to file
+    - Try to BREAK the fix
+
+  Step 2: Feed test output to adversary gate
+    python3 .claude/hooks/adversary_gate.py <test-output-file>
+
+  The gate validates REAL test output. No shortcuts.
+  set-field adversary_verdict is BLOCKED.
+
+======================================================================"""
+
+        if not verdict.startswith("VERIFIED"):
+            return False, f"""
+======================================================================
+  BLOCKED — Adversary Found Issues
+======================================================================
+
+  Verdict: {verdict}
+
+  The adversary agent found problems with your fix.
+  Address the issues before committing.
+======================================================================"""
+
+        return True, f"Adversary verdict: {verdict}"
+
+    except Exception as e:
+        # Don't block on hook errors
+        return True, f"Adversary check error: {e}"
+
+
+def load_workflow_state() -> dict | None:
+    """Load workflow state file (same as workflow_state_multi.py uses)."""
+    state_file = Path(__file__).parent.parent / "workflow_state.json"
+    if not state_file.exists():
+        return None
+    try:
+        with open(state_file, 'r') as f:
+            return json.load(f)
+    except Exception:
+        return None
+
+
 def main():
     config = get_pre_commit_config()
     tool_input = get_tool_input()
@@ -222,6 +307,12 @@ def main():
         print(file=sys.stderr)
         print("Erst updaten, dann committen.", file=sys.stderr)
         print("=" * 70, file=sys.stderr)
+        sys.exit(2)
+
+    # CHECK: Adversary verdict required before commit
+    adv_ok, adv_msg = check_adversary_verdict()
+    if not adv_ok:
+        print(adv_msg, file=sys.stderr)
         sys.exit(2)
 
     # Run tests (only if test gate enabled)

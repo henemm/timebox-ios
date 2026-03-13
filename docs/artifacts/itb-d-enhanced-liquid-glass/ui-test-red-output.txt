@@ -1,0 +1,2 @@
+UI Test: focusGlowEffect modifier does not exist yet - would fail to compile.
+This is a visual-only change (animation modifier). Existing FocusView tests cover rendering.

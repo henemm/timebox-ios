@@ -1,0 +1,21 @@
+TDD RED - Unit Tests: FocusBlockTitleUpdateTests
+Date: 2026-03-05
+
+COMPILE ERRORS (6 errors):
+
+1. FocusBlockTitleUpdateTests.swift:23:32: error: type 'FocusBlock' has no member 'generateTitle'
+2. FocusBlockTitleUpdateTests.swift:39:32: error: type 'FocusBlock' has no member 'generateTitle'
+3. FocusBlockTitleUpdateTests.swift:55:35: error: type 'FocusBlock' has no member 'generateTitle'
+4. FocusBlockTitleUpdateTests.swift:59:35: error: type 'FocusBlock' has no member 'generateTitle'
+5. FocusBlockTitleUpdateTests.swift:83:30: error: value of type 'MockEventKitRepository' has no member 'lastUpdatedFocusBlockTitle'
+6. FocusBlockTitleUpdateTests.swift:88:29: error: value of type 'MockEventKitRepository' has no member 'lastUpdatedFocusBlockTitle'
+
+** TEST FAILED **
+
+Missing implementations:
+- FocusBlock.generateTitle(for: Date) -> String
+- MockEventKitRepository.lastUpdatedFocusBlockTitle
+
+UI Test: FocusBlockDropIndicatorUITests
+- testDropIndicatorElementExistsInTimeline: Cannot build (blocked by unit test compile errors)
+- Expected failure: 'dropPreviewIndicator' element doesn't exist in timeline view hierarchy

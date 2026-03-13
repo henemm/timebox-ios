@@ -1,0 +1,10 @@
+Bug Investigation: macOS ContentView missing overlay for importStatusMessage
+
+5 parallel agents confirmed:
+- ContentView.swift line 56: @State private var importStatusMessage: String? EXISTS
+- ContentView.swift lines 606,620,623,630: importStatusMessage IS SET with withAnimation
+- ContentView.swift: NO .overlay() modifier exists to RENDER the message
+- iOS BacklogView.swift lines 274-284: HAS overlay (works on iOS)
+- macOS ContentView: MISSING overlay (never renders)
+
+TEST RESULT: FAILED - overlay does not exist on macOS, importStatusMessage is never displayed

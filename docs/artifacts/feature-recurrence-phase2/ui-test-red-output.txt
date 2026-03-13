@@ -1,0 +1,23 @@
+UI Test RED Phase - Recurring View Swipe Actions
+==================================================
+
+PLATFORM: iOS
+VIEW: BacklogView → recurringView (Wiederkehrend filter)
+DATE: 2026-02-20
+
+ISSUE: recurringView uses ScrollView + LazyVStack instead of List.
+       SwipeActions (.swipeActions modifier) only work inside List.
+       User cannot swipe to edit/delete/add-to-next-up in Wiederkehrend view.
+
+EVIDENCE: User screenshot shows recurring tasks displayed but swipe gestures
+          do not activate. Compared to listView which uses List and has
+          working swipeActions.
+
+ROOT CAUSE:
+- recurringView (line 1015): ScrollView > LazyVStack > ForEach > BacklogRow
+- listView (line 747): List > ForEach > BacklogRow + .swipeActions
+
+FIX NEEDED: Change recurringView from ScrollView/LazyVStack to List,
+            add .swipeActions identical to listView.
+
+STATUS: FAILED - swipe actions not available in recurring view

@@ -1,0 +1,8 @@
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/FocusBlockDragTests.swift:38:24: error: no exact matches in call to initializer 
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/FocusBlockDragTests.swift:45:24: error: no exact matches in call to initializer 
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/FocusBlockDragTests.swift:52:24: error: no exact matches in call to initializer 
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/FocusBlockDragTests.swift:59:24: error: no exact matches in call to initializer 
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/FocusBlockDragTests.swift:137:29: error: value of type 'MockEventKitRepository' has no member 'lastUpdatedFocusBlockID'
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/FocusBlockDragTests.swift:138:29: error: value of type 'MockEventKitRepository' has no member 'lastUpdatedFocusBlockStart'
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/FocusBlockDragTests.swift:139:29: error: value of type 'MockEventKitRepository' has no member 'lastUpdatedFocusBlockEnd'
+** TEST FAILED **

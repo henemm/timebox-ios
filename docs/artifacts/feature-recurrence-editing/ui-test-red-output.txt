@@ -1,0 +1,8 @@
+UI Test RED Results - RecurrenceEditingUITests
+================================================
+Test case 'RecurrenceEditingUITests.testRecurrencePicker_containsQuarterlyOption()' FAILED (25.378s)
+Test case 'RecurrenceEditingUITests.testRecurrencePicker_containsWeekdaysOption()' FAILED (19.836s)
+Test case 'RecurrenceEditingUITests.testRecurrencePicker_containsWeekendsOption()' FAILED (23.372s)
+Test case 'RecurrenceEditingUITests.testRecurrencePicker_containsYearlyOption()' FAILED (18.922s)
+
+** TEST FAILED **

@@ -1,0 +1,9 @@
+Settings batch enrichment button - UI verification
+Platform: iOS + macOS
+Date: 2026-02-20
+
+iOS: Button 'Bestehende Tasks analysieren' visible in Settings > Apple Intelligence section
+     Tapped → showed '27 aktualisiert' after processing
+     
+macOS: Button visible in Settings > Allgemein > Apple Intelligence section  
+       Tapped → showed '0 aktualisiert' (all tasks already enriched via iOS sync)

@@ -1,0 +1,3 @@
+** TEST FAILED **
+Test case 'QuickCaptureIntentTests.testCreateTaskIntentDoesNotOpenApp()' failed on 'Clone 1 of FocusBlox - FocusBlox (33128)' (0.707 seconds)
+Test case 'QuickCaptureIntentTests.testCreateTaskIntentSavesDirectlyViaSwiftData()' failed on 'Clone 1 of FocusBlox - FocusBlox (33128)' (0.051 seconds)

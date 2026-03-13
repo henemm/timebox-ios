@@ -1,0 +1,19 @@
+TDD RED - DEP-4b Unit Tests
+Date: 2026-03-10
+
+FAILED: 3/4 tests failed as expected
+
+Test case 'TaskDependencyTests.test_syncEngine_completeTask_rejectsBlockedTask' FAILED (0.006s)
+  - blocked.isCompleted == true, expected false
+  - SyncEngine has no blockerTaskID guard
+
+Test case 'TaskDependencyTests.test_notificationDelegate_rejectsBlockedCompletion' FAILED (0.041s)
+  - blocked.isCompleted == true, expected false
+  - NotificationActionDelegate has no blockerTaskID guard
+
+Test case 'TaskDependencyTests.test_notificationDelegate_freesDependentsOnCompletion' FAILED (0.635s)
+  - dep.blockerTaskID != nil, expected nil
+  - NotificationActionDelegate does not call freeDependents
+
+Test case 'TaskDependencyTests.test_syncEngine_completeTask_allowsUnblockedTask' PASSED (0.042s)
+  - Positive test: unblocked tasks remain completable

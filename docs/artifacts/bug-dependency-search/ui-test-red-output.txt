@@ -1,0 +1,40 @@
+        "CA_ASSERT_MAIN_THREAD_TRANSACTIONS" = 0;
+        "CA_DEBUG_TRANSACTIONS" = 0;
+        "DYLD_FRAMEWORK_PATH" = "/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-iphonesimulator:/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks";
+        "DYLD_INSERT_LIBRARIES" = "/usr/lib/libRPAC.dylib:/Library/Developer/CoreSimulator/Volumes/iOS_23C54/Library/Developer/CoreSimulator/Profiles/Runtimes/iOS 26.2.simruntime/Contents/Resources/RuntimeRoot/usr/lib/libMainThreadChecker.dylib:/usr/lib/libRPAC.dylib";
+        "DYLD_LIBRARY_PATH" = "/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-iphonesimulator:/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib";
+        "LLVM_PROFILE_FILE" = "/var/folders/dk/p4qd3_xx6ls6_xybmqzfgs1h0000gn/T/com.henning.timebox.uitests.xctrunner/EF35B468-DE3D-4AED-87C4-D785541ED75B-8609-000027BF82801900/459DF3B1-DE69-46DB-9673-4E70B42A0FD6-%p%c.profraw";
+        NSApplicationQuitWithoutSuddenTermination = YES;
+        NSUnbufferedIO = YES;
+        "OS_ACTIVITY_DT_MODE" = YES;
+        "PERFC_ENABLE_EXTENDED_DIAGNOSTIC_FORMAT" = 1;
+        "PERFC_ENABLE_PROFILE_MODE" = 1;
+        "PERFC_RESET_INSERT_LIBRARIES" = 1;
+        "PERFC_SUPPRESS_SYSTEM_REPORTS" = 1;
+        "RUN_DESTINATION_DEVICE_NAME" = "Clone 2 of FocusBlox";
+        "RUN_DESTINATION_DEVICE_PLATFORM_IDENTIFIER" = "com.apple.platform.iphonesimulator";
+        "RUN_DESTINATION_DEVICE_UDID" = "E0049374-26D8-4A3F-8301-4691A8647F54";
+        "SQLITE_ENABLE_THREAD_ASSERTIONS" = 1;
+        TERM = dumb;
+        "XCODE_SCHEME_NAME" = FocusBlox;
+        "XCODE_TEST_PLAN_NAME" = FocusBlox;
+        XCTestBundleInjectPath = "/usr/lib/libRPAC.dylib:/Library/Developer/CoreSimulator/Volumes/iOS_23C54/Library/Developer/CoreSimulator/Profiles/Runtimes/iOS 26.2.simruntime/Contents/Resources/RuntimeRoot/usr/lib/libMainThreadChecker.dylib:/usr/lib/libRPAC.dylib";
+        XCTestBundlePath = "PlugIns/FocusBloxUITests.xctest";
+        XCTestConfigurationFilePath = "";
+        XCTestSessionIdentifier = "29051C2D-1C64-4B07-A9C6-8688AE2AD22A";
+        "__XCODE_BUILT_PRODUCTS_DIR_PATHS" = "/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-iphonesimulator";
+        "__XPC_DYLD_FRAMEWORK_PATH" = "/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-iphonesimulator";
+        "__XPC_DYLD_LIBRARY_PATH" = "/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-iphonesimulator";
+        "__XPC_LLVM_PROFILE_FILE" = "/var/folders/dk/p4qd3_xx6ls6_xybmqzfgs1h0000gn/T/com.henning.timebox.uitests.xctrunner/EF35B468-DE3D-4AED-87C4-D785541ED75B-8609-000027BF82801900/459DF3B1-DE69-46DB-9673-4E70B42A0FD6-%p%c.profraw";
+    };
+    stderr = "/dev/ttys017";
+    stdout = "/dev/ttys017";
+    "terminate_running_process" = 1;
+    "wait_for_debugger" = 1;
+} (error = Error Domain=NSMachErrorDomain Code=-308 "(ipc/mig) server died")
+Testing started
+Test suite 'BlockerPickerSearchUITests' started on 'Clone 1 of FocusBlox - FocusBloxUITests-Runner (9666)'
+Test case 'BlockerPickerSearchUITests.test_blockerButton_opensSheetWithSearch()' failed on 'Clone 1 of FocusBlox - FocusBloxUITests-Runner (9666)' (86.013 seconds)
+Test case 'BlockerPickerSearchUITests.test_blockerSection_showsButtonThatOpensSheet()' failed on 'Clone 1 of FocusBlox - FocusBloxUITests-Runner (9666)' (54.020 seconds)
+Test case 'BlockerPickerSearchUITests.test_searchField_filtersTaskList()' failed on 'Clone 1 of FocusBlox - FocusBloxUITests-Runner (9666)' (82.968 seconds)
+Test case 'BlockerPickerSearchUITests.test_selectingTask_updatesButtonAndDismissesSheet()' failed on 'Clone 1 of FocusBlox - FocusBloxUITests-Runner (9666)' (105.211 seconds)

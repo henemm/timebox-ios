@@ -1,0 +1,6 @@
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/RemindersImportServiceTests.swift:277:31: error: value of type 'RemindersImportService.ImportResult' has no member 'markedComplete'
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/RemindersImportServiceTests.swift:285:18: error: value of type 'MockEventKitRepository' has no member 'markCompleteError'
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/RemindersImportServiceTests.swift:294:31: error: value of type 'RemindersImportService.ImportResult' has no member 'markCompleteFailures'
+Testing failed:
+	Testing cancelled because the build failed.
+The following build commands failed:

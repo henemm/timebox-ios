@@ -19,6 +19,7 @@ struct DailyReviewView: View {
     @State private var isLoading = true
     @State private var reviewMode: ReviewMode = .today
     @AppStorage("coachModeEnabled") private var coachModeEnabled: Bool = false
+    @State private var aiReflectionTexts: [IntentionOption: String] = [:]
     private let statsCalculator = ReviewStatsCalculator()
 
     // MARK: - Computed Properties
@@ -176,7 +177,8 @@ struct DailyReviewView: View {
                             EveningReflectionCard(
                                 intentions: DailyIntention.load().selections,
                                 tasks: allLocalTasks,
-                                focusBlocks: todayBlocks
+                                focusBlocks: todayBlocks,
+                                aiTexts: aiReflectionTexts
                             )
                             .padding(.horizontal)
                         }
@@ -222,6 +224,7 @@ struct DailyReviewView: View {
         }
         .task {
             await loadData()
+            await loadAIReflectionTexts()
         }
     }
 
@@ -646,6 +649,24 @@ struct DailyReviewView: View {
         }
 
         isLoading = false
+    }
+
+    private func loadAIReflectionTexts() async {
+        guard showEveningReflection else { return }
+        let intention = DailyIntention.load()
+        guard intention.isSet else { return }
+
+        if ProcessInfo.processInfo.arguments.contains("-AIDisabled") {
+            AppSettings.shared.aiScoringEnabled = false
+        }
+
+        let service = EveningReflectionTextService()
+        let texts = await service.generateTexts(
+            intentions: intention.selections,
+            tasks: allLocalTasks,
+            focusBlocks: todayBlocks
+        )
+        aiReflectionTexts = texts
     }
 }
 

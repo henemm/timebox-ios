@@ -39,7 +39,7 @@
 - **Fix:** Swipe-Aktionen zu `blockedRow()` hinzugefuegt: Bearbeiten, Loeschen, Freigeben (Abhaengigkeit entfernen). macOS: Kontextmenue-Eintrag "Abhaengigkeit entfernen".
 - **Tests:** 4 UI Tests gruen (BlockedTaskSwipeUITests)
 - **Dateien:** BacklogView.swift (iOS), ContentView.swift (macOS)
-- **Commit:** (dieser Commit)
+- **Commit:** 271d993
 
 ---
 

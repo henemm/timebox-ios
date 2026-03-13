@@ -1,0 +1,17 @@
+} (error = Error Domain=FBSOpenApplicationServiceErrorDomain Code=1 "Simulator device failed to launch com.henning.timebox." UserInfo={NSLocalizedDescription=Simulator device failed to launch com.henning.timebox., NSUnderlyingError=0x7aad92970 {Error Domain=FBSOpenApplicationServiceErrorDomain Code=1 "The request to open "com.henning.timebox" failed." UserInfo={BSErrorCodeDescription=RequestDenied, NSLocalizedDescription=The request to open "com.henning.timebox" failed., NSUnderlyingError=0x7aad93990 {Error Domain=FBProcessExit Code=64 "The process failed to launch." UserInfo={NSUnderlyingError=0x7aad93300 {Error Domain=RBSRequestErrorDomain Code=5 "Launch failed." UserInfo=0x7a2da58c0 (not displayed)}, BSErrorCodeDescription=launch-failed, NSLocalizedFailureReason=The process failed to launch.}}, FBSOpenApplicationRequestID=0x2140, NSLocalizedFailureReason=The request was denied by service delegate (SBMainWorkspace).}}, NSLocalizedFailureReason=The request was denied by service delegate (SBMainWorkspace)., FBSOpenApplicationRequestID=0x2140, SimCallingSelector=launchApplicationWithID:options:pid:error:, BSErrorCodeDescription=RequestDenied})
+Test suite 'SpotlightIntegrationTests' started on 'Clone 1 of FocusBlox - FocusBlox (35917)'
+Test case 'SpotlightIntegrationTests.test_completeTask_makesTaskNonIndexable()' passed on 'Clone 1 of FocusBlox - FocusBlox (35917)' (0.048 seconds)
+Test case 'SpotlightIntegrationTests.test_deindexTask_doesNotCrashForAnyUUID()' failed on 'Clone 1 of FocusBlox - FocusBlox (35917)' (0.000 seconds)
+Test case 'SpotlightIntegrationTests.test_deleteTask_removesTaskFromStore()' passed on 'Clone 1 of FocusBlox - FocusBlox (35969)' (0.029 seconds)
+Test case 'SpotlightIntegrationTests.test_indexTask_doesNotCrashForActiveTask()' passed on 'Clone 1 of FocusBlox - FocusBlox (35969)' (93.771 seconds)
+Test case 'SpotlightIntegrationTests.test_templateTask_isNotIndexable()' passed on 'Clone 1 of FocusBlox - FocusBlox (35969)' (0.069 seconds)
+Test suite 'SpotlightIndexingServiceTests' started on 'Clone 1 of FocusBlox - FocusBlox (35969)'
+Test case 'SpotlightIndexingServiceTests.test_buildAttributeSet_includesTaskTypeInKeywords()' passed on 'Clone 1 of FocusBlox - FocusBlox (35969)' (0.040 seconds)
+Test case 'SpotlightIndexingServiceTests.test_buildAttributeSet_setsTagsAsKeywords()' passed on 'Clone 1 of FocusBlox - FocusBlox (35969)' (0.015 seconds)
+Test case 'SpotlightIndexingServiceTests.test_buildAttributeSet_setsTitle()' passed on 'Clone 1 of FocusBlox - FocusBlox (35969)' (0.024 seconds)
+Test case 'SpotlightIndexingServiceTests.test_buildSearchableItem_usesCorrectDomain()' passed on 'Clone 1 of FocusBlox - FocusBlox (35969)' (0.005 seconds)
+Test case 'SpotlightIndexingServiceTests.test_buildSearchableItem_usesUUIDAsIdentifier()' passed on 'Clone 1 of FocusBlox - FocusBlox (35969)' (0.017 seconds)
+Test case 'SpotlightIndexingServiceTests.test_shouldIndex_returnsFalse_forCompletedTask()' passed on 'Clone 1 of FocusBlox - FocusBlox (35969)' (0.005 seconds)
+Test case 'SpotlightIndexingServiceTests.test_shouldIndex_returnsFalse_forTemplate()' passed on 'Clone 1 of FocusBlox - FocusBlox (35969)' (0.016 seconds)
+Test case 'SpotlightIndexingServiceTests.test_shouldIndex_returnsTrue_forActiveTask()' passed on 'Clone 1 of FocusBlox - FocusBlox (35969)' (0.005 seconds)
+Test case 'SpotlightIndexingServiceTests.test_shouldIndex_returnsTrue_forRecurringInstance()' passed on 'Clone 1 of FocusBlox - FocusBlox (35969)' (0.022 seconds)

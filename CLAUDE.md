@@ -1,31 +1,10 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code when working with this repository.
-
-## ⚠️ WICHTIG: Apple Versionsnummern (NICHT VERGESSEN!)
-
-**Seit WWDC 2025 gilt ein neues Nummernsystem für ALLE Apple-Plattformen:**
-
-| Jahr | Version |
-|------|---------|
-| 2025 | **26.x** |
-| 2026 | **27.x** |
-| 2027 | **28.x** |
-
-Die Versionsnummer ist immer das **Folgejahr**. Wir sind aktuell auf **iOS 26.2**.
-
-Dies gilt für: iOS, iPadOS, macOS, watchOS, tvOS, visionOS, Xcode
-
 ## Platform & SDK
 
-**Deployment Target:** iOS 26.2 / iPadOS 26.2 / watchOS 26.2 / macOS 26.2
+**Deployment Target:** iOS 26.2 / iPadOS 26.2 / watchOS 26.2 / macOS 26.2 | **Xcode:** 26.2
 
-**Xcode:** 26.2
-
-**iOS 26 Features die wir nutzen:**
-- **Icon Composer** - Liquid Glass App Icons mit Layer-System
-- **SwiftUI 7** - Neue APIs und Performance-Verbesserungen
-- Deployment auf iOS 26+ Geräten
+Apple Versionsnummern seit WWDC 2025: Version = Folgejahr (2025 → 26.x, 2026 → 27.x).
 
 ## Design-Leitbild
 
@@ -33,138 +12,47 @@ Minimalistisch, wenige Farben, iOS-nativ ohne Custom-Widgets. Moeglichst nah am 
 
 ## Cross-Platform Code-Sharing (iOS + macOS)
 
-**Architektur-Regel:**
-- `Sources/` = Shared Code (Models, Services, Business-Logik) → wird von **beiden** Plattformen genutzt
-- `FocusBloxMac/` = **nur** macOS-spezifische Views/UI
-- **Keine Duplikation** von Logik in `FocusBloxMac/` — immer Shared-Code aus `Sources/` nutzen
-- Bei jedem Bug/Feature prüfen: Betrifft es beide Plattformen? Ist die Logik geteilt?
-- Neue Business-Logik **immer** in `Sources/` implementieren
-- macOS-Views importieren und nutzen `AppSettings`, `SoundService`, Enums etc. aus `Sources/`
+- `Sources/` = Shared Code (Models, Services, Business-Logik) → beide Plattformen
+- `FocusBloxMac/` = nur macOS-spezifische Views/UI
+- Neue Business-Logik **immer** in `Sources/` — keine Duplikation in `FocusBloxMac/`
+- Bei jedem Bug/Feature pruefen: Betrifft es beide Plattformen?
 
 ## Workflow
 
-This project uses the **OpenSpec TDD Workflow** (9 Phasen):
+This project uses the **OpenSpec TDD Workflow**:
 
 | Phase | Command | Purpose |
 |-------|---------|---------|
 | 0 | `/reset` | Reset workflow to idle |
-| 1 | `/context` | Context generation - understand codebase |
+| 1 | `/context` | Context generation |
 | 2 | `/analyse` | Deep analysis of request |
 | 3 | `/write-spec` | Create specification |
 | 4 | User: "approved" | Spec approval |
 | 5 | `/tdd-red` | Write failing tests (TDD RED) |
 | 6 | `/implement` | Implement to make tests pass (TDD GREEN) |
 | 7 | `/validate` | Validate before commit |
-| 8 | - | Complete |
 
-**Hooks enforce this workflow!** Edit/Write on protected files is blocked unless:
-- TDD RED phase completed with real test artifacts
-- Spec approved
-- Proper phase progression followed
+Hooks enforce phase progression. Edit/Write on protected files is blocked without active workflow + TDD RED artifacts.
 
-## ⛔ MANDATORY: UI TESTS FOR EVERY FEATURE/BUG
+For bug fixes: `/bug <description>` triggers Analysis-First → Spec → TDD RED → Implement → Validate.
 
-**THIS IS NON-NEGOTIABLE:**
+## TDD & Testing Rules
 
-1. **EVERY feature** must have UI tests in `FocusBloxUITests/`
-2. **EVERY bug fix** must have UI tests verifying the fix
-3. UI tests must be written **BEFORE** implementation (TDD RED)
-4. UI tests must **FAIL** when first run (proving feature doesn't exist)
-5. Implementation is **BLOCKED** until:
-   - `ui_test_red_done: true` is set in workflow state
-   - `ui_test_red_result` contains "failed"
-   - Real failure artifacts exist
+- UI tests are **mandatory** for every feature/bug — written BEFORE implementation (TDD RED)
+- Tests must FAIL first, then PASS after implementation — no retroactive tests
+- **Never ask for manual testing** — fix the code until tests are green
+- `tdd_enforcement.py` hook verifies real test artifacts with timestamps
 
-**NO EXCEPTIONS. NO RETROACTIVE TESTS. NO EXEMPTIONS.**
-
-The `tdd_enforcement.py` hook verifies:
-- UI test artifacts exist with proper timestamps
-- Tests actually failed before implementation
-- No retroactive artifact creation
-
-## ⛔ NEVER ASK FOR MANUAL TESTING
-
-**After implementation, UI tests MUST PASS (GREEN).**
-
-If tests fail after implementation:
-1. **FIX THE CODE** - not ask user to test manually
-2. Re-run tests until GREEN
-3. Only when ALL tests pass → Feature is complete
-
-**"Bitte manuell testen" = WORKFLOW VIOLATION**
-
-The complete TDD cycle:
-```
-RED:   UI Tests written → Tests FAIL (feature doesn't exist)
-GREEN: Implementation → Tests PASS (feature works)
-DONE:  All tests green → No manual testing needed
-```
-
-## Quick Commands
-
-```bash
-# Slash commands
-/context      # Phase 1: Generate context
-/analyse      # Phase 2: Analyse request
-/write-spec   # Phase 3: Create specification
-/tdd-red      # Phase 5: Write failing tests
-/implement    # Phase 6: Implement (after TDD RED)
-/validate     # Phase 7: Validate implementation
-/workflow     # Show current workflow status
-/reset        # Reset to idle
-```
-
-## Bug Fixes
-
-For bug fixes, use `/bug <description>` which triggers:
-1. Analysis-First investigation
-2. Root cause identification
-3. Spec for fix
-4. TDD RED → Implement → Validate
-
-## Specs
-
-All entities/components need specs before implementation:
-- Template: `docs/specs/_template.md`
-- Location: `docs/specs/[category]/[entity].md`
-
-## Documentation Structure
-
-- `docs/specs/` - Entity specifications
-- `docs/features/` - Feature documentation
-- `docs/reference/` - Technical reference
-- `docs/project/` - Project management
-- `docs/project/stories/` - User Stories (JTBD)
-
-## Product Vision & Roadmap
-
-**IMPORTANT: Read these before starting work!**
-
-- **User Story:** `docs/project/stories/timebox-core.md`
-- **Backlog & Roadmap:** `docs/ACTIVE-todos.md` ← **SINGLE SOURCE OF TRUTH**
-- **Gap-Analyse:** `docs/context/user-story-gap-analysis.md`
-
-## Testing
-
-**Designated Test Simulator:**
-- Identifier: `6364A54B-5048-4346-899E-FFB67E630D53`
-- Name: "FocusBlox"
-
-All automated tests (Unit Tests, UI Tests) must run on this specific simulator.
-
-Example command:
+**Test Simulator:**
 ```bash
 xcodebuild test -project FocusBlox.xcodeproj -scheme FocusBlox \
-  -destination 'id=6364A54B-5048-4346-899E-FFB67E630D53'
+  -destination 'id=1EC79950-6704-47D0-BDF8-2C55236B4B40'
 ```
 
-## Learnings & Gotchas
+## Specs & Documentation
 
-Siehe `docs/reference/learnings.md`
-
----
-
-Generated by OpenSpec Framework on 2026-01-13
-Updated: 2026-01-18 (TDD Workflow dokumentiert)
-Updated: 2026-01-23 (Platform iOS 26.2, Learnings & Gotchas)
-Updated: 2026-02-12 (Cross-Platform Code-Sharing Guideline)
+- Specs: `docs/specs/[category]/[entity].md` (Template: `docs/specs/_template.md`)
+- Features: `docs/features/`
+- Reference: `docs/reference/` (inkl. `learnings.md`)
+- **Backlog & Roadmap:** `docs/ACTIVE-todos.md` ← **SINGLE SOURCE OF TRUTH**
+- User Story: `docs/project/stories/timebox-core.md`

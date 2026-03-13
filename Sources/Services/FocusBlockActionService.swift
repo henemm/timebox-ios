@@ -73,16 +73,20 @@ enum FocusBlockActionService {
                 RecurrenceService.createNextInstance(from: localTask, in: modelContext)
             }
 
+            // Capture values BEFORE save — SwiftData objects are not thread-safe
+            let capturedID = localTask.id
+            let capturedTitle = localTask.title
+
+            try? modelContext.save()
+
             // ITB-G1: Donate intent so Siri learns completion patterns
             #if !os(macOS)
             Task {
                 let donationIntent = CompleteTaskIntent()
-                donationIntent.task = TaskEntity(id: localTask.id, title: localTask.title)
+                donationIntent.task = TaskEntity(id: capturedID, title: capturedTitle)
                 try? await IntentDonationManager.shared.donate(intent: donationIntent)
             }
             #endif
-
-            try? modelContext.save()
         }
 
         return .completed

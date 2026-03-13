@@ -1,0 +1,1 @@
+Test case 'SiriTipPersistenceUITests.test_siriTipDismissal_persistsAcrossRelaunch()' FAILED: SiriTipView reappeared after app relaunch because @State does not persist across launches. Needs @AppStorage.

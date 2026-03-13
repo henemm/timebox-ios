@@ -1,0 +1,5 @@
+    export TREAT_MISSING_BASELINES_AS_TEST_FAILURES\=NO
+** TEST FAILED **
+Test case 'NextUpLongPressUITests.testLongPressShowsDeleteAction()' failed on 'Clone 1 of FocusBlox - FocusBloxUITests-Runner (40390)' (14.818 seconds)
+Test case 'NextUpLongPressUITests.testLongPressShowsEditAction()' failed on 'Clone 1 of FocusBlox - FocusBloxUITests-Runner (40390)' (9.400 seconds)
+Test case 'NextUpLongPressUITests.testLongPressShowsRemoveAction()' failed on 'Clone 1 of FocusBlox - FocusBloxUITests-Runner (40390)' (10.907 seconds)

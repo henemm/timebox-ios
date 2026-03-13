@@ -1,0 +1,30 @@
+	Cannot find 'TaskCompletionUndoService' in scope
+	Cannot find 'TaskCompletionUndoService' in scope
+	Cannot find 'TaskCompletionUndoService' in scope
+	'nil' requires a contextual type
+	Cannot find 'TaskCompletionUndoService' in scope
+	'nil' requires a contextual type
+	Cannot find 'TaskCompletionUndoService' in scope
+	Cannot find 'TaskCompletionUndoService' in scope
+	'nil' requires a contextual type
+	Cannot find 'TaskCompletionUndoService' in scope
+	'nil' requires a contextual type
+	Cannot find 'TaskCompletionUndoService' in scope
+	Cannot find 'TaskCompletionUndoService' in scope
+	Cannot find 'TaskCompletionUndoService' in scope
+	Cannot find 'TaskCompletionUndoService' in scope
+	'nil' requires a contextual type
+	Cannot find 'TaskCompletionUndoService' in scope
+	'nil' requires a contextual type
+	Cannot find 'TaskCompletionUndoService' in scope
+	Cannot find 'TaskCompletionUndoService' in scope
+	Testing cancelled because the build failed.
+
+** TEST FAILED **
+
+
+The following build commands failed:
+	SwiftCompile normal arm64 /Users/hem/Developer/my-daily-sprints/FocusBloxTests/TaskCompletionUndoServiceTests.swift (in target 'FocusBloxTests' from project 'FocusBlox')
+	SwiftCompile normal arm64 Compiling\ TaskCompletionUndoServiceTests.swift /Users/hem/Developer/my-daily-sprints/FocusBloxTests/TaskCompletionUndoServiceTests.swift (in target 'FocusBloxTests' from project 'FocusBlox')
+	Testing project FocusBlox with scheme FocusBlox
+(3 failures)

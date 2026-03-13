@@ -1,0 +1,32 @@
+    export TREAT_MISSING_BASELINES_AS_TEST_FAILURES\=NO
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/RecurringTemplateTests.swift:14:26: error: main actor-isolated property 'mainContext' can not be referenced from a nonisolated context
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/RecurringTemplateTests.swift:22:29: error: value of type 'LocalTask' has no member 'isTemplate'
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/RecurringTemplateTests.swift:28:14: error: value of type 'LocalTask' has no member 'isTemplate'
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/RecurringTemplateTests.swift:34:79: error: argument 'dueDate' must precede argument 'recurrencePattern'
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/RecurringTemplateTests.swift:54:27: error: type 'RecurrenceService' has no member 'migrateToTemplateModel'
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/RecurringTemplateTests.swift:56:13: error: the compiler is unable to type-check this expression in reasonable time; try breaking up the expression into distinct sub-expressions
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/RecurringTemplateTests.swift:59:38: error: generic parameter 'T' could not be inferred
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/RecurringTemplateTests.swift:69:18: error: value of type 'LocalTask' has no member 'isTemplate'
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/RecurringTemplateTests.swift:76:27: error: type 'RecurrenceService' has no member 'migrateToTemplateModel'
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/RecurringTemplateTests.swift:78:13: error: the compiler is unable to type-check this expression in reasonable time; try breaking up the expression into distinct sub-expressions
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/RecurringTemplateTests.swift:81:38: error: generic parameter 'T' could not be inferred
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/RecurringTemplateTests.swift:98:18: error: value of type 'LocalTask' has no member 'isTemplate'
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/RecurringTemplateTests.swift:117:37: error: value of type 'LocalTask' has no member 'isTemplate'
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/RecurringTemplateTests.swift:127:18: error: value of type 'LocalTask' has no member 'isTemplate'
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/RecurringTemplateTests.swift:148:18: error: value of type 'LocalTask' has no member 'isTemplate'
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/RecurringTemplateTests.swift:165:24: error: value of type 'SyncEngine' has no member 'deleteRecurringTemplate'
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/RecurringTemplateTests.swift:179:14: error: value of type 'LocalTask' has no member 'isTemplate'
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/RecurringTemplateTests.swift:181:32: error: value of type 'PlanItem' has no member 'isTemplate'
+	Value of type 'LocalTask' has no member 'isTemplate'
+	Value of type 'LocalTask' has no member 'isTemplate'
+	Type 'RecurrenceService' has no member 'migrateToTemplateModel'
+	Value of type 'LocalTask' has no member 'isTemplate'
+	Type 'RecurrenceService' has no member 'migrateToTemplateModel'
+	Value of type 'LocalTask' has no member 'isTemplate'
+	Value of type 'LocalTask' has no member 'isTemplate'
+	Value of type 'LocalTask' has no member 'isTemplate'
+	Value of type 'LocalTask' has no member 'isTemplate'
+	Value of type 'SyncEngine' has no member 'deleteRecurringTemplate'
+	Value of type 'LocalTask' has no member 'isTemplate'
+	Value of type 'PlanItem' has no member 'isTemplate'
+** TEST FAILED **

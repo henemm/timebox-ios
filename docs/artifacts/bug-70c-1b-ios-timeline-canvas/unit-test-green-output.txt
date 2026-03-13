@@ -1,0 +1,28 @@
+    export ALLOW_BUILD_REQUEST_OVERRIDES\=NO
+    export BUILD_ACTIVE_RESOURCES_ONLY\=YES
+    export BUILD_COMPONENTS\=headers\ build
+    export BUILD_DIR\=/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products
+    export BUILD_LIBRARY_FOR_DISTRIBUTION\=NO
+    export BUILD_ROOT\=/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products
+    export BUILD_STYLE\=
+    export BUILD_VARIANTS\=normal
+    export CLANG_MODULES_BUILD_SESSION_FILE\=/Users/hem/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Session.modulevalidation
+    export CONFIGURATION_BUILD_DIR\=/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-iphonesimulator
+    export FUSE_BUILD_PHASES\=YES
+    export FUSE_BUILD_SCRIPT_PHASES\=NO
+    export INFOPLIST_EXPAND_BUILD_SETTINGS\=YES
+    export IS_UNOPTIMIZED_BUILD\=YES
+    export MAC_OS_X_PRODUCT_BUILD_VERSION\=25D125
+    export PLATFORM_PRODUCT_BUILD_VERSION\=23C53
+    export SDK_PRODUCT_BUILD_VERSION\=23C53
+    export TARGET_BUILD_DIR\=/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-iphonesimulator
+    export VERSION_INFO_BUILDER\=hem
+    export XCODE_PRODUCT_BUILD_VERSION\=17C52
+Test case 'IOSTimelineCanvasTests.test_calculateTimeFromLocation_halfHour()' passed on 'Clone 1 of FocusBlox - FocusBlox (71908)' (0.002 seconds)
+Test case 'IOSTimelineCanvasTests.test_calculateTimeFromLocation_negativeY_clamped()' passed on 'Clone 1 of FocusBlox - FocusBlox (71908)' (0.000 seconds)
+Test case 'IOSTimelineCanvasTests.test_calculateTimeFromLocation_snapsToQuarterHour()' passed on 'Clone 1 of FocusBlox - FocusBlox (71908)' (0.000 seconds)
+Test case 'IOSTimelineCanvasTests.test_calculateTimeFromLocation_standardPosition()' passed on 'Clone 1 of FocusBlox - FocusBlox (71908)' (0.000 seconds)
+Test case 'IOSTimelineCanvasTests.test_calculateTimeFromLocation_topOfTimeline()' passed on 'Clone 1 of FocusBlox - FocusBlox (71908)' (0.000 seconds)
+Test case 'IOSTimelineCanvasTests.test_focusBlockPositioning_nonOverlapping_singleColumn()' passed on 'Clone 1 of FocusBlox - FocusBlox (71908)' (0.001 seconds)
+Test case 'IOSTimelineCanvasTests.test_focusBlockPositioning_overlapping_multipleColumns()' passed on 'Clone 1 of FocusBlox - FocusBlox (71908)' (0.000 seconds)
+Test case 'IOSTimelineCanvasTests.test_positionedFocusBlock_existsAsSharedType()' passed on 'Clone 1 of FocusBlox - FocusBlox (71908)' (0.001 seconds)

@@ -1,0 +1,22 @@
+** TEST FAILED **
+
+UI Tests could not run — build failed due to unit test compilation errors.
+Same root cause as unit tests: PositionedFocusBlock and TimelineLocationCalculator not defined.
+
+FocusBloxUITests/IOSTimelineCanvasUITests.swift COMPILES but cannot execute because
+FocusBloxTests target fails to build (Xcode builds all targets in scheme).
+
+UI Tests: 5 tests, ALL RED (blocked by build failure)
+
+Expected runtime failures when implementation exists:
+- testBlocksHaveDurationProportionalHeight: WILL FAIL — blocks currently have ~40pt fixed height,
+  120-min block is NOT 2x taller than 60-min block (list-based rendering)
+- testHourGridLabelsExist: MAY PASS — hourMarker_8 already exists in current TimelineHourRow
+- testCanvasDropZoneExists: WILL FAIL — "canvasDropZone" identifier does not exist
+  (current implementation uses per-hour "timelineDropZone_\(hour)")
+- testBlocksPositionedByStartTime: WILL FAIL — Y-difference between blocks is too small
+  (list-based layout, not canvas-positioned by time)
+- testFocusBlockIsTappable: MAY PASS — blocks are already tappable in current layout
+
+Run date: 2026-03-05 07:54
+Simulator: FocusBlox (1EC79950-6704-47D0-BDF8-2C55236B4B40)

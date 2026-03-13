@@ -1,0 +1,20 @@
+TDD RED — Monster Coach Phase 2: Morning Intention
+Date: 2026-03-12
+
+Unit Tests: FocusBloxTests/MorningIntentionTests.swift
+UI Tests: FocusBloxUITests/MorningIntentionUITests.swift
+
+BUILD FAILED — Compile errors as expected:
+
+error: Build input files cannot be found:
+  '/Users/hem/Developer/my-daily-sprints/Sources/Models/DailyIntention.swift'
+  '/Users/hem/Developer/my-daily-sprints/Sources/Views/MorningIntentionView.swift'
+
+Tests reference types that don't exist yet:
+- IntentionOption (enum with 6 cases)
+- DailyIntention (struct with save/load)
+- NotificationService.buildIntentionReminderRequest(hour:minute:)
+
+Total: 13 unit tests + 5 UI tests — ALL fail to compile (RED)
+
+** TEST FAILED **

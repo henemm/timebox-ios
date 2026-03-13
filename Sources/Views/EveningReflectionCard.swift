@@ -6,6 +6,7 @@ struct EveningReflectionCard: View {
     let intentions: [IntentionOption]
     let tasks: [LocalTask]
     let focusBlocks: [FocusBlock]
+    var aiTexts: [IntentionOption: String] = [:]
     var now: Date = Date()
 
     var body: some View {
@@ -30,9 +31,8 @@ struct EveningReflectionCard: View {
         let level = IntentionEvaluationService.evaluateFulfillment(
             intention: intention, tasks: tasks, focusBlocks: focusBlocks, now: now
         )
-        let template = IntentionEvaluationService.fallbackTemplate(
-            intention: intention, level: level
-        )
+        let template = aiTexts[intention]
+            ?? IntentionEvaluationService.fallbackTemplate(intention: intention, level: level)
 
         VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 8) {

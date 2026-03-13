@@ -1,0 +1,3 @@
+Test case 'FocusBlockAssignmentTests.testAssignment_toBlockWithExistingTasks_preservesThem_Bug81()' failed on 'Clone 1 of FocusBlox - FocusBlox (68151)' (0.522 seconds)
+Test case 'FocusBlockAssignmentTests.testThreeAssignments_withStaleSnapshot_allTasksShouldSurvive_Bug81()' failed on 'Clone 1 of FocusBlox - FocusBlox (68151)' (0.003 seconds)
+Test case 'FocusBlockAssignmentTests.testTwoAssignments_withStaleSnapshot_bothTasksShouldSurvive_Bug81()' failed on 'Clone 1 of FocusBlox - FocusBlox (68151)' (0.003 seconds)

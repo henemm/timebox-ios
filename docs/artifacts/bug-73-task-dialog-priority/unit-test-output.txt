@@ -1,0 +1,7 @@
+Bug 73: FocusBlockTasksSheetTests - 3/3 Tests GREEN (pre-implementation)
+Date: Mo.  9 März 2026 11:03:29 CET
+Tests validate:
+  1. testAllTasksSortedByPriorityDescending - PASSED (sorting logic works on PlanItem)
+  2. testPlanItemHasPriorityScoreAndTier - PASSED (PlanItem exposes score+tier)
+  3. testSamePriorityTasksStableSort - PASSED (stable sort, no crash)
+Note: Tests validate the sorting + data model. The UI change (adding badges to SheetNextUpRow) is a visual-only change reusing existing shared components.

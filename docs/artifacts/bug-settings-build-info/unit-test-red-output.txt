@@ -1,0 +1,16 @@
+Unit Test RED Phase - Settings Build-Info + Vorwarnungs-Labels
+==============================================================
+
+DATE: 2026-02-20
+PLATFORM: iOS + macOS
+
+EXISTING TESTS THAT WILL BREAK:
+- WarningTests.test_warningTiming_hasCorrectLabels:
+  XCTAssertEqual(WarningTiming.short.label, "Knapp") — will fail after rename to "Kurz vorher"
+  XCTAssertEqual(WarningTiming.early.label, "Früh") — will fail after rename to "Weit vorher"
+
+NEW CODE NOT YET EXISTING:
+- BuildInfo.swift does not exist yet
+- SettingsView has no Info section
+
+STATUS: FAILED - labels will change, BuildInfo not created

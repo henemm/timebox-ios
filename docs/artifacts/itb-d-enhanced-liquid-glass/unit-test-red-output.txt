@@ -1,0 +1,3 @@
+Unit Test N/A: focusGlowEffect is a pure visual modifier (animation only).
+No business logic to test. Visual effect verified by existing FocusView rendering tests.
+The modifier adds a pulsing glow shadow - cannot be meaningfully unit tested.

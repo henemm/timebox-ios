@@ -5,7 +5,7 @@ final class DebugBacklogHierarchyTest: XCTestCase {
         let app = XCUIApplication()
         app.launchArguments = ["-UITesting"]
         app.launch()
-        
+
         // Navigate to Backlog
         let backlogTab = app.buttons["tab-backlog"]
         guard backlogTab.waitForExistence(timeout: 10) else {
@@ -13,68 +13,69 @@ final class DebugBacklogHierarchyTest: XCTestCase {
             return
         }
         backlogTab.tap()
-        sleep(1)
-        
-        // Switch to Liste
-        let viewModeSwitcher = app.buttons["viewModeSwitcher"]
-        guard viewModeSwitcher.waitForExistence(timeout: 5) else {
-            XCTFail("viewModeSwitcher not found")
-            return
+        sleep(2)
+
+        var log = ""
+
+        // Search for mock tasks by scrolling
+        log += "\n=== SEARCHING FOR MOCK TASKS ===\n"
+
+        for swipeNum in 0..<10 {
+            let texts = app.staticTexts.matching(
+                NSPredicate(format: "label CONTAINS 'MOCK'")
+            )
+            log += "After swipe \(swipeNum): Found \(texts.count) MOCK texts\n"
+            for i in 0..<min(texts.count, 20) {
+                let t = texts.element(boundBy: i)
+                if t.exists {
+                    log += "  [\(i)] '\(t.label)' frame=\(t.frame)\n"
+                }
+            }
+
+            // Search for Blockiert labels
+            let blocked = app.buttons.matching(
+                NSPredicate(format: "label == 'Blockiert'")
+            )
+            if blocked.count > 0 {
+                log += "  >>> FOUND \(blocked.count) 'Blockiert' buttons!\n"
+                for i in 0..<min(blocked.count, 5) {
+                    let b = blocked.element(boundBy: i)
+                    if b.exists {
+                        log += "    button[\(i)] frame=\(b.frame)\n"
+                    }
+                }
+            }
+
+            // Check for lock images
+            let locks = app.images.matching(
+                NSPredicate(format: "label CONTAINS 'lock'")
+            )
+            if locks.count > 0 {
+                log += "  >>> FOUND \(locks.count) lock images\n"
+            }
+
+            app.swipeUp()
+            sleep(1)
         }
-        viewModeSwitcher.tap()
-        sleep(1)
-        
-        let listeOption = app.buttons.matching(
-            NSPredicate(format: "label CONTAINS 'Liste'")
-        ).firstMatch
-        guard listeOption.waitForExistence(timeout: 3) else {
-            XCTFail("Liste option not found")
-            return
+
+        // Write log as test failure message so it appears in xcresult
+        // Using XCTContext.runActivity to embed the log
+        XCTContext.runActivity(named: "Hierarchy Debug Log") { activity in
+            let attachment = XCTAttachment(string: log)
+            attachment.name = "debug_log"
+            attachment.lifetime = .keepAlways
+            activity.add(attachment)
         }
-        listeOption.tap()
-        sleep(3)
-        
-        // Take screenshot
-        let screenshot = XCTAttachment(screenshot: app.screenshot())
-        screenshot.name = "BacklogListDebug"
-        screenshot.lifetime = .keepAlways
-        add(screenshot)
-        
-        // Print full hierarchy
-        print("=== FULL APP HIERARCHY ===")
-        print(app.debugDescription)
-        
-        // Search for specific patterns
-        print("\n=== BUTTONS WITH 'backlog' ===")
-        let backlogButtons = app.buttons.matching(NSPredicate(format: "identifier CONTAINS 'backlog'"))
-        print("Count: \(backlogButtons.count)")
-        for i in 0..<min(backlogButtons.count, 10) {
-            print("  \(backlogButtons.element(boundBy: i).identifier)")
+
+        // Also force-fail with the log so it shows in test output
+        if log.contains("MOCK") {
+            XCTAssertTrue(true, "Found MOCK tasks - see attachment for details")
         }
-        
-        print("\n=== OTHER ELEMENTS WITH 'backlog' ===")
-        let backlogOther = app.otherElements.matching(NSPredicate(format: "identifier CONTAINS 'backlog'"))
-        print("Count: \(backlogOther.count)")
-        for i in 0..<min(backlogOther.count, 10) {
-            print("  \(backlogOther.element(boundBy: i).identifier)")
-        }
-        
-        print("\n=== IMAGES ===")
-        let images = app.images
-        print("Count: \(images.count)")
-        for i in 0..<min(images.count, 20) {
-            let img = images.element(boundBy: i)
-            print("  \(img.identifier) - \(img.label)")
-        }
-        
-        print("\n=== STATIC TEXTS ===")
-        let texts = app.staticTexts
-        print("Count: \(texts.count)")
-        for i in 0..<min(texts.count, 20) {
-            let txt = texts.element(boundBy: i)
-            print("  '\(txt.identifier)' = '\(txt.label)'")
-        }
-        
-        XCTAssertTrue(true)
+
+        // Try to assert something that will show the log in failure message
+        let mockTexts = app.staticTexts.matching(
+            NSPredicate(format: "label CONTAINS 'MOCK'")
+        )
+        XCTAssert(mockTexts.count > 0, "DEBUG LOG:\n\(log)")
     }
 }

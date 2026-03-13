@@ -1,0 +1,41 @@
+    export ENABLE_TESTABILITY\=YES
+    export ENABLE_TESTING_SEARCH_PATHS\=NO
+    export TEST_FRAMEWORK_SEARCH_PATHS\=\ /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks\ /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk/Developer/Library/Frameworks
+    export TEST_LIBRARY_SEARCH_PATHS\=\ /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib
+    export TREAT_MISSING_BASELINES_AS_TEST_FAILURES\=NO
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/MonsterCoachTests.swift:11:26: error: cannot find 'Discipline' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/MonsterCoachTests.swift:22:26: error: cannot find 'Discipline' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/MonsterCoachTests.swift:33:26: error: cannot find 'Discipline' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/MonsterCoachTests.swift:44:26: error: cannot find 'Discipline' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/MonsterCoachTests.swift:57:21: error: cannot find 'MonsterCoach' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/MonsterCoachTests.swift:58:29: error: cannot infer contextual base in reference to member 'mut'
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/MonsterCoachTests.swift:59:26: error: cannot find 'Discipline' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/MonsterCoachTests.swift:60:26: error: cannot find 'Discipline' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/MonsterCoachTests.swift:67:21: error: cannot find 'MonsterCoach' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/MonsterCoachTests.swift:72:29: error: cannot infer contextual base in reference to member 'konsequenz'
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/MonsterCoachTests.swift:76:29: error: cannot infer contextual base in reference to member 'mut'
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/MonsterCoachTests.swift:80:29: error: cannot infer contextual base in reference to member 'fokus'
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/MonsterCoachTests.swift:84:29: error: cannot infer contextual base in reference to member 'ausdauer'
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/MonsterCoachTests.swift:92:45: error: cannot find 'UUID' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/MonsterCoachTests.swift:93:24: error: cannot find 'MonsterCoach' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/MonsterCoachTests.swift:94:32: error: cannot infer contextual base in reference to member 'konsequenz'
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/MonsterCoachTests.swift:95:32: error: cannot infer contextual base in reference to member 'mut'
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/MonsterCoachTests.swift:99:22: error: cannot find 'MonsterCoach' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/MonsterCoachTests.swift:102:27: error: cannot find 'Discipline' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/MonsterCoachTests.swift:103:27: error: cannot find 'Discipline' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/MonsterCoachTests.swift:107:9: error: cannot find 'UserDefaults' in scope
+	Cannot find 'Discipline' in scope
+	Cannot find 'Discipline' in scope
+	Cannot find 'Discipline' in scope
+	Cannot find 'Discipline' in scope
+	Cannot find 'MonsterCoach' in scope
+	Cannot find 'Discipline' in scope
+	Cannot find 'Discipline' in scope
+	Cannot find 'MonsterCoach' in scope
+	Cannot find 'UUID' in scope
+	Cannot find 'MonsterCoach' in scope
+	Cannot find 'MonsterCoach' in scope
+	Cannot find 'Discipline' in scope
+	Cannot find 'Discipline' in scope
+	Cannot find 'UserDefaults' in scope
+** TEST FAILED **

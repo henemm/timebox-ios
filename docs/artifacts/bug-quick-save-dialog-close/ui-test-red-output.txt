@@ -1,0 +1,7 @@
+TDD RED - QuickCapture dismiss test FAILED as expected
+Date: 2026-03-09T17:25:02
+Test: QuickCaptureUITests/testSaveDismissesSheetImmediately()
+Result: FAILED
+Failure: XCTAssertTrue failed - BUG: QuickCaptureView must dismiss after save. Sheet stays open due to async dismiss pattern.
+Duration: 24.870 seconds
+

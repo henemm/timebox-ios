@@ -1,0 +1,15 @@
+TDD RED — Bug 94: macOS Fokus nach Task-Add
+Date: 2026-03-12
+Scheme: FocusBloxMac (macOS)
+
+Test Results:
+  Bug94FocusAfterAddUITests.testEmptyStateDisappearsAfterTaskCreation - FAILED (60.859s)
+  Bug94FocusAfterAddUITests.testNewTaskIsVisibleInListAfterCreation - FAILED (10.392s)
+  Bug94FocusAfterAddUITests.testNewTaskShowsInInspectorAfterCreation - FAILED (24.921s)
+
+Failures:
+1. "Bug 94: Neuer Task muss im sichtbaren Bereich sein (Auto-Scroll nach Erstellung)"
+2. "Bug 94: Inspector muss den neuen Task anzeigen (Selection muss funktionieren)"
+3. "Bug 94: 'Kein Task ausgewaehlt' darf nach Erstellung nicht mehr sichtbar sein"
+
+All 3 failures confirm: Neither selection NOR scroll works after task creation.

@@ -1,0 +1,32 @@
+** TEST FAILED **
+
+Testing failed:
+  Cannot find 'PositionedFocusBlock' in scope (5x)
+  Cannot find type 'PositionedFocusBlock' in scope (5x)
+  Cannot find 'TimelineLocationCalculator' in scope (5x)
+  Testing cancelled because the build failed.
+
+FocusBloxTests/IOSTimelineCanvasTests.swift:
+  Line 32:  error: cannot find 'PositionedFocusBlock' in scope
+  Line 83:  error: cannot find type 'PositionedFocusBlock' in scope
+  Line 104: error: cannot find 'PositionedFocusBlock' in scope
+  Line 127: error: cannot find type 'PositionedFocusBlock' in scope
+  Line 151: error: cannot find 'PositionedFocusBlock' in scope
+  Line 178: error: cannot find 'TimelineLocationCalculator' in scope
+  Line 201: error: cannot find 'TimelineLocationCalculator' in scope
+  Line 223: error: cannot find 'TimelineLocationCalculator' in scope
+  Line 243: error: cannot find 'TimelineLocationCalculator' in scope
+  Line 260: error: cannot find 'TimelineLocationCalculator' in scope
+
+Tests: 8 tests, ALL RED (compilation failure)
+- test_positionedFocusBlock_existsAsSharedType: PositionedFocusBlock not defined
+- test_focusBlockPositioning_nonOverlapping_singleColumn: PositionedFocusBlock not defined
+- test_focusBlockPositioning_overlapping_multipleColumns: PositionedFocusBlock not defined
+- test_calculateTimeFromLocation_standardPosition: TimelineLocationCalculator not defined
+- test_calculateTimeFromLocation_halfHour: TimelineLocationCalculator not defined
+- test_calculateTimeFromLocation_snapsToQuarterHour: TimelineLocationCalculator not defined
+- test_calculateTimeFromLocation_topOfTimeline: TimelineLocationCalculator not defined
+- test_calculateTimeFromLocation_negativeY_clamped: TimelineLocationCalculator not defined
+
+Run date: 2026-03-05 07:54
+Simulator: FocusBlox (1EC79950-6704-47D0-BDF8-2C55236B4B40)

@@ -1,0 +1,19 @@
+Unit Test RED Phase - macOS Swipe Actions
+==========================================
+
+PLATFORM: macOS
+DATE: 2026-02-20
+
+NO NEW BUSINESS LOGIC TO TEST.
+
+This change adds .swipeActions UI modifier to existing List rows.
+The swipe actions call EXISTING functions that are already tested:
+- addToNextUp() — tested in existing ContentView integration
+- removeFromNextUp() — tested in existing ContentView integration
+- deleteTasksByIds() — tested in existing ContentView integration
+- selectedTasks assignment — standard SwiftUI state binding
+
+No new functions, no new logic, no new data transformations.
+Pure UI modifier addition = no unit test needed.
+
+STATUS: FAILED - no swipe actions exist yet (pure UI gap)

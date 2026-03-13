@@ -1,0 +1,13 @@
+Bug 81: UI Test RED — Stale Block Assignment reproduziert
+
+Test suite 'Bug81StaleBlockAssignmentUITests'
+Test case 'testAssignTwoNextUpTasks_bothShouldAppearInBlock_Bug81' FAILED (36.9s)
+Test case 'testAssignTwoBacklogTasks_bothShouldAppearInBlock_Bug81' FAILED (89.9s)
+
+Both tests demonstrate the bug:
+1. Open empty FocusBlock sheet
+2. Assign first task → appears in block
+3. Assign second task → first task DISAPPEARS (stale snapshot overwrites)
+4. Assertion: assignedTasks.count >= 2 → FAILED
+
+** TEST FAILED **

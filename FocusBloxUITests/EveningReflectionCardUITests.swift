@@ -155,4 +155,64 @@ final class EveningReflectionCardUITests: XCTestCase {
             "Fokus fallback text should be visible in the card"
         )
     }
+
+    // MARK: - Phase 3d: AI Text Integration
+
+    /// GIVEN: Coach mode ON + Intention gesetzt + AI disabled via launch arg
+    /// WHEN: Card ist sichtbar
+    /// THEN: Fallback-Text wird angezeigt (nicht leer)
+    /// Bricht wenn: aiTexts-Parameter in EveningReflectionCard nicht existiert
+    ///              oder Fallback-Logik (aiTexts[intention] ?? fallbackTemplate()) fehlt.
+    ///              Auch wenn -AIDisabled Launch-Argument nicht verarbeitet wird.
+    func test_eveningCard_showsFallbackWhenAiDisabled() throws {
+        app.terminate()
+        app = XCUIApplication()
+        app.launchArguments = [
+            "-UITesting",
+            "-CoachModeEnabled",
+            "-ForceEveningReflection",
+            "-AIDisabled"
+        ]
+        app.launch()
+
+        setMorningIntention()
+
+        let card = app.otherElements["eveningReflectionCard"]
+        XCTAssertTrue(
+            card.waitForExistence(timeout: 5),
+            "Evening reflection card should be visible even when AI is disabled"
+        )
+
+        // With AI disabled, fallback template text should show.
+        // fokus/notFulfilled = "Viel dazwischen gekommen heute. Passiert."
+        let fallbackText = app.staticTexts.matching(
+            NSPredicate(format: "label CONTAINS %@", "dazwischen")
+        )
+        XCTAssertTrue(
+            fallbackText.firstMatch.waitForExistence(timeout: 5),
+            "Fallback reflection text should be visible when AI is disabled"
+        )
+    }
+
+    /// GIVEN: Coach mode ON + Intention gesetzt + normale Launch Args
+    /// WHEN: Card ist sichtbar (AI oder Fallback)
+    /// THEN: Reflection-Text ist vorhanden und nicht leer
+    /// Bricht wenn: Text-Aufloesung in intentionRow() weder AI noch Fallback liefert
+    func test_eveningCard_reflectionTextNotEmpty() throws {
+        setMorningIntention()
+
+        let card = app.otherElements["eveningReflectionCard"]
+        XCTAssertTrue(card.waitForExistence(timeout: 5), "Card should exist")
+
+        // The card should contain at least one static text with reflection content
+        // (either AI-generated or fallback template).
+        // fokus/notFulfilled fallback = "Viel dazwischen gekommen heute. Passiert."
+        let fokusText = app.staticTexts.matching(
+            NSPredicate(format: "label CONTAINS %@", "dazwischen")
+        )
+        XCTAssertTrue(
+            fokusText.firstMatch.waitForExistence(timeout: 8),
+            "Reflection text should be visible (AI or fallback) and not empty"
+        )
+    }
 }

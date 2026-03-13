@@ -1,0 +1,8 @@
+AI Task Scoring Service Tests - Default Value Changed
+Date: 2026-02-20
+
+Test: test_appSettings_aiScoringEnabled_defaultTrue
+Expected: aiScoringEnabled defaults to true (was false before)
+Result: PASS - AppSettings.shared.aiScoringEnabled returns true after UserDefaults key removal
+
+All existing AI scoring tests continue to pass.

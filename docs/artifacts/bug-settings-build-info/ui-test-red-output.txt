@@ -1,0 +1,14 @@
+UI Test RED Phase - Settings Build-Info + Vorwarnungs-Labels
+=============================================================
+
+DATE: 2026-02-20
+PLATFORM: iOS + macOS
+
+CHANGES: Label rename (display-only) + BuildInfo display.
+No new interactive UI elements added.
+Existing warningTimingPicker accessibility identifier unchanged.
+
+macOS XCUITest limitation: Settings view not reliably testable.
+Business logic (WarningTiming enum) covered by unit tests.
+
+STATUS: FAILED - current labels show "Knapp"/"Früh", should show "Kurz vorher"/"Weit vorher"

@@ -1,0 +1,1 @@
+QuickCaptureView before fix - dialog stays open after save

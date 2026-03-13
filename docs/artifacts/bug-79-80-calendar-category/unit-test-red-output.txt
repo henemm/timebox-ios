@@ -1,0 +1,20 @@
+
+Testing started
+Test suite 'SyncedSettingsTests' started on 'Clone 1 of FocusBlox - FocusBlox (54480)'
+Test case 'SyncedSettingsTests.testCalendarNameMatching()' passed on 'Clone 1 of FocusBlox - FocusBlox (54480)' (0.006 seconds)
+Test case 'SyncedSettingsTests.testFetchFocusBlocksIgnoresVisibleFilter()' passed on 'Clone 1 of FocusBlox - FocusBlox (54480)' (0.003 seconds)
+Test case 'SyncedSettingsTests.testInvalidCalendarNameReturnsNil()' passed on 'Clone 1 of FocusBlox - FocusBlox (54480)' (0.025 seconds)
+Test case 'SyncedSettingsTests.testPullFromCloud_mergesEventCategories()' failed on 'Clone 1 of FocusBlox - FocusBlox (54480)' (0.504 seconds)
+Test case 'SyncedSettingsTests.testPullFromCloud_mergesWithExistingLocalCategories()' failed on 'Clone 1 of FocusBlox - FocusBlox (54480)' (0.008 seconds)
+Test case 'SyncedSettingsTests.testPullFromCloud_remoteWinsOnConflict()' failed on 'Clone 1 of FocusBlox - FocusBlox (54480)' (0.002 seconds)
+Test case 'SyncedSettingsTests.testPullFromCloudDoesNotCrash()' passed on 'Clone 1 of FocusBlox - FocusBlox (54480)' (0.000 seconds)
+Test case 'SyncedSettingsTests.testPushToCloud_includesEventCategories()' failed on 'Clone 1 of FocusBlox - FocusBlox (54480)' (0.004 seconds)
+Test case 'SyncedSettingsTests.testPushToCloudDoesNotCrash()' passed on 'Clone 1 of FocusBlox - FocusBlox (54480)' (0.001 seconds)
+Test case 'SyncedSettingsTests.testSyncedSettingsCanBeCreated()' passed on 'Clone 1 of FocusBlox - FocusBlox (54480)' (0.005 seconds)
+Test suite 'CategoryIconBadgeTests' started on 'Clone 1 of FocusBlox - FocusBlox (54480)'
+Test case 'CategoryIconBadgeTests.testBadge_canBeCreatedForAllCategories()' passed on 'Clone 1 of FocusBlox - FocusBlox (54480)' (0.005 seconds)
+Test case 'CategoryIconBadgeTests.testBadge_holdsCorrectCategory()' passed on 'Clone 1 of FocusBlox - FocusBlox (54480)' (0.000 seconds)
+Test case 'CategoryIconBadgeTests.testBadge_labelText_allCategoriesAreBadgeFriendly()' passed on 'Clone 1 of FocusBlox - FocusBlox (54480)' (0.000 seconds)
+Test case 'CategoryIconBadgeTests.testBadge_labelText_allCategoriesShowEnglishDisplayName()' passed on 'Clone 1 of FocusBlox - FocusBlox (54480)' (0.000 seconds)
+Test case 'CategoryIconBadgeTests.testBadge_labelText_returnsDisplayName()' passed on 'Clone 1 of FocusBlox - FocusBlox (54480)' (0.000 seconds)
+Test case 'CategoryIconBadgeTests.testBadge_selfCare_matchesTaskCategory()' passed on 'Clone 1 of FocusBlox - FocusBlox (54480)' (0.000 seconds)

@@ -177,13 +177,17 @@ final class SyncEngine {
         }
         TaskCompletionUndoService.recordCreatedInstance(id: newInstanceID)
 
+        // Capture values BEFORE save — SwiftData objects are not thread-safe
+        let capturedID = task.id
+        let capturedTitle = task.title
+
         try modelContext.save()
 
         // ITB-G1: Donate intent so Siri learns completion patterns
         #if !os(macOS)
         Task {
             let donationIntent = CompleteTaskIntent()
-            donationIntent.task = TaskEntity(id: task.id, title: task.title)
+            donationIntent.task = TaskEntity(id: capturedID, title: capturedTitle)
             try? await IntentDonationManager.shared.donate(intent: donationIntent)
         }
         #endif

@@ -1,0 +1,28 @@
+UI Test RED Phase - macOS Swipe Actions
+========================================
+
+PLATFORM: macOS
+VIEW: ContentView → Backlog List
+DATE: 2026-02-20
+
+ISSUE: macOS backlog list has no swipe actions.
+       Tasks can only be managed via right-click context menu.
+       No quick way to toggle Next Up, edit, or delete.
+
+EVIDENCE: User reported "viel zu kompliziert" for Next Up toggling.
+          iOS has swipe actions on all views, macOS has none.
+
+ROOT CAUSE:
+- ContentView.swift List rows have no .swipeActions modifier
+- Only .contextMenu(forSelectionType:) for right-click actions
+- .onDelete only on regular section (keyboard Delete key)
+
+FIX NEEDED: Add .swipeActions to both sections (Next Up + Regular).
+            Leading: Next Up toggle, Trailing: Edit + Delete.
+
+NOTE: macOS XCUITest cannot test swipe gestures on List rows.
+      This is a known limitation (see MEMORY.md).
+      Business logic (addToNextUp, removeFromNextUp, deleteTasksByIds)
+      is already tested via existing unit tests.
+
+STATUS: FAILED - swipe actions not available on macOS

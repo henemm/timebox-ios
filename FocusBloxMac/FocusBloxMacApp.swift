@@ -507,30 +507,17 @@ enum MacModelContainer {
 // MARK: - Test Data Cleanup
 
 extension FocusBloxMacApp {
-    /// One-time cleanup of test data that leaked into the persistent store
-    /// from macOS UI tests that were missing the -UITesting flag.
+    /// Continuous cleanup of test data that leaked into the persistent store.
+    /// Runs on EVERY launch (not one-time) to catch any future leaks.
     static func cleanupLeakedTestData(in context: ModelContext) {
-        let key = "hasCleanedLeakedTestData_v2"
-        guard !UserDefaults.standard.bool(forKey: key) else { return }
-
         let descriptor = FetchDescriptor<LocalTask>()
         guard let allTasks = try? context.fetch(descriptor) else { return }
 
-        // Exact titles from seedUITestData (both iOS + macOS)
-        let exactMockTitles: Set<String> = [
-            "Mock Task 1 #30min", "Mock Task 2 #15min", "Mock Task 3 #45min",
-            "Backlog Task 1", "Backlog Task 2",
-            "TBD Task - Unvollständig", "Badge Overflow Demo",
-            "Assigned Task #20min",
-            "Focus Task 1", "Focus Task 2", "Focus Task 3",
-            "Erledigte Aufgabe", "Erledigte Backlog-Aufgabe",
-            "Startups anschreiben wegen Kapitalerhöhung",
-            "Lohnsteuererklärung Amazon Deutschland einreichen",
-            "Taeglich lesen", "Wochenreview", "Zweiwochentlich aufraeumen",
-        ]
-
-        // Prefix patterns from UI tests that created tasks via the UI
+        // Prefix patterns that identify test/mock data
         let testPrefixes = [
+            "[MOCK] ",
+            "Bug94 ", "Bug94Test", "Bug94Inspector", "Bug94Visible", "Bug94EmptyState",
+            "Diagnose ",
             "UI Test Task ", "Badge Test Task ", "Inspector Test Task ",
             "Category Grid Test ", "Test Task ",
         ]
@@ -538,7 +525,6 @@ extension FocusBloxMacApp {
         var deletedCount = 0
         for task in allTasks {
             let shouldDelete =
-                exactMockTitles.contains(task.title) ||
                 testPrefixes.contains(where: { task.title.hasPrefix($0) }) ||
                 (task.recurrenceGroupID?.hasPrefix("uitest-") == true)
 
@@ -552,8 +538,6 @@ extension FocusBloxMacApp {
             try? context.save()
             print("[Cleanup] Deleted \(deletedCount) leaked test tasks from persistent store")
         }
-
-        UserDefaults.standard.set(true, forKey: key)
     }
 }
 
