@@ -17,7 +17,7 @@
 - **Fix:** Task synchron erstellen (insert + save), Inspector-Override SOFORT setzen, AI-Enrichment im Hintergrund nachlaufen lassen.
 - **Tests:** 2 UI Tests stabil gruen (3x3 Durchlaeufe, 100% Passrate)
 - **Dateien:** ContentView.swift (macOS), Bug94FocusAfterAddUITests.swift, FocusBloxApp.swift
-- **Commit:** (wird mit diesem Commit gesetzt)
+- **Commit:** 5986c27
 
 ### Bug 95: Neue Tasks bekommen immer Faelligkeitsdatum "heute"
 - **Status:** ERLEDIGT

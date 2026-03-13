@@ -203,10 +203,12 @@
     "FocusBloxUITests/BlockedTaskSwipeUITests.swift",
     "FocusBloxMacUITests/Bug94FocusAfterAddUITests.swift",
     "FocusBloxTests/EveningReflectionTextServiceTests.swift",
-    "Sources/Services/EveningReflectionTextService.swift"
+    "Sources/Services/EveningReflectionTextService.swift",
+    "FocusBloxTests/NotificationEveningReminderTests.swift",
+    "FocusBloxUITests/DueDateBadgeExtractionUITests.swift"
   ],
   "last_validation": "2026-02-02T18:40:00.000000",
-  "last_change": "2026-03-13T09:17:53.527706",
+  "last_change": "2026-03-13T11:42:15.750130",
   "validation_result": {
     "status": "passed",
     "build_status": "success",
