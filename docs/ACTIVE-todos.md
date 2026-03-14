@@ -232,6 +232,15 @@
 
 ---
 
+### Bug: Abend-Review Text zu generisch — nicht auf Intention bezogen
+- **Status:** ERLEDIGT
+- **Plattform:** iOS + macOS
+- **Symptom:** Der AI-generierte Abend-Text war generisch und ging nicht auf die gesetzte Tages-Intention ein. Tasks wurden blind abgeschnitten statt nach Relevanz sortiert.
+- **Root Cause:** `buildPrompt()` in EveningReflectionTextService hatte (1) keine Intention-Relevanz-Sortierung vor `.prefix(5)`, (2) keine Schwerpunkt-Guidance für die AI, (3) bei Balance keine Kategorie-Aufschlüsselung.
+- **Fix:** Tasks nach Intention-Relevanz sortieren (BHAG→importance=3, Fokus→Block-Tasks, Growth→Learning, Connection→Giving-Back), Schwerpunkt-Zeile im Prompt, Balance mit konkreter Kategorie-Aufschlüsselung.
+- **Tests:** 16 Unit Tests grün (EveningReflectionTextServiceTests)
+- **Dateien:** EveningReflectionTextService.swift
+
 ### Bug 98: Mein Tag Woche zeigt nur Sprint-Tasks — ausserhalb Sprints erledigte fehlen
 - **Status:** OFFEN
 - **Plattform:** iOS + macOS

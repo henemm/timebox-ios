@@ -110,9 +110,13 @@ final class EveningReflectionTextService {
         parts.append("Intention: \(intention.label) (\(intention.rawValue))")
         parts.append("Ergebnis: \(levelDescription(level))")
 
-        // Erledigte Tasks (max 5, mit Zeitstempel und Wichtigkeit)
-        if !completedTasks.isEmpty {
-            let taskLines = completedTasks.prefix(5).map { task -> String in
+        // Intention-spezifische Guidance
+        parts.append("Schwerpunkt: \(intentionGuidance(intention, completedTasks: completedTasks))")
+
+        // Erledigte Tasks (max 5, nach Intention-Relevanz sortiert)
+        let sorted = sortedByRelevance(completedTasks, for: intention)
+        if !sorted.isEmpty {
+            let taskLines = sorted.prefix(5).map { task -> String in
                 let timeStr = formatTime(task.completedAt, now: now)
                 let importanceStr = task.importance == 3 ? " [Wichtigkeit: hoch]" : ""
                 return "- '\(task.title)'\(timeStr)\(importanceStr)"
@@ -130,6 +134,81 @@ final class EveningReflectionTextService {
         }
 
         return parts.joined(separator: "\n")
+    }
+
+    /// Sorts completed tasks so intention-relevant ones appear first.
+    private func sortedByRelevance(_ tasks: [LocalTask], for intention: IntentionOption) -> [LocalTask] {
+        tasks.sorted { a, b in
+            let aRelevant = isRelevant(a, for: intention)
+            let bRelevant = isRelevant(b, for: intention)
+            if aRelevant != bRelevant { return aRelevant }
+            return false
+        }
+    }
+
+    private func isRelevant(_ task: LocalTask, for intention: IntentionOption) -> Bool {
+        switch intention {
+        case .bhag:
+            return task.importance == 3
+        case .fokus:
+            return task.assignedFocusBlockID != nil
+        case .growth:
+            return task.taskType == "learning"
+        case .connection:
+            return task.taskType == "giving_back"
+        case .survival, .balance:
+            return false
+        }
+    }
+
+    private func intentionGuidance(_ intention: IntentionOption, completedTasks: [LocalTask]) -> String {
+        switch intention {
+        case .survival:
+            return "Beziehe dich darauf, dass der User den Tag überstanden hat"
+        case .fokus:
+            return "Beziehe dich auf fokussiertes Arbeiten in Focus-Blocks"
+        case .bhag:
+            return "Beziehe dich auf das große, wichtige Ziel des Users"
+        case .balance:
+            return balanceGuidance(completedTasks)
+        case .growth:
+            return "Beziehe dich auf Lernen und persönliches Wachstum"
+        case .connection:
+            return "Beziehe dich auf Verbundenheit und für andere da sein"
+        }
+    }
+
+    private func balanceGuidance(_ tasks: [LocalTask]) -> String {
+        let categories: [(key: String, label: String)] = [
+            ("income", "Geld"),
+            ("maintenance", "Pflege"),
+            ("recharge", "Energie"),
+            ("learning", "Lernen"),
+            ("giving_back", "Geben")
+        ]
+
+        var active: [String] = []
+        var missing: [String] = []
+
+        for cat in categories {
+            let count = tasks.filter { $0.taskType == cat.key }.count
+            if count > 0 {
+                active.append("\(cat.label) (\(count))")
+            } else {
+                missing.append(cat.label)
+            }
+        }
+
+        var parts = ["Balance zwischen 5 Bereichen."]
+        if active.isEmpty {
+            parts.append("Heute in keinem Bereich aktiv.")
+        } else {
+            parts.append("Heute aktiv: \(active.joined(separator: ", ")).")
+            if !missing.isEmpty {
+                parts.append("Fehlend: \(missing.joined(separator: ", ")).")
+            }
+        }
+        return parts.joined(separator: " ")
     }
 
     // MARK: - Private
