@@ -320,20 +320,24 @@ struct FocusBloxApp: App {
                     rescheduleDueDateNotifications()
                     NotificationService.updateOverdueBadge(container: sharedModelContainer)
                     // Coach intention reminder
+                    let todayIntention = DailyIntention.load()
+                    let primaryIntention = todayIntention.selections.first
                     if settings.coachModeEnabled && settings.coachIntentionReminderEnabled {
                         NotificationService.scheduleIntentionReminder(
                             hour: settings.coachIntentionReminderHour,
-                            minute: settings.coachIntentionReminderMinute)
+                            minute: settings.coachIntentionReminderMinute,
+                            intention: primaryIntention)
                     } else {
                         NotificationService.cancelIntentionReminder()
                     }
                     // Coach evening reminder
                     if settings.coachModeEnabled,
                        settings.coachEveningReminderEnabled,
-                       DailyIntention.load().isSet {
+                       todayIntention.isSet {
                         NotificationService.scheduleEveningReminder(
                             hour: settings.coachEveningReminderHour,
-                            minute: settings.coachEveningReminderMinute
+                            minute: settings.coachEveningReminderMinute,
+                            intention: primaryIntention
                         )
                     } else {
                         NotificationService.cancelEveningReminder()
@@ -810,6 +814,15 @@ struct FocusBloxApp: App {
         context.insert(completedOutsideBlock)
 
         try? context.save()
+
+        // Pre-set daily intention if requested (for evening reflection UI tests)
+        if ProcessInfo.processInfo.arguments.contains("-MockIntentionSet") {
+            var intention = DailyIntention(
+                date: DailyIntention.todayKey().replacingOccurrences(of: "dailyIntention_", with: ""),
+                selections: [.survival]
+            )
+            intention.save()
+        }
     }
 }
 

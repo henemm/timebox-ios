@@ -143,7 +143,8 @@ struct MorningIntentionView: View {
                    settings.coachEveningReminderEnabled {
                     NotificationService.scheduleEveningReminder(
                         hour: settings.coachEveningReminderHour,
-                        minute: settings.coachEveningReminderMinute
+                        minute: settings.coachEveningReminderMinute,
+                        intention: selections.first
                     )
                 }
 

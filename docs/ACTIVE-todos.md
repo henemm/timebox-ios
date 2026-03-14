@@ -129,9 +129,14 @@
 - 2 UI Tests SKIPPED (vorbestehendes Problem: EveningReflectionCard nicht sichtbar nach Tab-Wechsel — DailyIntention.load().isSet ist kein reaktives Binding)
 - **Dateien:** EveningReflectionCard.swift
 
-### Phase 4e: Monster in Push-Notifications (Could) — OFFEN
-- Rich Notifications mit Monster-Bild als Attachment
-- **Dateien:** NotificationService.swift
+### Phase 4e: Monster in Push-Notifications (Could) — ERLEDIGT
+- Rich Notifications mit Monster-Bild als UNNotificationAttachment (PNG)
+- Alle 3 Notification-Typen: Morgen-Erinnerung, Abend-Erinnerung, Tages-Nudges
+- `buildMonsterAttachment(for:)` — UIImage → temp PNG → UNNotificationAttachment
+- Backward-kompatibel: `intention: IntentionOption? = nil` Default-Parameter
+- `#if !os(macOS)` Guard (macOS unterstuetzt keine Notification-Attachments)
+- 6 Unit Tests + 2 UI Tests gruen
+- **Dateien:** NotificationService.swift, FocusBloxApp.swift, MorningIntentionView.swift
 
 ### Ueberlegung: Nutzer beim Kategorisieren der Tasks einbeziehen — OFFEN
 - **Kontext:** Aktuell werden Tasks automatisch einer Discipline zugeordnet (AI-basiert via TaskTitleEngine). Der Nutzer hat keinen Einfluss darauf.

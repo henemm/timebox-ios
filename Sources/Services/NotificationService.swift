@@ -1,5 +1,8 @@
 import SwiftData
 import UserNotifications
+#if canImport(UIKit)
+import UIKit
+#endif
 
 /// Service for scheduling local push notifications
 @MainActor
@@ -411,16 +414,51 @@ enum NotificationService {
         }
     }
 
+    // MARK: - Monster Attachment
+
+    #if !os(macOS)
+    /// Build a notification attachment with the monster image for the given intention.
+    /// Returns nil if the image cannot be loaded (e.g. in unit tests without asset catalog).
+    nonisolated static func buildMonsterAttachment(for intention: IntentionOption) -> UNNotificationAttachment? {
+        let imageName = intention.monsterDiscipline.imageName
+        guard let image = UIImage(named: imageName),
+              let pngData = image.pngData() else { return nil }
+
+        let fileURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent("monster-\(imageName).png")
+        do {
+            try pngData.write(to: fileURL, options: .atomic)
+            return try UNNotificationAttachment(
+                identifier: imageName,
+                url: fileURL,
+                options: nil
+            )
+        } catch {
+            return nil
+        }
+    }
+    #endif
+
     // MARK: - Coach Intention Reminder
 
     private static let intentionReminderID = "coach-intention-reminder"
 
     /// Build a daily repeating notification request for the morning intention (testable).
-    static func buildIntentionReminderRequest(hour: Int, minute: Int) -> UNNotificationRequest {
+    static func buildIntentionReminderRequest(
+        hour: Int,
+        minute: Int,
+        intention: IntentionOption? = nil
+    ) -> UNNotificationRequest {
         let content = UNMutableNotificationContent()
         content.title = "Guten Morgen"
         content.body = "Was soll heute zählen?"
         content.sound = .default
+
+        #if !os(macOS)
+        if let intention, let attachment = buildMonsterAttachment(for: intention) {
+            content.attachments = [attachment]
+        }
+        #endif
 
         var dateComponents = DateComponents()
         dateComponents.hour = hour
@@ -436,11 +474,11 @@ enum NotificationService {
     }
 
     /// Schedule the daily morning intention reminder.
-    static func scheduleIntentionReminder(hour: Int, minute: Int) {
+    static func scheduleIntentionReminder(hour: Int, minute: Int, intention: IntentionOption? = nil) {
         let center = UNUserNotificationCenter.current()
         center.removePendingNotificationRequests(withIdentifiers: [intentionReminderID])
 
-        let request = buildIntentionReminderRequest(hour: hour, minute: minute)
+        let request = buildIntentionReminderRequest(hour: hour, minute: minute, intention: intention)
         center.add(request)
     }
 
@@ -458,6 +496,7 @@ enum NotificationService {
     static func buildEveningReminderRequest(
         hour: Int,
         minute: Int,
+        intention: IntentionOption? = nil,
         now: Date = Date()
     ) -> UNNotificationRequest? {
         let calendar = Calendar.current
@@ -471,6 +510,12 @@ enum NotificationService {
         content.title = "Dein Abend-Spiegel wartet"
         content.body = "Wie war dein Tag? Schau kurz rein."
         content.sound = .default
+
+        #if !os(macOS)
+        if let intention, let attachment = buildMonsterAttachment(for: intention) {
+            content.attachments = [attachment]
+        }
+        #endif
 
         var dateComponents = DateComponents()
         dateComponents.hour = hour
@@ -490,8 +535,8 @@ enum NotificationService {
 
     /// Schedule the daily evening reminder. Only replaces if a new request can be built.
     /// If time already passed today, leaves existing repeating notification untouched.
-    static func scheduleEveningReminder(hour: Int, minute: Int) {
-        guard let request = buildEveningReminderRequest(hour: hour, minute: minute) else {
+    static func scheduleEveningReminder(hour: Int, minute: Int, intention: IntentionOption? = nil) {
+        guard let request = buildEveningReminderRequest(hour: hour, minute: minute, intention: intention) else {
             return // Time passed today — leave existing repeating notification alone
         }
         let center = UNUserNotificationCenter.current()
@@ -539,6 +584,12 @@ enum NotificationService {
             content.title = intention.label
             content.body = bodyText
             content.sound = .default
+
+            #if !os(macOS)
+            if let attachment = buildMonsterAttachment(for: intention) {
+                content.attachments = [attachment]
+            }
+            #endif
 
             let trigger = UNTimeIntervalNotificationTrigger(
                 timeInterval: fireDate.timeIntervalSince(now),

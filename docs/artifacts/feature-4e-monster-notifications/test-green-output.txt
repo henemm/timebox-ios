@@ -1,0 +1,70 @@
+Test Suite 'MonsterNotificationAttachmentTests' started at 2026-03-14 11:20:48.810.
+Test Case '-[FocusBloxTests.MonsterNotificationAttachmentTests test_buildDailyNudgeRequests_survival_stillReturnsEmpty]' started.
+Test Case '-[FocusBloxTests.MonsterNotificationAttachmentTests test_buildDailyNudgeRequests_survival_stillReturnsEmpty]' passed (0.001 seconds).
+Test Case '-[FocusBloxTests.MonsterNotificationAttachmentTests test_buildEveningReminderRequest_withIntention_returnsValidRequest]' started.
+Test Case '-[FocusBloxTests.MonsterNotificationAttachmentTests test_buildEveningReminderRequest_withIntention_returnsValidRequest]' passed (0.001 seconds).
+Test Case '-[FocusBloxTests.MonsterNotificationAttachmentTests test_buildEveningReminderRequest_withoutIntention_noAttachments]' started.
+Test Case '-[FocusBloxTests.MonsterNotificationAttachmentTests test_buildEveningReminderRequest_withoutIntention_noAttachments]' passed (0.001 seconds).
+Test Case '-[FocusBloxTests.MonsterNotificationAttachmentTests test_buildIntentionReminderRequest_withIntention_returnsValidRequest]' started.
+Test Case '-[FocusBloxTests.MonsterNotificationAttachmentTests test_buildIntentionReminderRequest_withIntention_returnsValidRequest]' passed (0.001 seconds).
+Test Case '-[FocusBloxTests.MonsterNotificationAttachmentTests test_buildIntentionReminderRequest_withoutIntention_noAttachments]' started.
+Test Case '-[FocusBloxTests.MonsterNotificationAttachmentTests test_buildIntentionReminderRequest_withoutIntention_noAttachments]' passed (0.001 seconds).
+Test Case '-[FocusBloxTests.MonsterNotificationAttachmentTests test_buildMonsterAttachment_allIntentions_noCrash]' started.
+Test Case '-[FocusBloxTests.MonsterNotificationAttachmentTests test_buildMonsterAttachment_allIntentions_noCrash]' passed (0.001 seconds).
+Test Suite 'MonsterNotificationAttachmentTests' passed at 2026-03-14 11:20:48.814.
+	 Executed 6 tests, with 0 failures (0 unexpected) in 0.006 (0.004) seconds
+
+Test Suite 'MonsterGraphicsTests' started at 2026-03-14 11:20:48.815.
+Test Case '-[FocusBloxTests.MonsterGraphicsTests test_allMonsterImages_existInAssets]' started.
+Test Case '-[FocusBloxTests.MonsterGraphicsTests test_allMonsterImages_existInAssets]' passed (1.482 seconds).
+Test Case '-[FocusBloxTests.MonsterGraphicsTests test_disciplineImageName_mappingIsCorrect]' started.
+Test Case '-[FocusBloxTests.MonsterGraphicsTests test_disciplineImageName_mappingIsCorrect]' passed (0.001 seconds).
+Test Case '-[FocusBloxTests.MonsterGraphicsTests test_intentionToDiscipline_mappingIsCorrect]' started.
+Test Case '-[FocusBloxTests.MonsterGraphicsTests test_intentionToDiscipline_mappingIsCorrect]' passed (0.001 seconds).
+Test Suite 'MonsterGraphicsTests' passed at 2026-03-14 11:20:50.299.
+	 Executed 3 tests, with 0 failures (0 unexpected) in 1.484 (1.484) seconds
+
+Test Suite 'NotificationDailyNudgeTests' started at 2026-03-14 11:20:50.074.
+Test Case '-[FocusBloxTests.NotificationDailyNudgeTests test_buildDailyNudgeRequests_containsMotivationalContent]' started.
+Test Case '-[FocusBloxTests.NotificationDailyNudgeTests test_buildDailyNudgeRequests_containsMotivationalContent]' passed (1.493 seconds).
+Test Case '-[FocusBloxTests.NotificationDailyNudgeTests test_buildDailyNudgeRequests_limitedByMaxCount]' started.
+Test Case '-[FocusBloxTests.NotificationDailyNudgeTests test_buildDailyNudgeRequests_limitedByMaxCount]' passed (0.001 seconds).
+Test Case '-[FocusBloxTests.NotificationDailyNudgeTests test_buildDailyNudgeRequests_requestsHaveCalendarTrigger]' started.
+Test Case '-[FocusBloxTests.NotificationDailyNudgeTests test_buildDailyNudgeRequests_requestsHaveCalendarTrigger]' passed (0.001 seconds).
+Test Case '-[FocusBloxTests.NotificationDailyNudgeTests test_buildDailyNudgeRequests_returnsMaxCountRequests]' started.
+Test Case '-[FocusBloxTests.NotificationDailyNudgeTests test_buildDailyNudgeRequests_returnsMaxCountRequests]' passed (0.001 seconds).
+Test Case '-[FocusBloxTests.NotificationDailyNudgeTests test_buildDailyNudgeRequests_returnsRequests]' started.
+Test Case '-[FocusBloxTests.NotificationDailyNudgeTests test_buildDailyNudgeRequests_returnsRequests]' passed (0.001 seconds).
+Test Case '-[FocusBloxTests.NotificationDailyNudgeTests test_buildDailyNudgeRequests_survival_returnsEmpty]' started.
+Test Case '-[FocusBloxTests.NotificationDailyNudgeTests test_buildDailyNudgeRequests_survival_returnsEmpty]' passed (0.001 seconds).
+Test Case '-[FocusBloxTests.NotificationDailyNudgeTests test_buildDailyNudgeRequests_whenWindowAlreadyPast_returnsEmpty]' started.
+Test Case '-[FocusBloxTests.NotificationDailyNudgeTests test_buildDailyNudgeRequests_whenWindowAlreadyPast_returnsEmpty]' passed (0.001 seconds).
+Test Suite 'NotificationDailyNudgeTests' passed at 2026-03-14 11:20:51.574.
+	 Executed 7 tests, with 0 failures (0 unexpected) in 1.498 (1.500) seconds
+
+Test Suite 'NotificationEveningReminderTests' started at 2026-03-14 11:20:51.575.
+Test Case '-[FocusBloxTests.NotificationEveningReminderTests test_buildRequest_hasCorrectContent]' started.
+Test Case '-[FocusBloxTests.NotificationEveningReminderTests test_buildRequest_hasCorrectContent]' passed (0.002 seconds).
+Test Case '-[FocusBloxTests.NotificationEveningReminderTests test_buildRequest_hasCorrectIdentifier]' started.
+Test Case '-[FocusBloxTests.NotificationEveningReminderTests test_buildRequest_hasCorrectIdentifier]' passed (0.001 seconds).
+Test Case '-[FocusBloxTests.NotificationEveningReminderTests test_buildRequest_returnsNil_whenExactTime]' started.
+Test Case '-[FocusBloxTests.NotificationEveningReminderTests test_buildRequest_returnsNil_whenExactTime]' passed (0.001 seconds).
+Test Case '-[FocusBloxTests.NotificationEveningReminderTests test_buildRequest_returnsNil_whenTimeAlreadyPassed]' started.
+Test Case '-[FocusBloxTests.NotificationEveningReminderTests test_buildRequest_returnsNil_whenTimeAlreadyPassed]' passed (0.001 seconds).
+Test Case '-[FocusBloxTests.NotificationEveningReminderTests test_buildRequest_returnsRequest_oneMinuteBefore]' started.
+Test Case '-[FocusBloxTests.NotificationEveningReminderTests test_buildRequest_returnsRequest_oneMinuteBefore]' passed (0.001 seconds).
+Test Case '-[FocusBloxTests.NotificationEveningReminderTests test_buildRequest_returnsValidRequest_whenBeforeScheduledTime]' started.
+Test Case '-[FocusBloxTests.NotificationEveningReminderTests test_buildRequest_returnsValidRequest_whenBeforeScheduledTime]' passed (0.001 seconds).
+Test Case '-[FocusBloxTests.NotificationEveningReminderTests test_buildRequest_triggerIsCalendarWithCorrectTime]' started.
+Test Case '-[FocusBloxTests.NotificationEveningReminderTests test_buildRequest_triggerIsCalendarWithCorrectTime]' passed (0.001 seconds).
+Test Case '-[FocusBloxTests.NotificationEveningReminderTests test_buildRequest_triggerRepeats]' started.
+Test Case '-[FocusBloxTests.NotificationEveningReminderTests test_buildRequest_triggerRepeats]' passed (0.001 seconds).
+Test Suite 'NotificationEveningReminderTests' passed at 2026-03-14 11:20:51.613.
+	 Executed 8 tests, with 0 failures (0 unexpected) in 0.006 (0.039) seconds
+
+Test Suite 'FocusBloxTests.xctest' passed at 2026-03-14 11:20:51.614.
+	 Executed 33 tests, with 0 failures (0 unexpected) in 2.992 (4.303) seconds
+Test Suite 'Selected tests' passed at 2026-03-14 11:20:51.614.
+	 Executed 33 tests, with 0 failures (0 unexpected) in 2.992 (4.304) seconds
+
+** TEST SUCCEEDED **
