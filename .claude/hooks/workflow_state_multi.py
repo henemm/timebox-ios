@@ -39,9 +39,11 @@ Phases (in order):
 - phase8_complete    : Workflow complete, ready for commit
 """
 
+import fcntl
 import json
 import os
 import sys
+from contextlib import contextmanager
 from datetime import datetime
 from pathlib import Path
 from typing import Optional
@@ -151,6 +153,26 @@ def _has_valid_override_token(workflow_name: str = None) -> bool:
         return False
 
 
+@contextmanager
+def _state_lock():
+    """Exclusive file lock for workflow state read-modify-write operations.
+
+    Uses fcntl.flock(LOCK_EX) on .claude/workflow_state.lock.
+    Blocks until lock is acquired. Released automatically on exit.
+    """
+    lock_path = get_state_file().parent / "workflow_state.lock"
+    lock_path.parent.mkdir(parents=True, exist_ok=True)
+    fd = None
+    try:
+        fd = open(lock_path, "w")
+        fcntl.flock(fd, fcntl.LOCK_EX)
+        yield
+    finally:
+        if fd is not None:
+            fcntl.flock(fd, fcntl.LOCK_UN)
+            fd.close()
+
+
 def get_state_file() -> Path:
     """Get the path to the workflow state file."""
     # Try to find project root via .git
@@ -182,13 +204,19 @@ def load_state() -> dict:
     return state
 
 
-def save_state(state: dict) -> None:
-    """Save the workflow state."""
+def _save_state_unlocked(state: dict) -> None:
+    """Save the workflow state (caller must hold _state_lock)."""
     state_file = get_state_file()
     state_file.parent.mkdir(parents=True, exist_ok=True)
 
     with open(state_file, 'w') as f:
         json.dump(state, f, indent=2)
+
+
+def save_state(state: dict) -> None:
+    """Save the workflow state with exclusive file lock."""
+    with _state_lock():
+        _save_state_unlocked(state)
 
 
 def migrate_v1_to_v2(v1_state: dict) -> dict:
@@ -268,16 +296,17 @@ def create_workflow(name: str) -> dict:
 
 def start_workflow(name: str, make_active: bool = True) -> dict:
     """Start a new workflow or resume existing one."""
-    state = load_state()
+    with _state_lock():
+        state = load_state()
 
-    if name not in state["workflows"]:
-        state["workflows"][name] = create_workflow(name)
+        if name not in state["workflows"]:
+            state["workflows"][name] = create_workflow(name)
 
-    if make_active:
-        state["active_workflow"] = name
+        if make_active:
+            state["active_workflow"] = name
 
-    save_state(state)
-    return state
+        _save_state_unlocked(state)
+        return state
 
 
 def get_active_workflow() -> Optional[dict]:
@@ -295,14 +324,15 @@ def get_active_workflow() -> Optional[dict]:
 
 def set_active_workflow(name: str) -> bool:
     """Switch to a different workflow."""
-    state = load_state()
+    with _state_lock():
+        state = load_state()
 
-    if name not in state["workflows"]:
-        return False
+        if name not in state["workflows"]:
+            return False
 
-    state["active_workflow"] = name
-    save_state(state)
-    return True
+        state["active_workflow"] = name
+        _save_state_unlocked(state)
+        return True
 
 
 def advance_phase(workflow_name: str = None) -> Optional[str]:
@@ -311,27 +341,28 @@ def advance_phase(workflow_name: str = None) -> Optional[str]:
         print("BLOCKED: Stop-lock active. Cannot advance phase.", file=sys.stderr)
         return None
 
-    state = load_state()
+    with _state_lock():
+        state = load_state()
 
-    name = workflow_name or state.get("active_workflow")
-    if not name or name not in state["workflows"]:
+        name = workflow_name or state.get("active_workflow")
+        if not name or name not in state["workflows"]:
+            return None
+
+        workflow = state["workflows"][name]
+        current_phase = workflow["current_phase"]
+
+        try:
+            current_index = PHASES.index(current_phase)
+            if current_index < len(PHASES) - 1:
+                new_phase = PHASES[current_index + 1]
+                workflow["current_phase"] = new_phase
+                workflow["last_updated"] = datetime.now().isoformat()
+                _save_state_unlocked(state)
+                return new_phase
+        except ValueError:
+            pass
+
         return None
-
-    workflow = state["workflows"][name]
-    current_phase = workflow["current_phase"]
-
-    try:
-        current_index = PHASES.index(current_phase)
-        if current_index < len(PHASES) - 1:
-            new_phase = PHASES[current_index + 1]
-            workflow["current_phase"] = new_phase
-            workflow["last_updated"] = datetime.now().isoformat()
-            save_state(state)
-            return new_phase
-    except ValueError:
-        pass
-
-    return None
 
 
 def set_phase(workflow_name: str, phase: str, force: bool = False) -> tuple[bool, str]:
@@ -352,53 +383,54 @@ def set_phase(workflow_name: str, phase: str, force: bool = False) -> tuple[bool
     if phase not in PHASES:
         return False, f"Invalid phase: {phase}"
 
-    state = load_state()
+    with _state_lock():
+        state = load_state()
 
-    if workflow_name not in state["workflows"]:
-        return False, f"Workflow not found: {workflow_name}"
+        if workflow_name not in state["workflows"]:
+            return False, f"Workflow not found: {workflow_name}"
 
-    workflow = state["workflows"][workflow_name]
+        workflow = state["workflows"][workflow_name]
 
-    # Override only required for non-sequential phase jumps (skipping phases)
-    if not force:
-        current_phase = workflow.get("current_phase", "phase0_idle")
-        try:
-            current_idx = PHASES.index(current_phase)
-            target_idx = PHASES.index(phase)
-            # Allow sequential forward progression and going back without override
-            # Only require override when skipping forward (jumping over phases)
-            if target_idx > current_idx + 1 and not _has_valid_override_token(workflow_name):
-                skipped = PHASES[current_idx + 1:target_idx]
-                skipped_names = [PHASE_NAMES.get(p, p) for p in skipped]
-                return False, f"Override required: skipping phases ({', '.join(skipped_names)})"
-        except ValueError:
-            pass
+        # Override only required for non-sequential phase jumps (skipping phases)
+        if not force:
+            current_phase = workflow.get("current_phase", "phase0_idle")
+            try:
+                current_idx = PHASES.index(current_phase)
+                target_idx = PHASES.index(phase)
+                # Allow sequential forward progression and going back without override
+                # Only require override when skipping forward (jumping over phases)
+                if target_idx > current_idx + 1 and not _has_valid_override_token(workflow_name):
+                    skipped = PHASES[current_idx + 1:target_idx]
+                    skipped_names = [PHASE_NAMES.get(p, p) for p in skipped]
+                    return False, f"Override required: skipping phases ({', '.join(skipped_names)})"
+            except ValueError:
+                pass
 
-    # Validation check for phase7_validate
-    if phase == "phase7_validate" and not force:
-        # Check if both unit and UI tests are complete
-        unit_red = workflow.get("red_test_done", False)
-        unit_green = workflow.get("green_test_done", False)
-        ui_red = workflow.get("ui_test_red_done", False)
-        ui_green = workflow.get("ui_test_green_done", False)
+        # Validation check for phase7_validate
+        if phase == "phase7_validate" and not force:
+            # Check if both unit and UI tests are complete
+            unit_red = workflow.get("red_test_done", False)
+            unit_green = workflow.get("green_test_done", False)
+            ui_red = workflow.get("ui_test_red_done", False)
+            ui_green = workflow.get("ui_test_green_done", False)
 
-        missing = []
-        if not unit_red:
-            missing.append("Unit RED")
-        if not unit_green:
-            missing.append("Unit GREEN")
-        if not ui_red:
-            missing.append("UI RED")
-        if not ui_green:
-            missing.append("UI GREEN")
+            missing = []
+            if not unit_red:
+                missing.append("Unit RED")
+            if not unit_green:
+                missing.append("Unit GREEN")
+            if not ui_red:
+                missing.append("UI RED")
+            if not ui_green:
+                missing.append("UI GREEN")
 
-        if missing:
-            return False, f"Cannot enter validation phase. Missing: {', '.join(missing)}"
+            if missing:
+                return False, f"Cannot enter validation phase. Missing: {', '.join(missing)}"
 
-    state["workflows"][workflow_name]["current_phase"] = phase
-    state["workflows"][workflow_name]["last_updated"] = datetime.now().isoformat()
-    save_state(state)
-    return True, f"Phase set to {phase}"
+        state["workflows"][workflow_name]["current_phase"] = phase
+        state["workflows"][workflow_name]["last_updated"] = datetime.now().isoformat()
+        _save_state_unlocked(state)
+        return True, f"Phase set to {phase}"
 
 
 def add_test_artifact(workflow_name: str, artifact: dict) -> bool:
@@ -414,16 +446,17 @@ def add_test_artifact(workflow_name: str, artifact: dict) -> bool:
         "phase": "phase5_tdd_red" | "phase7_validate"
     }
     """
-    state = load_state()
+    with _state_lock():
+        state = load_state()
 
-    if workflow_name not in state["workflows"]:
-        return False
+        if workflow_name not in state["workflows"]:
+            return False
 
-    artifact["created"] = datetime.now().isoformat()
-    state["workflows"][workflow_name]["test_artifacts"].append(artifact)
-    state["workflows"][workflow_name]["last_updated"] = datetime.now().isoformat()
-    save_state(state)
-    return True
+        artifact["created"] = datetime.now().isoformat()
+        state["workflows"][workflow_name]["test_artifacts"].append(artifact)
+        state["workflows"][workflow_name]["last_updated"] = datetime.now().isoformat()
+        _save_state_unlocked(state)
+        return True
 
 
 def get_workflow_status(name: str = None) -> str:
@@ -555,22 +588,23 @@ def find_workflow_for_file(file_path: str) -> list[tuple[str, dict]]:
 
 def complete_workflow(name: str) -> bool:
     """Mark a workflow as complete and archive it."""
-    state = load_state()
+    with _state_lock():
+        state = load_state()
 
-    if name not in state["workflows"]:
-        return False
+        if name not in state["workflows"]:
+            return False
 
-    state["workflows"][name]["current_phase"] = "phase8_complete"
-    state["workflows"][name]["backlog_status"] = "done"  # Explicitly set to done
-    state["workflows"][name]["user_override"] = False  # Remove override on completion
-    state["workflows"][name]["last_updated"] = datetime.now().isoformat()
+        state["workflows"][name]["current_phase"] = "phase8_complete"
+        state["workflows"][name]["backlog_status"] = "done"  # Explicitly set to done
+        state["workflows"][name]["user_override"] = False  # Remove override on completion
+        state["workflows"][name]["last_updated"] = datetime.now().isoformat()
 
-    # If this was the active workflow, clear it (don't auto-switch to random workflow)
-    if state.get("active_workflow") == name:
-        state["active_workflow"] = None
+        # If this was the active workflow, clear it (don't auto-switch to random workflow)
+        if state.get("active_workflow") == name:
+            state["active_workflow"] = None
 
-    save_state(state)
-    return True
+        _save_state_unlocked(state)
+        return True
 
 
 def mark_red_test_done(workflow_name: str = None, result: str = None) -> bool:
@@ -585,30 +619,31 @@ def mark_red_test_done(workflow_name: str = None, result: str = None) -> bool:
         print("BLOCKED: Stop-lock active. Cannot mark red test done.", file=sys.stderr)
         return False
 
-    state = load_state()
+    with _state_lock():
+        state = load_state()
 
-    name = workflow_name or state.get("active_workflow")
-    if not name or name not in state["workflows"]:
-        return False
+        name = workflow_name or state.get("active_workflow")
+        if not name or name not in state["workflows"]:
+            return False
 
-    # Override only required if no test result is provided (prevents marking without evidence)
-    if not result and not _has_valid_override_token(name):
-        print(f"BLOCKED: Override required for mark_red_test_done without result. Workflow: {name}", file=sys.stderr)
-        return False
+        # Override only required if no test result is provided (prevents marking without evidence)
+        if not result and not _has_valid_override_token(name):
+            print(f"BLOCKED: Override required for mark_red_test_done without result. Workflow: {name}", file=sys.stderr)
+            return False
 
-    workflow = state["workflows"][name]
-    workflow["red_test_done"] = True
-    workflow["red_test_result"] = result
-    workflow["last_updated"] = datetime.now().isoformat()
+        workflow = state["workflows"][name]
+        workflow["red_test_done"] = True
+        workflow["red_test_result"] = result
+        workflow["last_updated"] = datetime.now().isoformat()
 
-    # Auto-advance to phase5 if in phase4
-    if workflow["current_phase"] == "phase4_approved":
-        workflow["current_phase"] = "phase5_tdd_red"
-        if "phase5_tdd_red" not in workflow.get("phases_completed", []):
-            workflow.setdefault("phases_completed", []).append("phase5_tdd_red")
+        # Auto-advance to phase5 if in phase4
+        if workflow["current_phase"] == "phase4_approved":
+            workflow["current_phase"] = "phase5_tdd_red"
+            if "phase5_tdd_red" not in workflow.get("phases_completed", []):
+                workflow.setdefault("phases_completed", []).append("phase5_tdd_red")
 
-    save_state(state)
-    return True
+        _save_state_unlocked(state)
+        return True
 
 
 def mark_green_test_done(workflow_name: str = None, result: str = None) -> bool:
@@ -619,25 +654,26 @@ def mark_green_test_done(workflow_name: str = None, result: str = None) -> bool:
         workflow_name: Name of workflow (uses active if None)
         result: Description of passing tests
     """
-    state = load_state()
+    with _state_lock():
+        state = load_state()
 
-    name = workflow_name or state.get("active_workflow")
-    if not name or name not in state["workflows"]:
-        return False
+        name = workflow_name or state.get("active_workflow")
+        if not name or name not in state["workflows"]:
+            return False
 
-    workflow = state["workflows"][name]
-    workflow["green_test_done"] = True
-    workflow["green_test_result"] = result
-    workflow["last_updated"] = datetime.now().isoformat()
+        workflow = state["workflows"][name]
+        workflow["green_test_done"] = True
+        workflow["green_test_result"] = result
+        workflow["last_updated"] = datetime.now().isoformat()
 
-    # Auto-advance to phase7 if in phase6
-    if workflow["current_phase"] == "phase6_implement":
-        workflow["current_phase"] = "phase7_validate"
-        if "phase7_validate" not in workflow.get("phases_completed", []):
-            workflow.setdefault("phases_completed", []).append("phase7_validate")
+        # Auto-advance to phase7 if in phase6
+        if workflow["current_phase"] == "phase6_implement":
+            workflow["current_phase"] = "phase7_validate"
+            if "phase7_validate" not in workflow.get("phases_completed", []):
+                workflow.setdefault("phases_completed", []).append("phase7_validate")
 
-    save_state(state)
-    return True
+        _save_state_unlocked(state)
+        return True
 
 
 def get_tdd_status(workflow_name: str = None) -> dict:
@@ -699,24 +735,25 @@ def mark_ui_test_red_done(workflow_name: str = None, result: str = None) -> bool
         print("BLOCKED: Stop-lock active. Cannot mark UI test red done.", file=sys.stderr)
         return False
 
-    state = load_state()
+    with _state_lock():
+        state = load_state()
 
-    name = workflow_name or state.get("active_workflow")
-    if not name or name not in state["workflows"]:
-        return False
+        name = workflow_name or state.get("active_workflow")
+        if not name or name not in state["workflows"]:
+            return False
 
-    # Override only required if no test result is provided (prevents marking without evidence)
-    if not result and not _has_valid_override_token(name):
-        print(f"BLOCKED: Override required for mark_ui_test_red_done without result. Workflow: {name}", file=sys.stderr)
-        return False
+        # Override only required if no test result is provided (prevents marking without evidence)
+        if not result and not _has_valid_override_token(name):
+            print(f"BLOCKED: Override required for mark_ui_test_red_done without result. Workflow: {name}", file=sys.stderr)
+            return False
 
-    workflow = state["workflows"][name]
-    workflow["ui_test_red_done"] = True
-    workflow["ui_test_red_result"] = result
-    workflow["last_updated"] = datetime.now().isoformat()
+        workflow = state["workflows"][name]
+        workflow["ui_test_red_done"] = True
+        workflow["ui_test_red_result"] = result
+        workflow["last_updated"] = datetime.now().isoformat()
 
-    save_state(state)
-    return True
+        _save_state_unlocked(state)
+        return True
 
 
 def mark_ui_test_green_done(workflow_name: str = None, result: str = None) -> bool:
@@ -727,19 +764,20 @@ def mark_ui_test_green_done(workflow_name: str = None, result: str = None) -> bo
         workflow_name: Name of workflow (uses active if None)
         result: Description of passing UI tests
     """
-    state = load_state()
+    with _state_lock():
+        state = load_state()
 
-    name = workflow_name or state.get("active_workflow")
-    if not name or name not in state["workflows"]:
-        return False
+        name = workflow_name or state.get("active_workflow")
+        if not name or name not in state["workflows"]:
+            return False
 
-    workflow = state["workflows"][name]
-    workflow["ui_test_green_done"] = True
-    workflow["ui_test_green_result"] = result
-    workflow["last_updated"] = datetime.now().isoformat()
+        workflow = state["workflows"][name]
+        workflow["ui_test_green_done"] = True
+        workflow["ui_test_green_result"] = result
+        workflow["last_updated"] = datetime.now().isoformat()
 
-    save_state(state)
-    return True
+        _save_state_unlocked(state)
+        return True
 
 
 def are_all_tests_complete(workflow_name: str = None) -> tuple[bool, str]:
@@ -816,16 +854,17 @@ def set_backlog_status(status: str, workflow_name: str = None) -> bool:
     if status not in BACKLOG_STATUSES:
         return False
 
-    state = load_state()
+    with _state_lock():
+        state = load_state()
 
-    name = workflow_name or state.get("active_workflow")
-    if not name or name not in state["workflows"]:
-        return False
+        name = workflow_name or state.get("active_workflow")
+        if not name or name not in state["workflows"]:
+            return False
 
-    state["workflows"][name]["backlog_status"] = status
-    state["workflows"][name]["last_updated"] = datetime.now().isoformat()
-    save_state(state)
-    return True
+        state["workflows"][name]["backlog_status"] = status
+        state["workflows"][name]["last_updated"] = datetime.now().isoformat()
+        _save_state_unlocked(state)
+        return True
 
 
 def is_pause_message(message: str) -> bool:
@@ -853,32 +892,33 @@ def pause_workflow(workflow_name: str = None) -> tuple[bool, str]:
     Returns:
         (success, message) tuple
     """
-    state = load_state()
+    with _state_lock():
+        state = load_state()
 
-    name = workflow_name or state.get("active_workflow")
-    if not name or name not in state["workflows"]:
-        return False, "No active workflow to pause."
+        name = workflow_name or state.get("active_workflow")
+        if not name or name not in state["workflows"]:
+            return False, "No active workflow to pause."
 
-    workflow = state["workflows"][name]
-    phase = workflow["current_phase"]
-    phase_index = PHASES.index(phase) if phase in PHASES else 0
+        workflow = state["workflows"][name]
+        phase = workflow["current_phase"]
+        phase_index = PHASES.index(phase) if phase in PHASES else 0
 
-    # Determine appropriate backlog status based on progress
-    if phase == "phase8_complete":
-        return False, "Workflow already complete."
-    elif phase_index >= PHASES.index("phase4_approved"):
-        # Spec is approved but not implemented -> spec_ready
-        workflow["backlog_status"] = "spec_ready"
-        status_msg = "spec_ready"
-    else:
-        # Still in early phases -> open
-        workflow["backlog_status"] = "open"
-        status_msg = "open"
+        # Determine appropriate backlog status based on progress
+        if phase == "phase8_complete":
+            return False, "Workflow already complete."
+        elif phase_index >= PHASES.index("phase4_approved"):
+            # Spec is approved but not implemented -> spec_ready
+            workflow["backlog_status"] = "spec_ready"
+            status_msg = "spec_ready"
+        else:
+            # Still in early phases -> open
+            workflow["backlog_status"] = "open"
+            status_msg = "open"
 
-    workflow["last_updated"] = datetime.now().isoformat()
-    save_state(state)
+        workflow["last_updated"] = datetime.now().isoformat()
+        _save_state_unlocked(state)
 
-    return True, f"Workflow '{name}' paused. Backlog status: {status_msg}"
+        return True, f"Workflow '{name}' paused. Backlog status: {status_msg}"
 
 
 def sync_backlog_status_from_phase(workflow_name: str = None) -> bool:
@@ -888,22 +928,23 @@ def sync_backlog_status_from_phase(workflow_name: str = None) -> bool:
     Call this when phase changes to keep backlog status in sync
     (unless manually overridden).
     """
-    state = load_state()
+    with _state_lock():
+        state = load_state()
 
-    name = workflow_name or state.get("active_workflow")
-    if not name or name not in state["workflows"]:
-        return False
+        name = workflow_name or state.get("active_workflow")
+        if not name or name not in state["workflows"]:
+            return False
 
-    workflow = state["workflows"][name]
-    phase = workflow["current_phase"]
+        workflow = state["workflows"][name]
+        phase = workflow["current_phase"]
 
-    # Only auto-sync if not manually set to blocked
-    if workflow.get("backlog_status") != "blocked":
-        workflow["backlog_status"] = derive_backlog_status(phase)
-        workflow["last_updated"] = datetime.now().isoformat()
-        save_state(state)
+        # Only auto-sync if not manually set to blocked
+        if workflow.get("backlog_status") != "blocked":
+            workflow["backlog_status"] = derive_backlog_status(phase)
+            workflow["last_updated"] = datetime.now().isoformat()
+            _save_state_unlocked(state)
 
-    return True
+        return True
 
 
 if __name__ == "__main__":
@@ -975,15 +1016,16 @@ if __name__ == "__main__":
             print("Use: python3 .claude/hooks/adversary_gate.py <test-output-file>")
             sys.exit(1)
         field_value = sys.argv[3]
-        state = load_state()
-        active = state.get("active_workflow")
-        if active and active in state.get("workflows", {}):
-            state["workflows"][active][field_name] = field_value
-            state["workflows"][active]["last_updated"] = datetime.now().isoformat()
-            save_state(state)
-            print(f"Set {field_name} = {field_value} on workflow {active}")
-        else:
-            print("No active workflow")
+        with _state_lock():
+            state = load_state()
+            active = state.get("active_workflow")
+            if active and active in state.get("workflows", {}):
+                state["workflows"][active][field_name] = field_value
+                state["workflows"][active]["last_updated"] = datetime.now().isoformat()
+                _save_state_unlocked(state)
+                print(f"Set {field_name} = {field_value} on workflow {active}")
+            else:
+                print("No active workflow")
     elif cmd == "pause":
         success, message = pause_workflow()
         print(message)

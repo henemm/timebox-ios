@@ -239,7 +239,7 @@ def main():
         names = [n for n, _ in active_candidates]
         print(f"""
 ╔══════════════════════════════════════════════════════════════════╗
-║  🟡 WARNING: File Overlap Detected!                              ║
+║  BLOCKED: File Overlap — Parallel Conflict!                      ║
 ╠══════════════════════════════════════════════════════════════════╣
 ║  File: {file_path[-58:]:<58}║
 ║                                                                  ║
@@ -247,12 +247,14 @@ def main():
         for n in names:
             print(f"║    - {n:<59}║", file=sys.stderr)
         print(f"""║                                                                  ║
-║  Using most recently updated: {names[0]:<34}║
+║  Parallel edits to the same file WILL cause conflicts!           ║
 ║                                                                  ║
-║  RISK: Parallel edits to the same file can cause conflicts!      ║
-║  Consider moving this file to only ONE workflow's affected_files. ║
+║  REQUIRED ACTION:                                                ║
+║  - Move this file to only ONE workflow's affected_files           ║
+║  - OR complete one workflow before editing in the other           ║
 ╚══════════════════════════════════════════════════════════════════╝
 """, file=sys.stderr)
+        sys.exit(2)
 
     if candidates:
         wf_name, workflow = candidates[0]

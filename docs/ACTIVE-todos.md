@@ -197,12 +197,14 @@
 - **Dateien:** MacCoachBacklogView.swift (NEU), ContentView.swift, MacBacklogRow.swift
 - **Commit:** (wird nach Commit ergaenzt)
 
-### Phase 6c: MorningIntentionView in macOS (Must) — OFFEN
-- Morgen-Dialog mit Intentions-Auswahl und Monster-Grafik fuer macOS
-- Die shared MorningIntentionView aus `Sources/Views/` koennte direkt eingebettet werden — pruefen ob sie macOS-kompatibel ist oder Anpassungen braucht
-- **Referenz:** Sources/Views/MorningIntentionView.swift
-- **Dateien:** FocusBloxMac/ (Integration in macOS-Layout)
-- **Komplexitaet:** S-M
+### Phase 6c: MorningIntentionView in macOS (Must) — ERLEDIGT
+- macOS Review-Tab zeigt bei `coachModeEnabled` die MacCoachReviewView mit MorningIntentionView + Tages-Fortschritt
+- Bei Coach AUS: normale MacReviewView wie bisher
+- Setting einer Intention schaltet automatisch zum Backlog-Tab um
+- Shared MorningIntentionView direkt nutzbar (macOS-kompatibel)
+- 4 UI Tests gruen (MacCoachReviewUITests)
+- **Dateien:** MacCoachReviewView.swift (NEU), ContentView.swift, FocusBloxMacApp.swift, MacCoachReviewUITests.swift
+- **Commit:** (wird nach Commit ergaenzt)
 
 ### Phase 6d: EveningReflectionCard in macOS (Must) — OFFEN
 - Abend-Spiegel mit Erfuellungsbewertung, Monster-Icons und KI-Texten fuer macOS
