@@ -6,7 +6,7 @@ import SwiftData
 struct CoachBacklogView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(CloudKitSyncMonitor.self) private var cloudKitMonitor
-    @AppStorage("intentionFilterOptions") private var intentionFilterOptions: String = ""
+    @AppStorage("selectedCoach") private var selectedCoach: String = ""
     @State private var planItems: [PlanItem] = []
     @State private var isLoading = false
     @State private var errorMessage: String?
@@ -14,45 +14,19 @@ struct CoachBacklogView: View {
     @State private var taskToEdit: PlanItem?
     @State private var searchText: String = ""
 
-    // MARK: - Intention
+    // MARK: - Task Sections (via shared CoachBacklogViewModel)
 
-    private var activeIntentionFilters: [IntentionOption] {
-        guard !intentionFilterOptions.isEmpty else { return [] }
-        return intentionFilterOptions.split(separator: ",").compactMap {
-            IntentionOption(rawValue: String($0))
-        }
-    }
-
-    private var primaryIntention: IntentionOption? {
-        activeIntentionFilters.first
-    }
-
-    private var intention: DailyIntention {
-        DailyIntention.load()
-    }
-
-    // MARK: - Task Sections
-
-    private var incompleteTasks: [PlanItem] {
-        planItems.filter { !$0.isCompleted && !$0.isTemplate && matchesSearch($0) }
+    private var searchFilteredItems: [PlanItem] {
+        guard !searchText.isEmpty else { return planItems }
+        return planItems.filter { $0.title.localizedCaseInsensitiveContains(searchText) }
     }
 
     private var relevantTasks: [PlanItem] {
-        let filters = activeIntentionFilters
-        guard !filters.isEmpty, !filters.contains(.survival) else { return [] }
-        return incompleteTasks.filter { IntentionOption.matchesFilter(activeOptions: filters, task: $0) }
+        CoachBacklogViewModel.relevantTasks(from: searchFilteredItems, selectedCoach: selectedCoach)
     }
 
     private var otherTasks: [PlanItem] {
-        let filters = activeIntentionFilters
-        guard !filters.isEmpty, !filters.contains(.survival) else { return incompleteTasks }
-        let relevantIDs = Set(relevantTasks.map(\.id))
-        return incompleteTasks.filter { !relevantIDs.contains($0.id) }
-    }
-
-    private func matchesSearch(_ item: PlanItem) -> Bool {
-        guard !searchText.isEmpty else { return true }
-        return item.title.localizedCaseInsensitiveContains(searchText)
+        CoachBacklogViewModel.otherTasks(from: searchFilteredItems, selectedCoach: selectedCoach)
     }
 
     // MARK: - Body
@@ -137,47 +111,10 @@ struct CoachBacklogView: View {
         .accessibilityIdentifier("coachTaskList")
     }
 
-    // MARK: - Monster Header
+    // MARK: - Monster Header (shared component)
 
     private var monsterHeader: some View {
-        VStack(spacing: 8) {
-            if let primary = primaryIntention {
-                let discipline = primary.monsterDiscipline
-                Image(discipline.imageName)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(height: 100)
-                    .clipShape(Circle())
-
-                Text(primary.label)
-                    .font(.headline)
-                    .foregroundStyle(discipline.color)
-            } else if intention.isSet {
-                let firstSelection = intention.selections.first
-                let discipline = firstSelection?.monsterDiscipline ?? .ausdauer
-                Image(discipline.imageName)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(height: 100)
-                    .clipShape(Circle())
-
-                Text(firstSelection?.label ?? "")
-                    .font(.headline)
-                    .foregroundStyle(discipline.color)
-            } else {
-                Image(systemName: "sun.and.horizon")
-                    .font(.system(size: 48))
-                    .foregroundStyle(.secondary)
-
-                Text("Starte deinen Tag unter Mein Tag")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-            }
-        }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 12)
-        .accessibilityElement(children: .contain)
-        .accessibilityIdentifier("coachMonsterHeader")
+        MonsterIntentionHeader(selectedCoach: selectedCoach, imageHeight: 100)
     }
 
     // MARK: - Coach Row (with Discipline Color)

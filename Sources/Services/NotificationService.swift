@@ -419,8 +419,8 @@ enum NotificationService {
     #if !os(macOS)
     /// Build a notification attachment with the monster image for the given intention.
     /// Returns nil if the image cannot be loaded (e.g. in unit tests without asset catalog).
-    nonisolated static func buildMonsterAttachment(for intention: IntentionOption) -> UNNotificationAttachment? {
-        let imageName = intention.monsterDiscipline.imageName
+    nonisolated static func buildMonsterAttachment(for coach: CoachType) -> UNNotificationAttachment? {
+        let imageName = coach.monsterImage
         guard let image = UIImage(named: imageName),
               let pngData = image.pngData() else { return nil }
 
@@ -447,7 +447,7 @@ enum NotificationService {
     static func buildIntentionReminderRequest(
         hour: Int,
         minute: Int,
-        intention: IntentionOption? = nil
+        coach: CoachType? = nil
     ) -> UNNotificationRequest {
         let content = UNMutableNotificationContent()
         content.title = "Guten Morgen"
@@ -455,7 +455,7 @@ enum NotificationService {
         content.sound = .default
 
         #if !os(macOS)
-        if let intention, let attachment = buildMonsterAttachment(for: intention) {
+        if let coach, let attachment = buildMonsterAttachment(for: coach) {
             content.attachments = [attachment]
         }
         #endif
@@ -474,11 +474,11 @@ enum NotificationService {
     }
 
     /// Schedule the daily morning intention reminder.
-    static func scheduleIntentionReminder(hour: Int, minute: Int, intention: IntentionOption? = nil) {
+    static func scheduleIntentionReminder(hour: Int, minute: Int, coach: CoachType? = nil) {
         let center = UNUserNotificationCenter.current()
         center.removePendingNotificationRequests(withIdentifiers: [intentionReminderID])
 
-        let request = buildIntentionReminderRequest(hour: hour, minute: minute, intention: intention)
+        let request = buildIntentionReminderRequest(hour: hour, minute: minute, coach: coach)
         center.add(request)
     }
 
@@ -496,7 +496,7 @@ enum NotificationService {
     static func buildEveningReminderRequest(
         hour: Int,
         minute: Int,
-        intention: IntentionOption? = nil,
+        coach: CoachType? = nil,
         now: Date = Date()
     ) -> UNNotificationRequest? {
         let calendar = Calendar.current
@@ -512,7 +512,7 @@ enum NotificationService {
         content.sound = .default
 
         #if !os(macOS)
-        if let intention, let attachment = buildMonsterAttachment(for: intention) {
+        if let coach, let attachment = buildMonsterAttachment(for: coach) {
             content.attachments = [attachment]
         }
         #endif
@@ -535,8 +535,8 @@ enum NotificationService {
 
     /// Schedule the daily evening reminder. Only replaces if a new request can be built.
     /// If time already passed today, leaves existing repeating notification untouched.
-    static func scheduleEveningReminder(hour: Int, minute: Int, intention: IntentionOption? = nil) {
-        guard let request = buildEveningReminderRequest(hour: hour, minute: minute, intention: intention) else {
+    static func scheduleEveningReminder(hour: Int, minute: Int, coach: CoachType? = nil) {
+        guard let request = buildEveningReminderRequest(hour: hour, minute: minute, coach: coach) else {
             return // Time passed today — leave existing repeating notification alone
         }
         let center = UNUserNotificationCenter.current()
@@ -558,14 +558,13 @@ enum NotificationService {
     /// Distributes maxCount notifications evenly within the time window.
     /// Returns empty array for survival or if window has passed.
     nonisolated static func buildDailyNudgeRequests(
-        intention: IntentionOption,
-        gap: IntentionGap,
+        coach: CoachType,
+        gap: CoachGap,
         windowStart: Date,
         windowEnd: Date,
         maxCount: Int,
         now: Date = Date()
     ) -> [UNNotificationRequest] {
-        guard intention != .survival else { return [] }
         guard windowEnd > now else { return [] }
 
         let bodyText = nudgeText(for: gap)
@@ -581,12 +580,12 @@ enum NotificationService {
             guard fireDate > now else { continue }
 
             let content = UNMutableNotificationContent()
-            content.title = intention.label
+            content.title = coach.displayName
             content.body = bodyText
             content.sound = .default
 
             #if !os(macOS)
-            if let attachment = buildMonsterAttachment(for: intention) {
+            if let attachment = buildMonsterAttachment(for: coach) {
                 content.attachments = [attachment]
             }
             #endif
@@ -608,7 +607,7 @@ enum NotificationService {
     }
 
     /// Schedule daily nudge notifications based on current settings.
-    static func scheduleDailyNudges(intention: IntentionOption, gap: IntentionGap) {
+    static func scheduleDailyNudges(coach: CoachType, gap: CoachGap) {
         let settings = AppSettings.shared
         let cal = Calendar.current
         let now = Date()
@@ -630,7 +629,7 @@ enum NotificationService {
         ) else { return }
 
         let requests = buildDailyNudgeRequests(
-            intention: intention,
+            coach: coach,
             gap: gap,
             windowStart: windowStart,
             windowEnd: windowEnd,
@@ -658,22 +657,22 @@ enum NotificationService {
     }
 
     /// Notification body text for each gap type.
-    nonisolated private static func nudgeText(for gap: IntentionGap) -> String {
+    nonisolated private static func nudgeText(for gap: CoachGap) -> String {
         switch gap {
-        case .noBhagBlockCreated:
-            return "Du wolltest das grosse Ding anpacken. Wann legst du los?"
-        case .bhagTaskNotStarted:
-            return "Dein BHAG wartet noch."
-        case .noFocusBlockPlanned:
-            return "Kein Block geplant. Du wolltest fokussiert bleiben."
+        case .procrastinatedTasksPending:
+            return "Da liegen noch aufgeschobene Tasks rum. Die gehen nicht von alleine weg."
+        case .noBigTaskStarted:
+            return "Die grosse Herausforderung wartet noch. Wann packst du sie an?"
+        case .bigTaskNotCompleted:
+            return "Guter Anfang — aber das grosse Ding ist noch nicht fertig."
+        case .noPlannedTasks:
+            return "Nichts eingeplant. Waehl maximal 3 Tasks aus."
         case .tasksOutsideBlocks:
-            return "Tasks ohne Block erledigt. Willst du einen erstellen?"
+            return "Tasks ausserhalb des Plans erledigt. Willst du beim Plan bleiben?"
         case .onlySingleCategory:
-            return "Bisher nur Arbeit. Wie waer's mit was fuer dich?"
-        case .noLearningTask:
-            return "Du wolltest was Neues lernen. Hast du schon was im Auge?"
-        case .noConnectionTask:
-            return "Du wolltest fuer andere da sein heute."
+            return "Bisher nur ein Bereich. Wie waer's mit was anderem?"
+        case .noTasksCompleted:
+            return "Noch nichts erledigt heute. Fang klein an."
         }
     }
 

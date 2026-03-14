@@ -1,26 +1,22 @@
 import AppIntents
 
-/// AppEnum for Siri parameter — maps to IntentionOption model enum.
-enum IntentionOptionEnum: String, AppEnum, CaseIterable {
-    case survival
-    case fokus
-    case bhag
-    case balance
-    case growth
-    case connection
+/// AppEnum for Siri parameter — maps to CoachType model enum.
+enum CoachTypeEnum: String, AppEnum, CaseIterable {
+    case troll
+    case feuer
+    case eule
+    case golem
 
-    static let typeDisplayRepresentation = TypeDisplayRepresentation(name: "Intention")
+    static let typeDisplayRepresentation = TypeDisplayRepresentation(name: "Coach")
 
-    static let caseDisplayRepresentations: [IntentionOptionEnum: DisplayRepresentation] = [
-        .survival: "Tag überleben",
-        .fokus: "Nicht verzetteln",
-        .bhag: "Das große Ding",
-        .balance: "Balance",
-        .growth: "Etwas lernen",
-        .connection: "Für andere da sein"
+    static let caseDisplayRepresentations: [CoachTypeEnum: DisplayRepresentation] = [
+        .troll: "Troll — Der Aufräumer",
+        .feuer: "Feuer — Der Herausforderer",
+        .eule: "Eule — Der Fokussierer",
+        .golem: "Golem — Der Balancer"
     ]
 
-    var asIntentionOption: IntentionOption {
-        IntentionOption(rawValue: rawValue)!
+    var asCoachType: CoachType {
+        CoachType(rawValue: rawValue)!
     }
 }

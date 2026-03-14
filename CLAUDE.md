@@ -12,10 +12,24 @@ Minimalistisch, wenige Farben, iOS-nativ ohne Custom-Widgets. Moeglichst nah am 
 
 ## Cross-Platform Code-Sharing (iOS + macOS)
 
-- `Sources/` = Shared Code (Models, Services, Business-Logik) → beide Plattformen
-- `FocusBloxMac/` = nur macOS-spezifische Views/UI
+**Prinzip: Maximales Code-Sharing, minimale Plattform-Duplikation.**
+
+Alles was sinnvoll fuer beide Plattformen funktioniert, wird EINMAL in `Sources/` entwickelt — nicht separat pro Plattform kopiert.
+
+- `Sources/` = Shared Code (Models, Services, Business-Logik, **und plattformuebergreifende Views**) → beide Plattformen
+- `FocusBloxMac/` = **NUR** was auf macOS tatsaechlich anders aussehen/funktionieren MUSS (Sidebar-Navigation, Window-Management, macOS-spezifische UI-Patterns)
 - Neue Business-Logik **immer** in `Sources/` — keine Duplikation in `FocusBloxMac/`
-- Bei jedem Bug/Feature pruefen: Betrifft es beide Plattformen?
+
+**Entscheidungsregel bei jedem Feature/Bug:**
+
+1. **Kann die View shared werden?** → `Sources/Views/` mit `#if os()` nur wo noetig
+2. **Braucht macOS ein anderes Layout?** → Shared ViewModel in `Sources/`, nur View in `FocusBloxMac/`
+3. **Ist es rein plattformspezifisch?** (z.B. Sidebar, NSWindow) → `FocusBloxMac/`
+
+**Pflicht-Check vor jedem Commit:**
+- Gibt es Code-Duplikation zwischen `Sources/Views/` und `FocusBloxMac/`?
+- Kann bestehender plattformspezifischer Code nach `Sources/` verschoben werden?
+- Wenn ein iOS-Feature kein macOS-Pendant hat: Backlog-Eintrag erstellen
 
 ## Workflow
 

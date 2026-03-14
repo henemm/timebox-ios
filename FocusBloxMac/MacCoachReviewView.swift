@@ -35,22 +35,10 @@ struct MacCoachReviewView: View {
         }
     }
 
-    // MARK: - Day Progress
+    // MARK: - Day Progress (shared component)
 
     private var dayProgressSection: some View {
-        HStack {
-            Image(systemName: "checkmark.circle.fill")
-                .foregroundStyle(.green)
-            Text("\(todayCompletedCount) Tasks erledigt")
-                .font(.subheadline)
-            Spacer()
-        }
-        .padding()
-        .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(.ultraThinMaterial)
-        )
-        .accessibilityIdentifier("coachDayProgress")
+        DayProgressSection(completedCount: todayCompletedCount)
     }
 
     // MARK: - Data Loading

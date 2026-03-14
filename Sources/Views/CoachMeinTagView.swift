@@ -1,17 +1,15 @@
 import SwiftUI
 import SwiftData
 
-/// Coach-specific "Mein Tag" view (Phase 5b).
+/// Coach-specific "Mein Tag" view.
 /// Replaces DailyReviewView when coach mode is enabled.
-/// Shows MorningIntentionView, day progress, and EveningReflectionCard.
+/// Shows coach selection, day progress, and evening reflection.
 struct CoachMeinTagView: View {
     @Environment(\.modelContext) private var modelContext
     @State private var allLocalTasks: [LocalTask] = []
     @State private var todayBlocks: [FocusBlock] = []
-    @State private var aiReflectionTexts: [IntentionOption: String] = [:]
+    @State private var aiReflectionText: String?
     @State private var eventKitRepo = EventKitRepository()
-    /// Observes when MorningIntentionView saves an intention — triggers body re-render
-    /// so that EveningReflectionCard condition is re-evaluated.
     @AppStorage("intentionJustSet") private var intentionJustSet: Bool = false
 
     /// Show evening reflection card after 18:00 or when forced via launch arg.
@@ -22,10 +20,9 @@ struct CoachMeinTagView: View {
         return Calendar.current.component(.hour, from: Date()) >= 18
     }
 
-    /// Tasks completed today matching the current intention.
+    /// Tasks completed today.
     private var todayCompletedCount: Int {
-        let calendar = Calendar.current
-        let startOfToday = calendar.startOfDay(for: Date())
+        let startOfToday = Calendar.current.startOfDay(for: Date())
         return allLocalTasks.filter { task in
             guard task.isCompleted, let completedAt = task.completedAt else { return false }
             return completedAt >= startOfToday
@@ -42,12 +39,12 @@ struct CoachMeinTagView: View {
                     dayProgressSection
                         .padding(.horizontal)
 
-                    if showEveningReflection && DailyIntention.load().isSet {
+                    if showEveningReflection, let coach = DailyCoachSelection.load().coach {
                         EveningReflectionCard(
-                            intentions: DailyIntention.load().selections,
+                            coach: coach,
                             tasks: allLocalTasks,
                             focusBlocks: todayBlocks,
-                            aiTexts: aiReflectionTexts
+                            aiText: aiReflectionText
                         )
                         .padding(.horizontal)
                     }
@@ -59,31 +56,19 @@ struct CoachMeinTagView: View {
         }
         .task {
             await loadData()
-            await loadAIReflectionTexts()
+            await loadAIReflectionText()
         }
         .onChange(of: intentionJustSet) {
             if intentionJustSet {
-                Task { await loadAIReflectionTexts() }
+                Task { await loadAIReflectionText() }
             }
         }
     }
 
-    // MARK: - Day Progress
+    // MARK: - Day Progress (shared component)
 
     private var dayProgressSection: some View {
-        HStack {
-            Image(systemName: "checkmark.circle.fill")
-                .foregroundStyle(.green)
-            Text("\(todayCompletedCount) Tasks erledigt")
-                .font(.subheadline)
-            Spacer()
-        }
-        .padding()
-        .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(.ultraThinMaterial)
-        )
-        .accessibilityIdentifier("coachDayProgress")
+        DayProgressSection(completedCount: todayCompletedCount)
     }
 
     // MARK: - Data Loading
@@ -97,26 +82,25 @@ struct CoachMeinTagView: View {
         }
 
         do {
-            let calendar = Calendar.current
-            let today = calendar.startOfDay(for: Date())
+            let today = Calendar.current.startOfDay(for: Date())
             todayBlocks = try eventKitRepo.fetchFocusBlocks(for: today)
         } catch {
             todayBlocks = []
         }
     }
 
-    private func loadAIReflectionTexts() async {
+    private func loadAIReflectionText() async {
         guard showEveningReflection else { return }
-        let intention = DailyIntention.load()
-        guard intention.isSet else { return }
+        let selection = DailyCoachSelection.load()
+        guard let coach = selection.coach else { return }
 
         if ProcessInfo.processInfo.arguments.contains("-AIDisabled") {
             AppSettings.shared.aiScoringEnabled = false
         }
 
         let service = EveningReflectionTextService()
-        aiReflectionTexts = await service.generateTexts(
-            intentions: intention.selections,
+        aiReflectionText = await service.generateTextForCoach(
+            coach: coach,
             tasks: allLocalTasks,
             focusBlocks: todayBlocks
         )

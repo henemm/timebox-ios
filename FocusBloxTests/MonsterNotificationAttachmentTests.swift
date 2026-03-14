@@ -19,76 +19,76 @@ final class MonsterNotificationAttachmentTests: XCTestCase {
         Calendar.current.date(bySettingHour: 18, minute: 0, second: 0, of: Date())!
     }
 
-    // MARK: - buildIntentionReminderRequest with intention (RED: parameter doesn't exist yet)
+    // MARK: - buildIntentionReminderRequest with coach
 
-    /// Verhalten: Builder akzeptiert neuen intention-Parameter und gibt gueltigen Request zurueck.
-    /// Bricht wenn: intention-Parameter aus buildIntentionReminderRequest entfernt wird.
-    func test_buildIntentionReminderRequest_withIntention_returnsValidRequest() {
+    /// Verhalten: Builder akzeptiert coach-Parameter und gibt gueltigen Request zurueck.
+    /// Bricht wenn: coach-Parameter aus buildIntentionReminderRequest entfernt wird.
+    func test_buildIntentionReminderRequest_withCoach_returnsValidRequest() {
         let request = NotificationService.buildIntentionReminderRequest(
-            hour: 8, minute: 0, intention: .bhag
+            hour: 8, minute: 0, coach: .feuer
         )
         XCTAssertEqual(request.identifier, "coach-intention-reminder")
         XCTAssertEqual(request.content.title, "Guten Morgen")
     }
 
-    /// Verhalten: Ohne intention kein Attachment (Backward-Kompatibilitaet).
-    /// Bricht wenn: Attachments auch ohne intention-Parameter gesetzt werden.
-    func test_buildIntentionReminderRequest_withoutIntention_noAttachments() {
+    /// Verhalten: Ohne coach kein Attachment (Backward-Kompatibilitaet).
+    /// Bricht wenn: Attachments auch ohne coach-Parameter gesetzt werden.
+    func test_buildIntentionReminderRequest_withoutCoach_noAttachments() {
         let request = NotificationService.buildIntentionReminderRequest(
             hour: 8, minute: 0
         )
         XCTAssertTrue(request.content.attachments.isEmpty,
-            "Without intention, no attachment should be set")
+            "Without coach, no attachment should be set")
     }
 
-    // MARK: - buildEveningReminderRequest with intention (RED: parameter doesn't exist yet)
+    // MARK: - buildEveningReminderRequest with coach
 
-    /// Verhalten: Builder akzeptiert neuen intention-Parameter.
-    /// Bricht wenn: intention-Parameter aus buildEveningReminderRequest entfernt wird.
-    func test_buildEveningReminderRequest_withIntention_returnsValidRequest() {
+    /// Verhalten: Builder akzeptiert coach-Parameter.
+    /// Bricht wenn: coach-Parameter aus buildEveningReminderRequest entfernt wird.
+    func test_buildEveningReminderRequest_withCoach_returnsValidRequest() {
         let request = NotificationService.buildEveningReminderRequest(
-            hour: 20, minute: 0, intention: .connection, now: earlyMorning()
+            hour: 20, minute: 0, coach: .golem, now: earlyMorning()
         )
         XCTAssertNotNil(request)
         XCTAssertEqual(request?.content.title, "Dein Abend-Spiegel wartet")
     }
 
-    /// Verhalten: Ohne intention kein Attachment (Backward-Kompatibilitaet).
-    /// Bricht wenn: Attachments auch ohne intention-Parameter gesetzt werden.
-    func test_buildEveningReminderRequest_withoutIntention_noAttachments() {
+    /// Verhalten: Ohne coach kein Attachment (Backward-Kompatibilitaet).
+    /// Bricht wenn: Attachments auch ohne coach-Parameter gesetzt werden.
+    func test_buildEveningReminderRequest_withoutCoach_noAttachments() {
         let request = NotificationService.buildEveningReminderRequest(
             hour: 20, minute: 0, now: earlyMorning()
         )
         XCTAssertTrue(request?.content.attachments.isEmpty ?? true,
-            "Without intention, no attachment should be set")
+            "Without coach, no attachment should be set")
     }
 
-    // MARK: - buildMonsterAttachment (RED: method doesn't exist yet)
+    // MARK: - buildMonsterAttachment
 
-    /// Verhalten: buildMonsterAttachment existiert und crasht nicht fuer jede Intention.
+    /// Verhalten: buildMonsterAttachment existiert und crasht nicht fuer jeden Coach.
     /// Bricht wenn: Methode entfernt/umbenannt wird oder ein Mapping fehlt.
-    func test_buildMonsterAttachment_allIntentions_noCrash() {
-        for option in IntentionOption.allCases {
+    func test_buildMonsterAttachment_allCoaches_noCrash() {
+        for coach in CoachType.allCases {
             // In unit tests UIImage(named:) returns nil → attachment is nil (safe fallback).
             // This validates the API exists and handles missing images gracefully.
-            let attachment = NotificationService.buildMonsterAttachment(for: option)
+            let attachment = NotificationService.buildMonsterAttachment(for: coach)
             _ = attachment
         }
     }
 
-    // MARK: - Regression: Survival still returns empty
+    // MARK: - buildDailyNudgeRequests
 
-    /// Verhalten: Survival erzeugt weiterhin keine Requests (Attachment-Code aendert nichts).
-    /// Bricht wenn: der .survival Guard entfernt wird.
-    func test_buildDailyNudgeRequests_survival_stillReturnsEmpty() {
+    /// Verhalten: Nudge-Requests werden korrekt fuer Troll-Coach erzeugt.
+    /// Bricht wenn: buildDailyNudgeRequests die coach/gap Parameter nicht akzeptiert.
+    func test_buildDailyNudgeRequests_troll_producesRequests() {
         let requests = NotificationService.buildDailyNudgeRequests(
-            intention: .survival,
-            gap: .noBhagBlockCreated,
+            coach: .troll,
+            gap: .procrastinatedTasksPending,
             windowStart: windowStart(),
             windowEnd: windowEnd(),
             maxCount: 2,
             now: earlyMorning()
         )
-        XCTAssertTrue(requests.isEmpty, "Survival must never produce notifications")
+        XCTAssertEqual(requests.count, 2, "Troll with gap should produce 2 nudge requests")
     }
 }

@@ -21,6 +21,8 @@ final class SyncedSettings {
         static let warningTimingRaw = "sync_warningTimingRaw"
         static let defaultTaskDuration = "sync_defaultTaskDuration"
         static let eventCategories = "sync_eventCategories"
+        static let selectedCoach = "sync_selectedCoach"
+        static let selectedCoachDate = "sync_selectedCoachDate"
     }
 
     // MARK: - Local Keys (UserDefaults)
@@ -35,6 +37,8 @@ final class SyncedSettings {
         static let warningTimingRaw = "warningTiming"
         static let defaultTaskDuration = "defaultTaskDuration"
         static let eventCategories = "calendarEventCategories"
+        static let selectedCoach = "selectedCoach"
+        static let selectedCoachDate = "selectedCoachDate"
     }
 
     // MARK: - Init
@@ -87,6 +91,10 @@ final class SyncedSettings {
             cloud.set(catDict, forKey: CloudKey.eventCategories)
         }
 
+        // Coach-Wahl: String + Datum direkt kopieren
+        cloud.set(defaults.string(forKey: LocalKey.selectedCoach) ?? "", forKey: CloudKey.selectedCoach)
+        cloud.set(defaults.string(forKey: LocalKey.selectedCoachDate) ?? "", forKey: CloudKey.selectedCoachDate)
+
         cloud.synchronize()
     }
 
@@ -135,6 +143,14 @@ final class SyncedSettings {
             var localDict = defaults.dictionary(forKey: LocalKey.eventCategories) as? [String: String] ?? [:]
             localDict.merge(remoteDict) { _, remote in remote }
             defaults.set(localDict, forKey: LocalKey.eventCategories)
+        }
+
+        // Coach-Wahl: Remote gewinnt (zuletzt gesetzte Coach-Wahl)
+        let remoteCoachDate = cloud.string(forKey: CloudKey.selectedCoachDate) ?? ""
+        let localCoachDate = defaults.string(forKey: LocalKey.selectedCoachDate) ?? ""
+        if remoteCoachDate >= localCoachDate, !remoteCoachDate.isEmpty {
+            defaults.set(cloud.string(forKey: CloudKey.selectedCoach) ?? "", forKey: LocalKey.selectedCoach)
+            defaults.set(remoteCoachDate, forKey: LocalKey.selectedCoachDate)
         }
     }
 

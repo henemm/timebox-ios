@@ -42,21 +42,21 @@ final class MorningIntentionUITests: XCTestCase {
                        "Morning Intention card should be visible when Coach mode is enabled")
     }
 
-    // MARK: - Chip Selection Tests
+    // MARK: - Coach Selection Tests
 
-    func test_chipSelection_togglesOnTap() {
+    func test_coachSelection_togglesOnTap() {
         app.launchArguments.append("-CoachModeEnabled")
         app.launch()
 
         app.tabBars.firstMatch.buttons["Mein Tag"].tap()
 
-        let fokusChip = app.buttons["intentionChip_fokus"]
-        XCTAssertTrue(fokusChip.waitForExistence(timeout: 5), "Fokus chip should exist")
-        fokusChip.tap()
+        let euleCard = app.buttons["coachSelectionCard_eule"]
+        XCTAssertTrue(euleCard.waitForExistence(timeout: 5), "Eule coach card should exist")
+        euleCard.tap()
 
         let setButton = app.buttons["setIntentionButton"]
         XCTAssertTrue(setButton.waitForExistence(timeout: 3), "Set button should exist")
-        XCTAssertTrue(setButton.isEnabled, "Set button should be enabled after selecting a chip")
+        XCTAssertTrue(setButton.isEnabled, "Set button should be enabled after selecting a coach")
     }
 
     func test_setButton_disabled_withoutSelection() {
@@ -72,16 +72,16 @@ final class MorningIntentionUITests: XCTestCase {
 
     // MARK: - Set + Edit Flow
 
-    func test_setIntention_showsCompactView_withEditButton() {
+    func test_setCoach_showsCompactView_withEditButton() {
         app.launchArguments.append("-CoachModeEnabled")
         app.launch()
 
         app.tabBars.firstMatch.buttons["Mein Tag"].tap()
 
-        // Select a chip
-        let survivalChip = app.buttons["intentionChip_survival"]
-        XCTAssertTrue(survivalChip.waitForExistence(timeout: 5))
-        survivalChip.tap()
+        // Select a coach card
+        let trollCard = app.buttons["coachSelectionCard_troll"]
+        XCTAssertTrue(trollCard.waitForExistence(timeout: 5))
+        trollCard.tap()
 
         // Tap "Intention setzen"
         let setButton = app.buttons["setIntentionButton"]
@@ -91,6 +91,6 @@ final class MorningIntentionUITests: XCTestCase {
         // After setting, "Aendern" button should appear
         let editButton = app.buttons["editIntentionButton"]
         XCTAssertTrue(editButton.waitForExistence(timeout: 3),
-                       "Edit button should appear after setting intention")
+                       "Edit button should appear after setting coach")
     }
 }

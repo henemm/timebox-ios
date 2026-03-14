@@ -2,8 +2,10 @@
 //  MacCoachBacklogUITests.swift
 //  FocusBloxMacUITests
 //
-//  TDD RED: Tests for Coach Backlog view in macOS.
-//  These tests MUST FAIL until MacCoachBacklogView is implemented.
+//  Tests for Coach Backlog view in macOS.
+//  Verified IDs from production code (2026-03-14):
+//  - coachMonsterHeader (MonsterIntentionHeader)
+//  - coachRelevantSection, coachOtherSection, coachTaskList (CoachBacklogView)
 //
 
 import XCTest
@@ -44,9 +46,9 @@ final class MacCoachBacklogUITests: XCTestCase {
 
     private func navigateToBacklog() {
         // macOS uses segmented picker for navigation; Backlog is default but ensure it
-        let picker = app.segmentedControls["mainNavigationPicker"]
+        let picker = app.radioGroups["mainNavigationPicker"]
         if picker.waitForExistence(timeout: 3) {
-            let backlogButton = picker.buttons["Backlog"]
+            let backlogButton = picker.radioButtons["list.bullet"]
             if backlogButton.exists {
                 backlogButton.tap()
             }
@@ -57,7 +59,6 @@ final class MacCoachBacklogUITests: XCTestCase {
 
     /// Verhalten: Bei coachModeEnabled zeigt macOS Backlog einen Monster-Header.
     /// Bricht wenn: ContentView.mainContentView keine Weiche fuer coachModeEnabled hat
-    /// und weiterhin die normale backlogView zeigt.
     func test_coachModeOn_showsMonsterHeader() throws {
         launchWithCoachMode()
         navigateToBacklog()
@@ -70,7 +71,6 @@ final class MacCoachBacklogUITests: XCTestCase {
     // MARK: - Test 2: Coach mode OFF hides monster header
 
     /// Verhalten: Ohne coachModeEnabled zeigt macOS die normale Backlog-View.
-    /// Bricht wenn: MacCoachBacklogView immer angezeigt wird statt nur bei coachModeEnabled.
     func test_coachModeOff_noMonsterHeader() throws {
         launchWithoutCoachMode()
         navigateToBacklog()
@@ -80,24 +80,21 @@ final class MacCoachBacklogUITests: XCTestCase {
                        "Monster header should NOT be visible when Coach mode is OFF")
     }
 
-    // MARK: - Test 3: No intention set shows hint text
+    // MARK: - Test 3: No coach set shows hint text
 
-    /// Verhalten: Ohne gesetzte Intention zeigt der Monster-Header einen Hinweis-Text.
-    /// Bricht wenn: MacCoachBacklogView keinen Fallback-Text bei fehlender Intention hat.
-    func test_coachModeOn_noIntention_showsHint() throws {
+    /// Verhalten: Ohne gewaehlten Coach zeigt der Monster-Header einen Hinweis-Text.
+    func test_coachModeOn_noCoach_showsHint() throws {
         launchWithCoachMode()
         navigateToBacklog()
 
         let hintText = app.staticTexts["Starte deinen Tag unter Mein Tag"]
         XCTAssertTrue(hintText.waitForExistence(timeout: 5),
-                      "Hint text should appear when no intention is set")
+                      "Hint text should appear when no coach is set")
     }
 
     // MARK: - Test 4: Sidebar simplified in coach mode
 
     /// Verhalten: Bei Coach-Modus zeigt die Sidebar nur "Backlog" ohne Filter-Optionen.
-    /// Bricht wenn: SidebarView nicht auf coachModeEnabled reagiert und weiterhin
-    /// alle Filter (Prioritaet, Zuletzt, Ueberfaellig, etc.) anzeigt.
     func test_coachModeOn_sidebarSimplified() throws {
         launchWithCoachMode()
         navigateToBacklog()

@@ -47,7 +47,7 @@ struct BacklogView: View {
     @AppStorage("backlogViewMode") private var selectedMode: ViewMode = .priority
     @AppStorage("remindersSyncEnabled") private var remindersSyncEnabled: Bool = false
     @AppStorage("remindersMarkCompleteOnImport") private var remindersMarkCompleteOnImport: Bool = true
-    @AppStorage("intentionFilterOptions") private var intentionFilterOptions: String = ""
+    @AppStorage("selectedCoach") private var selectedCoach: String = ""
     @State private var planItems: [PlanItem] = []
     @State private var allRecurringItems: [PlanItem] = []
     @State private var errorMessage: String?
@@ -74,29 +74,21 @@ struct BacklogView: View {
     @State private var undoResultMessage = ""
 
 
-    // MARK: - Intention Filter
+    // MARK: - Coach Filter
 
-    /// Active intention filter options parsed from AppStorage.
-    private var activeIntentionFilters: [IntentionOption] {
-        guard !intentionFilterOptions.isEmpty else { return [] }
-        return intentionFilterOptions.split(separator: ",").compactMap {
-            IntentionOption(rawValue: String($0))
-        }
+    /// Active coach parsed from AppStorage.
+    private var activeCoach: CoachType? {
+        CoachBacklogViewModel.parseCoach(selectedCoach)
     }
 
-    /// Whether any intention filter is actively narrowing tasks.
-    private var hasActiveIntentionFilter: Bool {
-        let filters = activeIntentionFilters
-        guard !filters.isEmpty else { return false }
-        // Survival means "no filter"
-        return !filters.contains(.survival)
+    /// Whether a coach filter is actively narrowing tasks.
+    private var hasActiveCoachFilter: Bool {
+        activeCoach != nil
     }
 
-    /// Removes one intention option from the active filters.
-    private func removeIntentionFilter(_ option: IntentionOption) {
-        var current = activeIntentionFilters
-        current.removeAll { $0 == option }
-        intentionFilterOptions = current.map(\.rawValue).joined(separator: ",")
+    /// Clears the active coach filter.
+    private func clearCoachFilter() {
+        selectedCoach = ""
     }
 
     // MARK: - Search Filter
@@ -123,9 +115,9 @@ struct BacklogView: View {
     private var backlogTasks: [PlanItem] {
         // Top-level only: exclude blocked tasks (they appear under their blocker)
         let tasks = allBacklogTasks.topLevelTasks
-        let filters = activeIntentionFilters
-        guard !filters.isEmpty, !filters.contains(.survival) else { return tasks }
-        return tasks.filter { IntentionOption.matchesFilter(activeOptions: filters, task: $0) }
+        guard let coach = activeCoach else { return tasks }
+        let relevantIDs = Set(CoachType.filterTasks(tasks, coach: coach).map(\.id))
+        return tasks.filter { relevantIDs.contains($0.id) }
     }
 
     /// Blocked tasks that depend on the given blocker task ID
@@ -192,8 +184,8 @@ struct BacklogView: View {
             }
             .navigationBarTitleDisplayMode(.inline)
             .safeAreaInset(edge: .top) {
-                if !activeIntentionFilters.isEmpty && !activeIntentionFilters.contains(.survival) {
-                    intentionFilterChips
+                if let coach = activeCoach {
+                    coachFilterChip(coach)
                 }
             }
             .toolbar {
@@ -1002,39 +994,36 @@ struct BacklogView: View {
         }
     }
 
-    // MARK: - Intention Filter Chips
+    // MARK: - Coach Filter Chip
 
-    private var intentionFilterChips: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 8) {
-                ForEach(activeIntentionFilters, id: \.self) { option in
-                    Button {
-                        withAnimation(.spring()) {
-                            removeIntentionFilter(option)
-                        }
-                    } label: {
-                        HStack(spacing: 4) {
-                            Image(systemName: option.icon)
-                                .font(.caption2)
-                            Text(option.label)
-                                .font(.caption)
-                                .lineLimit(1)
-                            Image(systemName: "xmark.circle.fill")
-                                .font(.caption2)
-                                .foregroundStyle(option.color.opacity(0.6))
-                        }
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 6)
-                        .background(Capsule().fill(option.color.opacity(0.15)))
-                        .overlay(Capsule().stroke(option.color.opacity(0.3), lineWidth: 1))
-                    }
-                    .foregroundStyle(option.color)
-                    .accessibilityIdentifier("removeIntentionFilter_\(option.rawValue)")
+    private func coachFilterChip(_ coach: CoachType) -> some View {
+        HStack(spacing: 8) {
+            Button {
+                withAnimation(.spring()) {
+                    clearCoachFilter()
                 }
+            } label: {
+                HStack(spacing: 4) {
+                    Image(systemName: coach.icon)
+                        .font(.caption2)
+                    Text(coach.displayName)
+                        .font(.caption)
+                        .lineLimit(1)
+                    Image(systemName: "xmark.circle.fill")
+                        .font(.caption2)
+                        .foregroundStyle(coach.color.opacity(0.6))
+                }
+                .padding(.horizontal, 10)
+                .padding(.vertical, 6)
+                .background(Capsule().fill(coach.color.opacity(0.15)))
+                .overlay(Capsule().stroke(coach.color.opacity(0.3), lineWidth: 1))
             }
-            .padding(.horizontal)
-            .padding(.vertical, 6)
+            .foregroundStyle(coach.color)
+            .accessibilityIdentifier("removeCoachFilter_\(coach.rawValue)")
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal)
+        .padding(.vertical, 6)
         .background(.ultraThinMaterial)
     }
 

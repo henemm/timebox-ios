@@ -6,7 +6,6 @@ import FoundationModels
 
 /// Generates personalized evening reflection texts using on-device AI (Foundation Models).
 /// Falls back to IntentionEvaluationService.fallbackTemplate() when AI is unavailable.
-/// Follows the TaskTitleEngine pattern: immediate fallback, async AI replacement.
 @MainActor
 final class EveningReflectionTextService {
 
@@ -34,10 +33,10 @@ final class EveningReflectionTextService {
 
     // MARK: - Public API
 
-    /// Generates AI text for a single intention.
+    /// Generates AI text for the selected coach.
     /// Returns nil when AI is unavailable or disabled — caller uses fallbackTemplate().
     func generateText(
-        intention: IntentionOption,
+        coach: CoachType,
         level: FulfillmentLevel,
         tasks: [LocalTask],
         focusBlocks: [FocusBlock],
@@ -49,7 +48,7 @@ final class EveningReflectionTextService {
         #if canImport(FoundationModels)
         if #available(iOS 26.0, macOS 26.0, *) {
             return await performGeneration(
-                intention: intention,
+                coach: coach,
                 level: level,
                 tasks: tasks,
                 focusBlocks: focusBlocks,
@@ -60,42 +59,25 @@ final class EveningReflectionTextService {
         return nil
     }
 
-    /// Batch: Generates AI texts for all given intentions.
-    /// Returns dictionary [IntentionOption: String] — only entries where AI succeeded.
-    func generateTexts(
-        intentions: [IntentionOption],
+    /// Generate AI text for the active coach selection.
+    func generateTextForCoach(
+        coach: CoachType,
         tasks: [LocalTask],
         focusBlocks: [FocusBlock],
         now: Date = Date()
-    ) async -> [IntentionOption: String] {
-        guard Self.isAvailable else { return [:] }
-        guard AppSettings.shared.aiScoringEnabled else { return [:] }
-
-        var results: [IntentionOption: String] = [:]
-        for intention in intentions {
-            let level = IntentionEvaluationService.evaluateFulfillment(
-                intention: intention,
-                tasks: tasks,
-                focusBlocks: focusBlocks,
-                now: now
-            )
-            if let text = await generateText(
-                intention: intention,
-                level: level,
-                tasks: tasks,
-                focusBlocks: focusBlocks,
-                now: now
-            ) {
-                results[intention] = text
-            }
-        }
-        return results
+    ) async -> String? {
+        let level = IntentionEvaluationService.evaluateFulfillment(
+            coach: coach, tasks: tasks, focusBlocks: focusBlocks, now: now
+        )
+        return await generateText(
+            coach: coach, level: level, tasks: tasks, focusBlocks: focusBlocks, now: now
+        )
     }
 
     // MARK: - Prompt Building (internal for testing)
 
     func buildPrompt(
-        intention: IntentionOption,
+        coach: CoachType,
         level: FulfillmentLevel,
         tasks: [LocalTask],
         focusBlocks: [FocusBlock],
@@ -106,20 +88,22 @@ final class EveningReflectionTextService {
 
         var parts: [String] = []
 
-        // Intention + Ergebnis
-        parts.append("Intention: \(intention.label) (\(intention.rawValue))")
+        // Coach + Ergebnis
+        parts.append("Coach: \(coach.displayName) — \(coach.subtitle)")
+        parts.append("Persönlichkeit: \(coach.personality)")
         parts.append("Ergebnis: \(levelDescription(level))")
 
-        // Intention-spezifische Guidance
-        parts.append("Schwerpunkt: \(intentionGuidance(intention, completedTasks: completedTasks))")
+        // Coach-spezifische Guidance
+        parts.append("Schwerpunkt: \(coachGuidance(coach, completedTasks: completedTasks))")
 
-        // Erledigte Tasks (max 5, nach Intention-Relevanz sortiert)
-        let sorted = sortedByRelevance(completedTasks, for: intention)
+        // Erledigte Tasks (max 5, nach Coach-Relevanz sortiert)
+        let sorted = sortedByRelevance(completedTasks, for: coach)
         if !sorted.isEmpty {
             let taskLines = sorted.prefix(5).map { task -> String in
                 let timeStr = formatTime(task.completedAt, now: now)
                 let importanceStr = task.importance == 3 ? " [Wichtigkeit: hoch]" : ""
-                return "- '\(task.title)'\(timeStr)\(importanceStr)"
+                let rescheduleStr = task.rescheduleCount >= 2 ? " [verschoben: \(task.rescheduleCount)x]" : ""
+                return "- '\(task.title)'\(timeStr)\(importanceStr)\(rescheduleStr)"
             }
             parts.append("Erledigte Tasks heute:\n\(taskLines.joined(separator: "\n"))")
         } else {
@@ -136,45 +120,43 @@ final class EveningReflectionTextService {
         return parts.joined(separator: "\n")
     }
 
-    /// Sorts completed tasks so intention-relevant ones appear first.
-    private func sortedByRelevance(_ tasks: [LocalTask], for intention: IntentionOption) -> [LocalTask] {
+    /// Sorts completed tasks so coach-relevant ones appear first.
+    private func sortedByRelevance(_ tasks: [LocalTask], for coach: CoachType) -> [LocalTask] {
         tasks.sorted { a, b in
-            let aRelevant = isRelevant(a, for: intention)
-            let bRelevant = isRelevant(b, for: intention)
+            let aRelevant = isRelevant(a, for: coach)
+            let bRelevant = isRelevant(b, for: coach)
             if aRelevant != bRelevant { return aRelevant }
             return false
         }
     }
 
-    private func isRelevant(_ task: LocalTask, for intention: IntentionOption) -> Bool {
-        switch intention {
-        case .bhag:
+    private func isRelevant(_ task: LocalTask, for coach: CoachType) -> Bool {
+        switch coach {
+        case .troll:
+            return task.rescheduleCount >= 2
+        case .feuer:
             return task.importance == 3
-        case .fokus:
-            return task.assignedFocusBlockID != nil
-        case .growth:
-            return task.taskType == "learning"
-        case .connection:
-            return task.taskType == "giving_back"
-        case .survival, .balance:
-            return false
+        case .eule:
+            return task.assignedFocusBlockID != nil || task.isNextUp
+        case .golem:
+            return false // All categories equally relevant
         }
     }
 
-    private func intentionGuidance(_ intention: IntentionOption, completedTasks: [LocalTask]) -> String {
-        switch intention {
-        case .survival:
-            return "Beziehe dich darauf, dass der User den Tag überstanden hat"
-        case .fokus:
-            return "Beziehe dich auf fokussiertes Arbeiten in Focus-Blocks"
-        case .bhag:
-            return "Beziehe dich auf das große, wichtige Ziel des Users"
-        case .balance:
+    private func coachGuidance(_ coach: CoachType, completedTasks: [LocalTask]) -> String {
+        switch coach {
+        case .troll:
+            let procrastinated = completedTasks.filter { $0.rescheduleCount >= 2 }
+            if procrastinated.isEmpty {
+                return "Sprich die aufgeschobenen Tasks an — grummelig aber fair"
+            }
+            return "Lobe dass aufgeschobene Tasks erledigt wurden — trockener Humor"
+        case .feuer:
+            return "Beziehe dich auf die große Herausforderung — energisch und wettkampflustig"
+        case .eule:
+            return "Beziehe dich auf fokussiertes Arbeiten nur am Geplanten — ruhig und weise"
+        case .golem:
             return balanceGuidance(completedTasks)
-        case .growth:
-            return "Beziehe dich auf Lernen und persönliches Wachstum"
-        case .connection:
-            return "Beziehe dich auf Verbundenheit und für andere da sein"
         }
     }
 
@@ -199,7 +181,7 @@ final class EveningReflectionTextService {
             }
         }
 
-        var parts = ["Balance zwischen 5 Bereichen."]
+        var parts = ["Balance zwischen 5 Bereichen — geduldig und warmherzig."]
         if active.isEmpty {
             parts.append("Heute in keinem Bereich aktiv.")
         } else {
@@ -216,7 +198,7 @@ final class EveningReflectionTextService {
     #if canImport(FoundationModels)
     @available(iOS 26.0, macOS 26.0, *)
     private func performGeneration(
-        intention: IntentionOption,
+        coach: CoachType,
         level: FulfillmentLevel,
         tasks: [LocalTask],
         focusBlocks: [FocusBlock],
@@ -224,19 +206,20 @@ final class EveningReflectionTextService {
     ) async -> String? {
         do {
             let session = LanguageModelSession {
-                "Du bist ein sympathisches Monster — Trainingspartner des Users."
+                "Du bist \(coach.displayName), ein Monster-Coach."
+                coach.personality
                 "Schreib 2-3 persoenliche Saetze ueber seinen heutigen Tag."
                 "Regeln:"
                 "- Nie toxisch positiv ('Du hast das grossartig gemacht!')"
                 "- Nie schuldzuweisend ('Du haettest X tun sollen')"
-                "- Empathisch und direkt — wie ein ehrlicher Freund"
+                "- Bleib in deiner Persoenlichkeit"
                 "- Bezieh dich auf konkrete Task-Titel wenn vorhanden"
                 "- Immer auf Deutsch"
                 "- Max 200 Zeichen"
             }
 
             let userPrompt = buildPrompt(
-                intention: intention,
+                coach: coach,
                 level: level,
                 tasks: tasks,
                 focusBlocks: focusBlocks,

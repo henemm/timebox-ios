@@ -1,22 +1,17 @@
 import SwiftUI
 
-/// Morning Intention card shown in the Review tab when Coach mode is enabled.
-/// Two states: selection grid (not set) or compact summary (set).
+/// Coach selection card shown in the "Mein Tag" tab when Coach mode is enabled.
+/// Two states: 4 coach cards (not set) or compact summary (coach selected).
 struct MorningIntentionView: View {
-    @State private var intention = DailyIntention.load()
-    @State private var selectedOptions: Set<IntentionOption> = []
+    @State private var selection = DailyCoachSelection.load()
+    @State private var selectedCoachType: CoachType?
     @State private var isEditing = false
-    @AppStorage("intentionFilterOptions") private var intentionFilterOptions: String = ""
+    @AppStorage("selectedCoach") private var selectedCoach: String = ""
     @AppStorage("intentionJustSet") private var intentionJustSet: Bool = false
-
-    private let columns = [
-        GridItem(.flexible(), spacing: 12),
-        GridItem(.flexible(), spacing: 12)
-    ]
 
     var body: some View {
         VStack(spacing: 12) {
-            if intention.isSet && !isEditing {
+            if selection.isSet && !isEditing {
                 compactView
             } else {
                 selectionView
@@ -30,18 +25,18 @@ struct MorningIntentionView: View {
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("morningIntentionCard")
         .onAppear {
-            if intention.isSet {
-                selectedOptions = Set(intention.selections)
+            if selection.isSet {
+                selectedCoachType = selection.coach
             }
         }
     }
 
-    // MARK: - Compact View (after setting)
+    // MARK: - Compact View (after selecting a coach)
 
     private var compactView: some View {
         HStack {
-            if let primary = intention.selections.first {
-                Image(primary.monsterDiscipline.imageName)
+            if let coach = selection.coach {
+                Image(coach.monsterImage)
                     .resizable()
                     .scaledToFit()
                     .frame(width: 44, height: 44)
@@ -49,21 +44,19 @@ struct MorningIntentionView: View {
                     .accessibilityElement(children: .ignore)
                     .accessibilityAddTraits(.isImage)
                     .accessibilityIdentifier("monsterImage")
-            }
 
-            ForEach(intention.selections, id: \.self) { option in
-                HStack(spacing: 4) {
-                    Image(systemName: option.icon)
-                        .foregroundStyle(option.color)
-                    Text(option.label)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(coach.displayName)
+                        .font(.headline)
+                    Text(coach.subtitle)
                         .font(.caption)
-                        .lineLimit(1)
+                        .foregroundStyle(.secondary)
                 }
             }
 
             Spacer()
 
-            Button("Aendern") {
+            Button("Ändern") {
                 withAnimation(.spring()) {
                     isEditing = true
                 }
@@ -73,20 +66,20 @@ struct MorningIntentionView: View {
         }
     }
 
-    // MARK: - Selection View
+    // MARK: - Selection View (4 Coach Cards)
 
-    /// The dominant discipline for the currently selected options.
-    private var selectedMonsterDiscipline: Discipline? {
-        selectedOptions.first?.monsterDiscipline
-    }
+    private let columns = [
+        GridItem(.flexible(), spacing: 12),
+        GridItem(.flexible(), spacing: 12)
+    ]
 
     private var selectionView: some View {
         VStack(spacing: 16) {
-            Text("Wie wird dein Tag?")
+            Text("Wähle deinen Coach")
                 .font(.headline)
 
-            if let discipline = selectedMonsterDiscipline {
-                Image(discipline.imageName)
+            if let coach = selectedCoachType {
+                Image(coach.monsterImage)
                     .resizable()
                     .scaledToFit()
                     .frame(height: 120)
@@ -97,106 +90,119 @@ struct MorningIntentionView: View {
                     .transition(.scale.combined(with: .opacity))
             }
 
-            Text("Wenn du heute Abend auf diesen Tag zurueckblickst...")
-                .font(.subheadline)
-                .italic()
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
-
             LazyVGrid(columns: columns, spacing: 12) {
-                ForEach(IntentionOption.allCases, id: \.self) { option in
-                    chipButton(for: option)
+                ForEach(CoachType.allCases, id: \.self) { coach in
+                    coachCard(for: coach)
                 }
             }
 
+            // "Ohne Coach" option
             Button {
-                let selections = Array(selectedOptions)
-                var newIntention = DailyIntention(
-                    date: intention.date,
-                    selections: selections
-                )
-                newIntention.save()
-
-                // Write active filter options for BacklogView
-                intentionFilterOptions = selections.map(\.rawValue).joined(separator: ",")
-                // Signal tab switch to Backlog
-                intentionJustSet = true
-
-                // Schedule daily nudge notifications if enabled
-                let settings = AppSettings.shared
-                if settings.coachModeEnabled,
-                   settings.coachDailyNudgesEnabled,
-                   !selections.contains(.survival) {
-                    // Use first selected intention for gap detection
-                    if let primary = selections.first,
-                       let gap = IntentionEvaluationService.detectGap(
-                           intention: primary, tasks: [], focusBlocks: []
-                       ) {
-                        NotificationService.scheduleDailyNudges(
-                            intention: primary, gap: gap
-                        )
-                    }
-                }
-
-                // Schedule evening reminder if enabled
-                if settings.coachModeEnabled,
-                   settings.coachEveningReminderEnabled {
-                    NotificationService.scheduleEveningReminder(
-                        hour: settings.coachEveningReminderHour,
-                        minute: settings.coachEveningReminderMinute,
-                        intention: selections.first
-                    )
-                }
-
-                withAnimation(.spring()) {
-                    intention = newIntention
-                    isEditing = false
-                }
+                saveSelection(coach: nil)
             } label: {
-                Text("Intention setzen")
+                Text("Ohne Coach weitermachen")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            .accessibilityIdentifier("noCoachButton")
+
+            Button {
+                guard let coach = selectedCoachType else { return }
+                saveSelection(coach: coach)
+            } label: {
+                Text("Coach wählen")
                     .font(.headline)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 12)
             }
             .buttonStyle(.borderedProminent)
-            .disabled(selectedOptions.isEmpty)
+            .tint(selectedCoachType?.color ?? .accentColor)
+            .disabled(selectedCoachType == nil)
             .accessibilityIdentifier("setIntentionButton")
         }
     }
 
-    // MARK: - Chip Button
+    // MARK: - Coach Card
 
-    private func chipButton(for option: IntentionOption) -> some View {
-        let isSelected = selectedOptions.contains(option)
+    private func coachCard(for coach: CoachType) -> some View {
+        let isSelected = selectedCoachType == coach
 
         return Button {
             withAnimation(.spring()) {
-                if isSelected {
-                    selectedOptions.remove(option)
-                } else {
-                    selectedOptions.insert(option)
-                }
+                selectedCoachType = coach
             }
         } label: {
-            HStack(spacing: 6) {
-                Image(systemName: option.icon)
-                Text(option.label)
-                    .font(.caption)
-                    .lineLimit(1)
+            VStack(spacing: 6) {
+                Image(coach.monsterImage)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(height: 48)
+                    .clipShape(Circle())
+
+                Text(coach.displayName)
+                    .font(.subheadline.bold())
+
+                Text(coach.shortPitch)
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                    .lineLimit(2)
             }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 8)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 10)
             .frame(maxWidth: .infinity)
             .background(
-                RoundedRectangle(cornerRadius: 10)
-                    .fill(isSelected ? option.color.opacity(0.2) : Color.clear)
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(isSelected ? coach.color.opacity(0.15) : Color.clear)
             )
             .overlay(
-                RoundedRectangle(cornerRadius: 10)
-                    .stroke(isSelected ? option.color : .secondary.opacity(0.3), lineWidth: 1)
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(isSelected ? coach.color : .secondary.opacity(0.3), lineWidth: isSelected ? 2 : 1)
             )
         }
-        .foregroundStyle(isSelected ? option.color : .primary)
-        .accessibilityIdentifier("intentionChip_\(option.rawValue)")
+        .foregroundStyle(isSelected ? coach.color : .primary)
+        .accessibilityIdentifier("coachSelectionCard_\(coach.rawValue)")
+    }
+
+    // MARK: - Save
+
+    private func saveSelection(coach: CoachType?) {
+        var newSelection = DailyCoachSelection(date: selection.date, coach: coach)
+        newSelection.save()
+
+        // Write AppStorage for BacklogView
+        selectedCoach = coach?.rawValue ?? ""
+        // Signal tab switch to Backlog
+        intentionJustSet = true
+
+        // Sync to iCloud
+        let today = DailyCoachSelection.todayKey().replacingOccurrences(of: "dailyCoach_", with: "")
+        UserDefaults.standard.set(today, forKey: "selectedCoachDate")
+        Task { @MainActor in
+            SyncedSettings().pushToCloud()
+        }
+
+        // Schedule notifications if coach selected
+        if let coach, AppSettings.shared.coachModeEnabled {
+            scheduleCoachNotifications(coach: coach)
+        }
+
+        withAnimation(.spring()) {
+            selection = newSelection
+            isEditing = false
+        }
+    }
+
+    private func scheduleCoachNotifications(coach: CoachType) {
+        let settings = AppSettings.shared
+
+        // Schedule evening reminder if enabled
+        if settings.coachEveningReminderEnabled {
+            NotificationService.scheduleEveningReminder(
+                hour: settings.coachEveningReminderHour,
+                minute: settings.coachEveningReminderMinute,
+                coach: coach
+            )
+        }
     }
 }

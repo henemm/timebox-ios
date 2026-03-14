@@ -1,13 +1,18 @@
 import XCTest
 
-/// UI Tests for Evening Reflection Card (Monster Coach Phase 3c).
+/// UI Tests for Evening Reflection Card (Coach-based).
 ///
 /// The card appears in the Review tab when:
 /// - Coach mode is enabled
-/// - A morning intention is set
+/// - A coach is selected for today
 /// - It's after 18:00 (or -ForceEveningReflection launch arg for testing)
 ///
-/// EXPECTED TO FAIL (TDD RED): EveningReflectionCard does not exist yet.
+/// Verified IDs from production code (2026-03-14):
+/// - eveningReflectionCard (container)
+/// - eveningResult_<coach> (e.g. eveningResult_eule)
+/// - monsterIcon_<coach>, reflectionText_<coach>, fulfillmentBadge_<coach>
+/// - coachSelectionCard_<coach> (selection cards)
+/// - setIntentionButton, editIntentionButton
 final class EveningReflectionCardUITests: XCTestCase {
 
     var app: XCUIApplication!
@@ -30,7 +35,6 @@ final class EveningReflectionCardUITests: XCTestCase {
     // MARK: - Helpers
 
     /// Navigate to Review tab (called "Mein Tag" when coach mode is on).
-    /// Known IDs from /inspect-ui: tab label "Mein Tag" in coach mode, "Rückblick" otherwise.
     private func navigateToReviewTab() {
         let meinTagTab = app.tabBars.buttons["Mein Tag"]
         if meinTagTab.waitForExistence(timeout: 5) {
@@ -38,21 +42,20 @@ final class EveningReflectionCardUITests: XCTestCase {
         }
     }
 
-    /// Set a morning intention by tapping a chip and confirming.
-    /// Known IDs: intentionChip_fokus, setIntentionButton (from MorningIntentionView).
-    /// Note: Setting the intention switches to Backlog tab, so we navigate back.
-    private func setMorningIntention() {
+    /// Select a coach by tapping its card and confirming.
+    /// Note: Setting the coach switches to Backlog tab, so we navigate back.
+    private func selectCoach(_ coach: String = "eule") {
         navigateToReviewTab()
 
-        // If intention already set, tap "Aendern" to show selection grid
+        // If coach already set, tap "Aendern" to show selection grid
         let editButton = app.buttons["editIntentionButton"]
         if editButton.waitForExistence(timeout: 3) {
             editButton.tap()
         }
 
-        let fokusChip = app.buttons["intentionChip_fokus"]
-        if fokusChip.waitForExistence(timeout: 5) {
-            fokusChip.tap()
+        let card = app.buttons["coachSelectionCard_\(coach)"]
+        if card.waitForExistence(timeout: 5) {
+            card.tap()
 
             let setButton = app.buttons["setIntentionButton"]
             if setButton.waitForExistence(timeout: 3) {
@@ -60,30 +63,28 @@ final class EveningReflectionCardUITests: XCTestCase {
             }
         }
 
-        // Setting intention switches to Backlog tab — navigate back
+        // Setting coach switches to Backlog tab — navigate back
         navigateToReviewTab()
     }
 
     // MARK: - Visibility Tests
 
-    /// GIVEN: Coach mode ON + Intention gesetzt + ForceEveningReflection
-    /// WHEN: User navigiert zum Review-Tab
-    /// THEN: EveningReflectionCard ist sichtbar
-    /// EXPECTED TO FAIL: Card existiert noch nicht — eveningReflectionCard ID fehlt
+    /// GIVEN: Coach mode ON + Coach selected + ForceEveningReflection
+    /// WHEN: User navigates to Review tab
+    /// THEN: EveningReflectionCard is visible
     func test_eveningReflectionCard_visibleWhenCoachEnabled() throws {
-        setMorningIntention()
+        selectCoach("eule")
 
         let card = app.otherElements["eveningReflectionCard"]
         XCTAssertTrue(
             card.waitForExistence(timeout: 5),
-            "Evening reflection card should be visible when coach mode enabled and intention set"
+            "Evening reflection card should be visible when coach mode enabled and coach set"
         )
     }
 
     /// GIVEN: Coach mode OFF
-    /// WHEN: User navigiert zum Review-Tab
-    /// THEN: EveningReflectionCard ist NICHT sichtbar
-    /// EXPECTED TO FAIL: Card existiert noch nicht
+    /// WHEN: User navigates to Review tab
+    /// THEN: EveningReflectionCard is NOT visible
     func test_eveningReflectionCard_hiddenWhenCoachDisabled() throws {
         app.terminate()
         app = XCUIApplication()
@@ -103,67 +104,56 @@ final class EveningReflectionCardUITests: XCTestCase {
         )
     }
 
-    /// GIVEN: Coach mode ON + KEINE Intention gesetzt
-    /// WHEN: User navigiert zum Review-Tab
-    /// THEN: EveningReflectionCard ist NICHT sichtbar
-    /// EXPECTED TO FAIL: Card existiert noch nicht
-    func test_eveningReflectionCard_hiddenWhenNoIntention() throws {
+    /// GIVEN: Coach mode ON + NO coach selected
+    /// WHEN: User navigates to Review tab
+    /// THEN: EveningReflectionCard is NOT visible
+    func test_eveningReflectionCard_hiddenWhenNoCoach() throws {
         navigateToReviewTab()
 
         let card = app.otherElements["eveningReflectionCard"]
         XCTAssertFalse(
             card.waitForExistence(timeout: 3),
-            "Evening reflection card should NOT be visible when no intention is set"
+            "Evening reflection card should NOT be visible when no coach is set"
         )
     }
 
     // MARK: - Content Tests
 
-    /// GIVEN: Coach mode ON + Intention gesetzt
-    /// WHEN: Card ist sichtbar
-    /// THEN: Fulfillment-Badge ist sichtbar
-    /// EXPECTED TO FAIL: Card + Badge existieren noch nicht
-    func test_eveningReflectionCard_showsFulfillmentBadge() throws {
-        setMorningIntention()
+    /// GIVEN: Coach mode ON + Eule selected
+    /// WHEN: Card is visible
+    /// THEN: Evening result row for eule is visible
+    func test_eveningReflectionCard_showsCoachResult() throws {
+        selectCoach("eule")
 
-        // First verify the intention row container exists
-        let row = app.descendants(matching: .any)["eveningResult_fokus"]
+        let row = app.descendants(matching: .any)["eveningResult_eule"]
         XCTAssertTrue(
             row.waitForExistence(timeout: 5),
-            "Intention row for fokus should exist inside the card"
+            "Evening result row for eule should exist inside the card"
         )
     }
 
-    /// GIVEN: Coach mode ON + Intention gesetzt
-    /// WHEN: Card ist sichtbar
-    /// THEN: Reflection-Text ist sichtbar und nicht leer
-    /// EXPECTED TO FAIL: Card + Text existieren noch nicht
+    /// GIVEN: Coach mode ON + Eule selected
+    /// WHEN: Card is visible
+    /// THEN: Reflection text is visible and not empty
     func test_eveningReflectionCard_showsReflectionText() throws {
-        setMorningIntention()
+        selectCoach("eule")
 
-        // The reflection card should contain fallback text as staticText
         let card = app.otherElements["eveningReflectionCard"]
         XCTAssertTrue(card.waitForExistence(timeout: 5), "Card should exist")
 
-        // With no tasks, fokus evaluates to notFulfilled.
-        // Template: "Viel dazwischen gekommen heute. Passiert."
-        let fokusText = app.staticTexts.matching(
-            NSPredicate(format: "label CONTAINS %@", "dazwischen")
-        )
+        // Eule reflection text should reference focus
+        let reflectionText = app.descendants(matching: .any)["reflectionText_eule"]
         XCTAssertTrue(
-            fokusText.firstMatch.waitForExistence(timeout: 5),
-            "Fokus fallback text should be visible in the card"
+            reflectionText.waitForExistence(timeout: 5),
+            "Reflection text for eule should be visible in the card"
         )
     }
 
-    // MARK: - Phase 3d: AI Text Integration
+    // MARK: - AI Text / Fallback
 
-    /// GIVEN: Coach mode ON + Intention gesetzt + AI disabled via launch arg
-    /// WHEN: Card ist sichtbar
-    /// THEN: Fallback-Text wird angezeigt (nicht leer)
-    /// Bricht wenn: aiTexts-Parameter in EveningReflectionCard nicht existiert
-    ///              oder Fallback-Logik (aiTexts[intention] ?? fallbackTemplate()) fehlt.
-    ///              Auch wenn -AIDisabled Launch-Argument nicht verarbeitet wird.
+    /// GIVEN: Coach mode ON + Coach set + AI disabled
+    /// WHEN: Card is visible
+    /// THEN: Fallback text is displayed (not empty)
     func test_eveningCard_showsFallbackWhenAiDisabled() throws {
         app.terminate()
         app = XCUIApplication()
@@ -175,7 +165,7 @@ final class EveningReflectionCardUITests: XCTestCase {
         ]
         app.launch()
 
-        setMorningIntention()
+        selectCoach("eule")
 
         let card = app.otherElements["eveningReflectionCard"]
         XCTAssertTrue(
@@ -183,35 +173,26 @@ final class EveningReflectionCardUITests: XCTestCase {
             "Evening reflection card should be visible even when AI is disabled"
         )
 
-        // With AI disabled, fallback template text should show.
-        // fokus/notFulfilled = "Viel dazwischen gekommen heute. Passiert."
-        let fallbackText = app.staticTexts.matching(
-            NSPredicate(format: "label CONTAINS %@", "dazwischen")
-        )
+        // With AI disabled, fallback template text should show
+        let reflectionText = app.descendants(matching: .any)["reflectionText_eule"]
         XCTAssertTrue(
-            fallbackText.firstMatch.waitForExistence(timeout: 5),
+            reflectionText.waitForExistence(timeout: 5),
             "Fallback reflection text should be visible when AI is disabled"
         )
     }
 
-    /// GIVEN: Coach mode ON + Intention gesetzt + normale Launch Args
-    /// WHEN: Card ist sichtbar (AI oder Fallback)
-    /// THEN: Reflection-Text ist vorhanden und nicht leer
-    /// Bricht wenn: Text-Aufloesung in intentionRow() weder AI noch Fallback liefert
+    /// GIVEN: Coach mode ON + Coach set
+    /// WHEN: Card is visible (AI or fallback)
+    /// THEN: Reflection text exists
     func test_eveningCard_reflectionTextNotEmpty() throws {
-        setMorningIntention()
+        selectCoach("eule")
 
         let card = app.otherElements["eveningReflectionCard"]
         XCTAssertTrue(card.waitForExistence(timeout: 5), "Card should exist")
 
-        // The card should contain at least one static text with reflection content
-        // (either AI-generated or fallback template).
-        // fokus/notFulfilled fallback = "Viel dazwischen gekommen heute. Passiert."
-        let fokusText = app.staticTexts.matching(
-            NSPredicate(format: "label CONTAINS %@", "dazwischen")
-        )
+        let reflectionText = app.descendants(matching: .any)["reflectionText_eule"]
         XCTAssertTrue(
-            fokusText.firstMatch.waitForExistence(timeout: 8),
+            reflectionText.waitForExistence(timeout: 8),
             "Reflection text should be visible (AI or fallback) and not empty"
         )
     }

@@ -2,14 +2,12 @@ import XCTest
 import SwiftData
 @testable import FocusBlox
 
-/// Unit Tests for intention-based backlog filtering.
+/// Unit Tests for coach-based backlog filtering.
 ///
-/// Tests the static function `IntentionOption.matchesFilter(activeOptions:task:)`
-/// which determines task visibility based on active morning intentions.
-///
-/// ALL tests expected to FAIL (RED) — the function doesn't exist yet.
+/// Tests the static functions on CoachBacklogViewModel that determine
+/// task visibility based on the selected morning coach.
 @MainActor
-final class IntentionFilterTests: XCTestCase {
+final class CoachTypeFilterTests: XCTestCase {
 
     var container: ModelContainer!
     var context: ModelContext!
@@ -27,207 +25,156 @@ final class IntentionFilterTests: XCTestCase {
 
     // MARK: - Helpers
 
-    /// Creates a PlanItem from a LocalTask with specific properties.
     private func makePlanItem(
         title: String = "Test Task",
         isNextUp: Bool = false,
         importance: Int? = nil,
         rescheduleCount: Int = 0,
-        taskType: String = ""
+        taskType: String = "",
+        isCompleted: Bool = false,
+        isTemplate: Bool = false
     ) -> PlanItem {
-        let task = LocalTask(title: title, importance: importance, taskType: taskType)
+        let task = LocalTask(title: title, importance: importance, isCompleted: isCompleted, taskType: taskType)
         task.isNextUp = isNextUp
         task.rescheduleCount = rescheduleCount
+        task.isTemplate = isTemplate
         context.insert(task)
         return PlanItem(localTask: task)
     }
 
-    // MARK: - UT-01: Survival overrides all other filters
+    // MARK: - Troll: rescheduleCount threshold
 
-    /// Verhalten: When survival is among active options, ALL tasks pass the filter.
-    /// Bricht wenn: IntentionOption.matchesFilter doesn't check for .survival early-return.
-    func test_survival_overridesAllOtherFilters() {
-        let task = makePlanItem(isNextUp: false, importance: 1, taskType: "income")
-        let activeOptions: [IntentionOption] = [.survival, .fokus, .bhag]
+    /// Verhalten: Troll zeigt nur Tasks mit rescheduleCount >= 2.
+    /// Bricht wenn: Schwelle != 2 (z.B. >= 1 oder >= 3).
+    func test_troll_rescheduleThresholdIsExactlyTwo() {
+        let once = makePlanItem(title: "Once", rescheduleCount: 1)
+        let twice = makePlanItem(title: "Twice", rescheduleCount: 2)
+        let thrice = makePlanItem(title: "Thrice", rescheduleCount: 3)
+        let items = [once, twice, thrice]
 
-        let result = IntentionOption.matchesFilter(activeOptions: activeOptions, task: task)
+        let result = CoachBacklogViewModel.relevantTasks(from: items, selectedCoach: "troll")
 
-        XCTAssertTrue(result, "Survival should override all other filters — every task passes")
+        XCTAssertFalse(result.contains { $0.title == "Once" },
+            "rescheduleCount 1 should NOT pass troll filter (threshold is 2)")
+        XCTAssertTrue(result.contains { $0.title == "Twice" },
+            "rescheduleCount 2 should pass troll filter")
+        XCTAssertTrue(result.contains { $0.title == "Thrice" },
+            "rescheduleCount 3 should pass troll filter")
     }
 
-    // MARK: - UT-02: Fokus shows only NextUp tasks
+    // MARK: - Feuer: importance threshold
 
-    /// Verhalten: Fokus filter shows only tasks with isNextUp == true.
-    /// Bricht wenn: IntentionOption.matchesFilter .fokus case doesn't check isNextUp.
-    func test_fokus_onlyShowsNextUpTasks() {
-        let nextUpTask = makePlanItem(title: "NextUp Task", isNextUp: true)
-        let backlogTask = makePlanItem(title: "Backlog Task", isNextUp: false)
-        let activeOptions: [IntentionOption] = [.fokus]
+    /// Verhalten: Feuer zeigt nur Tasks mit importance == 3.
+    /// Bricht wenn: Schwelle auf importance >= 2 geaendert wird.
+    func test_feuer_importanceThresholdIsExactlyThree() {
+        let low = makePlanItem(title: "Low", importance: 1)
+        let medium = makePlanItem(title: "Medium", importance: 2)
+        let high = makePlanItem(title: "High", importance: 3)
+        let items = [low, medium, high]
 
-        XCTAssertTrue(
-            IntentionOption.matchesFilter(activeOptions: activeOptions, task: nextUpTask),
-            "NextUp task should be visible with fokus filter"
-        )
-        XCTAssertFalse(
-            IntentionOption.matchesFilter(activeOptions: activeOptions, task: backlogTask),
-            "Non-NextUp task should be hidden with fokus filter"
-        )
+        let result = CoachBacklogViewModel.relevantTasks(from: items, selectedCoach: "feuer")
+
+        XCTAssertEqual(result.count, 1)
+        XCTAssertEqual(result.first?.title, "High")
     }
 
-    // MARK: - UT-03: BHAG shows tasks with importance 3
+    // MARK: - Eule: NextUp only, max 3
 
-    /// Verhalten: BHAG filter shows tasks with importance == 3.
-    /// Bricht wenn: IntentionOption.matchesFilter .bhag case doesn't check importance.
-    func test_bhag_showsHighImportanceTasks() {
-        let highTask = makePlanItem(title: "Important", importance: 3)
-        let medTask = makePlanItem(title: "Medium", importance: 2)
-        let activeOptions: [IntentionOption] = [.bhag]
+    /// Verhalten: Eule zeigt nur isNextUp Tasks, maximal 3.
+    /// Bricht wenn: Max-Limit entfernt oder isNextUp-Filter fehlt.
+    func test_eule_maxThreeNextUpTasks() {
+        let items = (1...5).map { i in
+            makePlanItem(title: "NextUp \(i)", isNextUp: true)
+        }
 
-        XCTAssertTrue(
-            IntentionOption.matchesFilter(activeOptions: activeOptions, task: highTask),
-            "Task with importance 3 should be visible with BHAG filter"
-        )
-        XCTAssertFalse(
-            IntentionOption.matchesFilter(activeOptions: activeOptions, task: medTask),
-            "Task with importance 2 should be hidden with BHAG filter"
-        )
+        let result = CoachBacklogViewModel.relevantTasks(from: items, selectedCoach: "eule")
+
+        XCTAssertEqual(result.count, 3, "Eule should show max 3 NextUp tasks")
     }
 
-    // MARK: - UT-04: BHAG shows highly rescheduled tasks
+    /// Verhalten: Eule zeigt KEINE Tasks die nicht NextUp sind.
+    /// Bricht wenn: isNextUp-Filter fehlt.
+    func test_eule_excludesNonNextUpTasks() {
+        let nextUp = makePlanItem(title: "Planned", isNextUp: true)
+        let backlog = makePlanItem(title: "Backlog", isNextUp: false)
+        let items = [nextUp, backlog]
 
-    /// Verhalten: BHAG filter shows tasks with rescheduleCount >= 2.
-    /// Bricht wenn: IntentionOption.matchesFilter .bhag case doesn't check rescheduleCount.
-    func test_bhag_showsHighlyRescheduledTasks() {
-        let rescheduled2 = makePlanItem(title: "Twice rescheduled", rescheduleCount: 2)
-        let rescheduled5 = makePlanItem(title: "Often rescheduled", rescheduleCount: 5)
-        let fresh = makePlanItem(title: "Fresh task", rescheduleCount: 0)
-        let activeOptions: [IntentionOption] = [.bhag]
+        let result = CoachBacklogViewModel.relevantTasks(from: items, selectedCoach: "eule")
 
-        XCTAssertTrue(
-            IntentionOption.matchesFilter(activeOptions: activeOptions, task: rescheduled2),
-            "Task rescheduled 2x should be visible with BHAG filter"
-        )
-        XCTAssertTrue(
-            IntentionOption.matchesFilter(activeOptions: activeOptions, task: rescheduled5),
-            "Task rescheduled 5x should be visible with BHAG filter"
-        )
-        XCTAssertFalse(
-            IntentionOption.matchesFilter(activeOptions: activeOptions, task: fresh),
-            "Task with rescheduleCount 0 should be hidden with BHAG filter"
-        )
+        XCTAssertEqual(result.count, 1)
+        XCTAssertEqual(result.first?.title, "Planned")
     }
 
-    // MARK: - UT-05: Growth filters on learning category
+    // MARK: - Completed/Template exclusion
 
-    /// Verhalten: Growth filter shows only tasks with taskType == "learning".
-    /// Bricht wenn: IntentionOption.matchesFilter .growth case doesn't check taskType.
-    func test_growth_filtersOnLearningCategory() {
-        let learningTask = makePlanItem(title: "Learn Swift", taskType: "learning")
-        let incomeTask = makePlanItem(title: "Invoice", taskType: "income")
-        let emptyTask = makePlanItem(title: "No category", taskType: "")
-        let activeOptions: [IntentionOption] = [.growth]
+    /// Verhalten: Erledigte Tasks werden bei ALLEN Coaches ausgeschlossen.
+    /// Bricht wenn: isCompleted-Filter in relevantTasks fehlt.
+    func test_allCoaches_excludeCompletedTasks() {
+        for coachName in ["troll", "feuer", "eule", "golem"] {
+            let completed = makePlanItem(
+                title: "Done", isNextUp: true, importance: 3,
+                rescheduleCount: 3, isCompleted: true
+            )
+            let active = makePlanItem(
+                title: "Active", isNextUp: true, importance: 3,
+                rescheduleCount: 3
+            )
+            let items = [completed, active]
 
-        XCTAssertTrue(
-            IntentionOption.matchesFilter(activeOptions: activeOptions, task: learningTask),
-            "Learning task should be visible with growth filter"
-        )
-        XCTAssertFalse(
-            IntentionOption.matchesFilter(activeOptions: activeOptions, task: incomeTask),
-            "Income task should be hidden with growth filter"
-        )
-        XCTAssertFalse(
-            IntentionOption.matchesFilter(activeOptions: activeOptions, task: emptyTask),
-            "Uncategorized task should be hidden with growth filter"
-        )
+            let result = CoachBacklogViewModel.relevantTasks(from: items, selectedCoach: coachName)
+
+            XCTAssertFalse(result.contains { $0.title == "Done" },
+                "\(coachName) should exclude completed tasks")
+        }
     }
 
-    // MARK: - UT-06: Connection filters on giving_back category
+    /// Verhalten: Template-Tasks werden bei ALLEN Coaches ausgeschlossen.
+    /// Bricht wenn: isTemplate-Filter in relevantTasks fehlt.
+    func test_allCoaches_excludeTemplateTasks() {
+        for coachName in ["troll", "feuer", "eule", "golem"] {
+            let template = makePlanItem(
+                title: "Template", isNextUp: true, importance: 3,
+                rescheduleCount: 3, isTemplate: true
+            )
+            let normal = makePlanItem(
+                title: "Normal", isNextUp: true, importance: 3,
+                rescheduleCount: 3
+            )
+            let items = [template, normal]
 
-    /// Verhalten: Connection filter shows only tasks with taskType == "giving_back".
-    /// Bricht wenn: IntentionOption.matchesFilter .connection case doesn't check taskType.
-    func test_connection_filtersOnGivingBackCategory() {
-        let socialTask = makePlanItem(title: "Call Mom", taskType: "giving_back")
-        let workTask = makePlanItem(title: "Work task", taskType: "maintenance")
-        let activeOptions: [IntentionOption] = [.connection]
+            let result = CoachBacklogViewModel.relevantTasks(from: items, selectedCoach: coachName)
 
-        XCTAssertTrue(
-            IntentionOption.matchesFilter(activeOptions: activeOptions, task: socialTask),
-            "Giving_back task should be visible with connection filter"
-        )
-        XCTAssertFalse(
-            IntentionOption.matchesFilter(activeOptions: activeOptions, task: workTask),
-            "Maintenance task should be hidden with connection filter"
-        )
+            XCTAssertFalse(result.contains { $0.title == "Template" },
+                "\(coachName) should exclude template tasks")
+        }
     }
 
-    // MARK: - UT-07: Multi-select uses UNION logic
+    // MARK: - Invalid/empty coach
 
-    /// Verhalten: Multiple intentions use OR logic — task visible if it matches ANY.
-    /// Bricht wenn: matchesFilter uses AND instead of OR for multiple options.
-    func test_multiSelect_usesUnionLogic() {
-        let nextUpIncome = makePlanItem(title: "NextUp Income", isNextUp: true, taskType: "income")
-        let learningBacklog = makePlanItem(title: "Learning Backlog", isNextUp: false, taskType: "learning")
-        let neitherTask = makePlanItem(title: "Neither", isNextUp: false, taskType: "income")
-        let activeOptions: [IntentionOption] = [.fokus, .growth]
-
-        XCTAssertTrue(
-            IntentionOption.matchesFilter(activeOptions: activeOptions, task: nextUpIncome),
-            "NextUp task should pass via fokus filter"
-        )
-        XCTAssertTrue(
-            IntentionOption.matchesFilter(activeOptions: activeOptions, task: learningBacklog),
-            "Learning task should pass via growth filter"
-        )
-        XCTAssertFalse(
-            IntentionOption.matchesFilter(activeOptions: activeOptions, task: neitherTask),
-            "Task matching neither fokus nor growth should be hidden"
-        )
+    /// Verhalten: Ungueltiger Coach-String → leeres Ergebnis.
+    /// Bricht wenn: parseCoach unbekannte Werte nicht als nil behandelt.
+    func test_invalidCoach_returnsEmpty() {
+        let item = makePlanItem(title: "Task", isNextUp: true, importance: 3, rescheduleCount: 5)
+        let result = CoachBacklogViewModel.relevantTasks(from: [item], selectedCoach: "nonsense")
+        XCTAssertTrue(result.isEmpty, "Invalid coach should return empty relevant tasks")
     }
 
-    // MARK: - UT-08: Balance shows all tasks (no filter)
+    // MARK: - otherTasks complement
 
-    /// Verhalten: Balance has no task-level filter (only changes grouping in UI).
-    /// Bricht wenn: IntentionOption.matchesFilter .balance case filters out tasks.
-    func test_balance_showsAllTasks() {
-        let anyTask = makePlanItem(title: "Random task", importance: 1, taskType: "income")
-        let activeOptions: [IntentionOption] = [.balance]
+    /// Verhalten: relevantTasks + otherTasks = alle aktiven Tasks (keine Luecken).
+    /// Bricht wenn: Ein Task weder in relevant noch in other erscheint.
+    func test_relevantAndOther_coverAllActiveTasks() {
+        let items = [
+            makePlanItem(title: "Rescheduled", rescheduleCount: 3),
+            makePlanItem(title: "Normal"),
+            makePlanItem(title: "Important", importance: 3),
+        ]
 
-        XCTAssertTrue(
-            IntentionOption.matchesFilter(activeOptions: activeOptions, task: anyTask),
-            "Balance should show all tasks (filtering is UI-level grouping only)"
-        )
-    }
+        let relevant = CoachBacklogViewModel.relevantTasks(from: items, selectedCoach: "troll")
+        let other = CoachBacklogViewModel.otherTasks(from: items, selectedCoach: "troll")
 
-    // MARK: - UT-09: Empty filter list means no filter
-
-    /// Verhalten: When no intentions are active, all tasks pass (no filtering).
-    /// Bricht wenn: matchesFilter returns false for empty activeOptions.
-    func test_emptyFilters_showsAllTasks() {
-        let anyTask = makePlanItem(title: "Any task")
-        let activeOptions: [IntentionOption] = []
-
-        XCTAssertTrue(
-            IntentionOption.matchesFilter(activeOptions: activeOptions, task: anyTask),
-            "Empty filter list should show all tasks"
-        )
-    }
-
-    // MARK: - UT-10: BHAG reschedule threshold is exactly 2
-
-    /// Verhalten: rescheduleCount == 1 does NOT pass BHAG filter, == 2 does.
-    /// Bricht wenn: BHAG threshold is != 2 (e.g. >= 1 or >= 3).
-    func test_bhag_rescheduleThresholdIsTwo() {
-        let once = makePlanItem(title: "Once rescheduled", rescheduleCount: 1)
-        let twice = makePlanItem(title: "Twice rescheduled", rescheduleCount: 2)
-        let activeOptions: [IntentionOption] = [.bhag]
-
-        XCTAssertFalse(
-            IntentionOption.matchesFilter(activeOptions: activeOptions, task: once),
-            "Task rescheduled 1x should NOT pass BHAG filter (threshold is 2)"
-        )
-        XCTAssertTrue(
-            IntentionOption.matchesFilter(activeOptions: activeOptions, task: twice),
-            "Task rescheduled 2x should pass BHAG filter"
-        )
+        let allTitles = Set(relevant.map(\.title) + other.map(\.title))
+        let inputTitles = Set(items.map(\.title))
+        XCTAssertEqual(allTitles, inputTitles, "relevant + other should cover all input tasks")
     }
 }

@@ -60,10 +60,10 @@ struct FocusBloxShortcuts: AppShortcutsProvider {
         AppShortcut(
             intent: SetDailyIntentionIntent(),
             phrases: [
-                "Setz meine Intention auf \(\.$intention) in \(.applicationName)",
-                "Intention \(\.$intention) in \(.applicationName)"
+                "Waehle \(\.$coach) als Coach in \(.applicationName)",
+                "Coach \(\.$coach) in \(.applicationName)"
             ],
-            shortTitle: "Intention setzen",
+            shortTitle: "Coach waehlen",
             systemImageName: "sunrise"
         )
     }

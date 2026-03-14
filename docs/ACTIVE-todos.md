@@ -7,142 +7,143 @@
 
 ---
 
-## Bugs (offen)
+## Priorisierte Reihenfolge (nur offene Items)
 
-### Bug 94: macOS — Neuer Task ueber Eingabeschlitz bekommt keinen Fokus
-- **Status:** ERLEDIGT
+| Prio | Item | Typ | Kompl. | Warum diese Reihenfolge? |
+|------|------|-----|--------|--------------------------|
+| **1** | Coach-Redesign abschliessen | Feature | S | IN ARBEIT — Code fertig, UI Tests + Commit fehlen. Muss zuerst landed werden. |
+| **2** | Bug 102: Coach-Sync iOS↔macOS | Bug P0 | S-M | Ohne Sync ist Coach-Modus auf macOS nutzlos. Blockiert taegliche Nutzung. |
+| **3** | Phase 6d: Abend-Spiegel macOS | Feature | S-M | Komplettiert den Coach-Tagesbogen auf macOS. Shared View wahrscheinlich direkt nutzbar. |
+| **4** | Phase 6e: CoachMeinTagView macOS | Feature | M | Abhaengig von 6d. Danach ist Coach-Modus auf macOS komplett. |
+| **5** | Bug 101: macOS 5 statt 4 Views | Bug | M | Inkonsistenz zwischen Plattformen. Assign-View zusammenlegen. |
+| **6** | Bug 98: Mein Tag Woche unvollstaendig | Bug | S-M | Daten-Luecke in der Wochenansicht. Kein Blocker, aber irritierend. |
+| **7** | Discipline manuell ueberschreiben | Feature | M | Nice-to-have fuer Power-User. Kreisfarbe korrigierbar machen. |
+| **8** | TD-03: Services ohne Tests | Tech Debt | M | NotificationService, FocusBlockActionService, GapFinder — Sicherheitsnetz fehlt. |
+| **9** | MAC-026: Enhanced Quick Capture | Feature | L | macOS Produktivitaet. Kein Blocker. |
+| **10** | TD-01: God-Views aufbrechen | Tech Debt | L | BacklogView 1181 LoC, BlockPlanningView 1400 LoC — Wartbarkeit. |
+| **11** | Emotionales Aufladen (Report) | Feature | L | Motivations-Feature. Kein Blocker. |
+| **12** | MAC-030: Shortcuts.app | Feature | L | macOS Automatisierung. P3. |
+| **13** | MAC-031: Focus Mode Integration | Feature | M | macOS System-Integration. P3. |
+| **14** | MAC-032: NC Widget | Feature | XL | Grosser Aufwand, niedriger Druck. |
+| **15** | TD-02: View-Duplikation | Tech Debt | XL | ~7300 LoC. Langfristig wichtig, kurzfristig kein Blocker. |
+| **16** | ITB-C: OrganizeMyDay Intent | Feature | XL | Komplexer Intent. Kann warten. |
+| **17** | ITB-F: CaptureContextIntent | Feature | M | WARTEND auf Apple APIs (iOS 26.5/27). |
+
+---
+
+## Offene Bugs
+
+### Bug 102: Coach-Wahl wird NICHT zwischen iOS und macOS synchronisiert — P0
+- **Status:** OFFEN
+- **Plattform:** iOS + macOS
+- **Symptom:** Wenn man morgens auf dem iPhone einen Coach waehlt (z.B. Troll), weiss der Mac nichts davon. CoachBacklogView auf macOS zeigt keine Schwerpunkt-Sektion, Monster-Header bleibt leer.
+- **Root Cause:** Die Coach-Wahl wird in lokalen UserDefaults gespeichert (`@AppStorage("selectedCoach")` + `DailyCoachSelection.save()` in App Group). Kein iCloud-Sync.
+- **Betroffene Daten:** `selectedCoach` (String: "troll"/"feuer"/"eule"/"golem"/""), `selectedCoachDate` (String: "YYYY-MM-DD")
+- **Bestehende Infrastruktur:** `SyncedSettings` nutzt bereits `NSUbiquitousKeyValueStore` fuer andere Settings. Coach-Wahl muss dort angebunden werden.
+- **Loesung:** `selectedCoach` + `selectedCoachDate` ueber `NSUbiquitousKeyValueStore` synchronisieren. Push bei Coach-Wahl, Pull bei `cloudDidChange`. Cloud-Keys: `sync_selectedCoach`, `sync_selectedCoachDate`.
+- **Komplexitaet:** S-M
+
+### Bug 98: Mein Tag Woche zeigt nur Sprint-Tasks — ausserhalb Sprints erledigte fehlen
+- **Status:** OFFEN
+- **Plattform:** iOS + macOS
+- **Symptom:** Die Wochenansicht in "Mein Tag" zeigt nur Tasks die innerhalb von Sprints erledigt wurden. Tasks die ausserhalb von Sprints erledigt wurden, fehlen komplett — sollen aber gleichberechtigt angezeigt werden.
+
+### Bug 101: macOS hat 5 Views statt 4 — Unified Calendar View nicht umgesetzt
+- **Status:** OFFEN
 - **Plattform:** macOS
-- **Symptom:** Wenn man ueber den Eingabeschlitz einen neuen Task anlegt ("+"-Button), liegt der Fokus anschliessend NICHT auf dem neu erstellten Task. Man muss ihn manuell in der Liste suchen.
-- **Root Cause:** `addTask()` nutzte `await LocalTaskSource.createTask()` das AI-Enrichment + Title-Improvement (3-8 Sek.) blockierte BEVOR der Inspector-Override gesetzt wurde. Der User sah solange "Kein Task ausgewaehlt".
-- **Fix:** Task synchron erstellen (insert + save), Inspector-Override SOFORT setzen, AI-Enrichment im Hintergrund nachlaufen lassen.
-- **Tests:** 2 UI Tests stabil gruen (3x3 Durchlaeufe, 100% Passrate)
-- **Dateien:** ContentView.swift (macOS), Bug94FocusAfterAddUITests.swift, FocusBloxApp.swift
+- **Symptom:** iOS hat 4 Tabs (Backlog, Blox, Focus, Review), macOS hat 5 Sidebar-Eintraege (Backlog, Blox, **Assign**, Focus, Review). Die "Assign"-Section ist ein Ueberschuss.
+- **Ursache:** Die "Unified Calendar View" wurde auf iOS umgesetzt — BlockPlanningView kombiniert Timeline + Task-Zuweisung. Auf macOS existieren noch zwei getrennte Views.
+- **Erwartetes Verhalten:** macOS soll wie iOS 4 Sections haben. "Blox" und "Assign" zusammenlegen.
+- **Betroffene Dateien:** SidebarView.swift, ContentView.swift, MacPlanningView.swift, MacAssignView.swift
+- **Komplexitaet:** M
+
+## Erledigte Bugs (Archiv-Kandidaten)
+
+<details>
+<summary>Bug 93, 94, 95, 96, 97, 99, 100, Abend-Review — alle ERLEDIGT</summary>
+
+### Bug 94: macOS — Neuer Task bekommt keinen Fokus — ERLEDIGT
 - **Commit:** 5986c27
 
-### Bug 95: Neue Tasks bekommen immer Faelligkeitsdatum "heute"
-- **Status:** ERLEDIGT
-- **Plattform:** iOS + macOS
-- **Symptom:** Alle neu erstellten Tasks erhalten automatisch das Faelligkeitsdatum "heute", unabhaengig vom Inhalt oder Kontext.
-- **Root Cause:** TaskTitleEngine AI-Enrichment setzte dueDate auf "heute" fuer generische Titel, weil der System-Prompt kein Nil-Beispiel hatte. Die AI halluzinierte Datum-Keywords.
-- **Fix:** (1) Deterministische Keyword-Pruefung `titleContainsDateKeyword()` als Guard vor AI-dueDate-Akzeptanz, (2) Nil-Beispiel im AI-Prompt, (3) RecurrenceService Date()-Fallback entfernt.
-- **Commit:** (wird nach Commit ergaenzt)
+### Bug 95: Neue Tasks bekommen immer Faelligkeitsdatum "heute" — ERLEDIGT
 
-### Bug 97: Apple Shortcut — "heute" im Titel wird nicht als Datum erkannt
-- **Status:** ERLEDIGT
-- **Plattform:** iOS + macOS
-- **Symptom:** Tasks per Apple Shortcut/Siri mit "heute" im Titel bekamen kein Faelligkeitsdatum. Auch kein Title-Cleanup und keine Urgency-Erkennung.
-- **Root Cause:** `CreateTaskIntent.perform()` erstellte Tasks ohne `needsTitleImprovement = true` zu setzen und ohne deterministische Datum-Extraktion. Die TitleEngine-Pipeline wurde nie getriggert.
-- **Fix:** (1) Neue `extractDeterministicDueDate(from:)` Funktion fuer sofortige Datum-Extraktion aus Keywords (kein AI noetig), (2) `needsTitleImprovement = true` fuer spaeteres AI Title-Cleanup.
-- **Tests:** 6 Unit Tests gruen (TaskTitleEngineTests)
-- **Dateien:** CreateTaskIntent.swift, TaskTitleEngine.swift
-- **Commit:** (wird nach Commit ergaenzt)
+### Bug 96: Apple Shortcut oeffnet App statt Hintergrund-Save — ERLEDIGT
 
-### Bug 96: Apple Shortcut oeffnet FocusBlox komplett statt Hintergrund-Save
-- **Status:** ERLEDIGT
-- **Plattform:** iOS
-- **Symptom:** Der Siri-Shortcut "Task erstellen" oeffnete die App im Vordergrund statt den Task im Hintergrund zu speichern.
-- **Root Cause:** Commit 382a5a1 hatte `openAppWhenRun=true` als Workaround gesetzt.
-- **Fix:** `openAppWhenRun=false` + direkter SwiftData-Save statt UserDefaults-Handoff.
-- **Commit:** (wird nach Commit ergaenzt)
+### Bug 97: Apple Shortcut — "heute" nicht als Datum erkannt — ERLEDIGT
 
-### Bug 93: Swipe-Gesten bei eingerueckten Tasks funktionieren nicht (iOS)
-- **Status:** ERLEDIGT
-- **Plattform:** iOS + macOS
-- **Root Cause:** `blockedRow()` hatte absichtlich keine `.swipeActions` — blockierte Tasks waren "gefangen".
-- **Fix:** Swipe-Aktionen zu `blockedRow()` hinzugefuegt: Bearbeiten, Loeschen, Freigeben (Abhaengigkeit entfernen). macOS: Kontextmenue-Eintrag "Abhaengigkeit entfernen".
-- **Tests:** 4 UI Tests gruen (BlockedTaskSwipeUITests)
-- **Dateien:** BacklogView.swift (iOS), ContentView.swift (macOS)
+### Bug 93: Swipe-Gesten bei eingerueckten Tasks — ERLEDIGT
 - **Commit:** 271d993
 
+### Bug 99: CoachBacklogView — Next-Up-Swipe fehlt — ERLEDIGT
+
+### Bug 100: Intention-Labels — ERLEDIGT (OBSOLET nach Coach-Redesign)
+
+### Bug: Abend-Review Text zu generisch — ERLEDIGT
+
+</details>
+
 ---
 
-## BACKLOG: Feature — Monster Coach Phase 3 "Der Tagesbogen"
+## BACKLOG: Feature — Monster Coach Phase 3 "Der Tagesbogen" — KOMPLETT ERLEDIGT
 
 - **User Story:** `docs/project/stories/monster-coach.md`
-- **Vision:** Nach der Morgen-Intention passiert bisher NICHTS. Phase 3 schliesst die Luecke: Morgen → Tag → Abend als durchgaengiges Erlebnis.
+- **Vision:** Morgen → Tag → Abend als durchgaengiges Coach-Erlebnis.
+- **Hinweis:** Phase 3 wurde mit dem alten 6-Intentionen-System gebaut. Seit dem **Coach-Redesign** (4 Coaches statt 6 Absichten) nutzt der gesamte Code `CoachType` statt `IntentionOption`. Die Grundfunktionalitaet bleibt identisch.
 
-**Bisherige Grundlage (Phase 1+2+3a+3b):**
-- `Sources/Models/DailyIntention.swift` — Model mit `IntentionOption` Enum
-- `Sources/Views/MorningIntentionView.swift` — Selection Grid + Zusammenfassung
-- `Sources/Views/DailyReviewView.swift` — Review-Tab
-- `Sources/Models/Discipline.swift` — Task-Disziplin Enum
-- `Sources/Services/IntentionEvaluationService.swift` — Gap-Erkennung (aus Phase 3b)
-- Phase 3a (Backlog-Filter) ERLEDIGT
-- Phase 3b (Smart Notifications) ERLEDIGT
+**Aktuelle Grundlage (nach Redesign):**
+- `Sources/Models/CoachType.swift` — 4 Coaches: Troll, Feuer, Eule, Golem (ersetzt IntentionOption)
+- `Sources/Models/DailyCoachSelection.swift` — Tages-Coach-Wahl (ersetzt DailyIntention)
+- `Sources/Views/MorningIntentionView.swift` — Coach-Auswahl Grid
+- `Sources/Services/IntentionEvaluationService.swift` — Coach-basierte Fulfillment + Gap-Erkennung
+- `Sources/Services/EveningReflectionTextService.swift` — Coach-persoenlichkeitsbasierte AI-Texte
+- Phase 3a-3f: ALLE ERLEDIGT
 
 ### Phase 3c: Abend-Spiegel mit automatischer Auswertung (Must) — ERLEDIGT
-- Karte im Review-Tab (`DailyReviewView`) ab 18 Uhr
-- FulfillmentLevel (fulfilled/partial/notFulfilled) + evaluateFulfillment() in IntentionEvaluationService
-- EveningReflectionCard mit Stimmungs-Farbe, Badge, Fallback-Templates
-- 40 Unit Tests + 5 UI Tests gruen
-- **Dateien:** EveningReflectionCard.swift (NEU), IntentionEvaluationService.swift, DailyReviewView.swift
+- FulfillmentLevel pro Coach: Troll (aufgeschobene Tasks), Feuer (grosse Tasks), Eule (Block-Completion), Golem (Kategorie-Balance)
+- EveningReflectionCard mit Stimmungs-Farbe, Badge, Coach-spezifische Fallback-Templates
+- **Dateien:** EveningReflectionCard.swift, IntentionEvaluationService.swift, DailyReviewView.swift
 
 ### Phase 3d: Foundation Models Abend-Text (Must) — ERLEDIGT
-- EveningReflectionTextService: On-Device AI (Foundation Models) generiert persoenlichen Abend-Text
-- buildPrompt() mit Intention, FulfillmentLevel, erledigten Tasks (max 5), FocusBlock-Stats
-- Fallback auf handgeschriebene Template-Sprueche wenn AI nicht verfuegbar
-- DailyReviewView laedt AI-Texte async, Card zeigt sofort Fallback bis AI fertig
-- 11 Unit Tests + 2 neue UI Tests gruen (gesamt 7/7 UI Tests)
-- **Dateien:** EveningReflectionTextService.swift (NEU), EveningReflectionCard.swift, DailyReviewView.swift
+- buildPrompt() mit Coach-Persoenlichkeit, FulfillmentLevel, erledigten Tasks (nach Coach-Relevanz sortiert, max 5)
+- Coach-spezifische Schwerpunkt-Guidance (Troll: aufgeschobene Tasks, Feuer: grosse Herausforderung, Eule: Focus-Blocks, Golem: Kategorie-Balance)
+- **Dateien:** EveningReflectionTextService.swift, EveningReflectionCard.swift
 
 ### Phase 3e: Abend Push-Notification (Should) — ERLEDIGT
-- Konfigurierbare Abend-Push-Notification (Default 20:00 Uhr)
-- Nur wenn coachModeEnabled UND Intention gesetzt (Dreifach-Guard in scenePhase)
-- Settings: Toggle "Abend-Erinnerung" + Uhrzeit-Picker im Monster Coach Bereich
-- Scheduling: Nach Intention-Save (MorningIntentionView) + bei App-Vordergrund (FocusBloxApp)
-- 8 Unit Tests + 3 UI Tests gruen (+ 12 bestehende Coach-Tests unveraendert)
-- **Dateien:** NotificationService.swift, AppSettings.swift, SettingsView.swift, MorningIntentionView.swift, FocusBloxApp.swift
+- Konfigurierbare Abend-Push-Notification mit Coach-Monster-Attachment
+- Nur wenn coachModeEnabled UND Coach gewaehlt
+- **Dateien:** NotificationService.swift, AppSettings.swift, SettingsView.swift, FocusBloxApp.swift
 
 ### Phase 3f: Siri Integration / App Intents (Should) — ERLEDIGT
-- GetEveningSummaryIntent: "Wie war mein Tag?" — Siri liest Abend-Auswertung vor (fallbackTemplate-Texte)
-- SetDailyIntentionIntent: "Setz meine Intention auf Fokus" — setzt Tages-Intention per Sprache
-- DailyIntention UserDefaults-Migration auf App Group (Siri-Prozess kann Intention lesen/schreiben)
-- IntentionOptionEnum: AppEnum mit 6 deutschen Siri-Titeln
-- 8 Unit Tests gruen (+ 85 bestehende Intention-Tests unveraendert)
-- **Dateien:** DailyIntention.swift, IntentionOptionEnum.swift (NEU), GetEveningSummaryIntent.swift (NEU), SetDailyIntentionIntent.swift (NEU), FocusBloxShortcuts.swift
+- GetEveningSummaryIntent: "Wie war mein Tag?" — Siri liest Coach-Abend-Auswertung vor
+- SetDailyIntentionIntent: "Waehle Troll als Coach" — setzt Tages-Coach per Sprache
+- CoachTypeEnum: AppEnum mit 4 deutschen Siri-Titeln (Troll, Feuer, Eule, Golem)
+- **Dateien:** CoachType.swift, CoachTypeEnum.swift, GetEveningSummaryIntent.swift, SetDailyIntentionIntent.swift, FocusBloxShortcuts.swift
 
 ---
 
-## BACKLOG: Feature — Monster Coach Phase 4 "Monster-Grafiken & Visualisierung"
+## BACKLOG: Feature — Monster Coach Phase 4 "Monster-Grafiken & Visualisierung" — KOMPLETT ERLEDIGT
 
 - **User Story:** `docs/project/stories/monster-coach.md`
-- **Kontext:** 4 Monster-Grafiken (PNG, transparent) fuer die 4 Disciplines erstellt. Muessen ins Projekt integriert und an allen relevanten Stellen angezeigt werden.
+- **Kontext:** 4 Monster-Grafiken (PNG, transparent) fuer die 4 Coaches. Seit dem Redesign ist das Mapping direkt: Jeder Coach HAT ein Monster (1:1 statt frueher 6→4 Mapping).
 
 ### Phase 4a: Monster-Assets einbinden (Must) — ERLEDIGT
-- 4 PNGs als Image Assets: monsterFokus (Eule), monsterMut (Feuer), monsterAusdauer (Golem), monsterKonsequenz (Troll)
-- `Discipline.imageName` computed property + `IntentionOption.monsterDiscipline` Mapping
-- 12 Unit Tests gruen (MonsterGraphicsTests)
-- **Dateien:** Discipline.swift, DailyIntention.swift, Assets.xcassets (4 ImageSets)
+- 4 PNGs: monsterFokus (Eule), monsterMut (Feuer), monsterAusdauer (Golem), monsterKonsequenz (Troll)
+- `Discipline.imageName` + `CoachType.discipline` Mapping (jeder Coach = eine Discipline)
+- **Dateien:** Discipline.swift, CoachType.swift, Assets.xcassets (4 ImageSets)
 
-### Phase 4b: Farbiger Discipline-Kreis in Task-Zeilen (Should) — INTEGRIERT IN PHASE 5
-- Wird als Teil der neuen Coach-Views umgesetzt (Phase 5a: CoachBacklogView)
-- Discipline-Kreise nur in Coach-Views sichtbar, nicht in der normalen BacklogView
+### Phase 4b-4e: ALLE ERLEDIGT
+- Monster in Coach-Auswahl, Abend-Spiegel, Push-Notifications
+- `buildMonsterAttachment(for: CoachType)` — `coach: CoachType? = nil` Parameter
+- **Dateien:** MorningIntentionView.swift, EveningReflectionCard.swift, NotificationService.swift
 
-### Phase 4c: Monster in Morgen-Dialog (Must) — ERLEDIGT
-- Monster-Grafik waehrend Chip-Auswahl (120px, dynamisch wechselnd) UND in Kompakt-Ansicht (44px Circle)
-- Mapping: Survival/Balance → Golem, Fokus/Wachstum → Eule, BHAG → Feuer, Verbundenheit → Troll
-- 4 UI Tests gruen (MonsterGraphicsUITests)
-- **Dateien:** MorningIntentionView.swift
-
-### Phase 4d: Monster im Abend-Spiegel (Must) — ERLEDIGT
-- Monster-Icon (40x40 Circle) neben dem Intentions-Label in jeder Zeile der Abend-Karte
-- 2 UI Tests SKIPPED (vorbestehendes Problem: EveningReflectionCard nicht sichtbar nach Tab-Wechsel — DailyIntention.load().isSet ist kein reaktives Binding)
-- **Dateien:** EveningReflectionCard.swift
-
-### Phase 4e: Monster in Push-Notifications (Could) — ERLEDIGT
-- Rich Notifications mit Monster-Bild als UNNotificationAttachment (PNG)
-- Alle 3 Notification-Typen: Morgen-Erinnerung, Abend-Erinnerung, Tages-Nudges
-- `buildMonsterAttachment(for:)` — UIImage → temp PNG → UNNotificationAttachment
-- Backward-kompatibel: `intention: IntentionOption? = nil` Default-Parameter
-- `#if !os(macOS)` Guard (macOS unterstuetzt keine Notification-Attachments)
-- 6 Unit Tests + 2 UI Tests gruen
-- **Dateien:** NotificationService.swift, FocusBloxApp.swift, MorningIntentionView.swift
-
-### Ueberlegung: Nutzer beim Kategorisieren der Tasks einbeziehen — OFFEN
-- **Kontext:** Aktuell werden Tasks automatisch einer Discipline zugeordnet (AI-basiert via TaskTitleEngine). Der Nutzer hat keinen Einfluss darauf.
-- **Ueberlegung:** Soll der Nutzer die Discipline manuell waehlen/korrigieren koennen? Z.B. beim Erstellen oder Bearbeiten eines Tasks.
-- **Offene Fragen:** Wie integrieren? Optionaler Picker? Nur bei Coach-Modus? Automatik beibehalten mit Manual-Override?
-- **Abhaengigkeiten:** Haengt eng mit Phase 5 (Coach-Views) zusammen — dort werden Disciplines prominent angezeigt. Falsche Zuordnung wuerde dort auffallen.
+### Feature: Discipline manuell ueberschreiben — OFFEN
+- **Kontext:** Die Kreisfarbe im CoachBacklogView (= Discipline: Konsequenz/Mut/Fokus/Ausdauer) wird automatisch berechnet aus `rescheduleCount` + `importance`. Der Nutzer kann das nicht korrigieren.
+- **Problem:** Wenn die automatische Zuordnung falsch ist, landet ein Task visuell in der falschen Monster-Disziplin. Aktuell gibt es keinen Weg das zu aendern.
+- **Gewuenschtes Verhalten:** Context Menu (Long-Press) auf Task in CoachBacklogView mit Discipline-Auswahl (Konsequenz/Mut/Fokus/Ausdauer). Ueberschreibt die automatische Berechnung.
+- **Technische Notiz:** `Discipline.classifyOpen()` berechnet aktuell rein automatisch. Braucht ein neues Feld auf `LocalTask` (z.B. `manualDiscipline: String?`) das Vorrang vor der Berechnung hat.
+- **Betroffene Sektionszuordnung:** Die Coach-Filter (`CoachBacklogViewModel.relevantTasks`) nutzen NICHT Discipline, sondern eigene Regeln pro Coach (Troll: rescheduleCount, Feuer: importance, Eule: isNextUp, Golem: Kategorie-Balance). Discipline-Override aendert nur die Kreisfarbe, nicht die Sektion.
+- **Plattform:** iOS (CoachBacklogView) + macOS (MacCoachBacklogView)
+- **Komplexitaet:** M (neues Feld + Override-Logik + Context Menu)
 
 ---
 
@@ -154,149 +155,51 @@
 
 ### Phase 5a: CoachBacklogView (Must) — ERLEDIGT
 - Coach-Modus AN → Backlog-Tab zeigt CoachBacklogView statt BacklogView
-- Monster-Header zeigt transparent den aktiven Schwerpunkt (Intention)
-- Zwei Sektionen: "Dein Schwerpunkt" (passende Tasks) + "Weitere Tasks" (Rest)
-- Farbige Discipline-Kreise in Task-Zeilen (= Phase 4b integriert)
-- **Spec:** `docs/specs/features/coach-views-backlog.md`
-- **Dateien:** CoachBacklogView.swift (NEU), MainTabView.swift, Discipline.swift, BacklogRow.swift
-- **Tests:** 6 Unit Tests + 4 UI Tests gruen
-- **Commit:** (wird nach Commit ergaenzt)
+- Monster-Header zeigt transparent den aktiven Coach
+- Zwei Sektionen: "Dein Schwerpunkt" (Coach-gefilterte Tasks) + "Weitere Tasks" (Rest)
+- Filter-Logik: `CoachBacklogViewModel.relevantTasks(from:selectedCoach:)`
+- **Dateien:** CoachBacklogView.swift, CoachBacklogViewModel.swift, MainTabView.swift
 
 ### Phase 5b: CoachMeinTagView (Must) — ERLEDIGT
 - Coach-Modus AN → "Mein Tag"-Tab zeigt CoachMeinTagView statt DailyReviewView
 - MorningIntentionView + EveningReflectionCard in eigenem Layout
 - Tages-Fortschritt ("X Tasks erledigt") mit coachDayProgress ID
-- Coach-Elemente aus DailyReviewView entfernt (coachModeEnabled, aiReflectionTexts, showEveningReflection)
-- DailyReviewView navigationTitle statisch "Review"
-- **Spec:** `docs/specs/features/coach-views-meintag.md`
-- **Dateien:** CoachMeinTagView.swift (NEU), MainTabView.swift, DailyReviewView.swift, FocusBloxApp.swift
-- **Tests:** 3 UI Tests gruen (CoachMeinTagUITests)
-- **Commit:** (wird nach Commit ergaenzt)
-- **Offen:** Intention-Chips Text abgeschnitten (Bug bleibt — separates Ticket), Tages-Statistiken vereinfacht (kein Completion-Ring)
+- **Dateien:** CoachMeinTagView.swift, MainTabView.swift, DailyReviewView.swift, FocusBloxApp.swift
 
 ---
 
 ## BACKLOG: Feature — Monster Coach Phase 6 "macOS-Paritaet"
 
-- **Kontext:** Alle Monster Coach Features (Phase 1-5) existieren nur als iOS-UI. Die Business-Logik (Models, Services) liegt korrekt in `Sources/` und ist geteilt — aber `FocusBloxMac/` hat KEINE Coach-Views. macOS-Nutzer koennen den Coach-Modus weder aktivieren noch nutzen.
-- **Abhaengigkeit:** Phase 5b (CoachMeinTagView) ist ERLEDIGT — macOS-Paritaet kann gebaut werden.
+- **Kontext:** Coach-Modus (4 Coaches: Troll/Feuer/Eule/Golem) ist auf iOS komplett. Business-Logik liegt shared in `Sources/`. macOS hat Settings + Backlog + Coach-Auswahl — fehlen noch Abend-Spiegel und volle Mein-Tag-View.
+- **Abhaengigkeit:** Phase 5b (CoachMeinTagView iOS) ist ERLEDIGT.
 
 ### Phase 6a: Coach-Settings in macOS (Must) — ERLEDIGT
-- Neuer 5. Tab "Monster Coach" in MacSettingsView mit identischen Settings wie iOS
-- Master-Toggle, Morgen-Erinnerung, Tages-Erinnerungen (Max/Von/Bis), Abend-Erinnerung
-- 4 UI Tests gruen (MacCoachSettingsUITests)
-- **Dateien:** MacSettingsView.swift, MacCoachSettingsUITests.swift
-- **Spec:** docs/specs/features/coach-settings-macos.md
-- **Commit:** (wird nach Commit ergaenzt)
-
 ### Phase 6b: CoachBacklogView in macOS (Must) — ERLEDIGT
-- macOS ContentView zeigt bei `coachModeEnabled` die MacCoachBacklogView statt normale Backlog-View
-- Monster-Header mit Intention, Disziplin-Farbkreise auf Checkboxen, Schwerpunkt/Weitere-Sektionen
-- Sidebar vereinfacht bei Coach-Modus (nur "Backlog" Label, keine Filter)
-- 4 UI Tests gruen (MacCoachBacklogUITests)
-- **Dateien:** MacCoachBacklogView.swift (NEU), ContentView.swift, MacBacklogRow.swift
-- **Commit:** (wird nach Commit ergaenzt)
-
-### Phase 6c: MorningIntentionView in macOS (Must) — ERLEDIGT
-- macOS Review-Tab zeigt bei `coachModeEnabled` die MacCoachReviewView mit MorningIntentionView + Tages-Fortschritt
-- Bei Coach AUS: normale MacReviewView wie bisher
-- Setting einer Intention schaltet automatisch zum Backlog-Tab um
-- Shared MorningIntentionView direkt nutzbar (macOS-kompatibel)
-- 4 UI Tests gruen (MacCoachReviewUITests)
-- **Dateien:** MacCoachReviewView.swift (NEU), ContentView.swift, FocusBloxMacApp.swift, MacCoachReviewUITests.swift
-- **Commit:** (wird nach Commit ergaenzt)
+### Phase 6c: Coach-Auswahl in macOS (Must) — ERLEDIGT
 
 ### Phase 6d: EveningReflectionCard in macOS (Must) — OFFEN
-- Abend-Spiegel mit Erfuellungsbewertung, Monster-Icons und KI-Texten fuer macOS
-- Wie 6c: pruefen ob die shared View direkt nutzbar ist
+- Abend-Spiegel mit Coach-spezifischer Erfuellungsbewertung, Monster-Icons und KI-Texten fuer macOS
+- Pruefen ob die shared `EveningReflectionCard` direkt in `MacCoachReviewView` eingebettet werden kann
+- Coach-basiert: `evaluateFulfillment(coach:tasks:focusBlocks:)` + `fallbackTemplate(coach:level:)`
 - **Referenz:** Sources/Views/EveningReflectionCard.swift
-- **Dateien:** FocusBloxMac/ (Integration in macOS-Layout)
+- **Dateien:** MacCoachReviewView.swift (Integration)
 - **Komplexitaet:** S-M
 
 ### Phase 6e: CoachMeinTagView in macOS (Should) — OFFEN
-- Phase 5b (iOS) ist fertig — macOS-Paritaet kann jetzt gebaut werden
-- macOS-Aequivalent fuer den "Mein Tag"-Tab im Coach-Modus
-- **Abhaengigkeit:** Phase 5b (ERLEDIGT)
+- Volle "Mein Tag"-View fuer macOS Coach-Modus (Coach-Auswahl + Tages-Fortschritt + Abend-Spiegel)
+- Pruefen ob shared `CoachMeinTagView` direkt nutzbar ist oder macOS eigenes Layout braucht
+- **Abhaengigkeit:** Phase 6d (EveningReflectionCard muss zuerst auf macOS laufen)
 - **Komplexitaet:** M
 
 ---
 
-### Bug 99: CoachBacklogView — Next-Up-Swipe fehlt
-- **Status:** ERLEDIGT
-- **Plattform:** iOS
-- **Fix:** `.swipeActions(edge: .leading)` mit "Next Up"/"Entfernen"-Button in `coachRow()` ergänzt
-- **Dateien:** CoachBacklogView.swift
-- **Tests:** 5 UI Tests grün
-
-### Bug 100: Intention-Labels — Umlaute fehlen + Texte als Tagesziel umformulieren
-- **Status:** ERLEDIGT
+### Coach-Redesign: 4 Coaches statt 6 Absichten — IN ARBEIT
+- **Status:** IN ARBEIT (Production Code + Unit Tests fertig, UI Tests + Commit ausstehend)
 - **Plattform:** iOS + macOS
-- **Fix:** Alle 6 IntentionOption-Labels mit Umlauten und als Tagesziel-Formulierung (Infinitiv statt Vergangenheit). Siri-Labels und Notification-Text ebenfalls gefixt.
-- **Neue Labels:** "Tag überleben", "Nicht verzetteln", "Das große Ding anpacken", "In allen Bereichen leben", "Etwas Neues lernen", "Für andere da sein"
-- **Dateien:** DailyIntention.swift, IntentionOptionEnum.swift, NotificationService.swift, MorningIntentionTests.swift
-- **Tests:** 13 Unit Tests grün
-
----
-
-### Bug: Abend-Review Text zu generisch — nicht auf Intention bezogen
-- **Status:** ERLEDIGT
-- **Plattform:** iOS + macOS
-- **Symptom:** Der AI-generierte Abend-Text war generisch und ging nicht auf die gesetzte Tages-Intention ein. Tasks wurden blind abgeschnitten statt nach Relevanz sortiert.
-- **Root Cause:** `buildPrompt()` in EveningReflectionTextService hatte (1) keine Intention-Relevanz-Sortierung vor `.prefix(5)`, (2) keine Schwerpunkt-Guidance für die AI, (3) bei Balance keine Kategorie-Aufschlüsselung.
-- **Fix:** Tasks nach Intention-Relevanz sortieren (BHAG→importance=3, Fokus→Block-Tasks, Growth→Learning, Connection→Giving-Back), Schwerpunkt-Zeile im Prompt, Balance mit konkreter Kategorie-Aufschlüsselung.
-- **Tests:** 19 Unit Tests grün (EveningReflectionTextServiceTests) — inkl. Sortierungsreihenfolge, Balance-Kategorien, Guidance pro Intention
-- **Dateien:** EveningReflectionTextService.swift, EveningReflectionTextServiceTests.swift
-
-### Bug 98: Mein Tag Woche zeigt nur Sprint-Tasks — ausserhalb Sprints erledigte fehlen
-- **Status:** OFFEN
-- **Plattform:** iOS + macOS
-- **Symptom:** Die Wochenansicht in "Mein Tag" zeigt nur Tasks die innerhalb von Sprints erledigt wurden. Tasks die ausserhalb von Sprints erledigt wurden, fehlen komplett — sollen aber gleichberechtigt angezeigt werden.
-
-### Bug 101: macOS hat 5 Views statt 4 — Unified Calendar View nicht umgesetzt
-- **Status:** OFFEN
-- **Plattform:** macOS
-- **Symptom:** iOS hat 4 Tabs (Backlog, Blox, Focus, Review), macOS hat 5 Sidebar-Eintraege (Backlog, Blox, **Assign**, Focus, Review). Die "Assign"-Section ist ein Ueberschuss.
-- **Ursache:** Die "Unified Calendar View" (Spec: `docs/specs/features/unified-calendar-view.md`) wurde auf iOS umgesetzt — BlockPlanningView kombiniert Timeline + Task-Zuweisung in einer View. Auf macOS existieren noch zwei getrennte Views: MacPlanningView (Timeline) und MacAssignView (Task-Zuweisung).
-- **Erwartetes Verhalten:** macOS soll wie iOS 4 Sections haben. "Blox" und "Assign" werden zu einer View zusammengelegt — Tap auf FocusBlock oeffnet Task-Zuweisungs-Sheet (wie auf iOS).
-- **Betroffene Dateien:** SidebarView.swift (MainSection enum), ContentView.swift (mainContentView switch), MacPlanningView.swift, MacAssignView.swift
-- **Referenz-Spec:** `docs/specs/features/unified-calendar-view.md`
-- **Komplexitaet:** M
-
----
-
-## Weitere offene Features
-
-| # | Item | Prio | Kompl. |
-|---|------|------|--------|
-| 9 | MAC-031 Focus Mode Integration | P3 | M |
-| 10 | MAC-030 Shortcuts.app | P3 | L |
-| 11 | Emotionales Aufladen (Report) | Mittel | L |
-| 12 | MAC-026 Enhanced Quick Capture | P2 | L |
-| 14 | MAC-032 NC Widget | P3 | XL |
-| 17 | ITB-C: OrganizeMyDay Intent | Mittel | XL |
-| 20 | ITB-F: CaptureContextIntent (Siri On-Screen) | WARTEND | M |
-
-**Komplexitaet:** XS = halbe Stunde | S = 1 Session | M = 2-3 Sessions | L = halber Tag | XL = ganzer Tag+
-
-**WARTEND (Apple-Abhaengigkeit):** #20 ITB-F — wartet auf Siri On-Screen Awareness (iOS 26.5/27)
-
----
-
-## Bundles (nur offene Items)
-
-### Bundle D: Erfolge feiern
-- Emotionales Aufladen im Report
-
-### Bundle E: macOS Native Experience (P2/P3)
-- Monster Coach Phase 6: macOS-Paritaet (6a-6e)
-- MAC-026 Enhanced Quick Capture
-- MAC-030 Shortcuts.app
-- MAC-031 Focus Mode Integration
-- MAC-032 NC Widget
-
-### Bundle G: Intelligent Task Blox (Rest)
-- ITB-F (CaptureContextIntent) — WARTEND auf Apple APIs
-- ITB-C (OrganizeMyDay) — Komplexer Intent (XL)
+- **Aenderung:** 6 Morgen-Absichten ersetzt durch 4 Monster-Coaches mit klarer Persoenlichkeit
+- **Coaches:** Troll (aufgeschobene Tasks), Feuer (wichtige Tasks), Eule (geplante Tasks max 3), Golem (Kategorie-Balance)
+- **Neue Typen:** `CoachType`, `DailyCoachSelection`, `CoachGap`, `CoachTypeEnum`
+- **Tests:** 116 Unit Tests gruen, iOS + macOS Build SUCCEEDED
 
 ---
 
@@ -304,7 +207,7 @@
 
 ### Verbleibende Tech-Debts (dokumentiert in `docs/context/tech-debt-analysis.md`)
 - **TD-01:** God-Views (BlockPlanningView 1400 LoC, BacklogView 1181 LoC) — Aufwand: L
-- **TD-02:** iOS/macOS View-Duplikation — Paket 1-3 ERLEDIGT (Badges, Sheets, Header: ~412 LoC eliminiert). Verbleibend: ~7500 LoC, Aufwand: XL
+- **TD-02:** iOS/macOS View-Duplikation — Paket 1-3 ERLEDIGT (Badges, Sheets, Header: ~412 LoC eliminiert). TD-05 Coach-Pilot ERLEDIGT (~180 LoC konsolidiert). Verbleibend: ~7300 LoC, Aufwand: XL
 - **TD-03:** 3 Services ohne Unit Tests (NotificationService, FocusBlockActionService, GapFinder) — Aufwand: M
 
 ### TD-04: Parallele Claude Code Sessions absichern — ERLEDIGT
@@ -314,6 +217,13 @@
 - Kein File-Locking auf workflow_state.json (Korruptionsgefahr)
 - **Fix:** load_state Import, fcntl.flock Locking, Overlap→Block, test_lock_guard registriert
 - **Dateien:** parallel_test_guard.py, workflow_state_multi.py, strict_code_gate.py, settings.json
+
+### TD-05: Coach Views Cross-Platform Consolidation (Pilot) — ERLEDIGT
+- Duplizierte Filter-Logik in shared `CoachBacklogViewModel` extrahiert (`relevantTasks`, `otherTasks`, `parseCoach`)
+- MonsterIntentionHeader und DayProgressSection als shared Components in Sources/Views/Components/
+- Seit Coach-Redesign: Filter nutzt `CoachType`-basierte Logik (Troll: rescheduleCount>=2, Feuer: importance==3, Eule: isNextUp max 3, Golem: Kategorie-Balance)
+- **14 Unit Tests gruen** (CoachBacklogViewModelTests)
+- **Dateien:** CoachBacklogViewModel.swift, MonsterIntentionHeader.swift, DayProgressSection.swift, CoachBacklogView.swift, MacCoachBacklogView.swift, MacCoachReviewView.swift, CoachMeinTagView.swift
 
 ---
 

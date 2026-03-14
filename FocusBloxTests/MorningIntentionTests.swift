@@ -3,95 +3,70 @@ import XCTest
 
 final class MorningIntentionTests: XCTestCase {
 
-    // MARK: - IntentionOption Tests
+    // MARK: - CoachType Tests
 
-    func test_allCases_have6Options() {
-        XCTAssertEqual(IntentionOption.allCases.count, 6)
+    func test_allCases_have4Coaches() {
+        XCTAssertEqual(CoachType.allCases.count, 4)
     }
 
-    func test_eachOption_hasLabelAndIcon() {
-        for option in IntentionOption.allCases {
-            XCTAssertFalse(option.label.isEmpty, "\(option.rawValue) should have a label")
-            XCTAssertFalse(option.icon.isEmpty, "\(option.rawValue) should have an icon")
+    func test_eachCoach_hasDisplayNameAndIcon() {
+        for coach in CoachType.allCases {
+            XCTAssertFalse(coach.displayName.isEmpty, "\(coach.rawValue) should have a displayName")
+            XCTAssertFalse(coach.icon.isEmpty, "\(coach.rawValue) should have an icon")
         }
     }
 
-    func test_survivalOption_properties() {
-        let option = IntentionOption.survival
-        XCTAssertEqual(option.label, "Egal, Tag überleben")
-        XCTAssertEqual(option.icon, "shield")
+    func test_trollCoach_properties() {
+        let coach = CoachType.troll
+        XCTAssertEqual(coach.displayName, "Troll")
+        XCTAssertEqual(coach.subtitle, "Der Aufräumer")
     }
 
-    func test_fokusOption_properties() {
-        let option = IntentionOption.fokus
-        XCTAssertEqual(option.label, "Nicht verzetteln")
-        XCTAssertEqual(option.icon, "scope")
+    func test_feuerCoach_properties() {
+        let coach = CoachType.feuer
+        XCTAssertEqual(coach.displayName, "Feuer")
+        XCTAssertEqual(coach.subtitle, "Der Herausforderer")
     }
 
-    func test_bhagOption_properties() {
-        let option = IntentionOption.bhag
-        XCTAssertEqual(option.label, "Das große Ding anpacken")
-        XCTAssertEqual(option.icon, "flame")
+    func test_euleCoach_properties() {
+        let coach = CoachType.eule
+        XCTAssertEqual(coach.displayName, "Eule")
+        XCTAssertEqual(coach.subtitle, "Der Fokussierer")
     }
 
-    func test_balanceOption_properties() {
-        let option = IntentionOption.balance
-        XCTAssertEqual(option.label, "In allen Bereichen leben")
-        XCTAssertEqual(option.icon, "equal")
+    func test_golemCoach_properties() {
+        let coach = CoachType.golem
+        XCTAssertEqual(coach.displayName, "Golem")
+        XCTAssertEqual(coach.subtitle, "Der Balancer")
     }
 
-    func test_growthOption_properties() {
-        let option = IntentionOption.growth
-        XCTAssertEqual(option.label, "Etwas Neues lernen")
-        XCTAssertEqual(option.icon, "book")
+    // MARK: - DailyCoachSelection Tests
+
+    func test_emptySelection_isSetFalse() {
+        let selection = DailyCoachSelection(date: "2026-03-14", coach: nil)
+        XCTAssertFalse(selection.isSet)
     }
 
-    func test_connectionOption_properties() {
-        let option = IntentionOption.connection
-        XCTAssertEqual(option.label, "Für andere da sein")
-        XCTAssertEqual(option.icon, "heart.circle")
-    }
-
-    // MARK: - DailyIntention Tests
-
-    func test_emptyIntention_isSetFalse() {
-        let intention = DailyIntention(date: "2026-03-12", selections: [])
-        XCTAssertFalse(intention.isSet)
-    }
-
-    func test_intentionWithSelections_isSetTrue() {
-        let intention = DailyIntention(date: "2026-03-12", selections: [.fokus, .bhag])
-        XCTAssertTrue(intention.isSet)
+    func test_selectionWithCoach_isSetTrue() {
+        let selection = DailyCoachSelection(date: "2026-03-14", coach: .troll)
+        XCTAssertTrue(selection.isSet)
     }
 
     func test_todayKey_format() {
-        let key = DailyIntention.todayKey()
-        // Key format: "dailyIntention_YYYY-MM-DD"
-        XCTAssertTrue(key.hasPrefix("dailyIntention_"))
-        let datePart = key.replacingOccurrences(of: "dailyIntention_", with: "")
+        let key = DailyCoachSelection.todayKey()
+        XCTAssertTrue(key.hasPrefix("dailyCoach_"))
+        let datePart = key.replacingOccurrences(of: "dailyCoach_", with: "")
         XCTAssertEqual(datePart.count, 10, "Date part should be YYYY-MM-DD format")
         XCTAssertTrue(datePart.contains("-"), "Date should contain dashes")
     }
 
     func test_saveAndLoad_roundtrip() {
-        // Use unique test key to avoid collisions
-        let testKey = "dailyIntention_test_\(UUID().uuidString)"
-        var intention = DailyIntention(date: "2026-03-12", selections: [.survival, .growth])
-        intention.save(key: testKey)
+        var selection = DailyCoachSelection(date: DailyCoachSelection.todayDateString(), coach: .feuer)
+        selection.save()
 
-        let loaded = DailyIntention.load(key: testKey)
-        XCTAssertEqual(loaded.date, "2026-03-12")
-        XCTAssertEqual(loaded.selections, [.survival, .growth])
+        let loaded = DailyCoachSelection.load()
+        XCTAssertEqual(loaded.coach, .feuer)
         XCTAssertTrue(loaded.isSet)
-
-        // Cleanup
-        UserDefaults.standard.removeObject(forKey: testKey)
-    }
-
-    func test_load_missingKey_returnsEmptyIntention() {
-        let loaded = DailyIntention.load(key: "dailyIntention_nonexistent_key_xyz")
-        XCTAssertFalse(loaded.isSet)
-        XCTAssertTrue(loaded.selections.isEmpty)
     }
 
     // MARK: - Notification Reminder Tests

@@ -1,12 +1,12 @@
 import SwiftUI
 
-/// Evening reflection card shown in the Review tab after 18:00 (Phase 3c).
-/// Displays fulfillment level per selected intention with fallback template text.
+/// Evening reflection card shown in the Review tab after 18:00.
+/// Displays fulfillment level for the selected coach with reflection text.
 struct EveningReflectionCard: View {
-    let intentions: [IntentionOption]
+    let coach: CoachType
     let tasks: [LocalTask]
     let focusBlocks: [FocusBlock]
-    var aiTexts: [IntentionOption: String] = [:]
+    var aiText: String?
     var now: Date = Date()
 
     var body: some View {
@@ -14,9 +14,7 @@ struct EveningReflectionCard: View {
             Text("Dein Abend-Spiegel")
                 .font(.headline)
 
-            ForEach(intentions, id: \.self) { intention in
-                intentionRow(intention)
-            }
+            coachRow
         }
         .padding()
         .background(RoundedRectangle(cornerRadius: 16).fill(.ultraThinMaterial))
@@ -24,73 +22,71 @@ struct EveningReflectionCard: View {
         .accessibilityElement(children: .contain)
     }
 
-    // MARK: - Intention Row
+    // MARK: - Coach Row
 
-    @ViewBuilder
-    private func intentionRow(_ intention: IntentionOption) -> some View {
+    private var coachRow: some View {
         let level = IntentionEvaluationService.evaluateFulfillment(
-            intention: intention, tasks: tasks, focusBlocks: focusBlocks, now: now
+            coach: coach, tasks: tasks, focusBlocks: focusBlocks, now: now
         )
-        let template = aiTexts[intention]
-            ?? IntentionEvaluationService.fallbackTemplate(intention: intention, level: level)
+        let template = aiText
+            ?? IntentionEvaluationService.fallbackTemplate(coach: coach, level: level)
 
-        VStack(alignment: .leading, spacing: 8) {
+        return VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 8) {
-                Image(intention.monsterDiscipline.imageName)
+                Image(coach.monsterImage)
                     .resizable()
                     .scaledToFit()
                     .frame(width: 40, height: 40)
                     .clipShape(Circle())
                     .accessibilityElement(children: .ignore)
                     .accessibilityAddTraits(.isImage)
-                    .accessibilityLabel(intention.monsterDiscipline.displayName)
-                    .accessibilityIdentifier("monsterIcon_\(intention.rawValue)")
-                Text(intention.label)
+                    .accessibilityLabel(coach.displayName)
+                    .accessibilityIdentifier("monsterIcon_\(coach.rawValue)")
+                Text("\(coach.displayName) — \(coach.subtitle)")
                     .font(.subheadline.weight(.medium))
                 Spacer()
-                fulfillmentBadge(level, intention: intention)
+                fulfillmentBadge(level)
             }
 
             if !template.isEmpty {
                 Text(template)
                     .font(.callout)
                     .foregroundStyle(.secondary)
-                    .accessibilityIdentifier("reflectionText_\(intention.rawValue)")
+                    .accessibilityIdentifier("reflectionText_\(coach.rawValue)")
             }
         }
         .padding(12)
         .background(
             RoundedRectangle(cornerRadius: 12)
-                .fill(backgroundColor(for: level, intention: intention))
+                .fill(backgroundColor(for: level))
         )
-        .accessibilityIdentifier("eveningResult_\(intention.rawValue)")
+        .accessibilityIdentifier("eveningResult_\(coach.rawValue)")
     }
 
     // MARK: - Badge
 
-    @ViewBuilder
-    private func fulfillmentBadge(_ level: FulfillmentLevel, intention: IntentionOption) -> some View {
-        let (icon, color) = badgeAttributes(level, intention: intention)
-        Image(systemName: icon)
+    private func fulfillmentBadge(_ level: FulfillmentLevel) -> some View {
+        let (icon, color) = badgeAttributes(level)
+        return Image(systemName: icon)
             .foregroundStyle(color)
             .font(.title3)
-            .accessibilityIdentifier("fulfillmentBadge_\(intention.rawValue)")
+            .accessibilityIdentifier("fulfillmentBadge_\(coach.rawValue)")
     }
 
-    private func badgeAttributes(_ level: FulfillmentLevel, intention: IntentionOption) -> (String, Color) {
+    private func badgeAttributes(_ level: FulfillmentLevel) -> (String, Color) {
         switch level {
-        case .fulfilled:    return ("checkmark.circle.fill", intention.color)
-        case .partial:      return ("exclamationmark.circle.fill", intention.color.opacity(0.6))
+        case .fulfilled:    return ("checkmark.circle.fill", coach.color)
+        case .partial:      return ("exclamationmark.circle.fill", coach.color.opacity(0.6))
         case .notFulfilled: return ("xmark.circle", .secondary)
         }
     }
 
     // MARK: - Colors
 
-    private func backgroundColor(for level: FulfillmentLevel, intention: IntentionOption) -> Color {
+    private func backgroundColor(for level: FulfillmentLevel) -> Color {
         switch level {
-        case .fulfilled:    return intention.color.opacity(0.15)
-        case .partial:      return intention.color.opacity(0.08)
+        case .fulfilled:    return coach.color.opacity(0.15)
+        case .partial:      return coach.color.opacity(0.08)
         case .notFulfilled: return Color.secondary.opacity(0.08)
         }
     }

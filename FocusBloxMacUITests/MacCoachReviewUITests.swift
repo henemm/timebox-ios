@@ -2,8 +2,8 @@
 //  MacCoachReviewUITests.swift
 //  FocusBloxMacUITests
 //
-//  TDD RED: Tests for MorningIntentionView integration in macOS Review tab.
-//  These tests MUST FAIL until MacCoachReviewView is implemented.
+//  Tests for Coach Selection (MorningIntentionView) integration in macOS Review tab.
+//  Uses coach cards (coachSelectionCard_*) instead of old intention chips.
 //
 
 import XCTest
@@ -67,12 +67,11 @@ final class MacCoachReviewUITests: XCTestCase {
         }
     }
 
-    // MARK: - Test 1: Coach OFF shows normal MacReviewView (no intention card)
+    // MARK: - Test 1: Coach OFF shows normal MacReviewView (no coach card)
 
     /// Verhalten: Ohne Coach-Modus zeigt Review-Tab die normale MacReviewView.
     /// Bricht wenn: ContentView.mainContentView .review-case immer MacCoachReviewView zeigt
-    /// statt nur bei coachModeEnabled == true.
-    func test_coachModeOff_reviewShowsNoIntentionCard() throws {
+    func test_coachModeOff_reviewShowsNoCoachCard() throws {
         launchWithoutCoachMode()
         navigateToReview()
 
@@ -81,12 +80,12 @@ final class MacCoachReviewUITests: XCTestCase {
                        "MorningIntentionCard should NOT be visible when Coach mode is OFF")
     }
 
-    // MARK: - Test 2: Coach ON shows MorningIntentionView
+    // MARK: - Test 2: Coach ON shows MorningIntentionView with coach cards
 
-    /// Verhalten: Bei Coach-Modus zeigt Review-Tab die MorningIntentionView.
+    /// Verhalten: Bei Coach-Modus zeigt Review-Tab die MorningIntentionView mit Coach-Karten.
     /// Bricht wenn: MacCoachReviewView nicht erstellt wird oder MorningIntentionView()
     /// nicht einbettet.
-    func test_coachModeOn_reviewShowsIntentionCard() throws {
+    func test_coachModeOn_reviewShowsCoachCard() throws {
         launchWithCoachMode()
         navigateToReview()
 
@@ -95,12 +94,11 @@ final class MacCoachReviewUITests: XCTestCase {
                       "MorningIntentionCard should be visible when Coach mode is ON")
     }
 
-    // MARK: - Test 3: Intention setzen switches to Backlog
+    // MARK: - Test 3: Setting coach switches to Backlog
 
-    /// Verhalten: Nach Intention-Setzen wechselt die App zum Backlog-Tab.
+    /// Verhalten: Nach Coach-Auswahl wechselt die App zum Backlog-Tab.
     /// Bricht wenn: ContentView keinen onChange(of: intentionJustSet)-Observer hat
-    /// der selectedSection auf .backlog setzt.
-    func test_setIntention_switchesToBacklog() throws {
+    func test_setCoach_switchesToBacklog() throws {
         launchWithCoachMode()
         navigateToReview()
 
@@ -111,10 +109,10 @@ final class MacCoachReviewUITests: XCTestCase {
             return
         }
 
-        // If intention was already set (compact view), tap "Aendern" to switch to selection
+        // If coach was already set (compact view), tap "Aendern" to switch to selection
         let editButton = app.buttons["editIntentionButton"]
-        let hasExistingIntention = editButton.waitForExistence(timeout: 2)
-        if hasExistingIntention {
+        let hasExistingCoach = editButton.waitForExistence(timeout: 2)
+        if hasExistingCoach {
             editButton.tap()
         }
 
@@ -124,19 +122,19 @@ final class MacCoachReviewUITests: XCTestCase {
             return
         }
 
-        // Only select a chip if button is disabled (no prior selections)
+        // Only select a coach card if button is disabled (no prior selections)
         if !setButton.isEnabled {
-            let fokusChip = app.buttons["intentionChip_fokus"]
-            guard fokusChip.waitForExistence(timeout: 3) else {
-                XCTFail("Intention chip 'fokus' should exist in selection view")
+            let euleCard = app.buttons["coachSelectionCard_eule"]
+            guard euleCard.waitForExistence(timeout: 3) else {
+                XCTFail("Coach card 'eule' should exist in selection view")
                 return
             }
-            fokusChip.tap()
+            euleCard.tap()
         }
 
         // Tap "Intention setzen" button
         guard setButton.isEnabled else {
-            XCTFail("setIntentionButton should be enabled after chip selection")
+            XCTFail("setIntentionButton should be enabled after coach selection")
             return
         }
         setButton.tap()
@@ -154,14 +152,13 @@ final class MacCoachReviewUITests: XCTestCase {
         let expectation = XCTNSPredicateExpectation(predicate: predicate, object: backlogRadio)
         let result = XCTWaiter.wait(for: [expectation], timeout: 5)
         XCTAssertEqual(result, .completed,
-                       "After setting intention, Backlog radio button should be selected")
+                       "After setting coach, Backlog radio button should be selected")
     }
 
     // MARK: - Test 4: Day progress section visible
 
     /// Verhalten: MacCoachReviewView zeigt Tages-Fortschritt ("X Tasks erledigt").
     /// Bricht wenn: MacCoachReviewView keine dayProgressSection hat
-    /// oder das accessibilityIdentifier "coachDayProgress" fehlt.
     func test_coachModeOn_showsDayProgress() throws {
         launchWithCoachMode()
         navigateToReview()

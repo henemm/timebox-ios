@@ -22,30 +22,13 @@ final class NotificationDailyNudgeTests: XCTestCase {
         Calendar.current.date(bySettingHour: 20, minute: 0, second: 0, of: Date())!
     }
 
-    // MARK: - Survival returns empty
-
-    /// Verhalten: Survival erzeugt KEINE Notifications — absolute Ruhe.
-    /// Bricht wenn: der .survival Guard in buildDailyNudgeRequests entfernt wird.
-    func test_buildDailyNudgeRequests_survival_returnsEmpty() {
-        let requests = NotificationService.buildDailyNudgeRequests(
-            intention: .survival,
-            gap: .noBhagBlockCreated,
-            windowStart: windowStart(),
-            windowEnd: windowEnd(),
-            maxCount: 2,
-            now: earlyMorning()
-        )
-        XCTAssertTrue(requests.isEmpty, "Survival must never produce notifications")
-    }
-
     // MARK: - Count matches maxCount
 
     /// Verhalten: maxCount=2 erzeugt genau 2 Notification-Requests.
-    /// Bricht wenn: die Schleifen-Logik die maxCount nicht respektiert.
     func test_buildDailyNudgeRequests_maxCount2_returnsTwoRequests() {
         let requests = NotificationService.buildDailyNudgeRequests(
-            intention: .bhag,
-            gap: .noBhagBlockCreated,
+            coach: .feuer,
+            gap: .noBigTaskStarted,
             windowStart: windowStart(),
             windowEnd: windowEnd(),
             maxCount: 2,
@@ -55,11 +38,10 @@ final class NotificationDailyNudgeTests: XCTestCase {
     }
 
     /// Verhalten: maxCount=1 erzeugt genau 1 Notification-Request.
-    /// Bricht wenn: Minimum auf > 1 gesetzt oder maxCount ignoriert wird.
     func test_buildDailyNudgeRequests_maxCount1_returnsOneRequest() {
         let requests = NotificationService.buildDailyNudgeRequests(
-            intention: .fokus,
-            gap: .noFocusBlockPlanned,
+            coach: .eule,
+            gap: .noPlannedTasks,
             windowStart: windowStart(),
             windowEnd: windowEnd(),
             maxCount: 1,
@@ -71,11 +53,10 @@ final class NotificationDailyNudgeTests: XCTestCase {
     // MARK: - Window validation
 
     /// Verhalten: Wenn Zeitfenster bereits vorbei → leeres Array.
-    /// Bricht wenn: die windowEnd <= now Pruefung fehlt.
     func test_buildDailyNudgeRequests_whenWindowAlreadyPast_returnsEmpty() {
         let requests = NotificationService.buildDailyNudgeRequests(
-            intention: .bhag,
-            gap: .noBhagBlockCreated,
+            coach: .feuer,
+            gap: .noBigTaskStarted,
             windowStart: windowStart(hour: 10),
             windowEnd: windowEnd(hour: 18),
             maxCount: 2,
@@ -86,32 +67,30 @@ final class NotificationDailyNudgeTests: XCTestCase {
 
     // MARK: - Content correctness
 
-    /// Verhalten: BHAG/noBhagBlock hat den korrekten Notification-Text.
-    /// Bricht wenn: der Text-Mapping fuer .noBhagBlockCreated geaendert wird.
-    func test_buildDailyNudgeRequests_bhagNoBhagBlock_hasCorrectBodyText() {
+    /// Verhalten: Feuer/noBigTaskStarted hat den korrekten Notification-Text.
+    func test_buildDailyNudgeRequests_feuerNoBigTask_hasCorrectBodyText() {
         let requests = NotificationService.buildDailyNudgeRequests(
-            intention: .bhag,
-            gap: .noBhagBlockCreated,
+            coach: .feuer,
+            gap: .noBigTaskStarted,
             windowStart: windowStart(),
             windowEnd: windowEnd(),
             maxCount: 1,
             now: earlyMorning()
         )
         XCTAssertFalse(requests.isEmpty)
-        XCTAssertEqual(
-            requests[0].content.body,
-            "Du wolltest das grosse Ding anpacken. Wann legst du los?"
+        XCTAssertTrue(
+            requests[0].content.body.contains("grosse Herausforderung"),
+            "Feuer nudge should mention the big challenge"
         )
     }
 
     // MARK: - Identifier format
 
     /// Verhalten: Identifier folgen dem Schema "coach-nudge-N".
-    /// Bricht wenn: das Prefix oder die Nummerierung geaendert wird.
     func test_buildDailyNudgeRequests_identifiersHaveCorrectPrefix() {
         let requests = NotificationService.buildDailyNudgeRequests(
-            intention: .bhag,
-            gap: .noBhagBlockCreated,
+            coach: .troll,
+            gap: .procrastinatedTasksPending,
             windowStart: windowStart(),
             windowEnd: windowEnd(),
             maxCount: 2,
@@ -124,11 +103,10 @@ final class NotificationDailyNudgeTests: XCTestCase {
 
     // MARK: - Even distribution
 
-    /// Verhalten: 3 Notifications in 8h-Fenster sind gleichmaessig verteilt (~2h40min Abstand).
-    /// Bricht wenn: die Verteilungs-Logik nicht gleichmaessig aufteilt.
+    /// Verhalten: 3 Notifications in 8h-Fenster sind gleichmaessig verteilt.
     func test_buildDailyNudgeRequests_fireDatesAreEvenlyDistributed() {
         let requests = NotificationService.buildDailyNudgeRequests(
-            intention: .balance,
+            coach: .golem,
             gap: .onlySingleCategory,
             windowStart: windowStart(hour: 10),
             windowEnd: windowEnd(hour: 18),
@@ -137,7 +115,6 @@ final class NotificationDailyNudgeTests: XCTestCase {
         )
         XCTAssertEqual(requests.count, 3)
 
-        // Extract fire dates from time interval triggers
         let fireDates: [Date] = requests.compactMap { request in
             guard let trigger = request.trigger as? UNTimeIntervalNotificationTrigger else {
                 return nil
@@ -146,7 +123,6 @@ final class NotificationDailyNudgeTests: XCTestCase {
         }
         XCTAssertEqual(fireDates.count, 3, "All requests should have time interval triggers")
 
-        // Check spacing between consecutive notifications (tolerance: 60 seconds)
         let gap1 = fireDates[1].timeIntervalSince(fireDates[0])
         let gap2 = fireDates[2].timeIntervalSince(fireDates[1])
         XCTAssertEqual(gap1, gap2, accuracy: 60, "Gaps between notifications should be equal")

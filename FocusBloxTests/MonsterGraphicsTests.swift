@@ -1,13 +1,11 @@
 import XCTest
 @testable import FocusBlox
 
-/// EXPECTED TO FAIL (TDD RED): Discipline.imageName and IntentionOption.monsterDiscipline do not exist yet.
+/// Tests for Discipline.imageName and CoachType.discipline mapping.
 final class MonsterGraphicsTests: XCTestCase {
 
     // MARK: - Discipline.imageName
 
-    /// Verhalten: Jede Discipline hat einen Asset-Namen fuer das Monster-Bild.
-    /// Bricht wenn: Discipline.imageName Property nicht existiert.
     func test_imageName_fokus_returnsMonsterFokus() {
         XCTAssertEqual(Discipline.fokus.imageName, "monsterFokus")
     }
@@ -29,39 +27,29 @@ final class MonsterGraphicsTests: XCTestCase {
         XCTAssertEqual(Set(names).count, 4, "All 4 disciplines should have unique image names")
     }
 
-    // MARK: - IntentionOption.monsterDiscipline
+    // MARK: - CoachType.discipline
 
-    /// Verhalten: 6 Intentionen mappen auf 4 Disciplines (Monster).
-    /// Bricht wenn: IntentionOption.monsterDiscipline Property nicht existiert.
-    func test_monsterDiscipline_survival_mapsToAusdauer() {
-        XCTAssertEqual(IntentionOption.survival.monsterDiscipline, .ausdauer)
+    func test_discipline_troll_mapsToKonsequenz() {
+        XCTAssertEqual(CoachType.troll.discipline, .konsequenz)
     }
 
-    func test_monsterDiscipline_fokus_mapsToFokus() {
-        XCTAssertEqual(IntentionOption.fokus.monsterDiscipline, .fokus)
+    func test_discipline_feuer_mapsToMut() {
+        XCTAssertEqual(CoachType.feuer.discipline, .mut)
     }
 
-    func test_monsterDiscipline_bhag_mapsToMut() {
-        XCTAssertEqual(IntentionOption.bhag.monsterDiscipline, .mut)
+    func test_discipline_eule_mapsToFokus() {
+        XCTAssertEqual(CoachType.eule.discipline, .fokus)
     }
 
-    func test_monsterDiscipline_balance_mapsToAusdauer() {
-        XCTAssertEqual(IntentionOption.balance.monsterDiscipline, .ausdauer)
+    func test_discipline_golem_mapsToAusdauer() {
+        XCTAssertEqual(CoachType.golem.discipline, .ausdauer)
     }
 
-    func test_monsterDiscipline_growth_mapsToFokus() {
-        XCTAssertEqual(IntentionOption.growth.monsterDiscipline, .fokus)
-    }
-
-    func test_monsterDiscipline_connection_mapsToKonsequenz() {
-        XCTAssertEqual(IntentionOption.connection.monsterDiscipline, .konsequenz)
-    }
-
-    func test_monsterDiscipline_allCases_mapToValidDiscipline() {
-        for option in IntentionOption.allCases {
-            let discipline = option.monsterDiscipline
+    func test_discipline_allCases_mapToValidDiscipline() {
+        for coach in CoachType.allCases {
+            let discipline = coach.discipline
             XCTAssertTrue(Discipline.allCases.contains(discipline),
-                "\(option.rawValue) should map to a valid Discipline")
+                "\(coach.rawValue) should map to a valid Discipline")
         }
     }
 }

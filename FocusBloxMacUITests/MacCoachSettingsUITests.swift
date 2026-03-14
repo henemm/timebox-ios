@@ -2,8 +2,9 @@
 //  MacCoachSettingsUITests.swift
 //  FocusBloxMacUITests
 //
-//  TDD RED: Tests for Monster Coach settings tab in macOS preferences.
-//  These tests MUST FAIL until the Coach tab is implemented in MacSettingsView.
+//  Tests for Monster Coach settings tab in macOS preferences.
+//  Verified IDs from production code (2026-03-14):
+//  - coachModeToggle, intentionReminderToggle, coachDailyNudgesToggle, coachEveningReminderToggle
 //
 
 import XCTest

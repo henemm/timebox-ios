@@ -320,24 +320,24 @@ struct FocusBloxApp: App {
                     rescheduleDueDateNotifications()
                     NotificationService.updateOverdueBadge(container: sharedModelContainer)
                     // Coach intention reminder
-                    let todayIntention = DailyIntention.load()
-                    let primaryIntention = todayIntention.selections.first
+                    let coachSelection = DailyCoachSelection.load()
+                    let selectedCoach = coachSelection.coach
                     if settings.coachModeEnabled && settings.coachIntentionReminderEnabled {
                         NotificationService.scheduleIntentionReminder(
                             hour: settings.coachIntentionReminderHour,
                             minute: settings.coachIntentionReminderMinute,
-                            intention: primaryIntention)
+                            coach: selectedCoach)
                     } else {
                         NotificationService.cancelIntentionReminder()
                     }
                     // Coach evening reminder
                     if settings.coachModeEnabled,
                        settings.coachEveningReminderEnabled,
-                       todayIntention.isSet {
+                       coachSelection.coach != nil {
                         NotificationService.scheduleEveningReminder(
                             hour: settings.coachEveningReminderHour,
                             minute: settings.coachEveningReminderMinute,
-                            intention: primaryIntention
+                            coach: selectedCoach
                         )
                     } else {
                         NotificationService.cancelEveningReminder()
@@ -401,12 +401,11 @@ struct FocusBloxApp: App {
         }
     }
 
-    /// Cancel daily nudges if the today's intention is already fulfilled.
+    /// Cancel daily nudges if the today's coach goal is already fulfilled.
     private func checkAndCancelFulfilledNudges() {
         guard settings.coachModeEnabled, settings.coachDailyNudgesEnabled else { return }
-        let intention = DailyIntention.load()
-        guard intention.isSet, let primary = intention.selections.first else { return }
-        guard primary != .survival else { return }
+        let coachSelection = DailyCoachSelection.load()
+        guard let coach = coachSelection.coach else { return }
 
         let context = sharedModelContainer.mainContext
         do {
@@ -414,7 +413,7 @@ struct FocusBloxApp: App {
             // FocusBlocks require calendar access — use empty array for lightweight check.
             // Full block evaluation can be added when CalendarService is accessible here.
             if IntentionEvaluationService.isFulfilled(
-                intention: primary, tasks: tasks, focusBlocks: []
+                coach: coach, tasks: tasks, focusBlocks: []
             ) {
                 NotificationService.cancelDailyNudges()
             }
@@ -558,10 +557,9 @@ struct FocusBloxApp: App {
             } else {
                 UserDefaults.standard.set(false, forKey: "coachModeEnabled")
             }
-            // Clear daily intention and filter state to avoid test state leakage
-            let todayKey = DailyIntention.todayKey()
-            UserDefaults.standard.removeObject(forKey: todayKey)
-            UserDefaults.standard.removeObject(forKey: "intentionFilterOptions")
+            // Clear daily coach selection and filter state to avoid test state leakage
+            UserDefaults.standard.removeObject(forKey: "selectedCoach")
+            UserDefaults.standard.removeObject(forKey: "selectedCoachDate")
             UserDefaults.standard.removeObject(forKey: "intentionJustSet")
         }
 
@@ -815,13 +813,13 @@ struct FocusBloxApp: App {
 
         try? context.save()
 
-        // Pre-set daily intention if requested (for evening reflection UI tests)
+        // Pre-set daily coach if requested (for evening reflection UI tests)
         if ProcessInfo.processInfo.arguments.contains("-MockIntentionSet") {
-            var intention = DailyIntention(
-                date: DailyIntention.todayKey().replacingOccurrences(of: "dailyIntention_", with: ""),
-                selections: [.survival]
+            var selection = DailyCoachSelection(
+                date: DailyCoachSelection.todayDateString(),
+                coach: .troll
             )
-            intention.save()
+            selection.save()
         }
     }
 }

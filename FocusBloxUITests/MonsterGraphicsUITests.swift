@@ -1,20 +1,19 @@
 import XCTest
 
-/// EXPECTED TO FAIL (TDD RED): Monster graphics are not yet integrated into the views.
-/// Tests verify monster images appear in MorningIntentionView, EveningReflectionCard, and BacklogRow.
+/// Tests verify monster images appear in MorningIntentionView (Coach Selection),
+/// EveningReflectionCard, and BacklogRow.
 ///
-/// Verified IDs from /inspect-ui (2026-03-13):
+/// Verified IDs from production code (2026-03-14):
 /// - Tab: "Mein Tag" (coach mode), "Review" (normal)
-/// - Intention chips: intentionChip_fokus, intentionChip_bhag, etc.
+/// - Coach cards: coachSelectionCard_troll, coachSelectionCard_feuer,
+///                coachSelectionCard_eule, coachSelectionCard_golem
 /// - Set button: setIntentionButton
 /// - Edit button: editIntentionButton
+/// - No coach button: noCoachButton
+/// - Monster image: monsterImage
 /// - Evening card: eveningReflectionCard
-/// - Evening rows: eveningResult_fokus, eveningResult_bhag, etc.
+/// - Evening rows: eveningResult_troll, eveningResult_feuer, etc.
 /// - Backlog rows: completeButton_<UUID>
-///
-/// NEW IDs (to be added during implementation):
-/// - monsterImage (Image in MorningIntentionView)
-/// - monsterIcon_<intention> (Image in EveningReflectionCard)
 final class MonsterGraphicsUITests: XCTestCase {
 
     var app: XCUIApplication!
@@ -42,18 +41,18 @@ final class MonsterGraphicsUITests: XCTestCase {
         }
     }
 
-    private func setMorningIntention(option: String = "fokus") {
+    private func selectCoach(_ coach: String = "eule") {
         navigateToReviewTab()
 
-        // If intention already set, tap edit to show selection grid
+        // If coach already set, tap edit to show selection grid
         let editButton = app.buttons["editIntentionButton"]
         if editButton.waitForExistence(timeout: 3) {
             editButton.tap()
         }
 
-        let chip = app.buttons["intentionChip_\(option)"]
-        if chip.waitForExistence(timeout: 5) {
-            chip.tap()
+        let card = app.buttons["coachSelectionCard_\(coach)"]
+        if card.waitForExistence(timeout: 5) {
+            card.tap()
 
             let setButton = app.buttons["setIntentionButton"]
             if setButton.waitForExistence(timeout: 3) {
@@ -61,114 +60,111 @@ final class MonsterGraphicsUITests: XCTestCase {
             }
         }
 
-        // Setting intention switches to Backlog tab — navigate back
+        // Setting coach switches to Backlog tab — navigate back
         navigateToReviewTab()
     }
 
-    // MARK: - 4c: Monster in Morgen-Dialog (waehrend Auswahl)
+    // MARK: - Monster in Coach Selection (during selection)
 
-    /// GIVEN: Coach mode ON, Auswahl-Grid sichtbar
-    /// WHEN: User tippt auf "Fokus" Chip
-    /// THEN: Monster-Bild fuer Fokus (Eule) wird angezeigt
-    /// Bricht wenn: monsterImage ID nicht in MorningIntentionView existiert
-    func test_morningDialog_showsMonsterDuringSelection() throws {
+    /// GIVEN: Coach mode ON, selection grid visible
+    /// WHEN: User taps on Eule coach card
+    /// THEN: Monster image for Eule is displayed
+    /// Breaks if: monsterImage ID not in MorningIntentionView
+    func test_coachSelection_showsMonsterDuringSelection() throws {
         app.launch()
         navigateToReviewTab()
 
-        // If intention already set from previous test, tap edit to show selection grid
+        // If coach already set, tap edit to show selection grid
         let editButton = app.buttons["editIntentionButton"]
         if editButton.waitForExistence(timeout: 3) {
             editButton.tap()
         }
 
-        // Tap a chip to trigger monster display
-        let fokusChip = app.buttons["intentionChip_fokus"]
-        XCTAssertTrue(fokusChip.waitForExistence(timeout: 5), "Fokus chip should exist")
-        fokusChip.tap()
+        // Tap a coach card to trigger monster display
+        let euleCard = app.buttons["coachSelectionCard_eule"]
+        XCTAssertTrue(euleCard.waitForExistence(timeout: 5), "Eule coach card should exist")
+        euleCard.tap()
 
-        // Monster image should appear for the selected intention's discipline
+        // Monster image should appear for the selected coach
         let monsterImage = app.images["monsterImage"]
         XCTAssertTrue(
             monsterImage.waitForExistence(timeout: 3),
-            "Monster image should be visible during chip selection"
+            "Monster image should be visible during coach selection"
         )
     }
 
-    /// GIVEN: Coach mode ON, Auswahl-Grid sichtbar
-    /// WHEN: User wechselt Chip von Fokus zu BHAG
-    /// THEN: Monster-Bild wechselt (anderes Monster sichtbar)
-    /// Bricht wenn: Monster-Bild nicht dynamisch auf Chip-Wechsel reagiert
-    func test_morningDialog_monsterChangesByChipSelection() throws {
+    /// GIVEN: Coach mode ON, selection grid visible
+    /// WHEN: User switches from Eule to Feuer
+    /// THEN: Monster image changes (different monster visible)
+    /// Breaks if: Monster image doesn't react dynamically to coach card switch
+    func test_coachSelection_monsterChangesByCardSelection() throws {
         app.launch()
         navigateToReviewTab()
 
-        // If intention already set from previous test, tap edit to show selection grid
+        // If coach already set, tap edit to show selection grid
         let editButton = app.buttons["editIntentionButton"]
         if editButton.waitForExistence(timeout: 3) {
             editButton.tap()
         }
 
-        // Select fokus first
-        let fokusChip = app.buttons["intentionChip_fokus"]
-        XCTAssertTrue(fokusChip.waitForExistence(timeout: 5))
-        fokusChip.tap()
+        // Select Eule first
+        let euleCard = app.buttons["coachSelectionCard_eule"]
+        XCTAssertTrue(euleCard.waitForExistence(timeout: 5))
+        euleCard.tap()
 
         let monsterImage = app.images["monsterImage"]
         XCTAssertTrue(monsterImage.waitForExistence(timeout: 3),
-            "Monster image should appear after chip selection")
+            "Monster image should appear after coach selection")
 
-        // Now switch to bhag — monster should still be visible (different one)
-        let bhagChip = app.buttons["intentionChip_bhag"]
-        XCTAssertTrue(bhagChip.waitForExistence(timeout: 3))
-        bhagChip.tap()
+        // Now switch to Feuer — monster should still be visible (different one)
+        let feuerCard = app.buttons["coachSelectionCard_feuer"]
+        XCTAssertTrue(feuerCard.waitForExistence(timeout: 3))
+        feuerCard.tap()
 
         XCTAssertTrue(monsterImage.waitForExistence(timeout: 3),
-            "Monster image should still be visible after switching chip")
+            "Monster image should still be visible after switching coach")
     }
 
-    // MARK: - 4c: Monster in Morgen-Dialog (nach Auswahl)
+    // MARK: - Monster in Coach Selection (after selection)
 
-    /// GIVEN: Coach mode ON, Intention gesetzt
-    /// WHEN: Kompakt-Ansicht wird angezeigt
-    /// THEN: Monster-Bild ist in der Kompakt-Ansicht sichtbar
-    /// Bricht wenn: monsterImage ID nicht in compactView existiert
-    func test_morningDialog_showsMonsterInCompactView() throws {
+    /// GIVEN: Coach mode ON, coach set
+    /// WHEN: Compact view is displayed
+    /// THEN: Monster image is visible in compact view
+    /// Breaks if: monsterImage ID not in compactView
+    func test_coachSelection_showsMonsterInCompactView() throws {
         app.launch()
-        setMorningIntention(option: "fokus")
+        selectCoach("eule")
 
         // In compact view, monster image should be visible
         let monsterImage = app.images["monsterImage"]
         XCTAssertTrue(
             monsterImage.waitForExistence(timeout: 5),
-            "Monster image should be visible in compact view after setting intention"
+            "Monster image should be visible in compact view after setting coach"
         )
     }
 
-    // MARK: - 4d: Monster im Abend-Spiegel
+    // MARK: - Monster in Evening Reflection
 
-    /// GIVEN: Coach mode ON + Intention gesetzt + ForceEveningReflection
-    /// WHEN: Abend-Karte ist sichtbar
-    /// THEN: Monster-Icon (60x60) ist neben dem Intentions-Label sichtbar
-    /// Bricht wenn: monsterIcon_<intention> ID nicht in EveningReflectionCard existiert
+    /// GIVEN: Coach mode ON + Coach set + ForceEveningReflection
+    /// WHEN: Evening card is visible
+    /// THEN: Monster icon is visible next to the coach label
     /// Pre-existing issue: DailyReviewView does not re-render after tab switch
-    /// because DailyIntention.load().isSet is not a reactive binding.
-    /// The evening card itself doesn't appear reliably in UI tests.
-    /// Monster icon implementation is correct (verified in code review).
+    /// because DailyCoachSelection.load().isSet is not a reactive binding.
     func test_eveningCard_showsMonsterIcon() throws {
-        throw XCTSkip("Pre-existing: EveningReflectionCard not visible after tab switch (no reactive binding for DailyIntention)")
+        throw XCTSkip("Pre-existing: EveningReflectionCard not visible after tab switch (no reactive binding for DailyCoachSelection)")
     }
 
     /// Same pre-existing issue as test_eveningCard_showsMonsterIcon.
-    func test_eveningCard_showsMonsterIconPerIntention() throws {
-        throw XCTSkip("Pre-existing: EveningReflectionCard not visible after tab switch (no reactive binding for DailyIntention)")
+    func test_eveningCard_showsMonsterIconPerCoach() throws {
+        throw XCTSkip("Pre-existing: EveningReflectionCard not visible after tab switch (no reactive binding for DailyCoachSelection)")
     }
 
-    // MARK: - 4b: Farbiger Discipline-Kreis im Backlog
+    // MARK: - Backlog Row Complete Button
 
-    /// GIVEN: Tasks existieren im Backlog
-    /// WHEN: User navigiert zum Backlog-Tab
-    /// THEN: Task-Zeilen haben einen completeButton (Pattern bestaetigt via /inspect-ui)
-    /// Bricht wenn: completeButton_<UUID> Identifier-Pattern sich aendert
+    /// GIVEN: Tasks exist in backlog
+    /// WHEN: User navigates to Backlog tab
+    /// THEN: Task rows have a completeButton (pattern confirmed via production code)
+    /// Breaks if: completeButton_<UUID> identifier pattern changes
     func test_backlogRow_completeButtonExists() throws {
         app.launch()
 
@@ -177,7 +173,7 @@ final class MonsterGraphicsUITests: XCTestCase {
         XCTAssertTrue(backlogTab.waitForExistence(timeout: 5))
         backlogTab.tap()
 
-        // Look for any complete button (verified IDs from /inspect-ui)
+        // Look for any complete button (verified IDs from production code)
         let buttons = app.buttons.matching(
             NSPredicate(format: "identifier BEGINSWITH %@", "completeButton_")
         )

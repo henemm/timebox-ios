@@ -1,23 +1,23 @@
 import AppIntents
 
-/// Siri intent: "Setz meine Intention auf Fokus" — sets the daily intention.
+/// Siri intent: "Wähle Troll als Coach" — sets the daily coach.
 struct SetDailyIntentionIntent: AppIntent {
-    static let title: LocalizedStringResource = "Intention setzen"
-    static let description = IntentDescription("Setzt deine Tages-Intention.")
+    static let title: LocalizedStringResource = "Coach wählen"
+    static let description = IntentDescription("Wählt deinen Tages-Coach.")
     static let openAppWhenRun: Bool = false
 
-    @Parameter(title: "Intention")
-    var intention: IntentionOptionEnum
+    @Parameter(title: "Coach")
+    var coach: CoachTypeEnum
 
     func perform() async throws -> some IntentResult & ProvidesDialog {
-        let option = intention.asIntentionOption
+        let coachType = coach.asCoachType
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
         let dateString = formatter.string(from: Date())
 
-        var daily = DailyIntention(date: dateString, selections: [option])
-        daily.save()
+        var selection = DailyCoachSelection(date: dateString, coach: coachType)
+        selection.save()
 
-        return .result(dialog: "Intention auf \(option.label) gesetzt. Viel Erfolg heute!")
+        return .result(dialog: "\(coachType.displayName) als Coach gewählt. Los geht's!")
     }
 }

@@ -4,13 +4,13 @@ import SwiftData
 /// Siri intent: "Wie war mein Tag?" — reads the evening reflection summary.
 struct GetEveningSummaryIntent: AppIntent {
     static let title: LocalizedStringResource = "Tagesrueckblick"
-    static let description = IntentDescription("Liest die Abend-Auswertung deiner Intention vor.")
+    static let description = IntentDescription("Liest die Abend-Auswertung deines Coaches vor.")
     static let openAppWhenRun: Bool = false
 
     func perform() async throws -> some IntentResult & ProvidesDialog {
-        let intention = DailyIntention.load()
-        guard intention.isSet else {
-            return .result(dialog: "Du hast heute keine Intention gesetzt.")
+        let selection = DailyCoachSelection.load()
+        guard let coach = selection.coach else {
+            return .result(dialog: "Du hast heute keinen Coach gewaehlt.")
         }
 
         // Tasks via SharedModelContainer (App Group SwiftData)
@@ -26,21 +26,13 @@ struct GetEveningSummaryIntent: AppIntent {
             blocks = []
         }
 
-        // Evaluate each selected intention
-        var summaryParts: [String] = []
-        for option in intention.selections {
-            let level = IntentionEvaluationService.evaluateFulfillment(
-                intention: option, tasks: tasks, focusBlocks: blocks
-            )
-            let text = IntentionEvaluationService.fallbackTemplate(
-                intention: option, level: level
-            )
-            if !text.isEmpty {
-                summaryParts.append(text)
-            }
-        }
+        let level = IntentionEvaluationService.evaluateFulfillment(
+            coach: coach, tasks: tasks, focusBlocks: blocks
+        )
+        let text = IntentionEvaluationService.fallbackTemplate(
+            coach: coach, level: level
+        )
 
-        let summary = summaryParts.joined(separator: " ")
-        return .result(dialog: "\(summary)")
+        return .result(dialog: "\(text)")
     }
 }

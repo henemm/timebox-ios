@@ -1,8 +1,7 @@
 import XCTest
 @testable import FocusBlox
 
-/// TDD RED Tests for Phase 3f: Siri Integration / App Intents
-/// Tests for DailyIntention App Group migration, IntentionOptionEnum,
+/// Tests for DailyCoachSelection App Group persistence, CoachTypeEnum,
 /// GetEveningSummaryIntent, and SetDailyIntentionIntent.
 final class SiriIntentionTests: XCTestCase {
 
@@ -10,123 +9,72 @@ final class SiriIntentionTests: XCTestCase {
 
     override func tearDown() {
         super.tearDown()
-        // Clean up test keys from App Group UserDefaults
-        if let defaults = UserDefaults(suiteName: appGroupID) {
-            defaults.removeObject(forKey: "dailyIntention_test_siri_roundtrip")
-            defaults.removeObject(forKey: "dailyIntention_test_siri_migration")
-            defaults.synchronize()
-        }
-        // Clean up from .standard too (migration test)
-        UserDefaults.standard.removeObject(forKey: "dailyIntention_test_siri_migration")
+        // Clean up AppStorage keys
+        UserDefaults.standard.removeObject(forKey: "selectedCoach")
     }
 
-    // MARK: - DailyIntention App Group Migration
+    // MARK: - DailyCoachSelection Persistence
 
-    /// Verhalten: save()/load() muessen ueber App Group UserDefaults funktionieren,
-    /// damit der Siri-Intent-Prozess die Intention lesen kann.
-    /// Bricht wenn: DailyIntention.save() weiterhin UserDefaults.standard benutzt
-    /// statt UserDefaults(suiteName: "group.com.henning.focusblox")
-    func test_dailyIntention_savesAndLoadsFromAppGroup() throws {
-        let testKey = "dailyIntention_test_siri_roundtrip"
-        let intention = DailyIntention(date: "2026-03-13", selections: [.fokus, .bhag])
-        intention.save(key: testKey)
+    /// Verhalten: save()/load() muessen ueber App Group UserDefaults funktionieren.
+    func test_dailyCoachSelection_savesAndLoads() {
+        var selection = DailyCoachSelection(date: DailyCoachSelection.todayDateString(), coach: .feuer)
+        selection.save()
 
-        // Verify data is in App Group UserDefaults (not .standard)
-        guard let appGroupDefaults = UserDefaults(suiteName: appGroupID) else {
-            throw XCTSkip("App Group not available in test environment")
-        }
-        let appGroupData = appGroupDefaults.data(forKey: testKey)
-        XCTAssertNotNil(appGroupData,
-                        "DailyIntention must be saved to App Group UserDefaults, not .standard")
-
-        // Verify load() reads from App Group
-        let loaded = DailyIntention.load(key: testKey)
-        XCTAssertEqual(loaded.selections, [.fokus, .bhag],
-                       "load() must read from App Group UserDefaults")
+        let loaded = DailyCoachSelection.load()
+        XCTAssertEqual(loaded.coach, .feuer, "load() must return the saved coach")
     }
 
-    /// Verhalten: Bestehende Daten in .standard werden einmalig nach App Group migriert.
-    /// Bricht wenn: DailyIntention.load() keine Migration von .standard → App Group macht
-    func test_dailyIntention_migrationFromStandard() throws {
-        let testKey = "dailyIntention_test_siri_migration"
+    /// Verhalten: Kein Coach gesetzt → coach ist nil.
+    func test_dailyCoachSelection_noCoach_returnsNil() {
+        // Save with nil coach
+        var selection = DailyCoachSelection(date: DailyCoachSelection.todayDateString(), coach: nil)
+        selection.save()
 
-        guard let appGroupDefaults = UserDefaults(suiteName: appGroupID) else {
-            throw XCTSkip("App Group not available in test environment")
-        }
-
-        // Simuliere Altdaten in .standard (wie vor der Migration)
-        let oldIntention = DailyIntention(date: "2026-03-13", selections: [.survival])
-        let data = try JSONEncoder().encode(oldIntention)
-        UserDefaults.standard.set(data, forKey: testKey)
-
-        // Stelle sicher, App Group hat KEINE Daten
-        appGroupDefaults.removeObject(forKey: testKey)
-        appGroupDefaults.synchronize()
-
-        // load() sollte Daten aus .standard migrieren
-        let loaded = DailyIntention.load(key: testKey)
-        XCTAssertEqual(loaded.selections, [.survival],
-                       "load() should migrate data from .standard to App Group")
-
-        // Nach Migration: Daten muessen in App Group sein
-        let migratedData = appGroupDefaults.data(forKey: testKey)
-        XCTAssertNotNil(migratedData,
-                        "After migration, data must exist in App Group UserDefaults")
+        let loaded = DailyCoachSelection.load()
+        XCTAssertNil(loaded.coach, "Coach should be nil when none selected")
+        XCTAssertFalse(loaded.isSet, "isSet should be false when no coach")
     }
 
-    // MARK: - IntentionOptionEnum
+    // MARK: - CoachTypeEnum
 
-    /// Verhalten: IntentionOptionEnum muss alle 6 IntentionOption-Werte abbilden.
-    /// Bricht wenn: IntentionOptionEnum nicht existiert oder Cases fehlen
-    func test_intentionOptionEnum_allCasesMapped() {
-        let allCases = IntentionOptionEnum.allCases
-        XCTAssertEqual(allCases.count, 6,
-                       "IntentionOptionEnum must have all 6 intention options")
+    /// Verhalten: CoachTypeEnum muss alle 4 CoachType-Werte abbilden.
+    func test_coachTypeEnum_allCasesMapped() {
+        let allCases = CoachTypeEnum.allCases
+        XCTAssertEqual(allCases.count, 4,
+                       "CoachTypeEnum must have all 4 coach options")
 
-        // Verify all expected cases exist
         let rawValues = Set(allCases.map(\.rawValue))
-        XCTAssertTrue(rawValues.contains("survival"))
-        XCTAssertTrue(rawValues.contains("fokus"))
-        XCTAssertTrue(rawValues.contains("bhag"))
-        XCTAssertTrue(rawValues.contains("balance"))
-        XCTAssertTrue(rawValues.contains("growth"))
-        XCTAssertTrue(rawValues.contains("connection"))
+        XCTAssertTrue(rawValues.contains("troll"))
+        XCTAssertTrue(rawValues.contains("feuer"))
+        XCTAssertTrue(rawValues.contains("eule"))
+        XCTAssertTrue(rawValues.contains("golem"))
     }
 
-    /// Verhalten: asIntentionOption konvertiert korrekt zum DailyIntention-Model-Enum.
-    /// Bricht wenn: IntentionOptionEnum.asIntentionOption falsch mappt
-    func test_intentionOptionEnum_convertsToIntentionOption() {
-        XCTAssertEqual(IntentionOptionEnum.fokus.asIntentionOption, IntentionOption.fokus)
-        XCTAssertEqual(IntentionOptionEnum.bhag.asIntentionOption, IntentionOption.bhag)
-        XCTAssertEqual(IntentionOptionEnum.survival.asIntentionOption, IntentionOption.survival)
-        XCTAssertEqual(IntentionOptionEnum.balance.asIntentionOption, IntentionOption.balance)
-        XCTAssertEqual(IntentionOptionEnum.growth.asIntentionOption, IntentionOption.growth)
-        XCTAssertEqual(IntentionOptionEnum.connection.asIntentionOption, IntentionOption.connection)
+    /// Verhalten: asCoachType konvertiert korrekt zum CoachType-Model-Enum.
+    func test_coachTypeEnum_convertsToCoachType() {
+        XCTAssertEqual(CoachTypeEnum.troll.asCoachType, CoachType.troll)
+        XCTAssertEqual(CoachTypeEnum.feuer.asCoachType, CoachType.feuer)
+        XCTAssertEqual(CoachTypeEnum.eule.asCoachType, CoachType.eule)
+        XCTAssertEqual(CoachTypeEnum.golem.asCoachType, CoachType.golem)
     }
 
     // MARK: - GetEveningSummaryIntent
 
-    /// Verhalten: Wenn keine Intention gesetzt ist, sagt Siri "keine Intention gesetzt".
-    /// Bricht wenn: GetEveningSummaryIntent.perform() den isSet-Guard nicht prueft
-    func test_getEveningSummary_noIntention_returnsNoIntentionDialog() async throws {
-        // Stelle sicher, dass fuer heute keine Intention existiert
-        let testKey = "dailyIntention_9999-12-31"
-        if let defaults = UserDefaults(suiteName: appGroupID) {
-            defaults.removeObject(forKey: testKey)
-            defaults.synchronize()
-        }
+    /// Verhalten: Wenn kein Coach gesetzt, sagt Siri "keinen Coach gewaehlt".
+    func test_getEveningSummary_noCoach_returnsNoCoachDialog() async throws {
+        // Clear today's coach
+        var selection = DailyCoachSelection(date: DailyCoachSelection.todayDateString(), coach: nil)
+        selection.save()
 
         let intent = GetEveningSummaryIntent()
         let result = try await intent.perform()
 
-        // Der Dialog muss erwaehnen, dass keine Intention gesetzt ist
         let dialog = String(describing: result)
-        XCTAssertTrue(dialog.contains("keine Intention"),
-                      "When no intention is set, dialog must mention 'keine Intention'")
+        XCTAssertTrue(dialog.contains("keinen Coach"),
+                      "When no coach is set, dialog must mention 'keinen Coach'")
     }
 
     /// Verhalten: Intent darf die App NICHT oeffnen.
-    /// Bricht wenn: GetEveningSummaryIntent.openAppWhenRun auf true steht
     func test_getEveningSummary_doesNotOpenApp() {
         XCTAssertFalse(GetEveningSummaryIntent.openAppWhenRun,
                        "GetEveningSummaryIntent must NOT open the app")
@@ -134,22 +82,18 @@ final class SiriIntentionTests: XCTestCase {
 
     // MARK: - SetDailyIntentionIntent
 
-    /// Verhalten: Intent speichert die uebergebene Intention korrekt.
-    /// Bricht wenn: SetDailyIntentionIntent.perform() die Intention nicht speichert
+    /// Verhalten: Intent speichert den uebergebenen Coach korrekt.
     func test_setDailyIntention_savesCorrectly() async throws {
         let intent = SetDailyIntentionIntent()
-        intent.intention = .fokus
+        intent.coach = .troll
         _ = try await intent.perform()
 
-        // Pruefen ob Intention gespeichert wurde
-        let loaded = DailyIntention.load()
-        XCTAssertTrue(loaded.isSet, "Intention must be set after SetDailyIntentionIntent")
-        XCTAssertTrue(loaded.selections.contains(.fokus),
-                      "Saved intention must contain .fokus")
+        let loaded = DailyCoachSelection.load()
+        XCTAssertTrue(loaded.isSet, "Coach must be set after SetDailyIntentionIntent")
+        XCTAssertEqual(loaded.coach, .troll, "Saved coach must be .troll")
     }
 
     /// Verhalten: Intent darf die App NICHT oeffnen.
-    /// Bricht wenn: SetDailyIntentionIntent.openAppWhenRun auf true steht
     func test_setDailyIntention_doesNotOpenApp() {
         XCTAssertFalse(SetDailyIntentionIntent.openAppWhenRun,
                        "SetDailyIntentionIntent must NOT open the app")
