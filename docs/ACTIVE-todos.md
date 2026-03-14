@@ -114,10 +114,9 @@
 - 12 Unit Tests gruen (MonsterGraphicsTests)
 - **Dateien:** Discipline.swift, DailyIntention.swift, Assets.xcassets (4 ImageSets)
 
-### Phase 4b: Farbiger Discipline-Kreis in Task-Zeilen (Should) — OFFEN
-- Abhak-Kreis am Anfang jeder Task-Zeile kraeftiger und in Discipline-Farbe
-- Discipline-Klassifizierung fuer offene Tasks (rescheduleCount >= 2 → Konsequenz, importance == 3 → Mut, sonst Ausdauer; Fokus erst nach Erledigung)
-- **Dateien:** BacklogRow.swift, Discipline.swift
+### Phase 4b: Farbiger Discipline-Kreis in Task-Zeilen (Should) — INTEGRIERT IN PHASE 5
+- Wird als Teil der neuen Coach-Views umgesetzt (Phase 5a: CoachBacklogView)
+- Discipline-Kreise nur in Coach-Views sichtbar, nicht in der normalen BacklogView
 
 ### Phase 4c: Monster in Morgen-Dialog (Must) — ERLEDIGT
 - Monster-Grafik waehrend Chip-Auswahl (120px, dynamisch wechselnd) UND in Kompakt-Ansicht (44px Circle)
@@ -133,6 +132,110 @@
 ### Phase 4e: Monster in Push-Notifications (Could) — OFFEN
 - Rich Notifications mit Monster-Bild als Attachment
 - **Dateien:** NotificationService.swift
+
+### Ueberlegung: Nutzer beim Kategorisieren der Tasks einbeziehen — OFFEN
+- **Kontext:** Aktuell werden Tasks automatisch einer Discipline zugeordnet (AI-basiert via TaskTitleEngine). Der Nutzer hat keinen Einfluss darauf.
+- **Ueberlegung:** Soll der Nutzer die Discipline manuell waehlen/korrigieren koennen? Z.B. beim Erstellen oder Bearbeiten eines Tasks.
+- **Offene Fragen:** Wie integrieren? Optionaler Picker? Nur bei Coach-Modus? Automatik beibehalten mit Manual-Override?
+- **Abhaengigkeiten:** Haengt eng mit Phase 5 (Coach-Views) zusammen — dort werden Disciplines prominent angezeigt. Falsche Zuordnung wuerde dort auffallen.
+
+---
+
+## BACKLOG: Feature — Monster Coach Phase 5 "Eigene Coach-Views"
+
+- **User Story:** `docs/project/stories/monster-coach.md`
+- **Kontext:** Coach-Modus = eigene Views statt Modifikationen an bestehenden Views. Saubere Trennung: Coach AN zeigt pro Tab eine eigene View, Coach AUS bleibt wie bisher.
+- **Gesamtkonzept:** `docs/context/feature-coach-views.md`
+
+### Phase 5a: CoachBacklogView (Must) — ERLEDIGT
+- Coach-Modus AN → Backlog-Tab zeigt CoachBacklogView statt BacklogView
+- Monster-Header zeigt transparent den aktiven Schwerpunkt (Intention)
+- Zwei Sektionen: "Dein Schwerpunkt" (passende Tasks) + "Weitere Tasks" (Rest)
+- Farbige Discipline-Kreise in Task-Zeilen (= Phase 4b integriert)
+- **Spec:** `docs/specs/features/coach-views-backlog.md`
+- **Dateien:** CoachBacklogView.swift (NEU), MainTabView.swift, Discipline.swift, BacklogRow.swift
+- **Tests:** 6 Unit Tests + 4 UI Tests gruen
+- **Commit:** (wird nach Commit ergaenzt)
+
+### Phase 5b: CoachMeinTagView (Must) — SPEC READY
+- Coach-Modus AN → "Mein Tag"-Tab zeigt eigene View statt DailyReviewView
+- MorningIntentionView + EveningReflectionCard in eigenem Layout (nicht in Review eingebettet)
+- Tages-Fortschritt bezogen auf die Intention
+- Coach-Elemente aus DailyReviewView entfernen
+- **Bug: Intention-Chips Text abgeschnitten** — Alle 6 Labels in der MorningIntentionView sind durch `.lineLimit(1)` + `.font(.caption)` im 2-Spalten-Grid abgeschnitten und nicht lesbar (z.B. "Egal, Tag ueb...", "Stolz: nicht..."). Muss beim Rework der View gefixt werden.
+- **Spec:** `docs/specs/features/coach-views-meintag.md`
+- **Dateien:** CoachMeinTagView.swift (NEU), MainTabView.swift, DailyReviewView.swift
+- **Scope:** ~120-150 LoC, 3-4 UI Tests
+
+---
+
+## BACKLOG: Feature — Monster Coach Phase 6 "macOS-Paritaet"
+
+- **Kontext:** Alle Monster Coach Features (Phase 1-5) existieren nur als iOS-UI. Die Business-Logik (Models, Services) liegt korrekt in `Sources/` und ist geteilt — aber `FocusBloxMac/` hat KEINE Coach-Views. macOS-Nutzer koennen den Coach-Modus weder aktivieren noch nutzen.
+- **Abhaengigkeit:** Phase 5b (CoachMeinTagView) sollte zuerst auf iOS fertig sein, bevor macOS-Paritaet gebaut wird.
+
+### Phase 6a: Coach-Settings in macOS (Must) — ERLEDIGT
+- Neuer 5. Tab "Monster Coach" in MacSettingsView mit identischen Settings wie iOS
+- Master-Toggle, Morgen-Erinnerung, Tages-Erinnerungen (Max/Von/Bis), Abend-Erinnerung
+- 4 UI Tests gruen (MacCoachSettingsUITests)
+- **Dateien:** MacSettingsView.swift, MacCoachSettingsUITests.swift
+- **Spec:** docs/specs/features/coach-settings-macos.md
+- **Commit:** (wird nach Commit ergaenzt)
+
+### Phase 6b: CoachBacklogView in macOS (Must) — OFFEN
+- macOS ContentView/SidebarView muss bei `coachModeEnabled` eine Coach-Variante des Backlogs anzeigen
+- Monster-Header, Disziplin-Kreise, Schwerpunkt/Weitere-Sektionen
+- Die iOS CoachBacklogView kann als Vorlage dienen, muss aber ans macOS-Layout angepasst werden (Sidebar + Detail statt Tab)
+- **Referenz:** iOS CoachBacklogView.swift, Spec `docs/specs/features/coach-views-backlog.md`
+- **Dateien:** FocusBloxMac/ (ContentView oder neue MacCoachBacklogView), Discipline.swift (shared)
+- **Komplexitaet:** M
+
+### Phase 6c: MorningIntentionView in macOS (Must) — OFFEN
+- Morgen-Dialog mit Intentions-Auswahl und Monster-Grafik fuer macOS
+- Die shared MorningIntentionView aus `Sources/Views/` koennte direkt eingebettet werden — pruefen ob sie macOS-kompatibel ist oder Anpassungen braucht
+- **Referenz:** Sources/Views/MorningIntentionView.swift
+- **Dateien:** FocusBloxMac/ (Integration in macOS-Layout)
+- **Komplexitaet:** S-M
+
+### Phase 6d: EveningReflectionCard in macOS (Must) — OFFEN
+- Abend-Spiegel mit Erfuellungsbewertung, Monster-Icons und KI-Texten fuer macOS
+- Wie 6c: pruefen ob die shared View direkt nutzbar ist
+- **Referenz:** Sources/Views/EveningReflectionCard.swift
+- **Dateien:** FocusBloxMac/ (Integration in macOS-Layout)
+- **Komplexitaet:** S-M
+
+### Phase 6e: CoachMeinTagView in macOS (Should) — OFFEN
+- Erst relevant wenn Phase 5b (iOS CoachMeinTagView) fertig ist
+- macOS-Aequivalent fuer den "Mein Tag"-Tab im Coach-Modus
+- **Abhaengigkeit:** Phase 5b
+- **Komplexitaet:** M
+
+---
+
+### Bug 99: CoachBacklogView — Next-Up-Swipe fehlt
+- **Status:** OFFEN
+- **Plattform:** iOS
+- **Symptom:** In der CoachBacklogView kann man Tasks nicht per Swipe zu "Next Up" hinzufügen. Die normale BacklogView hat Swipe-nach-rechts → "Next Up", die CoachBacklogView nicht.
+- **Auswirkung:** Die Intention "fokus" (matcht auf `task.isNextUp`) ist im Coach-Modus unbenutzbar, weil man Tasks nicht als Next-Up markieren kann.
+- **Fix:** `.swipeActions(edge: .leading)` mit "Next Up"-Button in `coachRow()` ergänzen (analog zu BacklogView).
+- **Dateien:** CoachBacklogView.swift
+- **Komplexität:** XS
+
+### Bug 100: Intention-Labels — Umlaute fehlen + Texte als Tagesziel umformulieren
+- **Status:** OFFEN
+- **Plattform:** iOS + macOS
+- **Symptom 1:** IntentionOption-Labels verwenden ASCII statt Umlaute ("ueberleben" statt "überleben", "grosse haessliche" statt "große hässliche").
+- **Symptom 2:** Label "Das grosse haessliche Ding geschafft" klingt nach Rückblick, nicht nach Tagesziel. Alle Labels prüfen ob sie als Tagesziel-Formulierung sinnvoll sind.
+- **Betroffene Labels:** `IntentionOption.label` in `DailyIntention.swift` — wird überall verwendet (MorningIntentionView, EveningReflectionCard, CoachBacklogView Monster-Header).
+- **Dateien:** Sources/Models/DailyIntention.swift
+- **Komplexität:** XS
+
+---
+
+### Bug 98: Mein Tag Woche zeigt nur Sprint-Tasks — ausserhalb Sprints erledigte fehlen
+- **Status:** OFFEN
+- **Plattform:** iOS + macOS
+- **Symptom:** Die Wochenansicht in "Mein Tag" zeigt nur Tasks die innerhalb von Sprints erledigt wurden. Tasks die ausserhalb von Sprints erledigt wurden, fehlen komplett — sollen aber gleichberechtigt angezeigt werden.
 
 ---
 
@@ -160,6 +263,7 @@
 - Emotionales Aufladen im Report
 
 ### Bundle E: macOS Native Experience (P2/P3)
+- Monster Coach Phase 6: macOS-Paritaet (6a-6e)
 - MAC-026 Enhanced Quick Capture
 - MAC-030 Shortcuts.app
 - MAC-031 Focus Mode Integration
