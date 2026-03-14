@@ -157,7 +157,7 @@
 - **Tests:** 6 Unit Tests + 4 UI Tests gruen
 - **Commit:** (wird nach Commit ergaenzt)
 
-### Phase 5b: CoachMeinTagView (Must) — SPEC READY
+### Phase 5b: CoachMeinTagView (Must) — IN ARBEIT
 - Coach-Modus AN → "Mein Tag"-Tab zeigt eigene View statt DailyReviewView
 - MorningIntentionView + EveningReflectionCard in eigenem Layout (nicht in Review eingebettet)
 - Tages-Fortschritt bezogen auf die Intention
@@ -182,16 +182,13 @@
 - **Spec:** docs/specs/features/coach-settings-macos.md
 - **Commit:** (wird nach Commit ergaenzt)
 
-### Phase 6b: CoachBacklogView in macOS (Must) — GEPLANT
-- macOS ContentView/SidebarView muss bei `coachModeEnabled` eine Coach-Variante des Backlogs anzeigen
-- Monster-Header, Disziplin-Kreise, Schwerpunkt/Weitere-Sektionen
-- Die iOS CoachBacklogView dient als Vorlage, aber macOS arbeitet mit `LocalTask` statt `PlanItem` — separate MacCoachBacklogView noetig
-- **Ansatz:** Neue `FocusBloxMac/MacCoachBacklogView.swift`, ContentView bekommt coachModeEnabled-Weiche, SidebarView vereinfacht
-- **Referenz:** iOS CoachBacklogView.swift, Spec `docs/specs/features/coach-views-backlog.md`
-- **Proposal:** `openspec/changes/monster-coach-phase6b/proposal.md`
-- **Dateien:** MacCoachBacklogView.swift (NEU), ContentView.swift, MacBacklogRow.swift, SidebarView.swift
-- **Scope:** ~190 LoC, 4 UI Tests
-- **Komplexitaet:** M
+### Phase 6b: CoachBacklogView in macOS (Must) — ERLEDIGT
+- macOS ContentView zeigt bei `coachModeEnabled` die MacCoachBacklogView statt normale Backlog-View
+- Monster-Header mit Intention, Disziplin-Farbkreise auf Checkboxen, Schwerpunkt/Weitere-Sektionen
+- Sidebar vereinfacht bei Coach-Modus (nur "Backlog" Label, keine Filter)
+- 4 UI Tests gruen (MacCoachBacklogUITests)
+- **Dateien:** MacCoachBacklogView.swift (NEU), ContentView.swift, MacBacklogRow.swift
+- **Commit:** (wird nach Commit ergaenzt)
 
 ### Phase 6c: MorningIntentionView in macOS (Must) — OFFEN
 - Morgen-Dialog mit Intentions-Auswahl und Monster-Grafik fuer macOS

@@ -1,0 +1,11 @@
+Test Case '-[FocusBloxMacUITests.MacCoachBacklogUITests test_coachModeOff_noMonsterHeader]' passed (21.998 seconds).
+Test Case '-[FocusBloxMacUITests.MacCoachBacklogUITests test_coachModeOn_noIntention_showsHint]' passed (13.030 seconds).
+Test Case '-[FocusBloxMacUITests.MacCoachBacklogUITests test_coachModeOn_showsMonsterHeader]' passed (12.345 seconds).
+Test Case '-[FocusBloxMacUITests.MacCoachBacklogUITests test_coachModeOn_sidebarSimplified]' passed (7.775 seconds).
+Test Suite 'MacCoachBacklogUITests' passed at 2026-03-14 08:16:38.058.
+Test Suite 'FocusBloxMacUITests.xctest' passed at 2026-03-14 08:16:38.059.
+Test Suite 'Selected tests' passed at 2026-03-14 08:16:38.060.
+Test case 'MacCoachBacklogUITests.test_coachModeOff_noMonsterHeader()' passed on 'My Mac - FocusBloxMacUITests-Runner (32772)' (21.998 seconds)
+Test case 'MacCoachBacklogUITests.test_coachModeOn_noIntention_showsHint()' passed on 'My Mac - FocusBloxMacUITests-Runner (32772)' (13.030 seconds)
+Test case 'MacCoachBacklogUITests.test_coachModeOn_showsMonsterHeader()' passed on 'My Mac - FocusBloxMacUITests-Runner (32772)' (12.345 seconds)
+Test case 'MacCoachBacklogUITests.test_coachModeOn_sidebarSimplified()' passed on 'My Mac - FocusBloxMacUITests-Runner (32772)' (7.775 seconds)

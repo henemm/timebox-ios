@@ -1,0 +1,14 @@
+Test Case '-[FocusBloxMacUITests.MacCoachBacklogUITests test_coachModeOff_noMonsterHeader]' passed (11.171 seconds).
+/Users/hem/Developer/my-daily-sprints/FocusBloxMacUITests/MacCoachBacklogUITests.swift:92: error: -[FocusBloxMacUITests.MacCoachBacklogUITests test_coachModeOn_noIntention_showsHint] : XCTAssertTrue failed - Hint text should appear when no intention is set
+Test Case '-[FocusBloxMacUITests.MacCoachBacklogUITests test_coachModeOn_noIntention_showsHint]' failed (13.757 seconds).
+/Users/hem/Developer/my-daily-sprints/FocusBloxMacUITests/MacCoachBacklogUITests.swift:66: error: -[FocusBloxMacUITests.MacCoachBacklogUITests test_coachModeOn_showsMonsterHeader] : XCTAssertTrue failed - Monster header should be visible when Coach mode is ON in macOS
+Test Case '-[FocusBloxMacUITests.MacCoachBacklogUITests test_coachModeOn_showsMonsterHeader]' failed (14.483 seconds).
+/Users/hem/Developer/my-daily-sprints/FocusBloxMacUITests/MacCoachBacklogUITests.swift:112: error: -[FocusBloxMacUITests.MacCoachBacklogUITests test_coachModeOn_sidebarSimplified] : XCTAssertFalse failed - Priority filter should be hidden in Coach mode sidebar
+Test Case '-[FocusBloxMacUITests.MacCoachBacklogUITests test_coachModeOn_sidebarSimplified]' failed (8.775 seconds).
+Test Suite 'MacCoachBacklogUITests' failed at 2026-03-14 08:06:39.050.
+Test Suite 'FocusBloxMacUITests.xctest' failed at 2026-03-14 08:06:39.050.
+Test Suite 'Selected tests' failed at 2026-03-14 08:06:39.051.
+Test case 'MacCoachBacklogUITests.test_coachModeOff_noMonsterHeader()' passed on 'My Mac - FocusBloxMacUITests-Runner (29961)' (11.171 seconds)
+Test case 'MacCoachBacklogUITests.test_coachModeOn_noIntention_showsHint()' failed on 'My Mac - FocusBloxMacUITests-Runner (29961)' (13.757 seconds)
+Test case 'MacCoachBacklogUITests.test_coachModeOn_showsMonsterHeader()' failed on 'My Mac - FocusBloxMacUITests-Runner (29961)' (14.483 seconds)
+Test case 'MacCoachBacklogUITests.test_coachModeOn_sidebarSimplified()' failed on 'My Mac - FocusBloxMacUITests-Runner (29961)' (8.775 seconds)

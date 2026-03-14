@@ -66,6 +66,9 @@ struct ContentView: View {
     @AppStorage("remindersSyncEnabled") private var remindersSyncEnabled: Bool = true
     @AppStorage("remindersMarkCompleteOnImport") private var remindersMarkCompleteOnImport: Bool = true
 
+    // Coach mode
+    @AppStorage("coachModeEnabled") private var coachModeEnabled: Bool = false
+
     // CloudKit sync monitor
     @Environment(CloudKitSyncMonitor.self) private var cloudKitMonitor
     @Environment(DeferredSortController.self) private var deferredSort
@@ -177,14 +180,22 @@ struct ContentView: View {
 
     var body: some View {
         NavigationSplitView(columnVisibility: $columnVisibility) {
-            // Sidebar: Only show filter options when Backlog is selected
-            if selectedSection == .backlog {
+            // Sidebar: Only show filter options when Backlog is selected (non-coach mode)
+            if selectedSection == .backlog && !coachModeEnabled {
                 SidebarView(
                     selectedFilter: $selectedFilter,
                     overdueCount: overdueCount,
                     completedCount: completedCount,
                     recurringCount: recurringCount
                 )
+                .navigationSplitViewColumnWidth(min: 180, ideal: 220, max: 280)
+            } else if selectedSection == .backlog && coachModeEnabled {
+                List {
+                    Label("Backlog", systemImage: "list.bullet")
+                        .foregroundStyle(.secondary)
+                }
+                .listStyle(.sidebar)
+                .navigationTitle("Backlog")
                 .navigationSplitViewColumnWidth(min: 180, ideal: 220, max: 280)
             } else {
                 // Empty sidebar for other sections
@@ -237,7 +248,11 @@ struct ContentView: View {
     private var mainContentView: some View {
         switch selectedSection {
         case .backlog:
-            backlogView
+            if coachModeEnabled {
+                MacCoachBacklogView(tasks: visibleTasks, selectedTasks: $selectedTasks)
+            } else {
+                backlogView
+            }
         case .planning:
             MacPlanningView(
                 selectedDate: $sharedDate
