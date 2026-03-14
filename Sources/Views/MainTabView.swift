@@ -34,7 +34,13 @@ struct MainTabView: View {
                 }
                 .tag(AppTab.focus)
 
-            DailyReviewView()
+            Group {
+                if coachModeEnabled {
+                    CoachMeinTagView()
+                } else {
+                    DailyReviewView()
+                }
+            }
                 .tabItem {
                     Label(coachModeEnabled ? "Mein Tag" : "Review",
                           systemImage: coachModeEnabled ? "sun.and.horizon" : "chart.bar")

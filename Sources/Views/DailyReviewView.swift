@@ -18,19 +18,9 @@ struct DailyReviewView: View {
     @State private var calendarEvents: [CalendarEvent] = []
     @State private var isLoading = true
     @State private var reviewMode: ReviewMode = .today
-    @AppStorage("coachModeEnabled") private var coachModeEnabled: Bool = false
-    @State private var aiReflectionTexts: [IntentionOption: String] = [:]
     private let statsCalculator = ReviewStatsCalculator()
 
     // MARK: - Computed Properties
-
-    /// Show evening reflection card after 18:00 or when forced via launch arg.
-    private var showEveningReflection: Bool {
-        if ProcessInfo.processInfo.arguments.contains("-ForceEveningReflection") {
-            return true
-        }
-        return Calendar.current.component(.hour, from: Date()) >= 18
-    }
 
     private var todayBlocks: [FocusBlock] {
         let calendar = Calendar.current
@@ -168,22 +158,6 @@ struct DailyReviewView: View {
                     .padding(.horizontal)
                     .padding(.top, 8)
 
-                    if coachModeEnabled && reviewMode == .today {
-                        MorningIntentionView()
-                            .padding(.horizontal)
-
-                        // Evening reflection card (Phase 3c)
-                        if showEveningReflection && DailyIntention.load().isSet {
-                            EveningReflectionCard(
-                                intentions: DailyIntention.load().selections,
-                                tasks: allLocalTasks,
-                                focusBlocks: todayBlocks,
-                                aiTexts: aiReflectionTexts
-                            )
-                            .padding(.horizontal)
-                        }
-                    }
-
                     if isLoading {
                         ProgressView()
                             .padding(.top, 100)
@@ -219,12 +193,11 @@ struct DailyReviewView: View {
                     }
                 }
             }
-            .navigationTitle(coachModeEnabled ? "Mein Tag" : "Review")
+            .navigationTitle("Review")
             .withSettingsToolbar()
         }
         .task {
             await loadData()
-            await loadAIReflectionTexts()
         }
     }
 
@@ -651,22 +624,5 @@ struct DailyReviewView: View {
         isLoading = false
     }
 
-    private func loadAIReflectionTexts() async {
-        guard showEveningReflection else { return }
-        let intention = DailyIntention.load()
-        guard intention.isSet else { return }
-
-        if ProcessInfo.processInfo.arguments.contains("-AIDisabled") {
-            AppSettings.shared.aiScoringEnabled = false
-        }
-
-        let service = EveningReflectionTextService()
-        let texts = await service.generateTexts(
-            intentions: intention.selections,
-            tasks: allLocalTasks,
-            focusBlocks: todayBlocks
-        )
-        aiReflectionTexts = texts
-    }
 }
 

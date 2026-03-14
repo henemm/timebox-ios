@@ -162,22 +162,24 @@
 - **Tests:** 6 Unit Tests + 4 UI Tests gruen
 - **Commit:** (wird nach Commit ergaenzt)
 
-### Phase 5b: CoachMeinTagView (Must) — IN ARBEIT
-- Coach-Modus AN → "Mein Tag"-Tab zeigt eigene View statt DailyReviewView
-- MorningIntentionView + EveningReflectionCard in eigenem Layout (nicht in Review eingebettet)
-- Tages-Fortschritt bezogen auf die Intention
-- Coach-Elemente aus DailyReviewView entfernen
-- **Bug: Intention-Chips Text abgeschnitten** — Alle 6 Labels in der MorningIntentionView sind durch `.lineLimit(1)` + `.font(.caption)` im 2-Spalten-Grid abgeschnitten und nicht lesbar (z.B. "Egal, Tag ueb...", "Stolz: nicht..."). Muss beim Rework der View gefixt werden.
+### Phase 5b: CoachMeinTagView (Must) — ERLEDIGT
+- Coach-Modus AN → "Mein Tag"-Tab zeigt CoachMeinTagView statt DailyReviewView
+- MorningIntentionView + EveningReflectionCard in eigenem Layout
+- Tages-Fortschritt ("X Tasks erledigt") mit coachDayProgress ID
+- Coach-Elemente aus DailyReviewView entfernt (coachModeEnabled, aiReflectionTexts, showEveningReflection)
+- DailyReviewView navigationTitle statisch "Review"
 - **Spec:** `docs/specs/features/coach-views-meintag.md`
-- **Dateien:** CoachMeinTagView.swift (NEU), MainTabView.swift, DailyReviewView.swift
-- **Scope:** ~120-150 LoC, 3-4 UI Tests
+- **Dateien:** CoachMeinTagView.swift (NEU), MainTabView.swift, DailyReviewView.swift, FocusBloxApp.swift
+- **Tests:** 3 UI Tests gruen (CoachMeinTagUITests)
+- **Commit:** (wird nach Commit ergaenzt)
+- **Offen:** Intention-Chips Text abgeschnitten (Bug bleibt — separates Ticket), Tages-Statistiken vereinfacht (kein Completion-Ring)
 
 ---
 
 ## BACKLOG: Feature — Monster Coach Phase 6 "macOS-Paritaet"
 
 - **Kontext:** Alle Monster Coach Features (Phase 1-5) existieren nur als iOS-UI. Die Business-Logik (Models, Services) liegt korrekt in `Sources/` und ist geteilt — aber `FocusBloxMac/` hat KEINE Coach-Views. macOS-Nutzer koennen den Coach-Modus weder aktivieren noch nutzen.
-- **Abhaengigkeit:** Phase 5b (CoachMeinTagView) sollte zuerst auf iOS fertig sein, bevor macOS-Paritaet gebaut wird.
+- **Abhaengigkeit:** Phase 5b (CoachMeinTagView) ist ERLEDIGT — macOS-Paritaet kann gebaut werden.
 
 ### Phase 6a: Coach-Settings in macOS (Must) — ERLEDIGT
 - Neuer 5. Tab "Monster Coach" in MacSettingsView mit identischen Settings wie iOS
@@ -210,9 +212,9 @@
 - **Komplexitaet:** S-M
 
 ### Phase 6e: CoachMeinTagView in macOS (Should) — OFFEN
-- Erst relevant wenn Phase 5b (iOS CoachMeinTagView) fertig ist
+- Phase 5b (iOS) ist fertig — macOS-Paritaet kann jetzt gebaut werden
 - macOS-Aequivalent fuer den "Mein Tag"-Tab im Coach-Modus
-- **Abhaengigkeit:** Phase 5b
+- **Abhaengigkeit:** Phase 5b (ERLEDIGT)
 - **Komplexitaet:** M
 
 ---
@@ -292,6 +294,14 @@
 - **TD-01:** God-Views (BlockPlanningView 1400 LoC, BacklogView 1181 LoC) — Aufwand: L
 - **TD-02:** iOS/macOS View-Duplikation — Paket 1-3 ERLEDIGT (Badges, Sheets, Header: ~412 LoC eliminiert). Verbleibend: ~7500 LoC, Aufwand: XL
 - **TD-03:** 3 Services ohne Unit Tests (NotificationService, FocusBlockActionService, GapFinder) — Aufwand: M
+
+### TD-04: Parallele Claude Code Sessions absichern — ERLEDIGT
+- parallel_test_guard las falsche JSON-Datei (komplett funktionslos)
+- test_lock_guard war nicht in settings.json registriert
+- File-Overlap war nur WARNING statt BLOCK
+- Kein File-Locking auf workflow_state.json (Korruptionsgefahr)
+- **Fix:** load_state Import, fcntl.flock Locking, Overlap→Block, test_lock_guard registriert
+- **Dateien:** parallel_test_guard.py, workflow_state_multi.py, strict_code_gate.py, settings.json
 
 ---
 
