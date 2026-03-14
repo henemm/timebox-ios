@@ -216,6 +216,17 @@ struct CoachBacklogView: View {
             }
             .tint(.blue)
         }
+        .contextMenu {
+            Menu("Kategorie") {
+                ForEach(TaskCategory.allCases, id: \.rawValue) { category in
+                    Button {
+                        setCategoryForTask(item, category: category.rawValue)
+                    } label: {
+                        Label(category.displayName, systemImage: category.icon)
+                    }
+                }
+            }
+        }
     }
 
     // MARK: - Data Loading
@@ -297,6 +308,22 @@ struct CoachBacklogView: View {
             Task { await loadTasks() }
         } catch {
             errorMessage = "Task konnte nicht aktualisiert werden."
+        }
+    }
+
+    private func setCategoryForTask(_ item: PlanItem, category: String) {
+        do {
+            let taskSource = LocalTaskSource(modelContext: modelContext)
+            let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
+            try syncEngine.updateTask(
+                itemID: item.id, title: item.title, importance: item.importance,
+                duration: item.estimatedDuration, tags: item.tags,
+                urgency: item.urgency, taskType: category,
+                dueDate: item.dueDate, description: item.taskDescription
+            )
+            Task { await loadTasks() }
+        } catch {
+            errorMessage = "Kategorie konnte nicht geändert werden."
         }
     }
 }

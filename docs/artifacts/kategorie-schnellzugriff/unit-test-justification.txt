@@ -1,0 +1,7 @@
+Unit Test Justification: kategorie-schnellzugriff
+
+No unit tests needed — this is a pure UI convenience feature:
+- Adds .contextMenu modifier to existing coachRow() view
+- Uses existing syncEngine.updateTask() for persistence (already tested)
+- No new business logic, no new models, no new services
+- UI Tests cover the interaction (long-press → category menu → selection)
