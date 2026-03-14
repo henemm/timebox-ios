@@ -49,7 +49,7 @@ struct ContentView: View {
 
     // Navigation state
     @State private var columnVisibility: NavigationSplitViewVisibility = .all
-    @State private var selectedSection: MainSection = .backlog
+    @Binding var selectedSection: MainSection
     @State private var selectedFilter: SidebarFilter = .priority
     @State private var selectedTasks: Set<UUID> = []
     @State private var scrollToTaskID: UUID?  // Bug 94: Auto-scroll after task creation
@@ -232,8 +232,11 @@ struct ContentView: View {
             ToolbarItem(id: "navigationPicker", placement: .principal) {
                 Picker("Bereich", selection: $selectedSection) {
                     ForEach(MainSection.allCases, id: \.self) { section in
-                        Label(section.rawValue, systemImage: section.icon)
-                            .tag(section)
+                        Label(
+                            section == .review && coachModeEnabled ? "Mein Tag" : section.rawValue,
+                            systemImage: section == .review && coachModeEnabled ? "sun.and.horizon" : section.icon
+                        )
+                        .tag(section)
                     }
                 }
                 .pickerStyle(.segmented)
@@ -265,7 +268,11 @@ struct ContentView: View {
         case .focus:
             MacFocusView()
         case .review:
-            MacReviewView()
+            if coachModeEnabled {
+                MacCoachReviewView()
+            } else {
+                MacReviewView()
+            }
         }
     }
 
@@ -1157,5 +1164,5 @@ struct ContentView: View {
 }
 
 #Preview {
-    ContentView()
+    ContentView(selectedSection: .constant(.backlog))
 }

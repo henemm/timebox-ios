@@ -261,6 +261,16 @@
 - **Plattform:** iOS + macOS
 - **Symptom:** Die Wochenansicht in "Mein Tag" zeigt nur Tasks die innerhalb von Sprints erledigt wurden. Tasks die ausserhalb von Sprints erledigt wurden, fehlen komplett — sollen aber gleichberechtigt angezeigt werden.
 
+### Bug 101: macOS hat 5 Views statt 4 — Unified Calendar View nicht umgesetzt
+- **Status:** OFFEN
+- **Plattform:** macOS
+- **Symptom:** iOS hat 4 Tabs (Backlog, Blox, Focus, Review), macOS hat 5 Sidebar-Eintraege (Backlog, Blox, **Assign**, Focus, Review). Die "Assign"-Section ist ein Ueberschuss.
+- **Ursache:** Die "Unified Calendar View" (Spec: `docs/specs/features/unified-calendar-view.md`) wurde auf iOS umgesetzt — BlockPlanningView kombiniert Timeline + Task-Zuweisung in einer View. Auf macOS existieren noch zwei getrennte Views: MacPlanningView (Timeline) und MacAssignView (Task-Zuweisung).
+- **Erwartetes Verhalten:** macOS soll wie iOS 4 Sections haben. "Blox" und "Assign" werden zu einer View zusammengelegt — Tap auf FocusBlock oeffnet Task-Zuweisungs-Sheet (wie auf iOS).
+- **Betroffene Dateien:** SidebarView.swift (MainSection enum), ContentView.swift (mainContentView switch), MacPlanningView.swift, MacAssignView.swift
+- **Referenz-Spec:** `docs/specs/features/unified-calendar-view.md`
+- **Komplexitaet:** M
+
 ---
 
 ## Weitere offene Features
