@@ -162,7 +162,6 @@
 		CBHELP01BUILD0001 /* ClipboardHelperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBHELP01FILE00001 /* ClipboardHelperTests.swift */; };
 		CBPASTE01BUILD0001 /* ClipboardTaskFlowUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBPASTE01FILE00001 /* ClipboardTaskFlowUITests.swift */; };
 		CC3848FFA2D898F1A3FDFC27 /* TaskSourceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76296762878DC5D17EA4E12A /* TaskSourceTests.swift */; };
-		CC5C01BUILD0000001 /* CoachCategoryContextMenuUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC5C01FILEREF00001 /* CoachCategoryContextMenuUITests.swift */; };
 		CC61BCDC9DB25FDB433AC477 /* TaskCompletionUndoService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 233B665A0DF1A421C1CDF80A /* TaskCompletionUndoService.swift */; };
 		CE465D61D24BA0B73AB397E4 /* ShakeGestureModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14CEC8C14442ABE7F65B5EE8 /* ShakeGestureModifier.swift */; };
 		CF2E7692295B675D8541312A /* BacklogViewUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 339BBA1A3799CB0C6CF5897A /* BacklogViewUITests.swift */; };
@@ -728,7 +727,6 @@
 		CB5C01FILEREF00001 /* CoachBacklogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoachBacklogView.swift; sourceTree = "<group>"; };
 		CBHELP01FILE00001 /* ClipboardHelperTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardHelperTests.swift; sourceTree = "<group>"; };
 		CBPASTE01FILE00001 /* ClipboardTaskFlowUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardTaskFlowUITests.swift; sourceTree = "<group>"; };
-		CC5C01FILEREF00001 /* CoachCategoryContextMenuUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CoachCategoryContextMenuUITests.swift; sourceTree = "<group>"; };
 		CC7B2E12D270CC49B824429F /* FocusBlockDropIndicatorUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = FocusBlockDropIndicatorUITests.swift; sourceTree = "<group>"; };
 		CE21F83C52F46219D0186198 /* FocusBlockDragTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = FocusBlockDragTests.swift; sourceTree = "<group>"; };
 		CKSM01FILE000001 /* CloudKitSyncMonitorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitSyncMonitorTests.swift; sourceTree = "<group>"; };
@@ -1149,7 +1147,6 @@
 				DE59459EB563B50137F303E8 /* FocusBloxUITests/DependencyIndentUITests.swift */,
 				FAD0E9CA71F3D40E44246594 /* IntentionFilterUITests.swift */,
 				CB5B01FILEREF00001 /* CoachBacklogViewUITests.swift */,
-				CC5C01FILEREF00001 /* CoachCategoryContextMenuUITests.swift */,
 				CNSU01FILEREF00001 /* CoachNotificationSettingsUITests.swift */,
 				EVRC03FILEREF00001 /* EveningReflectionCardUITests.swift */,
 				35E10E0297BB375AFCD4517E /* DueDateBadgeExtractionUITests.swift */,
@@ -2305,7 +2302,6 @@
 				4D87251CF1F054F848940F82 /* FocusBloxUITests/DependencyIndentUITests.swift in Sources */,
 				324335EAD3A707ABE5F3BEFE /* IntentionFilterUITests.swift in Sources */,
 				CB5B01BUILD0000001 /* CoachBacklogViewUITests.swift in Sources */,
-				CC5C01BUILD0000001 /* CoachCategoryContextMenuUITests.swift in Sources */,
 				CNSU01BUILD0000001 /* CoachNotificationSettingsUITests.swift in Sources */,
 				EVRC03BUILD0000001 /* EveningReflectionCardUITests.swift in Sources */,
 				CA22A8F18B6FEFFE3F35774E /* DueDateBadgeExtractionUITests.swift in Sources */,

@@ -206,15 +206,6 @@
 - **Dateien:** MacCoachReviewView.swift (NEU), ContentView.swift, FocusBloxMacApp.swift, MacCoachReviewUITests.swift
 - **Commit:** (wird nach Commit ergaenzt)
 
-### Feature: Kategorie-Schnellzugriff in CoachBacklogView — ERLEDIGT
-- Long-Press auf Task zeigt Context Menu mit "Kategorie"-Submenu
-- Alle 5 TaskCategory-Optionen (Earn, Essentials, Self Care, Learn, Social)
-- Persistierung ueber bestehenden SyncEngine.updateTask Pattern
-- **Plattform:** iOS (macOS hat bereits Kontextmenue in ContentView)
-- **Tests:** 2 UI Tests gruen (CoachCategoryContextMenuUITests)
-- **Dateien:** CoachBacklogView.swift
-- **Commit:** (wird nach Commit ergaenzt)
-
 ### Phase 6d: EveningReflectionCard in macOS (Must) — OFFEN
 - Abend-Spiegel mit Erfuellungsbewertung, Monster-Icons und KI-Texten fuer macOS
 - Wie 6c: pruefen ob die shared View direkt nutzbar ist
@@ -311,21 +302,9 @@
 
 ## Backlog (Technical Debt)
 
-### TD-05: Cross-Platform Code-Sharing Audit — OFFEN
-- **Status:** OFFEN
-- **Prioritaet:** Hoch (vor weiteren Features)
-- **Ziel:** Identifizieren welcher Code in `FocusBloxMac/` eigentlich shared sein koennte und nach `Sources/` gehoert. Konkret:
-  1. **Audit:** Alle Views in `FocusBloxMac/` durchgehen — welche haben ein iOS-Pendant in `Sources/Views/` mit (fast) identischer Logik?
-  2. **Konsolidierungs-Plan:** Pro View entscheiden: (a) komplett shared, (b) shared ViewModel + plattformspezifische View, (c) bleibt plattformspezifisch
-  3. **Quick Wins:** Views die SOFORT nach `Sources/` verschoben werden koennen (z.B. MacCoachReviewView nutzt bereits shared MorningIntentionView)
-  4. **Regel verankern:** Pflicht-Check in Workflow einbauen — bei jedem Feature pruefen ob Code shared werden kann
-- **Bekannte Kandidaten:** MacCoachBacklogView vs CoachBacklogView, MacCoachReviewView vs CoachMeinTagView, MacSettingsView vs SettingsView
-- **Bezug:** Erweitert TD-02 (View-Duplikation) um systematischen Ansatz
-- **Komplexitaet:** M (Audit) + L-XL (Umsetzung, kann in Pakete aufgeteilt werden)
-
 ### Verbleibende Tech-Debts (dokumentiert in `docs/context/tech-debt-analysis.md`)
 - **TD-01:** God-Views (BlockPlanningView 1400 LoC, BacklogView 1181 LoC) — Aufwand: L
-- **TD-02:** iOS/macOS View-Duplikation — Paket 1-3 ERLEDIGT (Badges, Sheets, Header: ~412 LoC eliminiert). Verbleibend: ~7500 LoC, Aufwand: XL → **Siehe TD-05 fuer systematischen Ansatz**
+- **TD-02:** iOS/macOS View-Duplikation — Paket 1-3 ERLEDIGT (Badges, Sheets, Header: ~412 LoC eliminiert). Verbleibend: ~7500 LoC, Aufwand: XL
 - **TD-03:** 3 Services ohne Unit Tests (NotificationService, FocusBlockActionService, GapFinder) — Aufwand: M
 
 ### TD-04: Parallele Claude Code Sessions absichern — ERLEDIGT
