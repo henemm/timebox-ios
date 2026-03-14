@@ -18,37 +18,37 @@ final class MorningIntentionTests: XCTestCase {
 
     func test_survivalOption_properties() {
         let option = IntentionOption.survival
-        XCTAssertEqual(option.label, "Egal, Tag ueberleben")
+        XCTAssertEqual(option.label, "Egal, Tag überleben")
         XCTAssertEqual(option.icon, "shield")
     }
 
     func test_fokusOption_properties() {
         let option = IntentionOption.fokus
-        XCTAssertEqual(option.label, "Stolz: nicht verzettelt")
+        XCTAssertEqual(option.label, "Nicht verzetteln")
         XCTAssertEqual(option.icon, "scope")
     }
 
     func test_bhagOption_properties() {
         let option = IntentionOption.bhag
-        XCTAssertEqual(option.label, "Das grosse haessliche Ding geschafft")
+        XCTAssertEqual(option.label, "Das große Ding anpacken")
         XCTAssertEqual(option.icon, "flame")
     }
 
     func test_balanceOption_properties() {
         let option = IntentionOption.balance
-        XCTAssertEqual(option.label, "In allen Bereichen gelebt")
+        XCTAssertEqual(option.label, "In allen Bereichen leben")
         XCTAssertEqual(option.icon, "equal")
     }
 
     func test_growthOption_properties() {
         let option = IntentionOption.growth
-        XCTAssertEqual(option.label, "Etwas Neues gelernt")
+        XCTAssertEqual(option.label, "Etwas Neues lernen")
         XCTAssertEqual(option.icon, "book")
     }
 
     func test_connectionOption_properties() {
         let option = IntentionOption.connection
-        XCTAssertEqual(option.label, "Fuer andere da gewesen")
+        XCTAssertEqual(option.label, "Für andere da sein")
         XCTAssertEqual(option.icon, "heart.circle")
     }
 
@@ -116,6 +116,6 @@ final class MorningIntentionTests: XCTestCase {
     func test_buildIntentionReminderRequest_correctContent() {
         let request = NotificationService.buildIntentionReminderRequest(hour: 7, minute: 0)
         XCTAssertEqual(request.content.title, "Guten Morgen")
-        XCTAssertEqual(request.content.body, "Was soll heute zaehlen?")
+        XCTAssertEqual(request.content.body, "Was soll heute zählen?")
     }
 }

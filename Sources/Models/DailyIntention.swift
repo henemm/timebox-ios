@@ -11,12 +11,12 @@ enum IntentionOption: String, Codable, CaseIterable {
 
     var label: String {
         switch self {
-        case .survival: "Egal, Tag ueberleben"
-        case .fokus: "Stolz: nicht verzettelt"
-        case .bhag: "Das grosse haessliche Ding geschafft"
-        case .balance: "In allen Bereichen gelebt"
-        case .growth: "Etwas Neues gelernt"
-        case .connection: "Fuer andere da gewesen"
+        case .survival: "Egal, Tag überleben"
+        case .fokus: "Nicht verzetteln"
+        case .bhag: "Das große Ding anpacken"
+        case .balance: "In allen Bereichen leben"
+        case .growth: "Etwas Neues lernen"
+        case .connection: "Für andere da sein"
         }
     }
 

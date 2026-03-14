@@ -15,6 +15,7 @@ struct BacklogRow: View {
     var isPendingResort: Bool = false  // Deferred sort: shows border when item changed but not yet re-sorted
     var isCompletionPending: Bool = false  // Deferred completion: shows filled checkbox before task disappears
     var isBlocked: Bool = false  // Task is blocked by another task (dimmed + indented + checkbox disabled)
+    var disciplineColor: Color?  // Optional discipline color for Coach mode checkbox
 
     // State for inline title editing (double-tap)
     @State private var isEditingTitle = false
@@ -34,7 +35,8 @@ struct BacklogRow: View {
             } label: {
                 Image(systemName: isCompletionPending ? "checkmark.circle.fill" : (isBlocked ? "lock.circle" : "circle"))
                     .font(.system(size: 22))
-                    .foregroundStyle(isCompletionPending ? Color.green : (isBlocked ? Color.secondary.opacity(0.5) : Color.secondary))
+                    .fontWeight(disciplineColor != nil ? .semibold : .regular)
+                    .foregroundStyle(isCompletionPending ? Color.green : (isBlocked ? Color.secondary.opacity(0.5) : (disciplineColor ?? Color.secondary)))
             }
             .buttonStyle(.plain)
             .disabled(isBlocked)

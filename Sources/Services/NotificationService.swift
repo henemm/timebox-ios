@@ -419,7 +419,7 @@ enum NotificationService {
     static func buildIntentionReminderRequest(hour: Int, minute: Int) -> UNNotificationRequest {
         let content = UNMutableNotificationContent()
         content.title = "Guten Morgen"
-        content.body = "Was soll heute zaehlen?"
+        content.body = "Was soll heute zählen?"
         content.sound = .default
 
         var dateComponents = DateComponents()

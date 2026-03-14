@@ -44,6 +44,19 @@ enum Discipline: String, CaseIterable, Codable {
         }
     }
 
+    /// Classify an open (not yet completed) task into a discipline.
+    /// Simplified variant without duration — fokus is not determinable for open tasks.
+    /// Priority: konsequenz (procrastinated) > mut (high importance) > ausdauer (default)
+    static func classifyOpen(rescheduleCount: Int, importance: Int?) -> Discipline {
+        if rescheduleCount >= 2 {
+            return .konsequenz
+        }
+        if importance == 3 {
+            return .mut
+        }
+        return .ausdauer
+    }
+
     /// Classify a completed task into a discipline based on simple heuristics.
     /// Priority: konsequenz (procrastinated) > mut (high importance) > fokus (within estimate) > ausdauer (default)
     static func classify(

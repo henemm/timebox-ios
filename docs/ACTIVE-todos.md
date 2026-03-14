@@ -216,22 +216,19 @@
 ---
 
 ### Bug 99: CoachBacklogView — Next-Up-Swipe fehlt
-- **Status:** OFFEN
+- **Status:** ERLEDIGT
 - **Plattform:** iOS
-- **Symptom:** In der CoachBacklogView kann man Tasks nicht per Swipe zu "Next Up" hinzufügen. Die normale BacklogView hat Swipe-nach-rechts → "Next Up", die CoachBacklogView nicht.
-- **Auswirkung:** Die Intention "fokus" (matcht auf `task.isNextUp`) ist im Coach-Modus unbenutzbar, weil man Tasks nicht als Next-Up markieren kann.
-- **Fix:** `.swipeActions(edge: .leading)` mit "Next Up"-Button in `coachRow()` ergänzen (analog zu BacklogView).
+- **Fix:** `.swipeActions(edge: .leading)` mit "Next Up"/"Entfernen"-Button in `coachRow()` ergänzt
 - **Dateien:** CoachBacklogView.swift
-- **Komplexität:** XS
+- **Tests:** 5 UI Tests grün
 
 ### Bug 100: Intention-Labels — Umlaute fehlen + Texte als Tagesziel umformulieren
-- **Status:** OFFEN
+- **Status:** ERLEDIGT
 - **Plattform:** iOS + macOS
-- **Symptom 1:** IntentionOption-Labels verwenden ASCII statt Umlaute ("ueberleben" statt "überleben", "grosse haessliche" statt "große hässliche").
-- **Symptom 2:** Label "Das grosse haessliche Ding geschafft" klingt nach Rückblick, nicht nach Tagesziel. Alle Labels prüfen ob sie als Tagesziel-Formulierung sinnvoll sind.
-- **Betroffene Labels:** `IntentionOption.label` in `DailyIntention.swift` — wird überall verwendet (MorningIntentionView, EveningReflectionCard, CoachBacklogView Monster-Header).
-- **Dateien:** Sources/Models/DailyIntention.swift
-- **Komplexität:** XS
+- **Fix:** Alle 6 IntentionOption-Labels mit Umlauten und als Tagesziel-Formulierung (Infinitiv statt Vergangenheit). Siri-Labels und Notification-Text ebenfalls gefixt.
+- **Neue Labels:** "Tag überleben", "Nicht verzetteln", "Das große Ding anpacken", "In allen Bereichen leben", "Etwas Neues lernen", "Für andere da sein"
+- **Dateien:** DailyIntention.swift, IntentionOptionEnum.swift, NotificationService.swift, MorningIntentionTests.swift
+- **Tests:** 13 Unit Tests grün
 
 ---
 
