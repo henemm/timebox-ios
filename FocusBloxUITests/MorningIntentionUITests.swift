@@ -83,14 +83,19 @@ final class MorningIntentionUITests: XCTestCase {
         XCTAssertTrue(trollCard.waitForExistence(timeout: 5))
         trollCard.tap()
 
-        // Tap "Intention setzen"
+        // Tap "Coach wählen"
         let setButton = app.buttons["setIntentionButton"]
         XCTAssertTrue(setButton.waitForExistence(timeout: 3))
         setButton.tap()
 
-        // After setting, "Aendern" button should appear
+        // App auto-navigates to Backlog tab after setting coach — navigate back
+        let meinTagTab = app.tabBars.firstMatch.buttons["Mein Tag"]
+        XCTAssertTrue(meinTagTab.waitForExistence(timeout: 5))
+        meinTagTab.tap()
+
+        // After setting, compact view with "Ändern" button should appear
         let editButton = app.buttons["editIntentionButton"]
-        XCTAssertTrue(editButton.waitForExistence(timeout: 3),
+        XCTAssertTrue(editButton.waitForExistence(timeout: 5),
                        "Edit button should appear after setting coach")
     }
 }

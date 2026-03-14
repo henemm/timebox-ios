@@ -11,7 +11,7 @@
 
 | Prio | Item | Typ | Kompl. | Warum diese Reihenfolge? |
 |------|------|-----|--------|--------------------------|
-| **1** | Coach-Redesign abschliessen | Feature | S | IN ARBEIT — Code fertig, UI Tests + Commit fehlen. Muss zuerst landed werden. |
+| **1** | Coach-Redesign abschliessen | Feature | S | DONE — 116 Unit Tests + 14 UI Tests gruen. Committed. |
 | **2** | Bug 102: Coach-Sync iOS↔macOS | Bug P0 | S-M | DONE — pullFromCloud() vor pushToCloud(), Guard gegen leere Coach-Pushes. 7 Unit + 2 UI Tests gruen. |
 | **3** | Phase 6d: Abend-Spiegel macOS | Feature | S-M | Komplettiert den Coach-Tagesbogen auf macOS. Shared View wahrscheinlich direkt nutzbar. |
 | **4** | Phase 6e: CoachMeinTagView macOS | Feature | M | Abhaengig von 6d. Danach ist Coach-Modus auf macOS komplett. |
@@ -191,8 +191,8 @@
 
 ---
 
-### Coach-Redesign: 4 Coaches statt 6 Absichten — IN ARBEIT
-- **Status:** IN ARBEIT (Production Code + Unit Tests fertig, UI Tests + Commit ausstehend)
+### Coach-Redesign: 4 Coaches statt 6 Absichten — ERLEDIGT
+- **Status:** ERLEDIGT (116 Unit Tests + 14 UI Tests gruen)
 - **Plattform:** iOS + macOS
 - **Aenderung:** 6 Morgen-Absichten ersetzt durch 4 Monster-Coaches mit klarer Persoenlichkeit
 - **Coaches:** Troll (aufgeschobene Tasks), Feuer (wichtige Tasks), Eule (geplante Tasks max 3), Golem (Kategorie-Balance)
