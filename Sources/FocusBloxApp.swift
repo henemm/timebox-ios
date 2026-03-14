@@ -316,6 +316,7 @@ struct FocusBloxApp: App {
                 if newPhase == .active {
                     syncMonitor.triggerSync()
                     checkCCQuickCaptureTrigger()
+                    syncedSettings.pullFromCloud()  // Bug 102: Pull BEFORE push
                     syncedSettings.pushToCloud()
                     rescheduleDueDateNotifications()
                     NotificationService.updateOverdueBadge(container: sharedModelContainer)
@@ -561,6 +562,12 @@ struct FocusBloxApp: App {
             UserDefaults.standard.removeObject(forKey: "selectedCoach")
             UserDefaults.standard.removeObject(forKey: "selectedCoachDate")
             UserDefaults.standard.removeObject(forKey: "intentionJustSet")
+
+            // Bug 102: Re-apply MockSyncedCoach AFTER clearing (simulates pullFromCloud path)
+            if ProcessInfo.processInfo.arguments.contains("-MockSyncedCoach") {
+                UserDefaults.standard.set("troll", forKey: "selectedCoach")
+                UserDefaults.standard.set(DailyCoachSelection.todayDateString(), forKey: "selectedCoachDate")
+            }
         }
 
         guard ProcessInfo.processInfo.arguments.contains("-ResetUserDefaults") else { return }
@@ -820,6 +827,14 @@ struct FocusBloxApp: App {
                 coach: .troll
             )
             selection.save()
+        }
+
+        // Bug 102: Simulate synced coach from another device (for CoachSyncUITests)
+        // Writes selectedCoach + selectedCoachDate to UserDefaults.standard
+        // simulating pullFromCloud() path without actual iCloud
+        if ProcessInfo.processInfo.arguments.contains("-MockSyncedCoach") {
+            UserDefaults.standard.set("troll", forKey: "selectedCoach")
+            UserDefaults.standard.set(DailyCoachSelection.todayDateString(), forKey: "selectedCoachDate")
         }
     }
 }

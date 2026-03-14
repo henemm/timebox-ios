@@ -1,0 +1,11 @@
+** TEST BUILD FAILED ** (TDD RED — compile errors as expected)
+
+CoachSyncTests.swift:14:37: error: type 'SyncedSettings' has no member 'shouldPushCoach'
+CoachSyncTests.swift:21:37: error: type 'SyncedSettings' has no member 'shouldPushCoach'
+CoachSyncTests.swift:30:37: error: type 'SyncedSettings' has no member 'shouldAcceptRemoteCoach'
+CoachSyncTests.swift:40:37: error: type 'SyncedSettings' has no member 'shouldAcceptRemoteCoach'
+CoachSyncTests.swift:50:37: error: type 'SyncedSettings' has no member 'shouldAcceptRemoteCoach'
+CoachSyncTests.swift:60:37: error: type 'SyncedSettings' has no member 'shouldAcceptRemoteCoach'
+CoachSyncTests.swift:70:37: error: type 'SyncedSettings' has no member 'shouldAcceptRemoteCoach'
+
+7 compile errors — methods not yet implemented (RED confirmed)

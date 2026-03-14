@@ -231,8 +231,9 @@ struct FocusBloxMacApp: App {
             fatalError("Failed to create ModelContainer: \(error)")
         }
 
-        // Lokale Einstellungen in iCloud pushen
+        // Bug 102: Pull BEFORE push — verhindert dass leere lokale Werte Remote ueberschreiben
         if !isUITesting {
+            syncedSettings.pullFromCloud()
             syncedSettings.pushToCloud()
         }
     }
@@ -317,6 +318,7 @@ struct FocusBloxMacApp: App {
                 .onChange(of: scenePhase) { _, newPhase in
                     if newPhase == .active {
                         syncMonitor.triggerSync()
+                        syncedSettings.pullFromCloud()  // Bug 102: Pull BEFORE push
                         syncedSettings.pushToCloud()
                     }
                     if newPhase == .background {

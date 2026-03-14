@@ -12,7 +12,7 @@
 | Prio | Item | Typ | Kompl. | Warum diese Reihenfolge? |
 |------|------|-----|--------|--------------------------|
 | **1** | Coach-Redesign abschliessen | Feature | S | IN ARBEIT — Code fertig, UI Tests + Commit fehlen. Muss zuerst landed werden. |
-| **2** | Bug 102: Coach-Sync iOS↔macOS | Bug P0 | S-M | Ohne Sync ist Coach-Modus auf macOS nutzlos. Blockiert taegliche Nutzung. |
+| **2** | Bug 102: Coach-Sync iOS↔macOS | Bug P0 | S-M | DONE — pullFromCloud() vor pushToCloud(), Guard gegen leere Coach-Pushes. 7 Unit + 2 UI Tests gruen. |
 | **3** | Phase 6d: Abend-Spiegel macOS | Feature | S-M | Komplettiert den Coach-Tagesbogen auf macOS. Shared View wahrscheinlich direkt nutzbar. |
 | **4** | Phase 6e: CoachMeinTagView macOS | Feature | M | Abhaengig von 6d. Danach ist Coach-Modus auf macOS komplett. |
 | **5** | Bug 101: macOS 5 statt 4 Views | Bug | M | Inkonsistenz zwischen Plattformen. Assign-View zusammenlegen. |
@@ -34,14 +34,12 @@
 ## Offene Bugs
 
 ### Bug 102: Coach-Wahl wird NICHT zwischen iOS und macOS synchronisiert — P0
-- **Status:** OFFEN
+- **Status:** DONE
 - **Plattform:** iOS + macOS
-- **Symptom:** Wenn man morgens auf dem iPhone einen Coach waehlt (z.B. Troll), weiss der Mac nichts davon. CoachBacklogView auf macOS zeigt keine Schwerpunkt-Sektion, Monster-Header bleibt leer.
-- **Root Cause:** Die Coach-Wahl wird in lokalen UserDefaults gespeichert (`@AppStorage("selectedCoach")` + `DailyCoachSelection.save()` in App Group). Kein iCloud-Sync.
-- **Betroffene Daten:** `selectedCoach` (String: "troll"/"feuer"/"eule"/"golem"/""), `selectedCoachDate` (String: "YYYY-MM-DD")
-- **Bestehende Infrastruktur:** `SyncedSettings` nutzt bereits `NSUbiquitousKeyValueStore` fuer andere Settings. Coach-Wahl muss dort angebunden werden.
-- **Loesung:** `selectedCoach` + `selectedCoachDate` ueber `NSUbiquitousKeyValueStore` synchronisieren. Push bei Coach-Wahl, Pull bei `cloudDidChange`. Cloud-Keys: `sync_selectedCoach`, `sync_selectedCoachDate`.
-- **Komplexitaet:** S-M
+- **Root Cause:** pushToCloud() ueberschrieb valide Remote-Daten mit leeren lokalen Werten weil pullFromCloud() nie proaktiv aufgerufen wurde.
+- **Fix:** (1) pullFromCloud() vor pushToCloud() auf beiden Plattformen, (2) Guard gegen leere Coach-Pushes, (3) pullFromCloud() in SyncedSettings.init()
+- **Tests:** 7 Unit Tests (Guard-Logik) + 2 UI Tests (Synced Coach Header) — alle gruen
+- **Dateien:** SyncedSettings.swift, FocusBloxApp.swift, FocusBloxMacApp.swift
 
 ### Bug 98: Mein Tag Woche zeigt nur Sprint-Tasks — ausserhalb Sprints erledigte fehlen
 - **Status:** OFFEN

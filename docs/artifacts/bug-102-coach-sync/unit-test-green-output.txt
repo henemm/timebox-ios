@@ -1,0 +1,9 @@
+** ALL 7 UNIT TESTS PASSED (GREEN) **
+
+CoachSyncTests.test_shouldPushCoach_returnsFalseWhenDateEmpty() passed
+CoachSyncTests.test_shouldPushCoach_returnsTrueWhenDateSet() passed
+CoachSyncTests.test_shouldAcceptRemoteCoach_acceptsWhenRemoteNewer() passed
+CoachSyncTests.test_shouldAcceptRemoteCoach_rejectsWhenLocalNewer() passed
+CoachSyncTests.test_shouldAcceptRemoteCoach_remoteWinsOnEqualDate() passed
+CoachSyncTests.test_shouldAcceptRemoteCoach_rejectsEmptyRemoteDate() passed
+CoachSyncTests.test_shouldAcceptRemoteCoach_rejectsBothEmpty() passed

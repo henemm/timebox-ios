@@ -165,6 +165,8 @@
 		CATUI001BUILDFILE0001 /* CategoriesUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CATUI001FILEREF00001 /* CategoriesUITests.swift */; };
 		CB5A01BUILD0000001 /* CoachBacklogTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB5A01FILEREF00001 /* CoachBacklogTests.swift */; };
 		CB5B01BUILD0000001 /* CoachBacklogViewUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB5B01FILEREF00001 /* CoachBacklogViewUITests.swift */; };
+		CSYNC01BUILD0000001 /* CoachSyncTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CSYNC01FILEREF00001 /* CoachSyncTests.swift */; };
+		CSYNC02BUILD0000001 /* CoachSyncUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CSYNC02FILEREF00001 /* CoachSyncUITests.swift */; };
 		CB5C01BUILD0000001 /* CoachBacklogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB5C01FILEREF00001 /* CoachBacklogView.swift */; };
 		CBHELP01BUILD0001 /* ClipboardHelperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBHELP01FILE00001 /* ClipboardHelperTests.swift */; };
 		CBPASTE01BUILD0001 /* ClipboardTaskFlowUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBPASTE01FILE00001 /* ClipboardTaskFlowUITests.swift */; };
@@ -737,6 +739,8 @@
 		CB5A01FILEREF00001 /* CoachBacklogTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CoachBacklogTests.swift; sourceTree = "<group>"; };
 		CB5B01FILEREF00001 /* CoachBacklogViewUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CoachBacklogViewUITests.swift; sourceTree = "<group>"; };
 		CB5C01FILEREF00001 /* CoachBacklogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoachBacklogView.swift; sourceTree = "<group>"; };
+		CSYNC01FILEREF00001 /* CoachSyncTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoachSyncTests.swift; sourceTree = "<group>"; };
+		CSYNC02FILEREF00001 /* CoachSyncUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoachSyncUITests.swift; sourceTree = "<group>"; };
 		CBHELP01FILE00001 /* ClipboardHelperTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardHelperTests.swift; sourceTree = "<group>"; };
 		CBPASTE01FILE00001 /* ClipboardTaskFlowUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardTaskFlowUITests.swift; sourceTree = "<group>"; };
 		CC7B2E12D270CC49B824429F /* FocusBlockDropIndicatorUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = FocusBlockDropIndicatorUITests.swift; sourceTree = "<group>"; };
@@ -1296,6 +1300,7 @@
 				DE59459EB563B50137F303E8 /* DependencyIndentUITests.swift */,
 				FAD0E9CA71F3D40E44246594 /* IntentionFilterUITests.swift */,
 				CB5B01FILEREF00001 /* CoachBacklogViewUITests.swift */,
+				CSYNC02FILEREF00001 /* CoachSyncUITests.swift */,
 				CNSU01FILEREF00001 /* CoachNotificationSettingsUITests.swift */,
 				EVRC03FILEREF00001 /* EveningReflectionCardUITests.swift */,
 				35E10E0297BB375AFCD4517E /* DueDateBadgeExtractionUITests.swift */,
@@ -1519,6 +1524,7 @@
 				APPGRP02FILE00001 /* AppGroupSwiftDataTests.swift */,
 				DSGNSYS01FILE00001 /* DesignSystemTests.swift */,
 				SYNSET01FILE00001 /* SyncedSettingsTests.swift */,
+				CSYNC01FILEREF00001 /* CoachSyncTests.swift */,
 				BUG39LC01FILE00001 /* FocusBlockLifecycleTests.swift */,
 				CKSM01FILE000001 /* CloudKitSyncMonitorTests.swift */,
 				BUG50RO01FILE0001 /* CalendarEventReadOnlyTests.swift */,
@@ -2469,6 +2475,7 @@
 				4D87251CF1F054F848940F82 /* DependencyIndentUITests.swift in Sources */,
 				324335EAD3A707ABE5F3BEFE /* IntentionFilterUITests.swift in Sources */,
 				CB5B01BUILD0000001 /* CoachBacklogViewUITests.swift in Sources */,
+				CSYNC02BUILD0000001 /* CoachSyncUITests.swift in Sources */,
 				CNSU01BUILD0000001 /* CoachNotificationSettingsUITests.swift in Sources */,
 				EVRC03BUILD0000001 /* EveningReflectionCardUITests.swift in Sources */,
 				CA22A8F18B6FEFFE3F35774E /* DueDateBadgeExtractionUITests.swift in Sources */,
@@ -2529,6 +2536,7 @@
 				APPGRP02BUILD0001 /* AppGroupSwiftDataTests.swift in Sources */,
 				DSGNSYS01BUILD0001 /* DesignSystemTests.swift in Sources */,
 				SYNSET01BUILD0001 /* SyncedSettingsTests.swift in Sources */,
+				CSYNC01BUILD0000001 /* CoachSyncTests.swift in Sources */,
 				BUG39LC01BUILD0001 /* FocusBlockLifecycleTests.swift in Sources */,
 				CKSM01BUILD00001 /* CloudKitSyncMonitorTests.swift in Sources */,
 				BUG50RO01BUILD001 /* CalendarEventReadOnlyTests.swift in Sources */,

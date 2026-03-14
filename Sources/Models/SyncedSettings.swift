@@ -54,6 +54,9 @@ final class SyncedSettings {
             name: NSUbiquitousKeyValueStore.didChangeExternallyNotification,
             object: cloud
         )
+
+        // Bug 102: Proaktiv Remote-Daten holen beim App-Start
+        pullFromCloud()
     }
 
     // MARK: - Push: Lokale Settings → iCloud
@@ -91,9 +94,13 @@ final class SyncedSettings {
             cloud.set(catDict, forKey: CloudKey.eventCategories)
         }
 
-        // Coach-Wahl: String + Datum direkt kopieren
-        cloud.set(defaults.string(forKey: LocalKey.selectedCoach) ?? "", forKey: CloudKey.selectedCoach)
-        cloud.set(defaults.string(forKey: LocalKey.selectedCoachDate) ?? "", forKey: CloudKey.selectedCoachDate)
+        // Bug 102: Coach-Wahl NUR pushen wenn lokales Datum gesetzt ist
+        // Verhindert dass leere Werte valide Remote-Daten ueberschreiben
+        let localCoachDate = defaults.string(forKey: LocalKey.selectedCoachDate) ?? ""
+        if Self.shouldPushCoach(localCoachDate: localCoachDate) {
+            cloud.set(defaults.string(forKey: LocalKey.selectedCoach) ?? "", forKey: CloudKey.selectedCoach)
+            cloud.set(localCoachDate, forKey: CloudKey.selectedCoachDate)
+        }
 
         cloud.synchronize()
     }
@@ -145,13 +152,28 @@ final class SyncedSettings {
             defaults.set(localDict, forKey: LocalKey.eventCategories)
         }
 
-        // Coach-Wahl: Remote gewinnt (zuletzt gesetzte Coach-Wahl)
+        // Bug 102: Coach-Wahl mit Guard-Logik (Remote gewinnt bei neuerem/gleichem Datum)
         let remoteCoachDate = cloud.string(forKey: CloudKey.selectedCoachDate) ?? ""
         let localCoachDate = defaults.string(forKey: LocalKey.selectedCoachDate) ?? ""
-        if remoteCoachDate >= localCoachDate, !remoteCoachDate.isEmpty {
+        if Self.shouldAcceptRemoteCoach(remoteDate: remoteCoachDate, localDate: localCoachDate) {
             defaults.set(cloud.string(forKey: CloudKey.selectedCoach) ?? "", forKey: LocalKey.selectedCoach)
             defaults.set(remoteCoachDate, forKey: LocalKey.selectedCoachDate)
         }
+    }
+
+    // MARK: - Coach Sync Guards (Bug 102)
+
+    /// Guard: Nur pushen wenn lokales Coach-Datum gesetzt ist.
+    /// Verhindert dass leere Werte valide Remote-Daten ueberschreiben.
+    static func shouldPushCoach(localCoachDate: String) -> Bool {
+        !localCoachDate.isEmpty
+    }
+
+    /// Merge-Logik: Remote-Coach akzeptieren wenn Remote-Datum neuer oder gleich ist (Last-Writer-Wins).
+    /// Leeres Remote-Datum wird immer abgelehnt.
+    static func shouldAcceptRemoteCoach(remoteDate: String, localDate: String) -> Bool {
+        guard !remoteDate.isEmpty else { return false }
+        return remoteDate >= localDate
     }
 
     // MARK: - Event Category Sync (Bug 80)

@@ -1,0 +1,4 @@
+** ALL 2 UI TESTS PASSED (GREEN) **
+
+CoachSyncUITests.test_syncedCoach_showsCoachNameInHeader() passed (9.558 seconds)
+CoachSyncUITests.test_syncedCoach_hintTextDisappears() passed (13.826 seconds)

@@ -1,0 +1,9 @@
+** UI TESTS RED — expected runtime failures **
+
+CoachSyncUITests compiles but will fail at runtime because:
+1. -MockSyncedCoach launch argument handler not yet implemented in FocusBloxApp.swift
+2. No code sets selectedCoach="troll" + selectedCoachDate in response to this argument
+3. test_syncedCoach_showsCoachNameInHeader: "Troll — Der Aufräumer" text won't appear
+4. test_syncedCoach_hintTextDisappears: Hint text will still be visible (no coach set)
+
+RED confirmed — functionality does not exist yet.
