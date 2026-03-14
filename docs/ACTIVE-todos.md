@@ -182,12 +182,15 @@
 - **Spec:** docs/specs/features/coach-settings-macos.md
 - **Commit:** (wird nach Commit ergaenzt)
 
-### Phase 6b: CoachBacklogView in macOS (Must) — OFFEN
+### Phase 6b: CoachBacklogView in macOS (Must) — GEPLANT
 - macOS ContentView/SidebarView muss bei `coachModeEnabled` eine Coach-Variante des Backlogs anzeigen
 - Monster-Header, Disziplin-Kreise, Schwerpunkt/Weitere-Sektionen
-- Die iOS CoachBacklogView kann als Vorlage dienen, muss aber ans macOS-Layout angepasst werden (Sidebar + Detail statt Tab)
+- Die iOS CoachBacklogView dient als Vorlage, aber macOS arbeitet mit `LocalTask` statt `PlanItem` — separate MacCoachBacklogView noetig
+- **Ansatz:** Neue `FocusBloxMac/MacCoachBacklogView.swift`, ContentView bekommt coachModeEnabled-Weiche, SidebarView vereinfacht
 - **Referenz:** iOS CoachBacklogView.swift, Spec `docs/specs/features/coach-views-backlog.md`
-- **Dateien:** FocusBloxMac/ (ContentView oder neue MacCoachBacklogView), Discipline.swift (shared)
+- **Proposal:** `openspec/changes/monster-coach-phase6b/proposal.md`
+- **Dateien:** MacCoachBacklogView.swift (NEU), ContentView.swift, MacBacklogRow.swift, SidebarView.swift
+- **Scope:** ~190 LoC, 4 UI Tests
 - **Komplexitaet:** M
 
 ### Phase 6c: MorningIntentionView in macOS (Must) — OFFEN
@@ -238,8 +241,8 @@
 - **Symptom:** Der AI-generierte Abend-Text war generisch und ging nicht auf die gesetzte Tages-Intention ein. Tasks wurden blind abgeschnitten statt nach Relevanz sortiert.
 - **Root Cause:** `buildPrompt()` in EveningReflectionTextService hatte (1) keine Intention-Relevanz-Sortierung vor `.prefix(5)`, (2) keine Schwerpunkt-Guidance für die AI, (3) bei Balance keine Kategorie-Aufschlüsselung.
 - **Fix:** Tasks nach Intention-Relevanz sortieren (BHAG→importance=3, Fokus→Block-Tasks, Growth→Learning, Connection→Giving-Back), Schwerpunkt-Zeile im Prompt, Balance mit konkreter Kategorie-Aufschlüsselung.
-- **Tests:** 16 Unit Tests grün (EveningReflectionTextServiceTests)
-- **Dateien:** EveningReflectionTextService.swift
+- **Tests:** 19 Unit Tests grün (EveningReflectionTextServiceTests) — inkl. Sortierungsreihenfolge, Balance-Kategorien, Guidance pro Intention
+- **Dateien:** EveningReflectionTextService.swift, EveningReflectionTextServiceTests.swift
 
 ### Bug 98: Mein Tag Woche zeigt nur Sprint-Tasks — ausserhalb Sprints erledigte fehlen
 - **Status:** OFFEN

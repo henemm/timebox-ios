@@ -17,12 +17,14 @@ final class EveningReflectionTextServiceTests: XCTestCase {
         importance: Int? = nil,
         isCompleted: Bool = false,
         completedAt: Date? = nil,
-        taskType: String = ""
+        taskType: String = "",
+        assignedFocusBlockID: String? = nil
     ) -> LocalTask {
         let task = LocalTask(title: title, importance: importance)
         task.isCompleted = isCompleted
         task.completedAt = completedAt
         task.taskType = taskType
+        task.assignedFocusBlockID = assignedFocusBlockID
         return task
     }
 
@@ -311,5 +313,260 @@ final class EveningReflectionTextServiceTests: XCTestCase {
             prompt.contains("Wichtigkeit: hoch"),
             "Prompt should mark importance=3 tasks as high importance"
         )
+    }
+
+    // MARK: - Intention-Relevanz Sortierung (Bug: Review nicht spezifisch)
+
+    /// Verhalten: Bei BHAG-Intention steht der importance=3 Task VOR normalen Tasks.
+    /// Bricht wenn: buildPrompt() Tasks nicht nach Intention-Relevanz sortiert.
+    func test_buildPrompt_bhag_sortsHighImportanceFirst() {
+        let service = EveningReflectionTextService()
+
+        // 6 normale Tasks, dann 1 BHAG-Task am Ende — ohne Sortierung würde .prefix(5) ihn abschneiden
+        var tasks: [LocalTask] = (1...6).map { i in
+            makeTask(title: "Admin \(i)", isCompleted: true, completedAt: today)
+        }
+        let bhagTask = makeTask(
+            title: "Das Grosse Ding",
+            importance: 3,
+            isCompleted: true,
+            completedAt: today
+        )
+        tasks.append(bhagTask)
+
+        let prompt = service.buildPrompt(
+            intention: .bhag,
+            level: .fulfilled,
+            tasks: tasks,
+            focusBlocks: [],
+            now: today
+        )
+
+        // Task muss im Prompt sein UND vor den normalen Tasks stehen
+        let bhagPos = prompt.range(of: "Das Grosse Ding")
+        let adminPos = prompt.range(of: "Admin 1")
+        XCTAssertNotNil(bhagPos, "BHAG task must appear in prompt")
+        XCTAssertNotNil(adminPos, "Admin task must appear in prompt")
+        XCTAssertTrue(
+            bhagPos!.lowerBound < adminPos!.lowerBound,
+            "BHAG task (importance=3) must appear BEFORE normal tasks"
+        )
+    }
+
+    /// Verhalten: Bei Fokus-Intention steht der Block-Task VOR Tasks ohne Block.
+    /// Bricht wenn: buildPrompt() Tasks nicht nach assignedFocusBlockID sortiert.
+    func test_buildPrompt_fokus_sortsBlockTasksFirst() {
+        let service = EveningReflectionTextService()
+
+        var tasks: [LocalTask] = (1...6).map { i in
+            makeTask(title: "Ohne Block \(i)", isCompleted: true, completedAt: today)
+        }
+        let blockTask = makeTask(
+            title: "Im Block erledigt",
+            isCompleted: true,
+            completedAt: today,
+            assignedFocusBlockID: "block-1"
+        )
+        tasks.append(blockTask)
+
+        let prompt = service.buildPrompt(
+            intention: .fokus,
+            level: .fulfilled,
+            tasks: tasks,
+            focusBlocks: [],
+            now: today
+        )
+
+        let blockPos = prompt.range(of: "Im Block erledigt")
+        let ohnePos = prompt.range(of: "Ohne Block 1")
+        XCTAssertNotNil(blockPos, "Block task must appear in prompt")
+        XCTAssertNotNil(ohnePos, "Non-block task must appear in prompt")
+        XCTAssertTrue(
+            blockPos!.lowerBound < ohnePos!.lowerBound,
+            "Block-assigned task must appear BEFORE non-block tasks"
+        )
+    }
+
+    /// Verhalten: Bei Growth-Intention steht der Learning-Task VOR anderen.
+    /// Bricht wenn: buildPrompt() nicht nach taskType=="learning" sortiert.
+    func test_buildPrompt_growth_sortsLearningTasksFirst() {
+        let service = EveningReflectionTextService()
+
+        var tasks: [LocalTask] = (1...6).map { i in
+            makeTask(title: "Routine \(i)", isCompleted: true, completedAt: today, taskType: "income")
+        }
+        let learningTask = makeTask(
+            title: "Swift Kurs",
+            isCompleted: true,
+            completedAt: today,
+            taskType: "learning"
+        )
+        tasks.append(learningTask)
+
+        let prompt = service.buildPrompt(
+            intention: .growth,
+            level: .fulfilled,
+            tasks: tasks,
+            focusBlocks: [],
+            now: today
+        )
+
+        let learnPos = prompt.range(of: "Swift Kurs")
+        let routinePos = prompt.range(of: "Routine 1")
+        XCTAssertNotNil(learnPos, "Learning task must appear in prompt")
+        XCTAssertNotNil(routinePos, "Routine task must appear in prompt")
+        XCTAssertTrue(
+            learnPos!.lowerBound < routinePos!.lowerBound,
+            "Learning task must appear BEFORE income tasks"
+        )
+    }
+
+    /// Verhalten: Bei Connection-Intention steht der Giving-Back-Task VOR anderen.
+    /// Bricht wenn: buildPrompt() nicht nach taskType=="giving_back" sortiert.
+    func test_buildPrompt_connection_sortsGivingBackTasksFirst() {
+        let service = EveningReflectionTextService()
+
+        var tasks: [LocalTask] = (1...6).map { i in
+            makeTask(title: "Arbeit \(i)", isCompleted: true, completedAt: today, taskType: "income")
+        }
+        let connectionTask = makeTask(
+            title: "Oma anrufen",
+            isCompleted: true,
+            completedAt: today,
+            taskType: "giving_back"
+        )
+        tasks.append(connectionTask)
+
+        let prompt = service.buildPrompt(
+            intention: .connection,
+            level: .fulfilled,
+            tasks: tasks,
+            focusBlocks: [],
+            now: today
+        )
+
+        let socialPos = prompt.range(of: "Oma anrufen")
+        let workPos = prompt.range(of: "Arbeit 1")
+        XCTAssertNotNil(socialPos, "Giving-back task must appear in prompt")
+        XCTAssertNotNil(workPos, "Work task must appear in prompt")
+        XCTAssertTrue(
+            socialPos!.lowerBound < workPos!.lowerBound,
+            "Giving-back task must appear BEFORE income tasks"
+        )
+    }
+
+    // MARK: - Intention Guidance pro Intention
+
+    /// Verhalten: Jede Intention hat eine spezifische Schwerpunkt-Guidance im Prompt.
+    /// Bricht wenn: intentionGuidance() für eine Intention fehlt oder generisch ist.
+    func test_buildPrompt_guidancePerIntention() {
+        let service = EveningReflectionTextService()
+        let expectations: [(IntentionOption, String)] = [
+            (.survival, "überstanden"),
+            (.fokus, "Focus-Blocks"),
+            (.bhag, "große"),
+            (.growth, "Lernen"),
+            (.connection, "Verbundenheit"),
+        ]
+
+        for (intention, keyword) in expectations {
+            let prompt = service.buildPrompt(
+                intention: intention,
+                level: .fulfilled,
+                tasks: [],
+                focusBlocks: [],
+                now: today
+            )
+            XCTAssertTrue(
+                prompt.contains("Schwerpunkt:"),
+                "\(intention) prompt must contain 'Schwerpunkt:'"
+            )
+            XCTAssertTrue(
+                prompt.contains(keyword),
+                "\(intention) guidance must contain '\(keyword)'"
+            )
+        }
+    }
+
+    // MARK: - Balance Guidance mit Kategorie-Aufschlüsselung
+
+    /// Verhalten: Balance-Guidance listet aktive und fehlende Kategorien auf.
+    /// Bricht wenn: balanceGuidance() nicht nach TaskCategory aufschlüsselt.
+    func test_buildPrompt_balance_showsCategoryBreakdown() {
+        let service = EveningReflectionTextService()
+
+        let tasks: [LocalTask] = [
+            makeTask(title: "Gehalt", isCompleted: true, completedAt: today, taskType: "income"),
+            makeTask(title: "Rechnung", isCompleted: true, completedAt: today, taskType: "income"),
+            makeTask(title: "Yoga", isCompleted: true, completedAt: today, taskType: "recharge"),
+        ]
+
+        let prompt = service.buildPrompt(
+            intention: .balance,
+            level: .partial,
+            tasks: tasks,
+            focusBlocks: [],
+            now: today
+        )
+
+        // Aktive Kategorien mit Anzahl
+        XCTAssertTrue(prompt.contains("Geld (2)"), "Must show 'Geld (2)' for 2 income tasks")
+        XCTAssertTrue(prompt.contains("Energie (1)"), "Must show 'Energie (1)' for 1 recharge task")
+
+        // Fehlende Kategorien
+        XCTAssertTrue(prompt.contains("Pflege"), "Must list missing category 'Pflege'")
+        XCTAssertTrue(prompt.contains("Lernen"), "Must list missing category 'Lernen'")
+        XCTAssertTrue(prompt.contains("Geben"), "Must list missing category 'Geben'")
+        XCTAssertTrue(prompt.contains("Fehlend:"), "Must contain 'Fehlend:' label")
+    }
+
+    /// Verhalten: Balance-Guidance bei leeren Tasks zeigt "in keinem Bereich aktiv".
+    /// Bricht wenn: balanceGuidance() bei leeren Tasks redundanten Output erzeugt.
+    func test_buildPrompt_balance_emptyTasksShowsNoneActive() {
+        let service = EveningReflectionTextService()
+
+        let prompt = service.buildPrompt(
+            intention: .balance,
+            level: .notFulfilled,
+            tasks: [],
+            focusBlocks: [],
+            now: today
+        )
+
+        XCTAssertTrue(
+            prompt.contains("keinem Bereich aktiv"),
+            "Empty tasks must show 'in keinem Bereich aktiv'"
+        )
+        // Darf NICHT gleichzeitig "Fehlend:" zeigen (wäre redundant)
+        XCTAssertFalse(
+            prompt.contains("Fehlend:"),
+            "Must NOT show 'Fehlend:' when already saying 'keinem Bereich aktiv'"
+        )
+    }
+
+    /// Verhalten: Balance-Guidance bei allen 5 Kategorien aktiv zeigt keine fehlenden.
+    /// Bricht wenn: balanceGuidance() fälschlich fehlende Kategorien anzeigt.
+    func test_buildPrompt_balance_allCategoriesActive() {
+        let service = EveningReflectionTextService()
+
+        let tasks: [LocalTask] = [
+            makeTask(title: "T1", isCompleted: true, completedAt: today, taskType: "income"),
+            makeTask(title: "T2", isCompleted: true, completedAt: today, taskType: "maintenance"),
+            makeTask(title: "T3", isCompleted: true, completedAt: today, taskType: "recharge"),
+            makeTask(title: "T4", isCompleted: true, completedAt: today, taskType: "learning"),
+            makeTask(title: "T5", isCompleted: true, completedAt: today, taskType: "giving_back"),
+        ]
+
+        let prompt = service.buildPrompt(
+            intention: .balance,
+            level: .fulfilled,
+            tasks: tasks,
+            focusBlocks: [],
+            now: today
+        )
+
+        XCTAssertTrue(prompt.contains("Heute aktiv:"), "Must show active categories")
+        XCTAssertFalse(prompt.contains("Fehlend:"), "Must NOT show 'Fehlend:' when all categories active")
+        XCTAssertFalse(prompt.contains("keinem Bereich"), "Must NOT say 'keinem Bereich' when all active")
     }
 }
