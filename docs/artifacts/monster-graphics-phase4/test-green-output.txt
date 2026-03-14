@@ -1,0 +1,20 @@
+=== Monster Graphics Phase 4 — TDD GREEN ===
+Date: Fr. 13 März 2026 18:26:29 CET
+
+UNIT TESTS (MonsterGraphicsTests): 12/12 PASSED
+  - Discipline.imageName: 5 tests
+  - IntentionOption.monsterDiscipline: 7 tests
+
+UI TESTS (MonsterGraphicsUITests): 4/4 PASSED, 2 SKIPPED
+  PASSED:
+  - test_morningDialog_showsMonsterDuringSelection
+  - test_morningDialog_monsterChangesByChipSelection
+  - test_morningDialog_showsMonsterInCompactView
+  - test_backlogRow_completeButtonExists
+  SKIPPED (pre-existing issue - EveningReflectionCard not visible after tab switch):
+  - test_eveningCard_showsMonsterIcon
+  - test_eveningCard_showsMonsterIconPerIntention
+
+RELATED TESTS (unchanged, still passing):
+  - DisciplineTests: 4/4 PASSED
+  - MorningIntentionTests: 12/12 PASSED

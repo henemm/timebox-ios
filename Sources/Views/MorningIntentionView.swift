@@ -40,6 +40,17 @@ struct MorningIntentionView: View {
 
     private var compactView: some View {
         HStack {
+            if let primary = intention.selections.first {
+                Image(primary.monsterDiscipline.imageName)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 44, height: 44)
+                    .clipShape(Circle())
+                    .accessibilityElement(children: .ignore)
+                    .accessibilityAddTraits(.isImage)
+                    .accessibilityIdentifier("monsterImage")
+            }
+
             ForEach(intention.selections, id: \.self) { option in
                 HStack(spacing: 4) {
                     Image(systemName: option.icon)
@@ -64,10 +75,27 @@ struct MorningIntentionView: View {
 
     // MARK: - Selection View
 
+    /// The dominant discipline for the currently selected options.
+    private var selectedMonsterDiscipline: Discipline? {
+        selectedOptions.first?.monsterDiscipline
+    }
+
     private var selectionView: some View {
         VStack(spacing: 16) {
             Text("Wie wird dein Tag?")
                 .font(.headline)
+
+            if let discipline = selectedMonsterDiscipline {
+                Image(discipline.imageName)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(height: 120)
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
+                    .accessibilityElement(children: .ignore)
+                    .accessibilityAddTraits(.isImage)
+                    .accessibilityIdentifier("monsterImage")
+                    .transition(.scale.combined(with: .opacity))
+            }
 
             Text("Wenn du heute Abend auf diesen Tag zurueckblickst...")
                 .font(.subheadline)

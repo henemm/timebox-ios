@@ -32,16 +32,36 @@ FocusBlox funktioniert gut als Produktivitäts-Tool: Backlog, Planung, Timer, Go
 
 > "Wenn du heute Abend auf diesen Tag zurückblickst — was möchtest du dann sehen?"
 
-| Option | Intention | Monster-Verhalten |
-|--------|-----------|-------------------|
-| "Egal, Tag überleben" | Survival | Sanft, beschützend |
-| "Stolz: nicht verzettelt" | Fokus | Aufmerksam, wachsam |
-| "Das große hässliche Ding geschafft" | BHAG | Energisch, fordernd |
-| "In allen Bereichen gelebt" | Balance (Haug) | Ausgleichend, erinnernd |
-| "Etwas Neues gelernt" | Wachstum | Neugierig, ermutigend |
-| "Für andere da gewesen" | Verbundenheit | Warm, dankbar |
+| Option | Intention | Monster | Monster-Verhalten |
+|--------|-----------|---------|-------------------|
+| "Egal, Tag überleben" | Survival | Golem (Ausdauer) | Sanft, beschützend |
+| "Stolz: nicht verzettelt" | Fokus | Eule (Fokus) | Aufmerksam, wachsam |
+| "Das große hässliche Ding geschafft" | BHAG | Feuer (Mut) | Energisch, fordernd |
+| "In allen Bereichen gelebt" | Balance (Haug) | Golem (Ausdauer) | Ausgleichend, erinnernd |
+| "Etwas Neues gelernt" | Wachstum | Eule (Fokus) | Neugierig, ermutigend |
+| "Für andere da gewesen" | Verbundenheit | Troll (Konsequenz) | Warm, dankbar |
 
 Die Morgen-Frage dreht die Logik um: Nicht "Was tust du heute?" sondern "Wie willst du dich abends fühlen?" — und die App arbeitet rückwärts davon.
+
+## Die vier Monster (Trainingspartner)
+
+### Monster-Grafiken (Assets)
+
+Vier PNG-Grafiken mit transparentem Hintergrund, je eine pro Discipline:
+
+| Asset | Discipline | Beschreibung |
+|-------|-----------|--------------|
+| `monsterFokus` | Fokus (Blau) | Eule mit Lupe — wachsam, analytisch |
+| `monsterMut` | Mut (Orange) | Feuer-Monster — energisch, mutig |
+| `monsterAusdauer` | Ausdauer (Grau) | Stein-Golem mit Hut & Stock — geduldig, beständig |
+| `monsterKonsequenz` | Konsequenz (Grün) | Fels-Troll mit verschränkten Armen — diszipliniert, stark |
+
+### Einsatzorte der Monster-Grafiken
+
+- **Morgen-Dialog:** Das Monster passend zur gewählten Intention (siehe Mapping-Tabelle oben)
+- **Abend-Spiegel:** Das Monster der stärksten Discipline des Tages
+- **Push-Notifications:** Als Rich Notification Bild (optional)
+- **Task-Zeilen:** Farbiger Abhak-Kreis in der Discipline-Farbe des Tasks
 
 ## Mein Monster (Trainingspartner)
 
@@ -57,12 +77,12 @@ Die Morgen-Frage dreht die Logik um: Nicht "Was tust du heute?" sondern "Wie wil
 
 Ergänzend zur Morgen-Intention kategorisieren die Disziplinen die einzelnen Tasks nach Art des Widerstands:
 
-| Disziplin | Farbe | Trainiert | Typische Tasks |
-|-----------|-------|-----------|----------------|
-| Konsequenz | Grün | Disziplin & Durchhaltevermögen | Das Aufgeschobene endlich anpacken |
-| Ausdauer | Grau | Geduld & Beharrlichkeit | Das Langweilige durchziehen |
-| Mut | Rot | Emotionale Stärke | Das Unangenehme angehen |
-| Fokus | Blau | Zeitmanagement & Klarheit | Sich nicht verzetteln |
+| Disziplin | Farbe | Monster | Trainiert | Typische Tasks |
+|-----------|-------|---------|-----------|----------------|
+| Konsequenz | Grün | Troll (Fels-Troll, verschränkte Arme) | Disziplin & Durchhaltevermögen | Das Aufgeschobene endlich anpacken |
+| Ausdauer | Grau | Golem (Stein-Golem mit Hut & Stock) | Geduld & Beharrlichkeit | Das Langweilige durchziehen |
+| Mut | Orange/Rot | Feuer (Feuer-Monster, energisch) | Emotionale Stärke | Das Unangenehme angehen |
+| Fokus | Blau | Eule (Eule mit Lupe, wachsam) | Zeitmanagement & Klarheit | Sich nicht verzetteln |
 
 ## Der komplette Tagesbogen
 
@@ -291,12 +311,15 @@ Haugs Vier-in-einem-Perspektive teilt das Leben in gleichwertige Bereiche. Focus
 | Coach-Modus Toggle | Must | ERLEDIGT (Phase 1) |
 | Task-Disziplin-Zuordnung (Konsequenz/Ausdauer/Mut/Fokus) | Must | ERLEDIGT (Phase 1) |
 | **Intention-basierter Backlog-Filter** | **Must** | **ERLEDIGT (Phase 3a)** |
-| **Smart Notifications (Tagesbegleitung)** | **Must** | **Backlog** |
-| **Abend-Spiegel (Evaluation + Karte)** | **Must** | **Backlog** |
-| **Foundation Models Abend-Text** | **Must** | **Backlog** |
-| **Abend Push-Notification** | **Should** | **Backlog** |
-| **Siri Integration (App Intents)** | **Should** | **Backlog** |
-| Monster Character System (Persoenlichkeit, Verhalten) | Must | Backlog |
+| **Smart Notifications (Tagesbegleitung)** | **Must** | **ERLEDIGT (Phase 3b)** |
+| **Abend-Spiegel (Evaluation + Karte)** | **Must** | **ERLEDIGT (Phase 3c/3d)** |
+| **Foundation Models Abend-Text** | **Must** | **ERLEDIGT (Phase 3d)** |
+| **Abend Push-Notification** | **Should** | **ERLEDIGT (Phase 3e)** |
+| **Siri Integration (App Intents)** | **Should** | **ERLEDIGT (Phase 3f)** |
+| **Monster-Grafiken (4 Discipline-Monster)** | **Must** | **Backlog** |
+| **Farbiger Discipline-Kreis in Task-Zeilen** | **Should** | **Backlog** |
+| **Monster in Morgen-/Abend-Dialogen** | **Must** | **Backlog** |
+| **Monster in Push-Notifications** | **Could** | **Backlog** |
 | Lebensbalance-Visualisierung (Haug 4-in-1) | Should | Backlog |
 | Balance-Erinnerungen | Could | Backlog |
 

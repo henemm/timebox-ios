@@ -35,6 +35,15 @@ enum Discipline: String, CaseIterable, Codable {
         }
     }
 
+    var imageName: String {
+        switch self {
+        case .konsequenz: "monsterKonsequenz"
+        case .ausdauer: "monsterAusdauer"
+        case .mut: "monsterMut"
+        case .fokus: "monsterFokus"
+        }
+    }
+
     /// Classify a completed task into a discipline based on simple heuristics.
     /// Priority: konsequenz (procrastinated) > mut (high importance) > fokus (within estimate) > ausdauer (default)
     static func classify(

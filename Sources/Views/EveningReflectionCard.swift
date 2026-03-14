@@ -36,8 +36,15 @@ struct EveningReflectionCard: View {
 
         VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 8) {
-                Image(systemName: intention.icon)
-                    .foregroundStyle(intention.color)
+                Image(intention.monsterDiscipline.imageName)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 40, height: 40)
+                    .clipShape(Circle())
+                    .accessibilityElement(children: .ignore)
+                    .accessibilityAddTraits(.isImage)
+                    .accessibilityLabel(intention.monsterDiscipline.displayName)
+                    .accessibilityIdentifier("monsterIcon_\(intention.rawValue)")
                 Text(intention.label)
                     .font(.subheadline.weight(.medium))
                 Spacer()
@@ -57,7 +64,6 @@ struct EveningReflectionCard: View {
                 .fill(backgroundColor(for: level, intention: intention))
         )
         .accessibilityIdentifier("eveningResult_\(intention.rawValue)")
-        .accessibilityElement(children: .contain)
     }
 
     // MARK: - Badge

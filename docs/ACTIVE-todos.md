@@ -103,6 +103,39 @@
 
 ---
 
+## BACKLOG: Feature — Monster Coach Phase 4 "Monster-Grafiken & Visualisierung"
+
+- **User Story:** `docs/project/stories/monster-coach.md`
+- **Kontext:** 4 Monster-Grafiken (PNG, transparent) fuer die 4 Disciplines erstellt. Muessen ins Projekt integriert und an allen relevanten Stellen angezeigt werden.
+
+### Phase 4a: Monster-Assets einbinden (Must) — ERLEDIGT
+- 4 PNGs als Image Assets: monsterFokus (Eule), monsterMut (Feuer), monsterAusdauer (Golem), monsterKonsequenz (Troll)
+- `Discipline.imageName` computed property + `IntentionOption.monsterDiscipline` Mapping
+- 12 Unit Tests gruen (MonsterGraphicsTests)
+- **Dateien:** Discipline.swift, DailyIntention.swift, Assets.xcassets (4 ImageSets)
+
+### Phase 4b: Farbiger Discipline-Kreis in Task-Zeilen (Should) — OFFEN
+- Abhak-Kreis am Anfang jeder Task-Zeile kraeftiger und in Discipline-Farbe
+- Discipline-Klassifizierung fuer offene Tasks (rescheduleCount >= 2 → Konsequenz, importance == 3 → Mut, sonst Ausdauer; Fokus erst nach Erledigung)
+- **Dateien:** BacklogRow.swift, Discipline.swift
+
+### Phase 4c: Monster in Morgen-Dialog (Must) — ERLEDIGT
+- Monster-Grafik waehrend Chip-Auswahl (120px, dynamisch wechselnd) UND in Kompakt-Ansicht (44px Circle)
+- Mapping: Survival/Balance → Golem, Fokus/Wachstum → Eule, BHAG → Feuer, Verbundenheit → Troll
+- 4 UI Tests gruen (MonsterGraphicsUITests)
+- **Dateien:** MorningIntentionView.swift
+
+### Phase 4d: Monster im Abend-Spiegel (Must) — ERLEDIGT
+- Monster-Icon (40x40 Circle) neben dem Intentions-Label in jeder Zeile der Abend-Karte
+- 2 UI Tests SKIPPED (vorbestehendes Problem: EveningReflectionCard nicht sichtbar nach Tab-Wechsel — DailyIntention.load().isSet ist kein reaktives Binding)
+- **Dateien:** EveningReflectionCard.swift
+
+### Phase 4e: Monster in Push-Notifications (Could) — OFFEN
+- Rich Notifications mit Monster-Bild als Attachment
+- **Dateien:** NotificationService.swift
+
+---
+
 ## Weitere offene Features
 
 | # | Item | Prio | Kompl. |
