@@ -200,8 +200,6 @@ struct FocusBloxMacApp: App {
     @State private var showUndoAlert = false
     @State private var undoResultMessage = ""
     @State private var notificationDelegate: NotificationActionDelegate?
-    @State private var selectedSection: MainSection = .backlog
-    @AppStorage("intentionJustSet") private var intentionJustSet: Bool = false
 
     /// SyncedSettings fuer iCloud KV Store Sync zwischen Geraeten
     private let syncedSettings = SyncedSettings()
@@ -254,7 +252,7 @@ struct FocusBloxMacApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView(selectedSection: $selectedSection)
+            ContentView()
                 .environment(\.eventKitRepository, eventKitRepository)
                 .environment(syncMonitor)
                 .environment(deferredSort)
@@ -321,12 +319,6 @@ struct FocusBloxMacApp: App {
                     }
                     if newPhase == .background {
                         Task { await deferredCompletion.flushAll() }
-                    }
-                }
-                .onChange(of: intentionJustSet) { _, newValue in
-                    if newValue {
-                        selectedSection = .backlog
-                        intentionJustSet = false
                     }
                 }
         }

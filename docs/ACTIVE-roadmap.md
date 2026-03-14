@@ -74,25 +74,6 @@ Notifications feuern NUR wenn die Morgen-Intention nicht gelebt wird (Luecke zwi
 
 ---
 
-### Monster Coach Phase 4e — Monster in Push-Notifications
-
-**Status:** Geplant
-**Prioritaet:** Niedrig
-**Kategorie:** Support Feature
-**Aufwand:** Klein
-
-**Kurzbeschreibung:**
-Die drei Coach-Notification-Typen (Morgen-Erinnerung, Abend-Erinnerung, Tages-Nudges) erhalten das passende Monster-Bild als Rich Notification Attachment. Welches Monster erscheint haengt von der gesetzten Morgen-Intention ab (via bestehendes `IntentionOption.monsterDiscipline`-Mapping).
-
-**Betroffene Systeme:**
-- `Sources/Services/NotificationService.swift` (neue Hilfsfunktion `buildMonsterAttachment` + Erweiterung von 3 Buildern)
-- `Sources/Views/MorningIntentionView.swift` (Intention an `scheduleIntentionReminder` uebergeben)
-- `Sources/FocusBloxApp.swift` (Intention an `scheduleEveningReminder` uebergeben)
-
-**OpenSpec:** `openspec/changes/monster-coach-phase4e/`
-
----
-
 ### Sub-Tasks
 
 **Status:** Geplant

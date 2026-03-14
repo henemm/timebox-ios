@@ -1,9 +1,0 @@
----TEST SUMMARY---
-Executed 4 tests, with 3 failures (0 unexpected)
-
-PASSED: test_coachModeOff_reviewShowsNoIntentionCard (negative test - feature not yet implemented)
-FAILED: test_coachModeOn_reviewShowsIntentionCard - MorningIntentionCard not found (MacCoachReviewView doesn't exist)
-FAILED: test_coachModeOn_showsDayProgress - coachDayProgress not found (MacCoachReviewView doesn't exist)
-FAILED: test_setIntention_switchesToBacklog - intentionChip_focus not found (no intention view in macOS Review)
-
-TDD RED: 3/4 tests correctly failing.
