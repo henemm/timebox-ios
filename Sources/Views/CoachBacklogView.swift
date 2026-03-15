@@ -120,7 +120,8 @@ struct CoachBacklogView: View {
     // MARK: - Coach Row (with Discipline Color)
 
     private func coachRow(_ item: PlanItem) -> some View {
-        let discipline = Discipline.classifyOpen(
+        let discipline = Discipline.resolveOpen(
+            manualDiscipline: item.manualDiscipline,
             rescheduleCount: item.rescheduleCount,
             importance: item.importance
         )
@@ -135,6 +136,26 @@ struct CoachBacklogView: View {
         .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
         .listRowBackground(Color.clear)
         .listRowSeparator(.hidden)
+        .contextMenu {
+            Section("Disziplin") {
+                ForEach(Discipline.allCases, id: \.self) { d in
+                    Button {
+                        updateDiscipline(for: item, discipline: d.rawValue)
+                    } label: {
+                        Label(d.displayName, systemImage: d.icon)
+                    }
+                    .tint(d.color)
+                }
+                if item.manualDiscipline != nil {
+                    Divider()
+                    Button {
+                        updateDiscipline(for: item, discipline: nil)
+                    } label: {
+                        Label("Zurücksetzen", systemImage: "arrow.counterclockwise")
+                    }
+                }
+            }
+        }
         .swipeActions(edge: .leading, allowsFullSwipe: true) {
             Button {
                 updateNextUp(for: item, isNextUp: !item.isNextUp)
@@ -172,6 +193,17 @@ struct CoachBacklogView: View {
     }
 
     // MARK: - Task Actions
+
+    private func updateDiscipline(for item: PlanItem, discipline: String?) {
+        do {
+            let taskSource = LocalTaskSource(modelContext: modelContext)
+            let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
+            try syncEngine.updateDiscipline(itemID: item.id, discipline: discipline)
+            Task { await loadTasks() }
+        } catch {
+            errorMessage = "Disziplin konnte nicht geändert werden."
+        }
+    }
 
     private func updateNextUp(for item: PlanItem, isNextUp: Bool) {
         do {

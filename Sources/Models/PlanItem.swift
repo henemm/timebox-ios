@@ -51,6 +51,9 @@ struct PlanItem: Identifiable, Sendable {
     /// Number of times this task was rescheduled
     let rescheduleCount: Int
 
+    /// Manual discipline override (rawValue string, nil = auto-calculation)
+    let manualDiscipline: String?
+
     /// Timestamp when task was last modified (for "Zuletzt" sort)
     let modifiedAt: Date?
 
@@ -132,6 +135,7 @@ struct PlanItem: Identifiable, Sendable {
         self.assignedFocusBlockID = nil
         self.completedAt = nil
         self.rescheduleCount = 0
+        self.manualDiscipline = nil
 
         // Recurrence fields (Reminders don't have recurrence in this app)
         self.recurrencePattern = nil
@@ -180,6 +184,7 @@ struct PlanItem: Identifiable, Sendable {
         self.assignedFocusBlockID = localTask.assignedFocusBlockID
         self.completedAt = localTask.completedAt
         self.rescheduleCount = localTask.rescheduleCount
+        self.manualDiscipline = localTask.manualDiscipline
 
         // Recurrence fields from LocalTask
         self.recurrencePattern = localTask.recurrencePattern

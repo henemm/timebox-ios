@@ -44,6 +44,20 @@ enum Discipline: String, CaseIterable, Codable {
         }
     }
 
+    /// Resolve discipline for an open task, respecting manual override.
+    /// Override takes precedence; falls back to classifyOpen() if nil or invalid.
+    static func resolveOpen(
+        manualDiscipline: String?,
+        rescheduleCount: Int,
+        importance: Int?
+    ) -> Discipline {
+        if let manual = manualDiscipline,
+           let discipline = Discipline(rawValue: manual) {
+            return discipline
+        }
+        return classifyOpen(rescheduleCount: rescheduleCount, importance: importance)
+    }
+
     /// Classify an open (not yet completed) task into a discipline.
     /// Simplified variant without duration — fokus is not determinable for open tasks.
     /// Priority: konsequenz (procrastinated) > mut (high importance) > ausdauer (default)

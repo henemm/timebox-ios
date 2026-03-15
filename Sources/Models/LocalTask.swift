@@ -91,6 +91,10 @@ final class LocalTask {
     /// Number of times this task was rescheduled (moved to a different block)
     var rescheduleCount: Int = 0
 
+    /// Manual discipline override (rawValue of Discipline enum, e.g. "mut").
+    /// nil = use auto-calculation via Discipline.classifyOpen().
+    var manualDiscipline: String?
+
     /// Timestamp when task was completed (for "completed in last 7 days" filter)
     var completedAt: Date?
 

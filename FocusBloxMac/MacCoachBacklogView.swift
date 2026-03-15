@@ -77,7 +77,8 @@ struct MacCoachBacklogView: View {
     // MARK: - Coach Row
 
     private func coachRow(_ task: LocalTask) -> some View {
-        let discipline = Discipline.classifyOpen(
+        let discipline = Discipline.resolveOpen(
+            manualDiscipline: task.manualDiscipline,
             rescheduleCount: task.rescheduleCount,
             importance: task.importance
         )
@@ -85,5 +86,29 @@ struct MacCoachBacklogView: View {
             task: task,
             disciplineColor: discipline.color
         )
+        .contextMenu {
+            Section("Disziplin") {
+                ForEach(Discipline.allCases, id: \.self) { d in
+                    Button {
+                        task.manualDiscipline = d.rawValue
+                        task.modifiedAt = Date()
+                        try? task.modelContext?.save()
+                    } label: {
+                        Label(d.displayName, systemImage: d.icon)
+                    }
+                    .tint(d.color)
+                }
+                if task.manualDiscipline != nil {
+                    Divider()
+                    Button {
+                        task.manualDiscipline = nil
+                        task.modifiedAt = Date()
+                        try? task.modelContext?.save()
+                    } label: {
+                        Label("Zurücksetzen", systemImage: "arrow.counterclockwise")
+                    }
+                }
+            }
+        }
     }
 }

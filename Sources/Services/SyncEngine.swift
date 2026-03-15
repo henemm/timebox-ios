@@ -73,6 +73,13 @@ final class SyncEngine {
         try modelContext.save()
     }
 
+    func updateDiscipline(itemID: String, discipline: String?) throws {
+        guard let task = try findTask(byID: itemID) else { return }
+        task.manualDiscipline = discipline
+        task.modifiedAt = Date()
+        try modelContext.save()
+    }
+
     func updateTask(itemID: String, title: String, importance: Int?, duration: Int?, tags: [String], urgency: String?, taskType: String, dueDate: Date?, description: String?, recurrencePattern: String? = nil, recurrenceWeekdays: [Int]? = nil, recurrenceMonthDay: Int? = nil, recurrenceInterval: Int? = nil) throws {
         guard let task = try findTask(byID: itemID) else {
             return

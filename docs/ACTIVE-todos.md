@@ -17,7 +17,7 @@
 | **4** | Phase 6e: CoachMeinTagView macOS | Feature | M | DONE — MacCoachReviewView geloescht, shared CoachMeinTagView mit #if os(). macOS bekommt AI-Abend-Text. 7+3 UI Tests gruen. |
 | **5** | Bug 101: macOS 5 statt 4 Views | Bug | M | DONE — Assign entfernt, MainSection 5→4, MacAssignView geloescht (-720 LoC). 6 UI + 2 Unit Tests gruen. |
 | **6** | Bug 98: Mein Tag Woche unvollstaendig | Bug | S-M | DONE — DailyReviewView Guard gefixt + CoachMeinTagView Weekly Mode mit Coach-Texten. 68 Unit Tests gruen. |
-| **7** | Discipline manuell ueberschreiben | Feature | M | Nice-to-have fuer Power-User. Kreisfarbe korrigierbar machen. |
+| **7** | Discipline manuell ueberschreiben | Feature | M | DONE — Long-Press Context Menu mit 4 farbigen Disziplin-Optionen + Zuruecksetzen. iOS + macOS. 10 Unit + 6 UI Tests gruen. |
 | **8** | TD-03: Services ohne Tests | Tech Debt | M | NotificationService, FocusBlockActionService, GapFinder — Sicherheitsnetz fehlt. |
 | **9** | MAC-026: Enhanced Quick Capture | Feature | L | macOS Produktivitaet. Kein Blocker. |
 | **10** | TD-01: God-Views aufbrechen | Tech Debt | L | BacklogView 1181 LoC, BlockPlanningView 1400 LoC — Wartbarkeit. |
@@ -136,14 +136,14 @@
 - `buildMonsterAttachment(for: CoachType)` — `coach: CoachType? = nil` Parameter
 - **Dateien:** MorningIntentionView.swift, EveningReflectionCard.swift, NotificationService.swift
 
-### Feature: Discipline manuell ueberschreiben — OFFEN
-- **Kontext:** Die Kreisfarbe im CoachBacklogView (= Discipline: Konsequenz/Mut/Fokus/Ausdauer) wird automatisch berechnet aus `rescheduleCount` + `importance`. Der Nutzer kann das nicht korrigieren.
-- **Problem:** Wenn die automatische Zuordnung falsch ist, landet ein Task visuell in der falschen Monster-Disziplin. Aktuell gibt es keinen Weg das zu aendern.
-- **Gewuenschtes Verhalten:** Context Menu (Long-Press) auf Task in CoachBacklogView mit Discipline-Auswahl (Konsequenz/Mut/Fokus/Ausdauer). Ueberschreibt die automatische Berechnung.
-- **Technische Notiz:** `Discipline.classifyOpen()` berechnet aktuell rein automatisch. Braucht ein neues Feld auf `LocalTask` (z.B. `manualDiscipline: String?`) das Vorrang vor der Berechnung hat.
-- **Betroffene Sektionszuordnung:** Die Coach-Filter (`CoachBacklogViewModel.relevantTasks`) nutzen NICHT Discipline, sondern eigene Regeln pro Coach (Troll: rescheduleCount, Feuer: importance, Eule: isNextUp, Golem: Kategorie-Balance). Discipline-Override aendert nur die Kreisfarbe, nicht die Sektion.
-- **Plattform:** iOS (CoachBacklogView) + macOS (MacCoachBacklogView)
-- **Komplexitaet:** M (neues Feld + Override-Logik + Context Menu)
+### Feature: Discipline manuell ueberschreiben — ERLEDIGT
+- **Status:** DONE
+- **Plattform:** iOS + macOS
+- **Aenderung:** Long-Press/Right-Click auf Task im Coach-Backlog zeigt Context Menu mit 4 farbigen Disziplin-Optionen (Konsequenz=gruen, Ausdauer=grau, Mut=rot, Fokus=blau) + "Zuruecksetzen". Override hat Vorrang vor Auto-Berechnung, aendert Checkbox-Kreisfarbe. Coach-Sektionszuordnung bleibt unabhaengig.
+- **Fix:** `manualDiscipline: String?` auf LocalTask, `Discipline.resolveOpen()` fuer Override-Logik, `SyncEngine.updateDiscipline()`, Context Menu auf coachRow() (iOS + macOS)
+- **Tests:** 10 Unit Tests (6 neue resolveOpen + 4 bestehende) + 6 UI Tests (5 bestehende + 1 neuer Context Menu) — alle gruen
+- **Dateien:** Discipline.swift, LocalTask.swift, PlanItem.swift, CoachBacklogView.swift, MacCoachBacklogView.swift, SyncEngine.swift
+- **Spec:** `docs/specs/features/discipline-override.md`
 
 ---
 

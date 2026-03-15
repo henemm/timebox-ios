@@ -96,4 +96,42 @@ final class CoachBacklogViewUITests: XCTestCase {
         XCTAssertTrue(nextUpButton.waitForExistence(timeout: 3),
                       "Next Up swipe action should exist in Coach backlog")
     }
+
+    // MARK: - Discipline Override Context Menu
+
+    /// Bricht wenn: coachRow() hat kein .contextMenu mit Disziplin-Optionen
+    func test_coachModeOn_longPress_showsDisciplineMenu() throws {
+        launchWithCoachMode()
+        navigateToBacklog()
+
+        // Find a task row
+        let taskTitle = app.staticTexts.matching(
+            NSPredicate(format: "label CONTAINS '[MOCK]'")
+        ).firstMatch
+        XCTAssertTrue(taskTitle.waitForExistence(timeout: 5), "At least one mock task should exist")
+
+        // Long-press to show context menu
+        taskTitle.press(forDuration: 1.5)
+
+        // Context menu should show all 4 discipline options
+        let konsequenzButton = app.buttons["Konsequenz"]
+        XCTAssertTrue(konsequenzButton.waitForExistence(timeout: 3),
+                      "Context menu should show 'Konsequenz' discipline option")
+
+        let mutButton = app.buttons["Mut"]
+        XCTAssertTrue(mutButton.exists, "Context menu should show 'Mut' discipline option")
+
+        let fokusButton = app.buttons["Fokus"]
+        XCTAssertTrue(fokusButton.exists, "Context menu should show 'Fokus' discipline option")
+
+        let ausdauerButton = app.buttons["Ausdauer"]
+        XCTAssertTrue(ausdauerButton.exists, "Context menu should show 'Ausdauer' discipline option")
+
+        // Capture screenshot with context menu visible for verification
+        let screenshot = app.screenshot()
+        let attachment = XCTAttachment(screenshot: screenshot)
+        attachment.name = "discipline-context-menu"
+        attachment.lifetime = .keepAlways
+        add(attachment)
+    }
 }

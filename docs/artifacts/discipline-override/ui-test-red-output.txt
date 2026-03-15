@@ -1,0 +1,19 @@
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/DisciplineTests.swift:51:33: error: type 'Discipline' has no member 'resolveOpen'
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/DisciplineTests.swift:56:33: error: type 'Equatable' has no member 'mut'
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/DisciplineTests.swift:62:33: error: type 'Discipline' has no member 'resolveOpen'
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/DisciplineTests.swift:65:25: error: 'nil' requires a contextual type
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/DisciplineTests.swift:67:33: error: type 'Equatable' has no member 'fokus'
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/DisciplineTests.swift:73:33: error: type 'Discipline' has no member 'resolveOpen'
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/DisciplineTests.swift:74:31: error: 'nil' requires a contextual type
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/DisciplineTests.swift:78:33: error: type 'Equatable' has no member 'konsequenz'
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/DisciplineTests.swift:84:33: error: type 'Discipline' has no member 'resolveOpen'
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/DisciplineTests.swift:89:33: error: type 'Equatable' has no member 'mut'
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/DisciplineTests.swift:95:33: error: type 'Discipline' has no member 'resolveOpen'
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/DisciplineTests.swift:98:25: error: 'nil' requires a contextual type
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/DisciplineTests.swift:100:33: error: type 'Equatable' has no member 'konsequenz'
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/DisciplineTests.swift:106:33: error: type 'Discipline' has no member 'resolveOpen'
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/DisciplineTests.swift:111:33: error: type 'Equatable' has no member 'ausdauer'
+Testing failed:
+	Testing cancelled because the build failed.
+** TEST FAILED **
+The following build commands failed:
