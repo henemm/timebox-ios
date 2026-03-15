@@ -13,7 +13,7 @@
 |------|------|-----|--------|--------------------------|
 | **1** | Coach-Redesign abschliessen | Feature | S | DONE — 116 Unit Tests + 14 UI Tests gruen. Committed. |
 | **2** | Bug 102: Coach-Sync iOS↔macOS | Bug P0 | S-M | DONE — pullFromCloud() vor pushToCloud(), Guard gegen leere Coach-Pushes. 7 Unit + 2 UI Tests gruen. |
-| **3** | Phase 6d: Abend-Spiegel macOS | Feature | S-M | Komplettiert den Coach-Tagesbogen auf macOS. Shared View wahrscheinlich direkt nutzbar. |
+| **3** | Phase 6d: Abend-Spiegel macOS | Feature | S-M | DONE — EveningReflectionCard in MacCoachReviewView (angezeigt ab 18:00). 7 UI Tests gruen (4 Phase 6c + 3 neue). |
 | **4** | Phase 6e: CoachMeinTagView macOS | Feature | M | Abhaengig von 6d. Danach ist Coach-Modus auf macOS komplett. |
 | **5** | Bug 101: macOS 5 statt 4 Views | Bug | M | Inkonsistenz zwischen Plattformen. Assign-View zusammenlegen. |
 | **6** | Bug 98: Mein Tag Woche unvollstaendig | Bug | S-M | Daten-Luecke in der Wochenansicht. Kein Blocker, aber irritierend. |
@@ -175,13 +175,12 @@
 ### Phase 6b: CoachBacklogView in macOS (Must) — ERLEDIGT
 ### Phase 6c: Coach-Auswahl in macOS (Must) — ERLEDIGT
 
-### Phase 6d: EveningReflectionCard in macOS (Must) — OFFEN
-- Abend-Spiegel mit Coach-spezifischer Erfuellungsbewertung, Monster-Icons und KI-Texten fuer macOS
-- Pruefen ob die shared `EveningReflectionCard` direkt in `MacCoachReviewView` eingebettet werden kann
-- Coach-basiert: `evaluateFulfillment(coach:tasks:focusBlocks:)` + `fallbackTemplate(coach:level:)`
-- **Referenz:** Sources/Views/EveningReflectionCard.swift
-- **Dateien:** MacCoachReviewView.swift (Integration)
-- **Komplexitaet:** S-M
+### Phase 6d: EveningReflectionCard in macOS (Must) — ERLEDIGT
+- Shared EveningReflectionCard erfolgreich in MacCoachReviewView eingebettet (angezeigt ab 18:00)
+- Coach-Fulfillment mit Monster-Icon und Fallback-Template (KI-Text nicht verfuegbar auf macOS, EveningReflectionTextService nicht im macOS-Target)
+- Guard gegen `coach == nil` verhindert Anzeige ohne Coach-Wahl
+- **Dateien:** MacCoachReviewView.swift, MacCoachReviewUITests.swift (3 neue Tests), FocusBloxMacApp.swift (-MockIntentionSet Support)
+- **Tests:** 7 UI Tests gruen (4 bestehend + 3 neue Phase 6d)
 
 ### Phase 6e: CoachMeinTagView in macOS (Should) — OFFEN
 - Volle "Mein Tag"-View fuer macOS Coach-Modus (Coach-Auswahl + Tages-Fortschritt + Abend-Spiegel)

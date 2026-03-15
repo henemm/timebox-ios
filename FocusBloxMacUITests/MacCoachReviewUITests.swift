@@ -2,7 +2,8 @@
 //  MacCoachReviewUITests.swift
 //  FocusBloxMacUITests
 //
-//  Tests for Coach Selection (MorningIntentionView) integration in macOS Review tab.
+//  Tests for Coach Selection (MorningIntentionView) and Evening Reflection
+//  integration in macOS Review tab.
 //  Uses coach cards (coachSelectionCard_*) instead of old intention chips.
 //
 
@@ -166,6 +167,74 @@ final class MacCoachReviewUITests: XCTestCase {
         let dayProgress = app.descendants(matching: .any)["coachDayProgress"]
         XCTAssertTrue(dayProgress.waitForExistence(timeout: 5),
                       "Day progress section should be visible in Coach review")
+    }
+
+    // MARK: - Helpers (Evening Reflection)
+
+    private func launchWithEveningReflectionAndCoach() {
+        app.launchArguments = [
+            "-UITesting", "-MockData", "-ApplePersistenceIgnoreState", "YES",
+            "-coachModeEnabled", "1",
+            "-ForceEveningReflection",
+            "-MockIntentionSet"
+        ]
+        app.launch()
+        let window = app.windows.firstMatch
+        _ = window.waitForExistence(timeout: 5)
+    }
+
+    // MARK: - Test 5: Evening Card visible with coach set
+
+    /// Verhalten: Bei ForceEveningReflection + Coach gesetzt zeigt MacCoachReviewView die EveningReflectionCard.
+    /// Bricht wenn: MacCoachReviewView.body — EveningReflectionCard(...) nicht eingebaut wird
+    func test_eveningReflection_visibleWhenCoachSet() throws {
+        launchWithEveningReflectionAndCoach()
+        navigateToReview()
+
+        let card = app.descendants(matching: .any)["eveningReflectionCard"]
+        XCTAssertTrue(card.waitForExistence(timeout: 5),
+                      "Evening reflection card should be visible when coach is set and ForceEveningReflection is active")
+    }
+
+    // MARK: - Test 6: Evening Card NOT visible without coach
+
+    /// Verhalten: Ohne Coach-Modus zeigt Review-Tab KEINE EveningReflectionCard.
+    /// Bricht wenn: ContentView zeigt MacCoachReviewView auch wenn Coach-Modus aus ist
+    func test_eveningReflection_hiddenWhenCoachModeOff() throws {
+        app.launchArguments = [
+            "-UITesting", "-MockData", "-ApplePersistenceIgnoreState", "YES",
+            "-coachModeEnabled", "0",
+            "-ForceEveningReflection"
+        ]
+        app.launch()
+        let window = app.windows.firstMatch
+        _ = window.waitForExistence(timeout: 5)
+
+        navigateToReview()
+
+        let card = app.descendants(matching: .any)["eveningReflectionCard"]
+        XCTAssertFalse(card.waitForExistence(timeout: 3),
+                       "Evening reflection card should NOT be visible when coach mode is off")
+    }
+
+    // MARK: - Test 7: Evening Card renders content
+
+    /// Verhalten: EveningReflectionCard rendert Inhalt (Titel + Reflexionstext).
+    /// Bricht wenn: EveningReflectionCard Body leer ist oder nicht rendert
+    func test_eveningReflection_showsContent() throws {
+        launchWithEveningReflectionAndCoach()
+        navigateToReview()
+
+        let card = app.descendants(matching: .any)["eveningReflectionCard"]
+        guard card.waitForExistence(timeout: 5) else {
+            XCTFail("Evening reflection card should exist")
+            return
+        }
+
+        // Card should contain "Dein Abend-Spiegel" headline
+        let headline = app.staticTexts["Dein Abend-Spiegel"]
+        XCTAssertTrue(headline.waitForExistence(timeout: 5),
+                      "Evening card should display 'Dein Abend-Spiegel' headline")
     }
 
 }

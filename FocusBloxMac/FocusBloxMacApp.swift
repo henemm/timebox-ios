@@ -609,5 +609,14 @@ extension FocusBloxMacApp {
             context.insert(task)
         }
         try? context.save()
+
+        // Pre-set daily coach if requested (for evening reflection UI tests)
+        if ProcessInfo.processInfo.arguments.contains("-MockIntentionSet") {
+            var selection = DailyCoachSelection(
+                date: DailyCoachSelection.todayDateString(),
+                coach: .troll
+            )
+            selection.save()
+        }
     }
 }
