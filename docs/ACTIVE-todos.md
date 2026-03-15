@@ -18,16 +18,20 @@
 | **5** | Bug 101: macOS 5 statt 4 Views | Bug | M | DONE — Assign entfernt, MainSection 5→4, MacAssignView geloescht (-720 LoC). 6 UI + 2 Unit Tests gruen. |
 | **6** | Bug 98: Mein Tag Woche unvollstaendig | Bug | S-M | DONE — DailyReviewView Guard gefixt + CoachMeinTagView Weekly Mode mit Coach-Texten. 68 Unit Tests gruen. |
 | **7** | Discipline manuell ueberschreiben | Feature | M | DONE — Long-Press Context Menu mit 4 farbigen Disziplin-Optionen + Zuruecksetzen. iOS + macOS. 10 Unit + 6 UI Tests gruen. |
-| **8** | TD-03: Services ohne Tests | Tech Debt | M | NotificationService, FocusBlockActionService, GapFinder — Sicherheitsnetz fehlt. |
-| **9** | MAC-026: Enhanced Quick Capture | Feature | L | macOS Produktivitaet. Kein Blocker. |
-| **10** | TD-01: God-Views aufbrechen | Tech Debt | L | BacklogView 1181 LoC, BlockPlanningView 1400 LoC — Wartbarkeit. |
-| **11** | Emotionales Aufladen (Report) | Feature | L | Motivations-Feature. Kein Blocker. |
-| **12** | MAC-030: Shortcuts.app | Feature | L | macOS Automatisierung. P3. |
-| **13** | MAC-031: Focus Mode Integration | Feature | M | macOS System-Integration. P3. |
-| **14** | MAC-032: NC Widget | Feature | XL | Grosser Aufwand, niedriger Druck. |
-| **15** | TD-02: View-Duplikation | Tech Debt | XL | ~7300 LoC. Langfristig wichtig, kurzfristig kein Blocker. |
-| **16** | ITB-C: OrganizeMyDay Intent | Feature | XL | Komplexer Intent. Kann warten. |
-| **17** | ITB-F: CaptureContextIntent | Feature | M | WARTEND auf Apple APIs (iOS 26.5/27). |
+| **8** | Coach Mission Card | Feature | S | DONE — Monster spricht mit konkreter Tages-Mission an. Pro Coach eigene Logik. 10 Unit Tests gruen. iOS + macOS Build OK. |
+| **9** | TD-03: Services ohne Tests | Tech Debt | M | NotificationService, FocusBlockActionService, GapFinder — Sicherheitsnetz fehlt. |
+| **10** | Lebensbalance-Visualisierung (Frigga Haug 4-in-1) | Feature | M | Balance sichtbar machen — Golem-Filter existiert, Chart fehlt. |
+| **10** | Disziplin-Entwicklung sichtbar machen | Feature | M | Historische Auswertung ueber Wochen/Monate — welche Disziplinen gestaerkt? |
+| **11** | Stille-Regel: Nudges dynamisch canceln | Enhancement | S | Geplante Nudges stoppen wenn Intention tagsueber erfuellt wird. |
+| **12** | MAC-026: Enhanced Quick Capture | Feature | L | macOS Produktivitaet. Kein Blocker. |
+| **13** | TD-01: God-Views aufbrechen | Tech Debt | L | BacklogView 1181 LoC, BlockPlanningView 1400 LoC — Wartbarkeit. |
+| **14** | Emotionales Aufladen (Report) | Feature | L | Motivations-Feature. Kein Blocker. |
+| **15** | MAC-030: Shortcuts.app | Feature | L | macOS Automatisierung. P3. |
+| **16** | MAC-031: Focus Mode Integration | Feature | M | macOS System-Integration. P3. |
+| **17** | MAC-032: NC Widget | Feature | XL | Grosser Aufwand, niedriger Druck. |
+| **18** | TD-02: View-Duplikation | Tech Debt | XL | ~7300 LoC. Langfristig wichtig, kurzfristig kein Blocker. |
+| **19** | ITB-C: OrganizeMyDay Intent | Feature | XL | Komplexer Intent. Kann warten. |
+| **20** | ITB-F: CaptureContextIntent | Feature | M | WARTEND auf Apple APIs (iOS 26.5/27). |
 
 ---
 

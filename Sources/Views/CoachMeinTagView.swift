@@ -28,13 +28,9 @@ struct CoachMeinTagView: View {
         return Calendar.current.component(.hour, from: Date()) >= 18
     }
 
-    /// Tasks completed today.
-    private var todayCompletedCount: Int {
-        let startOfToday = Calendar.current.startOfDay(for: Date())
-        return allLocalTasks.filter { task in
-            guard task.isCompleted, let completedAt = task.completedAt else { return false }
-            return completedAt >= startOfToday
-        }.count
+    /// All tasks as PlanItems for coach mission logic.
+    private var planItems: [PlanItem] {
+        allLocalTasks.map { PlanItem(localTask: $0) }
     }
 
     /// Tasks completed this week.
@@ -60,6 +56,14 @@ struct CoachMeinTagView: View {
                 MorningIntentionView()
                     .padding(.horizontal)
 
+                if let coach = DailyCoachSelection.load().coach {
+                    CoachMissionCard(
+                        coach: coach,
+                        mission: CoachMissionService.generateMission(coach: coach, allTasks: planItems)
+                    )
+                    .padding(.horizontal)
+                }
+
                 Picker("Zeitraum", selection: $reviewMode) {
                     ForEach(ReviewMode.allCases, id: \.self) { mode in
                         Text(mode.rawValue).tag(mode)
@@ -70,9 +74,6 @@ struct CoachMeinTagView: View {
 
                 switch reviewMode {
                 case .today:
-                    dayProgressSection
-                        .padding(.horizontal)
-
                     if showEveningReflection, let coach = DailyCoachSelection.load().coach {
                         EveningReflectionCard(
                             coach: coach,
@@ -110,12 +111,6 @@ struct CoachMeinTagView: View {
                 Task { await loadWeeklyAIReflectionText() }
             }
         }
-    }
-
-    // MARK: - Day Progress (shared component)
-
-    private var dayProgressSection: some View {
-        DayProgressSection(completedCount: todayCompletedCount)
     }
 
     // MARK: - Week Progress
