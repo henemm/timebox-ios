@@ -33,6 +33,13 @@
 
 ## Offene Bugs
 
+### Bug: macOS Coach Backlog leer im Monster-Mode — ERLEDIGT
+- **Status:** DONE
+- **Plattform:** macOS
+- **Root Cause:** `.task { refreshTasks() }` war an `backlogView` gebunden — bei `coachModeEnabled == true` wird `backlogView` nie gerendert, daher lief `refreshTasks()` nie.
+- **Fix:** `.task` und `.onChange` von `backlogView` auf NavigationSplitView verschoben + `cloudKitDatabase: .none` fuer In-Memory-Test-Container.
+- **Dateien:** ContentView.swift, FocusBloxMacApp.swift
+
 ### Bug 102: Coach-Wahl wird NICHT zwischen iOS und macOS synchronisiert — P0
 - **Status:** DONE
 - **Plattform:** iOS + macOS

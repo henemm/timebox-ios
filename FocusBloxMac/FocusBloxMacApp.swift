@@ -219,7 +219,11 @@ struct FocusBloxMacApp: App {
             if isUITesting {
                 // In-memory store for UI tests — no CloudKit, no persistence
                 let schema = Schema([LocalTask.self, TaskMetadata.self])
-                let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
+                let config = ModelConfiguration(
+                    schema: schema,
+                    isStoredInMemoryOnly: true,
+                    cloudKitDatabase: .none
+                )
                 container = try ModelContainer(for: schema, configurations: [config])
                 Self.seedUITestData(into: container.mainContext)
             } else {
@@ -264,30 +268,36 @@ struct FocusBloxMacApp: App {
                     KeyboardShortcutsView()
                 }
                 .onAppear {
-                    syncMonitor.startRemoteChangeMonitoring(container: container)
+                    let isUITesting = ProcessInfo.processInfo.arguments.contains("-UITesting")
+
                     // Ensure window can receive keyboard/mouse events
                     DispatchQueue.main.async {
                         NSApplication.shared.activate(ignoringOtherApps: true)
                         NSApplication.shared.windows.first?.makeKeyAndOrderFront(nil)
                     }
-                    // One-time cleanup: Remove leaked test data from persistent store
-                    Self.cleanupLeakedTestData(in: container.mainContext)
-                    // Bug 38: Force CloudKit to sync all extended attribute fields
-                    MacModelContainer.forceCloudKitFieldSync(in: container.mainContext)
-                    // Repair orphaned recurring series (missing successors)
-                    RecurrenceService.repairOrphanedRecurringSeries(in: container.mainContext)
-                    // Migrate recurring tasks to template model (one-time)
-                    RecurrenceService.migrateToTemplateModel(in: container.mainContext)
-                    RecurrenceService.deduplicateTemplates(in: container.mainContext)
-                    // Background title improvement + enrichment for tasks from Watch, Siri, etc.
-                    let mainContext = container.mainContext
-                    let titleEngine = TaskTitleEngine(modelContext: mainContext)
-                    Task { await titleEngine.improveAllPendingTitles() }
-                    let enrichment = SmartTaskEnrichmentService(modelContext: mainContext)
-                    Task { await enrichment.enrichAllTbdTasks() }
-                    // Spotlight: reindex all active tasks so they appear in system search
-                    let spotlightContext = container.mainContext
-                    Task { try? await SpotlightIndexingService.shared.reindexAllTasks(context: spotlightContext) }
+
+                    // Skip production-only startup tasks in UI testing mode
+                    if !isUITesting {
+                        syncMonitor.startRemoteChangeMonitoring(container: container)
+                        // One-time cleanup: Remove leaked test data from persistent store
+                        Self.cleanupLeakedTestData(in: container.mainContext)
+                        // Bug 38: Force CloudKit to sync all extended attribute fields
+                        MacModelContainer.forceCloudKitFieldSync(in: container.mainContext)
+                        // Repair orphaned recurring series (missing successors)
+                        RecurrenceService.repairOrphanedRecurringSeries(in: container.mainContext)
+                        // Migrate recurring tasks to template model (one-time)
+                        RecurrenceService.migrateToTemplateModel(in: container.mainContext)
+                        RecurrenceService.deduplicateTemplates(in: container.mainContext)
+                        // Background title improvement + enrichment for tasks from Watch, Siri, etc.
+                        let mainContext = container.mainContext
+                        let titleEngine = TaskTitleEngine(modelContext: mainContext)
+                        Task { await titleEngine.improveAllPendingTitles() }
+                        let enrichment = SmartTaskEnrichmentService(modelContext: mainContext)
+                        Task { await enrichment.enrichAllTbdTasks() }
+                        // Spotlight: reindex all active tasks so they appear in system search
+                        let spotlightContext = container.mainContext
+                        Task { try? await SpotlightIndexingService.shared.reindexAllTasks(context: spotlightContext) }
+                    }
                     // Bug 58: Menu bar icon (after app is fully initialized)
                     MenuBarController.shared.setup(
                         container: container,

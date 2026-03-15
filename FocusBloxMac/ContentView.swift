@@ -225,6 +225,23 @@ struct ContentView: View {
             Text(importStatusMessage ?? "")
         }
         .frame(minWidth: 1000, minHeight: 600)
+        .task {
+            refreshTasks()
+            if !ProcessInfo.processInfo.arguments.contains("-UITesting") {
+                cloudKitMonitor.triggerSync()
+            }
+        }
+        .onChange(of: cloudKitMonitor.remoteChangeCount) { _, _ in
+            // Bug 90: Manual re-fetch after CloudKit import (replaces unreliable @Query).
+            Task {
+                try? await Task.sleep(for: .milliseconds(200))
+                refreshTasks()
+                // Enrich remote tasks (Watch, Share Extension, Siri) that arrived without attributes
+                let enrichment = SmartTaskEnrichmentService(modelContext: modelContext)
+                let enriched = await enrichment.enrichAllTbdTasks()
+                if enriched > 0 { refreshTasks() }
+            }
+        }
         .searchable(text: $searchText, prompt: "Tasks durchsuchen")
         .toolbar(id: "mainNavigation") {
             // Main navigation in toolbar
@@ -561,21 +578,6 @@ struct ContentView: View {
             ToolbarItem {
                 Text("\(filteredTasks.count) Tasks")
                     .foregroundStyle(.secondary)
-            }
-        }
-        .task {
-            refreshTasks()
-            cloudKitMonitor.triggerSync()
-        }
-        .onChange(of: cloudKitMonitor.remoteChangeCount) { _, _ in
-            // Bug 90: Manual re-fetch after CloudKit import (replaces unreliable @Query).
-            Task {
-                try? await Task.sleep(for: .milliseconds(200))
-                refreshTasks()
-                // Enrich remote tasks (Watch, Share Extension, Siri) that arrived without attributes
-                let enrichment = SmartTaskEnrichmentService(modelContext: modelContext)
-                let enriched = await enrichment.enrichAllTbdTasks()
-                if enriched > 0 { refreshTasks() }
             }
         }
         .confirmationDialog(
