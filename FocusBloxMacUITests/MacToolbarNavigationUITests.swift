@@ -11,23 +11,22 @@ import XCTest
 /// UI Tests for macOS Toolbar Navigation
 ///
 /// Tests verify:
-/// 1. Toolbar has navigation picker with 5 sections
+/// 1. Toolbar has navigation picker with 4 sections (Bug 101: Assign removed)
 /// 2. Picker changes the displayed view
 /// 3. Sidebar only visible for Backlog (filter options)
+/// 4. No "Assign" section exists (Bug 101)
 ///
 /// macOS Picker(.segmented) in toolbar renders as RadioGroup.
 /// Radio buttons use SF Symbol names as identifiers:
-///   Backlog="tray.full", Planen="calendar", Zuweisen="arrow.up.arrow.down",
-///   Focus="target", Review="chart.bar"
+///   Backlog="tray.full", Blox="calendar", Focus="target", Review="chart.bar"
 final class MacToolbarNavigationUITests: XCTestCase {
 
     var app: XCUIApplication!
 
-    // SF Symbol identifiers used by MainSection
+    // SF Symbol identifiers used by MainSection (Bug 101: 4 sections, no Assign)
     private let sectionSymbols = [
-        "tray.full",      // Backlog
-        "calendar",        // Planen
-        "arrow.up.arrow.down", // Zuweisen
+        "list.bullet",     // Backlog
+        "calendar",        // Blox
         "target",          // Focus
         "chart.bar"        // Review
     ]
@@ -66,9 +65,9 @@ final class MacToolbarNavigationUITests: XCTestCase {
         )
     }
 
-    // MARK: - Test 2: Picker has all 5 sections
+    // MARK: - Test 2: Picker has all 4 sections (Bug 101)
 
-    /// Test: Navigation picker must have all 5 main sections (as radio buttons with SF Symbol IDs)
+    /// Test: Navigation picker must have exactly 4 main sections (Assign removed per Bug 101)
     func testPickerHasAllSections() throws {
         let radioGroup = app.radioGroups["mainNavigationPicker"]
         guard radioGroup.waitForExistence(timeout: 3) else {
@@ -76,14 +75,41 @@ final class MacToolbarNavigationUITests: XCTestCase {
             return
         }
 
-        // Check for all 5 radio buttons by SF Symbol identifier
+        // Check for all 4 radio buttons by SF Symbol identifier
+        // Note: Review icon is "chart.bar" normally, but "sun.and.horizon" in coach mode
         for symbol in sectionSymbols {
             let radioButton = radioGroup.radioButtons[symbol]
-            XCTAssertTrue(
-                radioButton.exists,
-                "Picker must have radio button with SF Symbol '\(symbol)'"
-            )
+            if symbol == "chart.bar" && !radioButton.exists {
+                // Coach mode changes Review icon to sun.and.horizon
+                let coachReview = radioGroup.radioButtons["sun.and.horizon"]
+                XCTAssertTrue(
+                    coachReview.exists,
+                    "Picker must have Review radio button ('chart.bar' or 'sun.and.horizon' in coach mode)"
+                )
+            } else {
+                XCTAssertTrue(
+                    radioButton.exists,
+                    "Picker must have radio button with SF Symbol '\(symbol)'"
+                )
+            }
         }
+    }
+
+    // MARK: - Test 6: No Assign section exists (Bug 101)
+
+    /// Test: "Assign" section must NOT exist — removed per Bug 101
+    func testNoAssignSectionExists() throws {
+        let radioGroup = app.radioGroups["mainNavigationPicker"]
+        guard radioGroup.waitForExistence(timeout: 3) else {
+            XCTFail("Navigation picker RadioGroup not found")
+            return
+        }
+
+        let assignRadio = radioGroup.radioButtons["arrow.up.arrow.down"]
+        XCTAssertFalse(
+            assignRadio.exists,
+            "Assign section (arrow.up.arrow.down) must NOT exist — removed per Bug 101"
+        )
     }
 
     // MARK: - Test 3: Picker changes view
@@ -132,7 +158,7 @@ final class MacToolbarNavigationUITests: XCTestCase {
         }
 
         // Switch to Backlog
-        radioGroup.radioButtons["tray.full"].click()
+        radioGroup.radioButtons["list.bullet"].click()
         sleep(1)
 
         // Check sidebar/filter is visible for Backlog

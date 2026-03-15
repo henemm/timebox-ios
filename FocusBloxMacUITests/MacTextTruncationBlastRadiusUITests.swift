@@ -116,34 +116,7 @@ final class MacTextTruncationBlastRadiusUITests: XCTestCase {
         )
     }
 
-    // MARK: - Test 2: Assign View (MacDraggableTaskRow)
-
-    /// MacDraggableTaskRow VStack must expand to fill available width.
-    ///
-    /// Bricht wenn: MacAssignView.swift task rows fehlt .frame(maxWidth: .infinity)
-    func test_assignView_taskTitleNotCompressed() throws {
-        guard navigateToSection(symbol: "arrow.up.arrow.down") else { return }
-
-        let screenshot = XCTAttachment(screenshot: app.screenshot())
-        screenshot.name = "AssignView-TitleWidth"
-        screenshot.lifetime = .keepAlways
-        add(screenshot)
-
-        guard let (element, title) = findMockTaskTitle(from: nextUpTitles) else {
-            // Assign view might not show NextUp tasks depending on layout
-            return
-        }
-
-        let titleWidth = element.frame.width
-        // Assign view has split layout. With fix, title fills its column.
-        XCTAssertGreaterThan(
-            titleWidth, 100,
-            "Assign: '\(title)' width is only \(Int(titleWidth))px — " +
-            "MacDraggableTaskRow needs .frame(maxWidth: .infinity, alignment: .leading)"
-        )
-    }
-
-    // MARK: - Test 3: Focus View (TaskQueueRow)
+    // MARK: - Test 2: Focus View (TaskQueueRow)
 
     /// TaskQueueRow Text must expand to fill available width.
     ///

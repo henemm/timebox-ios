@@ -7,11 +7,10 @@
 
 import SwiftUI
 
-/// Main navigation sections
+/// Main navigation sections (Bug 101: 4 sections — Assign removed, matches iOS)
 enum MainSection: String, Hashable, CaseIterable {
     case backlog = "Backlog"
     case planning = "Blox"
-    case assign = "Assign"
     case focus = "Focus"
     case review = "Review"
 
@@ -19,7 +18,6 @@ enum MainSection: String, Hashable, CaseIterable {
         switch self {
         case .backlog: return "list.bullet"
         case .planning: return "calendar"
-        case .assign: return "arrow.up.arrow.down"
         case .focus: return "target"
         case .review: return "chart.bar"
         }

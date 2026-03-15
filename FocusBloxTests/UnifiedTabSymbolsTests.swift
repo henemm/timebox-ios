@@ -4,11 +4,10 @@ import XCTest
 /// These expected values must match both iOS MainTabView and macOS MainSection.
 final class UnifiedTabSymbolsTests: XCTestCase {
 
-    /// The agreed-upon unified symbol set for all platforms
+    /// The agreed-upon unified symbol set for all platforms (Bug 101: 4 sections, no Assign)
     private let expectedSymbols: [(section: String, symbol: String)] = [
         ("backlog", "list.bullet"),
         ("planning", "calendar"),
-        ("assign", "arrow.up.arrow.down"),
         ("focus", "target"),
         ("review", "chart.bar")
     ]
@@ -21,8 +20,8 @@ final class UnifiedTabSymbolsTests: XCTestCase {
         }
     }
 
-    /// Verify we have exactly 5 navigation sections
-    func testFiveNavigationSections() {
-        XCTAssertEqual(expectedSymbols.count, 5, "Should have exactly 5 navigation sections")
+    /// Verify we have exactly 4 navigation sections (Bug 101: Assign removed)
+    func testFourNavigationSections() {
+        XCTAssertEqual(expectedSymbols.count, 4, "Should have exactly 4 navigation sections (Bug 101)")
     }
 }

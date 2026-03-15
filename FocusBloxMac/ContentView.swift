@@ -55,9 +55,8 @@ struct ContentView: View {
     @State private var scrollToTaskID: UUID?  // Bug 94: Auto-scroll after task creation
     @State private var inspectorOverrideTaskID: UUID?  // Bug 94: Inspector fallback when List resets selection
 
-    // Shared state between Planen and Zuweisen tabs
+    // Shared date for Blox tab
     @State private var sharedDate = Date()
-    @State private var highlightedBlockID: String?
 
     // Reminders import
     @State private var isSyncing = false
@@ -260,16 +259,11 @@ struct ContentView: View {
             MacPlanningView(
                 selectedDate: $sharedDate
             )
-        case .assign:
-            MacAssignView(
-                selectedDate: $sharedDate,
-                highlightedBlockID: $highlightedBlockID
-            )
         case .focus:
             MacFocusView()
         case .review:
             if coachModeEnabled {
-                MacCoachReviewView()
+                CoachMeinTagView()
             } else {
                 MacReviewView()
             }

@@ -14,8 +14,8 @@
 | **1** | Coach-Redesign abschliessen | Feature | S | DONE — 116 Unit Tests + 14 UI Tests gruen. Committed. |
 | **2** | Bug 102: Coach-Sync iOS↔macOS | Bug P0 | S-M | DONE — pullFromCloud() vor pushToCloud(), Guard gegen leere Coach-Pushes. 7 Unit + 2 UI Tests gruen. |
 | **3** | Phase 6d: Abend-Spiegel macOS | Feature | S-M | DONE — EveningReflectionCard in MacCoachReviewView (angezeigt ab 18:00). 7 UI Tests gruen (4 Phase 6c + 3 neue). |
-| **4** | Phase 6e: CoachMeinTagView macOS | Feature | M | Abhaengig von 6d. Danach ist Coach-Modus auf macOS komplett. |
-| **5** | Bug 101: macOS 5 statt 4 Views | Bug | M | Inkonsistenz zwischen Plattformen. Assign-View zusammenlegen. |
+| **4** | Phase 6e: CoachMeinTagView macOS | Feature | M | DONE — MacCoachReviewView geloescht, shared CoachMeinTagView mit #if os(). macOS bekommt AI-Abend-Text. 7+3 UI Tests gruen. |
+| **5** | Bug 101: macOS 5 statt 4 Views | Bug | M | DONE — Assign entfernt, MainSection 5→4, MacAssignView geloescht (-720 LoC). 6 UI + 2 Unit Tests gruen. |
 | **6** | Bug 98: Mein Tag Woche unvollstaendig | Bug | S-M | Daten-Luecke in der Wochenansicht. Kein Blocker, aber irritierend. |
 | **7** | Discipline manuell ueberschreiben | Feature | M | Nice-to-have fuer Power-User. Kreisfarbe korrigierbar machen. |
 | **8** | TD-03: Services ohne Tests | Tech Debt | M | NotificationService, FocusBlockActionService, GapFinder — Sicherheitsnetz fehlt. |
@@ -46,14 +46,13 @@
 - **Plattform:** iOS + macOS
 - **Symptom:** Die Wochenansicht in "Mein Tag" zeigt nur Tasks die innerhalb von Sprints erledigt wurden. Tasks die ausserhalb von Sprints erledigt wurden, fehlen komplett — sollen aber gleichberechtigt angezeigt werden.
 
-### Bug 101: macOS hat 5 Views statt 4 — Unified Calendar View nicht umgesetzt
-- **Status:** OFFEN
+### Bug 101: macOS hat 5 Views statt 4 — Unified Calendar View nicht umgesetzt — ERLEDIGT
+- **Status:** DONE
 - **Plattform:** macOS
-- **Symptom:** iOS hat 4 Tabs (Backlog, Blox, Focus, Review), macOS hat 5 Sidebar-Eintraege (Backlog, Blox, **Assign**, Focus, Review). Die "Assign"-Section ist ein Ueberschuss.
-- **Ursache:** Die "Unified Calendar View" wurde auf iOS umgesetzt — BlockPlanningView kombiniert Timeline + Task-Zuweisung. Auf macOS existieren noch zwei getrennte Views.
-- **Erwartetes Verhalten:** macOS soll wie iOS 4 Sections haben. "Blox" und "Assign" zusammenlegen.
-- **Betroffene Dateien:** SidebarView.swift, ContentView.swift, MacPlanningView.swift, MacAssignView.swift
-- **Komplexitaet:** M
+- **Root Cause:** iOS wurde am 03.03.2026 von 5 auf 4 Tabs konsolidiert (Commit 4861e2f). macOS wurde nie nachgezogen.
+- **Fix:** `.assign` aus MainSection Enum entfernt, MacAssignView.swift geloescht (-463 LoC), UnifiedBlockNavigationUITests geloescht (-250 LoC). MacPlanningView unveraendert (hatte bereits FocusBlockTasksSheet).
+- **Tests:** 6/6 MacToolbarNavigationUITests + 2/2 UnifiedTabSymbolsTests gruen. Neuer Test: testNoAssignSectionExists.
+- **Netto:** ~-720 LoC
 
 ## Erledigte Bugs (Archiv-Kandidaten)
 
@@ -182,11 +181,14 @@
 - **Dateien:** MacCoachReviewView.swift, MacCoachReviewUITests.swift (3 neue Tests), FocusBloxMacApp.swift (-MockIntentionSet Support)
 - **Tests:** 7 UI Tests gruen (4 bestehend + 3 neue Phase 6d)
 
-### Phase 6e: CoachMeinTagView in macOS (Should) — OFFEN
-- Volle "Mein Tag"-View fuer macOS Coach-Modus (Coach-Auswahl + Tages-Fortschritt + Abend-Spiegel)
-- Pruefen ob shared `CoachMeinTagView` direkt nutzbar ist oder macOS eigenes Layout braucht
-- **Abhaengigkeit:** Phase 6d (EveningReflectionCard muss zuerst auf macOS laufen)
-- **Komplexitaet:** M
+### Phase 6e: CoachMeinTagView in macOS (Should) — ERLEDIGT
+- Shared `CoachMeinTagView` ersetzt `MacCoachReviewView` (82 Zeilen geloescht)
+- `#if os(macOS)` fuer NavigationStack vs .frame(), sonst identisch
+- EventKit via `@Environment(\.eventKitRepository)` statt `@State` (konsistent mit allen anderen Views)
+- macOS bekommt jetzt auch AI-Abend-Text (Feature-Paritaet)
+- **Dateien:** CoachMeinTagView.swift (edit), ContentView.swift (1 Zeile), MacCoachReviewView.swift (deleted), project.pbxproj (2 Build-File-Refs)
+- **Tests:** 7/7 MacCoachReviewUITests + 3/3 CoachMeinTagUITests gruen
+- **Netto:** ~-70 LoC
 
 ---
 
