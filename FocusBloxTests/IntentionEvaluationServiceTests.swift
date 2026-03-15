@@ -440,4 +440,186 @@ final class IntentionEvaluationServiceTests: XCTestCase {
             XCTAssertFalse(text.isEmpty, "\(coach) partial should have a template")
         }
     }
+
+    // MARK: - completedThisWeek
+
+    /// Verhalten: Filtert Tasks auf diese Woche erledigte (Mo-So).
+    func test_completedThisWeek_filtersByWeekBoundary() {
+        let calendar = Calendar.current
+        let now = Date()
+        let weekStart = calendar.dateInterval(of: .weekOfYear, for: now)!.start
+
+        let thisWeekTask = makeTask(isCompleted: true, completedAt: weekStart.addingTimeInterval(3600))
+        let lastWeekTask = makeTask(isCompleted: true, completedAt: weekStart.addingTimeInterval(-3600))
+        let incompleteTask = makeTask(isCompleted: false)
+
+        let result = IntentionEvaluationService.completedThisWeek(
+            [thisWeekTask, lastWeekTask, incompleteTask], now: now
+        )
+        XCTAssertEqual(result.count, 1, "Only this week's completed task should be returned")
+    }
+
+    /// Verhalten: completedThisWeek gibt leeres Array fuer leere Eingabe.
+    func test_completedThisWeek_emptyInput_returnsEmpty() {
+        let result = IntentionEvaluationService.completedThisWeek([], now: Date())
+        XCTAssertTrue(result.isEmpty)
+    }
+
+    // MARK: - focusBlocksThisWeek
+
+    /// Verhalten: Filtert Focus-Blocks auf diese Woche.
+    func test_focusBlocksThisWeek_filtersByWeekBoundary() {
+        let calendar = Calendar.current
+        let now = Date()
+        let weekStart = calendar.dateInterval(of: .weekOfYear, for: now)!.start
+
+        let thisWeekBlock = makeBlock(
+            id: "this-week",
+            startDate: weekStart.addingTimeInterval(3600),
+            endDate: weekStart.addingTimeInterval(7200)
+        )
+        let lastWeekBlock = makeBlock(
+            id: "last-week",
+            startDate: weekStart.addingTimeInterval(-86400),
+            endDate: weekStart.addingTimeInterval(-82800)
+        )
+
+        let result = IntentionEvaluationService.focusBlocksThisWeek(
+            [thisWeekBlock, lastWeekBlock], now: now
+        )
+        XCTAssertEqual(result.count, 1, "Only this week's block should be returned")
+        XCTAssertEqual(result.first?.id, "this-week")
+    }
+
+    // MARK: - evaluateWeeklyFulfillment: Troll
+
+    /// Verhalten: Troll + 3 aufgeschobene Tasks diese Woche → .fulfilled
+    func test_evaluateWeeklyFulfillment_troll_fulfilled() {
+        let tasks = (1...3).map { _ in
+            makeTask(isCompleted: true, completedAt: today, rescheduleCount: 3)
+        }
+        let result = IntentionEvaluationService.evaluateWeeklyFulfillment(
+            coach: .troll, tasks: tasks, focusBlocks: []
+        )
+        XCTAssertEqual(result, .fulfilled, "Troll with 3+ procrastinated tasks this week should be fulfilled")
+    }
+
+    /// Verhalten: Troll + 1-2 aufgeschobene Tasks → .partial
+    func test_evaluateWeeklyFulfillment_troll_partial() {
+        let tasks = [
+            makeTask(isCompleted: true, completedAt: today, rescheduleCount: 3),
+            makeTask(isCompleted: true, completedAt: today, rescheduleCount: 0),
+        ]
+        let result = IntentionEvaluationService.evaluateWeeklyFulfillment(
+            coach: .troll, tasks: tasks, focusBlocks: []
+        )
+        XCTAssertEqual(result, .partial, "Troll with 1-2 procrastinated tasks should be partial")
+    }
+
+    /// Verhalten: Troll + keine aufgeschobenen Tasks → .notFulfilled
+    func test_evaluateWeeklyFulfillment_troll_notFulfilled() {
+        let result = IntentionEvaluationService.evaluateWeeklyFulfillment(
+            coach: .troll, tasks: [], focusBlocks: []
+        )
+        XCTAssertEqual(result, .notFulfilled)
+    }
+
+    // MARK: - evaluateWeeklyFulfillment: Feuer
+
+    /// Verhalten: Feuer + 3 wichtige Tasks → .fulfilled
+    func test_evaluateWeeklyFulfillment_feuer_fulfilled() {
+        let tasks = (1...3).map { _ in
+            makeTask(importance: 3, isCompleted: true, completedAt: today)
+        }
+        let result = IntentionEvaluationService.evaluateWeeklyFulfillment(
+            coach: .feuer, tasks: tasks, focusBlocks: []
+        )
+        XCTAssertEqual(result, .fulfilled, "Feuer with 3+ importance-3 tasks should be fulfilled")
+    }
+
+    /// Verhalten: Feuer + 1-2 wichtige Tasks → .partial
+    func test_evaluateWeeklyFulfillment_feuer_partial() {
+        let task = makeTask(importance: 3, isCompleted: true, completedAt: today)
+        let result = IntentionEvaluationService.evaluateWeeklyFulfillment(
+            coach: .feuer, tasks: [task], focusBlocks: []
+        )
+        XCTAssertEqual(result, .partial, "Feuer with 1-2 importance-3 tasks should be partial")
+    }
+
+    // MARK: - evaluateWeeklyFulfillment: Eule
+
+    /// Verhalten: Eule + 70%+ Wochen-Block-Completion → .fulfilled
+    func test_evaluateWeeklyFulfillment_eule_fulfilled() {
+        let block = makeBlock(
+            taskIDs: ["t1", "t2", "t3", "t4"],
+            completedTaskIDs: ["t1", "t2", "t3"]
+        )
+        let result = IntentionEvaluationService.evaluateWeeklyFulfillment(
+            coach: .eule, tasks: [], focusBlocks: [block]
+        )
+        XCTAssertEqual(result, .fulfilled, "Eule with 75% weekly block completion should be fulfilled")
+    }
+
+    // MARK: - evaluateWeeklyFulfillment: Golem
+
+    /// Verhalten: Golem + 4+ Kategorien diese Woche → .fulfilled
+    func test_evaluateWeeklyFulfillment_golem_fulfilled() {
+        let tasks = [
+            makeTask(isCompleted: true, completedAt: today, taskType: "income"),
+            makeTask(isCompleted: true, completedAt: today, taskType: "learning"),
+            makeTask(isCompleted: true, completedAt: today, taskType: "giving_back"),
+            makeTask(isCompleted: true, completedAt: today, taskType: "maintenance"),
+        ]
+        let result = IntentionEvaluationService.evaluateWeeklyFulfillment(
+            coach: .golem, tasks: tasks, focusBlocks: []
+        )
+        XCTAssertEqual(result, .fulfilled, "Golem with 4+ categories this week should be fulfilled")
+    }
+
+    /// Verhalten: Golem + 2-3 Kategorien → .partial
+    func test_evaluateWeeklyFulfillment_golem_partial() {
+        let tasks = [
+            makeTask(isCompleted: true, completedAt: today, taskType: "income"),
+            makeTask(isCompleted: true, completedAt: today, taskType: "learning"),
+        ]
+        let result = IntentionEvaluationService.evaluateWeeklyFulfillment(
+            coach: .golem, tasks: tasks, focusBlocks: []
+        )
+        XCTAssertEqual(result, .partial, "Golem with 2-3 categories should be partial")
+    }
+
+    // MARK: - weeklyFallbackTemplate
+
+    /// Verhalten: Jeder Coach + fulfilled hat einen nicht-leeren WOCHEN-Template-Text.
+    func test_weeklyFallbackTemplate_allCoaches_fulfilled() {
+        for coach in CoachType.allCases {
+            let text = IntentionEvaluationService.weeklyFallbackTemplate(
+                coach: coach, level: .fulfilled
+            )
+            XCTAssertFalse(text.isEmpty, "\(coach) weekly fulfilled should have a template")
+        }
+    }
+
+    /// Verhalten: Jeder Coach + notFulfilled hat einen nicht-leeren WOCHEN-Template-Text.
+    func test_weeklyFallbackTemplate_allCoaches_notFulfilled() {
+        for coach in CoachType.allCases {
+            let text = IntentionEvaluationService.weeklyFallbackTemplate(
+                coach: coach, level: .notFulfilled
+            )
+            XCTAssertFalse(text.isEmpty, "\(coach) weekly notFulfilled should have a template")
+        }
+    }
+
+    /// Verhalten: Wochen-Templates unterscheiden sich von Tages-Templates.
+    func test_weeklyFallbackTemplate_differFromDailyTemplates() {
+        for coach in CoachType.allCases {
+            let daily = IntentionEvaluationService.fallbackTemplate(
+                coach: coach, level: .fulfilled
+            )
+            let weekly = IntentionEvaluationService.weeklyFallbackTemplate(
+                coach: coach, level: .fulfilled
+            )
+            XCTAssertNotEqual(daily, weekly, "\(coach) weekly template should differ from daily")
+        }
+    }
 }

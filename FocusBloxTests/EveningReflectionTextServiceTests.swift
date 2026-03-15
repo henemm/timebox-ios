@@ -494,4 +494,96 @@ final class EveningReflectionTextServiceTests: XCTestCase {
         XCTAssertFalse(prompt.contains("Fehlend:"), "Must NOT show 'Fehlend:' when all categories active")
         XCTAssertFalse(prompt.contains("keinem Bereich"), "Must NOT say 'keinem Bereich' when all active")
     }
+
+    // MARK: - Weekly Prompt Building
+
+    /// Verhalten: buildWeeklyPrompt enthaelt "Woche" statt "heute".
+    func test_buildWeeklyPrompt_containsWeekContext() {
+        let service = EveningReflectionTextService()
+        let task = makeTask(
+            title: "Wochenaufgabe",
+            isCompleted: true,
+            completedAt: today
+        )
+
+        let prompt = service.buildWeeklyPrompt(
+            coach: .feuer,
+            level: .fulfilled,
+            tasks: [task],
+            focusBlocks: [],
+            now: today
+        )
+
+        XCTAssertTrue(
+            prompt.contains("Woche"),
+            "Weekly prompt should contain 'Woche'"
+        )
+        XCTAssertTrue(
+            prompt.contains("Wochenaufgabe"),
+            "Weekly prompt should contain completed task title"
+        )
+    }
+
+    /// Verhalten: buildWeeklyPrompt enthaelt Coach-Namen.
+    func test_buildWeeklyPrompt_includesCoachName() {
+        let service = EveningReflectionTextService()
+        let prompt = service.buildWeeklyPrompt(
+            coach: .troll,
+            level: .partial,
+            tasks: [],
+            focusBlocks: [],
+            now: today
+        )
+
+        XCTAssertTrue(
+            prompt.contains("Troll"),
+            "Weekly prompt should contain coach name 'Troll'"
+        )
+    }
+
+    /// Verhalten: buildWeeklyPrompt begrenzt Tasks auf max 7 (mehr als taeglich).
+    func test_buildWeeklyPrompt_limitsTasksToSeven() {
+        let service = EveningReflectionTextService()
+        let tasks = (1...10).map { i in
+            makeTask(
+                title: "WTask \(i)",
+                isCompleted: true,
+                completedAt: today
+            )
+        }
+
+        let prompt = service.buildWeeklyPrompt(
+            coach: .golem,
+            level: .fulfilled,
+            tasks: tasks,
+            focusBlocks: [],
+            now: today
+        )
+
+        XCTAssertFalse(
+            prompt.contains("WTask 8"),
+            "Weekly prompt should not contain more than 7 tasks"
+        )
+        XCTAssertTrue(
+            prompt.contains("WTask 1"),
+            "Weekly prompt should contain the first tasks"
+        )
+    }
+
+    /// Verhalten: buildWeeklyPrompt enthaelt FulfillmentLevel.
+    func test_buildWeeklyPrompt_includesFulfillmentLevel() {
+        let service = EveningReflectionTextService()
+        let prompt = service.buildWeeklyPrompt(
+            coach: .eule,
+            level: .fulfilled,
+            tasks: [],
+            focusBlocks: [],
+            now: today
+        )
+
+        XCTAssertTrue(
+            prompt.contains("Erfuellt"),
+            "Weekly prompt should contain fulfillment level"
+        )
+    }
 }

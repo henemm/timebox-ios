@@ -257,4 +257,87 @@ final class EveningReflectionTextService {
         formatter.dateFormat = "HH:mm"
         return " (\(formatter.string(from: date)))"
     }
+
+    // MARK: - Weekly Prompt Building
+
+    func buildWeeklyPrompt(
+        coach: CoachType,
+        level: FulfillmentLevel,
+        tasks: [LocalTask],
+        focusBlocks: [FocusBlock],
+        now: Date
+    ) -> String {
+        let completedTasks = IntentionEvaluationService.completedThisWeek(tasks, now: now)
+        let weekBlocks = IntentionEvaluationService.focusBlocksThisWeek(focusBlocks, now: now)
+
+        var parts: [String] = []
+
+        parts.append("Coach: \(coach.displayName) — \(coach.subtitle)")
+        parts.append("Zeitraum: Diese Woche")
+        parts.append("Ergebnis: \(levelDescription(level))")
+        parts.append("Schwerpunkt: \(coachGuidance(coach, completedTasks: completedTasks))")
+
+        let sorted = sortedByRelevance(completedTasks, for: coach)
+        if !sorted.isEmpty {
+            let taskLines = sorted.prefix(7).map { task -> String in
+                let importanceStr = task.importance == 3 ? " [Wichtigkeit: hoch]" : ""
+                let rescheduleStr = task.rescheduleCount >= 2 ? " [verschoben: \(task.rescheduleCount)x]" : ""
+                return "- '\(task.title)'\(importanceStr)\(rescheduleStr)"
+            }
+            parts.append("Erledigte Tasks diese Woche:\n\(taskLines.joined(separator: "\n"))")
+        } else {
+            parts.append("Erledigte Tasks diese Woche: keine")
+        }
+
+        let completedBlocks = weekBlocks.filter { !$0.completedTaskIDs.isEmpty }.count
+        let totalBlocks = weekBlocks.count
+        if totalBlocks > 0 {
+            parts.append("Focus-Blocks diese Woche: \(completedBlocks) von \(totalBlocks) bearbeitet")
+        }
+
+        return parts.joined(separator: "\n")
+    }
+
+    /// Generate weekly AI text for the active coach.
+    func generateWeeklyTextForCoach(
+        coach: CoachType,
+        tasks: [LocalTask],
+        focusBlocks: [FocusBlock],
+        now: Date = Date()
+    ) async -> String? {
+        let level = IntentionEvaluationService.evaluateWeeklyFulfillment(
+            coach: coach, tasks: tasks, focusBlocks: focusBlocks, now: now
+        )
+        guard Self.isAvailable, AppSettings.shared.aiScoringEnabled else { return nil }
+
+        #if canImport(FoundationModels)
+        if #available(iOS 26.0, macOS 26.0, *) {
+            do {
+                let session = LanguageModelSession {
+                    "Du bist \(coach.displayName), ein Monster-Coach."
+                    coach.personality
+                    "Schreib 2-3 persoenliche Saetze als Wochen-Rueckblick."
+                    "Regeln:"
+                    "- Nie toxisch positiv"
+                    "- Nie schuldzuweisend"
+                    "- Bleib in deiner Persoenlichkeit"
+                    "- Bezieh dich auf konkrete Task-Titel wenn vorhanden"
+                    "- Immer auf Deutsch"
+                    "- Max 200 Zeichen"
+                }
+                let userPrompt = buildWeeklyPrompt(
+                    coach: coach, level: level, tasks: tasks, focusBlocks: focusBlocks, now: now
+                )
+                let response = try await session.respond(to: userPrompt, generating: ReflectionText.self)
+                let generated = response.content.text.trimmingCharacters(in: .whitespacesAndNewlines)
+                guard !generated.isEmpty else { return nil }
+                return String(generated.prefix(300))
+            } catch {
+                print("[WeeklyReflection] Failed: \(error)")
+                return nil
+            }
+        }
+        #endif
+        return nil
+    }
 }

@@ -16,7 +16,7 @@
 | **3** | Phase 6d: Abend-Spiegel macOS | Feature | S-M | DONE — EveningReflectionCard in MacCoachReviewView (angezeigt ab 18:00). 7 UI Tests gruen (4 Phase 6c + 3 neue). |
 | **4** | Phase 6e: CoachMeinTagView macOS | Feature | M | DONE — MacCoachReviewView geloescht, shared CoachMeinTagView mit #if os(). macOS bekommt AI-Abend-Text. 7+3 UI Tests gruen. |
 | **5** | Bug 101: macOS 5 statt 4 Views | Bug | M | DONE — Assign entfernt, MainSection 5→4, MacAssignView geloescht (-720 LoC). 6 UI + 2 Unit Tests gruen. |
-| **6** | Bug 98: Mein Tag Woche unvollstaendig | Bug | S-M | Daten-Luecke in der Wochenansicht. Kein Blocker, aber irritierend. |
+| **6** | Bug 98: Mein Tag Woche unvollstaendig | Bug | S-M | DONE — DailyReviewView Guard gefixt + CoachMeinTagView Weekly Mode mit Coach-Texten. 68 Unit Tests gruen. |
 | **7** | Discipline manuell ueberschreiben | Feature | M | Nice-to-have fuer Power-User. Kreisfarbe korrigierbar machen. |
 | **8** | TD-03: Services ohne Tests | Tech Debt | M | NotificationService, FocusBlockActionService, GapFinder — Sicherheitsnetz fehlt. |
 | **9** | MAC-026: Enhanced Quick Capture | Feature | L | macOS Produktivitaet. Kein Blocker. |
@@ -42,9 +42,12 @@
 - **Dateien:** SyncedSettings.swift, FocusBloxApp.swift, FocusBloxMacApp.swift
 
 ### Bug 98: Mein Tag Woche zeigt nur Sprint-Tasks — ausserhalb Sprints erledigte fehlen
-- **Status:** OFFEN
+- **Status:** DONE
 - **Plattform:** iOS + macOS
-- **Symptom:** Die Wochenansicht in "Mein Tag" zeigt nur Tasks die innerhalb von Sprints erledigt wurden. Tasks die ausserhalb von Sprints erledigt wurden, fehlen komplett — sollen aber gleichberechtigt angezeigt werden.
+- **Root Cause:** Zwei Probleme: (1) DailyReviewView Guard `weekBlocks.isEmpty` war zu restriktiv — zeigte leeren Zustand auch wenn Tasks ohne Sprint erledigt wurden. (2) CoachMeinTagView hatte keine Wochenansicht.
+- **Fix:** (1) Guard erweitert auf `weekBlocks.isEmpty && weekCompletedTasks.isEmpty` + weekOutsideSprintSection hinzugefuegt. (2) CoachMeinTagView bekommt Heute/Diese-Woche-Picker mit Weekly-Fulfillment-Bewertung + motivierenden Coach-Wochen-Texten (AI + 12 Fallback-Templates).
+- **Tests:** 48 IntentionEvaluationServiceTests + 20 EveningReflectionTextServiceTests — alle gruen
+- **Dateien:** DailyReviewView.swift, CoachMeinTagView.swift, IntentionEvaluationService.swift, EveningReflectionTextService.swift
 
 ### Bug 101: macOS hat 5 Views statt 4 — Unified Calendar View nicht umgesetzt — ERLEDIGT
 - **Status:** DONE

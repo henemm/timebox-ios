@@ -75,6 +75,12 @@ struct DailyReviewView: View {
         return todayCompletedTasks.filter { !blockCompletedIDs.contains($0.id) }
     }
 
+    /// Tasks completed this week but NOT in any block
+    private var weekOutsideSprintTasks: [PlanItem] {
+        let blockCompletedIDs = Set(weekBlocks.flatMap { $0.completedTaskIDs })
+        return weekCompletedTasks.filter { !blockCompletedIDs.contains($0.id) }
+    }
+
     /// Category statistics for daily view (tasks + calendar events)
     private var dailyCategoryStats: [CategoryStat] {
         var taskStats: [String: Int] = [:]
@@ -179,13 +185,18 @@ struct DailyReviewView: View {
                                 .padding(.horizontal)
                             }
                         case .week:
-                            if weekBlocks.isEmpty {
+                            if weekBlocks.isEmpty && weekCompletedTasks.isEmpty {
                                 weeklyEmptyState
                             } else {
                                 VStack(spacing: 24) {
                                     weeklyStatsHeader
                                     categoryStatsSection
-                                    planningAccuracySection(blocks: weekBlocks)
+                                    if !weekBlocks.isEmpty {
+                                        planningAccuracySection(blocks: weekBlocks)
+                                    }
+                                    if !weekOutsideSprintTasks.isEmpty {
+                                        weeklyOutsideSprintSection
+                                    }
                                 }
                                 .padding(.horizontal)
                             }
@@ -561,6 +572,35 @@ struct DailyReviewView: View {
             }
             VStack(spacing: 8) {
                 ForEach(todayOutsideSprintTasks) { task in
+                    ReviewTaskRow(task: task, isCompleted: true)
+                }
+            }
+        }
+        .padding()
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(.background)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .strokeBorder(.secondary.opacity(0.2), lineWidth: 1)
+        )
+    }
+
+    // MARK: - Weekly Outside Sprint Section
+
+    private var weeklyOutsideSprintSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Text("Ohne Sprint erledigt")
+                    .font(.headline)
+                Spacer()
+                Text("\(weekOutsideSprintTasks.count)")
+                    .font(.headline)
+                    .foregroundStyle(.green)
+            }
+            VStack(spacing: 8) {
+                ForEach(weekOutsideSprintTasks) { task in
                     ReviewTaskRow(task: task, isCompleted: true)
                 }
             }
