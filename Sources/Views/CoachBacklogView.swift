@@ -23,6 +23,12 @@ struct CoachBacklogView: View {
     @State private var showUndoAlert = false
     @State private var undoResultMessage = ""
 
+    // MARK: - Recurring Task Dialog State
+    @State private var taskToDeleteRecurring: PlanItem?
+    @State private var taskToEditRecurring: PlanItem?
+    @State private var editSeriesMode: Bool = false
+    @State private var taskToEndSeries: PlanItem?
+
     // MARK: - Task Sections (via shared CoachBacklogViewModel)
 
     private var searchFilteredItems: [PlanItem] {
@@ -82,7 +88,12 @@ struct CoachBacklogView: View {
                 TaskFormSheet(
                     task: task,
                     onSave: { title, priority, duration, tags, urgency, taskType, dueDate, description, recPat, recWeek, recMonth, recInterval in
-                        updateTask(task, title: title, priority: priority, duration: duration, tags: tags, urgency: urgency, taskType: taskType, dueDate: dueDate, description: description)
+                        if editSeriesMode {
+                            updateRecurringSeries(task, title: title, priority: priority, duration: duration, tags: tags, urgency: urgency, taskType: taskType, dueDate: dueDate, description: description, recurrencePattern: recPat, recurrenceWeekdays: recWeek, recurrenceMonthDay: recMonth, recurrenceInterval: recInterval)
+                            editSeriesMode = false
+                        } else {
+                            updateTask(task, title: title, priority: priority, duration: duration, tags: tags, urgency: urgency, taskType: taskType, dueDate: dueDate, description: description)
+                        }
                     },
                     onDelete: { deleteTask(task) }
                 )
@@ -112,6 +123,77 @@ struct CoachBacklogView: View {
             Button("OK") { }
         } message: {
             Text(undoResultMessage)
+        }
+        // MARK: - Recurring Task Dialogs
+        .confirmationDialog(
+            "Wiederkehrende Aufgabe löschen",
+            isPresented: Binding(
+                get: { taskToDeleteRecurring != nil },
+                set: { if !$0 { taskToDeleteRecurring = nil } }
+            ),
+            titleVisibility: .visible
+        ) {
+            Button("Nur diese Aufgabe", role: .destructive) {
+                if let task = taskToDeleteRecurring {
+                    deleteSingleTask(task)
+                    taskToDeleteRecurring = nil
+                }
+            }
+            Button("Alle offenen dieser Serie", role: .destructive) {
+                if let task = taskToDeleteRecurring {
+                    deleteRecurringSeries(task)
+                    taskToDeleteRecurring = nil
+                }
+            }
+            Button("Abbrechen", role: .cancel) {
+                taskToDeleteRecurring = nil
+            }
+        }
+        .confirmationDialog(
+            "Wiederkehrende Aufgabe bearbeiten",
+            isPresented: Binding(
+                get: { taskToEditRecurring != nil },
+                set: { if !$0 { taskToEditRecurring = nil } }
+            ),
+            titleVisibility: .visible
+        ) {
+            Button("Nur diese Aufgabe") {
+                if let task = taskToEditRecurring {
+                    editSeriesMode = false
+                    taskToEdit = task
+                    taskToEditRecurring = nil
+                }
+            }
+            Button("Alle offenen dieser Serie") {
+                if let task = taskToEditRecurring {
+                    editSeriesMode = true
+                    taskToEdit = task
+                    taskToEditRecurring = nil
+                }
+            }
+            Button("Abbrechen", role: .cancel) {
+                taskToEditRecurring = nil
+            }
+        }
+        .confirmationDialog(
+            "Serie beenden?",
+            isPresented: Binding(
+                get: { taskToEndSeries != nil },
+                set: { if !$0 { taskToEndSeries = nil } }
+            ),
+            titleVisibility: .visible
+        ) {
+            Button("Serie beenden", role: .destructive) {
+                if let task = taskToEndSeries {
+                    endSeries(task)
+                    taskToEndSeries = nil
+                }
+            }
+            Button("Abbrechen", role: .cancel) {
+                taskToEndSeries = nil
+            }
+        } message: {
+            Text("Die Vorlage und alle offenen Aufgaben werden gelöscht. Erledigte Aufgaben bleiben erhalten.")
         }
         .task { await loadTasks() }
         .onChange(of: cloudKitMonitor.remoteChangeCount) { _, _ in
@@ -405,7 +487,7 @@ struct CoachBacklogView: View {
     private func blockedRow(_ item: PlanItem) -> some View {
         BacklogRow(
             item: item,
-            onEditTap: { taskToEdit = item },
+            onEditTap: { handleEditTap(item) },
             onTitleSave: { newTitle in saveTitleEdit(for: item, title: newTitle) },
             isBlocked: true
         )
@@ -448,7 +530,7 @@ struct CoachBacklogView: View {
             onImportanceCycle: { newImportance in updateImportance(for: item, importance: newImportance) },
             onUrgencyToggle: { newUrgency in updateUrgency(for: item, urgency: newUrgency) },
             onCategoryTap: { selectedItemForCategory = item },
-            onEditTap: { taskToEdit = item },
+            onEditTap: { handleEditTap(item) },
             onDeleteTap: { deleteTask(item) },
             onTitleSave: { newTitle in saveTitleEdit(for: item, title: newTitle) },
             isPendingResort: deferredSort.isPending(item.id),
@@ -495,7 +577,7 @@ struct CoachBacklogView: View {
             Button(role: .destructive) { deleteTask(item) } label: {
                 Label("Löschen", systemImage: "trash")
             }
-            Button { taskToEdit = item } label: {
+            Button { handleEditTap(item) } label: {
                 Label("Bearbeiten", systemImage: "pencil")
             }
             .tint(.blue)
@@ -543,6 +625,11 @@ struct CoachBacklogView: View {
     }
 
     private func completeTask(_ item: PlanItem) {
+        // Templates can't be completed — checkbox means "end series"
+        if item.isTemplate, item.recurrenceGroupID != nil {
+            taskToEndSeries = item
+            return
+        }
         completeFeedback.toggle()
         deferredCompletion.scheduleCompletion(id: item.id) { [modelContext] in
             do {
@@ -557,6 +644,22 @@ struct CoachBacklogView: View {
     }
 
     private func deleteTask(_ task: PlanItem) {
+        // Template? Show "end series" dialog instead of deleting
+        if task.isTemplate, task.recurrenceGroupID != nil {
+            taskToEndSeries = task
+            return
+        }
+        // Recurring child? Show confirmation dialog
+        if let pattern = task.recurrencePattern,
+           pattern != "none",
+           task.recurrenceGroupID != nil {
+            taskToDeleteRecurring = task
+            return
+        }
+        deleteSingleTask(task)
+    }
+
+    private func deleteSingleTask(_ task: PlanItem) {
         do {
             let taskSource = LocalTaskSource(modelContext: modelContext)
             let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
@@ -565,6 +668,59 @@ struct CoachBacklogView: View {
             Task { await loadTasks() }
         } catch {
             errorMessage = "Task konnte nicht gelöscht werden."
+        }
+    }
+
+    private func deleteRecurringSeries(_ task: PlanItem) {
+        guard let groupID = task.recurrenceGroupID else { return }
+        do {
+            let taskSource = LocalTaskSource(modelContext: modelContext)
+            let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
+            try syncEngine.deleteRecurringSeries(groupID: groupID)
+            Task { await loadTasks() }
+        } catch {
+            errorMessage = "Serie konnte nicht gelöscht werden."
+        }
+    }
+
+    private func endSeries(_ task: PlanItem) {
+        guard let groupID = task.recurrenceGroupID else { return }
+        do {
+            let taskSource = LocalTaskSource(modelContext: modelContext)
+            let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
+            try syncEngine.deleteRecurringTemplate(groupID: groupID)
+            Task { await loadTasks() }
+        } catch {
+            errorMessage = "Serie konnte nicht beendet werden."
+        }
+    }
+
+    private func handleEditTap(_ task: PlanItem) {
+        // Recurring task? Show edit series dialog
+        if let pattern = task.recurrencePattern,
+           pattern != "none",
+           task.recurrenceGroupID != nil {
+            taskToEditRecurring = task
+            return
+        }
+        taskToEdit = task
+    }
+
+    private func updateRecurringSeries(_ task: PlanItem, title: String, priority: Int?, duration: Int?, tags: [String], urgency: String?, taskType: String?, dueDate: Date?, description: String?, recurrencePattern: String? = nil, recurrenceWeekdays: [Int]? = nil, recurrenceMonthDay: Int? = nil, recurrenceInterval: Int? = nil) {
+        guard let groupID = task.recurrenceGroupID else { return }
+        do {
+            let taskSource = LocalTaskSource(modelContext: modelContext)
+            let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
+            try syncEngine.updateRecurringSeries(
+                groupID: groupID, title: title, importance: priority,
+                duration: duration, tags: tags, urgency: urgency,
+                taskType: taskType ?? task.taskType, dueDate: dueDate, description: description,
+                recurrencePattern: recurrencePattern, recurrenceWeekdays: recurrenceWeekdays,
+                recurrenceMonthDay: recurrenceMonthDay, recurrenceInterval: recurrenceInterval
+            )
+            Task { await loadTasks() }
+        } catch {
+            errorMessage = "Serie konnte nicht aktualisiert werden."
         }
     }
 

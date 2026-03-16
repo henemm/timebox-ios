@@ -12,7 +12,7 @@
 
 | ID | Titel | Prio | Aufwand | Plattform | Beschreibung |
 |----|-------|------|---------|-----------|-------------|
-| ~~FEATURE_001~~ | ~~Coach-Backlog iOS: Recurring-Serie-Dialoge~~ | ~~High~~ | ~~S~~ | ~~iOS~~ | **ERLEDIGT** — Confirmation-Dialoge (Nur diese Aufgabe / Alle offenen dieser Serie) beim Loeschen/Bearbeiten wiederkehrender Tasks in CoachBacklogView hinzugefuegt. 5 UI Tests gruen. |
+| ~~FEATURE_001~~ | ~~Coach-Backlog iOS: Recurring-Serie-Dialoge~~ | ~~High~~ | ~~S~~ | ~~iOS~~ | **ERLEDIGT** — Confirmation-Dialoge (Nur diese Aufgabe / Alle offenen dieser Serie) beim Loeschen/Bearbeiten wiederkehrender Tasks in CoachBacklogView. 3 Dialoge, Recurring-Check + Template-Check, 5 UI Tests gruen. Implementation-Validator bestanden. |
 | FEATURE_002 | Coach-Backlog iOS: Blocked-Row Editing | Medium | S | iOS | Blocked Rows im Coach-Backlog sind read-only. In BacklogView erlauben sie Duration/Importance/Category-Aenderungen. |
 | FEATURE_003 | Coach-Backlog macOS: Quick-Add TextField | Medium | S | macOS | Normaler macOS-Backlog hat Quick-Add-TextField oben — Coach-Backlog nicht. |
 | FEATURE_004 | Coach-Backlog macOS: Suchfunktion | Medium | S | macOS | Normaler macOS-Backlog hat .searchable — Coach-Backlog nicht. |

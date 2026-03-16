@@ -1,0 +1,11 @@
+TDD RED — UI Tests (2026-03-16)
+
+Test suite 'CoachRecurringDialogUITests':
+  FAILED: test_swipeDelete_recurringTask_showsConfirmationDialog (15.150s)
+  FAILED: test_deleteDialog_singleOption_deletesOnlyOneInstance (13.621s)  
+  FAILED: test_deleteDialog_cancel_keepsTask (17.965s)
+  FAILED: test_swipeEdit_recurringTask_showsEditSeriesDialog (16.336s)
+  PASSED: test_swipeDelete_nonRecurringTask_noDialog (18.015s)
+
+4 FAILED, 1 PASSED — TDD RED confirmed.
+Root cause: CoachBacklogView.deleteTask() has no recurring check, no confirmation dialog.

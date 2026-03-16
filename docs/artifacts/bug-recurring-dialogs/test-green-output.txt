@@ -1,0 +1,7 @@
+** TEST SUCCEEDED **
+Test suite 'CoachRecurringDialogUITests' started on 'Clone 1 of FocusBlox - FocusBloxUITests-Runner (14699)'
+Test case 'CoachRecurringDialogUITests.test_deleteDialog_cancel_keepsTask()' passed on 'Clone 1 of FocusBlox - FocusBloxUITests-Runner (14699)' (40.826 seconds)
+Test case 'CoachRecurringDialogUITests.test_deleteDialog_singleOption_deletesOnlyOneInstance()' passed on 'Clone 1 of FocusBlox - FocusBloxUITests-Runner (14699)' (41.886 seconds)
+Test case 'CoachRecurringDialogUITests.test_swipeDelete_nonRecurringTask_noDialog()' passed on 'Clone 1 of FocusBlox - FocusBloxUITests-Runner (14699)' (20.164 seconds)
+Test case 'CoachRecurringDialogUITests.test_swipeDelete_recurringTask_showsConfirmationDialog()' passed on 'Clone 1 of FocusBlox - FocusBloxUITests-Runner (14699)' (35.488 seconds)
+Test case 'CoachRecurringDialogUITests.test_swipeEdit_recurringTask_showsEditSeriesDialog()' passed on 'Clone 1 of FocusBlox - FocusBloxUITests-Runner (14699)' (31.693 seconds)
