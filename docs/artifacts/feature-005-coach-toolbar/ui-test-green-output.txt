@@ -37,8 +37,8 @@ ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/usr/bin/actool --
 
 ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld -version_details
 
-Build description signature: 47c7e8ad2df31e42302dab709c9e455b
-Build description path: /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/XCBuildData/47c7e8ad2df31e42302dab709c9e455b.xcbuilddata
+Build description signature: f33b64aec5285c48411bd002c2f221ce
+Build description path: /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/XCBuildData/f33b64aec5285c48411bd002c2f221ce.xcbuilddata
 ClangStatCache /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk /Users/hem/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/macosx26.2-25C58-00fa09913b459cbbc988d1f6730289ae.sdkstatcache
     cd /Users/hem/Developer/my-daily-sprints/FocusBlox.xcodeproj
     /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk -o /Users/hem/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/macosx26.2-25C58-00fa09913b459cbbc988d1f6730289ae.sdkstatcache
@@ -66,13 +66,13 @@ ProcessProductPackaging /Users/hem/Developer/my-daily-sprints/FocusBloxMacShareE
     
     builtin-productPackagingUtility /Users/hem/Developer/my-daily-sprints/FocusBloxMacShareExtension/FocusBloxMacShareExtension.entitlements -entitlements -format xml -o /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug/FocusBloxMacShareExtension.build/FocusBloxMacShareExtension.appex.xcent
 
-ProcessProductPackagingDER /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug/FocusBloxMacShareExtension.build/FocusBloxMacShareExtension.appex.xcent /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug/FocusBloxMacShareExtension.build/FocusBloxMacShareExtension.appex.xcent.der (in target 'FocusBloxMacShareExtension' from project 'FocusBlox')
-    cd /Users/hem/Developer/my-daily-sprints
-    /usr/bin/derq query -f xml -i /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug/FocusBloxMacShareExtension.build/FocusBloxMacShareExtension.appex.xcent -o /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug/FocusBloxMacShareExtension.build/FocusBloxMacShareExtension.appex.xcent.der --raw
-
 MkDir /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/Frameworks (in target 'FocusBloxMac' from project 'FocusBlox')
     cd /Users/hem/Developer/my-daily-sprints
     /bin/mkdir -p /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/Frameworks
+
+ProcessProductPackagingDER /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug/FocusBloxMacShareExtension.build/FocusBloxMacShareExtension.appex.xcent /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug/FocusBloxMacShareExtension.build/FocusBloxMacShareExtension.appex.xcent.der (in target 'FocusBloxMacShareExtension' from project 'FocusBlox')
+    cd /Users/hem/Developer/my-daily-sprints
+    /usr/bin/derq query -f xml -i /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug/FocusBloxMacShareExtension.build/FocusBloxMacShareExtension.appex.xcent -o /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug/FocusBloxMacShareExtension.build/FocusBloxMacShareExtension.appex.xcent.der --raw
 
 ProcessInfoPlistFile /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMacShareExtension.appex/Contents/Info.plist /Users/hem/Developer/my-daily-sprints/FocusBloxMacShareExtension/Info.plist (in target 'FocusBloxMacShareExtension' from project 'FocusBlox')
     cd /Users/hem/Developer/my-daily-sprints
@@ -120,6 +120,42 @@ ProcessProductPackaging /Users/hem/Developer/my-daily-sprints/FocusBloxMac/Focus
 ProcessProductPackagingDER /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug/FocusBloxMac.build/FocusBloxMac.app.xcent /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug/FocusBloxMac.build/FocusBloxMac.app.xcent.der (in target 'FocusBloxMac' from project 'FocusBlox')
     cd /Users/hem/Developer/my-daily-sprints
     /usr/bin/derq query -f xml -i /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug/FocusBloxMac.build/FocusBloxMac.app.xcent -o /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug/FocusBloxMac.build/FocusBloxMac.app.xcent.der --raw
+
+Copy /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/Frameworks/Testing.framework /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks/Testing.framework (in target 'FocusBloxMac' from project 'FocusBlox')
+    cd /Users/hem/Developer/my-daily-sprints
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -exclude Headers -exclude PrivateHeaders -exclude Modules -exclude \*.tbd -resolve-src-symlinks /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks/Testing.framework /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/Frameworks
+
+Copy /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/Frameworks/XCTest.framework /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks/XCTest.framework (in target 'FocusBloxMac' from project 'FocusBlox')
+    cd /Users/hem/Developer/my-daily-sprints
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -exclude Headers -exclude PrivateHeaders -exclude Modules -exclude \*.tbd -resolve-src-symlinks /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks/XCTest.framework /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/Frameworks
+
+Copy /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/Frameworks/XCTAutomationSupport.framework /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks/XCTAutomationSupport.framework (in target 'FocusBloxMac' from project 'FocusBlox')
+    cd /Users/hem/Developer/my-daily-sprints
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -exclude Headers -exclude PrivateHeaders -exclude Modules -exclude \*.tbd -resolve-src-symlinks /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks/XCTAutomationSupport.framework /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/Frameworks
+
+Copy /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/Frameworks/XCTestSupport.framework /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks/XCTestSupport.framework (in target 'FocusBloxMac' from project 'FocusBlox')
+    cd /Users/hem/Developer/my-daily-sprints
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -exclude Headers -exclude PrivateHeaders -exclude Modules -exclude \*.tbd -resolve-src-symlinks /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks/XCTestSupport.framework /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/Frameworks
+
+Copy /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/Frameworks/XCTestCore.framework /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks/XCTestCore.framework (in target 'FocusBloxMac' from project 'FocusBlox')
+    cd /Users/hem/Developer/my-daily-sprints
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -exclude Headers -exclude PrivateHeaders -exclude Modules -exclude \*.tbd -resolve-src-symlinks /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks/XCTestCore.framework /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/Frameworks
+
+Copy /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/Frameworks/libXCTestSwiftSupport.dylib /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib/libXCTestSwiftSupport.dylib (in target 'FocusBloxMac' from project 'FocusBlox')
+    cd /Users/hem/Developer/my-daily-sprints
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -exclude Headers -exclude PrivateHeaders -exclude Modules -exclude \*.tbd -resolve-src-symlinks /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib/libXCTestSwiftSupport.dylib /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/Frameworks
+
+Copy /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/Frameworks/libXCTestBundleInject.dylib /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib/libXCTestBundleInject.dylib (in target 'FocusBloxMac' from project 'FocusBlox')
+    cd /Users/hem/Developer/my-daily-sprints
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -exclude Headers -exclude PrivateHeaders -exclude Modules -exclude \*.tbd -resolve-src-symlinks /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib/libXCTestBundleInject.dylib /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/Frameworks
+
+Copy /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/Frameworks/XCUnit.framework /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks/XCUnit.framework (in target 'FocusBloxMac' from project 'FocusBlox')
+    cd /Users/hem/Developer/my-daily-sprints
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -exclude Headers -exclude PrivateHeaders -exclude Modules -exclude \*.tbd -resolve-src-symlinks /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks/XCUnit.framework /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/Frameworks
+
+Copy /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/Frameworks/XCUIAutomation.framework /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks/XCUIAutomation.framework (in target 'FocusBloxMac' from project 'FocusBlox')
+    cd /Users/hem/Developer/my-daily-sprints
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -exclude Headers -exclude PrivateHeaders -exclude Modules -exclude \*.tbd -resolve-src-symlinks /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks/XCUIAutomation.framework /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/Frameworks
 
 PhaseScriptExecution Inject\ Git\ Hash /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug/FocusBloxMac.build/Script-8E072FC28A88AC15B0D8B9DA.sh (in target 'FocusBloxMac' from project 'FocusBlox')
     cd /Users/hem/Developer/my-daily-sprints
@@ -719,42 +755,6 @@ PhaseScriptExecution Inject\ Git\ Hash /Users/hem/Library/Developer/Xcode/Derive
     export variant\=normal
     /bin/sh -c /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug/FocusBloxMac.build/Script-8E072FC28A88AC15B0D8B9DA.sh
 
-Copy /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/Frameworks/XCTest.framework /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks/XCTest.framework (in target 'FocusBloxMac' from project 'FocusBlox')
-    cd /Users/hem/Developer/my-daily-sprints
-    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -exclude Headers -exclude PrivateHeaders -exclude Modules -exclude \*.tbd -resolve-src-symlinks /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks/XCTest.framework /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/Frameworks
-
-Copy /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/Frameworks/XCTAutomationSupport.framework /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks/XCTAutomationSupport.framework (in target 'FocusBloxMac' from project 'FocusBlox')
-    cd /Users/hem/Developer/my-daily-sprints
-    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -exclude Headers -exclude PrivateHeaders -exclude Modules -exclude \*.tbd -resolve-src-symlinks /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks/XCTAutomationSupport.framework /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/Frameworks
-
-Copy /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/Frameworks/XCTestCore.framework /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks/XCTestCore.framework (in target 'FocusBloxMac' from project 'FocusBlox')
-    cd /Users/hem/Developer/my-daily-sprints
-    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -exclude Headers -exclude PrivateHeaders -exclude Modules -exclude \*.tbd -resolve-src-symlinks /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks/XCTestCore.framework /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/Frameworks
-
-Copy /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/Frameworks/libXCTestSwiftSupport.dylib /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib/libXCTestSwiftSupport.dylib (in target 'FocusBloxMac' from project 'FocusBlox')
-    cd /Users/hem/Developer/my-daily-sprints
-    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -exclude Headers -exclude PrivateHeaders -exclude Modules -exclude \*.tbd -resolve-src-symlinks /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib/libXCTestSwiftSupport.dylib /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/Frameworks
-
-Copy /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/Frameworks/libXCTestBundleInject.dylib /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib/libXCTestBundleInject.dylib (in target 'FocusBloxMac' from project 'FocusBlox')
-    cd /Users/hem/Developer/my-daily-sprints
-    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -exclude Headers -exclude PrivateHeaders -exclude Modules -exclude \*.tbd -resolve-src-symlinks /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib/libXCTestBundleInject.dylib /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/Frameworks
-
-Copy /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/Frameworks/XCUnit.framework /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks/XCUnit.framework (in target 'FocusBloxMac' from project 'FocusBlox')
-    cd /Users/hem/Developer/my-daily-sprints
-    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -exclude Headers -exclude PrivateHeaders -exclude Modules -exclude \*.tbd -resolve-src-symlinks /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks/XCUnit.framework /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/Frameworks
-
-Copy /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/Frameworks/XCUIAutomation.framework /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks/XCUIAutomation.framework (in target 'FocusBloxMac' from project 'FocusBlox')
-    cd /Users/hem/Developer/my-daily-sprints
-    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -exclude Headers -exclude PrivateHeaders -exclude Modules -exclude \*.tbd -resolve-src-symlinks /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks/XCUIAutomation.framework /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/Frameworks
-
-Copy /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/Frameworks/XCTestSupport.framework /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks/XCTestSupport.framework (in target 'FocusBloxMac' from project 'FocusBlox')
-    cd /Users/hem/Developer/my-daily-sprints
-    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -exclude Headers -exclude PrivateHeaders -exclude Modules -exclude \*.tbd -resolve-src-symlinks /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks/XCTestSupport.framework /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/Frameworks
-
-Copy /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/Frameworks/Testing.framework /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks/Testing.framework (in target 'FocusBloxMac' from project 'FocusBlox')
-    cd /Users/hem/Developer/my-daily-sprints
-    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -exclude Headers -exclude PrivateHeaders -exclude Modules -exclude \*.tbd -resolve-src-symlinks /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks/Testing.framework /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/Frameworks
-
 Copy /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/PlugIns/FocusBloxMacShareExtension.appex /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMacShareExtension.appex (in target 'FocusBloxMac' from project 'FocusBlox')
     cd /Users/hem/Developer/my-daily-sprints
     builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -exclude Headers -exclude PrivateHeaders -exclude Modules -exclude \*.tbd -resolve-src-symlinks -remove-static-executable /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMacShareExtension.appex /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/PlugIns
@@ -762,36 +762,6 @@ Copy /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqr
 SwiftDriver FocusBloxMacTests normal arm64 com.apple.xcode.tools.swift.compiler (in target 'FocusBloxMacTests' from project 'FocusBlox')
     cd /Users/hem/Developer/my-daily-sprints
     builtin-SwiftDriver -- /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name FocusBloxMacTests -Onone -enforce-exclusivity\=checked @/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug/FocusBloxMacTests.build/Objects-normal/arm64/FocusBloxMacTests.SwiftFileList -DDEBUG -DDEBUG -plugin-path /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing -enable-bare-slash-regex -enable-upcoming-feature DisableOutwardActorInference -enable-upcoming-feature InferSendableFromCaptures -enable-upcoming-feature GlobalActorIsolatedTypesUsability -enable-upcoming-feature MemberImportVisibility -enable-upcoming-feature InferIsolatedConformances -enable-upcoming-feature NonisolatedNonsendingByDefault -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk -target arm64-apple-macos26.1 -g -module-cache-path /Users/hem/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -Xfrontend -serialize-debugging-options -profile-coverage-mapping -profile-generate -enable-testing -index-store-path /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Index.noindex/DataStore -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -swift-version 5 -I /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug -Isystem /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib -F /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug -F /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks -c -j10 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /Users/hem/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/macosx26.2-25C58-00fa09913b459cbbc988d1f6730289ae.sdkstatcache -output-file-map /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug/FocusBloxMacTests.build/Objects-normal/arm64/FocusBloxMacTests-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -explicit-module-build -module-cache-path /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -clang-scanner-module-cache-path /Users/hem/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -sdk-module-cache-path /Users/hem/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug/FocusBloxMacTests.build/Objects-normal/arm64/FocusBloxMacTests.swiftmodule -validate-clang-modules-once -clang-build-session-file /Users/hem/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug/FocusBloxMacTests.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug/FocusBloxMacTests.build/Objects-normal/arm64/FocusBloxMacTests_const_extract_protocols.json -Xcc -iquote -Xcc /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug/FocusBloxMacTests.build/FocusBloxMacTests-generated-files.hmap -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug/FocusBloxMacTests.build/FocusBloxMacTests-own-target-headers.hmap -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug/FocusBloxMacTests.build/FocusBloxMacTests-all-target-headers.hmap -Xcc -iquote -Xcc /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug/FocusBloxMacTests.build/FocusBloxMacTests-project-headers.hmap -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/include -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug/FocusBloxMacTests.build/DerivedSources-normal/arm64 -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug/FocusBloxMacTests.build/DerivedSources/arm64 -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug/FocusBloxMacTests.build/DerivedSources -Xcc -DDEBUG\=1 -Xcc -DDEBUG\=1 -emit-objc-header -emit-objc-header-path /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug/FocusBloxMacTests.build/Objects-normal/arm64/FocusBloxMacTests-Swift.h -working-directory /Users/hem/Developer/my-daily-sprints -experimental-emit-module-separately -disable-cmo
-
-CodeSign /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/Frameworks/XCTestSupport.framework (in target 'FocusBloxMac' from project 'FocusBlox')
-    cd /Users/hem/Developer/my-daily-sprints
-    
-    Signing Identity:     "Apple Development: henning.emmrich@gmail.com (986F8V7Y9Z)"
-    Provisioning Profile: "Mac Team Provisioning Profile: henemm.FocusBloxMac"
-                          (124bf929-07ff-4c81-9b92-fb8f6565329b)
-    
-    /usr/bin/codesign --force --sign 2C8277A4C1E6A1A1CC4B45484D787F1647143A06 -o runtime --timestamp\=none --preserve-metadata\=identifier,entitlements,flags --generate-entitlement-der /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/Frameworks/XCTestSupport.framework
-/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/Frameworks/XCTestSupport.framework: replacing existing signature
-
-CodeSign /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/Frameworks/XCTestCore.framework (in target 'FocusBloxMac' from project 'FocusBlox')
-    cd /Users/hem/Developer/my-daily-sprints
-    
-    Signing Identity:     "Apple Development: henning.emmrich@gmail.com (986F8V7Y9Z)"
-    Provisioning Profile: "Mac Team Provisioning Profile: henemm.FocusBloxMac"
-                          (124bf929-07ff-4c81-9b92-fb8f6565329b)
-    
-    /usr/bin/codesign --force --sign 2C8277A4C1E6A1A1CC4B45484D787F1647143A06 -o runtime --timestamp\=none --preserve-metadata\=identifier,entitlements,flags --generate-entitlement-der /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/Frameworks/XCTestCore.framework
-/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/Frameworks/XCTestCore.framework: replacing existing signature
-
-CodeSign /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/Frameworks/XCTest.framework (in target 'FocusBloxMac' from project 'FocusBlox')
-    cd /Users/hem/Developer/my-daily-sprints
-    
-    Signing Identity:     "Apple Development: henning.emmrich@gmail.com (986F8V7Y9Z)"
-    Provisioning Profile: "Mac Team Provisioning Profile: henemm.FocusBloxMac"
-                          (124bf929-07ff-4c81-9b92-fb8f6565329b)
-    
-    /usr/bin/codesign --force --sign 2C8277A4C1E6A1A1CC4B45484D787F1647143A06 -o runtime --timestamp\=none --preserve-metadata\=identifier,entitlements,flags --generate-entitlement-der /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/Frameworks/XCTest.framework
-/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/Frameworks/XCTest.framework: replacing existing signature
 
 CodeSign /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/Frameworks/libXCTestSwiftSupport.dylib (in target 'FocusBloxMac' from project 'FocusBlox')
     cd /Users/hem/Developer/my-daily-sprints
@@ -813,6 +783,36 @@ CodeSign /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvd
     /usr/bin/codesign --force --sign 2C8277A4C1E6A1A1CC4B45484D787F1647143A06 -o runtime --timestamp\=none --preserve-metadata\=identifier,entitlements,flags --generate-entitlement-der /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/Frameworks/XCUnit.framework
 /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/Frameworks/XCUnit.framework: replacing existing signature
 
+CodeSign /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/Frameworks/XCUIAutomation.framework (in target 'FocusBloxMac' from project 'FocusBlox')
+    cd /Users/hem/Developer/my-daily-sprints
+    
+    Signing Identity:     "Apple Development: henning.emmrich@gmail.com (986F8V7Y9Z)"
+    Provisioning Profile: "Mac Team Provisioning Profile: henemm.FocusBloxMac"
+                          (124bf929-07ff-4c81-9b92-fb8f6565329b)
+    
+    /usr/bin/codesign --force --sign 2C8277A4C1E6A1A1CC4B45484D787F1647143A06 -o runtime --timestamp\=none --preserve-metadata\=identifier,entitlements,flags --generate-entitlement-der /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/Frameworks/XCUIAutomation.framework
+/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/Frameworks/XCUIAutomation.framework: replacing existing signature
+
+CodeSign /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/Frameworks/XCTestSupport.framework (in target 'FocusBloxMac' from project 'FocusBlox')
+    cd /Users/hem/Developer/my-daily-sprints
+    
+    Signing Identity:     "Apple Development: henning.emmrich@gmail.com (986F8V7Y9Z)"
+    Provisioning Profile: "Mac Team Provisioning Profile: henemm.FocusBloxMac"
+                          (124bf929-07ff-4c81-9b92-fb8f6565329b)
+    
+    /usr/bin/codesign --force --sign 2C8277A4C1E6A1A1CC4B45484D787F1647143A06 -o runtime --timestamp\=none --preserve-metadata\=identifier,entitlements,flags --generate-entitlement-der /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/Frameworks/XCTestSupport.framework
+/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/Frameworks/XCTestSupport.framework: replacing existing signature
+
+CodeSign /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/Frameworks/XCTestCore.framework (in target 'FocusBloxMac' from project 'FocusBlox')
+    cd /Users/hem/Developer/my-daily-sprints
+    
+    Signing Identity:     "Apple Development: henning.emmrich@gmail.com (986F8V7Y9Z)"
+    Provisioning Profile: "Mac Team Provisioning Profile: henemm.FocusBloxMac"
+                          (124bf929-07ff-4c81-9b92-fb8f6565329b)
+    
+    /usr/bin/codesign --force --sign 2C8277A4C1E6A1A1CC4B45484D787F1647143A06 -o runtime --timestamp\=none --preserve-metadata\=identifier,entitlements,flags --generate-entitlement-der /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/Frameworks/XCTestCore.framework
+/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/Frameworks/XCTestCore.framework: replacing existing signature
+
 CodeSign /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/Frameworks/libXCTestBundleInject.dylib (in target 'FocusBloxMac' from project 'FocusBlox')
     cd /Users/hem/Developer/my-daily-sprints
     
@@ -823,15 +823,15 @@ CodeSign /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvd
     /usr/bin/codesign --force --sign 2C8277A4C1E6A1A1CC4B45484D787F1647143A06 -o runtime --timestamp\=none --preserve-metadata\=identifier,entitlements,flags --generate-entitlement-der /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/Frameworks/libXCTestBundleInject.dylib
 /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/Frameworks/libXCTestBundleInject.dylib: replacing existing signature
 
-CodeSign /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/Frameworks/XCUIAutomation.framework (in target 'FocusBloxMac' from project 'FocusBlox')
+CodeSign /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/Frameworks/XCTest.framework (in target 'FocusBloxMac' from project 'FocusBlox')
     cd /Users/hem/Developer/my-daily-sprints
     
     Signing Identity:     "Apple Development: henning.emmrich@gmail.com (986F8V7Y9Z)"
     Provisioning Profile: "Mac Team Provisioning Profile: henemm.FocusBloxMac"
                           (124bf929-07ff-4c81-9b92-fb8f6565329b)
     
-    /usr/bin/codesign --force --sign 2C8277A4C1E6A1A1CC4B45484D787F1647143A06 -o runtime --timestamp\=none --preserve-metadata\=identifier,entitlements,flags --generate-entitlement-der /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/Frameworks/XCUIAutomation.framework
-/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/Frameworks/XCUIAutomation.framework: replacing existing signature
+    /usr/bin/codesign --force --sign 2C8277A4C1E6A1A1CC4B45484D787F1647143A06 -o runtime --timestamp\=none --preserve-metadata\=identifier,entitlements,flags --generate-entitlement-der /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/Frameworks/XCTest.framework
+/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/Frameworks/XCTest.framework: replacing existing signature
 
 CodeSign /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/Frameworks/XCTAutomationSupport.framework (in target 'FocusBloxMac' from project 'FocusBlox')
     cd /Users/hem/Developer/my-daily-sprints
@@ -865,9 +865,72 @@ ProcessInfoPlistFile /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fs
     cd /Users/hem/Developer/my-daily-sprints
     builtin-infoPlistUtility /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug/FocusBloxMacTests.build/empty-FocusBloxMacTests.plist -producttype com.apple.product-type.bundle.unit-test -expandbuildsettings -platform macosx -o /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/PlugIns/FocusBloxMacTests.xctest/Contents/Info.plist
 
+SwiftCompile normal arm64 Compiling\ CloudKitSyncTests.swift /Users/hem/Developer/my-daily-sprints/FocusBloxMacTests/CloudKitSyncTests.swift (in target 'FocusBloxMacTests' from project 'FocusBlox')
+
+SwiftCompile normal arm64 /Users/hem/Developer/my-daily-sprints/FocusBloxMacTests/CloudKitSyncTests.swift (in target 'FocusBloxMacTests' from project 'FocusBlox')
+    cd /Users/hem/Developer/my-daily-sprints
+    
+/Users/hem/Developer/my-daily-sprints/FocusBloxMacTests/CloudKitSyncTests.swift:71:13: warning: initialization of immutable value 'expectedICloudContainer' was never used; consider replacing with assignment to '_' or removing it
+        let expectedICloudContainer = "iCloud.com.henning.focusblox"
+        ~~~~^~~~~~~~~~~~~~~~~~~~~~~
+        _
+
+SwiftEmitModule normal arm64 Emitting\ module\ for\ FocusBloxMacTests (in target 'FocusBloxMacTests' from project 'FocusBlox')
+
+EmitSwiftModule normal arm64 (in target 'FocusBloxMacTests' from project 'FocusBlox')
+    cd /Users/hem/Developer/my-daily-sprints
+    
+
+SwiftCompile normal arm64 Compiling\ MacBacklogRowScoreTests.swift /Users/hem/Developer/my-daily-sprints/FocusBloxMacTests/MacBacklogRowScoreTests.swift (in target 'FocusBloxMacTests' from project 'FocusBlox')
+
+SwiftCompile normal arm64 /Users/hem/Developer/my-daily-sprints/FocusBloxMacTests/MacBacklogRowScoreTests.swift (in target 'FocusBloxMacTests' from project 'FocusBlox')
+    cd /Users/hem/Developer/my-daily-sprints
+    
+
+SwiftCompile normal arm64 Compiling\ FocusBloxMacTests.swift /Users/hem/Developer/my-daily-sprints/FocusBloxMacTests/FocusBloxMacTests.swift (in target 'FocusBloxMacTests' from project 'FocusBlox')
+
+SwiftCompile normal arm64 /Users/hem/Developer/my-daily-sprints/FocusBloxMacTests/FocusBloxMacTests.swift (in target 'FocusBloxMacTests' from project 'FocusBlox')
+    cd /Users/hem/Developer/my-daily-sprints
+    
+
+SwiftCompile normal arm64 Compiling\ MenuBarFocusBlockTests.swift /Users/hem/Developer/my-daily-sprints/FocusBloxMacTests/MenuBarFocusBlockTests.swift (in target 'FocusBloxMacTests' from project 'FocusBlox')
+
+SwiftCompile normal arm64 /Users/hem/Developer/my-daily-sprints/FocusBloxMacTests/MenuBarFocusBlockTests.swift (in target 'FocusBloxMacTests' from project 'FocusBlox')
+    cd /Users/hem/Developer/my-daily-sprints
+    
+
+SwiftCompile normal arm64 Compiling\ TimelineLayoutTests.swift /Users/hem/Developer/my-daily-sprints/FocusBloxMacTests/TimelineLayoutTests.swift (in target 'FocusBloxMacTests' from project 'FocusBlox')
+SwiftCompile normal arm64 /Users/hem/Developer/my-daily-sprints/FocusBloxMacTests/TimelineLayoutTests.swift (in target 'FocusBloxMacTests' from project 'FocusBlox')
+    cd /Users/hem/Developer/my-daily-sprints
+    
+
+SwiftCompile normal arm64 Compiling\ MenuBarIdleIconTests.swift /Users/hem/Developer/my-daily-sprints/FocusBloxMacTests/MenuBarIdleIconTests.swift (in target 'FocusBloxMacTests' from project 'FocusBlox')
+
+SwiftCompile normal arm64 /Users/hem/Developer/my-daily-sprints/FocusBloxMacTests/MenuBarIdleIconTests.swift (in target 'FocusBloxMacTests' from project 'FocusBlox')
+    cd /Users/hem/Developer/my-daily-sprints
+    
+
+SwiftDriverJobDiscovery normal arm64 Emitting module for FocusBloxMacTests (in target 'FocusBloxMacTests' from project 'FocusBlox')
+
 SwiftDriver\ Compilation\ Requirements FocusBloxMacTests normal arm64 com.apple.xcode.tools.swift.compiler (in target 'FocusBloxMacTests' from project 'FocusBlox')
     cd /Users/hem/Developer/my-daily-sprints
     builtin-Swift-Compilation-Requirements -- /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name FocusBloxMacTests -Onone -enforce-exclusivity\=checked @/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug/FocusBloxMacTests.build/Objects-normal/arm64/FocusBloxMacTests.SwiftFileList -DDEBUG -DDEBUG -plugin-path /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing -enable-bare-slash-regex -enable-upcoming-feature DisableOutwardActorInference -enable-upcoming-feature InferSendableFromCaptures -enable-upcoming-feature GlobalActorIsolatedTypesUsability -enable-upcoming-feature MemberImportVisibility -enable-upcoming-feature InferIsolatedConformances -enable-upcoming-feature NonisolatedNonsendingByDefault -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk -target arm64-apple-macos26.1 -g -module-cache-path /Users/hem/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -Xfrontend -serialize-debugging-options -profile-coverage-mapping -profile-generate -enable-testing -index-store-path /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Index.noindex/DataStore -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -swift-version 5 -I /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug -Isystem /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib -F /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug -F /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks -c -j10 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /Users/hem/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/macosx26.2-25C58-00fa09913b459cbbc988d1f6730289ae.sdkstatcache -output-file-map /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug/FocusBloxMacTests.build/Objects-normal/arm64/FocusBloxMacTests-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -explicit-module-build -module-cache-path /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -clang-scanner-module-cache-path /Users/hem/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -sdk-module-cache-path /Users/hem/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug/FocusBloxMacTests.build/Objects-normal/arm64/FocusBloxMacTests.swiftmodule -validate-clang-modules-once -clang-build-session-file /Users/hem/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug/FocusBloxMacTests.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug/FocusBloxMacTests.build/Objects-normal/arm64/FocusBloxMacTests_const_extract_protocols.json -Xcc -iquote -Xcc /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug/FocusBloxMacTests.build/FocusBloxMacTests-generated-files.hmap -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug/FocusBloxMacTests.build/FocusBloxMacTests-own-target-headers.hmap -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug/FocusBloxMacTests.build/FocusBloxMacTests-all-target-headers.hmap -Xcc -iquote -Xcc /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug/FocusBloxMacTests.build/FocusBloxMacTests-project-headers.hmap -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/include -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug/FocusBloxMacTests.build/DerivedSources-normal/arm64 -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug/FocusBloxMacTests.build/DerivedSources/arm64 -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug/FocusBloxMacTests.build/DerivedSources -Xcc -DDEBUG\=1 -Xcc -DDEBUG\=1 -emit-objc-header -emit-objc-header-path /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug/FocusBloxMacTests.build/Objects-normal/arm64/FocusBloxMacTests-Swift.h -working-directory /Users/hem/Developer/my-daily-sprints -experimental-emit-module-separately -disable-cmo
+
+Copy /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMacTests.swiftmodule/arm64-apple-macos.abi.json /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug/FocusBloxMacTests.build/Objects-normal/arm64/FocusBloxMacTests.abi.json (in target 'FocusBloxMacTests' from project 'FocusBlox')
+    cd /Users/hem/Developer/my-daily-sprints
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug/FocusBloxMacTests.build/Objects-normal/arm64/FocusBloxMacTests.abi.json /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMacTests.swiftmodule/arm64-apple-macos.abi.json
+
+SwiftDriverJobDiscovery normal arm64 Compiling MenuBarFocusBlockTests.swift (in target 'FocusBloxMacTests' from project 'FocusBlox')
+
+SwiftDriverJobDiscovery normal arm64 Compiling MenuBarIdleIconTests.swift (in target 'FocusBloxMacTests' from project 'FocusBlox')
+
+SwiftDriverJobDiscovery normal arm64 Compiling MacBacklogRowScoreTests.swift (in target 'FocusBloxMacTests' from project 'FocusBlox')
+
+SwiftDriverJobDiscovery normal arm64 Compiling FocusBloxMacTests.swift (in target 'FocusBloxMacTests' from project 'FocusBlox')
+
+SwiftDriverJobDiscovery normal arm64 Compiling CloudKitSyncTests.swift (in target 'FocusBloxMacTests' from project 'FocusBlox')
+
+SwiftDriverJobDiscovery normal arm64 Compiling TimelineLayoutTests.swift (in target 'FocusBloxMacTests' from project 'FocusBlox')
 
 SwiftDriver\ Compilation FocusBloxMacTests normal arm64 com.apple.xcode.tools.swift.compiler (in target 'FocusBloxMacTests' from project 'FocusBlox')
     cd /Users/hem/Developer/my-daily-sprints
@@ -877,15 +940,15 @@ Ld /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhj
     cd /Users/hem/Developer/my-daily-sprints
     /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -Xlinker -reproducible -target arm64-apple-macos26.1 -bundle -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk -O0 -L/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/EagerLinkingTBDs/Debug -L/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug -L/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib -F/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/EagerLinkingTBDs/Debug -F/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug -iframework /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks -filelist /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug/FocusBloxMacTests.build/Objects-normal/arm64/FocusBloxMacTests.LinkFileList -Xlinker -rpath -Xlinker @loader_path/../Frameworks -Xlinker -rpath -Xlinker @executable_path/../Frameworks -bundle_loader /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/MacOS/FocusBloxMac -Xlinker -object_path_lto -Xlinker /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug/FocusBloxMacTests.build/Objects-normal/arm64/FocusBloxMacTests_lto.o -rdynamic -Xlinker -no_deduplicate -Xlinker -debug_variant -Xlinker -dependency_info -Xlinker /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug/FocusBloxMacTests.build/Objects-normal/arm64/FocusBloxMacTests_dependency_info.dat -fobjc-link-runtime -fprofile-instr-generate -L/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx -L/usr/lib/swift -Xlinker -add_ast_path -Xlinker /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug/FocusBloxMacTests.build/Objects-normal/arm64/FocusBloxMacTests.swiftmodule @/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug/FocusBloxMacTests.build/Objects-normal/arm64/FocusBloxMacTests-linker-args.resp -Xlinker -needed_framework -Xlinker XCTest -framework XCTest -Xlinker -needed-lXCTestSwiftSupport -lXCTestSwiftSupport /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/MacOS/FocusBloxMac.debug.dylib -Xlinker -no_adhoc_codesign -o /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/PlugIns/FocusBloxMacTests.xctest/Contents/MacOS/FocusBloxMacTests
 
-CopySwiftLibs /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/PlugIns/FocusBloxMacTests.xctest (in target 'FocusBloxMacTests' from project 'FocusBlox')
-    cd /Users/hem/Developer/my-daily-sprints
-    builtin-swiftStdLibTool --copy --verbose --sign 2C8277A4C1E6A1A1CC4B45484D787F1647143A06 --scan-executable /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/PlugIns/FocusBloxMacTests.xctest/Contents/MacOS/FocusBloxMacTests --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/PlugIns/FocusBloxMacTests.xctest/Contents/Frameworks --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/PlugIns/FocusBloxMacTests.xctest/Contents/PlugIns --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/PlugIns/FocusBloxMacTests.xctest/Contents/Library/SystemExtensions --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/PlugIns/FocusBloxMacTests.xctest/Contents/Extensions --platform macosx --toolchain /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain --destination /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/PlugIns/FocusBloxMacTests.xctest/Contents/Frameworks --strip-bitcode --scan-executable /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib/libXCTestSwiftSupport.dylib --strip-bitcode-tool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/bitcode_strip --emit-dependency-info /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug/FocusBloxMacTests.build/SwiftStdLibToolInputDependencies.dep --filter-for-swift-os
-
 ExtractAppIntentsMetadata (in target 'FocusBloxMacTests' from project 'FocusBlox')
     cd /Users/hem/Developer/my-daily-sprints
     /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/appintentsmetadataprocessor --toolchain-dir /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain --module-name FocusBloxMacTests --sdk-root /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk --xcode-version 17C529 --platform-family macOS --deployment-target 26.1 --bundle-identifier henemm.FocusBloxMacTests --output /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/PlugIns/FocusBloxMacTests.xctest/Contents/Resources --target-triple arm64-apple-macos26.1 --binary-file /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/PlugIns/FocusBloxMacTests.xctest/Contents/MacOS/FocusBloxMacTests --dependency-file /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug/FocusBloxMacTests.build/Objects-normal/arm64/FocusBloxMacTests_dependency_info.dat --stringsdata-file /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug/FocusBloxMacTests.build/Objects-normal/arm64/ExtractedAppShortcutsMetadata.stringsdata --source-file-list /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug/FocusBloxMacTests.build/Objects-normal/arm64/FocusBloxMacTests.SwiftFileList --metadata-file-list /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug/FocusBloxMacTests.build/FocusBloxMacTests.DependencyMetadataFileList --static-metadata-file-list /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug/FocusBloxMacTests.build/FocusBloxMacTests.DependencyStaticMetadataFileList --swift-const-vals-list /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug/FocusBloxMacTests.build/Objects-normal/arm64/FocusBloxMacTests.SwiftConstValuesFileList --compile-time-extraction --deployment-aware-processing --validate-assistant-intents --no-app-shortcuts-localization
-2026-03-16 14:11:15.054 appintentsmetadataprocessor[92454:59784893] Starting appintentsmetadataprocessor export
-2026-03-16 14:11:15.289 appintentsmetadataprocessor[92454:59784893] Extracted no relevant App Intents symbols, skipping writing output
+2026-03-16 16:31:44.063 appintentsmetadataprocessor[46636:60590923] Starting appintentsmetadataprocessor export
+2026-03-16 16:31:44.138 appintentsmetadataprocessor[46636:60590923] Extracted no relevant App Intents symbols, skipping writing output
+
+CopySwiftLibs /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/PlugIns/FocusBloxMacTests.xctest (in target 'FocusBloxMacTests' from project 'FocusBlox')
+    cd /Users/hem/Developer/my-daily-sprints
+    builtin-swiftStdLibTool --copy --verbose --sign 2C8277A4C1E6A1A1CC4B45484D787F1647143A06 --scan-executable /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/PlugIns/FocusBloxMacTests.xctest/Contents/MacOS/FocusBloxMacTests --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/PlugIns/FocusBloxMacTests.xctest/Contents/Frameworks --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/PlugIns/FocusBloxMacTests.xctest/Contents/PlugIns --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/PlugIns/FocusBloxMacTests.xctest/Contents/Library/SystemExtensions --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/PlugIns/FocusBloxMacTests.xctest/Contents/Extensions --platform macosx --toolchain /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain --destination /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/PlugIns/FocusBloxMacTests.xctest/Contents/Frameworks --strip-bitcode --scan-executable /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib/libXCTestSwiftSupport.dylib --strip-bitcode-tool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/bitcode_strip --emit-dependency-info /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug/FocusBloxMacTests.build/SwiftStdLibToolInputDependencies.dep --filter-for-swift-os
 
 CodeSign /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/PlugIns/FocusBloxMacTests.xctest (in target 'FocusBloxMacTests' from project 'FocusBlox')
     cd /Users/hem/Developer/my-daily-sprints
@@ -924,13 +987,13 @@ CodeSign /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvd
     /usr/bin/codesign --force --sign 2C8277A4C1E6A1A1CC4B45484D787F1647143A06 -o runtime --entitlements /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug/FocusBloxMac.build/FocusBloxMac.app.xcent --timestamp\=none --generate-entitlement-der /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app
 /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app: replacing existing signature
 
-ValidateEmbeddedBinary /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/PlugIns/FocusBloxMacShareExtension.appex (in target 'FocusBloxMac' from project 'FocusBlox')
-    cd /Users/hem/Developer/my-daily-sprints
-    /Applications/Xcode.app/Contents/Developer/usr/bin/embeddedBinaryValidationUtility /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/PlugIns/FocusBloxMacShareExtension.appex -signing-cert 2C8277A4C1E6A1A1CC4B45484D787F1647143A06 -info-plist-path /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/Info.plist
-
 Validate /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app (in target 'FocusBloxMac' from project 'FocusBlox')
     cd /Users/hem/Developer/my-daily-sprints
     builtin-validationUtility /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app -no-validate-extension -infoplist-subpath Contents/Info.plist
+
+ValidateEmbeddedBinary /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/PlugIns/FocusBloxMacShareExtension.appex (in target 'FocusBloxMac' from project 'FocusBlox')
+    cd /Users/hem/Developer/my-daily-sprints
+    /Applications/Xcode.app/Contents/Developer/usr/bin/embeddedBinaryValidationUtility /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/PlugIns/FocusBloxMacShareExtension.appex -signing-cert 2C8277A4C1E6A1A1CC4B45484D787F1647143A06 -info-plist-path /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app/Contents/Info.plist
 
 RegisterWithLaunchServices /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMac.app (in target 'FocusBloxMac' from project 'FocusBlox')
     cd /Users/hem/Developer/my-daily-sprints
@@ -940,116 +1003,112 @@ ProcessInfoPlistFile /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fs
     cd /Users/hem/Developer/my-daily-sprints
     builtin-infoPlistUtility /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug/FocusBloxMacUITests.build/empty-FocusBloxMacUITests.plist -producttype com.apple.product-type.bundle.ui-testing -expandbuildsettings -platform macosx -additionalcontentfile /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug/FocusBloxMacUITests.build/ProductTypeInfoPlistAdditions.plist -o /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMacUITests-Runner.app/Contents/PlugIns/FocusBloxMacUITests.xctest/Contents/Info.plist
 
-CopySwiftLibs /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMacUITests-Runner.app/Contents/PlugIns/FocusBloxMacUITests.xctest (in target 'FocusBloxMacUITests' from project 'FocusBlox')
-    cd /Users/hem/Developer/my-daily-sprints
-    builtin-swiftStdLibTool --copy --verbose --sign 2C8277A4C1E6A1A1CC4B45484D787F1647143A06 --scan-executable /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMacUITests-Runner.app/Contents/PlugIns/FocusBloxMacUITests.xctest/Contents/MacOS/FocusBloxMacUITests --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMacUITests-Runner.app/Contents/PlugIns/FocusBloxMacUITests.xctest/Contents/Frameworks --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMacUITests-Runner.app/Contents/PlugIns/FocusBloxMacUITests.xctest/Contents/PlugIns --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMacUITests-Runner.app/Contents/PlugIns/FocusBloxMacUITests.xctest/Contents/Library/SystemExtensions --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMacUITests-Runner.app/Contents/PlugIns/FocusBloxMacUITests.xctest/Contents/Extensions --platform macosx --toolchain /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain --destination /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug/FocusBloxMacUITests-Runner.app/Contents/PlugIns/FocusBloxMacUITests.xctest/Contents/Frameworks --strip-bitcode --scan-executable /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib/libXCTestSwiftSupport.dylib --strip-bitcode-tool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/bitcode_strip --emit-dependency-info /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug/FocusBloxMacUITests.build/SwiftStdLibToolInputDependencies.dep --filter-for-swift-os
-
 /Users/hem/Developer/my-daily-sprints/FocusBlox.xcodeproj: warning: The Copy Bundle Resources build phase contains this target's Info.plist file '/Users/hem/Developer/my-daily-sprints/FocusBloxMacShareExtension/Info.plist'. (in target 'FocusBloxMacShareExtension' from project 'FocusBlox')
 /Users/hem/Developer/my-daily-sprints/FocusBlox.xcodeproj: warning: The Copy Bundle Resources build phase contains this target's Info.plist file '/Users/hem/Developer/my-daily-sprints/FocusBloxMac/Info.plist'. (in target 'FocusBloxMac' from project 'FocusBlox')
 note: Run script build phase 'Inject Git Hash' will be run during every build because the option to run the script phase "Based on dependency analysis" is unchecked. (in target 'FocusBloxMac' from project 'FocusBlox')
-2026-03-16 14:11:23.110559+0100 FocusBloxMacUITests-Runner[92511:59785679] [Default] Running tests...
-Test Suite 'Selected tests' started at 2026-03-16 14:11:23.721.
-Test Suite 'FocusBloxMacUITests.xctest' started at 2026-03-16 14:11:23.722.
-Test Suite 'MacCoachBacklogUITests' started at 2026-03-16 14:11:23.722.
+2026-03-16 16:31:48.297565+0100 FocusBloxMacUITests-Runner[46644:60591115] [Default] Running tests...
+Test Suite 'Selected tests' started at 2026-03-16 16:31:48.708.
+Test Suite 'FocusBloxMacUITests.xctest' started at 2026-03-16 16:31:48.708.
+Test Suite 'MacCoachBacklogUITests' started at 2026-03-16 16:31:48.708.
 Test Case '-[FocusBloxMacUITests.MacCoachBacklogUITests test_coachModeOn_importRemindersButtonExists]' started.
-    t =     0.00s Start Test at 2026-03-16 14:11:23.723
-    t =     0.94s Set Up
-    t =     1.24s Open henemm.FocusBloxMac
-    t =     1.24s     Launch henemm.FocusBloxMac
-    t =     2.56s         Wait for accessibility to load
-    t =     4.58s         Setting up automation session
-    t =     4.60s         Wait for henemm.FocusBloxMac to idle
-    t =     4.89s Waiting 5.0s for Window (First Match) to exist
-    t =     5.92s     Checking `Expect predicate `existsNoRetry == 1` for object Window (First Match)`
-    t =     5.92s         Checking existence of `Window (First Match)`
-    t =     5.94s Waiting 3.0s for "mainNavigationPicker" RadioGroup to exist
-    t =     6.97s     Checking `Expect predicate `existsNoRetry == 1` for object "mainNavigationPicker" RadioGroup`
-    t =     6.97s         Checking existence of `"mainNavigationPicker" RadioGroup`
-    t =     7.77s Checking existence of `"list.bullet" RadioButton`
-    t =     8.04s Tap "list.bullet" RadioButton
-    t =     8.04s     Wait for henemm.FocusBloxMac to idle
-    t =     8.05s     Find the "list.bullet" RadioButton
-    t =     8.34s     Check for interrupting elements affecting "list.bullet" RadioButton
-    t =     8.37s     Synthesize event
-    t =     8.71s     Wait for henemm.FocusBloxMac to idle
-    t =     8.72s Waiting 5.0s for "coachImportRemindersButton" Button to exist
-    t =     9.75s     Checking `Expect predicate `existsNoRetry == 1` for object "coachImportRemindersButton" Button`
-    t =     9.75s         Checking existence of `"coachImportRemindersButton" Button`
-    t =    10.01s Tear Down
-Test Case '-[FocusBloxMacUITests.MacCoachBacklogUITests test_coachModeOn_importRemindersButtonExists]' passed (10.338 seconds).
+    t =     0.00s Start Test at 2026-03-16 16:31:48.709
+    t =     1.03s Set Up
+    t =     1.11s Open henemm.FocusBloxMac
+    t =     1.11s     Launch henemm.FocusBloxMac
+    t =     2.04s         Wait for accessibility to load
+    t =     3.14s         Setting up automation session
+    t =     3.15s         Wait for henemm.FocusBloxMac to idle
+    t =     3.26s Waiting 5.0s for Window (First Match) to exist
+    t =     4.29s     Checking `Expect predicate `existsNoRetry == 1` for object Window (First Match)`
+    t =     4.29s         Checking existence of `Window (First Match)`
+    t =     4.30s Waiting 3.0s for "mainNavigationPicker" RadioGroup to exist
+    t =     5.33s     Checking `Expect predicate `existsNoRetry == 1` for object "mainNavigationPicker" RadioGroup`
+    t =     5.33s         Checking existence of `"mainNavigationPicker" RadioGroup`
+    t =     5.79s Checking existence of `"list.bullet" RadioButton`
+    t =     5.94s Tap "list.bullet" RadioButton
+    t =     5.94s     Wait for henemm.FocusBloxMac to idle
+    t =     5.95s     Find the "list.bullet" RadioButton
+    t =     6.10s     Check for interrupting elements affecting "list.bullet" RadioButton
+    t =     6.11s     Synthesize event
+    t =     6.45s     Wait for henemm.FocusBloxMac to idle
+    t =     6.45s Waiting 5.0s for "coachImportRemindersButton" Button to exist
+    t =     7.49s     Checking `Expect predicate `existsNoRetry == 1` for object "coachImportRemindersButton" Button`
+    t =     7.49s         Checking existence of `"coachImportRemindersButton" Button`
+    t =     7.87s Tear Down
+Test Case '-[FocusBloxMacUITests.MacCoachBacklogUITests test_coachModeOn_importRemindersButtonExists]' passed (8.118 seconds).
 Test Case '-[FocusBloxMacUITests.MacCoachBacklogUITests test_coachModeOn_syncButtonExists]' started.
-    t =     0.00s Start Test at 2026-03-16 14:11:34.061
-    t =     0.35s Set Up
-    t =     0.35s Open henemm.FocusBloxMac
-    t =     0.35s     Launch henemm.FocusBloxMac
-    t =     0.35s         Terminate henemm.FocusBloxMac:92528
-    t =     1.94s         Wait for accessibility to load
-    t =     2.96s         Setting up automation session
-    t =     3.00s         Wait for henemm.FocusBloxMac to idle
-    t =     3.30s Waiting 5.0s for Window (First Match) to exist
-    t =     4.34s     Checking `Expect predicate `existsNoRetry == 1` for object Window (First Match)`
-    t =     4.34s         Checking existence of `Window (First Match)`
-    t =     4.35s Waiting 3.0s for "mainNavigationPicker" RadioGroup to exist
-    t =     5.36s     Checking `Expect predicate `existsNoRetry == 1` for object "mainNavigationPicker" RadioGroup`
-    t =     5.36s         Checking existence of `"mainNavigationPicker" RadioGroup`
-    t =     6.02s Checking existence of `"list.bullet" RadioButton`
-    t =     6.44s Tap "list.bullet" RadioButton
-    t =     6.44s     Wait for henemm.FocusBloxMac to idle
-    t =     6.48s     Find the "list.bullet" RadioButton
-    t =     6.90s     Check for interrupting elements affecting "list.bullet" RadioButton
-    t =     6.95s     Synthesize event
-    t =     7.36s     Wait for henemm.FocusBloxMac to idle
-    t =     7.36s Waiting 5.0s for "coachSyncButton" Button to exist
-    t =     8.39s     Checking `Expect predicate `existsNoRetry == 1` for object "coachSyncButton" Button`
-    t =     8.39s         Checking existence of `"coachSyncButton" Button`
-    t =     8.74s Tear Down
-Test Case '-[FocusBloxMacUITests.MacCoachBacklogUITests test_coachModeOn_syncButtonExists]' passed (9.147 seconds).
+    t =     0.00s Start Test at 2026-03-16 16:31:56.827
+    t =     0.25s Set Up
+    t =     0.25s Open henemm.FocusBloxMac
+    t =     0.25s     Launch henemm.FocusBloxMac
+    t =     0.25s         Terminate henemm.FocusBloxMac:46660
+    t =     1.73s         Wait for accessibility to load
+    t =     2.17s         Setting up automation session
+    t =     2.18s         Wait for henemm.FocusBloxMac to idle
+    t =     2.31s Waiting 5.0s for Window (First Match) to exist
+    t =     3.34s     Checking `Expect predicate `existsNoRetry == 1` for object Window (First Match)`
+    t =     3.34s         Checking existence of `Window (First Match)`
+    t =     3.35s Waiting 3.0s for "mainNavigationPicker" RadioGroup to exist
+    t =     4.38s     Checking `Expect predicate `existsNoRetry == 1` for object "mainNavigationPicker" RadioGroup`
+    t =     4.38s         Checking existence of `"mainNavigationPicker" RadioGroup`
+    t =     4.68s Checking existence of `"list.bullet" RadioButton`
+    t =     4.83s Tap "list.bullet" RadioButton
+    t =     4.83s     Wait for henemm.FocusBloxMac to idle
+    t =     4.83s     Find the "list.bullet" RadioButton
+    t =     4.99s     Check for interrupting elements affecting "list.bullet" RadioButton
+    t =     5.00s     Synthesize event
+    t =     5.35s     Wait for henemm.FocusBloxMac to idle
+    t =     5.35s Waiting 5.0s for "coachSyncButton" Button to exist
+    t =     6.38s     Checking `Expect predicate `existsNoRetry == 1` for object "coachSyncButton" Button`
+    t =     6.38s         Checking existence of `"coachSyncButton" Button`
+    t =     6.55s Tear Down
+Test Case '-[FocusBloxMacUITests.MacCoachBacklogUITests test_coachModeOn_syncButtonExists]' passed (6.794 seconds).
 Test Case '-[FocusBloxMacUITests.MacCoachBacklogUITests test_coachModeOn_syncStatusIndicatorExists]' started.
-    t =     0.00s Start Test at 2026-03-16 14:11:43.209
-    t =     0.53s Set Up
-    t =     0.53s Open henemm.FocusBloxMac
-    t =     0.53s     Launch henemm.FocusBloxMac
-    t =     0.53s         Terminate henemm.FocusBloxMac:92564
-    t =     2.72s         Wait for accessibility to load
-    t =     4.10s         Setting up automation session
-    t =     4.11s         Wait for henemm.FocusBloxMac to idle
-    t =     4.46s Waiting 5.0s for Window (First Match) to exist
-    t =     5.49s     Checking `Expect predicate `existsNoRetry == 1` for object Window (First Match)`
-    t =     5.49s         Checking existence of `Window (First Match)`
-    t =     5.53s Waiting 3.0s for "mainNavigationPicker" RadioGroup to exist
-    t =     6.56s     Checking `Expect predicate `existsNoRetry == 1` for object "mainNavigationPicker" RadioGroup`
-    t =     6.56s         Checking existence of `"mainNavigationPicker" RadioGroup`
-    t =     7.20s Checking existence of `"list.bullet" RadioButton`
-    t =     7.57s Tap "list.bullet" RadioButton
-    t =     7.57s     Wait for henemm.FocusBloxMac to idle
-    t =     7.60s     Find the "list.bullet" RadioButton
-    t =     7.96s     Check for interrupting elements affecting "list.bullet" RadioButton
-    t =     8.00s     Synthesize event
-    t =     8.39s     Wait for henemm.FocusBloxMac to idle
-    t =     8.40s Waiting 5.0s for "coachSyncStatusIndicator" Any to exist
-    t =     9.43s     Checking `Expect predicate `existsNoRetry == 1` for object "coachSyncStatusIndicator" Any`
-    t =     9.43s         Checking existence of `"coachSyncStatusIndicator" Any`
-    t =     9.72s Tear Down
-Test Case '-[FocusBloxMacUITests.MacCoachBacklogUITests test_coachModeOn_syncStatusIndicatorExists]' passed (9.979 seconds).
-Test Suite 'MacCoachBacklogUITests' passed at 2026-03-16 14:11:53.188.
-	 Executed 3 tests, with 0 failures (0 unexpected) in 29.464 (29.466) seconds
-Test Suite 'FocusBloxMacUITests.xctest' passed at 2026-03-16 14:11:53.189.
-	 Executed 3 tests, with 0 failures (0 unexpected) in 29.464 (29.467) seconds
-Test Suite 'Selected tests' passed at 2026-03-16 14:11:53.189.
-	 Executed 3 tests, with 0 failures (0 unexpected) in 29.464 (29.468) seconds
-2026-03-16 14:11:53.519 xcodebuild[92324:59783962] [MT] IDETestOperationsObserverDebug: 32.790 elapsed -- Testing started completed.
-2026-03-16 14:11:53.519 xcodebuild[92324:59783962] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
-2026-03-16 14:11:53.519 xcodebuild[92324:59783962] [MT] IDETestOperationsObserverDebug: 32.790 sec, +32.790 sec -- end
+    t =     0.00s Start Test at 2026-03-16 16:32:03.622
+    t =     0.25s Set Up
+    t =     0.25s Open henemm.FocusBloxMac
+    t =     0.25s     Launch henemm.FocusBloxMac
+    t =     0.25s         Terminate henemm.FocusBloxMac:46680
+    t =     1.69s         Wait for accessibility to load
+    t =     2.13s         Setting up automation session
+    t =     2.13s         Wait for henemm.FocusBloxMac to idle
+    t =     2.27s Waiting 5.0s for Window (First Match) to exist
+    t =     3.30s     Checking `Expect predicate `existsNoRetry == 1` for object Window (First Match)`
+    t =     3.30s         Checking existence of `Window (First Match)`
+    t =     3.31s Waiting 3.0s for "mainNavigationPicker" RadioGroup to exist
+    t =     4.33s     Checking `Expect predicate `existsNoRetry == 1` for object "mainNavigationPicker" RadioGroup`
+    t =     4.33s         Checking existence of `"mainNavigationPicker" RadioGroup`
+    t =     4.59s Checking existence of `"list.bullet" RadioButton`
+    t =     4.74s Tap "list.bullet" RadioButton
+    t =     4.74s     Wait for henemm.FocusBloxMac to idle
+    t =     4.74s     Find the "list.bullet" RadioButton
+    t =     4.90s     Check for interrupting elements affecting "list.bullet" RadioButton
+    t =     4.91s     Synthesize event
+    t =     5.25s     Wait for henemm.FocusBloxMac to idle
+    t =     5.25s Waiting 5.0s for "coachSyncStatusIndicator" Any to exist
+    t =     6.28s     Checking `Expect predicate `existsNoRetry == 1` for object "coachSyncStatusIndicator" Any`
+    t =     6.28s         Checking existence of `"coachSyncStatusIndicator" Any`
+    t =     6.46s Tear Down
+Test Case '-[FocusBloxMacUITests.MacCoachBacklogUITests test_coachModeOn_syncStatusIndicatorExists]' passed (6.705 seconds).
+Test Suite 'MacCoachBacklogUITests' passed at 2026-03-16 16:32:10.327.
+	 Executed 3 tests, with 0 failures (0 unexpected) in 21.617 (21.618) seconds
+Test Suite 'FocusBloxMacUITests.xctest' passed at 2026-03-16 16:32:10.327.
+	 Executed 3 tests, with 0 failures (0 unexpected) in 21.617 (21.619) seconds
+Test Suite 'Selected tests' passed at 2026-03-16 16:32:10.327.
+	 Executed 3 tests, with 0 failures (0 unexpected) in 21.617 (21.620) seconds
+2026-03-16 16:32:10.608 xcodebuild[46564:60590418] [MT] IDETestOperationsObserverDebug: 23.925 elapsed -- Testing started completed.
+2026-03-16 16:32:10.608 xcodebuild[46564:60590418] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2026-03-16 16:32:10.608 xcodebuild[46564:60590418] [MT] IDETestOperationsObserverDebug: 23.925 sec, +23.925 sec -- end
 
 Test session results, code coverage, and logs:
-	/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Logs/Test/Test-FocusBloxMac-2026.03.16_14-11-05-+0100.xcresult
+	/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Logs/Test/Test-FocusBloxMac-2026.03.16_16-31-38-+0100.xcresult
 
 ** TEST SUCCEEDED **
 
 Testing started
-Test suite 'Selected tests' started on 'My Mac - FocusBloxMacUITests-Runner (92511)'
-Test suite 'FocusBloxMacUITests.xctest' started on 'My Mac - FocusBloxMacUITests-Runner (92511)'
-Test suite 'MacCoachBacklogUITests' started on 'My Mac - FocusBloxMacUITests-Runner (92511)'
-Test case 'MacCoachBacklogUITests.test_coachModeOn_importRemindersButtonExists()' passed on 'My Mac - FocusBloxMacUITests-Runner (92511)' (10.338 seconds)
-Test case 'MacCoachBacklogUITests.test_coachModeOn_syncButtonExists()' passed on 'My Mac - FocusBloxMacUITests-Runner (92511)' (9.147 seconds)
-Test case 'MacCoachBacklogUITests.test_coachModeOn_syncStatusIndicatorExists()' passed on 'My Mac - FocusBloxMacUITests-Runner (92511)' (9.979 seconds)
+Test suite 'Selected tests' started on 'My Mac - FocusBloxMacUITests-Runner (46644)'
+Test suite 'FocusBloxMacUITests.xctest' started on 'My Mac - FocusBloxMacUITests-Runner (46644)'
+Test suite 'MacCoachBacklogUITests' started on 'My Mac - FocusBloxMacUITests-Runner (46644)'
+Test case 'MacCoachBacklogUITests.test_coachModeOn_importRemindersButtonExists()' passed on 'My Mac - FocusBloxMacUITests-Runner (46644)' (8.118 seconds)
+Test case 'MacCoachBacklogUITests.test_coachModeOn_syncButtonExists()' passed on 'My Mac - FocusBloxMacUITests-Runner (46644)' (6.794 seconds)
+Test case 'MacCoachBacklogUITests.test_coachModeOn_syncStatusIndicatorExists()' passed on 'My Mac - FocusBloxMacUITests-Runner (46644)' (6.705 seconds)

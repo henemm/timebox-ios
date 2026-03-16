@@ -16,6 +16,7 @@
 | FEATURE_002 | Coach-Backlog iOS: Blocked-Row Editing | Medium | S | iOS | Blocked Rows im Coach-Backlog sind read-only. In BacklogView erlauben sie Duration/Importance/Category-Aenderungen. |
 | FEATURE_003 | Coach-Backlog macOS: Quick-Add TextField | Medium | S | macOS | Normaler macOS-Backlog hat Quick-Add-TextField oben — Coach-Backlog nicht. |
 | FEATURE_004 | Coach-Backlog macOS: Suchfunktion | Medium | S | macOS | Normaler macOS-Backlog hat .searchable — Coach-Backlog nicht. |
+| ~~FEATURE_005~~ | ~~Coach-Backlog macOS: Toolbar (Sync + Import)~~ | ~~High~~ | ~~S-M~~ | ~~macOS~~ | **ERLEDIGT** — Commit bc87d5e + Adversary-Fix. |
 | FEATURE_006 | Coach-Backlog macOS: Inspector Panel | Medium | M | macOS | Normaler macOS-Backlog hat Detail-Inspector rechts (3-Spalten-Layout). Coach-Backlog zeigt nur Liste. |
 | FEATURE_007 | Coach-Backlog macOS: Multi-Selection + Bulk Actions | Medium | M | macOS | Normaler macOS-Backlog unterstuetzt Mehrfachauswahl + Bulk-Loeschen/Verschieben. Coach-Backlog nur Einzelaktionen. |
 | FEATURE_008 | Coach-Backlog macOS: Drag-to-Reorder NextUp | Low | S | macOS | Normaler macOS-Backlog erlaubt NextUp-Reihenfolge per Drag&Drop. Coach-Backlog nicht. |

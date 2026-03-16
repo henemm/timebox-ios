@@ -18,6 +18,7 @@ struct MacCoachBacklogView: View {
     @AppStorage("selectedCoach") private var selectedCoach: String = ""
     @AppStorage("coachBacklogViewMode") private var selectedModeRaw: String = "Priorität"
     @AppStorage("remindersSyncEnabled") private var remindersSyncEnabled: Bool = true
+    @State private var isSyncing = false
 
     private var selectedMode: CoachViewMode {
         CoachViewMode(rawValue: selectedModeRaw) ?? .priority
@@ -93,10 +94,15 @@ struct MacCoachBacklogView: View {
 
                 if remindersSyncEnabled {
                     Button {
-                        Task { await onImport?() }
+                        Task {
+                            isSyncing = true
+                            await onImport?()
+                            isSyncing = false
+                        }
                     } label: {
                         Image(systemName: "square.and.arrow.down")
                     }
+                    .disabled(isSyncing)
                     .accessibilityIdentifier("coachImportRemindersButton")
                     .help("Erinnerungen importieren")
                 }
@@ -348,7 +354,7 @@ struct MacCoachBacklogView: View {
 
     @ViewBuilder
     private var syncStatusIndicator: some View {
-        if cloudKitMonitor.isSyncing {
+        if cloudKitMonitor.isSyncing || isSyncing {
             ProgressView()
                 .scaleEffect(0.7)
         } else if cloudKitMonitor.hasSyncError {

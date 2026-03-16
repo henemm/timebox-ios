@@ -1,0 +1,110 @@
+ADVERSARY ANALYSIS — FEATURE_005 Coach-Toolbar macOS
+Analysiert: 2026-03-16
+Status: STATISCHE CODE-ANALYSE (Tests blockiert durch parallelen xcodebuild PID 21133)
+
+=== KORREKTUR ZU BEFUND 1 (zunaechst als KRITISCH eingestuft) ===
+
+BEFUND 1 ZURUECKGEZOGEN: NSUserDefaults-Launch-Argument-Mapping funktioniert implizit.
+NSUserDefaults akzeptiert -keyName value als launch arguments automatisch.
+UserDefaults.standard.bool(forKey: "coachModeEnabled") gibt true zurueck wenn
+"-coachModeEnabled 1" uebergeben wurde. Das beweist: MacCoachReviewUITests nutzt
+dasselbe Muster und ist laut git history bereits gruen (stand vor FEATURE_005).
+KEIN BUG.
+
+=== ECHTE BEFUNDE ===
+
+BEFUND 2: FUNKTIONAL — Import-Button .disabled() fehlt
+---------------------------------------------------------
+Vergleich Normal-Backlog (ContentView.swift Zeile 572):
+  .disabled(isSyncing)   ← VORHANDEN
+
+Coach-Toolbar (MacCoachBacklogView.swift Zeile 94-102):
+  if remindersSyncEnabled {
+      Button {
+          Task { await onImport?() }
+      } label: {
+          Image(systemName: "square.and.arrow.down")
+      }
+      .accessibilityIdentifier("coachImportRemindersButton")
+      .help("Erinnerungen importieren")
+      // KEIN .disabled(isSyncing) !!!
+  }
+
+Der normale Backlog-Import-Button ist disabled waehrend ein Import laeuft.
+Der Coach-Import-Button nicht. User kann Import mehrfach gleichzeitig starten.
+Das ist eine funktionale Regression gegenueber dem normalen Backlog.
+
+BEFUND 3: FUNKTIONAL — isSyncing-State fehlt in MacCoachBacklogView
+--------------------------------------------------------------------
+Der normale Backlog hat ZWEI Sync-Indikatoren:
+  1. cloudKitMonitor.isSyncing  (CloudKit background sync)
+  2. isSyncing                  (lokaler Reminders-Import-Zustand, @State in ContentView)
+
+ContentView.swift Zeile 537:
+  if cloudKitMonitor.isSyncing || isSyncing {
+      ProgressView()...
+
+MacCoachBacklogView.swift Zeile 351:
+  if cloudKitMonitor.isSyncing {    ← NUR CloudKit, kein lokaler isSyncing!
+      ProgressView()...
+
+MacCoachBacklogView bekommt keinen isSyncing-State von ContentView.
+Die View-Signatur hat kein isSyncing-Parameter.
+Konsequenz: Waehrend Reminders importiert werden, zeigt Coach-Toolbar
+keinen Ladeindikator. Normaler Backlog schon.
+
+BEFUND 4: GERING — Accessibility-Identifier-Inkonsistenz
+----------------------------------------------------------
+Normal-Backlog:
+  "syncStatusIndicator", "syncButton", "importRemindersButton"
+
+Coach-Backlog:
+  "coachSyncStatusIndicator", "coachSyncButton", "coachImportRemindersButton"
+
+Bewusst unterschiedlich — aber bedeutet parallele Test-Pfade. Kein Fehler,
+nur erhoehte Test-Komplexitaet.
+
+BEFUND 5: WERTLOS — Existierende Tests ohne echten Nutzwert
+------------------------------------------------------------
+Die drei neuen Tests pruefen NUR:
+  - test_coachModeOn_syncStatusIndicatorExists: Element vorhanden? IMMER true.
+  - test_coachModeOn_syncButtonExists: Element vorhanden? IMMER true.
+  - test_coachModeOn_importRemindersButtonExists: Element vorhanden? IMMER true.
+
+Diese Tests wuerden NICHT fehlschlagen wenn:
+  - Sync-Button keine Aktion haette (leere Closure)
+  - Import-Button doppelklickbar waere (kein disabled)
+  - Status-Indicator falschen Zustand zeigen wuerde
+
+=== FEHLENDE TESTS DIE ECHTEN NUTZWERT HAETTEN ===
+
+1. test_importButton_isDisabled_when_coachImportInProgress
+   Prueft: Button disabled nach erstem Klick waehrend Import laeuft
+   Status: WUERDE FEHLSCHLAGEN (Befund 2)
+
+2. test_syncStatusIndicator_showsProgress_duringRemindersImport
+   Prueft: ProgressView sichtbar waehrend Reminders-Import
+   Status: WUERDE FEHLSCHLAGEN (Befund 3)
+
+3. test_importButton_hidden_when_remindersSyncDisabled
+   Prueft: Import-Button verschwindet wenn remindersSyncEnabled=false
+   Status: NICHT IMPLEMENTIERT (kein Test)
+
+=== LAUFZEIT-TEST-STATUS ===
+Nicht ausgefuehrt: Paralleler xcodebuild-Prozess (PID 21133, iOS-Simulator) blockierte Tests.
+Statische Analyse ist vollstaendig.
+
+=== BEWERTUNG ===
+
+Die drei neuen Toolbar-Elemente EXISTIEREN und sind korrekt verdrahtet:
+- Sync-Button ruft cloudKitMonitor.triggerSync() auf (Zeile 87)
+- Import-Button ruft onImport?() auf (Zeile 96), Closure korrekt von ContentView durchgereicht (Zeile 271)
+- SyncStatus zeigt cloudKitMonitor-Zustand korrekt (Zeilen 351-365)
+- remindersSyncEnabled-Condition fuer Import-Button ist korrekt (Zeile 94)
+
+ABER: Gegenueber dem normalen Backlog fehlen:
+- .disabled(isSyncing) am Import-Button
+- isSyncing-State im SyncStatus-Indicator
+
+Die Implementation ist UNVOLLSTAENDIG (nicht BROKEN im engsten Sinne),
+aber erzeugt messbare UX-Inkonsistenz gegenueber dem normalen Backlog.
