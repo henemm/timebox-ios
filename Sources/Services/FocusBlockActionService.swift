@@ -6,14 +6,16 @@ import SwiftData
 /// Used by both iOS (FocusLiveView) and macOS (MacFocusView).
 enum FocusBlockActionService {
 
-    /// Result of a task action (complete or skip)
-    enum TaskActionResult: Sendable {
+    /// Result of a task action (complete, skip, or follow-up)
+    enum TaskActionResult: Sendable, Equatable {
         /// Task was marked as completed
         case completed
         /// Task was skipped (moved to end of queue)
         case skipped
         /// Last remaining task was skipped → auto-completed to end block
         case skippedLast
+        /// Task was completed and a follow-up copy was created
+        case followedUp(newTaskID: String)
     }
 
     /// Mark a task as completed: update completedTaskIDs, record time, persist to SwiftData.
@@ -136,5 +138,47 @@ enum FocusBlockActionService {
             )
             return .skipped
         }
+    }
+
+    /// Follow-up a task: complete the original and create an editable copy.
+    @MainActor
+    static func followUpTask(
+        taskID: String,
+        block: FocusBlock,
+        taskStartTime: Date?,
+        eventKitRepo: any EventKitRepositoryProtocol,
+        modelContext: ModelContext
+    ) throws -> TaskActionResult {
+        // Step 1: Complete the original task (reuse full completion logic)
+        _ = try completeTask(
+            taskID: taskID,
+            block: block,
+            taskStartTime: taskStartTime,
+            eventKitRepo: eventKitRepo,
+            modelContext: modelContext
+        )
+
+        // Step 2: Fetch the original task to copy its metadata
+        let descriptor = FetchDescriptor<LocalTask>()
+        guard let allTasks = try? modelContext.fetch(descriptor),
+              let original = allTasks.first(where: { $0.id == taskID }) else {
+            return .completed
+        }
+
+        // Step 3: Create a copy with metadata preserved, status fields reset
+        let copy = LocalTask(
+            title: original.title,
+            importance: original.importance,
+            tags: original.tags,
+            dueDate: original.dueDate,
+            estimatedDuration: original.estimatedDuration,
+            urgency: original.urgency,
+            taskType: original.taskType,
+            taskDescription: original.taskDescription
+        )
+        modelContext.insert(copy)
+        try? modelContext.save()
+
+        return .followedUp(newTaskID: copy.id)
     }
 }

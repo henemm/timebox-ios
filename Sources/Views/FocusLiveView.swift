@@ -58,6 +58,9 @@ struct FocusLiveView: View {
     @State private var warningPlayed = false
     @State private var lastOverdueReminderTime: Date?
     @State private var skipFeedback = false
+    @State private var followUpTask: LocalTask?
+    @State private var followUpSaved = false
+    @State private var followUpTaskID: String?
     private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     private let overdueReminderInterval: TimeInterval = 120 // 2 Minuten
     // Live Activity Manager
@@ -100,6 +103,44 @@ struct FocusLiveView: View {
             .navigationTitle("Focus")
             .withSettingsToolbar()
             .sensoryFeedback(.success, trigger: completionFeedback)
+            .sheet(item: $followUpTask, onDismiss: {
+                // If user dismissed without saving, delete the follow-up copy
+                if !followUpSaved, let taskID = followUpTaskID {
+                    let descriptor = FetchDescriptor<LocalTask>()
+                    if let tasks = try? modelContext.fetch(descriptor),
+                       let orphan = tasks.first(where: { $0.id == taskID }) {
+                        modelContext.delete(orphan)
+                        try? modelContext.save()
+                    }
+                }
+                followUpSaved = false
+                followUpTaskID = nil
+            }) { task in
+                TaskFormSheet(
+                    task: PlanItem(localTask: task),
+                    onSave: { title, importance, duration, tags, urgency, taskType, dueDate, description, recurrence, weekdays, monthDay, interval in
+                        task.title = title
+                        task.importance = importance
+                        task.estimatedDuration = duration
+                        task.tags = tags
+                        task.urgency = urgency
+                        task.taskType = taskType
+                        task.dueDate = dueDate
+                        task.taskDescription = description
+                        task.recurrencePattern = recurrence
+                        task.recurrenceWeekdays = weekdays
+                        task.recurrenceMonthDay = monthDay
+                        task.recurrenceInterval = interval
+                        task.modifiedAt = Date()
+                        followUpSaved = true
+                        try? modelContext.save()
+                    },
+                    onDelete: {
+                        modelContext.delete(task)
+                        try? modelContext.save()
+                    }
+                )
+            }
             .sheet(isPresented: $showSprintReview) {
                 if let block = activeBlock {
                     SprintReviewSheet(
@@ -357,7 +398,7 @@ struct FocusLiveView: View {
                 .font(.caption)
                 .foregroundStyle(.secondary)
             // Action buttons
-            HStack(spacing: 16) {
+            HStack(spacing: 12) {
                 // Skip button (Nicht erledigt)
                 Button {
                     skipTask(taskID: task.id, block: block)
@@ -365,12 +406,25 @@ struct FocusLiveView: View {
                     Label("Überspringen", systemImage: "forward.fill")
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(.white)
-                        .padding(.horizontal, 20)
+                        .padding(.horizontal, 16)
                         .padding(.vertical, 14)
                         .background(.orange, in: Capsule())
                 }
                 .buttonStyle(.plain)
                 .accessibilityIdentifier("taskSkipButton")
+                // Follow-up button
+                Button {
+                    performFollowUp(taskID: task.id, block: block)
+                } label: {
+                    Label("Follow-up", systemImage: "arrow.uturn.right.circle.fill")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 14)
+                        .background(.blue, in: Capsule())
+                }
+                .buttonStyle(.plain)
+                .accessibilityIdentifier("taskFollowUpButton")
                 // Complete button (Erledigt)
                 Button {
                     markTaskComplete(taskID: task.id, block: block)
@@ -378,7 +432,7 @@ struct FocusLiveView: View {
                     Label("Erledigt", systemImage: "checkmark.circle.fill")
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(.white)
-                        .padding(.horizontal, 20)
+                        .padding(.horizontal, 16)
                         .padding(.vertical, 14)
                         .background(.green, in: Capsule())
                 }
@@ -526,6 +580,41 @@ struct FocusLiveView: View {
                 }
             } catch {
                 errorMessage = "Task konnte nicht als erledigt markiert werden."
+            }
+        }
+    }
+    /// Follow-up: complete current task and open copy for editing
+    private func performFollowUp(taskID: String, block: FocusBlock) {
+        NotificationService.cancelTaskNotification(taskID: taskID)
+        Task {
+            do {
+                let result = try FocusBlockActionService.followUpTask(
+                    taskID: taskID,
+                    block: block,
+                    taskStartTime: taskStartTime,
+                    eventKitRepo: eventKitRepo,
+                    modelContext: modelContext
+                )
+                taskStartTime = nil
+                completionFeedback.toggle()
+                lastOverdueReminderTime = nil
+                await loadData()
+                if let updatedBlock = activeBlock {
+                    updateLiveActivity(for: updatedBlock)
+                    rescheduleEndNotification(for: updatedBlock)
+                }
+                // Open the copy in TaskFormSheet for editing
+                if case .followedUp(let newTaskID) = result {
+                    let descriptor = FetchDescriptor<LocalTask>()
+                    if let tasks = try? modelContext.fetch(descriptor),
+                       let newTask = tasks.first(where: { $0.id == newTaskID }) {
+                        followUpTaskID = newTaskID
+                        followUpSaved = false
+                        followUpTask = newTask
+                    }
+                }
+            } catch {
+                errorMessage = "Follow-up konnte nicht erstellt werden."
             }
         }
     }

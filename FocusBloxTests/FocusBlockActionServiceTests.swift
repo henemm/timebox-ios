@@ -321,4 +321,191 @@ final class FocusBlockActionServiceTests: XCTestCase {
         XCTAssertFalse(task.isCompleted, "Skip should NOT mark task as completed")
         XCTAssertNil(task.completedAt, "Skip should NOT set completedAt")
     }
+
+    // MARK: - followUpTask — Original wird completed
+
+    /// Verhalten: followUpTask completed den Original-Task (wie "Erledigt")
+    /// Bricht wenn: FocusBlockActionService.followUpTask — completeTask-Aufruf entfernt
+    func test_followUpTask_completesOriginalTask() throws {
+        let task = makeTask(title: "Anfrage senden")
+        let block = makeBlock(taskIDs: [task.id])
+
+        _ = try FocusBlockActionService.followUpTask(
+            taskID: task.id,
+            block: block,
+            taskStartTime: nil,
+            eventKitRepo: mockRepo,
+            modelContext: context
+        )
+
+        XCTAssertTrue(task.isCompleted, "Original task should be marked completed")
+        XCTAssertNotNil(task.completedAt, "Original task should have completedAt set")
+    }
+
+    // MARK: - followUpTask — Kopie wird erstellt
+
+    /// Verhalten: followUpTask erstellt eine neue LocalTask als Kopie
+    /// Bricht wenn: FocusBlockActionService.followUpTask — Task-Insert in ModelContext entfernt
+    func test_followUpTask_createsNewTask() throws {
+        let task = makeTask(title: "Anfrage senden")
+        let block = makeBlock(taskIDs: [task.id])
+
+        let result = try FocusBlockActionService.followUpTask(
+            taskID: task.id,
+            block: block,
+            taskStartTime: nil,
+            eventKitRepo: mockRepo,
+            modelContext: context
+        )
+
+        // Result should be .followedUp with a new task ID
+        guard case .followedUp(let newTaskID) = result else {
+            XCTFail("Expected .followedUp result, got \(result)")
+            return
+        }
+
+        // New task should exist in context
+        let descriptor = FetchDescriptor<LocalTask>()
+        let allTasks = try context.fetch(descriptor)
+        let newTask = allTasks.first { $0.id == newTaskID }
+
+        XCTAssertNotNil(newTask, "New follow-up task should exist in model context")
+        XCTAssertNotEqual(newTaskID, task.id, "New task should have different ID")
+    }
+
+    // MARK: - followUpTask — Metadaten werden kopiert
+
+    /// Verhalten: Kopie uebernimmt title, importance, urgency, estimatedDuration, taskType, tags
+    /// Bricht wenn: FocusBlockActionService.followUpTask — Feld-Kopierung unvollstaendig
+    func test_followUpTask_copiesMetadata() throws {
+        let task = makeTask(title: "E-Mail an Chef")
+        task.urgency = "urgent"
+        task.estimatedDuration = 45
+        task.taskType = "income"
+        task.tags = ["Arbeit", "Wichtig"]
+        task.dueDate = Calendar.current.date(byAdding: .day, value: 3, to: Date())
+        task.taskDescription = "Gehaltsverhandlung vorbereiten"
+        try context.save()
+
+        let block = makeBlock(taskIDs: [task.id])
+
+        let result = try FocusBlockActionService.followUpTask(
+            taskID: task.id,
+            block: block,
+            taskStartTime: nil,
+            eventKitRepo: mockRepo,
+            modelContext: context
+        )
+
+        guard case .followedUp(let newTaskID) = result else {
+            XCTFail("Expected .followedUp result")
+            return
+        }
+
+        let descriptor = FetchDescriptor<LocalTask>()
+        let allTasks = try context.fetch(descriptor)
+        let copy = allTasks.first { $0.id == newTaskID }!
+
+        XCTAssertEqual(copy.title, "E-Mail an Chef", "Title should be copied")
+        XCTAssertEqual(copy.importance, 2, "Importance should be copied")
+        XCTAssertEqual(copy.urgency, "urgent", "Urgency should be copied")
+        XCTAssertEqual(copy.estimatedDuration, 45, "Duration should be copied")
+        XCTAssertEqual(copy.taskType, "income", "TaskType should be copied")
+        XCTAssertEqual(copy.tags, ["Arbeit", "Wichtig"], "Tags should be copied")
+        XCTAssertEqual(copy.dueDate, task.dueDate, "DueDate should be copied")
+        XCTAssertEqual(copy.taskDescription, "Gehaltsverhandlung vorbereiten", "Description should be copied")
+    }
+
+    // MARK: - followUpTask — Status-Felder werden zurueckgesetzt
+
+    /// Verhalten: Kopie hat isCompleted=false, assignedFocusBlockID=nil, isNextUp=false
+    /// Bricht wenn: FocusBlockActionService.followUpTask — Status-Reset fehlt
+    func test_followUpTask_resetsStatusFields() throws {
+        let task = makeTask(title: "Review PR")
+        task.assignedFocusBlockID = "block-123"
+        task.isNextUp = true
+        try context.save()
+
+        let block = makeBlock(taskIDs: [task.id])
+
+        let result = try FocusBlockActionService.followUpTask(
+            taskID: task.id,
+            block: block,
+            taskStartTime: nil,
+            eventKitRepo: mockRepo,
+            modelContext: context
+        )
+
+        guard case .followedUp(let newTaskID) = result else {
+            XCTFail("Expected .followedUp result")
+            return
+        }
+
+        let descriptor = FetchDescriptor<LocalTask>()
+        let allTasks = try context.fetch(descriptor)
+        let copy = allTasks.first { $0.id == newTaskID }!
+
+        XCTAssertFalse(copy.isCompleted, "Copy should not be completed")
+        XCTAssertNil(copy.completedAt, "Copy should not have completedAt")
+        XCTAssertNil(copy.assignedFocusBlockID, "Copy should not be assigned to a block")
+        XCTAssertFalse(copy.isNextUp, "Copy should not be NextUp")
+    }
+
+    // MARK: - followUpTask — Recurrence und Blocker werden nicht kopiert
+
+    /// Verhalten: Kopie hat recurrencePattern="none", blockerTaskID=nil
+    /// Bricht wenn: FocusBlockActionService.followUpTask — recurrence/blocker Reset fehlt
+    func test_followUpTask_resetsRecurrenceAndBlocker() throws {
+        let blockerTask = makeTask(title: "Blocker")
+        let task = makeTask(title: "Recurring Task", recurrencePattern: "daily")
+        task.blockerTaskID = blockerTask.id
+        task.recurrenceGroupID = "group-abc"
+        try context.save()
+
+        let block = makeBlock(taskIDs: [task.id])
+
+        let result = try FocusBlockActionService.followUpTask(
+            taskID: task.id,
+            block: block,
+            taskStartTime: nil,
+            eventKitRepo: mockRepo,
+            modelContext: context
+        )
+
+        guard case .followedUp(let newTaskID) = result else {
+            XCTFail("Expected .followedUp result")
+            return
+        }
+
+        let descriptor = FetchDescriptor<LocalTask>()
+        let allTasks = try context.fetch(descriptor)
+        let copy = allTasks.first { $0.id == newTaskID }!
+
+        XCTAssertEqual(copy.recurrencePattern, "none", "Copy should not be recurring")
+        XCTAssertNil(copy.blockerTaskID, "Copy should not have a blocker")
+        XCTAssertNil(copy.recurrenceGroupID, "Copy should not be in a recurrence group")
+    }
+
+    // MARK: - followUpTask — Block completedTaskIDs aktualisiert
+
+    /// Verhalten: Original-TaskID ist in completedTaskIDs des Blocks
+    /// Bricht wenn: FocusBlockActionService.followUpTask — completeTask-Delegation fehlt
+    func test_followUpTask_updatesBlockCompletedIDs() throws {
+        let task = makeTask(title: "Feedback einholen")
+        let block = makeBlock(taskIDs: [task.id])
+
+        _ = try FocusBlockActionService.followUpTask(
+            taskID: task.id,
+            block: block,
+            taskStartTime: nil,
+            eventKitRepo: mockRepo,
+            modelContext: context
+        )
+
+        let updatedBlock = mockRepo.mockFocusBlocks.first
+        XCTAssertTrue(
+            updatedBlock?.completedTaskIDs.contains(task.id) == true,
+            "Original task should be in block's completedTaskIDs"
+        )
+    }
 }

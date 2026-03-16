@@ -1,0 +1,30 @@
+
+SwiftCompile normal arm64 Compiling\ TemplateDedupTests.swift,\ RecurringVisibilityFilterTests.swift,\ ReviewOutsideSprintTests.swift,\ UnifiedTabSymbolsTests.swift /Users/hem/Developer/FocusBlox/FocusBloxTests/TemplateDedupTests.swift /Users/hem/Developer/FocusBlox/FocusBloxTests/RecurringVisibilityFilterTests.swift /Users/hem/Developer/FocusBlox/FocusBloxTests/ReviewOutsideSprintTests.swift /Users/hem/Developer/FocusBlox/FocusBloxTests/UnifiedTabSymbolsTests.swift (in target 'FocusBloxTests' from project 'FocusBlox')
+
+
+Test session results, code coverage, and logs:
+	/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-elhdnzvjmjymreajbpqswiobgidw/Logs/Test/Test-FocusBlox-2026.03.16_18-38-34-+0100.xcresult
+
+Testing failed:
+	Type 'FocusBlockActionService' has no member 'followUpTask'
+	'nil' requires a contextual type
+	Type 'FocusBlockActionService' has no member 'followUpTask'
+	'nil' requires a contextual type
+	Type 'FocusBlockActionService' has no member 'followUpTask'
+	'nil' requires a contextual type
+	Type 'FocusBlockActionService' has no member 'followUpTask'
+	'nil' requires a contextual type
+	Type 'FocusBlockActionService' has no member 'followUpTask'
+	'nil' requires a contextual type
+	Type 'FocusBlockActionService' has no member 'followUpTask'
+	'nil' requires a contextual type
+	Testing cancelled because the build failed.
+
+** TEST FAILED **
+
+
+The following build commands failed:
+	SwiftCompile normal arm64 Compiling\ FocusBlockActionServiceTests.swift,\ DisciplineStatsServiceTests.swift,\ DisciplineTrendServiceTests.swift /Users/hem/Developer/FocusBlox/FocusBloxTests/FocusBlockActionServiceTests.swift /Users/hem/Developer/FocusBlox/FocusBloxTests/DisciplineStatsServiceTests.swift /Users/hem/Developer/FocusBlox/FocusBloxTests/DisciplineTrendServiceTests.swift (in target 'FocusBloxTests' from project 'FocusBlox')
+	SwiftCompile normal arm64 /Users/hem/Developer/FocusBlox/FocusBloxTests/FocusBlockActionServiceTests.swift (in target 'FocusBloxTests' from project 'FocusBlox')
+	Testing project FocusBlox with scheme FocusBlox
+(3 failures)

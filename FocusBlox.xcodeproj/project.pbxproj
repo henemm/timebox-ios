@@ -424,6 +424,12 @@
 		WDGTWCH01EMBED0002 /* FocusBloxWatchWidgetsExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = WDGTWCH01FILEREF001 /* FocusBloxWatchWidgetsExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		WKDYBTN01BUILD001 /* WeekdayButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = WKDYBTN01FILE0001 /* WeekdayButton.swift */; };
 		WKDYBTN01BUILD002 /* WeekdayButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = WKDYBTN01FILE0001 /* WeekdayButton.swift */; };
+		C5E5E1ECDF2B7CE371F3087B /* CategoryStatsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61F7E96282329C01FB95609C /* CategoryStatsService.swift */; };
+		6319203D4702E3A23F2BB009 /* CategoryStatsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61F7E96282329C01FB95609C /* CategoryStatsService.swift */; };
+		66C0D68335223400522071A4 /* CategoryTrendChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B00FF52557F6F42E8194A77 /* CategoryTrendChart.swift */; };
+		A908C829057E6E41882110A1 /* CategoryTrendChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B00FF52557F6F42E8194A77 /* CategoryTrendChart.swift */; };
+		8D9E6F69EEB901F1591BF22A /* CategoryStatsServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45E6417CA9AB4B2D688478D7 /* CategoryStatsServiceTests.swift */; };
+		C2B70864BF99F814D650C243 /* CategoryTrendUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D744CADFBE638C0D05663B39 /* CategoryTrendUITests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -956,6 +962,10 @@
 		WARNUI01FILEREF00001 /* WarningSettingsUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WarningSettingsUITests.swift; sourceTree = "<group>"; };
 		WDGTWCH01FILEREF001 /* FocusBloxWatchWidgetsExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = FocusBloxWatchWidgetsExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		WKDYBTN01FILE0001 /* WeekdayButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeekdayButton.swift; sourceTree = "<group>"; };
+		61F7E96282329C01FB95609C /* CategoryStatsService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CategoryStatsService.swift; sourceTree = "<group>"; };
+		1B00FF52557F6F42E8194A77 /* CategoryTrendChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryTrendChart.swift; sourceTree = "<group>"; };
+		45E6417CA9AB4B2D688478D7 /* CategoryStatsServiceTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CategoryStatsServiceTests.swift; sourceTree = "<group>"; };
+		D744CADFBE638C0D05663B39 /* CategoryTrendUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CategoryTrendUITests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -1349,6 +1359,7 @@
 				A0290883532E8AC7826B5E3F /* DisciplineHistoryUITests.swift */,
 				FE03027F5FEC9D484559AE39 /* CoachRecurringDialogUITests.swift */,
 				F023UITFREF000000001 /* DisciplineTrendUITests.swift */,
+				D744CADFBE638C0D05663B39 /* CategoryTrendUITests.swift */,
 			);
 			path = FocusBloxUITests;
 			sourceTree = "<group>";
@@ -1482,6 +1493,7 @@
 				CB5C01FILEREF00001 /* CoachBacklogView.swift */,
 				ED8097C89B9B534BF859E72C /* CoachMeinTagView.swift */,
 				0577AA0F051FD6C2DECA3B77 /* DisciplineTrendChart.swift */,
+				1B00FF52557F6F42E8194A77 /* CategoryTrendChart.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -1628,6 +1640,7 @@
 				TD03A00002FREF000000001 /* NotificationServiceBuildTests.swift */,
 				TD03A00003FREF000000001 /* FocusBlockActionServiceTests.swift */,
 				7D75178618986DA8EB698748 /* DisciplineStatsServiceTests.swift */,
+				45E6417CA9AB4B2D688478D7 /* CategoryStatsServiceTests.swift */,
 				F023UT01FREF000000001 /* DisciplineTrendServiceTests.swift */,
 			);
 			path = FocusBloxTests;
@@ -1690,6 +1703,7 @@
 				AA38311BF73B18EE67DD688B /* CoachMissionService.swift */,
 				1C2CFC8D409617C4122E7256 /* CoachPitchService.swift */,
 				639178EEBE156CA464C6F25D /* DisciplineStatsService.swift */,
+				61F7E96282329C01FB95609C /* CategoryStatsService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -2432,6 +2446,7 @@
 				CB5C01BUILD0000001 /* CoachBacklogView.swift in Sources */,
 				DD5AC3B83FCB7D2C72289411 /* CoachMeinTagView.swift in Sources */,
 				867B45575EC103458F65763D /* DisciplineTrendChart.swift in Sources */,
+				66C0D68335223400522071A4 /* CategoryTrendChart.swift in Sources */,
 				57B623EACBCE36FB5485819E /* CoachBacklogViewModel.swift in Sources */,
 				1297F2C0D79B8CFBF2F9A441 /* MonsterIntentionHeader.swift in Sources */,
 				0A76DEF9F3AA7A26322F066F /* DayProgressSection.swift in Sources */,
@@ -2439,6 +2454,7 @@
 				0D02BAAA041BF6ADF9954CB9 /* CoachMissionCard.swift in Sources */,
 				A6DFF03B9A1D1D6F56ACD18B /* CoachPitchService.swift in Sources */,
 				43E9F6A3AF10E5D8A3CD341B /* DisciplineStatsService.swift in Sources */,
+				C5E5E1ECDF2B7CE371F3087B /* CategoryStatsService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2544,6 +2560,7 @@
 				CEDB63F5DBE417F1C15F6A1C /* DisciplineHistoryUITests.swift in Sources */,
 				EAB8CA919C67F80AFF201E50 /* CoachRecurringDialogUITests.swift in Sources */,
 				F023UITBUILD00000001 /* DisciplineTrendUITests.swift in Sources */,
+				C2B70864BF99F814D650C243 /* CategoryTrendUITests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2656,6 +2673,7 @@
 				TD03A00002BUILD00000001 /* NotificationServiceBuildTests.swift in Sources */,
 				TD03A00003BUILD00000001 /* FocusBlockActionServiceTests.swift in Sources */,
 				69353F8733B7CE7A1198CE23 /* DisciplineStatsServiceTests.swift in Sources */,
+				8D9E6F69EEB901F1591BF22A /* CategoryStatsServiceTests.swift in Sources */,
 				F023UT01BUILD00000001 /* DisciplineTrendServiceTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2787,7 +2805,9 @@
 				E30F3411DEE331D896769E0A /* CoachMissionCard.swift in Sources */,
 				397465988F17245F88EFBB9D /* CoachPitchService.swift in Sources */,
 				582E9E6FA6358FA19463844F /* DisciplineStatsService.swift in Sources */,
+				6319203D4702E3A23F2BB009 /* CategoryStatsService.swift in Sources */,
 				F023MACBUILD00000001 /* DisciplineTrendChart.swift in Sources */,
+				A908C829057E6E41882110A1 /* CategoryTrendChart.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
