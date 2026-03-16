@@ -82,31 +82,14 @@ struct MorningIntentionView: View {
         }
     }
 
-    // MARK: - Selection View (4 Coach Cards)
-
-    private let columns = [
-        GridItem(.flexible(), spacing: 12),
-        GridItem(.flexible(), spacing: 12)
-    ]
+    // MARK: - Selection View (4 Coach Cards — vertical list)
 
     private var selectionView: some View {
         VStack(spacing: 16) {
             Text("Wähle deinen Coach")
                 .font(.headline)
 
-            if let coach = selectedCoachType {
-                Image(coach.monsterImage)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(height: 120)
-                    .clipShape(RoundedRectangle(cornerRadius: 16))
-                    .accessibilityElement(children: .ignore)
-                    .accessibilityAddTraits(.isImage)
-                    .accessibilityIdentifier("monsterImage")
-                    .transition(.scale.combined(with: .opacity))
-            }
-
-            LazyVGrid(columns: columns, spacing: 12) {
+            VStack(spacing: 12) {
                 ForEach(CoachType.allCases, id: \.self) { coach in
                     coachCard(for: coach)
                 }
@@ -151,36 +134,41 @@ struct MorningIntentionView: View {
                 selectedCoachType = coach
             }
         } label: {
-            VStack(spacing: 6) {
-                ZStack(alignment: .topTrailing) {
-                    Image(coach.monsterImage)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(height: 48)
-                        .clipShape(Circle())
+            HStack(alignment: .top, spacing: 12) {
+                Image(coach.monsterImage)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 56, height: 56)
+                    .clipShape(Circle())
 
-                    if isRecommended {
-                        Image(systemName: "star.fill")
-                            .font(.caption2)
-                            .foregroundStyle(.yellow)
-                            .offset(x: 4, y: -4)
-                            .accessibilityIdentifier("recommendedBadge_\(coach.rawValue)")
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack {
+                        Text("\(coach.displayName) — \(coach.subtitle)")
+                            .font(.subheadline.weight(.semibold))
+
+                        if isRecommended {
+                            Text("Empfohlen")
+                                .font(.caption2)
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 2)
+                                .background(coach.color.opacity(0.2))
+                                .clipShape(Capsule())
+                                .accessibilityIdentifier("recommendedBadge_\(coach.rawValue)")
+                        }
                     }
+
+                    Text(coach.shortPitch)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+
+                    Text(displayText)
+                        .font(.callout)
+                        .animation(.smooth, value: displayText)
                 }
-
-                Text(coach.displayName)
-                    .font(.subheadline.bold())
-
-                Text(displayText)
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.center)
-                    .lineLimit(2)
-                    .animation(.smooth, value: displayText)
+                .multilineTextAlignment(.leading)
             }
-            .padding(.horizontal, 8)
-            .padding(.vertical, 10)
-            .frame(maxWidth: .infinity)
+            .padding(10)
+            .frame(maxWidth: .infinity, alignment: .leading)
             .background(
                 RoundedRectangle(cornerRadius: 12)
                     .fill(isSelected ? coach.color.opacity(0.15) : Color.clear)

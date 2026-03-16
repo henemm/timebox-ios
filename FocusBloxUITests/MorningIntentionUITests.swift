@@ -70,6 +70,44 @@ final class MorningIntentionUITests: XCTestCase {
         XCTAssertFalse(setButton.isEnabled, "Set button should be disabled without selection")
     }
 
+    // MARK: - Vertical Layout Tests (feature-coach-vertical-layout)
+
+    /// Verhalten: Empfohlener Coach zeigt "Empfohlen"-Text als Capsule statt nur Star-Icon
+    /// Bricht wenn: MorningIntentionView.coachCard — Star-Icon statt Text("Empfohlen") Capsule
+    func test_recommendedCoach_showsEmpfohlenText() {
+        app.launchArguments.append("-CoachModeEnabled")
+        app.launch()
+
+        app.tabBars.firstMatch.buttons["Mein Tag"].tap()
+
+        let intentionCard = app.otherElements["morningIntentionCard"]
+        XCTAssertTrue(intentionCard.waitForExistence(timeout: 5), "Intention card should exist")
+
+        // The new layout should show "Empfohlen" as text capsule, not just a star icon
+        let empfohlenText = app.staticTexts["Empfohlen"]
+        XCTAssertTrue(empfohlenText.waitForExistence(timeout: 3),
+                       "Recommended coach should show 'Empfohlen' text capsule (not just star icon)")
+    }
+
+    /// Verhalten: Coach-Karte zeigt Subtitle (z.B. "Der Aufräumer") im neuen horizontalen Layout
+    /// Bricht wenn: MorningIntentionView.coachCard — nur displayName ohne subtitle
+    func test_coachCard_showsSubtitle() {
+        app.launchArguments.append("-CoachModeEnabled")
+        app.launch()
+
+        app.tabBars.firstMatch.buttons["Mein Tag"].tap()
+
+        let intentionCard = app.otherElements["morningIntentionCard"]
+        XCTAssertTrue(intentionCard.waitForExistence(timeout: 5), "Intention card should exist")
+
+        // The new horizontal card layout shows "DisplayName — Subtitle" as combined text
+        let subtitleText = app.staticTexts.matching(
+            NSPredicate(format: "label CONTAINS 'Der Aufräumer'")
+        ).firstMatch
+        XCTAssertTrue(subtitleText.waitForExistence(timeout: 3),
+                       "Coach card should show subtitle 'Der Aufräumer' in horizontal layout")
+    }
+
     // MARK: - Set + Edit Flow
 
     func test_setCoach_showsCompactView_withEditButton() {

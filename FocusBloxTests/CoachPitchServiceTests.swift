@@ -52,13 +52,7 @@ final class CoachPitchServiceTests: XCTestCase {
         XCTAssertTrue(prompt.contains(CoachType.troll.personality), "Prompt should contain personality")
     }
 
-    func test_buildPrompt_containsTaskTitles_max3() {
-        let tasks = [
-            makeTask(title: "Task Eins", rescheduleCount: 3),
-            makeTask(title: "Task Zwei", rescheduleCount: 2),
-            makeTask(title: "Task Drei", rescheduleCount: 2),
-            makeTask(title: "Task Vier", rescheduleCount: 2)
-        ]
+    func test_buildPrompt_containsTaskTitles_under5() {
         let old = Calendar.current.date(byAdding: .day, value: -30, to: Date())!
         let trollTasks = [
             makeTask(title: "Alpha", rescheduleCount: 5, createdAt: old),
@@ -72,7 +66,7 @@ final class CoachPitchServiceTests: XCTestCase {
         XCTAssertTrue(prompt.contains("Alpha"), "Should contain first task")
         XCTAssertTrue(prompt.contains("Beta"), "Should contain second task")
         XCTAssertTrue(prompt.contains("Gamma"), "Should contain third task")
-        XCTAssertFalse(prompt.contains("Delta"), "Should NOT contain fourth task (max 3)")
+        XCTAssertTrue(prompt.contains("Delta"), "Should contain fourth task (max is now 5)")
     }
 
     func test_buildPrompt_noRelevantTasks_mentionsKeine() {
@@ -92,6 +86,29 @@ final class CoachPitchServiceTests: XCTestCase {
         let result = await CoachPitchService.generatePitch(coach: .troll, allTasks: tasks)
 
         XCTAssertNil(result, "Should return nil when AI is disabled")
+    }
+
+    /// Verhalten: buildPrompt nimmt die ersten 5 relevanten Tasks statt nur 3
+    /// Bricht wenn: CoachPitchService.swift:38 — .prefix(3) statt .prefix(5)
+    func test_buildPrompt_containsTaskTitles_max5() {
+        let old = Calendar.current.date(byAdding: .day, value: -30, to: Date())!
+        let tasks = [
+            makeTask(title: "Alpha", rescheduleCount: 5, createdAt: old),
+            makeTask(title: "Beta", rescheduleCount: 5, createdAt: old),
+            makeTask(title: "Gamma", rescheduleCount: 4, createdAt: old),
+            makeTask(title: "Delta", rescheduleCount: 4, createdAt: old),
+            makeTask(title: "Epsilon", rescheduleCount: 3, createdAt: old),
+            makeTask(title: "Zeta", rescheduleCount: 3, createdAt: old)
+        ]
+
+        let prompt = CoachPitchService.buildPrompt(coach: .troll, allTasks: tasks)
+
+        XCTAssertTrue(prompt.contains("Alpha"), "Should contain 1st task")
+        XCTAssertTrue(prompt.contains("Beta"), "Should contain 2nd task")
+        XCTAssertTrue(prompt.contains("Gamma"), "Should contain 3rd task")
+        XCTAssertTrue(prompt.contains("Delta"), "Should contain 4th task (new max 5)")
+        XCTAssertTrue(prompt.contains("Epsilon"), "Should contain 5th task (new max 5)")
+        XCTAssertFalse(prompt.contains("Zeta"), "Should NOT contain 6th task (max 5)")
     }
 
     func test_buildPrompt_feuer_containsChallengeTasks() {

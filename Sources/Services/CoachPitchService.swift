@@ -26,7 +26,7 @@ struct CoachPitchService {
     @available(iOS 26.0, macOS 26.0, *)
     @Generable
     struct PitchText {
-        @Guide(description: "1-2 kurze Saetze in der Persoenlichkeit des Coaches. Spricht den User direkt an und bezieht sich auf konkrete Task-Titel. Auf Deutsch. Max 120 Zeichen.")
+        @Guide(description: "3-4 Saetze in der Persoenlichkeit des Coaches. Spricht den User direkt an und bezieht sich auf konkrete Task-Titel. Auf Deutsch. Max 300 Zeichen.")
         let text: String
     }
     #endif
@@ -35,7 +35,7 @@ struct CoachPitchService {
 
     static func buildPrompt(coach: CoachType, allTasks: [PlanItem]) -> String {
         let relevant = CoachType.filterTasks(allTasks, coach: coach)
-        let taskNames = relevant.prefix(3).map(\.title)
+        let taskNames = relevant.prefix(5).map(\.title)
 
         var parts: [String] = []
         parts.append("Coach: \(coach.displayName) — \(coach.subtitle)")
@@ -47,7 +47,7 @@ struct CoachPitchService {
             parts.append("Relevante Tasks: \(taskNames.joined(separator: ", "))")
         }
 
-        parts.append("Aufgabe: Überzeuge den User in 1-2 Sätzen, dich heute als Coach zu wählen. Bezieh dich auf die Tasks.")
+        parts.append("Aufgabe: Erkläre ausführlich in 3-4 Sätzen, warum du der richtige Coach für heute bist. Nenne konkrete Tasks beim Namen.")
 
         return parts.joined(separator: "\n")
     }
@@ -76,12 +76,12 @@ struct CoachPitchService {
             let session = LanguageModelSession {
                 "Du bist \(coach.displayName), ein Monster-Coach."
                 coach.personality
-                "Schreib 1-2 kurze Saetze als Pitch, warum der User dich heute waehlen soll."
+                "Schreib 3-4 ausfuehrliche Saetze als Pitch, warum der User dich heute waehlen soll."
                 "Regeln:"
                 "- Bezieh dich auf konkrete Task-Titel wenn vorhanden"
                 "- Bleib in deiner Persoenlichkeit"
                 "- Immer auf Deutsch"
-                "- Max 120 Zeichen"
+                "- Max 300 Zeichen"
             }
 
             let userPrompt = buildPrompt(coach: coach, allTasks: allTasks)
@@ -94,7 +94,7 @@ struct CoachPitchService {
                 .trimmingCharacters(in: .whitespacesAndNewlines)
 
             guard !generated.isEmpty else { return nil }
-            return String(generated.prefix(150))
+            return String(generated.prefix(400))
         } catch {
             print("[CoachPitch] Failed: \(error)")
             return nil

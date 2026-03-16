@@ -129,7 +129,7 @@
 **Aktuelle Grundlage (nach Redesign):**
 - `Sources/Models/CoachType.swift` — 4 Coaches: Troll, Feuer, Eule, Golem (ersetzt IntentionOption)
 - `Sources/Models/DailyCoachSelection.swift` — Tages-Coach-Wahl (ersetzt DailyIntention)
-- `Sources/Views/MorningIntentionView.swift` — Coach-Auswahl Grid
+- `Sources/Views/MorningIntentionView.swift` — Coach-Auswahl (vertikale Liste)
 - `Sources/Services/IntentionEvaluationService.swift` — Coach-basierte Fulfillment + Gap-Erkennung
 - `Sources/Services/EveningReflectionTextService.swift` — Coach-persoenlichkeitsbasierte AI-Texte
 - Phase 3a-3f: ALLE ERLEDIGT
@@ -239,6 +239,14 @@
 - **Logik:** Deterministischer Teaser sofort sichtbar → AI-Pitch laedt asynchron im Hintergrund → Text-Swap mit Animation
 - **Tests:** 8 CoachPreviewTests + 5 CoachPitchServiceTests + 10 CoachMissionServiceTests = 23 Tests gruen
 - **Dateien:** CoachMissionService.swift, CoachPitchService.swift (neu), MorningIntentionView.swift, CoachMeinTagView.swift, MacCoachReviewView.swift
+
+### Coach-Auswahl vertikales Layout + ausfuehrliche AI-Pitches — ERLEDIGT
+- **Status:** DONE
+- **Plattform:** iOS + macOS
+- **Aenderung:** 2x2-Grid durch vertikale Liste mit horizontalen Karten ersetzt (Monster 56x56 links, Text rechts). "Empfohlen"-Capsule statt Star-Icon. Subtitle immer sichtbar. AI-Pitches von 120→300 Zeichen, 3→5 Task-Referenzen, Output-Guardrail 150→400.
+- **Tests:** 6 CoachPitchServiceTests + 8 MorningIntentionUITests = 14 Tests gruen
+- **Dateien:** CoachPitchService.swift, MorningIntentionView.swift, CoachPitchServiceTests.swift, MorningIntentionUITests.swift
+- **Spec:** `docs/specs/features/feature-coach-vertical-layout.md`
 
 ### Coach-Redesign: 4 Coaches statt 6 Absichten — ERLEDIGT
 - **Status:** ERLEDIGT (116 Unit Tests + 14 UI Tests gruen)
