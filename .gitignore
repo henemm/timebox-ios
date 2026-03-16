@@ -55,3 +55,18 @@ credentials.json
 
 # Workflow state (local only)
 .claude/workflow_state.json
+.claude/workflow_state.lock
+.claude/workflow_state_multi.json
+.claude/workflow_last_cleanup.json
+.claude/validation_state.json
+.claude/ui_screenshot_lock.json
+.claude/ui_test_preflight_state.json
+.claude/test_execution_lock.json
+.claude/ai-scoring-unit-test-red.log
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Profiling data
+*.profraw
