@@ -1,0 +1,20 @@
+        "__XPC_DYLD_LIBRARY_PATH" = "/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-iphonesimulator";
+        "__XPC_LLVM_PROFILE_FILE" = "/var/folders/dk/p4qd3_xx6ls6_xybmqzfgs1h0000gn/T/com.henning.timebox.uitests.xctrunner/01D2C83A-3286-4541-8891-F3A1F5F24722-21663-00002B6EF41F2CF6/F1784906-602A-4F5B-98AE-BB5E4ED093A1-%p%c.profraw";
+    };
+    stderr = "/dev/ttys017";
+    stdout = "/dev/ttys017";
+    "terminate_running_process" = 1;
+    "wait_for_debugger" = 1;
+} (error = Error Domain=FBSOpenApplicationServiceErrorDomain Code=1 "Simulator device failed to launch com.henning.timebox.uitests.xctrunner." UserInfo={NSLocalizedDescription=Simulator device failed to launch com.henning.timebox.uitests.xctrunner., NSUnderlyingError=0xc92434c90 {Error Domain=FBSOpenApplicationServiceErrorDomain Code=1 "The request to open "com.henning.timebox.uitests.xctrunner" failed." UserInfo={BSErrorCodeDescription=RequestDenied, NSLocalizedDescription=The request to open "com.henning.timebox.uitests.xctrunner" failed., NSUnderlyingError=0xc92435ad0 {Error Domain=FBProcessExit Code=64 "The process failed to launch." UserInfo={NSUnderlyingError=0xc924368b0 {Error Domain=RBSRequestErrorDomain Code=5 "Launch failed." UserInfo=0xc8e4fce80 (not displayed)}, BSErrorCodeDescription=launch-failed, NSLocalizedFailureReason=The process failed to launch.}}, FBSOpenApplicationRequestID=0x3a39, NSLocalizedFailureReason=The request was denied by service delegate (SBMainWorkspace).}}, NSLocalizedFailureReason=The request was denied by service delegate (SBMainWorkspace)., FBSOpenApplicationRequestID=0x3a39, SimCallingSelector=launchApplicationWithID:options:pid:error:, BSErrorCodeDescription=RequestDenied})
+2026-03-14 07:38:39.342 xcodebuild[21663:52058440] [MT] IDETestOperationsObserverDebug: 102.480 elapsed -- Testing started completed.
+2026-03-14 07:38:39.342 xcodebuild[21663:52058440] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2026-03-14 07:38:39.342 xcodebuild[21663:52058440] [MT] IDETestOperationsObserverDebug: 102.480 sec, +102.480 sec -- end
+
+Test session results, code coverage, and logs:
+	/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Logs/Test/Test-FocusBlox-2026.03.14_07-36-50-+0100.xcresult
+
+** TEST FAILED **
+
+Testing started
+Test suite 'CoachBacklogViewUITests' started on 'Clone 1 of FocusBlox - FocusBloxUITests-Runner (22086)'
+Test case 'CoachBacklogViewUITests.test_coachModeOn_swipeRight_showsNextUpAction()' failed on 'Clone 1 of FocusBlox - FocusBloxUITests-Runner (22086)' (18.000 seconds)

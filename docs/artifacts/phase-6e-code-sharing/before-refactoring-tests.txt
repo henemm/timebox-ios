@@ -1,0 +1,18 @@
+Phase 6e — BEFORE Refactoring: Existing Tests Baseline
+=======================================================
+
+MacCoachReviewUITests: 7/7 PASSED
+- test_coachModeOff_reviewShowsNoCoachCard: PASSED (14.182s)
+- test_coachModeOn_reviewShowsCoachCard: PASSED (9.248s)
+- test_coachModeOn_showsDayProgress: PASSED (8.521s)
+- test_eveningReflection_hiddenWhenCoachModeOff: PASSED (11.614s)
+- test_eveningReflection_showsContent: PASSED (9.250s)
+- test_eveningReflection_visibleWhenCoachSet: PASSED (8.116s)
+- test_setCoach_switchesToBacklog: PASSED (13.346s)
+
+These tests verify BEHAVIOR (accessibility identifiers, view presence),
+not View TYPE NAMES. After refactoring MacCoachReviewView → shared
+CoachMeinTagView, all tests should still pass identically.
+
+Refactoring scope: Delete MacCoachReviewView, use shared CoachMeinTagView
+with #if os() for NavigationStack (iOS) vs .frame() (macOS).

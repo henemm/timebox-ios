@@ -1,0 +1,13 @@
+Monster Coach Redesign: 4 Coaches statt 6 Absichten
+=====================================================
+
+Plan approved by user on 2026-03-14.
+
+Phase 1: Model-Umbau (CoachType enum + DailyCoachSelection)
+Phase 2: Coach-Auswahl UI (CoachSelectionView)
+Phase 3: Backlog-Filter (shared CoachBacklogView)
+Phase 4: AI-Morgentext (CoachMorningMessageService)
+Phase 5: Abend-Reflexion (IntentionEvaluationService → CoachType)
+Phase 6: Notifications (NotificationService → CoachType)
+
+Tests will be written alongside implementation (model-first approach).

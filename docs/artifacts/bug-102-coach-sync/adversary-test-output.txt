@@ -1,0 +1,28 @@
+** TEST SUCCEEDED **
+Test suite 'CoachSyncTests' started on 'Clone 1 of FocusBlox - FocusBlox (67147)'
+Test case 'CoachSyncTests.test_shouldAcceptRemoteCoach_acceptsWhenRemoteNewer()' passed on 'Clone 1 of FocusBlox - FocusBlox (67147)' (0.001 seconds)
+Test case 'CoachSyncTests.test_shouldAcceptRemoteCoach_rejectsBothEmpty()' passed on 'Clone 1 of FocusBlox - FocusBlox (67147)' (0.001 seconds)
+Test case 'CoachSyncTests.test_shouldAcceptRemoteCoach_rejectsEmptyRemoteDate()' passed on 'Clone 1 of FocusBlox - FocusBlox (67147)' (0.001 seconds)
+Test case 'CoachSyncTests.test_shouldAcceptRemoteCoach_rejectsWhenLocalNewer()' passed on 'Clone 1 of FocusBlox - FocusBlox (67147)' (0.001 seconds)
+Test case 'CoachSyncTests.test_shouldAcceptRemoteCoach_remoteWinsOnEqualDate()' passed on 'Clone 1 of FocusBlox - FocusBlox (67147)' (0.000 seconds)
+Test case 'CoachSyncTests.test_shouldPushCoach_returnsFalseWhenDateEmpty()' passed on 'Clone 1 of FocusBlox - FocusBlox (67147)' (0.000 seconds)
+Test case 'CoachSyncTests.test_shouldPushCoach_returnsTrueWhenDateSet()' passed on 'Clone 1 of FocusBlox - FocusBlox (67147)' (0.000 seconds)
+** TEST SUCCEEDED **
+Test suite 'CoachSyncUITests' started on 'Clone 1 of FocusBlox - FocusBloxUITests-Runner (67462)'
+Test case 'CoachSyncUITests.test_syncedCoach_hintTextDisappears()' passed on 'Clone 1 of FocusBlox - FocusBloxUITests-Runner (67462)' (16.929 seconds)
+Test case 'CoachSyncUITests.test_syncedCoach_showsCoachNameInHeader()' passed on 'Clone 1 of FocusBlox - FocusBloxUITests-Runner (67462)' (10.536 seconds)
+
+--- EDGE CASE ANALYSIS ---
+1. shouldPushCoach(localCoachDate: "") = false: CORRECT — guard blocks empty push
+2. shouldAcceptRemoteCoach("", ""): false — guard blocks both-empty: CORRECT
+3. Date format yyyy-MM-dd: lexicographic comparison valid: CORRECT
+4. macOS init pullFromCloud + pushToCloud: NOT dead code: CORRECT
+5. MorningIntentionView temp SyncedSettings().pullFromCloud in init: same-day conflict
+   Remote wins on equal date — design tradeoff, documented in analysis as pre-existing
+6. clearCoachFilter() empty-coach + valid-date propagates to other devices
+   Documented out-of-scope in analysis (Luecke 4)
+7. No missing test for remoteDate="2026-03-14" + remoteCoach="" scenario
+   But: shouldAcceptRemoteCoach returns true, then coach set to "" — design gap
+   Not a regression, was also unfixed pre-patch
+
+--- VERDICT: HAELT (leider) ---

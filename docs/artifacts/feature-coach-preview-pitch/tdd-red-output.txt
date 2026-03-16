@@ -1,0 +1,22 @@
+TDD RED: CoachPreviewTests.swift + CoachPitchServiceTests.swift written
+Tests reference CoachPreview, CoachMissionService.generatePreview(), CoachMissionService.recommendedCoach(), CoachPitchService — none exist yet.
+Files not yet added to Xcode project — will fail at compile (BUILD FAILED) once added.
+
+CoachPreviewTests (9 tests):
+- test_troll_withProcrastinated_teaserContainsTaskName — WILL FAIL: CoachPreview not defined
+- test_troll_withoutTasks_isEmpty — WILL FAIL: CoachPreview not defined
+- test_feuer_withBigChallenge_teaserContainsTaskName — WILL FAIL: CoachPreview not defined
+- test_eule_withPlannedTasks_teaserContainsTaskNames — WILL FAIL: CoachPreview not defined
+- test_golem_withImbalance_teaserContainsCategoryName — WILL FAIL: CoachPreview not defined
+- test_recommendedCoach_highestTaskCount — WILL FAIL: recommendedCoach not defined
+- test_recommendedCoach_allEmpty_returnsNil — WILL FAIL: recommendedCoach not defined
+- test_teaser_maxLength60 — WILL FAIL: CoachPreview not defined
+
+CoachPitchServiceTests (5 tests):
+- test_buildPrompt_containsCoachNameAndPersonality — WILL FAIL: CoachPitchService not defined
+- test_buildPrompt_containsTaskTitles_max3 — WILL FAIL: CoachPitchService not defined
+- test_buildPrompt_noRelevantTasks_mentionsKeine — WILL FAIL: CoachPitchService not defined
+- test_generatePitch_nilWhenAIDisabled — WILL FAIL: CoachPitchService not defined
+- test_buildPrompt_feuer_containsChallengeTasks — WILL FAIL: CoachPitchService not defined
+
+Status: TDD RED — all tests will fail at compile

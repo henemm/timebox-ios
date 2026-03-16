@@ -331,3 +331,109 @@
 ### 2026-03-04: Stop-Lock + API-Guard
 ### 2026-03-12: XP/Evolution-System entfernt
 ### 2026-03-12: Monster Coach Phase 2 — Morning Intention Screen
+
+---
+
+## Verschoben am 2026-03-16: Backlog-Restrukturierung
+
+### Bug 104: Coach-Backlog Feature-Paritaet — iOS + macOS — ERLEDIGT
+- **Status:** DONE
+- **Plattform:** iOS + macOS
+- **Problem:** CoachBacklogView (iOS) und MacCoachBacklogView (macOS) fehlten zahlreiche Features der normalen BacklogView.
+- **Fix (7 Pakete):**
+  - P0: macOS Completion-Button repariert (onToggleComplete verdrahtet)
+  - P1: CoachBacklogViewModel erweitert: coachBoostedTasks, remainingTasks, overdueTasks, tierTasks, recentTasks, completedTasks, recurringTasks, coachSectionTitle (shared Logic)
+  - P2a: iOS alle Callbacks verdrahtet (11 BacklogRow-Closures), DurationPicker/CategoryPicker Sheets, TaskFormSheet, Postpone-Kontextmenu, DeferredSort/Completion
+  - P2b: iOS ViewMode-Switcher (5 Modi: Prioritaet/Zuletzt/Ueberfaellig/Wiederkehrend/Erledigt), Coach-Boost-Section, Priority-Tier-Sections (4 Stufen), deduplizierte Task-Zuordnung
+  - P3: macOS volle Paritaet: ViewMode-Switcher, alle MacBacklogRow-Callbacks, Tier-Sections, Coach-Boost, Postpone/Disziplin/Delete Context-Menu
+  - P4: iOS CloudKit Sync Auto-Refresh + Shake-to-Undo
+  - P5: Blocked-Task-Rendering (Lock-Icon, Einrueckung, Freigeben-Aktion) auf beiden Plattformen
+- **Tests:** 24 CoachBacklogViewModelTests gruen (7 neue Methoden getestet)
+- **Dateien:** CoachBacklogViewModel.swift, CoachBacklogView.swift, MacCoachBacklogView.swift, CoachBacklogViewModelTests.swift
+
+### Bug 103: NextUp-Section fehlt in Monster-Modus — ERLEDIGT
+- **Status:** DONE
+- **Plattform:** iOS + macOS
+- **Root Cause:** CoachBacklogView wurde in Phase 5a mit nur 2 Sections designed — NextUp-Tasks waren unsichtbar.
+- **Fix:** `CoachBacklogViewModel.nextUpTasks()`, NextUp-Section mit gruenem Header + Count-Badge, macOS Context-Menu erweitert
+- **Tests:** 5 Unit Tests + 2 iOS UI Tests + 1 macOS UI Test
+
+### Bug: macOS Coach Backlog leer im Monster-Mode — ERLEDIGT
+- **Status:** DONE
+- **Plattform:** macOS
+- **Root Cause:** `.task { refreshTasks() }` an `backlogView` gebunden — bei `coachModeEnabled == true` nie gerendert.
+- **Fix:** `.task` und `.onChange` auf NavigationSplitView verschoben
+
+### Bug 102: Coach-Wahl wird NICHT zwischen iOS und macOS synchronisiert — ERLEDIGT
+- **Status:** DONE
+- **Plattform:** iOS + macOS
+- **Root Cause:** pushToCloud() ueberschrieb valide Remote-Daten mit leeren lokalen Werten.
+- **Fix:** pullFromCloud() vor pushToCloud(), Guard gegen leere Coach-Pushes
+- **Tests:** 7 Unit Tests + 2 UI Tests
+
+### Bug 98: Mein Tag Woche zeigt nur Sprint-Tasks — ERLEDIGT
+- **Status:** DONE
+- **Plattform:** iOS + macOS
+- **Root Cause:** DailyReviewView Guard zu restriktiv + CoachMeinTagView hatte keine Wochenansicht.
+- **Fix:** Guard erweitert, CoachMeinTagView Weekly Mode mit Coach-Texten
+- **Tests:** 48 IntentionEvaluationServiceTests + 20 EveningReflectionTextServiceTests
+
+### Bug 101: macOS hat 5 Views statt 4 — ERLEDIGT
+- **Status:** DONE
+- **Plattform:** macOS
+- **Fix:** `.assign` aus MainSection entfernt, MacAssignView geloescht (-720 LoC)
+- **Tests:** 6 MacToolbarNavigationUITests + 2 UnifiedTabSymbolsTests
+
+### Bugs 93, 94, 95, 96, 97, 99, 100, Abend-Review — alle ERLEDIGT
+- Bug 93: Swipe-Gesten bei eingerueckten Tasks
+- Bug 94: macOS — Neuer Task bekommt keinen Fokus
+- Bug 95: Neue Tasks bekommen immer Faelligkeitsdatum "heute"
+- Bug 96: Apple Shortcut oeffnet App statt Hintergrund-Save
+- Bug 97: Apple Shortcut — "heute" nicht als Datum erkannt
+- Bug 99: CoachBacklogView — Next-Up-Swipe fehlt
+- Bug 100: Intention-Labels (OBSOLET nach Coach-Redesign)
+- Bug: Abend-Review Text zu generisch
+
+### Coach-Redesign: 4 Coaches statt 6 Absichten — ERLEDIGT
+- 116 Unit Tests + 14 UI Tests gruen
+- 6 Morgen-Absichten ersetzt durch 4 Monster-Coaches (Troll, Feuer, Eule, Golem)
+
+### Coach Mission Card — ERLEDIGT
+- Monster spricht mit konkreter Tages-Mission an. 10 Unit Tests gruen.
+
+### Coach Preview + Apple Intelligence Pitches — ERLEDIGT
+- Coach-Auswahl zeigt konkrete Tasks + AI-Pitches. 23 Tests gruen.
+
+### Coach-Auswahl vertikales Layout + ausfuehrliche AI-Pitches — ERLEDIGT
+- 2x2-Grid durch vertikale Liste ersetzt. 14 Tests gruen.
+
+### Discipline manuell ueberschreiben — ERLEDIGT
+- Long-Press Context Menu mit 4 Disziplin-Optionen. 10 Unit + 6 UI Tests gruen.
+
+### Monster Coach Phase 3 "Der Tagesbogen" — KOMPLETT ERLEDIGT
+- Phase 3a-3f alle erledigt (Backlog-Filter, Smart Notifications, Abend-Spiegel, Foundation Models, Push-Notification, Siri Integration)
+
+### Monster Coach Phase 4 "Monster-Grafiken & Visualisierung" — KOMPLETT ERLEDIGT
+- Phase 4a-4e alle erledigt (Monster-Assets, Coach-Auswahl, Abend-Spiegel, Push-Notifications)
+
+### Monster Coach Phase 5 "Eigene Coach-Views" — KOMPLETT ERLEDIGT
+- Phase 5a: CoachBacklogView, Phase 5b: CoachMeinTagView
+
+### Monster Coach Phase 6 "macOS-Paritaet" — KOMPLETT ERLEDIGT
+- Phase 6a: Coach-Settings macOS
+- Phase 6b: CoachBacklogView macOS
+- Phase 6c: Coach-Auswahl macOS
+- Phase 6d: EveningReflectionCard macOS
+- Phase 6e: CoachMeinTagView macOS (shared, MacCoachReviewView geloescht)
+
+### Watch: Quick Capture vereinfachen — ERLEDIGT
+- VoiceInputSheet vereinfacht, Auto-Save 1.5s→0.5s. 7 UI Tests gruen.
+
+### TD-03: Services ohne Tests — ERLEDIGT
+- 44 Unit Tests (GapFinder 15, NotificationService 17, FocusBlockActionService 12)
+
+### TD-04: Parallele Claude Code Sessions absichern — ERLEDIGT
+- File-Locking, Overlap→Block, Phase-Eintritt-Guard
+
+### TD-05: Coach Views Cross-Platform Consolidation (Pilot) — ERLEDIGT
+- Duplizierte Filter-Logik in shared CoachBacklogViewModel extrahiert. 14 Unit Tests gruen.

@@ -328,7 +328,7 @@ try syncEngine.updateTask(
 
 ## Naechste Schritte
 
-1. **Spec schreiben** (`/write-spec`) mit Fix-Strategie
+1. **Spec schreiben** (`/03-write-spec`) mit Fix-Strategie
 2. **TDD RED:** Tests fuer Single-Field Updates schreiben
 3. **Implementieren:** Neue Methoden + Callsites umstellen
 4. **Validieren:** Alle 3 Reproduktions-Tests durchfuehren

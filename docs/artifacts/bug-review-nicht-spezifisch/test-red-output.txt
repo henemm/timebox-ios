@@ -1,0 +1,6 @@
+** TEST FAILED **
+Test case 'EveningReflectionTextServiceTests.test_buildPrompt_bhag_sortsHighImportanceFirst()' failed on 'Clone 1 of FocusBlox - FocusBlox (15816)' (1.333 seconds)
+Test case 'EveningReflectionTextServiceTests.test_buildPrompt_connection_sortsGivingBackTasksFirst()' failed on 'Clone 1 of FocusBlox - FocusBlox (15816)' (0.004 seconds)
+Test case 'EveningReflectionTextServiceTests.test_buildPrompt_fokus_sortsBlockTasksFirst()' failed on 'Clone 1 of FocusBlox - FocusBlox (15816)' (0.002 seconds)
+Test case 'EveningReflectionTextServiceTests.test_buildPrompt_growth_sortsLearningTasksFirst()' failed on 'Clone 1 of FocusBlox - FocusBlox (15816)' (0.001 seconds)
+Test case 'EveningReflectionTextServiceTests.test_buildPrompt_includesIntentionGuidance()' failed on 'Clone 1 of FocusBlox - FocusBlox (15816)' (0.165 seconds)

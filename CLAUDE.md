@@ -37,18 +37,18 @@ This project uses the **OpenSpec TDD Workflow**:
 
 | Phase | Command | Purpose |
 |-------|---------|---------|
-| 0 | `/reset` | Reset workflow to idle |
-| 1 | `/context` | Context generation |
-| 2 | `/analyse` | Deep analysis of request |
-| 3 | `/write-spec` | Create specification |
+| 0 | `/00-reset` | Reset workflow to idle |
+| 1 | `/01-context` | Context generation |
+| 2 | `/02-analyse` | Deep analysis of request |
+| 3 | `/03-write-spec` | Create specification |
 | 4 | User: "approved" | Spec approval |
-| 5 | `/tdd-red` | Write failing tests (TDD RED) |
-| 6 | `/implement` | Implement to make tests pass (TDD GREEN) |
-| 7 | `/validate` | Validate before commit |
+| 5 | `/04-tdd-red` | Write failing tests (TDD RED) |
+| 6 | `/05-implement` | Implement to make tests pass (TDD GREEN) |
+| 7 | `/06-validate` | Validate before commit |
 
 Hooks enforce phase progression. Edit/Write on protected files is blocked without active workflow + TDD RED artifacts.
 
-For bug fixes: `/bug <description>` triggers Analysis-First → Spec → TDD RED → Implement → Validate.
+For bug fixes: `/10-bug <description>` triggers Analysis-First → Spec → TDD RED → Implement → Validate.
 
 ## TDD & Testing Rules
 

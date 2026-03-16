@@ -135,7 +135,7 @@ This feature converts the Eisenhower Matrix from a separate tab to an integrated
 1. **USER:** Review tests.md and spec.md
 2. **USER:** Answer open questions (if any)
 3. **USER:** Approve with "approved" message
-4. **CLAUDE:** Run `/implement` to execute implementation
+4. **CLAUDE:** Run `/05-implement` to execute implementation
 5. **CLAUDE:** Run UI tests to verify (TDD Green phase)
 6. **USER:** Manual testing on device
 

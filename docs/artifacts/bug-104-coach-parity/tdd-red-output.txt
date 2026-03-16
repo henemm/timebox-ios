@@ -1,0 +1,23 @@
+TDD RED - CoachBacklogViewModelTests - Mo. 16 März 2026 09:10:41 CET
+
+13 new tests written for P1 (ViewModel extension):
+- coachBoostedTasks: 3 tests (troll, feuer, empty coach)
+- remainingTasks: 1 test (excludes NextUp + Coach-Boost)
+- overdueTasks: 1 test (dueDate < today)
+- tierTasks: 2 tests (filter by tier, exclude IDs)
+- recentTasks: 1 test (sort by most recent)
+- completedTasks: 1 test (only completed)
+- recurringTasks: 1 test (only templates)
+- coachSectionTitle: 3 tests (format, feuer, empty)
+
+All FAIL to compile:
+- Type 'CoachBacklogViewModel' has no member 'coachBoostedTasks'
+- Type 'CoachBacklogViewModel' has no member 'remainingTasks'
+- Type 'CoachBacklogViewModel' has no member 'overdueTasks'
+- Type 'CoachBacklogViewModel' has no member 'tierTasks'
+- Type 'CoachBacklogViewModel' has no member 'recentTasks'
+- Type 'CoachBacklogViewModel' has no member 'completedTasks'
+- Type 'CoachBacklogViewModel' has no member 'recurringTasks'
+- Type 'CoachBacklogViewModel' has no member 'coachSectionTitle'
+
+STATUS: RED (compile errors)

@@ -1,0 +1,22 @@
+TDD RED — NextUp Section in Coach Backlog
+==========================================
+Date: 2026-03-16
+
+Unit Tests (CoachBacklogViewModelTests.swift):
+- test_nextUpTasks_returnsOnlyNextUpTasks: FAILS (CoachBacklogViewModel has no member 'nextUpTasks')
+- test_nextUpTasks_excludesCompletedTasks: FAILS (same)
+- test_nextUpTasks_excludesTemplateTasks: FAILS (same)
+- test_otherTasks_excludesNextUpTasks: FAILS (otherTasks does not exclude NextUp yet)
+- test_relevantTasks_eule_excludedByNextUpSection: FAILS (nextUpTasks doesn't exist)
+
+UI Tests (CoachBacklogViewUITests.swift):
+- test_coachModeOn_showsNextUpSection: FAILS (coachNextUpSection identifier doesn't exist)
+- test_coachModeOn_nextUpSection_showsHeader: FAILS ("Next Up" text doesn't exist in coach view)
+
+macOS UI Tests (MacCoachBacklogUITests.swift):
+- test_coachModeOn_showsNextUpSection: FAILS (coachNextUpSection identifier doesn't exist)
+
+Build error:
+  Type 'CoachBacklogViewModel' has no member 'nextUpTasks'
+
+All tests correctly FAIL before implementation.

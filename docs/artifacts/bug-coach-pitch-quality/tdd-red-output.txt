@@ -1,0 +1,7 @@
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/CoachPitchServiceTests.swift:134:42: error: type 'CoachPitchService' has no member 'shouldAcceptPitch'
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/CoachPitchServiceTests.swift:145:42: error: type 'CoachPitchService' has no member 'shouldAcceptPitch'
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/CoachPitchServiceTests.swift:156:42: error: type 'CoachPitchService' has no member 'shouldAcceptPitch'
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/CoachPitchServiceTests.swift:167:42: error: type 'CoachPitchService' has no member 'shouldAcceptPitch'
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/CoachPitchServiceTests.swift:178:42: error: type 'CoachPitchService' has no member 'shouldAcceptPitch'
+---
+5 compile errors — shouldAcceptPitch does not exist yet (TDD RED)

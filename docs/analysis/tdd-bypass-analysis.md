@@ -197,7 +197,7 @@ def main():
 
     # Check RED test
     if not workflow.get("red_test_done"):
-        print("❌ BLOCKED: RED test not done! Run /tdd-red first", file=sys.stderr)
+        print("❌ BLOCKED: RED test not done! Run /04-tdd-red first", file=sys.stderr)
         sys.exit(2)
 
     sys.exit(0)  # All checks passed
@@ -251,7 +251,7 @@ REQUIRED STEPS:
    - Analyze requirements
    - Create workflow
    - Define test strategy
-3. /tdd-red → Write failing tests
+3. /04-tdd-red → Write failing tests
 4. THEN implement
 
 SHORTCUT NOT ALLOWED!
@@ -312,8 +312,8 @@ def verify_file_in_workflow(workflow_name: str, file_path: str) -> bool:
 ```
 
 **Integration:**
-- `/analyse` Phase: Agent identifiziert betroffene Dateien
-- `/write-spec` Phase: Spec listet affected_files
+- `/02-analyse` Phase: Agent identifiziert betroffene Dateien
+- `/03-write-spec` Phase: Spec listet affected_files
 - Hook prüft: Ist Datei in workflow["affected_files"]?
 
 ---
@@ -414,7 +414,7 @@ echo "// test" >> FileB.swift  # Andere Datei!
 echo "func foo() {}" >> FileC.swift
 
 # Expected
-❌ BLOCKED: RED test not done! Run /tdd-red first
+❌ BLOCKED: RED test not done! Run /04-tdd-red first
 ```
 
 ---

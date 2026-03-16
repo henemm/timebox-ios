@@ -13,7 +13,7 @@ Every bug fix follows the Analysis-First principle. No quick fixes!
 
 ### 2. Use Bug-Investigator Agent
 ```
-/bug [description]
+/10-bug [description]
 ```
 
 The agent will:

@@ -141,4 +141,4 @@ ScrollView {
 
 ## Nächster Schritt
 
-`/write-spec` - Spezifikation für Ansatz A erstellen
+`/03-write-spec` - Spezifikation für Ansatz A erstellen

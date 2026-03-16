@@ -1,0 +1,25 @@
+Test Suite 'CoachSelectionUITests' started
+Test Case '-[FocusBloxUITests.CoachSelectionUITests test_coachSelectionView_shows4CoachCards]' started.
+    t =     0.00s Start Test
+    t =     2.13s     Open com.henning.focusblox
+    t =     4.52s     Find element: coachSelectionCard_troll
+    t =     4.52s     FAIL: No matches found for accessibility identifier "coachSelectionCard_troll"
+Test Case '-[FocusBloxUITests.CoachSelectionUITests test_coachSelectionView_shows4CoachCards]' failed (4.52 seconds).
+
+Test Case '-[FocusBloxUITests.CoachSelectionUITests test_selectCoach_filtersBacklog]' started.
+    t =     0.00s Start Test
+    t =     2.08s     Open com.henning.focusblox
+    t =     4.30s     Find element: coachSelectionCard_feuer
+    t =     4.30s     FAIL: No matches found for accessibility identifier "coachSelectionCard_feuer"
+Test Case '-[FocusBloxUITests.CoachSelectionUITests test_selectCoach_filtersBacklog]' failed (4.30 seconds).
+
+Test Case '-[FocusBloxUITests.CoachSelectionUITests test_noCoach_showsNormalBacklog]' started.
+    t =     0.00s Start Test
+    t =     2.15s     Open com.henning.focusblox
+    t =     4.44s     Find element: noCoachButton
+    t =     4.44s     FAIL: No matches found for accessibility identifier "noCoachButton"
+Test Case '-[FocusBloxUITests.CoachSelectionUITests test_noCoach_showsNormalBacklog]' failed (4.44 seconds).
+
+Test Suite 'CoachSelectionUITests' failed at 2026-03-14 16:05:00.
+     Executed 3 tests, with 3 failures (0 unexpected) in 13.26 (13.26) seconds
+** TEST FAILED ** (exit code 65)

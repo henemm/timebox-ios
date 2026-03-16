@@ -68,8 +68,6 @@ Vier PNG-Grafiken mit transparentem Hintergrund, je eine pro Discipline:
 - **EIN persönliches, sympathisches Monster** pro User
 - Nicht Gegner, nicht Coach — **Trainingspartner** der herausfordert damit man wächst
 - Passt sein Verhalten an die Morgen-Intention an
-- Wächst und entwickelt sich mit dem User über die Zeit
-- Tiefe emotionale Bindung durch Konstanz und Persönlichkeit
 
 **Charakter-Prinzip:** Das Monster fordert heraus wie ein Sparring-Partner im Sport. Es geht nicht ums Kämpfen oder Besiegen, sondern um die Gelegenheit, besser zu werden und an persönlichen Skills zu arbeiten.
 
@@ -260,7 +258,6 @@ Haugs Vier-in-einem-Perspektive teilt das Leben in gleichwertige Bereiche. Focus
 - **Morgens → Backlog:** Handlung — "Ich weiß genau welche Tasks zu meiner Intention passen"
 - **Tagsüber:** Begleitung — "Mein Monster meldet sich nur wenn ich Hilfe brauche"
 - **Abends:** Stolz, Zufriedenheit, Energie — "Ich sehe schwarz auf weiß was ich geschafft habe"
-- **Über Zeit:** Entwicklung — "Ich sehe wie mein Monster und ich zusammen gewachsen sind"
 
 ### Sozial
 - Nicht primär sozial — persönlicher Begleiter
@@ -298,7 +295,6 @@ Haugs Vier-in-einem-Perspektive teilt das Leben in gleichwertige Bereiche. Focus
 - [ ] Abends: Der Spiegel zeigt automatisch ob ich bekommen habe was ich mir morgens gewünscht habe
 - [ ] Abend-Text ist persönlich und nennt konkrete Tasks beim Namen (via Foundation Models)
 - [ ] Ich sehe über die Zeit an welchen Disziplinen ich gewachsen bin
-- [ ] Mein Monster wächst/entwickelt sich mit mir
 - [ ] Die App erkennt wenn ein Lebensbereich zu kurz kommt und erinnert sanft
 - [ ] Coach-Modus ist umschaltbar — Focus-Modus bleibt als Alternative
 - [ ] Kein Guilt-Tripping, kein Suchtdesign, keine toxische Positivität

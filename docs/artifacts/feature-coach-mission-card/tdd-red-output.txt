@@ -1,0 +1,4 @@
+TDD RED: CoachMissionServiceTests.swift written but CoachMissionService does not exist yet.
+Build would fail with: Cannot find 'CoachMissionService' in scope
+Tests: 10 test cases referencing non-existent type
+Date: 2026-03-15T20:35:12

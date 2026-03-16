@@ -158,14 +158,14 @@ echo "func foo() {}" >> TimeBox/Sources/Views/NewView.swift
 
 # Expected
 🔴 BLOCKED: Wrong Phase! (phase1_context)
-NEXT: /write-spec
+NEXT: /03-write-spec
 ```
 
 ### Test 3: Block ohne RED Test
 ```bash
 # Setup
 /11-feature "Test Feature"
-/write-spec
+/03-write-spec
 User: "approved"
 # Phase = phase4_approved, red_test_done = false
 
@@ -181,9 +181,9 @@ REQUIRED: Write FAILING tests first
 ```bash
 # Setup
 /11-feature "Test Feature"
-/write-spec
+/03-write-spec
 User: "approved"
-/tdd-red  # Schreibt Tests, red_test_done = true
+/04-tdd-red  # Schreibt Tests, red_test_done = true
 # Phase = phase6_implement
 
 # Test

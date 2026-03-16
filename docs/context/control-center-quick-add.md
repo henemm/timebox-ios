@@ -155,4 +155,4 @@ Falls nicht erfolgreich: Dokumentieren und alternative Lösungen evaluieren.
 
 ## Nächster Schritt
 
-`/write-spec` - Spezifikation für den Prototype erstellen
+`/03-write-spec` - Spezifikation für den Prototype erstellen

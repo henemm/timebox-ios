@@ -78,7 +78,7 @@ Body: "Focus Block [Titel] beginnt jetzt"
 
 ## Next Steps
 
-1. `/write-spec` - Specification erstellen
+1. `/03-write-spec` - Specification erstellen
 2. User Approval
-3. `/tdd-red` - UI Tests schreiben
-4. `/implement` - Implementieren
+3. `/04-tdd-red` - UI Tests schreiben
+4. `/05-implement` - Implementieren

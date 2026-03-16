@@ -36,7 +36,7 @@ Ask: "I see [existing system X], should I extend that or build new?"
 
 ### 3. Use Feature-Planner Agent
 ```
-/feature [name]
+/11-feature [name]
 ```
 
 The agent will:

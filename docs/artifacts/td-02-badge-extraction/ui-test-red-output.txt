@@ -1,0 +1,15 @@
+TD-02 Badge Extraction — TDD RED Results
+==========================================
+Date: 2026-03-13
+Tests: FocusBloxUITests/DueDateBadgeExtractionUITests
+
+Test Results:
+- testDueDateBadgeHasAccessibilityIdentifier: FAILED (24.374s)
+  Reason: dueDateBadge_* identifier does not exist — inline HStack in BacklogRow has no accessibilityIdentifier
+
+- testDueDateBadgeShowsHeuteForToday: FAILED (16.296s)
+  Reason: dueDateBadge_* identifier does not exist — cannot find element to verify label
+
+Both tests FAILED as expected — TDD RED confirmed.
+After extracting DueDateBadge to TaskBadges.swift with .accessibilityIdentifier("dueDateBadge_\(taskId)"),
+these tests will turn GREEN.

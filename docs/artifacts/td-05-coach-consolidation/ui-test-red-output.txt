@@ -1,0 +1,20 @@
+TD-05 Coach Consolidation — UI Test Strategy (Refactoring)
+
+This is a REFACTORING ticket — no new UI elements are added.
+Existing UI tests serve as regression validation:
+
+1. FocusBloxUITests/CoachBacklogViewUITests.swift
+   - Tests: coachMonsterHeader, coachRelevantSection, coachOtherSection, coachTaskList
+   - These elements keep their accessibilityIdentifiers unchanged
+
+2. FocusBloxMacUITests/MacCoachBacklogUITests.swift
+   - Tests: coachMonsterHeader, coachRelevantSection, coachOtherSection
+   - Same identifiers as iOS
+
+3. FocusBloxUITests/CoachMeinTagUITests.swift
+   - Tests: coachDayProgress
+   - Same identifier used by DayProgressSection
+
+After implementation: run ALL existing Coach UI tests to verify no regression.
+
+STATUS: EXISTING TESTS — will be run GREEN after implementation
