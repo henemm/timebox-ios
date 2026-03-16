@@ -201,21 +201,168 @@ final class CoachBacklogViewModelTests: XCTestCase {
         XCTAssertFalse(other.contains { $0.isNextUp })
     }
 
+    // MARK: - coachBoostedTasks (P1: Coach-Boost Section)
+
+    /// Verhalten: Coach-Boost gibt Tasks passend zum Coach, OHNE NextUp-Tasks
+    func test_coachBoostedTasks_troll_excludesNextUp() {
+        let t1 = makeLocalTask(title: "Rescheduled", rescheduleCount: 3)
+        let t2 = makeLocalTask(title: "NextUp Rescheduled", isNextUp: true, rescheduleCount: 5)
+        let t3 = makeLocalTask(title: "Normal")
+        let items = [t1, t2, t3].map { PlanItem(localTask: $0) }
+
+        let result = CoachBacklogViewModel.coachBoostedTasks(from: items, selectedCoach: "troll")
+        XCTAssertEqual(result.count, 1)
+        XCTAssertEqual(result.first?.title, "Rescheduled")
+    }
+
+    /// Verhalten: Coach-Boost Feuer filtert importance==3, ohne NextUp
+    func test_coachBoostedTasks_feuer_filtersHighImportance() {
+        let t1 = makeLocalTask(title: "Big", importance: 3)
+        let t2 = makeLocalTask(title: "Small", importance: 1)
+        let items = [t1, t2].map { PlanItem(localTask: $0) }
+
+        let result = CoachBacklogViewModel.coachBoostedTasks(from: items, selectedCoach: "feuer")
+        XCTAssertEqual(result.count, 1)
+        XCTAssertEqual(result.first?.title, "Big")
+    }
+
+    /// Verhalten: Kein Coach → leeres Array
+    func test_coachBoostedTasks_noCoach_empty() {
+        let items = [makeLocalTask(title: "Task", rescheduleCount: 5)].map { PlanItem(localTask: $0) }
+        let result = CoachBacklogViewModel.coachBoostedTasks(from: items, selectedCoach: "")
+        XCTAssertTrue(result.isEmpty)
+    }
+
+    // MARK: - remainingTasks (P1: Tasks MINUS NextUp MINUS Coach-Boost)
+
+    /// Verhalten: Remaining schliesst NextUp UND Coach-Boost aus
+    func test_remainingTasks_excludesNextUpAndCoachBoost() {
+        let t1 = makeLocalTask(title: "NextUp", isNextUp: true)
+        let t2 = makeLocalTask(title: "Boosted", rescheduleCount: 5)
+        let t3 = makeLocalTask(title: "Normal")
+        let items = [t1, t2, t3].map { PlanItem(localTask: $0) }
+
+        let result = CoachBacklogViewModel.remainingTasks(from: items, selectedCoach: "troll")
+        XCTAssertEqual(result.count, 1)
+        XCTAssertEqual(result.first?.title, "Normal")
+    }
+
+    // MARK: - overdueTasks (P1: Ueberfaellig-Sektion)
+
+    /// Verhalten: Nur Tasks mit dueDate < heute
+    func test_overdueTasks_filtersOverdueOnly() {
+        let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: Date())!
+        let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: Date())!
+        let t1 = makeLocalTask(title: "Overdue", dueDate: yesterday)
+        let t2 = makeLocalTask(title: "Future", dueDate: tomorrow)
+        let t3 = makeLocalTask(title: "NoDue")
+        let items = [t1, t2, t3].map { PlanItem(localTask: $0) }
+
+        let result = CoachBacklogViewModel.overdueTasks(from: items)
+        XCTAssertEqual(result.count, 1)
+        XCTAssertEqual(result.first?.title, "Overdue")
+    }
+
+    // MARK: - tierTasks (P1: Priority-Tier-Sections)
+
+    /// Verhalten: tierTasks filtert nach PriorityTier und schliesst excludeIDs aus
+    func test_tierTasks_filtersByTierAndExcludesIDs() {
+        // importance=3 + urgency="urgent" + dueDate=today → score ~77 → .doNow
+        let t1 = makeLocalTask(title: "DoNow", importance: 3, urgency: "urgent", dueDate: Date())
+        let t2 = makeLocalTask(title: "Someday")
+        let items = [t1, t2].map { PlanItem(localTask: $0) }
+
+        let doNow = CoachBacklogViewModel.tierTasks(from: items, tier: .doNow, excludeIDs: [])
+        XCTAssertTrue(doNow.contains { $0.title == "DoNow" }, "Score should be ≥60 with importance=3+urgent+dueToday")
+
+        let someday = CoachBacklogViewModel.tierTasks(from: items, tier: .someday, excludeIDs: [])
+        XCTAssertTrue(someday.contains { $0.title == "Someday" })
+    }
+
+    /// Verhalten: tierTasks schliesst excludeIDs aus (fuer Overdue-Deduplizierung)
+    func test_tierTasks_excludesIDs() {
+        let t1 = makeLocalTask(title: "Excluded", importance: 3, urgency: "urgent", dueDate: Date())
+        let items = [t1].map { PlanItem(localTask: $0) }
+
+        let result = CoachBacklogViewModel.tierTasks(from: items, tier: .doNow, excludeIDs: Set(items.map(\.id)))
+        XCTAssertTrue(result.isEmpty)
+    }
+
+    // MARK: - recentTasks (P1: Zuletzt-Ansicht)
+
+    /// Verhalten: Sortiert nach juengstem Datum (createdAt oder modifiedAt)
+    func test_recentTasks_sortsByMostRecent() {
+        let t1 = makeLocalTask(title: "Old")
+        let t2 = makeLocalTask(title: "New")
+        let items = [t1, t2].map { PlanItem(localTask: $0) }
+
+        let result = CoachBacklogViewModel.recentTasks(from: items)
+        XCTAssertEqual(result.count, 2)
+        XCTAssertEqual(result.first?.title, "New")
+    }
+
+    // MARK: - completedTasks (P1: Erledigt-Ansicht)
+
+    /// Verhalten: Nur erledigte Tasks zurueckgeben
+    func test_completedTasks_returnsOnlyCompleted() {
+        let t1 = makeLocalTask(title: "Done", isCompleted: true)
+        let t2 = makeLocalTask(title: "Open")
+        let items = [t1, t2].map { PlanItem(localTask: $0) }
+
+        let result = CoachBacklogViewModel.completedTasks(from: items)
+        XCTAssertEqual(result.count, 1)
+        XCTAssertEqual(result.first?.title, "Done")
+    }
+
+    // MARK: - recurringTasks (P1: Wiederkehrend-Ansicht)
+
+    /// Verhalten: Nur Templates zurueckgeben
+    func test_recurringTasks_returnsOnlyTemplates() {
+        let t1 = makeLocalTask(title: "Template", isTemplate: true)
+        let t2 = makeLocalTask(title: "Normal")
+        let items = [t1, t2].map { PlanItem(localTask: $0) }
+
+        let result = CoachBacklogViewModel.recurringTasks(from: items)
+        XCTAssertEqual(result.count, 1)
+        XCTAssertEqual(result.first?.title, "Template")
+    }
+
+    // MARK: - coachSectionTitle (P1: Section-Name)
+
+    /// Verhalten: Section-Name = "Coach.displayName — Coach.subtitle"
+    func test_coachSectionTitle_formatsCorrectly() {
+        let title = CoachBacklogViewModel.coachSectionTitle(for: "troll")
+        XCTAssertEqual(title, "Troll — Der Aufräumer")
+
+        let feuerTitle = CoachBacklogViewModel.coachSectionTitle(for: "feuer")
+        XCTAssertEqual(feuerTitle, "Feuer — Der Herausforderer")
+    }
+
+    /// Verhalten: Kein Coach → nil
+    func test_coachSectionTitle_noCoach_nil() {
+        let title = CoachBacklogViewModel.coachSectionTitle(for: "")
+        XCTAssertNil(title)
+    }
+
     // MARK: - Helper
 
     private func makeLocalTask(
         title: String = "Test Task",
         isNextUp: Bool = false,
         importance: Int? = nil,
+        urgency: String? = nil,
         rescheduleCount: Int = 0,
         taskType: String = "",
         isCompleted: Bool = false,
-        isTemplate: Bool = false
+        isTemplate: Bool = false,
+        dueDate: Date? = nil
     ) -> LocalTask {
         let task = LocalTask(title: title, importance: importance, isCompleted: isCompleted, taskType: taskType)
         task.isNextUp = isNextUp
         task.rescheduleCount = rescheduleCount
         task.isTemplate = isTemplate
+        task.dueDate = dueDate
+        task.urgency = urgency
         context.insert(task)
         return task
     }

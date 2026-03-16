@@ -14,6 +14,30 @@ struct MacCoachBacklogView: View {
     @Binding var selectedTasks: Set<UUID>
 
     @AppStorage("selectedCoach") private var selectedCoach: String = ""
+    @AppStorage("coachBacklogViewMode") private var selectedModeRaw: String = "Priorität"
+
+    private var selectedMode: CoachViewMode {
+        CoachViewMode(rawValue: selectedModeRaw) ?? .priority
+    }
+
+    enum CoachViewMode: String, CaseIterable, Identifiable {
+        case priority = "Priorität"
+        case recent = "Zuletzt"
+        case overdue = "Überfällig"
+        case recurring = "Wiederkehrend"
+        case completed = "Erledigt"
+
+        var id: String { rawValue }
+        var icon: String {
+            switch self {
+            case .priority: return "chart.bar.fill"
+            case .recent: return "clock.arrow.circlepath"
+            case .overdue: return "exclamationmark.circle"
+            case .completed: return "checkmark.circle"
+            case .recurring: return "arrow.triangle.2.circlepath"
+            }
+        }
+    }
 
     // MARK: - Task Sections (via shared CoachBacklogViewModel + PlanItem bridge)
 
@@ -21,24 +45,69 @@ struct MacCoachBacklogView: View {
         tasks.filter { $0.modelContext != nil }.map { PlanItem(localTask: $0) }
     }
 
-    private var relevantTasks: [LocalTask] {
-        let relevantIDs = Set(CoachBacklogViewModel.relevantTasks(from: planItems, selectedCoach: selectedCoach).map(\.id))
-        return tasks.filter { relevantIDs.contains($0.id) }
-    }
-
     private var nextUpTasks: [LocalTask] {
         let nextUpIDs = Set(CoachBacklogViewModel.nextUpTasks(from: planItems).map(\.id))
         return tasks.filter { nextUpIDs.contains($0.id) }
     }
 
-    private var otherTasks: [LocalTask] {
-        let otherIDs = Set(CoachBacklogViewModel.otherTasks(from: planItems, selectedCoach: selectedCoach).map(\.id))
-        return tasks.filter { otherIDs.contains($0.id) }
+    private var coachBoostedTasks: [LocalTask] {
+        let boostIDs = Set(CoachBacklogViewModel.coachBoostedTasks(from: planItems, selectedCoach: selectedCoach).map(\.id))
+        return tasks.filter { boostIDs.contains($0.id) }
+    }
+
+    private var remainingTasks: [LocalTask] {
+        let remainingIDs = Set(CoachBacklogViewModel.remainingTasks(from: planItems, selectedCoach: selectedCoach).map(\.id))
+        return tasks.filter { remainingIDs.contains($0.id) }
+    }
+
+    private var overdueTasks: [LocalTask] {
+        let overdueIDs = Set(CoachBacklogViewModel.overdueTasks(from: planItems.filter {
+            let remainIDs = Set(CoachBacklogViewModel.remainingTasks(from: planItems, selectedCoach: selectedCoach).map(\.id))
+            return remainIDs.contains($0.id)
+        }).map(\.id))
+        return tasks.filter { overdueIDs.contains($0.id) }
     }
 
     // MARK: - Body
 
     var body: some View {
+        VStack(spacing: 0) {
+            // Toolbar: ViewMode-Switcher + Task Count
+            HStack {
+                viewModeSwitcher
+                Spacer()
+                Text("\(tasks.filter { !$0.isCompleted }.count) Tasks")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 6)
+
+            taskList
+        }
+    }
+
+    // MARK: - Task List (switches based on ViewMode)
+
+    @ViewBuilder
+    private var taskList: some View {
+        switch selectedMode {
+        case .priority:
+            priorityView
+        case .recent:
+            recentView
+        case .overdue:
+            overdueView
+        case .recurring:
+            recurringView
+        case .completed:
+            completedView
+        }
+    }
+
+    // MARK: - Priority View (Coach-Boost + Tiers)
+
+    private var priorityView: some View {
         List(selection: $selectedTasks) {
             monsterHeader
                 .listRowSeparator(.hidden)
@@ -46,55 +115,208 @@ struct MacCoachBacklogView: View {
             if !nextUpTasks.isEmpty {
                 Section {
                     ForEach(nextUpTasks, id: \.uuid) { task in
-                        coachRow(task)
-                            .tag(task.uuid)
+                        coachRow(task).tag(task.uuid)
+                        ForEach(blockedTasks(for: task.id), id: \.uuid) { blocked in
+                            blockedRow(blocked).tag(blocked.uuid)
+                        }
                     }
                 } header: {
-                    HStack {
-                        Label("Next Up", systemImage: "arrow.up.circle.fill")
-                            .font(.headline)
-                            .foregroundStyle(.green)
-                        Spacer()
-                        Text("\(nextUpTasks.count)")
-                            .font(.caption)
-                            .foregroundStyle(.green)
-                            .padding(.horizontal, 6)
-                            .padding(.vertical, 2)
-                            .background(Color.green.opacity(0.2))
-                            .clipShape(Capsule())
-                    }
+                    sectionHeader("Next Up", icon: "arrow.up.circle.fill", count: nextUpTasks.count, color: .green)
                 }
                 .accessibilityIdentifier("coachNextUpSection")
             }
 
-            if !relevantTasks.isEmpty {
+            if !coachBoostedTasks.isEmpty, let sectionTitle = CoachBacklogViewModel.coachSectionTitle(for: selectedCoach) {
                 Section {
-                    ForEach(relevantTasks, id: \.uuid) { task in
-                        coachRow(task)
-                            .tag(task.uuid)
+                    ForEach(coachBoostedTasks, id: \.uuid) { task in
+                        coachRow(task).tag(task.uuid)
+                        ForEach(blockedTasks(for: task.id), id: \.uuid) { blocked in
+                            blockedRow(blocked).tag(blocked.uuid)
+                        }
                     }
                 } header: {
-                    Text("Dein Schwerpunkt")
-                        .font(.headline)
+                    sectionHeader(sectionTitle, count: coachBoostedTasks.count, color: .purple)
                 }
-                .accessibilityIdentifier("coachRelevantSection")
+                .accessibilityIdentifier("coachBoostSection")
             }
 
-            Section {
-                ForEach(otherTasks, id: \.uuid) { task in
-                    coachRow(task)
-                        .tag(task.uuid)
-                }
-            } header: {
-                if !relevantTasks.isEmpty {
-                    Text("Weitere Tasks")
-                        .font(.headline)
-                        .foregroundStyle(.secondary)
+            if !overdueTasks.isEmpty {
+                Section {
+                    ForEach(overdueTasks, id: \.uuid) { task in
+                        coachRow(task).tag(task.uuid)
+                        ForEach(blockedTasks(for: task.id), id: \.uuid) { blocked in
+                            blockedRow(blocked).tag(blocked.uuid)
+                        }
+                    }
+                } header: {
+                    sectionHeader("Überfällig", count: overdueTasks.count, color: .red)
                 }
             }
-            .accessibilityIdentifier("coachOtherSection")
+
+            ForEach(TaskPriorityScoringService.PriorityTier.allCases, id: \.self) { tier in
+                let overdueIDs = Set(overdueTasks.map(\.id))
+                let remainPlanItems = planItems.filter {
+                    let remainIDs = Set(CoachBacklogViewModel.remainingTasks(from: planItems, selectedCoach: selectedCoach).map(\.id))
+                    return remainIDs.contains($0.id)
+                }
+                let tierPlanItems = CoachBacklogViewModel.tierTasks(from: remainPlanItems, tier: tier, excludeIDs: overdueIDs)
+                let tierIDs = Set(tierPlanItems.map(\.id))
+                let tierLocalTasks = tasks.filter { tierIDs.contains($0.id) }
+                if !tierLocalTasks.isEmpty {
+                    Section {
+                        ForEach(tierLocalTasks, id: \.uuid) { task in
+                            coachRow(task).tag(task.uuid)
+                            ForEach(blockedTasks(for: task.id), id: \.uuid) { blocked in
+                                blockedRow(blocked).tag(blocked.uuid)
+                            }
+                        }
+                    } header: {
+                        sectionHeader(tier.label, count: tierLocalTasks.count, color: tierColor(tier))
+                    }
+                }
+            }
         }
         .accessibilityIdentifier("coachTaskList")
+    }
+
+    // MARK: - Recent View
+
+    private var recentView: some View {
+        let recentIDs = CoachBacklogViewModel.recentTasks(from: planItems).map(\.id)
+        let orderedTasks = recentIDs.compactMap { id in tasks.first { $0.id == id } }
+        return List(selection: $selectedTasks) {
+            monsterHeader.listRowSeparator(.hidden)
+            Section {
+                ForEach(orderedTasks, id: \.uuid) { task in
+                    coachRow(task).tag(task.uuid)
+                    ForEach(blockedTasks(for: task.id), id: \.uuid) { blocked in
+                        blockedRow(blocked).tag(blocked.uuid)
+                    }
+                }
+            } header: {
+                Text("Zuletzt bearbeitet").font(.headline).foregroundStyle(.secondary)
+            }
+        }
+        .accessibilityIdentifier("coachTaskList")
+    }
+
+    // MARK: - Overdue View
+
+    private var overdueView: some View {
+        let allOverdueIDs = Set(CoachBacklogViewModel.overdueTasks(from: planItems).map(\.id))
+        let allOverdue = tasks.filter { allOverdueIDs.contains($0.id) }
+        return List(selection: $selectedTasks) {
+            monsterHeader.listRowSeparator(.hidden)
+            if allOverdue.isEmpty {
+                Text("Keine überfälligen Tasks").foregroundStyle(.secondary)
+            } else {
+                Section {
+                    ForEach(allOverdue, id: \.uuid) { task in
+                        coachRow(task).tag(task.uuid)
+                        ForEach(blockedTasks(for: task.id), id: \.uuid) { blocked in
+                            blockedRow(blocked).tag(blocked.uuid)
+                        }
+                    }
+                } header: {
+                    sectionHeader("Überfällig", count: allOverdue.count, color: .red)
+                }
+            }
+        }
+        .accessibilityIdentifier("coachTaskList")
+    }
+
+    // MARK: - Recurring View
+
+    private var recurringView: some View {
+        let recurringIDs = Set(CoachBacklogViewModel.recurringTasks(from: planItems).map(\.id))
+        let recurring = tasks.filter { recurringIDs.contains($0.id) }
+        return List(selection: $selectedTasks) {
+            monsterHeader.listRowSeparator(.hidden)
+            if recurring.isEmpty {
+                Text("Keine wiederkehrenden Tasks").foregroundStyle(.secondary)
+            } else {
+                Section {
+                    ForEach(recurring, id: \.uuid) { task in
+                        coachRow(task).tag(task.uuid)
+                        ForEach(blockedTasks(for: task.id), id: \.uuid) { blocked in
+                            blockedRow(blocked).tag(blocked.uuid)
+                        }
+                    }
+                } header: {
+                    Text("Wiederkehrend").font(.headline).foregroundStyle(.secondary)
+                }
+            }
+        }
+        .accessibilityIdentifier("coachTaskList")
+    }
+
+    // MARK: - Completed View
+
+    private var completedView: some View {
+        let completedIDs = Set(CoachBacklogViewModel.completedTasks(from: planItems).map(\.id))
+        let completed = tasks.filter { completedIDs.contains($0.id) }
+        return List(selection: $selectedTasks) {
+            monsterHeader.listRowSeparator(.hidden)
+            if completed.isEmpty {
+                Text("Keine erledigten Tasks").foregroundStyle(.secondary)
+            } else {
+                Section {
+                    ForEach(completed, id: \.uuid) { task in
+                        coachRow(task).tag(task.uuid)
+                    }
+                } header: {
+                    Text("Erledigt").font(.headline).foregroundStyle(.secondary)
+                }
+            }
+        }
+        .accessibilityIdentifier("coachTaskList")
+    }
+
+    // MARK: - Section Header Helper
+
+    private func sectionHeader(_ title: String, icon: String? = nil, count: Int, color: Color) -> some View {
+        HStack {
+            if let icon {
+                Label(title, systemImage: icon)
+                    .font(.headline)
+                    .foregroundStyle(color)
+            } else {
+                Text(title)
+                    .font(.headline)
+                    .foregroundStyle(color)
+            }
+            Spacer()
+            Text("\(count)")
+                .font(.caption)
+                .foregroundStyle(color)
+                .padding(.horizontal, 6)
+                .padding(.vertical, 2)
+                .background(color.opacity(0.2))
+                .clipShape(Capsule())
+        }
+    }
+
+    // MARK: - ViewMode Switcher
+
+    private var viewModeSwitcher: some View {
+        Menu {
+            ForEach(CoachViewMode.allCases) { mode in
+                Button {
+                    withAnimation(.smooth) { selectedModeRaw = mode.rawValue }
+                } label: {
+                    Label(mode.rawValue, systemImage: mode.icon)
+                }
+            }
+        } label: {
+            HStack(spacing: 4) {
+                Image(systemName: selectedMode.icon)
+                Text(selectedMode.rawValue)
+                    .font(.headline)
+                Image(systemName: "chevron.down")
+                    .font(.caption)
+            }
+        }
+        .accessibilityIdentifier("coachViewModeSwitcher")
     }
 
     // MARK: - Monster Header (shared component)
@@ -103,7 +325,35 @@ struct MacCoachBacklogView: View {
         MonsterIntentionHeader(selectedCoach: selectedCoach, imageHeight: 80)
     }
 
-    // MARK: - Coach Row
+    // MARK: - Blocked Task Helpers
+
+    private func blockedTasks(for blockerID: String) -> [LocalTask] {
+        tasks.filter { $0.blockerTaskID == blockerID }
+    }
+
+    private func blockedRow(_ task: LocalTask) -> some View {
+        let discipline = Discipline.resolveOpen(
+            manualDiscipline: task.manualDiscipline,
+            rescheduleCount: task.rescheduleCount,
+            importance: task.importance
+        )
+        return MacBacklogRow(
+            task: task,
+            isBlocked: true,
+            disciplineColor: discipline.color
+        )
+        .contextMenu {
+            Button {
+                task.blockerTaskID = nil
+                task.modifiedAt = Date()
+                try? task.modelContext?.save()
+            } label: {
+                Label("Freigeben", systemImage: "link.badge.plus")
+            }
+        }
+    }
+
+    // MARK: - Coach Row (with all callbacks)
 
     private func coachRow(_ task: LocalTask) -> some View {
         let discipline = Discipline.resolveOpen(
@@ -113,6 +363,32 @@ struct MacCoachBacklogView: View {
         )
         return MacBacklogRow(
             task: task,
+            onToggleComplete: {
+                task.isCompleted.toggle()
+                task.completedAt = task.isCompleted ? Date() : nil
+                task.modifiedAt = Date()
+                try? task.modelContext?.save()
+            },
+            onImportanceCycle: { newImportance in
+                task.importance = newImportance
+                task.modifiedAt = Date()
+                try? task.modelContext?.save()
+            },
+            onUrgencyToggle: { newUrgency in
+                task.urgency = newUrgency
+                task.modifiedAt = Date()
+                try? task.modelContext?.save()
+            },
+            onCategorySelect: { newCategory in
+                task.taskType = newCategory
+                task.modifiedAt = Date()
+                try? task.modelContext?.save()
+            },
+            onDurationSelect: { newDuration in
+                task.estimatedDuration = newDuration
+                task.modifiedAt = Date()
+                try? task.modelContext?.save()
+            },
             disciplineColor: discipline.color
         )
         .contextMenu {
@@ -129,6 +405,20 @@ struct MacCoachBacklogView: View {
                 } label: {
                     Label(task.isNextUp ? "Aus Next Up entfernen" : "Zu Next Up hinzufügen",
                           systemImage: task.isNextUp ? "arrow.down.circle.fill" : "arrow.up.circle.fill")
+                }
+            }
+            if task.dueDate != nil {
+                Section("Verschieben") {
+                    Button {
+                        if let ctx = task.modelContext { _ = LocalTask.postpone(task, byDays: 1, context: ctx) }
+                    } label: {
+                        Label("Morgen", systemImage: "sunrise")
+                    }
+                    Button {
+                        if let ctx = task.modelContext { _ = LocalTask.postpone(task, byDays: 7, context: ctx) }
+                    } label: {
+                        Label("Nächste Woche", systemImage: "calendar.badge.plus")
+                    }
                 }
             }
             Section("Disziplin") {
@@ -153,6 +443,22 @@ struct MacCoachBacklogView: View {
                     }
                 }
             }
+            Divider()
+            Button(role: .destructive) {
+                task.modelContext?.delete(task)
+                try? task.modelContext?.save()
+            } label: {
+                Label("Löschen", systemImage: "trash")
+            }
+        }
+    }
+
+    private func tierColor(_ tier: TaskPriorityScoringService.PriorityTier) -> Color {
+        switch tier {
+        case .doNow: return .red
+        case .planSoon: return .orange
+        case .eventually: return .yellow
+        case .someday: return .gray
         }
     }
 }

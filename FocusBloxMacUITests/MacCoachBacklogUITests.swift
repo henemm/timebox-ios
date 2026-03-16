@@ -105,23 +105,69 @@ final class MacCoachBacklogUITests: XCTestCase {
                       "NextUp section should be visible in macOS Coach backlog")
     }
 
-    // MARK: - Test 5: Sidebar simplified in coach mode
+    // MARK: - Test 5: ViewMode Switcher (Bug 104: P3)
 
-    /// Verhalten: Bei Coach-Modus zeigt die Sidebar nur "Backlog" ohne Filter-Optionen.
-    func test_coachModeOn_sidebarSimplified() throws {
+    /// Verhalten: Coach-Backlog hat einen ViewMode-Switcher mit 5 Modi.
+    /// Bricht wenn: MacCoachBacklogView keinen viewModeSwitcher hat
+    func test_coachModeOn_viewModeSwitcherExists() throws {
         launchWithCoachMode()
         navigateToBacklog()
 
-        // The filter labels should NOT exist in coach mode
-        let priorityFilter = app.staticTexts["Priorität"]
-        let recentFilter = app.staticTexts["Zuletzt"]
-
-        // Give UI time to settle
-        _ = app.windows.firstMatch.waitForExistence(timeout: 3)
-
-        XCTAssertFalse(priorityFilter.exists,
-                       "Priority filter should be hidden in Coach mode sidebar")
-        XCTAssertFalse(recentFilter.exists,
-                       "Recent filter should be hidden in Coach mode sidebar")
+        let switcher = app.descendants(matching: .any)["coachViewModeSwitcher"]
+        XCTAssertTrue(switcher.waitForExistence(timeout: 5),
+                      "ViewMode switcher should exist in macOS Coach backlog")
     }
+
+    // MARK: - Test 6: Completion Button (Bug 104: P0)
+
+    /// Verhalten: Completion-Checkbox existiert und ist anklickbar.
+    /// Bricht wenn: onToggleComplete nicht an MacBacklogRow uebergeben wird
+    func test_coachModeOn_completionCheckboxExists() throws {
+        launchWithCoachMode()
+        navigateToBacklog()
+
+        let completeButtons = app.buttons.matching(
+            NSPredicate(format: "identifier BEGINSWITH 'completeButton_'")
+        )
+        XCTAssertGreaterThan(completeButtons.count, 0,
+                             "At least one completion checkbox should exist in macOS Coach backlog")
+    }
+
+    // MARK: - Test 7: Task List (Bug 104)
+
+    /// Bricht wenn: coachTaskList Identifier fehlt
+    func test_coachModeOn_taskListExists() throws {
+        launchWithCoachMode()
+        navigateToBacklog()
+
+        let taskList = app.descendants(matching: .any)["coachTaskList"]
+        XCTAssertTrue(taskList.waitForExistence(timeout: 5),
+                      "Task list should exist in macOS Coach backlog")
+    }
+
+    // MARK: - Test 8: Coach-Boost Section (Bug 104: P3)
+
+    /// Bricht wenn: Coach-Boost-Section nicht angezeigt wird bei gesetztem Coach
+    func test_coachModeOn_withFeuerCoach_showsBoostSection() throws {
+        app.launchArguments = [
+            "-UITesting", "-MockData", "-ApplePersistenceIgnoreState", "YES",
+            "-coachModeEnabled", "1",
+            "-selectedCoach", "feuer"
+        ]
+        app.launch()
+        let window = app.windows.firstMatch
+        _ = window.waitForExistence(timeout: 5)
+        navigateToBacklog()
+
+        let boostSection = app.descendants(matching: .any)["coachBoostSection"]
+        XCTAssertTrue(boostSection.waitForExistence(timeout: 5),
+                      "Coach-Boost section should appear with Feuer coach (importance=3 tasks)")
+
+        let screenshot = app.screenshot()
+        let attachment = XCTAttachment(screenshot: screenshot)
+        attachment.name = "mac-coach-boost-section-feuer"
+        attachment.lifetime = .keepAlways
+        add(attachment)
+    }
+
 }

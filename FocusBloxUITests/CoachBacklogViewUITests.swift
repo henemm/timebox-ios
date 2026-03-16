@@ -52,16 +52,15 @@ final class CoachBacklogViewUITests: XCTestCase {
                        "Monster header should NOT be visible when Coach mode is OFF")
     }
 
-    /// Bricht wenn: CoachBacklogView keine "Weitere Tasks" Sektion zeigt
-    /// When no intention is set, all tasks appear in the "other" section.
-    func test_coachModeOn_showsOtherSection() throws {
+    /// Bricht wenn: coachTaskList nicht vorhanden (Priority-Ansicht mit Tier-Sections)
+    func test_coachModeOn_showsPriorityTierSections() throws {
         launchWithCoachMode()
         navigateToBacklog()
 
-        // The coachOtherSection is always present (all tasks when no intention set)
-        let otherSection = app.descendants(matching: .any)["coachOtherSection"]
-        XCTAssertTrue(otherSection.waitForExistence(timeout: 5),
-                      "Other tasks section should be visible in Coach backlog")
+        // The coachTaskList wraps all tier sections in Priority mode
+        let taskList = app.descendants(matching: .any)["coachTaskList"]
+        XCTAssertTrue(taskList.waitForExistence(timeout: 5),
+                      "Priority tier sections should be visible in Coach backlog")
     }
 
     /// Bricht wenn: CoachBacklogView Hinweis-Text fehlt wenn keine Intention gesetzt
@@ -95,6 +94,105 @@ final class CoachBacklogViewUITests: XCTestCase {
         let nextUpHeader = app.staticTexts["Next Up"]
         XCTAssertTrue(nextUpHeader.waitForExistence(timeout: 5),
                       "NextUp section header should show 'Next Up' text")
+    }
+
+    // MARK: - ViewMode Switcher (Bug 104: P2b)
+
+    /// Bricht wenn: CoachBacklogView toolbar keinen ViewMode-Switcher hat
+    func test_coachModeOn_viewModeSwitcherExists() throws {
+        launchWithCoachMode()
+        navigateToBacklog()
+
+        let switcher = app.descendants(matching: .any)["coachViewModeSwitcher"]
+        XCTAssertTrue(switcher.waitForExistence(timeout: 5),
+                      "ViewMode switcher should exist in Coach backlog toolbar")
+    }
+
+    /// Bricht wenn: Default-ViewMode nicht "Priorität" ist
+    func test_coachModeOn_defaultModePrioritaet() throws {
+        launchWithCoachMode()
+        navigateToBacklog()
+
+        let prioritaetText = app.staticTexts["Priorität"]
+        XCTAssertTrue(prioritaetText.waitForExistence(timeout: 5),
+                      "Default ViewMode should show 'Priorität' text")
+    }
+
+    // MARK: - Coach-Boost Section (Bug 104: P2b)
+
+    /// Bricht wenn: Coach-Boost-Section nicht angezeigt wird bei gesetztem Coach
+    func test_coachModeOn_withFeuerCoach_showsBoostSection() throws {
+        app.launchArguments = [
+            "-UITesting",
+            "-coachModeEnabled", "1",
+            "-selectedCoach", "feuer"
+        ]
+        app.launch()
+        navigateToBacklog()
+
+        let boostSection = app.descendants(matching: .any)["coachBoostSection"]
+        XCTAssertTrue(boostSection.waitForExistence(timeout: 5),
+                      "Coach-Boost section should appear with Feuer coach (importance=3 tasks in mock data)")
+
+        let screenshot = app.screenshot()
+        let attachment = XCTAttachment(screenshot: screenshot)
+        attachment.name = "coach-boost-section-feuer"
+        attachment.lifetime = .keepAlways
+        add(attachment)
+    }
+
+    // MARK: - Completion (Bug 104: P2a)
+
+    /// Bricht wenn: coachRow() kein onComplete-Callback an BacklogRow uebergibt
+    func test_coachModeOn_completionButtonExists() throws {
+        launchWithCoachMode()
+        navigateToBacklog()
+
+        let completeButtons = app.buttons.matching(
+            NSPredicate(format: "identifier BEGINSWITH 'completeButton_'")
+        )
+        XCTAssertGreaterThan(completeButtons.count, 0,
+                             "At least one completion button should exist in Coach backlog")
+    }
+
+    /// Bricht wenn: addTaskButton fehlt in Coach-Backlog toolbar
+    func test_coachModeOn_addTaskButtonExists() throws {
+        launchWithCoachMode()
+        navigateToBacklog()
+
+        let addButton = app.buttons["addTaskButton"]
+        XCTAssertTrue(addButton.waitForExistence(timeout: 5),
+                      "Add task button should exist in Coach backlog toolbar")
+    }
+
+    // MARK: - Task List (Bug 104)
+
+    /// Bricht wenn: coachTaskList nicht als accessibilityIdentifier gesetzt
+    func test_coachModeOn_taskListExists() throws {
+        launchWithCoachMode()
+        navigateToBacklog()
+
+        let taskList = app.descendants(matching: .any)["coachTaskList"]
+        XCTAssertTrue(taskList.waitForExistence(timeout: 5),
+                      "Task list should exist in Coach backlog")
+    }
+
+    // MARK: - Trailing Swipe (Bug 104: P2a)
+
+    /// Bricht wenn: coachRow() kein .swipeActions(edge: .trailing) hat
+    func test_coachModeOn_swipeLeft_showsDeleteAction() throws {
+        launchWithCoachMode()
+        navigateToBacklog()
+
+        let taskTitle = app.staticTexts.matching(
+            NSPredicate(format: "label CONTAINS '[MOCK]'")
+        ).firstMatch
+        XCTAssertTrue(taskTitle.waitForExistence(timeout: 5), "Mock task should exist")
+        taskTitle.swipeLeft()
+
+        let deleteButton = app.buttons["Löschen"]
+        XCTAssertTrue(deleteButton.waitForExistence(timeout: 3),
+                      "Trailing swipe should show 'Löschen' button in Coach backlog")
     }
 
     // MARK: - Swipe Actions
