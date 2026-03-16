@@ -10,6 +10,7 @@
 		03A94D15FBA2530D8C629546 /* BacklogRowRedesignUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54C8A326C1D84FA7A3BD27A8 /* BacklogRowRedesignUITests.swift */; };
 		0587E54264E0E38EB462FEF4 /* MonsterGraphicsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D539D14F5D6B50516049920 /* MonsterGraphicsUITests.swift */; };
 		062C2C62A78FAAB837F02EA6 /* EventKitRepositoryEnvironment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F276F67582A827E523D8ED6 /* EventKitRepositoryEnvironment.swift */; };
+		072FC90E7931CB0AC2FBE863 /* CoachBacklogViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA4922C95335CD9AE2432690 /* CoachBacklogViewModelTests.swift */; };
 		0A76DEF9F3AA7A26322F066F /* DayProgressSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1CF56B22F7EC70EBA401ED8 /* DayProgressSection.swift */; };
 		0B30790C22063E68AD1A34AE /* SpotlightIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E693153139C30E62D300D923 /* SpotlightIntegrationTests.swift */; };
 		0D02BAAA041BF6ADF9954CB9 /* CoachMissionCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 916B374800A26FBCBF855A3A /* CoachMissionCard.swift */; };
@@ -36,6 +37,7 @@
 		324335EAD3A707ABE5F3BEFE /* IntentionFilterUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAD0E9CA71F3D40E44246594 /* IntentionFilterUITests.swift */; };
 		36C24ECAE1DAEC6AC61E16E8 /* EditFocusBlockSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 515D3A83205F8E00941BD4D0 /* EditFocusBlockSheet.swift */; };
 		36D240E1BAF93B48AAE8A9BC /* FocusBlockAssignmentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4564A875E99AE5CFAB35875 /* FocusBlockAssignmentTests.swift */; };
+		397465988F17245F88EFBB9D /* CoachPitchService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C2CFC8D409617C4122E7256 /* CoachPitchService.swift */; };
 		3F9639915C12205F6DE53C7D /* SyncEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14E16E8941781A7134CBEE3A /* SyncEngineTests.swift */; };
 		402B599EB1486BA1E69EF4FF /* BacklogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86453EFF3FD7231E39EC5E4D /* BacklogView.swift */; };
 		437A93B5161BFF7E7E5E73DC /* PlanItemTransfer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 548F5CBBB14618043F38ACE6 /* PlanItemTransfer.swift */; };
@@ -49,7 +51,6 @@
 		4D87251CF1F054F848940F82 /* DependencyIndentUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE59459EB563B50137F303E8 /* DependencyIndentUITests.swift */; };
 		506459C891B27A9B4B9A1702 /* BuildInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4520CF15C46DC2B515637C5 /* BuildInfo.swift */; };
 		5155F66E588A8366FE0E6D38 /* CalendarDeepLinkTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B1F5BC646304B206E7A16D1 /* CalendarDeepLinkTests.swift */; };
-		5343ED7A1DF3773E21DB586A /* CoachBacklogViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA4922C95335CD9AE2432690 /* CoachBacklogViewModelTests.swift */; };
 		53697A70444E5ECF3B760A1C /* SyncEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34D186C26C7135F80A5E3B0B /* SyncEngine.swift */; };
 		5696B45863B3DACF0773DF6C /* DebugHierarchyTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10F0B986805B8F703DB62935 /* DebugHierarchyTest.swift */; };
 		56CCCE1A3FEE81C6B13F6262 /* BadgeOverdueUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB1D1EF0A6758E6B9B2921F /* BadgeOverdueUITests.swift */; };
@@ -78,6 +79,7 @@
 		87CA02C51045D666A48CBC84 /* TbdTasksTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8702D64FB57BA327C378D4F4 /* TbdTasksTests.swift */; };
 		88ED9B394FA2293A587D7952 /* LocalTaskSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 999C0690FA25D74051BA1C6F /* LocalTaskSource.swift */; };
 		88FB3AEEAE86741E5EA6AC42 /* FocusBloxApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 407BE145C7716D6B1A1BB67F /* FocusBloxApp.swift */; };
+		8997A3E20C596B6DEDABB0B1 /* CoachPreviewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DD81FE304FEC839602AB5B0 /* CoachPreviewTests.swift */; };
 		89FC6DF4B33B36C48FF1AC45 /* SetDailyIntentionIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 700EF7589E4DBA5C75513690 /* SetDailyIntentionIntent.swift */; };
 		9038949DA4E294F2FC5062BC /* CoachMissionServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22FA56C12A8D5A83300A47E4 /* CoachMissionServiceTests.swift */; };
 		94EC1D85A0F4B53160332751 /* PlanItemTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32E6EA75FACA340867827895 /* PlanItemTests.swift */; };
@@ -94,6 +96,7 @@
 		A37B483E47D5F1A662D498CC /* SchedulingUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7ED51F72D6039EFAC3D85A3 /* SchedulingUITests.swift */; };
 		A387952A98C04E738CDAA238 /* MonsterIntentionHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DE17170FC796BF825ABAE62 /* MonsterIntentionHeader.swift */; };
 		A4A8AF1E9B1B715FE913F6F4 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 350DD1256F45268992636DEA /* NotificationService.swift */; };
+		A6DFF03B9A1D1D6F56ACD18B /* CoachPitchService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C2CFC8D409617C4122E7256 /* CoachPitchService.swift */; };
 		AA657A3EBF3967B2DECE4314 /* CreateTaskView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04068491AA7CD2368A273C00 /* CreateTaskView.swift */; };
 		AAF3C0B9F1D9D79682D3680F /* Bug81StaleBlockAssignmentUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BE6C24124E626E4489ECDFA /* Bug81StaleBlockAssignmentUITests.swift */; };
 		AC44830774F8C544E3F39995 /* UndoCompletionUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B242DB168BAB2F3CF8A63404 /* UndoCompletionUITests.swift */; };
@@ -156,6 +159,7 @@
 		C2A1677B81BC3C8D2C548495 /* HourRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 821E6E3E951900DF99190196 /* HourRow.swift */; };
 		C2ED3FE95B938EB35CB3C24C /* LocalTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A27D4BE199FA040FC61FFD6 /* LocalTask.swift */; };
 		C3F49C8B0CD3C6552054BE7D /* EventKitRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4451B46B76517090C636FA94 /* EventKitRepository.swift */; };
+		C691496633AB9E170FA6D7A8 /* CoachPitchServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2208F21C34A5522695CE5FFD /* CoachPitchServiceTests.swift */; };
 		C89E9F957213671FF1B0DC91 /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4383C656C07E4B4F56335921 /* MainTabView.swift */; };
 		CA22A8F18B6FEFFE3F35774E /* DueDateBadgeExtractionUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35E10E0297BB375AFCD4517E /* DueDateBadgeExtractionUITests.swift */; };
 		CALCATMAP01BUILD001 /* CalendarCategoryMappingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CALCATMAP01FILE0001 /* CalendarCategoryMappingTests.swift */; };
@@ -603,6 +607,7 @@
 		0A9FDDCD2C501D3A6679FA58 /* FocusBlox.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FocusBlox.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0B783A31231C9313A86914B9 /* BadgeOverdueNotificationTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BadgeOverdueNotificationTests.swift; sourceTree = "<group>"; };
 		0CB1D1EF0A6758E6B9B2921F /* BadgeOverdueUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BadgeOverdueUITests.swift; sourceTree = "<group>"; };
+		0DD81FE304FEC839602AB5B0 /* CoachPreviewTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CoachPreviewTests.swift; sourceTree = "<group>"; };
 		10CA990CA8C940567199502A /* BlockedTaskSwipeUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockedTaskSwipeUITests.swift; sourceTree = "<group>"; };
 		10F0B986805B8F703DB62935 /* DebugHierarchyTest.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DebugHierarchyTest.swift; sourceTree = "<group>"; };
 		1177F32AD2A8E3DE065A8945 /* FocusBlockTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusBlockTests.swift; sourceTree = "<group>"; };
@@ -612,9 +617,11 @@
 		16DB1BDF5EBAC3B508866AAF /* EditRedesignUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = EditRedesignUITests.swift; sourceTree = "<group>"; };
 		1950589463657F7EB526D130 /* WatchEnrichmentGapTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = FocusBloxTests/WatchEnrichmentGapTests.swift; sourceTree = SOURCE_ROOT; };
 		1A27D4BE199FA040FC61FFD6 /* LocalTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalTask.swift; sourceTree = "<group>"; };
+		1C2CFC8D409617C4122E7256 /* CoachPitchService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CoachPitchService.swift; sourceTree = "<group>"; };
 		1D66F3144BAE6701F9896956 /* CoachMeinTagUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CoachMeinTagUITests.swift; sourceTree = "<group>"; };
 		1DF9F4F40D442421734251AE /* IntentionFilterTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = IntentionFilterTests.swift; sourceTree = "<group>"; };
 		20D808247CA55763ACF23BC5 /* BlockPlanningView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockPlanningView.swift; sourceTree = "<group>"; };
+		2208F21C34A5522695CE5FFD /* CoachPitchServiceTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CoachPitchServiceTests.swift; sourceTree = "<group>"; };
 		2224B7322726CC9CD1E9C9E3 /* WidgetRelevanceCalculator.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WidgetRelevanceCalculator.swift; sourceTree = "<group>"; };
 		22FA56C12A8D5A83300A47E4 /* CoachMissionServiceTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CoachMissionServiceTests.swift; sourceTree = "<group>"; };
 		233B665A0DF1A421C1CDF80A /* TaskCompletionUndoService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TaskCompletionUndoService.swift; sourceTree = "<group>"; };
@@ -1589,6 +1596,8 @@
 				MNATT01FILEREF0001 /* MonsterNotificationAttachmentTests.swift */,
 				BA4922C95335CD9AE2432690 /* CoachBacklogViewModelTests.swift */,
 				22FA56C12A8D5A83300A47E4 /* CoachMissionServiceTests.swift */,
+				0DD81FE304FEC839602AB5B0 /* CoachPreviewTests.swift */,
+				2208F21C34A5522695CE5FFD /* CoachPitchServiceTests.swift */,
 			);
 			path = FocusBloxTests;
 			sourceTree = SOURCE_ROOT;
@@ -1648,6 +1657,7 @@
 				2224B7322726CC9CD1E9C9E3 /* WidgetRelevanceCalculator.swift */,
 				D4E47516E8F4B028B758DE42 /* EveningReflectionTextService.swift */,
 				AA38311BF73B18EE67DD688B /* CoachMissionService.swift */,
+				1C2CFC8D409617C4122E7256 /* CoachPitchService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -2394,6 +2404,7 @@
 				0A76DEF9F3AA7A26322F066F /* DayProgressSection.swift in Sources */,
 				60A3F668DCB11D1ECB156496 /* CoachMissionService.swift in Sources */,
 				0D02BAAA041BF6ADF9954CB9 /* CoachMissionCard.swift in Sources */,
+				A6DFF03B9A1D1D6F56ACD18B /* CoachPitchService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2600,8 +2611,10 @@
 				15D8BC61C78C0CD05E5AB4D7 /* SiriIntentionTests.swift in Sources */,
 				C2938201458A0ABC324A0E70 /* MonsterGraphicsTests.swift in Sources */,
 				MNATT01BUILD00001 /* MonsterNotificationAttachmentTests.swift in Sources */,
-				5343ED7A1DF3773E21DB586A /* CoachBacklogViewModelTests.swift in Sources */,
 				9038949DA4E294F2FC5062BC /* CoachMissionServiceTests.swift in Sources */,
+				8997A3E20C596B6DEDABB0B1 /* CoachPreviewTests.swift in Sources */,
+				C691496633AB9E170FA6D7A8 /* CoachPitchServiceTests.swift in Sources */,
+				072FC90E7931CB0AC2FBE863 /* CoachBacklogViewModelTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2730,6 +2743,7 @@
 				ERTS03MACBUILD0001 /* EveningReflectionTextService.swift in Sources */,
 				45DAA5D9D80C0E7E8FEBE081 /* CoachMissionService.swift in Sources */,
 				E30F3411DEE331D896769E0A /* CoachMissionCard.swift in Sources */,
+				397465988F17245F88EFBB9D /* CoachPitchService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -3,11 +3,24 @@ import SwiftUI
 /// Coach selection card shown in the "Mein Tag" tab when Coach mode is enabled.
 /// Two states: 4 coach cards (not set) or compact summary (coach selected).
 struct MorningIntentionView: View {
+    let allTasks: [PlanItem]
+
     @State private var selection = DailyCoachSelection.load()
     @State private var selectedCoachType: CoachType?
     @State private var isEditing = false
+    @State private var aiPitches: [CoachType: String] = [:]
     @AppStorage("selectedCoach") private var selectedCoach: String = ""
     @AppStorage("intentionJustSet") private var intentionJustSet: Bool = false
+
+    private var previews: [CoachType: CoachPreview] {
+        Dictionary(uniqueKeysWithValues:
+            CoachType.allCases.map { ($0, CoachMissionService.generatePreview(coach: $0, allTasks: allTasks)) }
+        )
+    }
+
+    private var recommendedCoach: CoachType? {
+        CoachMissionService.recommendedCoach(from: previews)
+    }
 
     var body: some View {
         VStack(spacing: 12) {
@@ -28,6 +41,9 @@ struct MorningIntentionView: View {
             if selection.isSet {
                 selectedCoachType = selection.coach
             }
+        }
+        .task {
+            await loadAIPitches()
         }
     }
 
@@ -126,6 +142,9 @@ struct MorningIntentionView: View {
 
     private func coachCard(for coach: CoachType) -> some View {
         let isSelected = selectedCoachType == coach
+        let preview = previews[coach] ?? CoachPreview(teaser: coach.shortPitch, taskCount: 0, isEmpty: true)
+        let displayText = aiPitches[coach] ?? preview.teaser
+        let isRecommended = recommendedCoach == coach
 
         return Button {
             withAnimation(.spring()) {
@@ -133,20 +152,31 @@ struct MorningIntentionView: View {
             }
         } label: {
             VStack(spacing: 6) {
-                Image(coach.monsterImage)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(height: 48)
-                    .clipShape(Circle())
+                ZStack(alignment: .topTrailing) {
+                    Image(coach.monsterImage)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(height: 48)
+                        .clipShape(Circle())
+
+                    if isRecommended {
+                        Image(systemName: "star.fill")
+                            .font(.caption2)
+                            .foregroundStyle(.yellow)
+                            .offset(x: 4, y: -4)
+                            .accessibilityIdentifier("recommendedBadge_\(coach.rawValue)")
+                    }
+                }
 
                 Text(coach.displayName)
                     .font(.subheadline.bold())
 
-                Text(coach.shortPitch)
+                Text(displayText)
                     .font(.caption2)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
                     .lineLimit(2)
+                    .animation(.smooth, value: displayText)
             }
             .padding(.horizontal, 8)
             .padding(.vertical, 10)
@@ -162,6 +192,24 @@ struct MorningIntentionView: View {
         }
         .foregroundStyle(isSelected ? coach.color : .primary)
         .accessibilityIdentifier("coachSelectionCard_\(coach.rawValue)")
+    }
+
+    // MARK: - AI Pitches
+
+    private func loadAIPitches() async {
+        await withTaskGroup(of: (CoachType, String?).self) { group in
+            for coach in CoachType.allCases {
+                group.addTask {
+                    let pitch = await CoachPitchService.generatePitch(coach: coach, allTasks: allTasks)
+                    return (coach, pitch)
+                }
+            }
+            for await (coach, pitch) in group {
+                if let pitch {
+                    aiPitches[coach] = pitch
+                }
+            }
+        }
     }
 
     // MARK: - Save

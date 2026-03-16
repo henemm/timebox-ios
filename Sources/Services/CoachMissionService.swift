@@ -11,6 +11,13 @@ struct CoachMission {
     let isEmpty: Bool
 }
 
+/// Short preview for coach selection cards — shows what this coach would tackle.
+struct CoachPreview {
+    let teaser: String
+    let taskCount: Int
+    let isEmpty: Bool
+}
+
 /// Generates coach-specific daily missions based on real task data.
 struct CoachMissionService {
 
@@ -151,6 +158,52 @@ struct CoachMissionService {
                             progressDone: coveredCategories.count,
                             progressTotal: allCategories.count,
                             progressLabel: "Bereiche abgedeckt", isEmpty: false)
+    }
+
+    // MARK: - Preview for Selection Cards
+
+    static func generatePreview(coach: CoachType, allTasks: [PlanItem]) -> CoachPreview {
+        let relevant = CoachType.filterTasks(allTasks, coach: coach)
+        guard !relevant.isEmpty else {
+            return CoachPreview(teaser: coach.shortPitch, taskCount: 0, isEmpty: true)
+        }
+
+        let raw: String
+        switch coach {
+        case .troll:
+            if let top = relevant.first {
+                raw = "\(relevant.count) aufgeschoben — z.B. \(top.title)"
+            } else {
+                raw = coach.shortPitch
+            }
+        case .feuer:
+            if let top = relevant.first {
+                raw = "Grösste Challenge: \(top.title)"
+            } else {
+                raw = coach.shortPitch
+            }
+        case .eule:
+            let names = relevant.prefix(2).map(\.title)
+            raw = "\(relevant.count) geplant: \(names.joined(separator: ", "))"
+        case .golem:
+            let incomplete = allTasks.filter { !$0.isCompleted && !$0.isTemplate }
+            let categories = Set(incomplete.map(\.taskType)).filter { !$0.isEmpty }
+            let leastCategory = Dictionary(grouping: incomplete, by: \.taskType)
+                .filter { !$0.key.isEmpty }
+                .min(by: { $0.value.count < $1.value.count })?.key
+            let name = leastCategory.flatMap { TaskCategory(rawValue: $0)?.localizedName } ?? "Ein Bereich"
+            raw = "\(name) braucht Aufmerksamkeit"
+        }
+
+        let teaser = raw.count > 60 ? String(raw.prefix(57)) + "…" : raw
+        return CoachPreview(teaser: teaser, taskCount: relevant.count, isEmpty: false)
+    }
+
+    static func recommendedCoach(from previews: [CoachType: CoachPreview]) -> CoachType? {
+        previews
+            .filter { !$0.value.isEmpty }
+            .max(by: { $0.value.taskCount < $1.value.taskCount })?
+            .key
     }
 
     // MARK: - Helpers

@@ -19,16 +19,14 @@
 | **6** | Bug 98: Mein Tag Woche unvollstaendig | Bug | S-M | DONE — DailyReviewView Guard gefixt + CoachMeinTagView Weekly Mode mit Coach-Texten. 68 Unit Tests gruen. |
 | **7** | Discipline manuell ueberschreiben | Feature | M | DONE — Long-Press Context Menu mit 4 farbigen Disziplin-Optionen + Zuruecksetzen. iOS + macOS. 10 Unit + 6 UI Tests gruen. |
 | **8** | Coach Mission Card | Feature | S | DONE — Monster spricht mit konkreter Tages-Mission an. Pro Coach eigene Logik. 10 Unit Tests gruen. iOS + macOS Build OK. |
+| **8b** | Coach Preview + AI Pitches | Feature | S | DONE — Coach-Auswahl zeigt konkrete Tasks + Apple Intelligence Pitches. Empfohlen-Badge. 23 Tests gruen. |
 | **9** | TD-03: Services ohne Tests | Tech Debt | M | NotificationService, FocusBlockActionService, GapFinder — Sicherheitsnetz fehlt. |
-| **10** | Lebensbalance-Visualisierung (Frigga Haug 4-in-1) | Feature | M | Balance sichtbar machen — Golem-Filter existiert, Chart fehlt. |
 | **10** | Disziplin-Entwicklung sichtbar machen | Feature | M | Historische Auswertung ueber Wochen/Monate — welche Disziplinen gestaerkt? |
 | **11** | Stille-Regel: Nudges dynamisch canceln | Enhancement | S | Geplante Nudges stoppen wenn Intention tagsueber erfuellt wird. |
 | **12** | MAC-026: Enhanced Quick Capture | Feature | L | macOS Produktivitaet. Kein Blocker. |
 | **13** | TD-01: God-Views aufbrechen | Tech Debt | L | BacklogView 1181 LoC, BlockPlanningView 1400 LoC — Wartbarkeit. |
-| **14** | Emotionales Aufladen (Report) | Feature | L | Motivations-Feature. Kein Blocker. |
 | **15** | MAC-030: Shortcuts.app | Feature | L | macOS Automatisierung. P3. |
 | **16** | MAC-031: Focus Mode Integration | Feature | M | macOS System-Integration. P3. |
-| **17** | MAC-032: NC Widget | Feature | XL | Grosser Aufwand, niedriger Druck. |
 | **18** | TD-02: View-Duplikation | Tech Debt | XL | ~7300 LoC. Langfristig wichtig, kurzfristig kein Blocker. |
 | **19** | ITB-C: OrganizeMyDay Intent | Feature | XL | Komplexer Intent. Kann warten. |
 | **20** | ITB-F: CaptureContextIntent | Feature | M | WARTEND auf Apple APIs (iOS 26.5/27). |
@@ -36,6 +34,14 @@
 ---
 
 ## Offene Bugs
+
+### Bug 103: NextUp-Section fehlt in Monster-Modus — ERLEDIGT
+- **Status:** DONE
+- **Plattform:** iOS + macOS
+- **Root Cause:** CoachBacklogView wurde in Phase 5a mit nur 2 Sections ("Dein Schwerpunkt" + "Weitere Tasks") designed — eine dedizierte NextUp-Section wurde nie implementiert. NextUp-Tasks waren unsichtbar in der Masse. macOS hatte zusaetzlich keinen NextUp-Toggle.
+- **Fix:** (1) `CoachBacklogViewModel.nextUpTasks()` als neue Filterfunktion, (2) NextUp-Section mit gruenem Header + Count-Badge in CoachBacklogView (iOS) + MacCoachBacklogView (macOS), (3) NextUp-Tasks aus "Dein Schwerpunkt" und "Weitere Tasks" ausgeschlossen (keine Duplikation), (4) macOS Context-Menu um "Zu Next Up hinzufuegen/entfernen" erweitert
+- **Tests:** 5 neue Unit Tests (nextUpTasks Filterung) + 2 neue UI Tests (Section + Header) — alle gruen. 8/8 bestehende UI Tests bestanden.
+- **Dateien:** CoachBacklogViewModel.swift, CoachBacklogView.swift, MacCoachBacklogView.swift
 
 ### Bug: macOS Coach Backlog leer im Monster-Mode — ERLEDIGT
 - **Status:** DONE
@@ -205,6 +211,15 @@
 - **Netto:** ~-70 LoC
 
 ---
+
+### Coach Preview + Apple Intelligence Pitches — ERLEDIGT
+- **Status:** DONE
+- **Plattform:** iOS + macOS
+- **Aenderung:** Coach-Auswahl zeigt jetzt konkrete Tasks statt generische shortPitch-Texte. Jeder Coach zeigt was er heute anpacken wuerde (z.B. "3 aufgeschoben — z.B. Steuererklaerung"). Apple Intelligence generiert In-Character Pitches. Coach mit staerkstem Angebot bekommt Empfohlen-Badge.
+- **Neue Typen:** `CoachPreview`, `CoachPitchService`
+- **Logik:** Deterministischer Teaser sofort sichtbar → AI-Pitch laedt asynchron im Hintergrund → Text-Swap mit Animation
+- **Tests:** 8 CoachPreviewTests + 5 CoachPitchServiceTests + 10 CoachMissionServiceTests = 23 Tests gruen
+- **Dateien:** CoachMissionService.swift, CoachPitchService.swift (neu), MorningIntentionView.swift, CoachMeinTagView.swift, MacCoachReviewView.swift
 
 ### Coach-Redesign: 4 Coaches statt 6 Absichten — ERLEDIGT
 - **Status:** ERLEDIGT (116 Unit Tests + 14 UI Tests gruen)

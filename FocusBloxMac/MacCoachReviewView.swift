@@ -30,7 +30,7 @@ struct MacCoachReviewView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 16) {
-                MorningIntentionView()
+                MorningIntentionView(allTasks: allLocalTasks.map { PlanItem(localTask: $0) })
                     .padding(.horizontal)
 
                 dayProgressSection

@@ -53,7 +53,7 @@ struct CoachMeinTagView: View {
     private var content: some View {
         ScrollView {
             VStack(spacing: 16) {
-                MorningIntentionView()
+                MorningIntentionView(allTasks: planItems)
                     .padding(.horizontal)
 
                 if let coach = DailyCoachSelection.load().coach {
