@@ -12,9 +12,12 @@ import SwiftData
 struct MacCoachBacklogView: View {
     let tasks: [LocalTask]
     @Binding var selectedTasks: Set<UUID>
+    var onImport: (() async -> Void)?
 
+    @Environment(CloudKitSyncMonitor.self) private var cloudKitMonitor
     @AppStorage("selectedCoach") private var selectedCoach: String = ""
     @AppStorage("coachBacklogViewMode") private var selectedModeRaw: String = "Priorität"
+    @AppStorage("remindersSyncEnabled") private var remindersSyncEnabled: Bool = true
 
     private var selectedMode: CoachViewMode {
         CoachViewMode(rawValue: selectedModeRaw) ?? .priority
@@ -72,10 +75,32 @@ struct MacCoachBacklogView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            // Toolbar: ViewMode-Switcher + Task Count
+            // Toolbar: ViewMode-Switcher + Sync + Task Count
             HStack {
                 viewModeSwitcher
                 Spacer()
+
+                syncStatusIndicator
+                    .accessibilityIdentifier("coachSyncStatusIndicator")
+
+                Button {
+                    cloudKitMonitor.triggerSync()
+                } label: {
+                    Image(systemName: "arrow.triangle.2.circlepath")
+                }
+                .accessibilityIdentifier("coachSyncButton")
+                .help("CloudKit synchronisieren")
+
+                if remindersSyncEnabled {
+                    Button {
+                        Task { await onImport?() }
+                    } label: {
+                        Image(systemName: "square.and.arrow.down")
+                    }
+                    .accessibilityIdentifier("coachImportRemindersButton")
+                    .help("Erinnerungen importieren")
+                }
+
                 Text("\(tasks.filter { !$0.isCompleted }.count) Tasks")
                     .font(.caption)
                     .foregroundStyle(.secondary)
@@ -317,6 +342,26 @@ struct MacCoachBacklogView: View {
             }
         }
         .accessibilityIdentifier("coachViewModeSwitcher")
+    }
+
+    // MARK: - Sync Status Indicator
+
+    @ViewBuilder
+    private var syncStatusIndicator: some View {
+        if cloudKitMonitor.isSyncing {
+            ProgressView()
+                .scaleEffect(0.7)
+        } else if cloudKitMonitor.hasSyncError {
+            Image(systemName: "exclamationmark.icloud")
+                .foregroundStyle(.red)
+                .help(cloudKitMonitor.errorMessage ?? "Sync-Fehler")
+        } else {
+            Image(systemName: "checkmark.icloud")
+                .foregroundStyle(.green)
+                .help(cloudKitMonitor.lastSuccessfulSync.map {
+                    "Letzter Sync: \($0.formatted(date: .omitted, time: .shortened))"
+                } ?? "CloudKit verbunden")
+        }
     }
 
     // MARK: - Monster Header (shared component)

@@ -145,7 +145,53 @@ final class MacCoachBacklogUITests: XCTestCase {
                       "Task list should exist in macOS Coach backlog")
     }
 
-    // MARK: - Test 8: Coach-Boost Section (Bug 104: P3)
+    // MARK: - Test 8: Sync Status Indicator (FEATURE_005)
+
+    /// Verhalten: Coach-Backlog zeigt Sync-Status-Indicator (wie normaler Backlog).
+    /// Bricht wenn: MacCoachBacklogView keinen coachSyncStatusIndicator im HStack hat
+    func test_coachModeOn_syncStatusIndicatorExists() throws {
+        launchWithCoachMode()
+        navigateToBacklog()
+
+        let syncStatus = app.descendants(matching: .any)["coachSyncStatusIndicator"]
+        XCTAssertTrue(syncStatus.waitForExistence(timeout: 5),
+                      "Sync status indicator should be visible in Coach backlog toolbar")
+    }
+
+    // MARK: - Test 9: Sync Button (FEATURE_005)
+
+    /// Verhalten: Coach-Backlog zeigt Sync-Button zum manuellen Sync-Trigger.
+    /// Bricht wenn: MacCoachBacklogView keinen coachSyncButton im HStack hat
+    func test_coachModeOn_syncButtonExists() throws {
+        launchWithCoachMode()
+        navigateToBacklog()
+
+        let syncButton = app.buttons["coachSyncButton"]
+        XCTAssertTrue(syncButton.waitForExistence(timeout: 5),
+                      "Sync button should be visible in Coach backlog toolbar")
+    }
+
+    // MARK: - Test 10: Import Reminders Button (FEATURE_005)
+
+    /// Verhalten: Coach-Backlog zeigt Import-Button wenn remindersSyncEnabled=true.
+    /// Bricht wenn: MacCoachBacklogView keinen coachImportRemindersButton im HStack hat
+    func test_coachModeOn_importRemindersButtonExists() throws {
+        app.launchArguments = [
+            "-UITesting", "-MockData", "-ApplePersistenceIgnoreState", "YES",
+            "-coachModeEnabled", "1",
+            "-remindersSyncEnabled", "1"
+        ]
+        app.launch()
+        let window = app.windows.firstMatch
+        _ = window.waitForExistence(timeout: 5)
+        navigateToBacklog()
+
+        let importButton = app.buttons["coachImportRemindersButton"]
+        XCTAssertTrue(importButton.waitForExistence(timeout: 5),
+                      "Import Reminders button should be visible when remindersSyncEnabled is true")
+    }
+
+    // MARK: - Test 11: Coach-Boost Section (Bug 104: P3)
 
     /// Bricht wenn: Coach-Boost-Section nicht angezeigt wird bei gesetztem Coach
     func test_coachModeOn_withFeuerCoach_showsBoostSection() throws {

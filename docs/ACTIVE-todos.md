@@ -16,7 +16,6 @@
 | FEATURE_002 | Coach-Backlog iOS: Blocked-Row Editing | Medium | S | iOS | Blocked Rows im Coach-Backlog sind read-only. In BacklogView erlauben sie Duration/Importance/Category-Aenderungen. |
 | FEATURE_003 | Coach-Backlog macOS: Quick-Add TextField | Medium | S | macOS | Normaler macOS-Backlog hat Quick-Add-TextField oben — Coach-Backlog nicht. |
 | FEATURE_004 | Coach-Backlog macOS: Suchfunktion | Medium | S | macOS | Normaler macOS-Backlog hat .searchable — Coach-Backlog nicht. |
-| FEATURE_005 | Coach-Backlog macOS: Toolbar (Sync + Import) | High | S-M | macOS | Normaler macOS-Backlog zeigt Sync-Status-Indicator + Apple-Reminders-Import-Button in Toolbar. Coach-Backlog hat nur ViewMode-Switcher. Fehlende Sync-Sichtbarkeit. |
 | FEATURE_006 | Coach-Backlog macOS: Inspector Panel | Medium | M | macOS | Normaler macOS-Backlog hat Detail-Inspector rechts (3-Spalten-Layout). Coach-Backlog zeigt nur Liste. |
 | FEATURE_007 | Coach-Backlog macOS: Multi-Selection + Bulk Actions | Medium | M | macOS | Normaler macOS-Backlog unterstuetzt Mehrfachauswahl + Bulk-Loeschen/Verschieben. Coach-Backlog nur Einzelaktionen. |
 | FEATURE_008 | Coach-Backlog macOS: Drag-to-Reorder NextUp | Low | S | macOS | Normaler macOS-Backlog erlaubt NextUp-Reihenfolge per Drag&Drop. Coach-Backlog nicht. |
@@ -36,6 +35,7 @@
 | FEATURE_022 | CaptureContextIntent | Low | M | iOS | WARTEND auf Apple APIs (iOS 26.5/27). |
 | TD_001 | God-Views aufbrechen | Low | L | Beide | BacklogView 1181 LoC, BlockPlanningView 1400 LoC — Wartbarkeit. |
 | TD_002 | View-Duplikation iOS/macOS | Low | XL | Beide | ~7300 LoC verbleibend. Langfristig wichtig, kurzfristig kein Blocker. |
+| FEATURE_023 | Disziplin-Trend (Multi-Wochen) | Low | M | Beide | Multi-Wochen-Trend mit Swift Charts (gestapeltes Balkendiagramm, 4-8 Wochen). Trend-Erkennung ("Konsequenz waechst seit 3 Wochen"), staerkstes/schwaechstes Disziplin-Highlight. Aufbauend auf FEATURE_016. |
 
 ---
 

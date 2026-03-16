@@ -268,7 +268,7 @@ struct ContentView: View {
         switch selectedSection {
         case .backlog:
             if coachModeEnabled {
-                MacCoachBacklogView(tasks: visibleTasks, selectedTasks: $selectedTasks)
+                MacCoachBacklogView(tasks: visibleTasks, selectedTasks: $selectedTasks, onImport: importFromReminders)
             } else {
                 backlogView
             }
