@@ -35,7 +35,7 @@
 | FEATURE_022 | CaptureContextIntent | Low | M | iOS | WARTEND auf Apple APIs (iOS 26.5/27). |
 | TD_001 | God-Views aufbrechen | Low | L | Beide | BacklogView 1181 LoC, BlockPlanningView 1400 LoC — Wartbarkeit. |
 | TD_002 | View-Duplikation iOS/macOS | Low | XL | Beide | ~7300 LoC verbleibend. Langfristig wichtig, kurzfristig kein Blocker. |
-| ~~FEATURE_023~~ | ~~Disziplin-Trend (Multi-Wochen)~~ | ~~Low~~ | ~~M~~ | ~~Beide~~ | **ERLEDIGT** — Multi-Wochen-Trend mit Swift Charts in CoachMeinTagView. Stacked Bar Chart (6 Wochen), Trend-Erkennung (growing/declining/stable), staerkstes Disziplin-Highlight. 9 Unit Tests + 3 UI Tests gruen. |
+| ~~FEATURE_023~~ | ~~Disziplin-Trend (Multi-Wochen)~~ | ~~Low~~ | ~~M~~ | ~~Beide~~ | **ERLEDIGT** (37fa398) — Multi-Wochen-Trend mit Swift Charts in CoachMeinTagView. Stacked Bar Chart (6 Wochen), Trend-Erkennung (growing/declining/stable), staerkstes Disziplin-Highlight. 9 Unit Tests + 3 UI Tests gruen. |
 
 ---
 

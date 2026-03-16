@@ -211,6 +211,7 @@
 		DCHIPSCRL01BUILD001 /* DurationChipScrollUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCHIPSCRL01FILE0001 /* DurationChipScrollUITests.swift */; };
 		DD5AC3B83FCB7D2C72289411 /* CoachMeinTagView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED8097C89B9B534BF859E72C /* CoachMeinTagView.swift */; };
 		867B45575EC103458F65763D /* DisciplineTrendChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0577AA0F051FD6C2DECA3B77 /* DisciplineTrendChart.swift */; };
+		F023MACBUILD00000001 /* DisciplineTrendChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0577AA0F051FD6C2DECA3B77 /* DisciplineTrendChart.swift */; };
 		DE5811F4F48BE79B9EB7C818 /* PlanningViewUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C40AFBB545C0FA15517B9CE4 /* PlanningViewUITests.swift */; };
 		DEFCMP01BUILD0001 /* DeferredCompletionUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEFCMP01FILE00001 /* DeferredCompletionUITests.swift */; };
 		DEFSORT01BUILD0001 /* DeferredSortUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEFSORT01FILE00001 /* DeferredSortUITests.swift */; };
@@ -2786,6 +2787,7 @@
 				E30F3411DEE331D896769E0A /* CoachMissionCard.swift in Sources */,
 				397465988F17245F88EFBB9D /* CoachPitchService.swift in Sources */,
 				582E9E6FA6358FA19463844F /* DisciplineStatsService.swift in Sources */,
+				F023MACBUILD00000001 /* DisciplineTrendChart.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
