@@ -11,35 +11,18 @@ struct VoiceInputSheet: View {
     let modelContext: ModelContext
 
     var body: some View {
-        NavigationStack {
-            VStack(spacing: 16) {
-                Text("Was möchtest du tun?")
-                    .font(.headline)
-                    .foregroundStyle(.secondary)
-
-                TextField("Task eingeben...", text: $taskTitle)
-                    .textFieldStyle(.plain)
-                    .focused($isFocused)
-                    .accessibilityIdentifier("taskTitleField")
-                    .onChange(of: taskTitle) { _, newValue in
-                        scheduleAutoSave(for: newValue)
-                    }
-            }
-            .padding()
-            .navigationTitle("Neuer Task")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Abbrechen") {
-                        autoSaveTask?.cancel()
-                        dismiss()
-                    }
-                    .accessibilityIdentifier("cancelButton")
+        VStack {
+            TextField("Task eingeben...", text: $taskTitle)
+                .textFieldStyle(.plain)
+                .focused($isFocused)
+                .accessibilityIdentifier("taskTitleField")
+                .onChange(of: taskTitle) { _, newValue in
+                    scheduleAutoSave(for: newValue)
                 }
-            }
-            .onAppear {
-                isFocused = true
-            }
+        }
+        .padding()
+        .onAppear {
+            isFocused = true
         }
     }
 
@@ -55,7 +38,7 @@ struct VoiceInputSheet: View {
             dismiss()
         }
         autoSaveTask = workItem
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5, execute: workItem)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: workItem)
     }
 
     private func saveTask(title: String) {

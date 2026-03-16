@@ -21,18 +21,32 @@
 | **8** | Coach Mission Card | Feature | S | DONE — Monster spricht mit konkreter Tages-Mission an. Pro Coach eigene Logik. 10 Unit Tests gruen. iOS + macOS Build OK. |
 | **8b** | Coach Preview + AI Pitches | Feature | S | DONE — Coach-Auswahl zeigt konkrete Tasks + Apple Intelligence Pitches. Empfohlen-Badge. 23 Tests gruen. |
 | **9** | Bug 104: Coach-Backlog Feature-Paritaet iOS+macOS | Bug P1 | M | DONE — Volle Feature-Paritaet: ViewMode-Switcher (5 Modi), Coach-Boost-Section, Priority-Tiers, alle Callbacks, Blocked Tasks, Undo, Sync. iOS + macOS. 24 Unit + 15 iOS UI + 8 macOS UI Tests. |
-| **10** | UX: Tag-Auswahl redesignen | Enhancement | S | Tag-Sektion in TaskFormSheet ist unuebersichtlich: "Neuer Tag" Textfeld dominiert, bestehende Tags kommen erst danach. Redesign: Bestehende Tags zuerst als antippbare Chips (Toggle-Auswahl), "Neuer Tag" Textfeld darunter. Vorbild: Apple Erinnerungen. |
-| **11** | Watch: Quick Capture vereinfachen | Bug | S | Komplikation-Tap zeigt unnoetig "Was moechtest du tun?" + Abbrechen. Soll direkt Spracheingabe oeffnen, nach "Fertig" sofort speichern. Kein Zwischenscreen, keine Rueckfragen. War nie anders spezifiziert. |
-| **12** | TD-03: Services ohne Tests | Tech Debt | M | DONE — 44 Unit Tests (GapFinder 15, NotificationService 17, FocusBlockActionService 12). Sicherheitsnetz fuer 3 Services. |
-| **13** | Disziplin-Entwicklung sichtbar machen | Feature | M | Historische Auswertung ueber Wochen/Monate — welche Disziplinen gestaerkt? |
-| **14** | Stille-Regel: Nudges dynamisch canceln | Enhancement | S | Geplante Nudges stoppen wenn Intention tagsueber erfuellt wird. |
-| **15** | MAC-026: Enhanced Quick Capture | Feature | L | macOS Produktivitaet. Kein Blocker. |
-| **16** | TD-01: God-Views aufbrechen | Tech Debt | L | BacklogView 1181 LoC, BlockPlanningView 1400 LoC — Wartbarkeit. |
-| **17** | MAC-030: Shortcuts.app | Feature | L | macOS Automatisierung. P3. |
-| **18** | MAC-031: Focus Mode Integration | Feature | M | macOS System-Integration. P3. |
-| **19** | TD-02: View-Duplikation | Tech Debt | XL | ~7300 LoC. Langfristig wichtig, kurzfristig kein Blocker. |
-| **20** | ITB-C: OrganizeMyDay Intent | Feature | XL | Komplexer Intent. Kann warten. |
-| **21** | ITB-F: CaptureContextIntent | Feature | M | WARTEND auf Apple APIs (iOS 26.5/27). |
+| **10** | Coach-Backlog iOS: Recurring-Serie-Dialoge | Feature | S | CoachBacklogView fehlen "Nur diese Aufgabe"/"Alle dieser Serie"-Dialoge beim Loeschen/Bearbeiten wiederkehrender Tasks. BacklogView hat taskToDeleteRecurring + editSeriesMode — Coach-Backlog nicht. |
+| **11** | Coach-Backlog iOS: Blocked-Row Editing | Feature | S | Blocked Rows im Coach-Backlog sind read-only. In BacklogView erlauben sie Duration/Importance/Category-Aenderungen. |
+| **12** | Coach-Backlog macOS: Quick-Add TextField | Feature | S | Normaler macOS-Backlog hat Quick-Add-TextField oben — Coach-Backlog nicht. |
+| **13** | Coach-Backlog macOS: Suchfunktion | Feature | S | Normaler macOS-Backlog hat .searchable — Coach-Backlog nicht. |
+| **14** | Coach-Backlog macOS: Toolbar (Sync-Status + Import) | Feature | S-M | Normaler macOS-Backlog zeigt Sync-Status-Indicator + Apple-Reminders-Import-Button in Toolbar. Coach-Backlog hat nur ViewMode-Switcher. |
+| **15** | Coach-Backlog macOS: Inspector Panel (3-Spalten) | Feature | M | Normaler macOS-Backlog hat Detail-Inspector rechts (3-Spalten-Layout). Coach-Backlog zeigt nur Liste. |
+| **16** | Coach-Backlog macOS: Multi-Selection + Bulk Actions | Feature | M | Normaler macOS-Backlog unterstuetzt Mehrfachauswahl + Bulk-Loeschen/Verschieben. Coach-Backlog nur Einzelaktionen. |
+| **17** | Coach-Backlog macOS: Drag-to-Reorder NextUp | Feature | S | Normaler macOS-Backlog erlaubt NextUp-Reihenfolge per Drag&Drop. Coach-Backlog nicht. |
+| **18** | Coach-Backlog macOS: Deferred Sort/Completion Feedback | Feature | S | Normaler macOS-Backlog zeigt visuelles Feedback bei Sort-Aenderungen (isPendingResort, isCompletionPending). Coach-Backlog gibt diese Parameter nicht an MacBacklogRow weiter. |
+| **19** | Coach-Backlog macOS: Keyboard Shortcuts | Feature | S | Normaler macOS-Backlog hat ⌘N (neuer Task), ⌘⌫ (loeschen), etc. Coach-Backlog keine. |
+| **20** | Coach-Backlog macOS: Undo (Shake/⌘Z) | Feature | S | iOS Coach-Backlog hat Shake-to-Undo. macOS Coach-Backlog hat kein ⌘Z-Undo. |
+| **21** | Coach-Backlog macOS: effectiveScore/Tier/dependentCount | Feature | S | MacBacklogRow bekommt diese Parameter nicht von Coach-Backlog. Normaler Backlog schon. Betrifft Badge-Anzeige und visuelle Priorisierung. |
+| **22** | Coach-Backlog macOS: Serien-Bearbeitung | Feature | S | Recurring-Task-Dialoge (Serie vs. Einzelaufgabe) fehlen auf macOS — sowohl in Coach- als auch normalem Backlog. |
+| **23** | Coach-Backlog: Apple Reminders Import | Feature | M | Beide Plattformen: Normaler Backlog hat Reminders-Import-Funktion. Coach-Backlog nicht. |
+| **24** | UX: Tag-Auswahl redesignen | Enhancement | S | Tag-Sektion in TaskFormSheet ist unuebersichtlich: "Neuer Tag" Textfeld dominiert, bestehende Tags kommen erst danach. Redesign: Bestehende Tags zuerst als antippbare Chips (Toggle-Auswahl), "Neuer Tag" Textfeld darunter. Vorbild: Apple Erinnerungen. |
+| **25** | Watch: Quick Capture vereinfachen | Bug | S | DONE — VoiceInputSheet vereinfacht: "Was moechtest du tun?", Nav-Titel, Abbrechen-Button entfernt. Auto-Save 1.5s→0.5s. 7 UI Tests gruen. |
+| **26** | TD-03: Services ohne Tests | Tech Debt | M | DONE — 44 Unit Tests (GapFinder 15, NotificationService 17, FocusBlockActionService 12). Sicherheitsnetz fuer 3 Services. |
+| **27** | Disziplin-Entwicklung sichtbar machen | Feature | M | Historische Auswertung ueber Wochen/Monate — welche Disziplinen gestaerkt? |
+| **28** | Stille-Regel: Nudges dynamisch canceln | Enhancement | S | Geplante Nudges stoppen wenn Intention tagsueber erfuellt wird. |
+| **29** | MAC-026: Enhanced Quick Capture | Feature | L | macOS Produktivitaet. Kein Blocker. |
+| **30** | TD-01: God-Views aufbrechen | Tech Debt | L | BacklogView 1181 LoC, BlockPlanningView 1400 LoC — Wartbarkeit. |
+| **31** | MAC-030: Shortcuts.app | Feature | L | macOS Automatisierung. P3. |
+| **32** | MAC-031: Focus Mode Integration | Feature | M | macOS System-Integration. P3. |
+| **33** | TD-02: View-Duplikation | Tech Debt | XL | ~7300 LoC. Langfristig wichtig, kurzfristig kein Blocker. |
+| **34** | ITB-C: OrganizeMyDay Intent | Feature | XL | Komplexer Intent. Kann warten. |
+| **35** | ITB-F: CaptureContextIntent | Feature | M | WARTEND auf Apple APIs (iOS 26.5/27). |
 
 ---
 
@@ -52,7 +66,7 @@
   - P5: Blocked-Task-Rendering (Lock-Icon, Einrueckung, Freigeben-Aktion) auf beiden Plattformen
 - **Tests:** 24 CoachBacklogViewModelTests gruen (7 neue Methoden getestet)
 - **Dateien:** CoachBacklogViewModel.swift, CoachBacklogView.swift, MacCoachBacklogView.swift, CoachBacklogViewModelTests.swift
-- **Verbleibend (bewusst nicht im Scope):** Recurring-Serie-Dialoge, macOS Inspector, macOS Quick-Add, macOS Drag-Reorder — separate Tickets
+- **Verbleibend:** Feature-Luecken gegenueber normaler BacklogView — siehe separate Backlog-Items unten
 
 ### Bug 103: NextUp-Section fehlt in Monster-Modus — ERLEDIGT
 - **Status:** DONE

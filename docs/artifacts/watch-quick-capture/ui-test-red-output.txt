@@ -1,0 +1,80 @@
+CopySwiftLibs /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-iphonesimulator/FocusBlox.app (in target 'FocusBlox' from project 'FocusBlox')
+    cd /Users/hem/Developer/my-daily-sprints
+    builtin-swiftStdLibTool --copy --verbose --sign - --scan-executable /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-iphonesimulator/FocusBlox.app/FocusBlox.debug.dylib --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-iphonesimulator/FocusBlox.app/Frameworks --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-iphonesimulator/FocusBlox.app/PlugIns --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-iphonesimulator/FocusBlox.app/SystemExtensions --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-iphonesimulator/FocusBlox.app/Extensions --scan-folder /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-iphonesimulator/FocusBloxCore.framework --platform iphonesimulator --toolchain /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain --destination /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-iphonesimulator/FocusBlox.app/Frameworks --strip-bitcode --strip-bitcode-tool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/bitcode_strip --emit-dependency-info /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBlox.build/SwiftStdLibToolInputDependencies.dep --filter-for-swift-os
+
+CodeSign /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-iphonesimulator/FocusBlox.app/FocusBlox.debug.dylib (in target 'FocusBlox' from project 'FocusBlox')
+    cd /Users/hem/Developer/my-daily-sprints
+    
+    Signing Identity:     "Sign to Run Locally"
+    
+    /usr/bin/codesign --force --sign - --timestamp\=none --generate-entitlement-der /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-iphonesimulator/FocusBlox.app/FocusBlox.debug.dylib
+
+CodeSign /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-iphonesimulator/FocusBlox.app/__preview.dylib (in target 'FocusBlox' from project 'FocusBlox')
+    cd /Users/hem/Developer/my-daily-sprints
+    
+    Signing Identity:     "Sign to Run Locally"
+    
+    /usr/bin/codesign --force --sign - --timestamp\=none --generate-entitlement-der /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-iphonesimulator/FocusBlox.app/__preview.dylib
+/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-iphonesimulator/FocusBlox.app/__preview.dylib: replacing existing signature
+
+CodeSign /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-iphonesimulator/FocusBlox.app (in target 'FocusBlox' from project 'FocusBlox')
+    cd /Users/hem/Developer/my-daily-sprints
+    
+    Signing Identity:     "Sign to Run Locally"
+    
+    /usr/bin/codesign --force --sign - --entitlements /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBlox.build/FocusBlox.app.xcent --timestamp\=none --generate-entitlement-der /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-iphonesimulator/FocusBlox.app
+
+Validate /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-iphonesimulator/FocusBlox.app (in target 'FocusBlox' from project 'FocusBlox')
+    cd /Users/hem/Developer/my-daily-sprints
+    builtin-validationUtility /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-iphonesimulator/FocusBlox.app -shallow-bundle -infoplist-subpath Info.plist
+
+ValidateEmbeddedBinary /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-iphonesimulator/FocusBlox.app/Watch/FocusBloxWatch\ Watch\ App.app (in target 'FocusBlox' from project 'FocusBlox')
+    cd /Users/hem/Developer/my-daily-sprints
+    /Applications/Xcode.app/Contents/Developer/usr/bin/embeddedBinaryValidationUtility /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-iphonesimulator/FocusBlox.app/Watch/FocusBloxWatch\ Watch\ App.app -signing-cert - -info-plist-path /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-iphonesimulator/FocusBlox.app/Info.plist
+
+ValidateEmbeddedBinary /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-iphonesimulator/FocusBlox.app/PlugIns/FocusBloxShareExtension.appex (in target 'FocusBlox' from project 'FocusBlox')
+    cd /Users/hem/Developer/my-daily-sprints
+    /Applications/Xcode.app/Contents/Developer/usr/bin/embeddedBinaryValidationUtility /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-iphonesimulator/FocusBlox.app/PlugIns/FocusBloxShareExtension.appex -signing-cert - -info-plist-path /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-iphonesimulator/FocusBlox.app/Info.plist
+
+ValidateEmbeddedBinary /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-iphonesimulator/FocusBlox.app/PlugIns/FocusBloxWidgetsExtension.appex (in target 'FocusBlox' from project 'FocusBlox')
+    cd /Users/hem/Developer/my-daily-sprints
+    /Applications/Xcode.app/Contents/Developer/usr/bin/embeddedBinaryValidationUtility /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-iphonesimulator/FocusBlox.app/PlugIns/FocusBloxWidgetsExtension.appex -signing-cert - -info-plist-path /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-iphonesimulator/FocusBlox.app/Info.plist
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-iphonesimulator/FocusBlox.app/Frameworks/Testing.framework'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-iphonesimulator/FocusBlox.app/Frameworks/XCTAutomationSupport.framework'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-iphonesimulator/FocusBlox.app/Frameworks/XCTest.framework'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-iphonesimulator/FocusBlox.app/Frameworks/XCTestCore.framework'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-iphonesimulator/FocusBlox.app/Frameworks/XCTestSupport.framework'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-iphonesimulator/FocusBlox.app/Frameworks/XCUIAutomation.framework'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-iphonesimulator/FocusBlox.app/Frameworks/XCUnit.framework'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-iphonesimulator/FocusBlox.app/Frameworks/libXCTestBundleInject.dylib'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-iphonesimulator/FocusBlox.app/Frameworks/libXCTestSwiftSupport.dylib'
+
+note: Run script build phase 'Inject Git Hash' will be run during every build because the option to run the script phase "Based on dependency analysis" is unchecked. (in target 'FocusBlox' from project 'FocusBlox')
+2026-03-16 12:13:30.024 xcodebuild[46870:59056459] [MT] IDETestOperationsObserverDebug: 152.833 elapsed -- Testing started completed.
+2026-03-16 12:13:30.025 xcodebuild[46870:59056459] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2026-03-16 12:13:30.025 xcodebuild[46870:59056459] [MT] IDETestOperationsObserverDebug: 152.833 sec, +152.833 sec -- end
+
+Test session results, code coverage, and logs:
+	/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Logs/Test/Test-FocusBloxWatch Watch App-2026.03.16_12-10-48-+0100.xcresult
+
+** TEST FAILED **
+
+Testing started
+Test suite 'WatchVoiceCaptureUITests' started on 'Clone 1 of FocusBlox - FocusBloxWatch Watch AppUITests-Runner (47223)'
+Test case 'WatchVoiceCaptureUITests.test_appLaunch_autoDiktatOpens()' passed on 'Clone 1 of FocusBlox - FocusBloxWatch Watch AppUITests-Runner (47223)' (62.517 seconds)
+Test case 'WatchVoiceCaptureUITests.test_complicationFlow_minimalVoiceInputSheet()' failed on 'Clone 1 of FocusBlox - FocusBloxWatch Watch AppUITests-Runner (47223)' (8.001 seconds)
+Test case 'WatchVoiceCaptureUITests.test_complicationFlow_reopenAfterDismiss()' failed on 'Clone 1 of FocusBlox - FocusBloxWatch Watch AppUITests-Runner (47223)' (13.654 seconds)
+Test case 'WatchVoiceCaptureUITests.test_noConfirmationScreenExists()' passed on 'Clone 1 of FocusBlox - FocusBloxWatch Watch AppUITests-Runner (47223)' (7.437 seconds)
+Test case 'WatchVoiceCaptureUITests.test_voiceInputSheet_noCancelButton()' failed on 'Clone 1 of FocusBlox - FocusBloxWatch Watch AppUITests-Runner (47223)' (4.536 seconds)
+Test case 'WatchVoiceCaptureUITests.test_voiceInputSheet_noNavigationTitle()' failed on 'Clone 1 of FocusBlox - FocusBloxWatch Watch AppUITests-Runner (47223)' (4.632 seconds)
+Test case 'WatchVoiceCaptureUITests.test_voiceInputSheet_noOKButton()' passed on 'Clone 1 of FocusBlox - FocusBloxWatch Watch AppUITests-Runner (47223)' (4.454 seconds)
+Test case 'WatchVoiceCaptureUITests.test_voiceInputSheet_noPromptText()' failed on 'Clone 1 of FocusBlox - FocusBloxWatch Watch AppUITests-Runner (47223)' (4.296 seconds)

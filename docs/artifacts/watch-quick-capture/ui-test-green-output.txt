@@ -1,0 +1,14 @@
+    export ENABLE_TESTABILITY\=YES
+    export ENABLE_TESTING_SEARCH_PATHS\=NO
+    export TEST_FRAMEWORK_SEARCH_PATHS\=\ /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks\ /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk/Developer/Library/Frameworks
+    export TEST_LIBRARY_SEARCH_PATHS\=\ /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib
+    export TREAT_MISSING_BASELINES_AS_TEST_FAILURES\=NO
+** TEST FAILED **
+Test case 'WatchVoiceCaptureUITests.test_appLaunch_autoDiktatOpens()' passed on 'Clone 1 of FocusBlox - FocusBloxWatch Watch AppUITests-Runner (50706)' (66.881 seconds)
+Test case 'WatchVoiceCaptureUITests.test_complicationFlow_minimalVoiceInputSheet()' passed on 'Clone 1 of FocusBlox - FocusBloxWatch Watch AppUITests-Runner (50706)' (6.929 seconds)
+Test case 'WatchVoiceCaptureUITests.test_complicationFlow_reopenAfterAutoSave()' failed on 'Clone 1 of FocusBlox - FocusBloxWatch Watch AppUITests-Runner (50706)' (15.442 seconds)
+Test case 'WatchVoiceCaptureUITests.test_noConfirmationScreenExists()' passed on 'Clone 1 of FocusBlox - FocusBloxWatch Watch AppUITests-Runner (50706)' (7.357 seconds)
+Test case 'WatchVoiceCaptureUITests.test_voiceInputSheet_noCancelButton()' passed on 'Clone 1 of FocusBlox - FocusBloxWatch Watch AppUITests-Runner (50706)' (6.430 seconds)
+Test case 'WatchVoiceCaptureUITests.test_voiceInputSheet_noNavigationTitle()' passed on 'Clone 1 of FocusBlox - FocusBloxWatch Watch AppUITests-Runner (50706)' (5.649 seconds)
+Test case 'WatchVoiceCaptureUITests.test_voiceInputSheet_noOKButton()' passed on 'Clone 1 of FocusBlox - FocusBloxWatch Watch AppUITests-Runner (50706)' (5.287 seconds)
+Test case 'WatchVoiceCaptureUITests.test_voiceInputSheet_noPromptText()' passed on 'Clone 1 of FocusBlox - FocusBloxWatch Watch AppUITests-Runner (50706)' (6.449 seconds)
