@@ -1,0 +1,10 @@
+** TEST SUCCEEDED **
+Test case 'DisciplineStatsServiceTests.test_breakdown_completedTaskWithEstimate_canBeFokus()' passed on 'Clone 1 of FocusBlox - FocusBlox (68924)' (0.019 seconds)
+Test case 'DisciplineStatsServiceTests.test_breakdown_emptyList_returnsAllZeroCounts()' passed on 'Clone 1 of FocusBlox - FocusBlox (68924)' (0.003 seconds)
+Test case 'DisciplineStatsServiceTests.test_breakdown_manualOverride_takesPrecedence()' passed on 'Clone 1 of FocusBlox - FocusBlox (68924)' (0.004 seconds)
+Test case 'DisciplineStatsServiceTests.test_breakdown_mixedTasks_correctDistribution()' passed on 'Clone 1 of FocusBlox - FocusBlox (68924)' (0.004 seconds)
+Test case 'DisciplineStatsServiceTests.test_breakdown_onlyCompletedTasksCounted()' passed on 'Clone 1 of FocusBlox - FocusBlox (68924)' (0.005 seconds)
+Test case 'DisciplineStatsServiceTests.test_breakdown_sortedByCountDescending()' passed on 'Clone 1 of FocusBlox - FocusBlox (68924)' (0.004 seconds)
+Test case 'DisciplineHistoryUITests.test_coachMeinTag_weekView_showsDisciplineProfileHeader()' passed on 'Clone 2 of FocusBlox - FocusBloxUITests-Runner (69063)' (16.397 seconds)
+Test case 'DisciplineHistoryUITests.test_disciplineProfile_sectionAlwaysVisible()' passed on 'Clone 2 of FocusBlox - FocusBloxUITests-Runner (69063)' (15.104 seconds)
+Test case 'DisciplineHistoryUITests.test_disciplineProfile_showsFourBars()' passed on 'Clone 2 of FocusBlox - FocusBloxUITests-Runner (69063)' (14.768 seconds)

@@ -38,6 +38,18 @@ struct CoachMeinTagView: View {
         IntentionEvaluationService.completedThisWeek(allLocalTasks).count
     }
 
+    /// Discipline breakdown for today's completed tasks.
+    private var todayDisciplineStats: [DisciplineStat] {
+        let todayTasks = IntentionEvaluationService.completedToday(allLocalTasks)
+        return DisciplineStatsService.breakdown(for: todayTasks)
+    }
+
+    /// Discipline breakdown for this week's completed tasks.
+    private var weekDisciplineStats: [DisciplineStat] {
+        let weekTasks = IntentionEvaluationService.completedThisWeek(allLocalTasks)
+        return DisciplineStatsService.breakdown(for: weekTasks)
+    }
+
     var body: some View {
         #if os(macOS)
         content
@@ -84,6 +96,9 @@ struct CoachMeinTagView: View {
                         .padding(.horizontal)
                     }
 
+                    disciplineBreakdownSection(stats: todayDisciplineStats)
+                        .padding(.horizontal)
+
                 case .week:
                     weekProgressSection
                         .padding(.horizontal)
@@ -92,6 +107,9 @@ struct CoachMeinTagView: View {
                         weeklyReflectionSection(coach: coach)
                             .padding(.horizontal)
                     }
+
+                    disciplineBreakdownSection(stats: weekDisciplineStats)
+                        .padding(.horizontal)
                 }
             }
             .padding(.top, 8)
@@ -111,6 +129,29 @@ struct CoachMeinTagView: View {
                 Task { await loadWeeklyAIReflectionText() }
             }
         }
+    }
+
+    // MARK: - Discipline Breakdown
+
+    private func disciplineBreakdownSection(stats: [DisciplineStat]) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Dein Disziplin-Profil")
+                .font(.headline)
+                .accessibilityIdentifier("disciplineProfileHeader")
+
+            if stats.allSatisfy({ $0.count == 0 }) {
+                Text("Noch keine Tasks erledigt")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .accessibilityIdentifier("disciplineEmptyState")
+            } else {
+                ForEach(stats) { stat in
+                    DisciplineBar(stat: stat)
+                }
+            }
+        }
+        .padding()
+        .background(RoundedRectangle(cornerRadius: 16).fill(.ultraThinMaterial))
     }
 
     // MARK: - Week Progress

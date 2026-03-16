@@ -1,0 +1,13 @@
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/DisciplineStatsServiceTests.swift:50:21: error: cannot find 'DisciplineStatsService' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/DisciplineStatsServiceTests.swift:65:21: error: cannot find 'DisciplineStatsService' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/DisciplineStatsServiceTests.swift:78:21: error: cannot find 'DisciplineStatsService' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/DisciplineStatsServiceTests.swift:80:58: error: cannot infer contextual base in reference to member 'konsequenz'
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/DisciplineStatsServiceTests.swift:81:51: error: cannot infer contextual base in reference to member 'mut'
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/DisciplineStatsServiceTests.swift:82:56: error: cannot infer contextual base in reference to member 'ausdauer'
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/DisciplineStatsServiceTests.swift:100:21: error: cannot find 'DisciplineStatsService' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/DisciplineStatsServiceTests.swift:102:51: error: cannot infer contextual base in reference to member 'mut'
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/DisciplineStatsServiceTests.swift:103:58: error: cannot infer contextual base in reference to member 'konsequenz'
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/DisciplineStatsServiceTests.swift:119:21: error: cannot find 'DisciplineStatsService' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/DisciplineStatsServiceTests.swift:141:21: error: cannot find 'DisciplineStatsService' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/DisciplineStatsServiceTests.swift:142:53: error: cannot infer contextual base in reference to member 'fokus'
+** TEST FAILED **

@@ -1,5 +1,57 @@
 import SwiftUI
 
+// MARK: - Discipline Stats
+
+/// Discipline stat for "Dein Disziplin-Profil" visualization.
+struct DisciplineStat: Identifiable {
+    let discipline: Discipline
+    let count: Int
+    let total: Int
+    var id: String { discipline.rawValue }
+}
+
+/// Visual bar for a single discipline (analogous to CategoryBar).
+struct DisciplineBar: View {
+    let stat: DisciplineStat
+
+    private var percentage: CGFloat {
+        guard stat.total > 0 else { return 0 }
+        return CGFloat(stat.count) / CGFloat(stat.total)
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Image(stat.discipline.imageName)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 24, height: 24)
+                    .clipShape(Circle())
+                Text(stat.discipline.displayName)
+                    .font(.subheadline)
+                Spacer()
+                Text("\(stat.count)")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(stat.discipline.color)
+            }
+
+            GeometryReader { geometry in
+                ZStack(alignment: .leading) {
+                    RoundedRectangle(cornerRadius: 4)
+                        .fill(.secondary.opacity(0.2))
+                        .frame(height: 8)
+                    RoundedRectangle(cornerRadius: 4)
+                        .fill(stat.discipline.color)
+                        .frame(width: geometry.size.width * percentage, height: 8)
+                        .animation(.spring(), value: percentage)
+                }
+            }
+            .frame(height: 8)
+        }
+        .accessibilityIdentifier("disciplineBar_\(stat.discipline.rawValue)")
+    }
+}
+
 // MARK: - Shared Data Types
 
 /// Category stat combining TaskCategory with aggregated minutes

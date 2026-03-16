@@ -1,0 +1,21 @@
+    export ENABLE_TESTABILITY\=YES
+    export ENABLE_TESTING_SEARCH_PATHS\=NO
+    export TEST_FRAMEWORK_SEARCH_PATHS\=\ /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks\ /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk/Developer/Library/Frameworks
+    export TEST_LIBRARY_SEARCH_PATHS\=\ /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib
+    export TREAT_MISSING_BASELINES_AS_TEST_FAILURES\=NO
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/DisciplineStatsServiceTests.swift:50:21: error: cannot find 'DisciplineStatsService' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/DisciplineStatsServiceTests.swift:65:21: error: cannot find 'DisciplineStatsService' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/DisciplineStatsServiceTests.swift:78:21: error: cannot find 'DisciplineStatsService' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/DisciplineStatsServiceTests.swift:80:58: error: cannot infer contextual base in reference to member 'konsequenz'
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/DisciplineStatsServiceTests.swift:81:51: error: cannot infer contextual base in reference to member 'mut'
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/DisciplineStatsServiceTests.swift:82:56: error: cannot infer contextual base in reference to member 'ausdauer'
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/DisciplineStatsServiceTests.swift:100:21: error: cannot find 'DisciplineStatsService' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/DisciplineStatsServiceTests.swift:102:51: error: cannot infer contextual base in reference to member 'mut'
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/DisciplineStatsServiceTests.swift:103:58: error: cannot infer contextual base in reference to member 'konsequenz'
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/DisciplineStatsServiceTests.swift:119:21: error: cannot find 'DisciplineStatsService' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/DisciplineStatsServiceTests.swift:141:21: error: cannot find 'DisciplineStatsService' in scope
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/DisciplineStatsServiceTests.swift:142:53: error: cannot infer contextual base in reference to member 'fokus'
+Testing failed:
+	Testing cancelled because the build failed.
+** TEST FAILED **
+The following build commands failed:
