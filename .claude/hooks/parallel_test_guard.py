@@ -52,6 +52,19 @@ except ImportError:
 STALE_THRESHOLD_HOURS = 48
 
 
+def has_valid_override_token() -> bool:
+    """Check if user has granted an override token (1h TTL)."""
+    token_path = Path(__file__).parent.parent / "user_override_token.json"
+    if not token_path.exists():
+        return False
+    try:
+        token = json.loads(token_path.read_text())
+        created = datetime.fromisoformat(token.get("created", ""))
+        return datetime.now() - created < timedelta(hours=1)
+    except (json.JSONDecodeError, ValueError, OSError):
+        return False
+
+
 def is_test_command(command: str) -> bool:
     """Check if this is an xcodebuild test command (not just text containing those words)."""
     stripped = command.strip()
@@ -238,9 +251,9 @@ def main():
         print(f"\nBLOCKED: {reason}", file=sys.stderr)
         sys.exit(2)
 
-    # Layer 2: Workflow conflict check
+    # Layer 2: Workflow conflict check (skipped with valid override token)
     conflicts = get_conflicting_workflows()
-    if conflicts:
+    if conflicts and not has_valid_override_token():
         lines = [
             "",
             "BLOCKED: Parallele Workflows mit unfertigen RED-Tests erkannt!",

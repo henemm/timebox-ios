@@ -82,6 +82,9 @@
 		8997A3E20C596B6DEDABB0B1 /* CoachPreviewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DD81FE304FEC839602AB5B0 /* CoachPreviewTests.swift */; };
 		89FC6DF4B33B36C48FF1AC45 /* SetDailyIntentionIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 700EF7589E4DBA5C75513690 /* SetDailyIntentionIntent.swift */; };
 		9038949DA4E294F2FC5062BC /* CoachMissionServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22FA56C12A8D5A83300A47E4 /* CoachMissionServiceTests.swift */; };
+		TD03A00001BUILD00000001 /* GapFinderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = TD03A00001FREF000000001 /* GapFinderTests.swift */; };
+		TD03A00002BUILD00000001 /* NotificationServiceBuildTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = TD03A00002FREF000000001 /* NotificationServiceBuildTests.swift */; };
+		TD03A00003BUILD00000001 /* FocusBlockActionServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = TD03A00003FREF000000001 /* FocusBlockActionServiceTests.swift */; };
 		94EC1D85A0F4B53160332751 /* PlanItemTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32E6EA75FACA340867827895 /* PlanItemTests.swift */; };
 		968A3087301F055E331E560C /* EventKitRepositoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DC26C4D8FDC4B811001FD2C /* EventKitRepositoryTests.swift */; };
 		96DD4A471C3F159FE2C19462 /* TaskFormTbdUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFD460F955B924EB6F6C5B94 /* TaskFormTbdUITests.swift */; };
@@ -624,6 +627,9 @@
 		2208F21C34A5522695CE5FFD /* CoachPitchServiceTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CoachPitchServiceTests.swift; sourceTree = "<group>"; };
 		2224B7322726CC9CD1E9C9E3 /* WidgetRelevanceCalculator.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WidgetRelevanceCalculator.swift; sourceTree = "<group>"; };
 		22FA56C12A8D5A83300A47E4 /* CoachMissionServiceTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CoachMissionServiceTests.swift; sourceTree = "<group>"; };
+		TD03A00001FREF000000001 /* GapFinderTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GapFinderTests.swift; sourceTree = "<group>"; };
+		TD03A00002FREF000000001 /* NotificationServiceBuildTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NotificationServiceBuildTests.swift; sourceTree = "<group>"; };
+		TD03A00003FREF000000001 /* FocusBlockActionServiceTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = FocusBlockActionServiceTests.swift; sourceTree = "<group>"; };
 		233B665A0DF1A421C1CDF80A /* TaskCompletionUndoService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TaskCompletionUndoService.swift; sourceTree = "<group>"; };
 		26CD9467C8156E2C66B2DC9C /* SettingsToolbarModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsToolbarModifier.swift; sourceTree = "<group>"; };
 		301796C3380CA4E06D1EF41B /* TaskCompletionUndoServiceTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TaskCompletionUndoServiceTests.swift; sourceTree = "<group>"; };
@@ -1598,6 +1604,9 @@
 				22FA56C12A8D5A83300A47E4 /* CoachMissionServiceTests.swift */,
 				0DD81FE304FEC839602AB5B0 /* CoachPreviewTests.swift */,
 				2208F21C34A5522695CE5FFD /* CoachPitchServiceTests.swift */,
+				TD03A00001FREF000000001 /* GapFinderTests.swift */,
+				TD03A00002FREF000000001 /* NotificationServiceBuildTests.swift */,
+				TD03A00003FREF000000001 /* FocusBlockActionServiceTests.swift */,
 			);
 			path = FocusBloxTests;
 			sourceTree = SOURCE_ROOT;
@@ -2615,6 +2624,9 @@
 				8997A3E20C596B6DEDABB0B1 /* CoachPreviewTests.swift in Sources */,
 				C691496633AB9E170FA6D7A8 /* CoachPitchServiceTests.swift in Sources */,
 				072FC90E7931CB0AC2FBE863 /* CoachBacklogViewModelTests.swift in Sources */,
+				TD03A00001BUILD00000001 /* GapFinderTests.swift in Sources */,
+				TD03A00002BUILD00000001 /* NotificationServiceBuildTests.swift in Sources */,
+				TD03A00003BUILD00000001 /* FocusBlockActionServiceTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -20,10 +20,10 @@
 | **7** | Discipline manuell ueberschreiben | Feature | M | DONE — Long-Press Context Menu mit 4 farbigen Disziplin-Optionen + Zuruecksetzen. iOS + macOS. 10 Unit + 6 UI Tests gruen. |
 | **8** | Coach Mission Card | Feature | S | DONE — Monster spricht mit konkreter Tages-Mission an. Pro Coach eigene Logik. 10 Unit Tests gruen. iOS + macOS Build OK. |
 | **8b** | Coach Preview + AI Pitches | Feature | S | DONE — Coach-Auswahl zeigt konkrete Tasks + Apple Intelligence Pitches. Empfohlen-Badge. 23 Tests gruen. |
-| **9** | Bug 104: macOS Monster-Backlog Regression | Bug P1 | S-M | Swipe-Gesten defekt + kein Task-Anlegen moeglich in MacCoachBacklogView. Regression seit Monster-Modus-Einfuehrung. Frage: Warum haben Tests das nicht bemerkt? MacCoachBacklogView hat keine swipeActions + keinen Add-Button — Features fehlen in der Coach-Variante. |
+| **9** | Bug 104: Coach-Backlog Feature-Paritaet iOS+macOS | Bug P1 | M | DONE — Volle Feature-Paritaet: ViewMode-Switcher (5 Modi), Coach-Boost-Section, Priority-Tiers, alle Callbacks, Blocked Tasks, Undo, Sync. iOS + macOS. 24 Unit Tests gruen. |
 | **10** | UX: Tag-Auswahl redesignen | Enhancement | S | Tag-Sektion in TaskFormSheet ist unuebersichtlich: "Neuer Tag" Textfeld dominiert, bestehende Tags kommen erst danach. Redesign: Bestehende Tags zuerst als antippbare Chips (Toggle-Auswahl), "Neuer Tag" Textfeld darunter. Vorbild: Apple Erinnerungen. |
 | **11** | Watch: Quick Capture vereinfachen | Bug | S | Komplikation-Tap zeigt unnoetig "Was moechtest du tun?" + Abbrechen. Soll direkt Spracheingabe oeffnen, nach "Fertig" sofort speichern. Kein Zwischenscreen, keine Rueckfragen. War nie anders spezifiziert. |
-| **12** | TD-03: Services ohne Tests | Tech Debt | M | NotificationService, FocusBlockActionService, GapFinder — Sicherheitsnetz fehlt. |
+| **12** | TD-03: Services ohne Tests | Tech Debt | M | DONE — 44 Unit Tests (GapFinder 15, NotificationService 17, FocusBlockActionService 12). Sicherheitsnetz fuer 3 Services. |
 | **13** | Disziplin-Entwicklung sichtbar machen | Feature | M | Historische Auswertung ueber Wochen/Monate — welche Disziplinen gestaerkt? |
 | **14** | Stille-Regel: Nudges dynamisch canceln | Enhancement | S | Geplante Nudges stoppen wenn Intention tagsueber erfuellt wird. |
 | **15** | MAC-026: Enhanced Quick Capture | Feature | L | macOS Produktivitaet. Kein Blocker. |
@@ -37,6 +37,22 @@
 ---
 
 ## Offene Bugs
+
+### Bug 104: Coach-Backlog Feature-Paritaet — iOS + macOS — ERLEDIGT
+- **Status:** DONE
+- **Plattform:** iOS + macOS
+- **Problem:** CoachBacklogView (iOS) und MacCoachBacklogView (macOS) fehlten zahlreiche Features der normalen BacklogView.
+- **Fix (7 Pakete):**
+  - P0: macOS Completion-Button repariert (onToggleComplete verdrahtet)
+  - P1: CoachBacklogViewModel erweitert: coachBoostedTasks, remainingTasks, overdueTasks, tierTasks, recentTasks, completedTasks, recurringTasks, coachSectionTitle (shared Logic)
+  - P2a: iOS alle Callbacks verdrahtet (11 BacklogRow-Closures), DurationPicker/CategoryPicker Sheets, TaskFormSheet, Postpone-Kontextmenu, DeferredSort/Completion
+  - P2b: iOS ViewMode-Switcher (5 Modi: Prioritaet/Zuletzt/Ueberfaellig/Wiederkehrend/Erledigt), Coach-Boost-Section, Priority-Tier-Sections (4 Stufen), deduplizierte Task-Zuordnung
+  - P3: macOS volle Paritaet: ViewMode-Switcher, alle MacBacklogRow-Callbacks, Tier-Sections, Coach-Boost, Postpone/Disziplin/Delete Context-Menu
+  - P4: iOS CloudKit Sync Auto-Refresh + Shake-to-Undo
+  - P5: Blocked-Task-Rendering (Lock-Icon, Einrueckung, Freigeben-Aktion) auf beiden Plattformen
+- **Tests:** 24 CoachBacklogViewModelTests gruen (7 neue Methoden getestet)
+- **Dateien:** CoachBacklogViewModel.swift, CoachBacklogView.swift, MacCoachBacklogView.swift, CoachBacklogViewModelTests.swift
+- **Verbleibend (bewusst nicht im Scope):** Recurring-Serie-Dialoge, macOS Inspector, macOS Quick-Add, macOS Drag-Reorder — separate Tickets
 
 ### Bug 103: NextUp-Section fehlt in Monster-Modus — ERLEDIGT
 - **Status:** DONE
