@@ -75,26 +75,48 @@ final class CoachBacklogViewUITests: XCTestCase {
                       "Hint text should appear when no intention is set")
     }
 
+    // MARK: - NextUp Section
+
+    /// Bricht wenn: CoachBacklogView keine NextUp-Section zeigt
+    func test_coachModeOn_showsNextUpSection() throws {
+        launchWithCoachMode()
+        navigateToBacklog()
+
+        let nextUpSection = app.descendants(matching: .any)["coachNextUpSection"]
+        XCTAssertTrue(nextUpSection.waitForExistence(timeout: 5),
+                      "NextUp section should be visible in Coach backlog when NextUp tasks exist")
+    }
+
+    /// Bricht wenn: NextUp-Section keinen "Next Up" Header-Text hat
+    func test_coachModeOn_nextUpSection_showsHeader() throws {
+        launchWithCoachMode()
+        navigateToBacklog()
+
+        let nextUpHeader = app.staticTexts["Next Up"]
+        XCTAssertTrue(nextUpHeader.waitForExistence(timeout: 5),
+                      "NextUp section header should show 'Next Up' text")
+    }
+
     // MARK: - Swipe Actions
 
-    /// Bricht wenn: coachRow() hat kein .swipeActions(edge: .leading) mit Next-Up-Button
+    /// Bricht wenn: coachRow() hat kein .swipeActions(edge: .leading) mit Next-Up-Toggle
     func test_coachModeOn_swipeRight_showsNextUpAction() throws {
         launchWithCoachMode()
         navigateToBacklog()
 
-        // Find a task by its title text (mock data contains [MOCK] prefix)
+        // Find a task in the NextUp section (mock tasks 1-3 are isNextUp=true)
         let taskTitle = app.staticTexts.matching(
-            NSPredicate(format: "label CONTAINS '[MOCK]'")
+            NSPredicate(format: "label CONTAINS '[MOCK] Task 1'")
         ).firstMatch
-        XCTAssertTrue(taskTitle.waitForExistence(timeout: 5), "At least one mock task should exist")
+        XCTAssertTrue(taskTitle.waitForExistence(timeout: 5), "Mock task should exist")
 
         // Swipe right to reveal leading swipe action
         taskTitle.swipeRight()
 
-        // The "Next Up" button should appear
-        let nextUpButton = app.buttons["Next Up"]
-        XCTAssertTrue(nextUpButton.waitForExistence(timeout: 3),
-                      "Next Up swipe action should exist in Coach backlog")
+        // Task is already NextUp, so button shows "Entfernen"
+        let removeButton = app.buttons["Entfernen"]
+        XCTAssertTrue(removeButton.waitForExistence(timeout: 3),
+                      "NextUp swipe action (Entfernen) should exist in Coach backlog")
     }
 
     // MARK: - Discipline Override Context Menu

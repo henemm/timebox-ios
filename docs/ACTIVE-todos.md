@@ -40,8 +40,8 @@
 - **Plattform:** iOS + macOS
 - **Root Cause:** CoachBacklogView wurde in Phase 5a mit nur 2 Sections ("Dein Schwerpunkt" + "Weitere Tasks") designed — eine dedizierte NextUp-Section wurde nie implementiert. NextUp-Tasks waren unsichtbar in der Masse. macOS hatte zusaetzlich keinen NextUp-Toggle.
 - **Fix:** (1) `CoachBacklogViewModel.nextUpTasks()` als neue Filterfunktion, (2) NextUp-Section mit gruenem Header + Count-Badge in CoachBacklogView (iOS) + MacCoachBacklogView (macOS), (3) NextUp-Tasks aus "Dein Schwerpunkt" und "Weitere Tasks" ausgeschlossen (keine Duplikation), (4) macOS Context-Menu um "Zu Next Up hinzufuegen/entfernen" erweitert
-- **Tests:** 5 neue Unit Tests (nextUpTasks Filterung) + 2 neue UI Tests (Section + Header) — alle gruen. 8/8 bestehende UI Tests bestanden.
-- **Dateien:** CoachBacklogViewModel.swift, CoachBacklogView.swift, MacCoachBacklogView.swift
+- **Tests:** 5 Unit Tests + 2 iOS UI Tests + 1 macOS UI Test — alle gruen
+- **Dateien:** CoachBacklogViewModel.swift, CoachBacklogView.swift, MacCoachBacklogView.swift, CoachBacklogViewModelTests.swift, CoachBacklogViewUITests.swift, MacCoachBacklogUITests.swift
 
 ### Bug: macOS Coach Backlog leer im Monster-Mode — ERLEDIGT
 - **Status:** DONE

@@ -136,6 +136,71 @@ final class CoachBacklogViewModelTests: XCTestCase {
         XCTAssertEqual(result.first?.title, "Active NextUp")
     }
 
+    // MARK: - nextUpTasks
+
+    /// Verhalten: nextUpTasks gibt nur isNextUp==true Tasks zurueck
+    func test_nextUpTasks_returnsOnlyNextUpTasks() {
+        let t1 = makeLocalTask(title: "Next 1", isNextUp: true)
+        let t2 = makeLocalTask(title: "Normal")
+        let t3 = makeLocalTask(title: "Next 2", isNextUp: true)
+        let items = [t1, t2, t3].map { PlanItem(localTask: $0) }
+
+        let result = CoachBacklogViewModel.nextUpTasks(from: items)
+        XCTAssertEqual(result.count, 2)
+        XCTAssertTrue(result.allSatisfy { $0.isNextUp })
+    }
+
+    /// Verhalten: nextUpTasks schliesst erledigte Tasks aus
+    func test_nextUpTasks_excludesCompletedTasks() {
+        let t1 = makeLocalTask(title: "Active NextUp", isNextUp: true)
+        let t2 = makeLocalTask(title: "Done NextUp", isNextUp: true, isCompleted: true)
+        let items = [t1, t2].map { PlanItem(localTask: $0) }
+
+        let result = CoachBacklogViewModel.nextUpTasks(from: items)
+        XCTAssertEqual(result.count, 1)
+        XCTAssertEqual(result.first?.title, "Active NextUp")
+    }
+
+    /// Verhalten: nextUpTasks schliesst Templates aus
+    func test_nextUpTasks_excludesTemplateTasks() {
+        let t1 = makeLocalTask(title: "Active NextUp", isNextUp: true)
+        let t2 = makeLocalTask(title: "Template NextUp", isNextUp: true, isTemplate: true)
+        let items = [t1, t2].map { PlanItem(localTask: $0) }
+
+        let result = CoachBacklogViewModel.nextUpTasks(from: items)
+        XCTAssertEqual(result.count, 1)
+        XCTAssertEqual(result.first?.title, "Active NextUp")
+    }
+
+    /// Verhalten: otherTasks schliesst NextUp-Tasks aus
+    func test_otherTasks_excludesNextUpTasks() {
+        let t1 = makeLocalTask(title: "Next Up", isNextUp: true)
+        let t2 = makeLocalTask(title: "Normal 1")
+        let t3 = makeLocalTask(title: "Normal 2")
+        let items = [t1, t2, t3].map { PlanItem(localTask: $0) }
+
+        let result = CoachBacklogViewModel.otherTasks(from: items, selectedCoach: "troll")
+        XCTAssertFalse(result.contains { $0.title == "Next Up" },
+                       "otherTasks should exclude NextUp tasks")
+        XCTAssertEqual(result.count, 2)
+    }
+
+    /// Verhalten: relevantTasks bei Eule schliesst NextUp aus (NextUp hat eigene Section)
+    func test_relevantTasks_eule_excludedByNextUpSection() {
+        let t1 = makeLocalTask(title: "Next 1", isNextUp: true)
+        let t2 = makeLocalTask(title: "Next 2", isNextUp: true)
+        let t3 = makeLocalTask(title: "Normal")
+        let items = [t1, t2, t3].map { PlanItem(localTask: $0) }
+
+        // NextUp tasks are now in their own section, not in relevantTasks
+        let nextUp = CoachBacklogViewModel.nextUpTasks(from: items)
+        XCTAssertEqual(nextUp.count, 2)
+
+        // otherTasks should not contain NextUp tasks
+        let other = CoachBacklogViewModel.otherTasks(from: items, selectedCoach: "eule")
+        XCTAssertFalse(other.contains { $0.isNextUp })
+    }
+
     // MARK: - Helper
 
     private func makeLocalTask(

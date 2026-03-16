@@ -92,7 +92,20 @@ final class MacCoachBacklogUITests: XCTestCase {
                       "Hint text should appear when no coach is set")
     }
 
-    // MARK: - Test 4: Sidebar simplified in coach mode
+    // MARK: - Test 4: NextUp section visible in coach mode
+
+    /// Verhalten: Bei coachModeEnabled zeigt macOS Coach-Backlog eine NextUp-Section.
+    /// Bricht wenn: MacCoachBacklogView keine coachNextUpSection hat
+    func test_coachModeOn_showsNextUpSection() throws {
+        launchWithCoachMode()
+        navigateToBacklog()
+
+        let nextUpSection = app.descendants(matching: .any)["coachNextUpSection"]
+        XCTAssertTrue(nextUpSection.waitForExistence(timeout: 5),
+                      "NextUp section should be visible in macOS Coach backlog")
+    }
+
+    // MARK: - Test 5: Sidebar simplified in coach mode
 
     /// Verhalten: Bei Coach-Modus zeigt die Sidebar nur "Backlog" ohne Filter-Optionen.
     func test_coachModeOn_sidebarSimplified() throws {

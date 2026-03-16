@@ -25,6 +25,10 @@ struct CoachBacklogView: View {
         CoachBacklogViewModel.relevantTasks(from: searchFilteredItems, selectedCoach: selectedCoach)
     }
 
+    private var nextUpTasks: [PlanItem] {
+        CoachBacklogViewModel.nextUpTasks(from: searchFilteredItems)
+    }
+
     private var otherTasks: [PlanItem] {
         CoachBacklogViewModel.otherTasks(from: searchFilteredItems, selectedCoach: selectedCoach)
     }
@@ -80,6 +84,29 @@ struct CoachBacklogView: View {
             monsterHeader
                 .listRowBackground(Color.clear)
                 .listRowSeparator(.hidden)
+
+            if !nextUpTasks.isEmpty {
+                Section {
+                    ForEach(nextUpTasks) { item in
+                        coachRow(item)
+                    }
+                } header: {
+                    HStack {
+                        Label("Next Up", systemImage: "arrow.up.circle.fill")
+                            .font(.headline)
+                            .foregroundStyle(.green)
+                        Spacer()
+                        Text("\(nextUpTasks.count)")
+                            .font(.caption)
+                            .foregroundStyle(.green)
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 2)
+                            .background(Color.green.opacity(0.2))
+                            .clipShape(Capsule())
+                    }
+                }
+                .accessibilityIdentifier("coachNextUpSection")
+            }
 
             if !relevantTasks.isEmpty {
                 Section {
