@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from __future__ import annotations
 """
 OpenSpec Framework - Pre-Commit Gate Hook
 
@@ -184,9 +185,14 @@ def check_for_ui_changes(config: dict) -> bool:
 
 
 def check_todos_staged() -> tuple[bool, str]:
-    """Check if docs/ACTIVE-todos.md is in the staged files."""
+    """Check if docs/ACTIVE-todos.md is in the staged files.
+
+    Only blocks if the file has unstaged changes (i.e. was modified but not added).
+    If the file is clean (no changes), it's already up-to-date and doesn't need staging.
+    """
     project_root = get_project_root()
     try:
+        # Check if ACTIVE-todos.md is already staged
         result = subprocess.run(
             ["git", "diff", "--cached", "--name-only"],
             cwd=project_root,
@@ -196,7 +202,21 @@ def check_todos_staged() -> tuple[bool, str]:
         staged_files = result.stdout.strip().split("\n")
         if "docs/ACTIVE-todos.md" in staged_files:
             return True, ""
-        return False, "docs/ACTIVE-todos.md ist NICHT in den staged files."
+
+        # Check if it has unstaged modifications
+        result2 = subprocess.run(
+            ["git", "diff", "--name-only", "--", "docs/ACTIVE-todos.md"],
+            cwd=project_root,
+            capture_output=True,
+            text=True,
+        )
+        has_unstaged_changes = bool(result2.stdout.strip())
+
+        if has_unstaged_changes:
+            return False, "docs/ACTIVE-todos.md hat Aenderungen die nicht staged sind."
+
+        # File is clean — already up-to-date, no need to stage
+        return True, ""
     except Exception as e:
         return True, f"Could not check staged files: {e}"
 

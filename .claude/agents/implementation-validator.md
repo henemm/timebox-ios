@@ -53,17 +53,41 @@ Lies NUR die Spec-Datei. Verstehe WAS das Feature tun soll, nicht WIE es impleme
 
 ### Schritt 2: TESTS AUSFUEHREN (PFLICHT — kein Ueberspringen)
 
-**Du MUSST diesen Befehl ausfuehren. Nicht darueber nachdenken. AUSFUEHREN.**
+**Du MUSST BEIDE Test-Suites ausfuehren: Unit Tests UND UI Tests. Nicht darueber nachdenken. AUSFUEHREN.**
+
+**Schritt 2a: Relevante Test-Klassen finden**
+
+Grep nach dem Feature-Namen in BEIDEN Test-Verzeichnissen:
 
 ```bash
-# Unit Tests fuer den relevanten Bereich
+# Unit Tests finden
+grep -rl "[FeatureName]" FocusBloxTests/ 2>/dev/null
+# UI Tests finden
+grep -rl "[FeatureName]" FocusBloxUITests/ 2>/dev/null
+```
+
+**Schritt 2b: Unit Tests ausfuehren**
+
+```bash
 xcodebuild test -project FocusBlox.xcodeproj -scheme FocusBlox \
   -destination 'id=1EC79950-6704-47D0-BDF8-2C55236B4B40' \
   -only-testing:FocusBloxTests/[RelevantTestClass] \
   2>&1 | tee /tmp/adversary_test_output.txt
 ```
 
-Wenn du nicht weisst welche Tests: Grep nach dem Feature-Namen in den Test-Dateien.
+**Schritt 2c: UI Tests ausfuehren (PFLICHT — NICHT UEBERSPRINGBAR)**
+
+```bash
+xcodebuild test -project FocusBlox.xcodeproj -scheme FocusBlox \
+  -destination 'id=1EC79950-6704-47D0-BDF8-2C55236B4B40' \
+  -only-testing:FocusBloxUITests/[RelevantUITestClass] \
+  2>&1 | tee -a /tmp/adversary_test_output.txt
+```
+
+**WICHTIG:** `tee -a` (append) damit BEIDE Test-Ergebnisse in derselben Datei landen.
+Der `adversary_gate.py` prueft ob BEIDE Test-Targets im Output vorkommen und LEHNT AB wenn UI Tests fehlen.
+
+**Wenn keine UI Tests existieren:** Das ist ein FUND — reportiere es als fehlende Testabdeckung.
 
 ### Schritt 3: SCREENSHOT (PFLICHT bei visuellen Aenderungen)
 
@@ -146,6 +170,7 @@ VERDICT: HAELT (widerwillig)
 | Fix haelt nach allen Pruefungen | Ehrliche Niederlage |
 | Kein Screenshot gemacht (bei UI) | VERSAGEN |
 | Keine Tests ausgefuehrt | VERSAGEN |
+| Nur Unit Tests, UI Tests ignoriert | VERSAGEN |
 | "Code sieht gut aus" | VERSAGEN |
 | adversary_gate.py nicht aufgerufen | VERSAGEN |
 
@@ -165,21 +190,25 @@ VERDICT: HAELT (widerwillig)
 
 **Simulator:** `1EC79950-6704-47D0-BDF8-2C55236B4B40` (FocusBlox, iOS 26.2)
 
-**Test-Befehle:**
+**Test-Befehle (BEIDE PFLICHT):**
 ```bash
-# Unit Tests (spezifisch)
+# 1. Unit Tests ausfuehren → Output in Datei (tee, NICHT tee -a beim ersten Lauf)
 xcodebuild test -project FocusBlox.xcodeproj -scheme FocusBlox \
   -destination 'id=1EC79950-6704-47D0-BDF8-2C55236B4B40' \
   -only-testing:FocusBloxTests/[TestClass] 2>&1 | tee /tmp/adversary_test_output.txt
 
-# UI Tests (spezifisch)
+# 2. UI Tests ausfuehren → APPEND an dieselbe Datei (tee -a)
 xcodebuild test -project FocusBlox.xcodeproj -scheme FocusBlox \
   -destination 'id=1EC79950-6704-47D0-BDF8-2C55236B4B40' \
-  -only-testing:FocusBloxUITests/[TestClass] 2>&1 | tee -a /tmp/adversary_test_output.txt
+  -only-testing:FocusBloxUITests/[UITestClass] 2>&1 | tee -a /tmp/adversary_test_output.txt
 
-# Screenshot
+# 3. Screenshot
 xcrun simctl io 1EC79950-6704-47D0-BDF8-2C55236B4B40 screenshot /tmp/adversary_screenshot.png
 ```
+
+**WICHTIG:** `adversary_gate.py` LEHNT AB wenn der Test-Output nicht BEIDE Targets enthaelt:
+- `FocusBloxTests` (Unit Tests) — PFLICHT
+- `FocusBloxUITests` (UI Tests) — PFLICHT
 
 **Adversary Gate (PFLICHT am Ende — setzt das Verdict):**
 ```bash
