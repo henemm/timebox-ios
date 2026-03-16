@@ -88,9 +88,20 @@ def validate_test_output(filepath: str) -> tuple[bool, str, dict]:
     if matches < 2:
         return False, f"File doesn't look like xcodebuild test output (matched {matches}/4 patterns).", {}
 
+    # 4b. Must contain BOTH unit tests AND UI tests
+    has_unit_tests = bool(re.search(r"FocusBloxTests", content))
+    has_ui_tests = bool(re.search(r"FocusBlox(?:Mac)?UITests", content))  # accepts iOS + macOS
+
+    if not has_unit_tests and not has_ui_tests:
+        return False, "Test output contains neither FocusBloxTests nor FocusBloxUITests results.", {}
+    if not has_ui_tests:
+        return False, "UI Tests missing! Test output contains only FocusBloxTests but no FocusBloxUITests (or FocusBloxMacUITests). Run UI tests and append with `tee -a`.", {}
+    if not has_unit_tests:
+        return False, "Unit Tests missing! Test output contains only UITests but no FocusBloxTests. Run unit tests too.", {}
+
     # 5. Check test results
-    # Look for "Executed X tests, with Y failures"
-    exec_match = re.search(r"Executed (\d+) tests?, with (\d+) failures?", content)
+    # Look for ALL "Executed X tests, with Y failures" lines (one per test run)
+    exec_matches = re.findall(r"Executed (\d+) tests?, with (\d+) failures?", content)
 
     # Look for "** TEST SUCCEEDED **" or "** TEST FAILED **"
     succeeded = "TEST SUCCEEDED" in content or "TEST EXECUTE SUCCEEDED" in content or "** BUILD SUCCEEDED **" in content
@@ -102,22 +113,26 @@ def validate_test_output(filepath: str) -> tuple[bool, str, dict]:
         "size_bytes": size,
         "age_minutes": round(age_minutes, 1),
         "pattern_matches": matches,
+        "has_unit_tests": has_unit_tests,
+        "has_ui_tests": has_ui_tests,
     }
 
-    if exec_match:
-        total = int(exec_match.group(1))
-        failures = int(exec_match.group(2))
+    if exec_matches:
+        # Sum up results from all test runs (unit + UI)
+        total = sum(int(m[0]) for m in exec_matches)
+        failures = sum(int(m[1]) for m in exec_matches)
         details["tests_total"] = total
         details["tests_failed"] = failures
+        details["test_runs"] = len(exec_matches)
 
         if failures > 0:
             # Extract failure names
             failure_lines = re.findall(r"(?:FAIL|failed).*?[-–]\s*(test\w+)", content, re.IGNORECASE)
             details["failed_tests"] = failure_lines[:10]
-            return False, f"Tests FAILED: {failures}/{total} failures", details
+            return False, f"Tests FAILED: {failures}/{total} failures across {len(exec_matches)} test runs", details
 
         details["tests_passed"] = total
-        return True, f"Tests PASSED: {total} tests, 0 failures", details
+        return True, f"Tests PASSED: {total} tests across {len(exec_matches)} runs (unit + UI), 0 failures", details
 
     if test_failed:
         return False, "Test output contains TEST FAILED marker", details

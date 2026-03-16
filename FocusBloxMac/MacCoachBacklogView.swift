@@ -15,6 +15,7 @@ struct MacCoachBacklogView: View {
     var onImport: (() async -> Void)?
 
     @Environment(CloudKitSyncMonitor.self) private var cloudKitMonitor
+    @Environment(DeferredSortController.self) private var deferredSort
     @AppStorage("selectedCoach") private var selectedCoach: String = ""
     @AppStorage("coachBacklogViewMode") private var selectedModeRaw: String = "Priorität"
     @AppStorage("remindersSyncEnabled") private var remindersSyncEnabled: Bool = true
@@ -376,6 +377,23 @@ struct MacCoachBacklogView: View {
         MonsterIntentionHeader(selectedCoach: selectedCoach, imageHeight: 80)
     }
 
+    // MARK: - Score Helpers (identisch zu ContentView.makeBacklogRow)
+
+    private func dependentCount(for taskID: String) -> Int {
+        tasks.filter { $0.blockerTaskID == taskID }.count
+    }
+
+    private func scoreFor(_ task: LocalTask) -> Int {
+        let liveScore = TaskPriorityScoringService.calculateScore(
+            importance: task.importance, urgency: task.urgency, dueDate: task.dueDate,
+            createdAt: task.createdAt, rescheduleCount: task.rescheduleCount,
+            estimatedDuration: task.estimatedDuration, taskType: task.taskType,
+            isNextUp: task.isNextUp,
+            dependentTaskCount: dependentCount(for: task.id)
+        )
+        return deferredSort.effectiveScore(id: task.id, liveScore: liveScore)
+    }
+
     // MARK: - Blocked Task Helpers
 
     private func blockedTasks(for blockerID: String) -> [LocalTask] {
@@ -388,10 +406,14 @@ struct MacCoachBacklogView: View {
             rescheduleCount: task.rescheduleCount,
             importance: task.importance
         )
+        let score = scoreFor(task)
         return MacBacklogRow(
             task: task,
             isBlocked: true,
-            disciplineColor: discipline.color
+            disciplineColor: discipline.color,
+            dependentCount: dependentCount(for: task.id),
+            effectiveScore: score,
+            effectiveTier: TaskPriorityScoringService.PriorityTier.from(score: score)
         )
         .contextMenu {
             Button {
@@ -412,6 +434,7 @@ struct MacCoachBacklogView: View {
             rescheduleCount: task.rescheduleCount,
             importance: task.importance
         )
+        let score = scoreFor(task)
         return MacBacklogRow(
             task: task,
             onToggleComplete: {
@@ -440,7 +463,10 @@ struct MacCoachBacklogView: View {
                 task.modifiedAt = Date()
                 try? task.modelContext?.save()
             },
-            disciplineColor: discipline.color
+            disciplineColor: discipline.color,
+            dependentCount: dependentCount(for: task.id),
+            effectiveScore: score,
+            effectiveTier: TaskPriorityScoringService.PriorityTier.from(score: score)
         )
         .contextMenu {
             Section("Next Up") {

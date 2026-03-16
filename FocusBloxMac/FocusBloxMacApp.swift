@@ -615,7 +615,21 @@ extension FocusBloxMacApp {
         completed.isCompleted = true
         completed.completedAt = Date()
 
-        for task in [task1, task2, task3, longTitleTask, backlogTask1, backlogTask2, tmpl1, child1, tmpl2, child2, tmpl3, child3, completed] {
+        // FEATURE_012: DEP-Blocker task pair (fixed UUID for UI test targeting)
+        // depBlocker has 1 dependent → DEP boost +3: score = 25 (without fix) or 28 (with fix)
+        let depBlockerUUID = UUID(uuidString: "00000000-0000-0000-0000-000000000011")!
+        let depBlocker = LocalTask(
+            uuid: depBlockerUUID,
+            title: "[MOCK] DEP-Blocker Task",
+            importance: 2,
+            estimatedDuration: 30,
+            urgency: "not_urgent",
+            taskType: "shallow_work"
+        )
+        let depDependent = LocalTask(title: "[MOCK] DEP-Dependent Task", importance: 1, estimatedDuration: 15, urgency: "not_urgent")
+        depDependent.blockerTaskID = depBlocker.id
+
+        for task in [task1, task2, task3, longTitleTask, backlogTask1, backlogTask2, tmpl1, child1, tmpl2, child2, tmpl3, child3, completed, depBlocker, depDependent] {
             context.insert(task)
         }
         try? context.save()

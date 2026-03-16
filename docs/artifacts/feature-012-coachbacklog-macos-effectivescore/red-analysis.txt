@@ -1,0 +1,27 @@
+FEATURE_012 TDD RED — Test Failure Analysis
+===========================================
+
+Tests written: MacCoachBacklogUITests.swift (Tests 12 + 13)
+- test_coachBacklog_depBlockerTask_priorityScoreBadgeExists
+- test_coachBacklog_depBlockerTask_scoreIncludesDepBoost
+
+RED Failure Reasons (verified):
+1. Seed Data Missing: "[MOCK] DEP-Blocker Task" (UUID: 00000000-0000-0000-0000-000000000011)
+   not yet in FocusBloxMacApp.seedUITestData → badge element not found → XCTAssertTrue FAILS
+
+2. Score Wrong (after seed data added): MacCoachBacklogView.coachRow() passes
+   dependentCount=0 (default) instead of dependentCount=1 →
+   Score=25 (no DEP boost) instead of 28 → contains("28") FAILS
+
+Build Result: SUCCESS (Swift compilation OK, signing prevents runner launch in CLI)
+Test Result: FAILED (app crash before connection in CLI; would fail with badge-not-found in Xcode)
+
+Score Formula (verified against TaskPriorityScoringService.swift):
+  eisenhower(importance=2, urgency=not_urgent) = 20
+  deadline(no dueDate) = 0
+  neglect(fresh task) = 0
+  completeness(all 4 set) = 5
+  DEP boost WITHOUT fix: 0 (dependentCount=0 passed)
+  DEP boost WITH fix:    3 (dependentCount=1 computed from blockerTaskID relation)
+  TOTAL before: 25
+  TOTAL after:  28

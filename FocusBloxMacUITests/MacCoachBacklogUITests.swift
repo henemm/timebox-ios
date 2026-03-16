@@ -216,4 +216,95 @@ final class MacCoachBacklogUITests: XCTestCase {
         add(attachment)
     }
 
+    // MARK: - FEATURE_012: effectiveScore/Tier/dependentCount TDD RED Tests
+
+    /// Fixed UUID fuer den DEP-Blocker-Task (in seedUITestData gesetzt).
+    /// Task: importance=2, urgency=not_urgent, dur=30, shallow_work, kein dueDate
+    /// Erwarteter Score OHNE Fix: 25 (dep=0)
+    /// Erwarteter Score MIT Fix:  28 (dep=1 → +3 Blocker-Bonus)
+    private let depBlockerTaskID = "00000000-0000-0000-0000-000000000011"
+
+    /// FEATURE_012 TDD RED Test 12:
+    /// Verhalten: Coach-Backlog zeigt Priority-Score-Badge fuer DEP-Blocker-Task.
+    /// Bricht wenn: MacCoachBacklogView.coachRow() keinen MacBacklogRow mit diesem Task rendert.
+    /// RED-Grund: "[MOCK] DEP-Blocker Task" ist noch NICHT in seedUITestData vorhanden →
+    ///            Badge-Element existiert nicht → XCTAssertTrue scheitert.
+    @MainActor
+    func test_coachBacklog_depBlockerTask_priorityScoreBadgeExists() throws {
+        launchWithCoachMode()
+        navigateToBacklog()
+
+        let badgeID = "priorityScoreBadge_\(depBlockerTaskID)"
+        let badge = app.otherElements.matching(
+            NSPredicate(format: "identifier == '\(badgeID)'")
+        ).firstMatch
+        let badgeAlt = app.staticTexts.matching(
+            NSPredicate(format: "identifier == '\(badgeID)'")
+        ).firstMatch
+
+        let found = badge.waitForExistence(timeout: 5) ? badge : badgeAlt
+        XCTAssertTrue(found.waitForExistence(timeout: 5),
+                      "Priority score badge for DEP-Blocker task must exist in Coach backlog. "
+                      + "RED: Task not yet in seedUITestData → badge not found.")
+    }
+
+    /// FEATURE_012 TDD RED Test 13:
+    /// Verhalten: DEP-Blocker-Task im Coach-Backlog zeigt Score 28 (mit +3 DEP-Boost).
+    /// Bricht wenn: MacCoachBacklogView.coachRow() kein dependentCount uebergibt → Score=25.
+    /// RED-Grund 1: Task noch nicht in seedUITestData → Element existiert nicht.
+    /// RED-Grund 2 (nach Seed-Daten-Fix): Score=25 (kein DEP-Boost) statt 28 → contains("28") scheitert.
+    @MainActor
+    func test_coachBacklog_depBlockerTask_scoreIncludesDepBoost() throws {
+        launchWithCoachMode()
+        navigateToBacklog()
+
+        let badgeID = "priorityScoreBadge_\(depBlockerTaskID)"
+        let badge = app.otherElements.matching(
+            NSPredicate(format: "identifier == '\(badgeID)'")
+        ).firstMatch
+        let badgeAlt = app.staticTexts.matching(
+            NSPredicate(format: "identifier == '\(badgeID)'")
+        ).firstMatch
+
+        let found: XCUIElement
+        if badge.waitForExistence(timeout: 5) {
+            found = badge
+        } else if badgeAlt.waitForExistence(timeout: 2) {
+            found = badgeAlt
+        } else {
+            XCTFail("Priority score badge for DEP-Blocker task not found. "
+                    + "Task must be in seedUITestData (UUID: \(depBlockerTaskID)).")
+            return
+        }
+
+        // Score calculation (fresh task, no dueDate, 1 dependent):
+        // eisenhower(imp=2, not_urgent) = 20
+        // deadline(no dueDate) = 0
+        // neglect(fresh) = 0
+        // completeness(all 4 set) = 5
+        // DEP boost (dependentCount=0 without fix) = 0
+        // DEP boost (dependentCount=1 with fix)    = +3
+        // TOTAL without fix: 25
+        // TOTAL with fix:    28
+
+        // Score calculation (fresh task, no dueDate, 1 dependent):
+        // eisenhower(imp=2, not_urgent) = 20
+        // deadline(no dueDate) = 0
+        // neglect(fresh) = 0
+        // completeness(all 4 set) = 5
+        // DEP boost (dependentCount=0 without fix) = 0
+        // DEP boost (dependentCount=1 with fix)    = +3
+        // TOTAL without fix: 25
+        // TOTAL with fix:    28
+        let label = found.label
+        let value = found.value as? String ?? ""
+        let title = found.title
+        // DEBUG: dump all accessible properties to see what macOS exposes
+        let hasScore = label.contains("28") || value.contains("28") || title.contains("28")
+        XCTAssertTrue(hasScore,
+                      "DEP-Blocker badge should show score 28 (includes +3 DEP boost for 1 dependent). "
+                      + "label='\(label)' value='\(value)' title='\(title)'. "
+                      + "Without fix: score=25 (dependentCount not passed to MacBacklogRow).")
+    }
+
 }

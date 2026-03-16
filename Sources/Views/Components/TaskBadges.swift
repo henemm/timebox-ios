@@ -194,6 +194,8 @@ struct PriorityScoreBadge: View {
                 .fill(badgeColor.opacity(0.2))
         )
         .fixedSize()
+        .accessibilityElement(children: .combine)
         .accessibilityIdentifier("priorityScoreBadge_\(taskId)")
+        .accessibilityLabel("\(score)")
     }
 }
