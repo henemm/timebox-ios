@@ -1,0 +1,28 @@
+TDD RED — Unit Tests for FEATURE_023 (Discipline Trend)
+========================================================
+
+Tests reference methods that DO NOT EXIST yet:
+- DisciplineStatsService.weeklyHistory(tasks:weeksBack:now:) — NOT IMPLEMENTED
+- DisciplineStatsService.trends(from:) — NOT IMPLEMENTED
+- WeeklyDisciplineSnapshot type — NOT DEFINED
+- DisciplineTrend type — NOT DEFINED
+- TrendDirection type — NOT DEFINED
+
+Build fails with compile errors:
+- type 'DisciplineStatsService' has no member 'weeklyHistory'
+- type 'DisciplineStatsService' has no member 'trends'
+- cannot find type 'WeeklyDisciplineSnapshot' in scope
+- cannot find type 'DisciplineTrend' in scope
+
+9 tests ALL FAIL (compile error = RED):
+1. test_weeklyHistory_emptyTasks_returnsSnapshotsWithZeroCounts — FAIL
+2. test_weeklyHistory_tasksInMultipleWeeks_correctDistribution — FAIL
+3. test_weeklyHistory_respectsWeeksBackParameter — FAIL
+4. test_weeklyHistory_snapshotsInChronologicalOrder — FAIL
+5. test_trends_growingDiscipline_detected — FAIL
+6. test_trends_decliningDiscipline_detected — FAIL
+7. test_trends_stableDiscipline_noTrend — FAIL
+8. test_trends_emptyWeeksIgnored — FAIL
+9. test_trends_lessThanThreeWeeksData_allStable — FAIL
+
+** TEST FAILED **

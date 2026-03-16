@@ -12,7 +12,7 @@
 
 | ID | Titel | Prio | Aufwand | Plattform | Beschreibung |
 |----|-------|------|---------|-----------|-------------|
-| FEATURE_001 | Coach-Backlog iOS: Recurring-Serie-Dialoge | High | S | iOS | "Nur diese Aufgabe"/"Alle dieser Serie"-Dialoge fehlen beim Loeschen/Bearbeiten wiederkehrender Tasks. BacklogView hat taskToDeleteRecurring + editSeriesMode — Coach-Backlog nicht. Datenverlust-Risiko. |
+| ~~FEATURE_001~~ | ~~Coach-Backlog iOS: Recurring-Serie-Dialoge~~ | ~~High~~ | ~~S~~ | ~~iOS~~ | **ERLEDIGT** — Confirmation-Dialoge (Nur diese Aufgabe / Alle offenen dieser Serie) beim Loeschen/Bearbeiten wiederkehrender Tasks in CoachBacklogView hinzugefuegt. 5 UI Tests gruen. |
 | FEATURE_002 | Coach-Backlog iOS: Blocked-Row Editing | Medium | S | iOS | Blocked Rows im Coach-Backlog sind read-only. In BacklogView erlauben sie Duration/Importance/Category-Aenderungen. |
 | FEATURE_003 | Coach-Backlog macOS: Quick-Add TextField | Medium | S | macOS | Normaler macOS-Backlog hat Quick-Add-TextField oben — Coach-Backlog nicht. |
 | FEATURE_004 | Coach-Backlog macOS: Suchfunktion | Medium | S | macOS | Normaler macOS-Backlog hat .searchable — Coach-Backlog nicht. |
@@ -23,7 +23,7 @@
 | FEATURE_010 | Coach-Backlog macOS: Keyboard Shortcuts | Low | S | macOS | Normaler macOS-Backlog hat Cmd+N (neuer Task), Cmd+Delete (loeschen), etc. Coach-Backlog keine. |
 | FEATURE_011 | Coach-Backlog macOS: Undo (Cmd+Z) | Low | S | macOS | iOS Coach-Backlog hat Shake-to-Undo. macOS Coach-Backlog hat kein Cmd+Z-Undo. |
 | FEATURE_012 | Coach-Backlog macOS: effectiveScore/Tier/dependentCount | High | S | macOS | MacBacklogRow bekommt diese Parameter nicht von Coach-Backlog. Normaler Backlog schon. Betrifft Badge-Anzeige und visuelle Priorisierung — falsche Darstellung. |
-| FEATURE_013 | Coach-Backlog macOS: Serien-Bearbeitung | Low | S | macOS | Recurring-Task-Dialoge (Serie vs. Einzelaufgabe) fehlen auf macOS — sowohl in Coach- als auch normalem Backlog. |
+| FEATURE_013 | Coach-Backlog macOS: Serien-Bearbeitung | Low | S | macOS | Recurring-Task-Dialoge (Serie vs. Einzelaufgabe) fehlen auf macOS (MacCoachBacklogView + MacBacklogRow). iOS BacklogView + CoachBacklogView haben sie bereits. |
 | FEATURE_014 | Coach-Backlog: Apple Reminders Import | Medium | M | Beide | Beide Plattformen: Normaler Backlog hat Reminders-Import-Funktion. Coach-Backlog nicht. |
 | FEATURE_015 | UX: Tag-Auswahl redesignen | Medium | S | iOS | Tag-Sektion in TaskFormSheet unuebersichtlich: "Neuer Tag" dominiert, bestehende Tags kommen danach. Redesign: Tags als antippbare Chips, "Neuer Tag" darunter. Vorbild: Apple Erinnerungen. |
 | FEATURE_016 | ~~Disziplin-Entwicklung sichtbar machen~~ | ~~Low~~ | ~~M~~ | ~~Beide~~ | **ERLEDIGT** — Phase 1: Disziplin-Profil (Heute + Woche) in CoachMeinTagView. Phase 2 (Multi-Wochen-Trend mit Charts) als separates Ticket. |
@@ -35,7 +35,7 @@
 | FEATURE_022 | CaptureContextIntent | Low | M | iOS | WARTEND auf Apple APIs (iOS 26.5/27). |
 | TD_001 | God-Views aufbrechen | Low | L | Beide | BacklogView 1181 LoC, BlockPlanningView 1400 LoC — Wartbarkeit. |
 | TD_002 | View-Duplikation iOS/macOS | Low | XL | Beide | ~7300 LoC verbleibend. Langfristig wichtig, kurzfristig kein Blocker. |
-| FEATURE_023 | Disziplin-Trend (Multi-Wochen) | Low | M | Beide | Multi-Wochen-Trend mit Swift Charts (gestapeltes Balkendiagramm, 4-8 Wochen). Trend-Erkennung ("Konsequenz waechst seit 3 Wochen"), staerkstes/schwaechstes Disziplin-Highlight. Aufbauend auf FEATURE_016. |
+| ~~FEATURE_023~~ | ~~Disziplin-Trend (Multi-Wochen)~~ | ~~Low~~ | ~~M~~ | ~~Beide~~ | **ERLEDIGT** — Multi-Wochen-Trend mit Swift Charts in CoachMeinTagView. Stacked Bar Chart (6 Wochen), Trend-Erkennung (growing/declining/stable), staerkstes Disziplin-Highlight. 9 Unit Tests + 3 UI Tests gruen. |
 
 ---
 

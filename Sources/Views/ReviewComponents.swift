@@ -52,6 +52,33 @@ struct DisciplineBar: View {
     }
 }
 
+// MARK: - Discipline Trend Types
+
+/// Weekly snapshot of discipline distribution for trend visualization.
+struct WeeklyDisciplineSnapshot: Identifiable {
+    let weekStart: Date
+    let stats: [DisciplineStat]
+    var id: Date { weekStart }
+
+    /// Total completed tasks in this week.
+    var total: Int { stats.first?.total ?? 0 }
+}
+
+/// Direction of a discipline trend over consecutive weeks.
+enum TrendDirection {
+    case growing
+    case declining
+    case stable
+}
+
+/// Detected trend for a single discipline.
+struct DisciplineTrend: Identifiable {
+    let discipline: Discipline
+    let direction: TrendDirection
+    let consecutiveWeeks: Int
+    var id: String { discipline.rawValue }
+}
+
 // MARK: - Shared Data Types
 
 /// Category stat combining TaskCategory with aggregated minutes

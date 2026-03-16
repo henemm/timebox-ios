@@ -13,11 +13,14 @@ struct CoachMeinTagView: View {
     @State private var aiReflectionText: String?
     @State private var weeklyAIReflectionText: String?
     @State private var reviewMode: ReviewMode = .today
+    @State private var trendSnapshots: [WeeklyDisciplineSnapshot] = []
+    @State private var disciplineTrends: [DisciplineTrend] = []
     @AppStorage("intentionJustSet") private var intentionJustSet: Bool = false
 
     private enum ReviewMode: String, CaseIterable {
         case today = "Heute"
         case week = "Diese Woche"
+        case trend = "Trend"
     }
 
     /// Show evening reflection card after 18:00 or when forced via launch arg.
@@ -110,6 +113,13 @@ struct CoachMeinTagView: View {
 
                     disciplineBreakdownSection(stats: weekDisciplineStats)
                         .padding(.horizontal)
+
+                case .trend:
+                    DisciplineTrendChart(
+                        snapshots: trendSnapshots,
+                        trends: disciplineTrends
+                    )
+                    .padding(.horizontal)
                 }
             }
             .padding(.top, 8)
@@ -127,6 +137,9 @@ struct CoachMeinTagView: View {
         .onChange(of: reviewMode) {
             if reviewMode == .week {
                 Task { await loadWeeklyAIReflectionText() }
+            }
+            if reviewMode == .trend {
+                loadTrendData()
             }
         }
     }
@@ -283,6 +296,14 @@ struct CoachMeinTagView: View {
             tasks: allLocalTasks,
             focusBlocks: todayBlocks
         )
+    }
+
+    private func loadTrendData() {
+        trendSnapshots = DisciplineStatsService.weeklyHistory(
+            tasks: allLocalTasks,
+            weeksBack: 6
+        )
+        disciplineTrends = DisciplineStatsService.trends(from: trendSnapshots)
     }
 
     private func loadWeeklyAIReflectionText() async {

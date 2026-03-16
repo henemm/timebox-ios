@@ -1,0 +1,15 @@
+TDD RED — UI Tests for FEATURE_023 (Discipline Trend)
+======================================================
+
+Tests reference UI elements that DO NOT EXIST yet:
+- Segmented control button "Trend" — NOT IN ReviewMode enum
+- disciplineTrendSection — NOT RENDERED (DisciplineTrendChart doesn't exist)
+- disciplineTrendHeader — NOT RENDERED
+- disciplineTrendChart — NOT RENDERED
+
+3 tests ALL FAIL:
+1. test_trendSegment_visible — FAIL (no "Trend" segment in picker)
+2. test_trendView_showsChartSection — FAIL (disciplineTrendSection not found)
+3. test_trendView_showsHeader — FAIL (disciplineTrendHeader not found)
+
+** TEST FAILED **
