@@ -121,6 +121,49 @@ CODE_MODIFY_PHASES = ["phase6_implement", "phase7_validate", "phase8_complete"]
 # Phases that require test artifacts
 TEST_REQUIRED_PHASES = ["phase6_implement", "phase7_validate"]
 
+# Phases where only one workflow may be active at a time (simulator/build exclusivity)
+TDD_BLOCKING_PHASES = ["phase5_tdd_red", "phase6_implement"]
+
+# Stale threshold: workflows older than this are ignored for conflict checks
+TDD_STALE_THRESHOLD_HOURS = 48
+
+
+def _get_conflicting_tdd_workflows(requesting_workflow: str) -> list[dict]:
+    """Find other workflows currently in TDD-blocking phases (< 48h active).
+
+    Returns list of dicts with 'name' and 'phase' for each conflicting workflow.
+    The requesting workflow itself is never considered a conflict (re-enter allowed).
+    """
+    state = load_state()
+    conflicts = []
+
+    for name, wf in state.get("workflows", {}).items():
+        if name == requesting_workflow:
+            continue
+
+        phase = wf.get("current_phase", "phase0_idle")
+        if phase not in TDD_BLOCKING_PHASES:
+            continue
+
+        # Check staleness
+        ts = wf.get("last_updated") or wf.get("created")
+        if not ts:
+            continue
+        try:
+            updated = datetime.fromisoformat(str(ts))
+            if (datetime.now() - updated).total_seconds() > TDD_STALE_THRESHOLD_HOURS * 3600:
+                continue
+        except (ValueError, TypeError):
+            continue
+
+        conflicts.append({
+            "name": name,
+            "phase": phase,
+            "phase_name": PHASE_NAMES.get(phase, phase),
+        })
+
+    return conflicts
+
 
 def _is_stop_locked() -> bool:
     """Check if the stop-lock is active."""
@@ -355,6 +398,20 @@ def advance_phase(workflow_name: str = None) -> Optional[str]:
             current_index = PHASES.index(current_phase)
             if current_index < len(PHASES) - 1:
                 new_phase = PHASES[current_index + 1]
+
+                # Parallel TDD conflict check before entering TDD phases
+                if new_phase in TDD_BLOCKING_PHASES:
+                    conflicts = _get_conflicting_tdd_workflows(name)
+                    if conflicts:
+                        names = ", ".join(f"'{c['name']}' ({c['phase_name']})" for c in conflicts)
+                        print(
+                            f"BLOCKED: Paralleler TDD-Konflikt! "
+                            f"Andere Workflows in TDD-Phasen: {names}. "
+                            f"Warte bis diese fertig sind.",
+                            file=sys.stderr,
+                        )
+                        return None
+
                 workflow["current_phase"] = new_phase
                 workflow["last_updated"] = datetime.now().isoformat()
                 _save_state_unlocked(state)
@@ -405,6 +462,17 @@ def set_phase(workflow_name: str, phase: str, force: bool = False) -> tuple[bool
                     return False, f"Override required: skipping phases ({', '.join(skipped_names)})"
             except ValueError:
                 pass
+
+        # Parallel TDD conflict check: block entering TDD phases when another workflow is active there
+        if phase in TDD_BLOCKING_PHASES and not force:
+            conflicts = _get_conflicting_tdd_workflows(workflow_name)
+            if conflicts:
+                names = ", ".join(f"'{c['name']}' ({c['phase_name']})" for c in conflicts)
+                return False, (
+                    f"BLOCKED: Paralleler TDD-Konflikt! "
+                    f"Andere Workflows in TDD-Phasen: {names}. "
+                    f"Warte bis diese fertig sind oder wechsle zum aktiven Workflow."
+                )
 
         # Validation check for phase7_validate
         if phase == "phase7_validate" and not force:
@@ -636,8 +704,18 @@ def mark_red_test_done(workflow_name: str = None, result: str = None) -> bool:
         workflow["red_test_result"] = result
         workflow["last_updated"] = datetime.now().isoformat()
 
-        # Auto-advance to phase5 if in phase4
+        # Auto-advance to phase5 if in phase4 (with parallel TDD check)
         if workflow["current_phase"] == "phase4_approved":
+            conflicts = _get_conflicting_tdd_workflows(name)
+            if conflicts:
+                names = ", ".join(f"'{c['name']}' ({c['phase_name']})" for c in conflicts)
+                print(
+                    f"BLOCKED: Paralleler TDD-Konflikt! "
+                    f"Andere Workflows in TDD-Phasen: {names}. "
+                    f"Warte bis diese fertig sind.",
+                    file=sys.stderr,
+                )
+                return False
             workflow["current_phase"] = "phase5_tdd_red"
             if "phase5_tdd_red" not in workflow.get("phases_completed", []):
                 workflow.setdefault("phases_completed", []).append("phase5_tdd_red")

@@ -20,16 +20,19 @@
 | **7** | Discipline manuell ueberschreiben | Feature | M | DONE — Long-Press Context Menu mit 4 farbigen Disziplin-Optionen + Zuruecksetzen. iOS + macOS. 10 Unit + 6 UI Tests gruen. |
 | **8** | Coach Mission Card | Feature | S | DONE — Monster spricht mit konkreter Tages-Mission an. Pro Coach eigene Logik. 10 Unit Tests gruen. iOS + macOS Build OK. |
 | **8b** | Coach Preview + AI Pitches | Feature | S | DONE — Coach-Auswahl zeigt konkrete Tasks + Apple Intelligence Pitches. Empfohlen-Badge. 23 Tests gruen. |
-| **9** | TD-03: Services ohne Tests | Tech Debt | M | NotificationService, FocusBlockActionService, GapFinder — Sicherheitsnetz fehlt. |
-| **10** | Disziplin-Entwicklung sichtbar machen | Feature | M | Historische Auswertung ueber Wochen/Monate — welche Disziplinen gestaerkt? |
-| **11** | Stille-Regel: Nudges dynamisch canceln | Enhancement | S | Geplante Nudges stoppen wenn Intention tagsueber erfuellt wird. |
-| **12** | MAC-026: Enhanced Quick Capture | Feature | L | macOS Produktivitaet. Kein Blocker. |
-| **13** | TD-01: God-Views aufbrechen | Tech Debt | L | BacklogView 1181 LoC, BlockPlanningView 1400 LoC — Wartbarkeit. |
-| **15** | MAC-030: Shortcuts.app | Feature | L | macOS Automatisierung. P3. |
-| **16** | MAC-031: Focus Mode Integration | Feature | M | macOS System-Integration. P3. |
-| **18** | TD-02: View-Duplikation | Tech Debt | XL | ~7300 LoC. Langfristig wichtig, kurzfristig kein Blocker. |
-| **19** | ITB-C: OrganizeMyDay Intent | Feature | XL | Komplexer Intent. Kann warten. |
-| **20** | ITB-F: CaptureContextIntent | Feature | M | WARTEND auf Apple APIs (iOS 26.5/27). |
+| **9** | Bug 104: macOS Monster-Backlog Regression | Bug P1 | S-M | Swipe-Gesten defekt + kein Task-Anlegen moeglich in MacCoachBacklogView. Regression seit Monster-Modus-Einfuehrung. Frage: Warum haben Tests das nicht bemerkt? MacCoachBacklogView hat keine swipeActions + keinen Add-Button — Features fehlen in der Coach-Variante. |
+| **10** | UX: Tag-Auswahl redesignen | Enhancement | S | Tag-Sektion in TaskFormSheet ist unuebersichtlich: "Neuer Tag" Textfeld dominiert, bestehende Tags kommen erst danach. Redesign: Bestehende Tags zuerst als antippbare Chips (Toggle-Auswahl), "Neuer Tag" Textfeld darunter. Vorbild: Apple Erinnerungen. |
+| **11** | Watch: Quick Capture vereinfachen | Bug | S | Komplikation-Tap zeigt unnoetig "Was moechtest du tun?" + Abbrechen. Soll direkt Spracheingabe oeffnen, nach "Fertig" sofort speichern. Kein Zwischenscreen, keine Rueckfragen. War nie anders spezifiziert. |
+| **12** | TD-03: Services ohne Tests | Tech Debt | M | NotificationService, FocusBlockActionService, GapFinder — Sicherheitsnetz fehlt. |
+| **13** | Disziplin-Entwicklung sichtbar machen | Feature | M | Historische Auswertung ueber Wochen/Monate — welche Disziplinen gestaerkt? |
+| **14** | Stille-Regel: Nudges dynamisch canceln | Enhancement | S | Geplante Nudges stoppen wenn Intention tagsueber erfuellt wird. |
+| **15** | MAC-026: Enhanced Quick Capture | Feature | L | macOS Produktivitaet. Kein Blocker. |
+| **16** | TD-01: God-Views aufbrechen | Tech Debt | L | BacklogView 1181 LoC, BlockPlanningView 1400 LoC — Wartbarkeit. |
+| **17** | MAC-030: Shortcuts.app | Feature | L | macOS Automatisierung. P3. |
+| **18** | MAC-031: Focus Mode Integration | Feature | M | macOS System-Integration. P3. |
+| **19** | TD-02: View-Duplikation | Tech Debt | XL | ~7300 LoC. Langfristig wichtig, kurzfristig kein Blocker. |
+| **20** | ITB-C: OrganizeMyDay Intent | Feature | XL | Komplexer Intent. Kann warten. |
+| **21** | ITB-F: CaptureContextIntent | Feature | M | WARTEND auf Apple APIs (iOS 26.5/27). |
 
 ---
 
@@ -245,6 +248,7 @@
 - Kein File-Locking auf workflow_state.json (Korruptionsgefahr)
 - **Fix:** load_state Import, fcntl.flock Locking, Overlap→Block, test_lock_guard registriert
 - **Dateien:** parallel_test_guard.py, workflow_state_multi.py, strict_code_gate.py, settings.json
+- **Nachtrag:** Phase-Eintritt-Guard hinzugefuegt — `set_phase()`, `advance_phase()`, `mark_red_test_done()` blockieren Betreten von TDD-Phasen wenn anderer Workflow dort aktiv ist (48h Stale-Threshold, Re-Enter erlaubt). Zwei-Layer-Schutz: Phase-Eintritt + xcodebuild-Guard.
 
 ### TD-05: Coach Views Cross-Platform Consolidation (Pilot) — ERLEDIGT
 - Duplizierte Filter-Logik in shared `CoachBacklogViewModel` extrahiert (`relevantTasks`, `otherTasks`, `parseCoach`)
