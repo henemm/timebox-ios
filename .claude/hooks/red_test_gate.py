@@ -168,13 +168,13 @@ def main():
 ║  TDD requires:                                                   ║
 ║  1. Write tests that exercise the new/changed functionality      ║
 ║  2. Run the tests - they MUST FAIL (that's the RED!)             ║
-║  3. Document the failure with /add-artifact or:                  ║
+║  3. Document the failure with /09-add-artifact or:               ║
 ║     - Save test output to docs/artifacts/                        ║
 ║     - Register artifact in workflow state                        ║
 ║                                                                  ║
 ║  Commands:                                                       ║
-║    /tdd-red          - Start RED phase                           ║
-║    /add-artifact     - Register test evidence                    ║
+║    /04-tdd-red       - Start RED phase                           ║
+║    /09-add-artifact  - Register test evidence                    ║
 ║                                                                  ║
 ║  Only AFTER red_test_done=true can you modify implementation!    ║
 ╚══════════════════════════════════════════════════════════════════╝

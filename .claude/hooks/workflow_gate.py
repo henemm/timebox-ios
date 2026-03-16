@@ -3,11 +3,11 @@
 OpenSpec Framework - Workflow Gate Hook
 
 Enforces the 4-phase workflow for protected files:
-1. idle -> analyse_done (/analyse)
-2. analyse_done -> spec_written (/write-spec)
+1. idle -> analyse_done (/02-analyse)
+2. analyse_done -> spec_written (/03-write-spec)
 3. spec_written -> spec_approved (user says "approved")
-4. spec_approved -> implemented (/implement)
-5. implemented -> validated (/validate)
+4. spec_approved -> implemented (/05-implement)
+5. implemented -> validated (/06-validate)
 
 Blocks Edit/Write on protected files unless workflow phase allows it.
 
@@ -186,16 +186,16 @@ def get_phase_error(state: dict, file_path: str) -> str | None:
 ║                                                                  ║
 ║  REQUIRED WORKFLOW:                                              ║
 ║  ┌─────────────────────────────────────────────────────────────┐ ║
-║  │ /context    → Gather relevant context         (Phase 1)     │ ║
-║  │ /analyse    → Analyse requirements            (Phase 2)     │ ║
-║  │ /write-spec → Create specification            (Phase 3)     │ ║
+║  │ /01-context    → Gather relevant context       (Phase 1)     │ ║
+║  │ /02-analyse    → Analyse requirements          (Phase 2)     │ ║
+║  │ /03-write-spec → Create specification          (Phase 3)     │ ║
 ║  │ "approved"  → User approval                   (Phase 4)     │ ║
-║  │ /tdd-red    → Write FAILING tests             (Phase 5)     │ ║
-║  │ /implement  → Make tests GREEN                (Phase 6)     │ ║
-║  │ /validate   → Manual validation               (Phase 7)     │ ║
+║  │ /04-tdd-red    → Write FAILING tests           (Phase 5)     │ ║
+║  │ /05-implement  → Make tests GREEN              (Phase 6)     │ ║
+║  │ /06-validate   → Manual validation             (Phase 7)     │ ║
 ║  └─────────────────────────────────────────────────────────────┘ ║
 ║                                                                  ║
-║  START WITH: /context or /analyse                                ║
+║  START WITH: /01-context or /02-analyse                           ║
 ║                                                                  ║
 ║  MANUAL OVERRIDE: User can say "ich genehmige das" to bypass.    ║
 ╚══════════════════════════════════════════════════════════════════╝
@@ -208,7 +208,7 @@ def get_phase_error(state: dict, file_path: str) -> str | None:
 ╠══════════════════════════════════════════════════════════════════╣
 ║  Context is being gathered, but analysis isn't complete.         ║
 ║                                                                  ║
-║  NEXT: /analyse                                                  ║
+║  NEXT: /02-analyse                                               ║
 ║                                                                  ║
 ║  Complete the analysis before modifying code!                    ║
 ╚══════════════════════════════════════════════════════════════════╝
@@ -221,7 +221,7 @@ def get_phase_error(state: dict, file_path: str) -> str | None:
 ╠══════════════════════════════════════════════════════════════════╣
 ║  Analysis is complete, but no spec has been written.             ║
 ║                                                                  ║
-║  NEXT: /write-spec                                               ║
+║  NEXT: /03-write-spec                                            ║
 ║                                                                  ║
 ║  The spec defines WHAT to build and HOW to test it.              ║
 ║  NO implementation without a spec!                               ║
@@ -264,7 +264,7 @@ def get_phase_error(state: dict, file_path: str) -> str | None:
 ║  │  REFACTOR → Clean up (optional)                             │ ║
 ║  └─────────────────────────────────────────────────────────────┘ ║
 ║                                                                  ║
-║  NEXT: /tdd-red                                                  ║
+║  NEXT: /04-tdd-red                                               ║
 ║                                                                  ║
 ║  Write tests, run them, capture the FAILURE as artifact!         ║
 ║                                                                  ║
@@ -287,7 +287,7 @@ def get_phase_error(state: dict, file_path: str) -> str | None:
 ║  REQUIRED:                                                       ║
 ║  1. Write tests for the new functionality                        ║
 ║  2. Run tests - they MUST FAIL                                   ║
-║  3. Capture failure: /add-artifact                               ║
+║  3. Capture failure: /09-add-artifact                            ║
 ║                                                                  ║
 ║  Only after capturing RED failure can you implement!             ║
 ║                                                                  ║
@@ -303,9 +303,35 @@ def get_phase_error(state: dict, file_path: str) -> str | None:
 ╠══════════════════════════════════════════════════════════════════╣
 ║  Implementation done, but not validated yet.                     ║
 ║                                                                  ║
-║  NEXT: /validate                                                 ║
+║  NEXT: /06-validate                                              ║
 ║                                                                  ║
 ║  Verify tests are GREEN and do manual testing!                   ║
+╚══════════════════════════════════════════════════════════════════╝
+"""
+
+    if phase in ["phase6b_adversary"]:
+        workflow = get_active_workflow(state)
+        verdict = None
+        if workflow:
+            verdict = workflow.get("adversary_verdict")
+        if not verdict or not str(verdict).startswith("VERIFIED"):
+            return """
+╔══════════════════════════════════════════════════════════════════╗
+║  ADVERSARY VERIFICATION REQUIRED!                                ║
+╠══════════════════════════════════════════════════════════════════╣
+║  Implementation + tests are done, but the Adversary hasn't       ║
+║  verified your work yet.                                         ║
+║                                                                  ║
+║  The Adversary is an independent agent that TRIES TO BREAK       ║
+║  your implementation. Only if it FAILS, you may proceed.         ║
+║                                                                  ║
+║  HOW:                                                            ║
+║  1. Run the implementation-validator agent (Task subagent)       ║
+║  2. It reads the Spec, runs tests, makes screenshots             ║
+║  3. It writes test output to /tmp/adversary_test_output.txt      ║
+║  4. Run: python3 .claude/hooks/adversary_gate.py <output-file>   ║
+║                                                                  ║
+║  You CANNOT skip this phase. No shortcuts.                       ║
 ╚══════════════════════════════════════════════════════════════════╝
 """
 
@@ -368,7 +394,7 @@ def main():
 ║  You may be working on a DIFFERENT task than the active one.     ║
 ║                                                                  ║
 ║  ACTION REQUIRED:                                                ║
-║  - Start a NEW workflow for this task (/context or /analyse)     ║
+║  - Start a NEW workflow for this task (/01-context or /02-analyse) ║
 ║  - Or update affected_files in the current workflow              ║
 ║                                                                  ║
 ║  Each task needs its own workflow - no piggybacking!             ║
@@ -383,7 +409,7 @@ def main():
     allowed_phases = [
         "spec_approved", "implemented", "validated",
         "phase4_approved", "phase5_tdd_red", "phase6_implement",
-        "phase7_validate", "phase8_complete"
+        "phase6b_adversary", "phase7_validate", "phase8_complete"
     ]
 
     if phase in allowed_phases:

@@ -80,6 +80,6 @@ python3 .claude/hooks/workflow_state_multi.py phase phase2_analyse
 ## Next Step
 
 Inform the user:
-> "Context gathered. Found [N] related files. Next: `/analyse` for detailed analysis."
+> "Context gathered. Found [N] related files. Next: `/02-analyse` for detailed analysis."
 
 **IMPORTANT:** Do NOT skip to implementation. Context → Analyse → Spec → Implement.

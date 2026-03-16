@@ -4,7 +4,7 @@ You are in **Phase 2 - Analysis** of the workflow.
 
 ## Prerequisites
 
-- Context gathered (`/context` completed, or combined with analysis)
+- Context gathered (`/01-context` completed, or combined with analysis)
 - Active workflow exists
 
 Check current workflow:
@@ -102,7 +102,7 @@ python3 .claude/hooks/workflow_state_multi.py phase phase3_spec
 ## Next Step
 
 When analysis is complete:
-> "Analysis complete. Type: [Bug/Feature]. Scope: [N] files, ~[N] LoC. Next: `/write-spec` to create the specification."
+> "Analysis complete. Type: [Bug/Feature]. Scope: [N] files, ~[N] LoC. Next: `/03-write-spec` to create the specification."
 
 If you have open questions, ask the user before proceeding.
 

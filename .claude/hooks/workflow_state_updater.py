@@ -108,7 +108,7 @@ def main():
     save_state(state)
 
     # Output confirmation (shown as hook output)
-    print(f"Spec approved! You may now run /implement")
+    print(f"Spec approved! You may now run /05-implement")
 
     sys.exit(0)
 

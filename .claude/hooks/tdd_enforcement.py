@@ -187,7 +187,7 @@ def validate_red_phase(workflow: dict) -> tuple[bool, str]:
 |  2. Run the tests - they MUST FAIL (RED)                             |
 |  3. Register artifact with type: "test_output"                       |
 |                                                                      |
-|  Use /add-artifact to register test evidence.                        |
+|  Use /09-add-artifact to register test evidence.                     |
 +======================================================================+
 """
 
@@ -209,7 +209,7 @@ def validate_red_phase(workflow: dict) -> tuple[bool, str]:
 |  - User interactions work as expected                                |
 |  - Navigation flows are correct                                      |
 |                                                                      |
-|  Use /add-artifact to register UI test evidence.                     |
+|  Use /09-add-artifact to register UI test evidence.                  |
 +======================================================================+
 """
 
@@ -229,7 +229,7 @@ def validate_red_phase(workflow: dict) -> tuple[bool, str]:
 |  - Actual test output logs                                           |
 |  - Actual API responses                                              |
 |                                                                      |
-|  Fix the artifact or add a valid one with /add-artifact.             |
+|  Fix the artifact or add a valid one with /09-add-artifact.          |
 +======================================================================+
 """
 
@@ -279,7 +279,7 @@ def validate_red_phase(workflow: dict) -> tuple[bool, str]:
 |  3. Capture the ACTUAL failure output                                |
 |  4. Set ui_test_red_done=true and ui_test_red_result="failed:..."    |
 |                                                                      |
-|  Use /tdd-red to properly start the TDD RED phase.                   |
+|  Use /04-tdd-red to properly start the TDD RED phase.                |
 +======================================================================+
 """
 

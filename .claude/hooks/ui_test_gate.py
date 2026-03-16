@@ -126,7 +126,7 @@ def main():
 |  2. Run tests - they FAIL (RED) before implementation                |
 |  3. Implement the feature                                            |
 |  4. Run tests again - they PASS (GREEN)                              |
-|  5. Register GREEN artifact with /add-artifact                       |
+|  5. Register GREEN artifact with /09-add-artifact                    |
 |                                                                      |
 |  UI Tests verify:                                                    |
 |  - Components render correctly                                       |
@@ -135,7 +135,7 @@ def main():
 |                                                                      |
 |  Fix with:                                                           |
 |  - Run UI tests and capture output                                   |
-|  - /add-artifact with type "ui_test_output" or "screenshot"          |
+|  - /09-add-artifact with type "ui_test_output" or "screenshot"       |
 +======================================================================+
 """, file=sys.stderr)
             sys.exit(2)

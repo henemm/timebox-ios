@@ -39,7 +39,7 @@ Beweisen = Logging einbauen, ausfuehren, Output lesen. Nicht: "Code lesen und fu
 2. `Grep` nach UI-Elementen (.searchable, Button-Identifier, etc.)
 3. ACTIVE-todos.md — steht es noch als OFFEN?
 
-Wenn nie implementiert → **kein Bug**. Henning informieren, `/implement` vorschlagen.
+Wenn nie implementiert → **kein Bug**. Henning informieren, `/05-implement` vorschlagen.
 
 > Negativbeispiel: "Suche nicht sichtbar" — war nie gebaut worden, nur Spec existierte.
 
@@ -189,7 +189,7 @@ Nach Freigabe — normaler TDD-Zyklus:
 python3 .claude/hooks/workflow_state_multi.py phase phase5_tdd_red
 ```
 
-Nutze `/tdd-red` — leite Tests aus der Analyse ab:
+Nutze `/04-tdd-red` — leite Tests aus der Analyse ab:
 - **Root Cause** → Regressions-Test (Input der den Bug ausloest → korrektes Ergebnis)
 - **Blast Radius** → Tests fuer betroffene Flows
 - Fuer jeden Test: "Welche Zeile bricht diesen Test?" — wenn nicht beantwortbar, Test streichen

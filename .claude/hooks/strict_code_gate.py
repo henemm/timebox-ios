@@ -316,10 +316,10 @@ def main():
 ║  Implementation requires phase6_implement or later!              ║
 ║                                                                  ║
 ║  NEXT STEPS:                                                     ║
-║  1. /write-spec  → Create specification (if not done)           ║
+║  1. /03-write-spec  → Create specification (if not done)        ║
 ║  2. User: "approved" → Get spec approval                         ║
-║  3. /tdd-red     → Write FAILING tests                          ║
-║  4. /implement   → Make tests GREEN                             ║
+║  3. /04-tdd-red     → Write FAILING tests                       ║
+║  4. /05-implement   → Make tests GREEN                          ║
 ║                                                                  ║
 ║  Current phase does not allow code modification!                 ║
 ╚══════════════════════════════════════════════════════════════════╝
@@ -346,7 +346,7 @@ def main():
 ║  REQUIRED STEPS:                                                 ║
 ║  1. Write XCUITests or Unit Tests for this feature               ║
 ║  2. Run tests → they MUST FAIL                                   ║
-║  3. Use /add-artifact to register test failure                   ║
+║  3. Use /09-add-artifact to register test failure                ║
 ║                                                                  ║
 ║  Only after capturing RED failure can you implement!             ║
 ║                                                                  ║
@@ -384,10 +384,10 @@ def main():
 ║  ┌─────────────────────────────────────────────────────────────┐ ║
 ║  │ OPTION 1: File belongs to CURRENT workflow                  │ ║
 ║  │   → Update spec to include this file in affected_files      │ ║
-║  │   → Re-run /analyse to update workflow state                │ ║
+║  │   → Re-run /02-analyse to update workflow state             │ ║
 ║  │                                                             │ ║
 ║  │ OPTION 2: This is a DIFFERENT task (bug/feature)            │ ║
-║  │   → First: /reset to clear current workflow                 │ ║
+║  │   → First: /00-reset to clear current workflow              │ ║
 ║  │   → Then: /10-bug or /11-feature to start NEW workflow      │ ║
 ║  └─────────────────────────────────────────────────────────────┘ ║
 ║                                                                  ║

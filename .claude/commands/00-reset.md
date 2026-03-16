@@ -6,9 +6,9 @@ Reset the workflow state to start fresh.
 
 | Situation | Action |
 |-----------|--------|
-| Workflow completed successfully | `/reset` |
-| Need to abort current workflow | `/reset` |
-| Starting a completely new task | `/reset` |
+| Workflow completed successfully | `/00-reset` |
+| Need to abort current workflow | `/00-reset` |
+| Starting a completely new task | `/00-reset` |
 
 ## What Happens
 
@@ -46,8 +46,8 @@ echo '{"current_phase": "idle", "workflows": {}}' > .claude/workflow_state.json
 After reset, start a new workflow:
 
 ```
-/analyse [feature/bug]  → Start analysis
-/context               → Gather context first
+/02-analyse [feature/bug]  → Start analysis
+/01-context               → Gather context first
 ```
 
 ---

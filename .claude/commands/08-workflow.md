@@ -137,9 +137,9 @@ And only if:
 
 Some phase transitions happen automatically:
 - User says "approved" → `phase4_approved`
-- `/context` completed → `phase1_context`
-- `/analyse` completed → `phase2_analyse`
-- `/write-spec` completed → `phase3_spec`
+- `/01-context` completed → `phase1_context`
+- `/02-analyse` completed → `phase2_analyse`
+- `/03-write-spec` completed → `phase3_spec`
 
 ## State File Location
 

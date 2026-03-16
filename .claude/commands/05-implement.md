@@ -105,8 +105,36 @@ add_test_artifact(active, {
 "
 ```
 
-### Step 6: Update Workflow State
+### Step 6: Update Workflow State to Adversary Phase
 
+```bash
+python3 .claude/hooks/workflow_state_multi.py phase phase6b_adversary
+```
+
+### Step 7: Run Adversary Verification (MANDATORY)
+
+**Du kannst NICHT direkt zu `/06-validate` springen. Der Adversary muss zuerst pruefen.**
+
+Starte den `implementation-validator` Agent:
+
+```
+Task (implementation-validator): "Pruefe den aktuellen Workflow.
+  Lies die Spec, fuehre Tests aus, mach Screenshots, pruefe Edge Cases.
+  Ruf am Ende adversary_gate.py auf."
+```
+
+Der Adversary-Agent:
+1. Liest NUR die Spec (nicht den Code)
+2. Fuehrt Tests aus → `/tmp/adversary_test_output.txt`
+3. Macht Screenshots → `/tmp/adversary_screenshot.png`
+4. Prueft Edge Cases
+5. Ruft `adversary_gate.py` auf → setzt Verdict
+
+**Wenn Adversary BROKEN meldet:**
+- Fixen und Step 7 wiederholen
+
+**Wenn Adversary VERIFIED meldet:**
+- Weiter zu Phase 7:
 ```bash
 python3 .claude/hooks/workflow_state_multi.py phase phase7_validate
 ```
@@ -121,8 +149,8 @@ Follow scoping limits:
 
 ## Next Step
 
-After implementation:
-> "Implementation complete. All [N] tests pass. Ready for `/validate`."
+After adversary verification:
+> "Implementation complete. Adversary verified. Ready for `/06-validate`."
 
 ## Common Mistakes
 
@@ -130,3 +158,4 @@ After implementation:
 - **Skipping tests** -> Not TDD
 - **Large functions** -> Hard to test/maintain
 - **Not running tests** -> Might still be RED
+- **Skipping adversary** -> Commit will be BLOCKED

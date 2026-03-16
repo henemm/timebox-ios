@@ -57,6 +57,7 @@ PHASES = [
     "phase4_approved",
     "phase5_tdd_red",
     "phase6_implement",
+    "phase6b_adversary",
     "phase7_validate",
     "phase8_complete",
 ]
@@ -70,6 +71,7 @@ PHASE_NAMES = {
     "phase4_approved": "Spec Approved",
     "phase5_tdd_red": "TDD RED - Write Failing Tests",
     "phase6_implement": "Implementation (TDD GREEN)",
+    "phase6b_adversary": "Adversary Verification",
     "phase7_validate": "Validation",
     "phase8_complete": "Complete",
 }
@@ -95,6 +97,7 @@ PHASE_TO_BACKLOG_STATUS = {
     "phase4_approved": "spec_ready",
     "phase5_tdd_red": "in_progress",
     "phase6_implement": "in_progress",
+    "phase6b_adversary": "in_progress",
     "phase7_validate": "in_progress",
     "phase8_complete": "done",
 }
@@ -116,7 +119,7 @@ PAUSE_PHRASES = [
 ]
 
 # Phases that allow code modification
-CODE_MODIFY_PHASES = ["phase6_implement", "phase7_validate", "phase8_complete"]
+CODE_MODIFY_PHASES = ["phase6_implement", "phase6b_adversary", "phase7_validate", "phase8_complete"]
 
 # Phases that require test artifacts
 TEST_REQUIRED_PHASES = ["phase6_implement", "phase7_validate"]
@@ -495,6 +498,13 @@ def set_phase(workflow_name: str, phase: str, force: bool = False) -> tuple[bool
             if missing:
                 return False, f"Cannot enter validation phase. Missing: {', '.join(missing)}"
 
+            # Check adversary verdict — must be VERIFIED before validation
+            verdict = workflow.get("adversary_verdict")
+            if not verdict:
+                return False, "Cannot enter validation phase. Adversary verdict missing. Run implementation-validator agent first."
+            if not str(verdict).startswith("VERIFIED"):
+                return False, f"Cannot enter validation phase. Adversary found issues: {verdict}"
+
         state["workflows"][workflow_name]["current_phase"] = phase
         state["workflows"][workflow_name]["last_updated"] = datetime.now().isoformat()
         _save_state_unlocked(state)
@@ -587,7 +597,7 @@ def can_modify_code(workflow_name: str = None) -> tuple[bool, str]:
 
     name = workflow_name or state.get("active_workflow")
     if not name:
-        return False, "No active workflow. Start with /context or /analyse."
+        return False, "No active workflow. Start with /01-context or /02-analyse."
 
     if name not in state["workflows"]:
         return False, f"Workflow '{name}' not found."
@@ -744,11 +754,11 @@ def mark_green_test_done(workflow_name: str = None, result: str = None) -> bool:
         workflow["green_test_result"] = result
         workflow["last_updated"] = datetime.now().isoformat()
 
-        # Auto-advance to phase7 if in phase6
+        # Auto-advance to phase6b_adversary if in phase6 (adversary must verify before validate)
         if workflow["current_phase"] == "phase6_implement":
-            workflow["current_phase"] = "phase7_validate"
-            if "phase7_validate" not in workflow.get("phases_completed", []):
-                workflow.setdefault("phases_completed", []).append("phase7_validate")
+            workflow["current_phase"] = "phase6b_adversary"
+            if "phase6b_adversary" not in workflow.get("phases_completed", []):
+                workflow.setdefault("phases_completed", []).append("phase6b_adversary")
 
         _save_state_unlocked(state)
         return True

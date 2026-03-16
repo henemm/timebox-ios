@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Adversary Gate — Sets adversary_verdict ONLY with proof of real test execution.
+Adversary Gate — Sets adversary_verdict ONLY with proof of real test execution + screenshots.
 
 This is the ONLY way to set adversary_verdict on a workflow.
 It cannot be set via set-field or direct JSON manipulation (hooks block that).
@@ -10,9 +10,12 @@ Requirements for VERIFIED verdict:
 2. File must contain real xcodebuild test output patterns
 3. Tests must have PASSED (no failures)
 4. File must be substantial (> 500 bytes — not fabricated)
+5. Screenshot must exist (< 30 min old) — unless --no-visual flag is passed with reason
 
 Usage:
     python3 .claude/hooks/adversary_gate.py <path-to-test-output-file>
+    python3 .claude/hooks/adversary_gate.py <path-to-test-output-file> --screenshot <path-to-screenshot>
+    python3 .claude/hooks/adversary_gate.py <path-to-test-output-file> --no-visual "reason why no screenshot"
     python3 .claude/hooks/adversary_gate.py --check  # Just check current verdict
 """
 
@@ -136,6 +139,36 @@ def validate_test_output(filepath: str) -> tuple[bool, str, dict]:
     return False, "Could not determine test result from output", details
 
 
+def validate_screenshot(filepath: str) -> tuple[bool, str]:
+    """
+    Validate that a screenshot file exists and is recent.
+
+    Returns: (is_valid, reason)
+    """
+    path = Path(filepath)
+
+    if not path.exists():
+        return False, f"Screenshot not found: {filepath}"
+
+    # Must be recent (< 30 minutes)
+    mtime = path.stat().st_mtime
+    age_minutes = (time.time() - mtime) / 60
+    if age_minutes > 30:
+        return False, f"Screenshot is {age_minutes:.0f} min old (max 30 min). Take a new one."
+
+    # Must be a real image (> 10KB — not a placeholder)
+    size = path.stat().st_size
+    if size < 10000:
+        return False, f"Screenshot too small ({size} bytes). Looks like a placeholder, not a real screenshot."
+
+    # Must be an image file
+    suffix = path.suffix.lower()
+    if suffix not in ('.png', '.jpg', '.jpeg', '.tiff'):
+        return False, f"Screenshot must be an image file, got: {suffix}"
+
+    return True, f"Screenshot valid: {filepath} ({size} bytes, {age_minutes:.1f} min old)"
+
+
 def set_verdict(verdict: str, details: dict):
     """Set adversary_verdict on active workflow."""
     state = load_state()
@@ -171,27 +204,88 @@ def main():
 
     test_output_file = sys.argv[1]
 
+    # Parse optional screenshot / --no-visual arguments
+    screenshot_path = None
+    no_visual_reason = None
+    i = 2
+    while i < len(sys.argv):
+        if sys.argv[i] == "--screenshot" and i + 1 < len(sys.argv):
+            screenshot_path = sys.argv[i + 1]
+            i += 2
+        elif sys.argv[i] == "--no-visual" and i + 1 < len(sys.argv):
+            no_visual_reason = sys.argv[i + 1]
+            i += 2
+        else:
+            i += 1
+
     print(f"Validating test output: {test_output_file}")
     print()
 
+    # 1. Validate test output
     is_valid, reason, details = validate_test_output(test_output_file)
 
     state = load_state()
     active = state.get("active_workflow", "unknown")
 
-    if is_valid:
-        verdict = f"VERIFIED:{reason}"
-        set_verdict(verdict, details)
-        print(f"VERIFIED — {reason}")
-        print(f"Workflow: {active}")
-        print(f"Commit is now allowed.")
-    else:
+    if not is_valid:
         verdict = f"FAILED:{reason}"
         set_verdict(verdict, details)
         print(f"FAILED — {reason}")
         print(f"Workflow: {active}")
         print(f"Fix the issues and re-run tests.")
         sys.exit(1)
+
+    # 2. Validate screenshot (required unless --no-visual with reason)
+    if no_visual_reason:
+        details["screenshot"] = f"NO_VISUAL: {no_visual_reason}"
+        print(f"Screenshot skipped: {no_visual_reason}")
+    elif screenshot_path:
+        ss_valid, ss_reason = validate_screenshot(screenshot_path)
+        if not ss_valid:
+            verdict = f"FAILED:Screenshot invalid — {ss_reason}"
+            details["screenshot_error"] = ss_reason
+            set_verdict(verdict, details)
+            print(f"FAILED — {ss_reason}")
+            print(f"Take a real screenshot and try again.")
+            sys.exit(1)
+        details["screenshot"] = screenshot_path
+        print(f"Screenshot: {ss_reason}")
+    else:
+        # No screenshot argument at all — try default location
+        default_screenshots = [
+            Path("/tmp/adversary_screenshot.png"),
+            Path("/tmp/adversary_screenshot.jpg"),
+        ]
+        found = None
+        for sp in default_screenshots:
+            if sp.exists():
+                ss_valid, ss_reason = validate_screenshot(str(sp))
+                if ss_valid:
+                    found = sp
+                    details["screenshot"] = str(sp)
+                    print(f"Screenshot (auto-detected): {ss_reason}")
+                    break
+
+        if not found:
+            verdict = "FAILED:No screenshot provided. Use --screenshot <path> or --no-visual <reason>."
+            details["screenshot_error"] = "missing"
+            set_verdict(verdict, details)
+            print("FAILED — No screenshot found.")
+            print()
+            print("Options:")
+            print("  --screenshot <path>        Provide screenshot path")
+            print('  --no-visual "reason"       Skip screenshot with explanation')
+            print()
+            print("Default locations checked: /tmp/adversary_screenshot.png")
+            sys.exit(1)
+
+    # 3. All checks passed
+    verdict = f"VERIFIED:{reason}"
+    set_verdict(verdict, details)
+    print()
+    print(f"VERIFIED — {reason}")
+    print(f"Workflow: {active}")
+    print(f"Commit is now allowed.")
 
 
 if __name__ == "__main__":

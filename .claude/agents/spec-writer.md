@@ -15,7 +15,7 @@ Creates and updates entity specifications following the spec-first workflow.
 
 ## Purpose
 
-Use this agent in Phase 2 (`/write-spec`) to create specifications for new entities/components.
+Use this agent in Phase 2 (`/03-write-spec`) to create specifications for new entities/components.
 
 ## Tools Available
 

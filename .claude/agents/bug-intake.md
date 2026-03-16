@@ -103,6 +103,6 @@ Bug reports go to:
 ## Handoff
 
 After intake, inform user:
-> "Bug confirmed: [summary]. To proceed with fix, start `/analyse`"
+> "Bug confirmed: [summary]. To proceed with fix, start `/02-analyse`"
 
 Do NOT fix without user confirmation!
