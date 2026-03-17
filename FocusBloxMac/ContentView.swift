@@ -268,7 +268,7 @@ struct ContentView: View {
         switch selectedSection {
         case .backlog:
             if coachModeEnabled {
-                MacCoachBacklogView(tasks: visibleTasks, selectedTasks: $selectedTasks, onImport: importFromReminders)
+                MacCoachBacklogView(tasks: visibleTasks, selectedTasks: $selectedTasks, onImport: importFromReminders, onAddTask: { title in addTask(with: title) })
             } else {
                 backlogView
             }
@@ -783,11 +783,12 @@ struct ContentView: View {
         guard !newTaskTitle.isEmpty else { return }
         let title = newTaskTitle
         newTaskTitle = ""
+        addTask(with: title)
+    }
 
+    private func addTask(with title: String) {
         // Bug 94 Fix: Task SOFORT erstellen + Inspector zeigen,
         // AI-Enrichment laeuft im Hintergrund nach.
-        // Vorher: createTask() blockierte 3-8 Sek. fuer AI-Enrichment
-        // bevor der Inspector-Override gesetzt wurde.
         let cleanedTitle = TaskTitleEngine.stripKeywords(title)
         let nextSortOrder = (tasks.map(\.sortOrder).max() ?? 0) + 1
         let newTask = LocalTask(
@@ -800,9 +801,6 @@ struct ContentView: View {
         try? modelContext.save()
 
         // Inspector SOFORT setzen (vor AI-Enrichment)
-        // Nicht selectedTasks setzen — onChange(of: selectedTasks) wuerde
-        // inspectorOverrideTaskID sofort loeschen, und NSTableView resettet
-        // selectedTasks danach auf leer → beide nil → Empty State.
         refreshTasks()
         inspectorOverrideTaskID = newTask.uuid
         scrollToTaskID = newTask.uuid

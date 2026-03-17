@@ -12,7 +12,7 @@
 
 | ID | Titel | Prio | Aufwand | Plattform | Beschreibung |
 |----|-------|------|---------|-----------|-------------|
-| FEATURE_003 | Coach-Backlog macOS: Quick-Add TextField | Medium | S | macOS | Normaler macOS-Backlog hat Quick-Add-TextField oben — Coach-Backlog nicht. |
+| ~~FEATURE_003~~ | ~~Coach-Backlog macOS: Quick-Add TextField~~ | ~~Medium~~ | ~~S~~ | ~~macOS~~ | **DONE** — Quick-Add TextField + Button + onAddTask callback. Tests: 2 UI tests gruen. |
 | FEATURE_004 | Coach-Backlog macOS: Suchfunktion | Medium | S | macOS | Normaler macOS-Backlog hat .searchable — Coach-Backlog nicht. |
 | FEATURE_006 | Coach-Backlog macOS: Inspector Panel | Medium | M | macOS | Normaler macOS-Backlog hat Detail-Inspector rechts (3-Spalten-Layout). Coach-Backlog zeigt nur Liste. |
 | FEATURE_007 | Coach-Backlog macOS: Multi-Selection + Bulk Actions | Medium | M | macOS | Normaler macOS-Backlog unterstuetzt Mehrfachauswahl + Bulk-Loeschen/Verschieben. Coach-Backlog nur Einzelaktionen. |

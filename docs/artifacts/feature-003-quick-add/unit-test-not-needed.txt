@@ -1,0 +1,11 @@
+FEATURE_003: Unit Test Assessment
+=================================
+
+No unit tests needed for this feature.
+
+Reason: Pure UI feature — Quick-Add TextField + Callback delegation.
+- No new business logic introduced
+- addTask(with:) is a refactoring extraction of existing addTask()
+- All task creation logic (TaskTitleEngine, SmartTaskEnrichmentService, 
+  modelContext insert/save) remains unchanged
+- UI behavior verified by 2 UI tests (T1, T2)

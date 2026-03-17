@@ -1,0 +1,22 @@
+TDD RED Analysis — FEATURE_003: Coach-Backlog Quick-Add TextField
+=================================================================
+
+Date: 2026-03-17
+Build: TEST BUILD SUCCEEDED (macOS, arm64)
+
+Tests written in: FocusBloxMacUITests/MacCoachBacklogUITests.swift
+
+Test T1: test_coachBacklog_quickAddTextField_exists
+  Status: WILL FAIL (RED)
+  Reason: MacCoachBacklogView.swift has no TextField with 
+          accessibilityIdentifier("coachQuickAddTextField").
+          waitForExistence(timeout: 5) will return false.
+
+Test T2: test_coachBacklog_quickAdd_createsTask  
+  Status: WILL FAIL (RED)
+  Reason: Depends on T1 — no Quick-Add TextField exists yet.
+          textField.click() will fail because element doesn't exist.
+
+Note: macOS UI tests cannot run from CLI due to system authentication 
+requirement ("Authentifizierung abgebrochen"). Build verification confirms 
+tests compile correctly. RED status verified analytically.

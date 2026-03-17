@@ -13,6 +13,7 @@ struct MacCoachBacklogView: View {
     let tasks: [LocalTask]
     @Binding var selectedTasks: Set<UUID>
     var onImport: (() async -> Void)?
+    var onAddTask: ((String) -> Void)?
 
     @Environment(CloudKitSyncMonitor.self) private var cloudKitMonitor
     @Environment(DeferredSortController.self) private var deferredSort
@@ -20,6 +21,7 @@ struct MacCoachBacklogView: View {
     @AppStorage("coachBacklogViewMode") private var selectedModeRaw: String = "Priorität"
     @AppStorage("remindersSyncEnabled") private var remindersSyncEnabled: Bool = true
     @State private var isSyncing = false
+    @State private var coachNewTaskTitle = ""
 
     private var selectedMode: CoachViewMode {
         CoachViewMode(rawValue: selectedModeRaw) ?? .priority
@@ -115,8 +117,40 @@ struct MacCoachBacklogView: View {
             .padding(.horizontal, 12)
             .padding(.vertical, 6)
 
+            // Quick-Add Bar (FEATURE_003)
+            HStack {
+                TextField("Neuer Task...", text: $coachNewTaskTitle)
+                    .textFieldStyle(.roundedBorder)
+                    .accessibilityIdentifier("coachQuickAddTextField")
+                    .onSubmit { submitCoachTask() }
+
+                Button {
+                    submitCoachTask()
+                } label: {
+                    Image(systemName: "plus.circle.fill")
+                        .font(.title2)
+                }
+                .disabled(coachNewTaskTitle.isEmpty)
+                .buttonStyle(.plain)
+                .foregroundStyle(.blue)
+                .accessibilityIdentifier("coachAddTaskButton")
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 6)
+
+            Divider()
+
             taskList
         }
+    }
+
+    // MARK: - Quick-Add
+
+    private func submitCoachTask() {
+        guard !coachNewTaskTitle.isEmpty else { return }
+        let title = coachNewTaskTitle
+        coachNewTaskTitle = ""
+        onAddTask?(title)
     }
 
     // MARK: - Task List (switches based on ViewMode)
