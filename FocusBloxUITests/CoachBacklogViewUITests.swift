@@ -217,6 +217,80 @@ final class CoachBacklogViewUITests: XCTestCase {
                       "NextUp swipe action (Entfernen) should exist in Coach backlog")
     }
 
+    // MARK: - BUG_107: Blocked Tasks duerfen nicht doppelt erscheinen
+
+    /// Bricht wenn: Blocked Tasks als eigenstaendige Eintraege in Tier-Sections erscheinen
+    func test_coachModeOn_blockedTasks_notDuplicated() throws {
+        launchWithCoachMode()
+        navigateToBacklog()
+
+        // Wait for task list to load
+        let taskList = app.descendants(matching: .any)["coachTaskList"]
+        XCTAssertTrue(taskList.waitForExistence(timeout: 5), "Coach task list should exist")
+
+        // Count occurrences of blocked mock task title
+        let blockedTaskCells = app.staticTexts.matching(
+            NSPredicate(format: "label CONTAINS 'Abhaengig: Frontend anpassen'")
+        )
+
+        // Blocked task should appear AT MOST once (as dependent under blocker),
+        // NOT twice (once as dependent + once as standalone tier entry)
+        XCTAssertLessThanOrEqual(blockedTaskCells.count, 1,
+            "Blocked task 'Frontend anpassen' must not appear as both dependent AND standalone entry (BUG_107)")
+    }
+
+    // MARK: - FEATURE_002: Blocked Row Swipe Actions
+
+    /// Helper: Find a blocked mock task row (contains "Abhaengig" in title).
+    private func findBlockedTaskRow() -> XCUIElement? {
+        let found = app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'Abhaengig'"))
+        if found.count > 0, found.element(boundBy: 0).isHittable {
+            return found.element(boundBy: 0)
+        }
+        let list = app.collectionViews.firstMatch.exists
+            ? app.collectionViews.firstMatch : app.tables.firstMatch
+        for _ in 0..<5 {
+            list.swipeUp()
+            let scrolled = app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'Abhaengig'"))
+            if scrolled.count > 0, scrolled.element(boundBy: 0).isHittable {
+                return scrolled.element(boundBy: 0)
+            }
+        }
+        return nil
+    }
+
+    /// Bricht wenn: blockedRow() in CoachBacklogView kein trailing swipe "Bearbeiten" hat
+    func test_coachBlocked_swipeLeft_showsEditAction() throws {
+        launchWithCoachMode()
+        navigateToBacklog()
+
+        guard let blockedRow = findBlockedTaskRow() else {
+            throw XCTSkip("No blocked mock task found in Coach backlog")
+        }
+
+        blockedRow.swipeLeft()
+
+        let editButton = app.buttons["Bearbeiten"]
+        XCTAssertTrue(editButton.waitForExistence(timeout: 3),
+                      "Swipe left on blocked task in Coach backlog should reveal 'Bearbeiten'")
+    }
+
+    /// Bricht wenn: blockedRow() in CoachBacklogView kein trailing swipe "Loeschen" hat
+    func test_coachBlocked_swipeLeft_showsDeleteAction() throws {
+        launchWithCoachMode()
+        navigateToBacklog()
+
+        guard let blockedRow = findBlockedTaskRow() else {
+            throw XCTSkip("No blocked mock task found in Coach backlog")
+        }
+
+        blockedRow.swipeLeft()
+
+        let deleteButton = app.buttons["Löschen"]
+        XCTAssertTrue(deleteButton.waitForExistence(timeout: 3),
+                      "Swipe left on blocked task in Coach backlog should reveal 'Löschen'")
+    }
+
     // MARK: - Discipline Override Context Menu
 
     /// Bricht wenn: coachRow() hat kein .contextMenu mit Disziplin-Optionen

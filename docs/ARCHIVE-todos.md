@@ -5,6 +5,24 @@
 
 ---
 
+## BUG_105 — Coach AI-Pitches: generisch + halluziniert + abgeschnitten (ERLEDIGT)
+
+- **Problem:** AI halluzinierte Task-Namen, Text abgeschnitten
+- **Fix:** `@Generable` Struct mit `@Guide` in CoachPitchService, `shouldAcceptPitch` entfernt
+- **Dateien:** CoachPitchService.swift
+- **Artefakte:** `docs/artifacts/bug-coach-pitch-quality/`
+
+---
+
+## FEATURE_002 — Coach-Backlog iOS: Blocked-Row Editing (ERLEDIGT)
+
+- **Problem:** Blocked Rows im Coach-Backlog hatten keine Trailing-Swipe-Actions (Bearbeiten + Loeschen)
+- **Fix:** `.swipeActions(edge: .trailing)` in `CoachBacklogView.blockedRow()` ergaenzt — 1:1 Parity mit BacklogView
+- **Dateien:** CoachBacklogView.swift (+12 LoC), CoachBacklogViewUITests.swift (+40 LoC)
+- **Tests:** 2 UI Tests GREEN
+
+---
+
 ## BUG_106 — Trend-Chart: Disziplin statt Kategorie (ERLEDIGT)
 
 - **Problem:** Discipline.classify() hatte Proxy-Bug — effectiveDuration == estimatedDuration immer true → 95% Tasks in Fokus/Ausdauer → einfarbige Trend-Wand

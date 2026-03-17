@@ -17,7 +17,7 @@ enum CoachBacklogViewModel {
     /// Returns incomplete, non-template tasks with isNextUp == true, sorted by nextUpSortOrder.
     /// Shown in a dedicated "Next Up" section above the coach-filtered sections.
     static func nextUpTasks(from tasks: [PlanItem]) -> [PlanItem] {
-        tasks.filter { $0.isNextUp && !$0.isCompleted && !$0.isTemplate }
+        tasks.filter { $0.isNextUp && !$0.isCompleted && !$0.isTemplate && !$0.isBlocked }
             .sorted { ($0.nextUpSortOrder ?? Int.max) < ($1.nextUpSortOrder ?? Int.max) }
     }
 
@@ -59,14 +59,15 @@ enum CoachBacklogViewModel {
         let boostIDs = Set(coachBoostedTasks(from: tasks, selectedCoach: selectedCoach).map(\.id))
         return tasks.filter {
             !$0.isCompleted && !$0.isTemplate &&
-            !nextUpIDs.contains($0.id) && !boostIDs.contains($0.id)
+            !nextUpIDs.contains($0.id) && !boostIDs.contains($0.id) &&
+            $0.blockerTaskID == nil
         }
     }
 
     /// Overdue tasks (dueDate < start of today) from the given pool.
     static func overdueTasks(from tasks: [PlanItem]) -> [PlanItem] {
         let startOfToday = Calendar.current.startOfDay(for: Date())
-        return tasks.filter { !$0.isCompleted && !$0.isTemplate }
+        return tasks.filter { !$0.isCompleted && !$0.isTemplate && $0.blockerTaskID == nil }
             .filter { item in
                 guard let due = item.dueDate else { return false }
                 return due < startOfToday
@@ -85,7 +86,7 @@ enum CoachBacklogViewModel {
 
     /// Recent tasks sorted by most recent date (createdAt or modifiedAt).
     static func recentTasks(from tasks: [PlanItem]) -> [PlanItem] {
-        tasks.filter { !$0.isCompleted && !$0.isTemplate }
+        tasks.filter { !$0.isCompleted && !$0.isTemplate && $0.blockerTaskID == nil }
             .sorted { a, b in
                 let aDate = max(a.createdAt, a.modifiedAt ?? .distantPast)
                 let bDate = max(b.createdAt, b.modifiedAt ?? .distantPast)

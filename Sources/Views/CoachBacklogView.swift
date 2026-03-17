@@ -502,6 +502,19 @@ struct CoachBacklogView: View {
             }
             .tint(.orange)
         }
+        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+            Button(role: .destructive) {
+                deleteTask(item)
+            } label: {
+                Label("Löschen", systemImage: "trash")
+            }
+            Button {
+                handleEditTap(item)
+            } label: {
+                Label("Bearbeiten", systemImage: "pencil")
+            }
+            .tint(.blue)
+        }
     }
 
     private func releaseDependency(_ item: PlanItem) {

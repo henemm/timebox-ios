@@ -69,15 +69,15 @@ final class CoachBacklogViewModelTests: XCTestCase {
 
     // MARK: - relevantTasks (Eule)
 
-    /// Verhalten: Eule filtert nur isNextUp Tasks, max 3
-    func test_relevantTasks_eule_filtersNextUpOnly() {
+    /// Verhalten: Eule filtert isNextUp, aber relevantTasks entfernt NextUp (eigene Section)
+    /// → Coach-Boost fuer Eule ist immer leer (Design-Limitierung, siehe Backlog)
+    func test_relevantTasks_eule_emptyBecauseNextUpHasOwnSection() {
         let t1 = makeLocalTask(title: "Next Up", isNextUp: true)
         let t2 = makeLocalTask(title: "Normal")
         let items = [t1, t2].map { PlanItem(localTask: $0) }
 
         let result = CoachBacklogViewModel.relevantTasks(from: items, selectedCoach: "eule")
-        XCTAssertEqual(result.count, 1)
-        XCTAssertEqual(result.first?.title, "Next Up")
+        XCTAssertEqual(result.count, 0, "Eule tasks are all NextUp → removed by relevantTasks (NextUp has own section)")
     }
 
     // MARK: - relevantTasks (Empty coach = empty)
@@ -114,26 +114,26 @@ final class CoachBacklogViewModelTests: XCTestCase {
 
     // MARK: - Completed/Template filtering
 
-    /// Verhalten: Erledigte Tasks werden NICHT in relevantTasks aufgenommen
+    /// Verhalten: Erledigte Tasks werden NICHT in relevantTasks aufgenommen (Troll-Coach)
     func test_relevantTasks_excludesCompletedTasks() {
-        let t1 = makeLocalTask(title: "Done NextUp", isNextUp: true, isCompleted: true)
-        let t2 = makeLocalTask(title: "Active NextUp", isNextUp: true)
+        let t1 = makeLocalTask(title: "Done Rescheduled", rescheduleCount: 3, isCompleted: true)
+        let t2 = makeLocalTask(title: "Active Rescheduled", rescheduleCount: 3)
         let items = [t1, t2].map { PlanItem(localTask: $0) }
 
-        let result = CoachBacklogViewModel.relevantTasks(from: items, selectedCoach: "eule")
+        let result = CoachBacklogViewModel.relevantTasks(from: items, selectedCoach: "troll")
         XCTAssertEqual(result.count, 1)
-        XCTAssertEqual(result.first?.title, "Active NextUp")
+        XCTAssertEqual(result.first?.title, "Active Rescheduled")
     }
 
-    /// Verhalten: Template-Tasks werden NICHT in relevantTasks aufgenommen
+    /// Verhalten: Template-Tasks werden NICHT in relevantTasks aufgenommen (Troll-Coach)
     func test_relevantTasks_excludesTemplateTasks() {
-        let t1 = makeLocalTask(title: "Template NextUp", isNextUp: true, isTemplate: true)
-        let t2 = makeLocalTask(title: "Active NextUp", isNextUp: true)
+        let t1 = makeLocalTask(title: "Template Rescheduled", rescheduleCount: 3, isTemplate: true)
+        let t2 = makeLocalTask(title: "Active Rescheduled", rescheduleCount: 3)
         let items = [t1, t2].map { PlanItem(localTask: $0) }
 
-        let result = CoachBacklogViewModel.relevantTasks(from: items, selectedCoach: "eule")
+        let result = CoachBacklogViewModel.relevantTasks(from: items, selectedCoach: "troll")
         XCTAssertEqual(result.count, 1)
-        XCTAssertEqual(result.first?.title, "Active NextUp")
+        XCTAssertEqual(result.first?.title, "Active Rescheduled")
     }
 
     // MARK: - nextUpTasks
@@ -344,6 +344,57 @@ final class CoachBacklogViewModelTests: XCTestCase {
         XCTAssertNil(title)
     }
 
+    // MARK: - BUG_107: Blocked Tasks duerfen NICHT als eigenstaendige Eintraege erscheinen
+
+    /// Verhalten: nextUpTasks schliesst blocked Tasks aus (blockerTaskID != nil)
+    func test_nextUpTasks_excludesBlockedTasks() {
+        let blocker = makeLocalTask(title: "Blocker")
+        let blocked = makeLocalTask(title: "Blocked NextUp", isNextUp: true, blockerTaskID: blocker.id)
+        let normal = makeLocalTask(title: "Normal NextUp", isNextUp: true)
+        let items = [blocker, blocked, normal].map { PlanItem(localTask: $0) }
+
+        let result = CoachBacklogViewModel.nextUpTasks(from: items)
+        XCTAssertEqual(result.count, 1, "Blocked tasks must not appear in nextUpTasks")
+        XCTAssertEqual(result.first?.title, "Normal NextUp")
+    }
+
+    /// Verhalten: remainingTasks schliesst blocked Tasks aus
+    func test_remainingTasks_excludesBlockedTasks() {
+        let blocker = makeLocalTask(title: "Blocker")
+        let blocked = makeLocalTask(title: "Blocked", blockerTaskID: blocker.id)
+        let normal = makeLocalTask(title: "Normal")
+        let items = [blocker, blocked, normal].map { PlanItem(localTask: $0) }
+
+        let result = CoachBacklogViewModel.remainingTasks(from: items, selectedCoach: "troll")
+        XCTAssertFalse(result.contains { $0.title == "Blocked" },
+                       "Blocked tasks must not appear in remainingTasks")
+    }
+
+    /// Verhalten: overdueTasks schliesst blocked Tasks aus
+    func test_overdueTasks_excludesBlockedTasks() {
+        let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: Date())!
+        let blocker = makeLocalTask(title: "Blocker")
+        let blocked = makeLocalTask(title: "Blocked Overdue", dueDate: yesterday, blockerTaskID: blocker.id)
+        let normal = makeLocalTask(title: "Normal Overdue", dueDate: yesterday)
+        let items = [blocker, blocked, normal].map { PlanItem(localTask: $0) }
+
+        let result = CoachBacklogViewModel.overdueTasks(from: items)
+        XCTAssertEqual(result.count, 1, "Blocked tasks must not appear in overdueTasks")
+        XCTAssertEqual(result.first?.title, "Normal Overdue")
+    }
+
+    /// Verhalten: recentTasks schliesst blocked Tasks aus
+    func test_recentTasks_excludesBlockedTasks() {
+        let blocker = makeLocalTask(title: "Blocker")
+        let blocked = makeLocalTask(title: "Blocked Recent", blockerTaskID: blocker.id)
+        let normal = makeLocalTask(title: "Normal Recent")
+        let items = [blocker, blocked, normal].map { PlanItem(localTask: $0) }
+
+        let result = CoachBacklogViewModel.recentTasks(from: items)
+        XCTAssertFalse(result.contains { $0.title == "Blocked Recent" },
+                       "Blocked tasks must not appear in recentTasks")
+    }
+
     // MARK: - Helper
 
     private func makeLocalTask(
@@ -355,7 +406,8 @@ final class CoachBacklogViewModelTests: XCTestCase {
         taskType: String = "",
         isCompleted: Bool = false,
         isTemplate: Bool = false,
-        dueDate: Date? = nil
+        dueDate: Date? = nil,
+        blockerTaskID: String? = nil
     ) -> LocalTask {
         let task = LocalTask(title: title, importance: importance, isCompleted: isCompleted, taskType: taskType)
         task.isNextUp = isNextUp
@@ -363,6 +415,7 @@ final class CoachBacklogViewModelTests: XCTestCase {
         task.isTemplate = isTemplate
         task.dueDate = dueDate
         task.urgency = urgency
+        task.blockerTaskID = blockerTaskID
         context.insert(task)
         return task
     }

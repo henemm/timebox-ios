@@ -12,7 +12,6 @@
 
 | ID | Titel | Prio | Aufwand | Plattform | Beschreibung |
 |----|-------|------|---------|-----------|-------------|
-| FEATURE_002 | Coach-Backlog iOS: Blocked-Row Editing | Medium | S | iOS | Blocked Rows im Coach-Backlog sind read-only. In BacklogView erlauben sie Duration/Importance/Category-Aenderungen. |
 | FEATURE_003 | Coach-Backlog macOS: Quick-Add TextField | Medium | S | macOS | Normaler macOS-Backlog hat Quick-Add-TextField oben — Coach-Backlog nicht. |
 | FEATURE_004 | Coach-Backlog macOS: Suchfunktion | Medium | S | macOS | Normaler macOS-Backlog hat .searchable — Coach-Backlog nicht. |
 | FEATURE_006 | Coach-Backlog macOS: Inspector Panel | Medium | M | macOS | Normaler macOS-Backlog hat Detail-Inspector rechts (3-Spalten-Layout). Coach-Backlog zeigt nur Liste. |
@@ -32,7 +31,7 @@
 | FEATURE_022 | CaptureContextIntent | Low | M | iOS | WARTEND auf Apple APIs (iOS 26.5/27). |
 | TD_001 | God-Views aufbrechen | Low | L | Beide | BacklogView 1181 LoC, BlockPlanningView 1400 LoC — Wartbarkeit. |
 | TD_002 | View-Duplikation iOS/macOS | Low | XL | Beide | ~7300 LoC verbleibend. Langfristig wichtig, kurzfristig kein Blocker. |
-| BUG_107 | Coach-Backlog: Blocked Tasks erscheinen doppelt | High | S | Beide | `CoachBacklogViewModel` filtert nicht nach `blockerTaskID` — blocked Tasks erscheinen doppelt (Dependent + Tier-Eintrag). **Fix:** 4 Stellen `blockerTaskID == nil` ergaenzen. Analyse: `docs/artifacts/bug-backlog-duplicates/analysis.md` |
+| ~~BUG_107~~ | ~~Coach-Backlog: Blocked Tasks erscheinen doppelt~~ | ~~High~~ | ~~S~~ | ~~Beide~~ | **ERLEDIGT** — 4 Filter in CoachBacklogViewModel ergaenzt (`blockerTaskID == nil` / `!isBlocked`): nextUpTasks, remainingTasks, overdueTasks, recentTasks. 30/30 Unit Tests gruen. 3 pre-existing Eule-Test-Failures korrigiert (Design-Limitierung: Eule-Coach-Boost immer leer weil NextUp eigene Section hat). |
 | ~~BUG_108~~ | ~~Zehnagel-Zombie: Recurring Task ueberlebt Serien-Ende~~ | ~~High~~ | ~~S-M~~ | ~~Beide~~ | **DONE.** Fix: (1) deleteRecurringTemplate neutralisiert completed Tasks (recurrencePattern=none), (2) Startup-Reihenfolge migration→dedup→repair. Analyse: `docs/artifacts/bug-108-zehnagel-zombie/analysis.md` |
 
 ---

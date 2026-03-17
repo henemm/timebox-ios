@@ -1,0 +1,14 @@
+TDD RED — BUG_107: Coach-Backlog Blocked Tasks Filter
+
+Test Run: 2026-03-17 06:27:00
+Simulator: iPhone 17 Pro (16F28771-6A3E-4FF3-862A-ECB185744184)
+Scheme: FocusBlox
+
+TEST FAILED — 4/4 tests failed as expected:
+
+Test case 'CoachBacklogViewModelTests.test_nextUpTasks_excludesBlockedTasks()' failed (1.048 seconds)
+Test case 'CoachBacklogViewModelTests.test_overdueTasks_excludesBlockedTasks()' failed (0.023 seconds)
+Test case 'CoachBacklogViewModelTests.test_recentTasks_excludesBlockedTasks()' failed (0.027 seconds)
+Test case 'CoachBacklogViewModelTests.test_remainingTasks_excludesBlockedTasks()' failed (0.031 seconds)
+
+All 4 tests fail because CoachBacklogViewModel does not filter out blocked tasks (blockerTaskID != nil).
