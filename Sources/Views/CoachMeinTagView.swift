@@ -13,8 +13,8 @@ struct CoachMeinTagView: View {
     @State private var aiReflectionText: String?
     @State private var weeklyAIReflectionText: String?
     @State private var reviewMode: ReviewMode = .today
-    @State private var trendSnapshots: [WeeklyDisciplineSnapshot] = []
-    @State private var disciplineTrends: [DisciplineTrend] = []
+    @State private var categorySnapshots: [WeeklyCategorySnapshot] = []
+    @State private var categoryTrends: [CategoryTrend] = []
     @AppStorage("intentionJustSet") private var intentionJustSet: Bool = false
 
     private enum ReviewMode: String, CaseIterable {
@@ -115,9 +115,9 @@ struct CoachMeinTagView: View {
                         .padding(.horizontal)
 
                 case .trend:
-                    DisciplineTrendChart(
-                        snapshots: trendSnapshots,
-                        trends: disciplineTrends
+                    CategoryTrendChart(
+                        snapshots: categorySnapshots,
+                        trends: categoryTrends
                     )
                     .padding(.horizontal)
                 }
@@ -299,11 +299,11 @@ struct CoachMeinTagView: View {
     }
 
     private func loadTrendData() {
-        trendSnapshots = DisciplineStatsService.weeklyHistory(
+        categorySnapshots = CategoryStatsService.weeklyCategoryHistory(
             tasks: allLocalTasks,
             weeksBack: 6
         )
-        disciplineTrends = DisciplineStatsService.trends(from: trendSnapshots)
+        categoryTrends = CategoryStatsService.categoryTrends(from: categorySnapshots)
     }
 
     private func loadWeeklyAIReflectionText() async {

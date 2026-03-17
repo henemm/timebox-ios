@@ -5,6 +5,15 @@
 
 ---
 
+## BUG_106 — Trend-Chart: Disziplin statt Kategorie (ERLEDIGT)
+
+- **Problem:** Discipline.classify() hatte Proxy-Bug — effectiveDuration == estimatedDuration immer true → 95% Tasks in Fokus/Ausdauer → einfarbige Trend-Wand
+- **Fix:** Trend-Chart gruppiert nach TaskCategory statt Discipline
+- **Dateien:** CategoryStatsService.swift (neu), CategoryTrendChart.swift (neu), CoachMeinTagView.swift, ReviewComponents.swift
+- **Tests:** 10 Unit + 3 UI Tests GREEN
+
+---
+
 ## ERLEDIGT: Feature — Monster Coach Phase 2 (Morning Intention)
 
 - **Anforderung:** Morning Intention Screen — die taegliche Frage "Wie wird dein Tag?" mit 6 waehlbaren Intentionen (Mehrfach-Auswahl)
@@ -437,3 +446,28 @@
 
 ### TD-05: Coach Views Cross-Platform Consolidation (Pilot) — ERLEDIGT
 - Duplizierte Filter-Logik in shared CoachBacklogViewModel extrahiert. 14 Unit Tests gruen.
+
+---
+
+## Verschoben am 2026-03-16: Session-Ergebnisse
+
+### FEATURE_001: Coach-Backlog iOS: Recurring-Serie-Dialoge — ERLEDIGT
+- Confirmation-Dialoge (Nur diese Aufgabe / Alle offenen dieser Serie) beim Loeschen/Bearbeiten wiederkehrender Tasks. 3 Dialoge, Recurring-Check + Template-Check, 5 UI Tests gruen.
+
+### FEATURE_005: Coach-Backlog macOS: Toolbar (Sync + Import) — ERLEDIGT
+- Commit bc87d5e + Adversary-Fix.
+
+### FEATURE_012: Coach-Backlog macOS: effectiveScore/Tier/dependentCount — ERLEDIGT
+- dependentCount, effectiveScore, effectiveTier an MacBacklogRow uebergeben. DEP-Blocker-Tasks zeigen korrekten Score mit Boost (+3). 2 UI Tests gruen. TaskBadges: macOS-Accessibility-Fix. Commit de67c9f.
+
+### FEATURE_016: Disziplin-Entwicklung sichtbar machen — ERLEDIGT
+- Phase 1: Disziplin-Profil (Heute + Woche) in CoachMeinTagView. Phase 2 (Multi-Wochen-Trend) als separates Ticket (FEATURE_023).
+
+### FEATURE_023: Disziplin-Trend (Multi-Wochen) — ERLEDIGT
+- Multi-Wochen-Trend mit Swift Charts in CoachMeinTagView. Stacked Bar Chart (6 Wochen), Trend-Erkennung (growing/declining/stable), staerkstes Disziplin-Highlight. 9 Unit Tests + 3 UI Tests gruen. Commit 37fa398.
+
+### FEATURE_024: Sprint Follow-up Action — ERLEDIGT
+- Dritte Sprint-Aktion "Follow-up" neben Ueberspringen/Erledigt. Schliesst aktuellen Task, erstellt editierbare Kopie mit vollem TaskFormSheet. Cancel-Discard-Logik (Sheet-Abbruch loescht Kopie). 6 Unit Tests + 3 UI Tests gruen. Adversary verified. Commit 5b8cd64.
+
+### CHORE_001: Aufraeumen uncommitted Dateien — ERLEDIGT
+- .gitignore erweitert, State-Dateien aus Tracking entfernt, alle Artefakte committet.

@@ -79,6 +79,35 @@ struct DisciplineTrend: Identifiable {
     var id: String { discipline.rawValue }
 }
 
+// MARK: - Category Trend Types
+
+/// Category count stat for trend visualization (count-based, not minutes).
+/// Uses optional category to support uncategorized tasks (taskType == "").
+struct CategoryCountStat: Identifiable {
+    let category: TaskCategory?
+    let count: Int
+    let total: Int
+    var id: String { category?.rawValue ?? "uncategorized" }
+}
+
+/// Weekly snapshot of category distribution for trend visualization.
+struct WeeklyCategorySnapshot: Identifiable {
+    let weekStart: Date
+    let stats: [CategoryCountStat]
+    var id: Date { weekStart }
+
+    /// Total completed tasks in this week.
+    var total: Int { stats.first?.total ?? 0 }
+}
+
+/// Detected trend for a single category.
+struct CategoryTrend: Identifiable {
+    let category: TaskCategory?
+    let direction: TrendDirection
+    let consecutiveWeeks: Int
+    var id: String { category?.rawValue ?? "uncategorized" }
+}
+
 // MARK: - Shared Data Types
 
 /// Category stat combining TaskCategory with aggregated minutes

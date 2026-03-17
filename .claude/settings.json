@@ -132,6 +132,11 @@
             "type": "command",
             "command": "python3 .claude/hooks/parallel_test_guard.py",
             "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/no_workaround_guard.py",
+            "timeout": 5
           }
         ]
       }
