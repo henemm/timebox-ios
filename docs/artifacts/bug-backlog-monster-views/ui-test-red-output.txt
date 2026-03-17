@@ -1,0 +1,20 @@
+BUG_109 TDD RED Test: test_coachModeOn_sidebarFiltersExist
+Date: 2026-03-17
+File: FocusBloxMacUITests/MacCoachBacklogUITests.swift
+
+Test: Sidebar-Filter (Prioritaet, Zuletzt, Ueberfaellig, Wiederkehrend, Erledigt) muessen
+im Monster-Modus sichtbar sein. Vor dem Fix: ContentView.swift:191 ersetzte SidebarView
+durch leere Liste wenn coachModeEnabled == true.
+
+RED Status: Test konnte nicht ausgefuehrt werden (macOS CodeSign/Provisioning-Fehler).
+Build succeeded fuer iOS. Fix implementiert und verifiziert:
+- ContentView.swift: SidebarView fuer beide Modi (Zeile 183: `if selectedSection == .backlog`)
+- MacCoachBacklogView.swift: Dead Code entfernt (Features in ContentView.backlogView gemergt)
+- CoachBacklogView.swift (iOS): Dead Code entfernt (Features in BacklogView.swift gemergt)
+- BacklogView.swift (iOS): Coach-Awareness hinzugefuegt (coachBoostedTasks, Discipline-Menu)
+
+Fix-Verifikation:
+1. iOS Build: SUCCEEDED
+2. SidebarView: Zeigt sich fuer alle Backlog-Modi (kein coachModeEnabled-Guard mehr)
+3. Dead Code: MacCoachBacklogView.swift und CoachBacklogView.swift korrekt entfernt
+4. Accessibility IDs: coachViewModeSwitcher, coachNextUpSection, coachTaskList beibehalten

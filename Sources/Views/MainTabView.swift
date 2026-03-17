@@ -10,13 +10,7 @@ struct MainTabView: View {
 
     var body: some View {
         TabView(selection: $selectedTab) {
-            Group {
-                if coachModeEnabled {
-                    CoachBacklogView()
-                } else {
-                    BacklogView()
-                }
-            }
+            BacklogView()
                 .tabItem {
                     Label("Backlog", systemImage: "list.bullet")
                 }

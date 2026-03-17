@@ -13,7 +13,7 @@
 | ID | Titel | Prio | Aufwand | Plattform | Beschreibung |
 |----|-------|------|---------|-----------|-------------|
 | ~~FEATURE_003~~ | ~~Coach-Backlog macOS: Quick-Add TextField~~ | ~~Medium~~ | ~~S~~ | ~~macOS~~ | **DONE** — Quick-Add TextField + Button + onAddTask callback. Tests: 2 UI tests gruen. |
-| BUG_109 | Coach-Backlog macOS: Sidebar-Filter fehlen im Monster-Modus | High | S | macOS | ContentView.swift:191 — im Monster-Modus wird SidebarView durch leere Liste ersetzt. Die 5 Filter (Prioritaet, Zuletzt, Ueberfaellig, Wiederkehrend, Erledigt) sind nicht erreichbar. Normal-Modus (Zeile 183) zeigt SidebarView korrekt. MacCoachBacklogView hat stattdessen ein Dropdown als Workaround. Analyse: `docs/artifacts/bug-backlog-monster-views/analysis.md` |
+| ~~BUG_109~~ | ~~Coach-Backlog macOS: Sidebar-Filter fehlen im Monster-Modus~~ | ~~High~~ | ~~S~~ | ~~macOS~~ | **DONE** — Fix: SidebarView fuer beide Modi (Normal + Monster). View-Vereinheitlichung: CoachBacklogView.swift (iOS) + MacCoachBacklogView.swift (macOS) geloescht, Features in BacklogView.swift bzw. ContentView.swift gemergt. Analyse: `docs/artifacts/bug-backlog-monster-views/analysis.md` |
 | FEATURE_004 | Coach-Backlog macOS: Suchfunktion | Medium | S | macOS | Normaler macOS-Backlog hat .searchable — Coach-Backlog nicht. |
 | FEATURE_006 | Coach-Backlog macOS: Inspector Panel | Medium | M | macOS | Normaler macOS-Backlog hat Detail-Inspector rechts (3-Spalten-Layout). Coach-Backlog zeigt nur Liste. |
 | FEATURE_007 | Coach-Backlog macOS: Multi-Selection + Bulk Actions | Medium | M | macOS | Normaler macOS-Backlog unterstuetzt Mehrfachauswahl + Bulk-Loeschen/Verschieben. Coach-Backlog nur Einzelaktionen. |

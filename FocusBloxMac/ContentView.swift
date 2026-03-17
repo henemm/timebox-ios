@@ -179,22 +179,14 @@ struct ContentView: View {
 
     var body: some View {
         NavigationSplitView(columnVisibility: $columnVisibility) {
-            // Sidebar: Only show filter options when Backlog is selected (non-coach mode)
-            if selectedSection == .backlog && !coachModeEnabled {
+            // Sidebar: Show filter options when Backlog is selected
+            if selectedSection == .backlog {
                 SidebarView(
                     selectedFilter: $selectedFilter,
                     overdueCount: overdueCount,
                     completedCount: completedCount,
                     recurringCount: recurringCount
                 )
-                .navigationSplitViewColumnWidth(min: 180, ideal: 220, max: 280)
-            } else if selectedSection == .backlog && coachModeEnabled {
-                List {
-                    Label("Backlog", systemImage: "list.bullet")
-                        .foregroundStyle(.secondary)
-                }
-                .listStyle(.sidebar)
-                .navigationTitle("Backlog")
                 .navigationSplitViewColumnWidth(min: 180, ideal: 220, max: 280)
             } else {
                 // Empty sidebar for other sections
@@ -267,11 +259,7 @@ struct ContentView: View {
     private var mainContentView: some View {
         switch selectedSection {
         case .backlog:
-            if coachModeEnabled {
-                MacCoachBacklogView(tasks: visibleTasks, selectedTasks: $selectedTasks, onImport: importFromReminders, onAddTask: { title in addTask(with: title) })
-            } else {
-                backlogView
-            }
+            backlogView
         case .planning:
             MacPlanningView(
                 selectedDate: $sharedDate
@@ -371,13 +359,74 @@ struct ContentView: View {
         }
     }
 
+    // MARK: - Coach-Boosted Tasks (when coachModeEnabled)
+
+    private var planItems: [PlanItem] {
+        visibleTasks.map { PlanItem(localTask: $0) }
+    }
+
+    private var coachBoostedTasks: [LocalTask] {
+        guard coachModeEnabled else { return [] }
+        let boostIDs = Set(CoachBacklogViewModel.coachBoostedTasks(from: planItems, selectedCoach: selectedCoach).map(\.id))
+        return visibleTasks.filter { boostIDs.contains($0.id) && !$0.isNextUp && $0.blockerTaskID == nil }
+    }
+
+    /// Regular tasks for tier sections, excluding coach-boosted when coach mode active.
+    private var tierFilteredTasks: [LocalTask] {
+        guard coachModeEnabled, !coachBoostedTasks.isEmpty else { return regularFilteredTasks }
+        let boostIDs = Set(coachBoostedTasks.map(\.id))
+        return regularFilteredTasks.filter { !boostIDs.contains($0.id) }
+    }
+
+    @AppStorage("selectedCoach") private var selectedCoach: String = ""
+
     private var backlogView: some View {
         VStack(spacing: 0) {
+            // Coach-mode toolbar (ViewMode-Switcher + Sync + Task Count)
+            if coachModeEnabled {
+                HStack {
+                    coachViewModeSwitcher
+                    Spacer()
+
+                    coachSyncStatusIndicator
+                        .accessibilityIdentifier("coachSyncStatusIndicator")
+
+                    Button {
+                        cloudKitMonitor.triggerSync()
+                    } label: {
+                        Image(systemName: "arrow.triangle.2.circlepath")
+                    }
+                    .accessibilityIdentifier("coachSyncButton")
+                    .help("CloudKit synchronisieren")
+
+                    if remindersSyncEnabled {
+                        Button {
+                            Task {
+                                isSyncing = true
+                                await importFromReminders()
+                                isSyncing = false
+                            }
+                        } label: {
+                            Image(systemName: "square.and.arrow.down")
+                        }
+                        .disabled(isSyncing)
+                        .accessibilityIdentifier("coachImportRemindersButton")
+                        .help("Erinnerungen importieren")
+                    }
+
+                    Text("\(visibleTasks.count) Tasks")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                .padding(.horizontal, 12)
+                .padding(.vertical, 6)
+            }
+
             // Quick Add Bar
             HStack {
                 TextField("Neuer Task...", text: $newTaskTitle)
                     .textFieldStyle(.roundedBorder)
-                    .accessibilityIdentifier("newTaskTextField")
+                    .accessibilityIdentifier(coachModeEnabled ? "coachQuickAddTextField" : "newTaskTextField")
                     .onSubmit { addTask() }
 
                 Button {
@@ -389,7 +438,7 @@ struct ContentView: View {
                 .disabled(newTaskTitle.isEmpty)
                 .buttonStyle(.plain)
                 .foregroundStyle(.blue)
-                .accessibilityIdentifier("addTaskButton")
+                .accessibilityIdentifier(coachModeEnabled ? "coachAddTaskButton" : "addTaskButton")
             }
             .padding()
 
@@ -397,6 +446,12 @@ struct ContentView: View {
 
             // Task List with Multi-Selection and Sections
             List(selection: $selectedTasks) {
+                // Monster header (coach mode only)
+                if coachModeEnabled {
+                    MonsterIntentionHeader(selectedCoach: selectedCoach, imageHeight: 80)
+                        .listRowSeparator(.hidden)
+                }
+
                 // MARK: Next Up Section (only in "All" filter)
                 if showNextUpSection {
                     Section {
@@ -442,6 +497,32 @@ struct ContentView: View {
                                 .clipShape(Capsule())
                         }
                     }
+                    .accessibilityIdentifier(coachModeEnabled ? "coachNextUpSection" : "nextUpSection")
+                }
+
+                // Coach-Boosted Section (between NextUp and Overdue)
+                if coachModeEnabled, !coachBoostedTasks.isEmpty,
+                   let sectionTitle = CoachBacklogViewModel.coachSectionTitle(for: selectedCoach) {
+                    Section {
+                        ForEach(coachBoostedTasks, id: \.uuid) { task in
+                            taskRowWithSwipe(task: task)
+                        }
+                    } header: {
+                        HStack {
+                            Text(sectionTitle)
+                                .font(.headline)
+                                .foregroundStyle(.purple)
+                            Spacer()
+                            Text("\(coachBoostedTasks.count)")
+                                .font(.caption)
+                                .foregroundStyle(.purple)
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 2)
+                                .background(Color.purple.opacity(0.2))
+                                .clipShape(Capsule())
+                        }
+                    }
+                    .accessibilityIdentifier("coachBoostSection")
                 }
 
                 // MARK: Regular Tasks — Priority Tier Sections or Flat List
@@ -469,9 +550,9 @@ struct ContentView: View {
                         }
                     }
 
-                    // Priority tier sections (doNow, planSoon, eventually, someday)
+                    // Priority tier sections (uses tierFilteredTasks to exclude coach-boosted)
                     ForEach(TaskPriorityScoringService.PriorityTier.allCases, id: \.self) { tier in
-                        let tierTasks = regularFilteredTasks.filter { task in
+                        let tierTasks = tierFilteredTasks.filter { task in
                             let taskTier = TaskPriorityScoringService.PriorityTier.from(score: scoreFor(task))
                             let isOverdue = overdueTasks.contains(where: { $0.uuid == task.uuid })
                             return taskTier == tier && !isOverdue
@@ -528,6 +609,7 @@ struct ContentView: View {
                     inspectorOverrideTaskID = nil
                 }
             }
+            .accessibilityIdentifier(coachModeEnabled ? "coachTaskList" : "backlogTaskList")
         }
         .navigationTitle(filterTitle)
         .toolbar {
@@ -649,6 +731,60 @@ struct ContentView: View {
             }
         } message: {
             Text("Die Vorlage und alle offenen Aufgaben werden gelöscht. Erledigte Aufgaben bleiben erhalten.")
+        }
+    }
+
+    // MARK: - Coach ViewMode Switcher (shown when coachModeEnabled)
+
+    private func coachFilterLabel(_ filter: SidebarFilter) -> (String, String) {
+        switch filter {
+        case .priority: return ("Priorität", "chart.bar.fill")
+        case .recent: return ("Zuletzt", "clock.arrow.circlepath")
+        case .overdue: return ("Überfällig", "exclamationmark.circle")
+        case .recurring: return ("Wiederkehrend", "arrow.triangle.2.circlepath")
+        case .completed: return ("Erledigt", "checkmark.circle")
+        }
+    }
+
+    private var coachViewModeSwitcher: some View {
+        let allFilters: [SidebarFilter] = [.priority, .recent, .overdue, .recurring, .completed]
+        let current = coachFilterLabel(selectedFilter)
+        return Menu {
+            ForEach(allFilters, id: \.self) { mode in
+                let info = coachFilterLabel(mode)
+                Button {
+                    withAnimation(.smooth) { selectedFilter = mode }
+                } label: {
+                    Label(info.0, systemImage: info.1)
+                }
+            }
+        } label: {
+            HStack(spacing: 4) {
+                Image(systemName: current.1)
+                Text(current.0)
+                    .font(.headline)
+                Image(systemName: "chevron.down")
+                    .font(.caption)
+            }
+        }
+        .accessibilityIdentifier("coachViewModeSwitcher")
+    }
+
+    @ViewBuilder
+    private var coachSyncStatusIndicator: some View {
+        if cloudKitMonitor.isSyncing || isSyncing {
+            ProgressView()
+                .scaleEffect(0.7)
+        } else if cloudKitMonitor.hasSyncError {
+            Image(systemName: "exclamationmark.icloud")
+                .foregroundStyle(.red)
+                .help(cloudKitMonitor.errorMessage ?? "Sync-Fehler")
+        } else {
+            Image(systemName: "checkmark.icloud")
+                .foregroundStyle(.green)
+                .help(cloudKitMonitor.lastSuccessfulSync.map {
+                    "Letzter Sync: \($0.formatted(date: .omitted, time: .shortened))"
+                } ?? "CloudKit verbunden")
         }
     }
 
