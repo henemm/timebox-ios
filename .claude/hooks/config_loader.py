@@ -10,6 +10,8 @@ Supports:
 - settings.local.json - Local overrides (NOT in git, for credentials etc.)
 """
 
+from __future__ import annotations
+
 import os
 import json
 import yaml

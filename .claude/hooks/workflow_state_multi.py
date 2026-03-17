@@ -219,6 +219,44 @@ def _state_lock():
             fd.close()
 
 
+# Short phase labels for iTerm2 tab title
+PHASE_SHORT = {
+    "phase0_idle": "",
+    "phase1_context": "Ctx",
+    "phase2_analyse": "Ana",
+    "phase3_spec": "Spec",
+    "phase4_approved": "OK",
+    "phase5_tdd_red": "RED",
+    "phase6_implement": "Impl",
+    "phase6b_adversary": "Adv",
+    "phase7_validate": "Val",
+    "phase8_complete": "Done",
+}
+
+
+def _update_iterm_title(workflow_name: str = None, phase: str = None):
+    """Set iTerm2 tab title. Called only on phase transitions."""
+    if not workflow_name:
+        title = os.path.basename(os.getcwd())
+    else:
+        short = (
+            workflow_name
+            .replace("feature-0", "F")
+            .replace("feature-", "F:")
+            .replace("bug-0", "B")
+            .replace("bug-", "B:")
+            .replace("sprint-", "S:")
+        )
+        phase_label = PHASE_SHORT.get(phase or "", "")
+        title = f"{short} | {phase_label}" if phase_label else short
+    try:
+        with open("/dev/tty", "w") as tty:
+            tty.write(f"\033]1;{title}\007")
+            tty.flush()
+    except Exception:
+        pass
+
+
 def get_state_file() -> Path:
     """Get the path to the workflow state file."""
     # Try to find project root via .git
@@ -352,7 +390,12 @@ def start_workflow(name: str, make_active: bool = True) -> dict:
             state["active_workflow"] = name
 
         _save_state_unlocked(state)
-        return state
+
+    if make_active:
+        phase = state["workflows"][name].get("current_phase", "phase1_context")
+        _update_iterm_title(name, phase)
+
+    return state
 
 
 def get_active_workflow() -> Optional[dict]:
@@ -378,7 +421,10 @@ def set_active_workflow(name: str) -> bool:
 
         state["active_workflow"] = name
         _save_state_unlocked(state)
-        return True
+
+    phase = state["workflows"][name].get("current_phase", "phase0_idle")
+    _update_iterm_title(name, phase)
+    return True
 
 
 def advance_phase(workflow_name: str = None) -> Optional[str]:
@@ -418,6 +464,7 @@ def advance_phase(workflow_name: str = None) -> Optional[str]:
                 workflow["current_phase"] = new_phase
                 workflow["last_updated"] = datetime.now().isoformat()
                 _save_state_unlocked(state)
+                _update_iterm_title(name, new_phase)
                 return new_phase
         except ValueError:
             pass
@@ -508,7 +555,9 @@ def set_phase(workflow_name: str, phase: str, force: bool = False) -> tuple[bool
         state["workflows"][workflow_name]["current_phase"] = phase
         state["workflows"][workflow_name]["last_updated"] = datetime.now().isoformat()
         _save_state_unlocked(state)
-        return True, f"Phase set to {phase}"
+
+    _update_iterm_title(workflow_name, phase)
+    return True, f"Phase set to {phase}"
 
 
 def add_test_artifact(workflow_name: str, artifact: dict) -> bool:
@@ -682,7 +731,10 @@ def complete_workflow(name: str) -> bool:
             state["active_workflow"] = None
 
         _save_state_unlocked(state)
-        return True
+
+    # Show project name when no active workflow
+    _update_iterm_title()
+    return True
 
 
 def mark_red_test_done(workflow_name: str = None, result: str = None) -> bool:
@@ -729,6 +781,9 @@ def mark_red_test_done(workflow_name: str = None, result: str = None) -> bool:
             workflow["current_phase"] = "phase5_tdd_red"
             if "phase5_tdd_red" not in workflow.get("phases_completed", []):
                 workflow.setdefault("phases_completed", []).append("phase5_tdd_red")
+            _save_state_unlocked(state)
+            _update_iterm_title(name, "phase5_tdd_red")
+            return True
 
         _save_state_unlocked(state)
         return True
@@ -759,6 +814,9 @@ def mark_green_test_done(workflow_name: str = None, result: str = None) -> bool:
             workflow["current_phase"] = "phase6b_adversary"
             if "phase6b_adversary" not in workflow.get("phases_completed", []):
                 workflow.setdefault("phases_completed", []).append("phase6b_adversary")
+            _save_state_unlocked(state)
+            _update_iterm_title(name, "phase6b_adversary")
+            return True
 
         _save_state_unlocked(state)
         return True
