@@ -1,0 +1,11 @@
+BUG_108 TDD RED Output — 2026-03-17
+
+Test suite 'RecurringTemplateTests' started on 'Clone 1 of iPhone 17 Pro - FocusBlox (68797)'
+Test case 'RecurringTemplateTests.test_deleteRecurringTemplate_neutralizesCompletedTasks()' failed on 'Clone 1 of iPhone 17 Pro - FocusBlox (68797)' (0.659 seconds)
+Test case 'RecurringTemplateTests.test_endedSeries_noZombieAfterFullStartupCycle()' passed on 'Clone 1 of iPhone 17 Pro - FocusBlox (68797)' (0.030 seconds)
+
+** TEST FAILED **
+
+Failure: test_deleteRecurringTemplate_neutralizesCompletedTasks
+Assertion: XCTAssertEqual(remaining.first?.recurrencePattern, "none") — completed task recurrencePattern is still "weekly" instead of "none"
+Root cause: deleteRecurringTemplate does not neutralize completed tasks (only deletes open tasks)

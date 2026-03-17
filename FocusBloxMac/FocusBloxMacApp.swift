@@ -283,11 +283,10 @@ struct FocusBloxMacApp: App {
                         Self.cleanupLeakedTestData(in: container.mainContext)
                         // Bug 38: Force CloudKit to sync all extended attribute fields
                         MacModelContainer.forceCloudKitFieldSync(in: container.mainContext)
-                        // Repair orphaned recurring series (missing successors)
-                        RecurrenceService.repairOrphanedRecurringSeries(in: container.mainContext)
-                        // Migrate recurring tasks to template model (one-time)
+                        // BUG_108: Order matters — migrate + dedup first to ensure clean state, then repair
                         RecurrenceService.migrateToTemplateModel(in: container.mainContext)
                         RecurrenceService.deduplicateTemplates(in: container.mainContext)
+                        RecurrenceService.repairOrphanedRecurringSeries(in: container.mainContext)
                         // Background title improvement + enrichment for tasks from Watch, Siri, etc.
                         let mainContext = container.mainContext
                         let titleEngine = TaskTitleEngine(modelContext: mainContext)

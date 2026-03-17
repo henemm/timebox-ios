@@ -268,6 +268,78 @@ final class RecurringTemplateTests: XCTestCase {
         XCTAssertTrue(remaining.first?.isCompleted ?? false, "Remaining task should be the completed one")
     }
 
+    // MARK: - BUG_108 Zehnagel-Zombie Tests
+
+    /// BUG_108: deleteRecurringTemplate muss completed Tasks neutralisieren
+    /// (recurrencePattern = "none"), damit Repair sie nie wieder aufsammelt.
+    /// Bricht wenn: deleteRecurringTemplate completed Tasks nicht neutralisiert.
+    func test_deleteRecurringTemplate_neutralizesCompletedTasks() throws {
+        let context = container.mainContext
+        let groupID = UUID().uuidString
+
+        // Template + offenes Kind + erledigtes Kind
+        let template = LocalTask(title: "Zehnagel", recurrencePattern: "weekly", recurrenceGroupID: groupID)
+        template.isTemplate = true
+        context.insert(template)
+
+        let openChild = LocalTask(title: "Zehnagel", dueDate: Date(), recurrencePattern: "weekly", recurrenceGroupID: groupID)
+        context.insert(openChild)
+
+        let completedChild = LocalTask(title: "Zehnagel", recurrencePattern: "weekly", recurrenceGroupID: groupID)
+        completedChild.isCompleted = true
+        completedChild.completedAt = Date()
+        context.insert(completedChild)
+        try context.save()
+
+        let syncEngine = SyncEngine(
+            taskSource: LocalTaskSource(modelContext: context),
+            modelContext: context
+        )
+        try syncEngine.deleteRecurringTemplate(groupID: groupID)
+
+        // Completed child should survive but with recurrencePattern = "none"
+        let remaining = try context.fetch(FetchDescriptor<LocalTask>(
+            predicate: #Predicate { $0.recurrenceGroupID == groupID }
+        ))
+        XCTAssertEqual(remaining.count, 1, "Only completed child should remain")
+        XCTAssertTrue(remaining.first?.isCompleted ?? false, "Remaining task should be completed")
+        XCTAssertEqual(remaining.first?.recurrencePattern, "none",
+                       "Completed task must be neutralized (recurrencePattern = none) to prevent zombie resurrection")
+    }
+
+    /// BUG_108: Nach Serie-beenden + vollem Startup-Zyklus darf KEIN Zombie entstehen.
+    /// Testet den kompletten Zyklus: migration → dedup → repair auf sauberem State.
+    /// Bricht wenn: Startup-Reihenfolge Repair VOR Migration/Dedup ausfuehrt UND completed Tasks nicht neutralisiert sind.
+    func test_endedSeries_noZombieAfterFullStartupCycle() throws {
+        let context = container.mainContext
+        let groupID = UUID().uuidString
+
+        // Zustand NACH "Serie beenden": nur completed Tasks ueberleben
+        let completed1 = LocalTask(title: "Zehnagel", dueDate: Calendar.current.date(byAdding: .day, value: -7, to: Date()), recurrencePattern: "weekly", recurrenceGroupID: groupID)
+        completed1.isCompleted = true
+        completed1.completedAt = Calendar.current.date(byAdding: .day, value: -7, to: Date())
+        context.insert(completed1)
+
+        let completed2 = LocalTask(title: "Zehnagel", dueDate: Calendar.current.date(byAdding: .day, value: -14, to: Date()), recurrencePattern: "weekly", recurrenceGroupID: groupID)
+        completed2.isCompleted = true
+        completed2.completedAt = Calendar.current.date(byAdding: .day, value: -14, to: Date())
+        context.insert(completed2)
+        try context.save()
+
+        // Simuliere kompletten Startup-Zyklus (neue Reihenfolge: migration → dedup → repair)
+        let _ = RecurrenceService.migrateToTemplateModel(in: context)
+        let _ = RecurrenceService.deduplicateTemplates(in: context)
+        let repaired = RecurrenceService.repairOrphanedRecurringSeries(in: context)
+
+        // KEIN Zombie darf entstehen
+        XCTAssertEqual(repaired, 0, "No zombie should be created for ended series")
+
+        let openTasks = try context.fetch(FetchDescriptor<LocalTask>(
+            predicate: #Predicate { !$0.isCompleted }
+        ))
+        XCTAssertEqual(openTasks.count, 0, "No open tasks should exist after ended series + startup cycle")
+    }
+
     // MARK: - PlanItem Tests
 
     /// Bricht wenn: PlanItem.init(localTask:) isTemplate nicht durchreicht

@@ -201,7 +201,8 @@ final class SyncEngine {
     }
 
     /// Deletes a recurring template and all its open children (ends the series).
-    /// Completed children are preserved for history.
+    /// Completed children are preserved for history but neutralized
+    /// (recurrencePattern = "none") so repair can never resurrect them.
     func deleteRecurringTemplate(groupID: String) throws {
         let descriptor = FetchDescriptor<LocalTask>(
             predicate: #Predicate { $0.recurrenceGroupID == groupID && !$0.isCompleted }
@@ -210,6 +211,17 @@ final class SyncEngine {
         for task in tasks {
             modelContext.delete(task) // Deletes template + all open children
         }
+
+        // BUG_108: Neutralize completed tasks so repair never picks them up again
+        let completedDescriptor = FetchDescriptor<LocalTask>(
+            predicate: #Predicate { $0.recurrenceGroupID == groupID && $0.isCompleted }
+        )
+        if let completedTasks = try? modelContext.fetch(completedDescriptor) {
+            for task in completedTasks {
+                task.recurrencePattern = "none"
+            }
+        }
+
         try modelContext.save()
     }
 

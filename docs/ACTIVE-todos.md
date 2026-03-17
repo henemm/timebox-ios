@@ -32,9 +32,8 @@
 | FEATURE_022 | CaptureContextIntent | Low | M | iOS | WARTEND auf Apple APIs (iOS 26.5/27). |
 | TD_001 | God-Views aufbrechen | Low | L | Beide | BacklogView 1181 LoC, BlockPlanningView 1400 LoC — Wartbarkeit. |
 | TD_002 | View-Duplikation iOS/macOS | Low | XL | Beide | ~7300 LoC verbleibend. Langfristig wichtig, kurzfristig kein Blocker. |
-| BUG_105 | Coach AI-Pitches: generisch + halluziniert + abgeschnitten | High | M | Beide | AI-Pitches in der Coach-Auswahl (MorningIntentionView) sind nutzlos: (1) AI halluziniert Task-Namen statt echte zu verwenden, (2) Text wird abgeschnitten ("La..."). **Root Cause:** Free-Text-Generierung — Apple's 3B On-Device Model halluziniert bei Free-Text (WWDC25-248). **Loesung:** `@Generable` Struct mit `@Guide(.anyOf(taskNames))` — Constrained Decoding erzwingt echten Task-Namen. `shouldAcceptPitch` entfernen. Artefakte: `docs/artifacts/bug-coach-pitch-quality/`. |
 | BUG_107 | Coach-Backlog: Blocked Tasks erscheinen doppelt | High | S | Beide | `CoachBacklogViewModel` filtert nicht nach `blockerTaskID` — blocked Tasks erscheinen doppelt (Dependent + Tier-Eintrag). **Fix:** 4 Stellen `blockerTaskID == nil` ergaenzen. Analyse: `docs/artifacts/bug-backlog-duplicates/analysis.md` |
-| BUG_108 | Zehnagel-Zombie: Recurring Task ueberlebt Serien-Ende | High | S-M | Beide | Alte GroupID-Fragmente ueberleben Dedup/Serie-beenden-Kette. Repair-Funktion erstellt neue Instanz aus completed Tasks mit unbekannter GroupID. **Fix:** Repair nach Titel statt nur GroupID. Analyse: `docs/artifacts/bug-backlog-duplicates/analysis.md` |
+| ~~BUG_108~~ | ~~Zehnagel-Zombie: Recurring Task ueberlebt Serien-Ende~~ | ~~High~~ | ~~S-M~~ | ~~Beide~~ | **DONE.** Fix: (1) deleteRecurringTemplate neutralisiert completed Tasks (recurrencePattern=none), (2) Startup-Reihenfolge migration→dedup→repair. Analyse: `docs/artifacts/bug-108-zehnagel-zombie/analysis.md` |
 
 ---
 
