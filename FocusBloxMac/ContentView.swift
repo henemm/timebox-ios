@@ -382,46 +382,6 @@ struct ContentView: View {
 
     private var backlogView: some View {
         VStack(spacing: 0) {
-            // Coach-mode toolbar (ViewMode-Switcher + Sync + Task Count)
-            if coachModeEnabled {
-                HStack {
-                    coachViewModeSwitcher
-                    Spacer()
-
-                    coachSyncStatusIndicator
-                        .accessibilityIdentifier("coachSyncStatusIndicator")
-
-                    Button {
-                        cloudKitMonitor.triggerSync()
-                    } label: {
-                        Image(systemName: "arrow.triangle.2.circlepath")
-                    }
-                    .accessibilityIdentifier("coachSyncButton")
-                    .help("CloudKit synchronisieren")
-
-                    if remindersSyncEnabled {
-                        Button {
-                            Task {
-                                isSyncing = true
-                                await importFromReminders()
-                                isSyncing = false
-                            }
-                        } label: {
-                            Image(systemName: "square.and.arrow.down")
-                        }
-                        .disabled(isSyncing)
-                        .accessibilityIdentifier("coachImportRemindersButton")
-                        .help("Erinnerungen importieren")
-                    }
-
-                    Text("\(visibleTasks.count) Tasks")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-                .padding(.horizontal, 12)
-                .padding(.vertical, 6)
-            }
-
             // Quick Add Bar
             HStack {
                 TextField("Neuer Task...", text: $newTaskTitle)
@@ -731,60 +691,6 @@ struct ContentView: View {
             }
         } message: {
             Text("Die Vorlage und alle offenen Aufgaben werden gelöscht. Erledigte Aufgaben bleiben erhalten.")
-        }
-    }
-
-    // MARK: - Coach ViewMode Switcher (shown when coachModeEnabled)
-
-    private func coachFilterLabel(_ filter: SidebarFilter) -> (String, String) {
-        switch filter {
-        case .priority: return ("Priorität", "chart.bar.fill")
-        case .recent: return ("Zuletzt", "clock.arrow.circlepath")
-        case .overdue: return ("Überfällig", "exclamationmark.circle")
-        case .recurring: return ("Wiederkehrend", "arrow.triangle.2.circlepath")
-        case .completed: return ("Erledigt", "checkmark.circle")
-        }
-    }
-
-    private var coachViewModeSwitcher: some View {
-        let allFilters: [SidebarFilter] = [.priority, .recent, .overdue, .recurring, .completed]
-        let current = coachFilterLabel(selectedFilter)
-        return Menu {
-            ForEach(allFilters, id: \.self) { mode in
-                let info = coachFilterLabel(mode)
-                Button {
-                    withAnimation(.smooth) { selectedFilter = mode }
-                } label: {
-                    Label(info.0, systemImage: info.1)
-                }
-            }
-        } label: {
-            HStack(spacing: 4) {
-                Image(systemName: current.1)
-                Text(current.0)
-                    .font(.headline)
-                Image(systemName: "chevron.down")
-                    .font(.caption)
-            }
-        }
-        .accessibilityIdentifier("coachViewModeSwitcher")
-    }
-
-    @ViewBuilder
-    private var coachSyncStatusIndicator: some View {
-        if cloudKitMonitor.isSyncing || isSyncing {
-            ProgressView()
-                .scaleEffect(0.7)
-        } else if cloudKitMonitor.hasSyncError {
-            Image(systemName: "exclamationmark.icloud")
-                .foregroundStyle(.red)
-                .help(cloudKitMonitor.errorMessage ?? "Sync-Fehler")
-        } else {
-            Image(systemName: "checkmark.icloud")
-                .foregroundStyle(.green)
-                .help(cloudKitMonitor.lastSuccessfulSync.map {
-                    "Letzter Sync: \($0.formatted(date: .omitted, time: .shortened))"
-                } ?? "CloudKit verbunden")
         }
     }
 

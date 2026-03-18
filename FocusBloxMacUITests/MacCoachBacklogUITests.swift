@@ -105,18 +105,7 @@ final class MacCoachBacklogUITests: XCTestCase {
                       "NextUp section should be visible in macOS Coach backlog")
     }
 
-    // MARK: - Test 5: ViewMode Switcher (Bug 104: P3)
-
-    /// Verhalten: Coach-Backlog hat einen ViewMode-Switcher mit 5 Modi.
-    /// Bricht wenn: MacCoachBacklogView keinen viewModeSwitcher hat
-    func test_coachModeOn_viewModeSwitcherExists() throws {
-        launchWithCoachMode()
-        navigateToBacklog()
-
-        let switcher = app.descendants(matching: .any)["coachViewModeSwitcher"]
-        XCTAssertTrue(switcher.waitForExistence(timeout: 5),
-                      "ViewMode switcher should exist in macOS Coach backlog")
-    }
+    // Test 5 removed by BUG_110: coachViewModeSwitcher was redundant with sidebar
 
     // MARK: - Test 6: Completion Button (Bug 104: P0)
 
@@ -145,51 +134,7 @@ final class MacCoachBacklogUITests: XCTestCase {
                       "Task list should exist in macOS Coach backlog")
     }
 
-    // MARK: - Test 8: Sync Status Indicator (FEATURE_005)
-
-    /// Verhalten: Coach-Backlog zeigt Sync-Status-Indicator (wie normaler Backlog).
-    /// Bricht wenn: MacCoachBacklogView keinen coachSyncStatusIndicator im HStack hat
-    func test_coachModeOn_syncStatusIndicatorExists() throws {
-        launchWithCoachMode()
-        navigateToBacklog()
-
-        let syncStatus = app.descendants(matching: .any)["coachSyncStatusIndicator"]
-        XCTAssertTrue(syncStatus.waitForExistence(timeout: 5),
-                      "Sync status indicator should be visible in Coach backlog toolbar")
-    }
-
-    // MARK: - Test 9: Sync Button (FEATURE_005)
-
-    /// Verhalten: Coach-Backlog zeigt Sync-Button zum manuellen Sync-Trigger.
-    /// Bricht wenn: MacCoachBacklogView keinen coachSyncButton im HStack hat
-    func test_coachModeOn_syncButtonExists() throws {
-        launchWithCoachMode()
-        navigateToBacklog()
-
-        let syncButton = app.buttons["coachSyncButton"]
-        XCTAssertTrue(syncButton.waitForExistence(timeout: 5),
-                      "Sync button should be visible in Coach backlog toolbar")
-    }
-
-    // MARK: - Test 10: Import Reminders Button (FEATURE_005)
-
-    /// Verhalten: Coach-Backlog zeigt Import-Button wenn remindersSyncEnabled=true.
-    /// Bricht wenn: MacCoachBacklogView keinen coachImportRemindersButton im HStack hat
-    func test_coachModeOn_importRemindersButtonExists() throws {
-        app.launchArguments = [
-            "-UITesting", "-MockData", "-ApplePersistenceIgnoreState", "YES",
-            "-coachModeEnabled", "1",
-            "-remindersSyncEnabled", "1"
-        ]
-        app.launch()
-        let window = app.windows.firstMatch
-        _ = window.waitForExistence(timeout: 5)
-        navigateToBacklog()
-
-        let importButton = app.buttons["coachImportRemindersButton"]
-        XCTAssertTrue(importButton.waitForExistence(timeout: 5),
-                      "Import Reminders button should be visible when remindersSyncEnabled is true")
-    }
+    // Tests 8, 9, 10 removed by BUG_110: coach sync/import buttons were redundant with toolbar
 
     // MARK: - Test 11: Coach-Boost Section (Bug 104: P3)
 
@@ -214,6 +159,61 @@ final class MacCoachBacklogUITests: XCTestCase {
         attachment.name = "mac-coach-boost-section-feuer"
         attachment.lifetime = .keepAlways
         add(attachment)
+    }
+
+    // MARK: - BUG_110: No duplicate controls in coach mode
+
+    /// BUG_110 TDD RED Test:
+    /// Verhalten: Coach-Modus zeigt KEINEN ViewMode-Switcher im Content-Bereich,
+    /// weil die Sidebar bereits die Filter-Auswahl bietet.
+    /// Bricht wenn: ContentView.backlogView noch den coachViewModeSwitcher HStack rendert
+    func test_coachModeOn_noViewModeSwitcherInContent() throws {
+        launchWithCoachMode()
+        navigateToBacklog()
+
+        let switcher = app.descendants(matching: .any)["coachViewModeSwitcher"]
+        XCTAssertFalse(switcher.waitForExistence(timeout: 3),
+                       "BUG_110: ViewMode switcher should NOT exist in content area — sidebar handles this")
+    }
+
+    /// BUG_110 TDD RED Test:
+    /// Verhalten: Coach-Modus zeigt KEINEN separaten Sync-Button im Content-Bereich.
+    func test_coachModeOn_noSyncButtonInContent() throws {
+        launchWithCoachMode()
+        navigateToBacklog()
+
+        let syncButton = app.buttons["coachSyncButton"]
+        XCTAssertFalse(syncButton.waitForExistence(timeout: 3),
+                       "BUG_110: Sync button should NOT exist in content area — toolbar handles this")
+    }
+
+    /// BUG_110 TDD RED Test:
+    /// Verhalten: Coach-Modus zeigt KEINEN separaten Sync-Status-Indicator im Content-Bereich.
+    func test_coachModeOn_noSyncStatusInContent() throws {
+        launchWithCoachMode()
+        navigateToBacklog()
+
+        let syncStatus = app.descendants(matching: .any)["coachSyncStatusIndicator"]
+        XCTAssertFalse(syncStatus.waitForExistence(timeout: 3),
+                       "BUG_110: Sync status indicator should NOT exist in content area")
+    }
+
+    /// BUG_110 TDD RED Test:
+    /// Verhalten: Coach-Modus zeigt KEINEN separaten Import-Button im Content-Bereich.
+    func test_coachModeOn_noImportButtonInContent() throws {
+        app.launchArguments = [
+            "-UITesting", "-MockData", "-ApplePersistenceIgnoreState", "YES",
+            "-coachModeEnabled", "1",
+            "-remindersSyncEnabled", "1"
+        ]
+        app.launch()
+        let window = app.windows.firstMatch
+        _ = window.waitForExistence(timeout: 5)
+        navigateToBacklog()
+
+        let importButton = app.buttons["coachImportRemindersButton"]
+        XCTAssertFalse(importButton.waitForExistence(timeout: 3),
+                       "BUG_110: Import button should NOT exist in content area")
     }
 
     // MARK: - FEATURE_003: Quick-Add TextField TDD RED Tests

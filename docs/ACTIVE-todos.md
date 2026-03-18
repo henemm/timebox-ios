@@ -24,6 +24,7 @@
 | TD_001 | God-Views aufbrechen | Low | L | Beide | BacklogView 1181 LoC, BlockPlanningView 1400 LoC — Wartbarkeit. |
 | TD_002 | View-Duplikation iOS/macOS | Low | L | Beide | ~5900 LoC verbleibend (von ~7300). BUG_109 View-Merge hat ~1400 LoC Duplikation eliminiert (CoachBacklogView.swift + MacCoachBacklogView.swift geloescht, in BacklogView/ContentView gemergt). Langfristig wichtig, kurzfristig kein Blocker. |
 | BUG_109 | Backlog: Relevanz-Sortierung invertiert | High | S | iOS (macOS pruefen) | Backlog zeigt Tasks mit niedrigster Relevanz oben, hoechste unten (18→43→40→71→75 statt 75→71→…→18). Score-Berechnung korrekt, Sortierrichtung invertiert. **Fix-Plan:** 1. Mock-Tests fuer Szenario bauen, 2. Sortierrichtung fixen. Analyse: `docs/artifacts/bug-relevance-sort-direction/analysis.md` |
+| BUG_110 | ~~macOS Coach-Backlog: Doppelte Controls ueber Task-Liste~~ | High | S | macOS | **ERLEDIGT** — Coach-Toolbar (ViewMode-Switcher + Sync/Import) entfernt; Sidebar und App-Toolbar decken alles ab. |
 
 ---
 
