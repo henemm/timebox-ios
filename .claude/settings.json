@@ -141,7 +141,7 @@
         ]
       },
       {
-        "matcher": "Task",
+        "matcher": "Grep|Glob|Task",
         "hooks": [
           {
             "type": "command",
