@@ -19,12 +19,15 @@ Fuehre die Unit Tests aus und fasse die Ergebnisse **kurz und verstaendlich** zu
 ## Vorgehen
 
 1. **Tests ausfuehren:**
+
+WICHTIG: IMMER `./scripts/sim.sh` verwenden — NIEMALS xcodebuild direkt aufrufen!
+
 ```bash
-xcodebuild test \
-  -project {{PROJECT_FILE}} \
-  -scheme "{{TEST_SCHEME}}" \
-  -destination 'platform=iOS Simulator,name=iPhone 16 Pro' \
-  2>&1
+# Unit Tests:
+./scripts/sim.sh unit [TestClass]
+
+# UI Tests:
+./scripts/sim.sh test [TestClass]
 ```
 
 2. **Ergebnis analysieren:**

@@ -30,8 +30,8 @@ Dispatche **4 parallele Haiku-Agenten** fuer umfassende Validierung:
 ```
 Task 1 (general-purpose/haiku) - TEST CHECK:
   "Fuehre ALLE Tests aus:
-  xcodebuild test -project FocusBlox.xcodeproj -scheme FocusBlox \
-    -destination 'id=548B4A2F-FDFF-4F9E-8335-1A7A7B98E492'
+  ./scripts/sim.sh unit [TestClass]  (Unit Tests)
+  ./scripts/sim.sh test [TestClass]  (UI Tests)
   Report: Anzahl passed/failed, Laufzeit, Fehlerdetails."
 
 Task 2 (general-purpose/haiku) - SPEC COMPLIANCE:
@@ -41,6 +41,8 @@ Task 2 (general-purpose/haiku) - SPEC COMPLIANCE:
 
 Task 3 (general-purpose/haiku) - REGRESSION CHECK:
   "Fuehre die vollstaendige Test-Suite aus (nicht nur Feature-Tests).
+  ./scripts/sim.sh unit [AllTests]
+  ./scripts/sim.sh test [AllUITests]
   Report: Gibt es Regressionen? Welche Tests die vorher gruen waren
   sind jetzt rot?"
 

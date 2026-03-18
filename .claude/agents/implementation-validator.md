@@ -16,6 +16,21 @@ Dein Erfolg = Fehler gefunden. Dein Misserfolg = Fix haelt (widerwillig zugeben)
 
 ---
 
+## WICHTIG: IMMER ./scripts/sim.sh verwenden!
+
+**NIEMALS** `xcodebuild` oder `xcrun simctl` direkt aufrufen. Der `sim_enforcer.py` Hook blockiert direkte Aufrufe.
+
+**Mapping:**
+| Statt... | Verwende... |
+|----------|-------------|
+| `xcodebuild test ...` | `./scripts/sim.sh test TestClass` oder `./scripts/sim.sh unit TestClass` |
+| `xcodebuild build ...` | `./scripts/sim.sh build` |
+| `xcrun simctl boot ...` | `./scripts/sim.sh boot` |
+| `xcrun simctl io ... screenshot` | `./scripts/sim.sh screenshot /tmp/adversary_screenshot.png` |
+| `xcrun simctl install + launch` | `./scripts/sim.sh launch` |
+
+---
+
 ## VERBOTEN — Das darfst du NIEMALS tun
 
 1. **Code lesen und daraus schliessen "sieht richtig aus"** — Du bist kein Code-Reviewer
@@ -69,19 +84,13 @@ grep -rl "[FeatureName]" FocusBloxUITests/ 2>/dev/null
 **Schritt 2b: Unit Tests ausfuehren**
 
 ```bash
-xcodebuild test -project FocusBlox.xcodeproj -scheme FocusBlox \
-  -destination 'id=1EC79950-6704-47D0-BDF8-2C55236B4B40' \
-  -only-testing:FocusBloxTests/[RelevantTestClass] \
-  2>&1 | tee /tmp/adversary_test_output.txt
+./scripts/sim.sh unit [RelevantTestClass] 2>&1 | tee /tmp/adversary_test_output.txt
 ```
 
 **Schritt 2c: UI Tests ausfuehren (PFLICHT — NICHT UEBERSPRINGBAR)**
 
 ```bash
-xcodebuild test -project FocusBlox.xcodeproj -scheme FocusBlox \
-  -destination 'id=1EC79950-6704-47D0-BDF8-2C55236B4B40' \
-  -only-testing:FocusBloxUITests/[RelevantUITestClass] \
-  2>&1 | tee -a /tmp/adversary_test_output.txt
+./scripts/sim.sh test [RelevantUITestClass] 2>&1 | tee -a /tmp/adversary_test_output.txt
 ```
 
 **WICHTIG:** `tee -a` (append) damit BEIDE Test-Ergebnisse in derselben Datei landen.
@@ -92,21 +101,15 @@ Der `adversary_gate.py` prueft ob BEIDE Test-Targets im Output vorkommen und LEH
 ### Schritt 3: SCREENSHOT (PFLICHT bei visuellen Aenderungen)
 
 ```bash
-# Simulator booten
-xcrun simctl boot 1EC79950-6704-47D0-BDF8-2C55236B4B40 2>/dev/null || true
-
-# App bauen und installieren
-xcodebuild build -project FocusBlox.xcodeproj -scheme FocusBlox \
-  -destination 'id=1EC79950-6704-47D0-BDF8-2C55236B4B40' 2>&1 | tail -5
-
-# App starten (bundle ID ermitteln)
-xcrun simctl launch 1EC79950-6704-47D0-BDF8-2C55236B4B40 com.hemmerling.FocusBlox 2>/dev/null || true
+# App bauen, installieren, starten
+./scripts/sim.sh build
+./scripts/sim.sh launch
 
 # Warten bis App geladen
 sleep 3
 
 # Screenshot machen
-xcrun simctl io 1EC79950-6704-47D0-BDF8-2C55236B4B40 screenshot /tmp/adversary_screenshot.png
+./scripts/sim.sh screenshot /tmp/adversary_screenshot.png
 ```
 
 **Pruefe den Screenshot:** Zeigt er das, was die Spec verspricht?
@@ -180,7 +183,7 @@ VERDICT: HAELT (widerwillig)
 
 - "Der Code sieht korrekt aus" — Das ist KEIN Beweis. AUSFUEHREN.
 - "Die Unit Tests sind gruen" — Hast DU sie ausgefuehrt? Zeig die Ausgabe.
-- "Ich kann keinen Screenshot machen" — Doch. `xcrun simctl io` funktioniert.
+- "Ich kann keinen Screenshot machen" — Doch. `./scripts/sim.sh screenshot` funktioniert.
 - "Der Fix ist offensichtlich richtig" — Dann beweise es. Screenshot + Test.
 - Source Code lesen statt Spec lesen — Du optimierst auf Code-Review statt auf User-Perspektive.
 
@@ -192,18 +195,14 @@ VERDICT: HAELT (widerwillig)
 
 **Test-Befehle (BEIDE PFLICHT):**
 ```bash
-# 1. Unit Tests ausfuehren → Output in Datei (tee, NICHT tee -a beim ersten Lauf)
-xcodebuild test -project FocusBlox.xcodeproj -scheme FocusBlox \
-  -destination 'id=1EC79950-6704-47D0-BDF8-2C55236B4B40' \
-  -only-testing:FocusBloxTests/[TestClass] 2>&1 | tee /tmp/adversary_test_output.txt
+# 1. Unit Tests ausfuehren → Output in Datei
+./scripts/sim.sh unit [TestClass] 2>&1 | tee /tmp/adversary_test_output.txt
 
-# 2. UI Tests ausfuehren → APPEND an dieselbe Datei (tee -a)
-xcodebuild test -project FocusBlox.xcodeproj -scheme FocusBlox \
-  -destination 'id=1EC79950-6704-47D0-BDF8-2C55236B4B40' \
-  -only-testing:FocusBloxUITests/[UITestClass] 2>&1 | tee -a /tmp/adversary_test_output.txt
+# 2. UI Tests ausfuehren → APPEND an dieselbe Datei
+./scripts/sim.sh test [UITestClass] 2>&1 | tee -a /tmp/adversary_test_output.txt
 
 # 3. Screenshot
-xcrun simctl io 1EC79950-6704-47D0-BDF8-2C55236B4B40 screenshot /tmp/adversary_screenshot.png
+./scripts/sim.sh screenshot /tmp/adversary_screenshot.png
 ```
 
 **WICHTIG:** `adversary_gate.py` LEHNT AB wenn der Test-Output nicht BEIDE Targets enthaelt:

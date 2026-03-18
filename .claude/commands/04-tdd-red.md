@@ -70,10 +70,7 @@ final class [FeatureName]Tests: XCTestCase {
 
 Ausfuehren:
 ```bash
-xcodebuild test -project FocusBlox.xcodeproj -scheme FocusBlox \
-  -destination 'id=6364A54B-5048-4346-899E-FFB67E630D53' \
-  -only-testing:FocusBloxTests/[FeatureName]Tests \
-  2>&1 | tee docs/artifacts/[workflow]/unit-test-red-output.txt
+./scripts/sim.sh unit [FeatureName]Tests 2>&1 | tee docs/artifacts/[workflow]/unit-test-red-output.txt
 ```
 
 ### 3. UI Tests schreiben
@@ -105,10 +102,7 @@ final class [FeatureName]UITests: XCTestCase {
 
 Ausfuehren:
 ```bash
-xcodebuild test -project FocusBlox.xcodeproj -scheme FocusBlox \
-  -destination 'id=6364A54B-5048-4346-899E-FFB67E630D53' \
-  -only-testing:FocusBloxUITests/[FeatureName]UITests \
-  2>&1 | tee docs/artifacts/[workflow]/ui-test-red-output.txt
+./scripts/sim.sh test [FeatureName]UITests 2>&1 | tee docs/artifacts/[workflow]/ui-test-red-output.txt
 ```
 
 ### 4. Alle Tests ausfuehren — MUESSEN FEHLSCHLAGEN (RED)
