@@ -106,6 +106,7 @@ struct BacklogView: View {
     // MARK: - Next Up Tasks
     private var nextUpTasks: [PlanItem] {
         planItems.filter { $0.isNextUp && !$0.isCompleted && !$0.isTemplate && !$0.isBlocked && matchesSearch($0) }
+            .sorted { $0.priorityScore > $1.priorityScore }
     }
 
     /// All non-completed backlog tasks (including blocked ones for grouping)
