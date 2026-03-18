@@ -340,12 +340,14 @@ struct ContentView: View {
         return deferredSort.effectiveScore(id: task.id, liveScore: liveScore)
     }
 
-    // Overdue tasks (non-NextUp, non-blocked, dueDate before today)
+    // Overdue tasks (non-NextUp, non-blocked, non-coach-boosted, dueDate before today)
+    // BUG_107: Exclude coach-boosted tasks to prevent cross-section duplicates
     private var overdueTasks: [LocalTask] {
         let startOfToday = Calendar.current.startOfDay(for: Date())
+        let boostIDs = Set(coachBoostedTasks.map(\.id))
         return visibleTasks.filter { task in
             guard !task.isNextUp, task.blockerTaskID == nil, let dueDate = task.dueDate else { return false }
-            return dueDate < startOfToday && matchesSearch(task)
+            return dueDate < startOfToday && matchesSearch(task) && !boostIDs.contains(task.id)
         }.sorted { ($0.dueDate ?? .distantFuture) < ($1.dueDate ?? .distantFuture) }
     }
 

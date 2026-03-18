@@ -145,12 +145,14 @@ struct BacklogView: View {
         allRecurringItems.filter { $0.isTemplate && !$0.isCompleted && matchesSearch($0) }
     }
 
-    // MARK: - Overdue Tasks (dueDate < today)
+    // MARK: - Overdue Tasks (dueDate < today, excluding coach-boosted)
+    // BUG_107: Exclude coach-boosted tasks to prevent cross-section duplicates
     private var overdueTasks: [PlanItem] {
         let startOfToday = Calendar.current.startOfDay(for: Date())
+        let boostIDs = Set(coachBoostedTasks.map(\.id))
         return backlogTasks.filter { item in
             guard let due = item.dueDate else { return false }
-            return due < startOfToday
+            return due < startOfToday && !boostIDs.contains(item.id)
         }.sorted { ($0.dueDate ?? .distantFuture) < ($1.dueDate ?? .distantFuture) }
     }
 
