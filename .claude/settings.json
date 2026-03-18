@@ -139,6 +139,21 @@
             "timeout": 5
           }
         ]
+      },
+      {
+        "matcher": "Task",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/visual_inspection_gate.py",
+            "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/feature_understanding_gate.py",
+            "timeout": 5
+          }
+        ]
       }
     ],
     "UserPromptSubmit": [

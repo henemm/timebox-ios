@@ -356,6 +356,15 @@ def create_workflow(name: str) -> dict:
         "context_file": None,
         "test_artifacts": [],
         "affected_files": [],
+        # Visual inspection (v2.4) - PFLICHT for bug workflows
+        "visual_inspection_done": False,
+        "visual_inspection_notes": None,  # What was observed
+        # User expectation (v2.5) - PFLICHT for feature workflows
+        "user_expectation_done": False,
+        "user_expectation_notes": None,  # What the user-advocate described
+        # Result inspection (v2.5) - PFLICHT for features after implementation
+        "result_inspection_done": False,
+        "result_inspection_notes": None,  # Fresh-eyes comparison
         # Separate RED/GREEN tracking for UNIT tests (v2.0)
         "red_test_done": False,
         "red_test_result": None,  # Description of the failing test

@@ -31,6 +31,68 @@ Beweisen = Logging einbauen, ausfuehren, Output lesen. Nicht: "Code lesen und fu
 
 ---
 
+## Schritt 0.2: HINSCHAUEN — Frische Augen auf das Problem
+
+**Annahme: Du verstehst das Problem nicht, weil du es nie gesehen hast.**
+
+Bevor du in den Code abtauchst, muss sich jemand das Problem ANSCHAUEN.
+Nicht du — jemand Unabhaengiges. Und dieser jemand weiss NICHT was der Bug ist.
+
+### Ablauf:
+
+**1. Screenshot machen:**
+```bash
+# Simulator muss laufen mit der App
+# Zum betroffenen Screen navigieren (falls moeglich)
+xcrun simctl io booted screenshot /tmp/bug_visual_inspection.png
+```
+
+**2. Frische-Augen-Agent losschicken — OHNE Bug-Kontext:**
+```
+Task: fresh-eyes-inspector Agent
+Input: NUR der Screenshot-Pfad (/tmp/bug_visual_inspection.png)
+KEIN Bug-Report, KEINE Symptom-Beschreibung, KEIN Kontext!
+```
+
+Der Agent weiss nicht warum er den Screenshot bekommt.
+Er beschreibt nur was er sieht und was ihm auffaellt.
+
+**3. Abgleich — NACHDEM der Agent zurueckkommt:**
+
+Erst JETZT vergleichst du:
+- Was hat der Agent gesehen/bemerkt?
+- Was sagt der Bug-Report?
+- **Passt das zusammen?** Oder hat der Agent etwas ganz Anderes gefunden?
+- **Hat der Agent den richtigen Screen gesehen?** Wenn nicht → neuer Screenshot vom richtigen Screen!
+
+Moegliche Ergebnisse:
+| Ergebnis | Bedeutung |
+|----------|-----------|
+| Agent findet genau das gemeldete Problem | Gute Ausgangslage — Problem ist visuell sichtbar |
+| Agent findet ANDERES Problem | Wichtig! Vielleicht liegt das echte Problem woanders |
+| Agent findet nichts Auffaelliges | Bug ist moeglicherweise nicht visuell, oder falscher Screen |
+
+**4. Ergebnis festhalten:**
+```bash
+python3 .claude/hooks/workflow_state_multi.py set-field visual_inspection_notes "Agent-Beobachtung: [Was der Agent sah]. Abgleich mit Bug: [Wie es zum Report passt]"
+python3 .claude/hooks/workflow_state_multi.py set-field visual_inspection_done true
+```
+
+### Kein Screenshot sinnvoll?
+
+Wenn der Bug reine Logik/Daten betrifft und ein Screenshot nichts zeigen wuerde:
+- **Henning erklaeren WARUM** ein Screenshot nichts bringt
+- **Um Override bitten** — NUR Henning kann entscheiden ob die Inspektion entfaellt
+- Beispiel: "Dieser Bug betrifft die Berechnung von Streak-Rewards. Ein Screenshot wuerde nur die korrekte UI zeigen, das Problem liegt in den berechneten Werten."
+
+**OHNE `visual_inspection_done=true` oder Override werden alle Investigation-Agents BLOCKIERT!**
+
+> Warum ein unabhaengiger Agent? Weil Claude den Screenshot sonst nur als Pflicht-Ritual abhandelt —
+> "sieht normal aus, weiter zum Code" — statt wirklich hinzuschauen. Ein Agent mit anderem
+> Ziel (verstehen, nicht finden) hat keinen Grund das abzukuerzen.
+
+---
+
 ## Schritt 0.5: EXISTENZ-CHECK — Gibt es das Feature ueberhaupt?
 
 **Annahme: Das Feature wurde nie implementiert.**
