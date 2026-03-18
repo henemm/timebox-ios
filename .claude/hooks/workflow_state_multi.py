@@ -40,6 +40,7 @@ Phases (in order):
 """
 
 import fcntl
+import hashlib
 import json
 import os
 import sys
@@ -234,8 +235,22 @@ PHASE_SHORT = {
 }
 
 
+def _tty_id() -> str:
+    """Eindeutige ID fuer das aktuelle TTY (per-Session)."""
+    try:
+        tty = os.ttyname(sys.stdout.fileno())
+    except Exception:
+        try:
+            tty = os.ttyname(sys.stdin.fileno())
+        except Exception:
+            tty = os.environ.get("SSH_TTY", "unknown")
+    return hashlib.md5(tty.encode()).hexdigest()[:8]
+
+
 def _update_iterm_title(workflow_name: str = None, phase: str = None):
-    """Set iTerm2 tab title. Called only on phase transitions."""
+    """Set iTerm2 tab title. Called only on phase transitions.
+    Writes to /dev/tty (per-session) AND a per-TTY temp file
+    so the PostToolUse hook can refresh the title."""
     if not workflow_name:
         title = os.path.basename(os.getcwd())
     else:
@@ -249,6 +264,14 @@ def _update_iterm_title(workflow_name: str = None, phase: str = None):
         )
         phase_label = PHASE_SHORT.get(phase or "", "")
         title = f"{short} | {phase_label}" if phase_label else short
+
+    # Per-TTY temp file fuer PostToolUse-Hook refresh
+    try:
+        Path(f"/tmp/claude_tab_title_{_tty_id()}").write_text(title)
+    except Exception:
+        pass
+
+    # Direkt auf eigenes TTY schreiben
     try:
         with open("/dev/tty", "w") as tty:
             tty.write(f"\033]1;{title}\007")
