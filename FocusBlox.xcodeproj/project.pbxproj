@@ -19,6 +19,7 @@
 		1297F2C0D79B8CFBF2F9A441 /* MonsterIntentionHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DE17170FC796BF825ABAE62 /* MonsterIntentionHeader.swift */; };
 		149FBAD913C3EB9CA73A8EEC /* CoachBacklogViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 872C3A128450969C0C780031 /* CoachBacklogViewModel.swift */; };
 		15D8BC61C78C0CD05E5AB4D7 /* SiriIntentionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10E068FD9AC0347881CB233 /* SiriIntentionTests.swift */; };
+		679DD8A94D88B08CBA097B91 /* TagRedesignUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC217D1BAA414B7974854ECE /* TagRedesignUITests.swift */; };
 		170C6E63339A92E86F659F7E /* TaskFormGlassCardUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDB06B85B45AB03356A14914 /* TaskFormGlassCardUITests.swift */; };
 		1800BB7020E3D6044A62475A /* DailyReviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A36E40124EBA31D7428EAA80 /* DailyReviewView.swift */; };
 		186664F5A9219E0AC9A4588A /* ShakeGestureModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14CEC8C14442ABE7F65B5EE8 /* ShakeGestureModifier.swift */; };
@@ -825,6 +826,7 @@
 		EABF765F6113A4B974211ACE /* FocusBlockTaskCountTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = FocusBlockTaskCountTests.swift; sourceTree = "<group>"; };
 		EAED8A7A7959F354879F7615 /* SiriTipPersistenceUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SiriTipPersistenceUITests.swift; sourceTree = "<group>"; };
 		ED8097C89B9B534BF859E72C /* CoachMeinTagView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CoachMeinTagView.swift; sourceTree = "<group>"; };
+		AC217D1BAA414B7974854ECE /* TagRedesignUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TagRedesignUITests.swift; sourceTree = "<group>"; };
 		EDB06B85B45AB03356A14914 /* TaskFormGlassCardUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TaskFormGlassCardUITests.swift; sourceTree = "<group>"; };
 		EDITTSK01FILE0001 /* EditTaskSheetUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditTaskSheetUITests.swift; sourceTree = "<group>"; };
 		EFBUI001FILEREF00001 /* EditFocusBlockUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = EditFocusBlockUITests.swift; sourceTree = "<group>"; };
@@ -1172,6 +1174,7 @@
 				10F0B986805B8F703DB62935 /* DebugHierarchyTest.swift */,
 				DFD460F955B924EB6F6C5B94 /* TaskFormTbdUITests.swift */,
 				EDB06B85B45AB03356A14914 /* TaskFormGlassCardUITests.swift */,
+				AC217D1BAA414B7974854ECE /* TagRedesignUITests.swift */,
 				9429869559454AC74078E98A /* AssignTabScrollUITests.swift */,
 				ATBE0001FILEREF00001 /* AssignTabBlockEditUITests.swift */,
 				ATTV0001FILEREF00001 /* AssignTabTaskVisibilityUITests.swift */,
@@ -2373,6 +2376,7 @@
 				5696B45863B3DACF0773DF6C /* DebugHierarchyTest.swift in Sources */,
 				96DD4A471C3F159FE2C19462 /* TaskFormTbdUITests.swift in Sources */,
 				170C6E63339A92E86F659F7E /* TaskFormGlassCardUITests.swift in Sources */,
+				679DD8A94D88B08CBA097B91 /* TagRedesignUITests.swift in Sources */,
 				DB9AD593BC5E32DD2C767F5C /* AssignTabScrollUITests.swift in Sources */,
 				ATBE0001BUILD000001 /* AssignTabBlockEditUITests.swift in Sources */,
 				ATTV0001BUILD000001 /* AssignTabTaskVisibilityUITests.swift in Sources */,

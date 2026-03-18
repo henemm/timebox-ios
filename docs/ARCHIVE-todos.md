@@ -5,6 +5,16 @@
 
 ---
 
+## FEATURE_015 — UX: Tag-Auswahl redesignen (ERLEDIGT)
+
+- **Problem:** Tag-Sektion in TaskFormSheet unuebersichtlich — "Neuer Tag" Input dominierte, bestehende Tags erschienen erst darunter
+- **Fix:** Layout-Reorder in TagInputView: Suggestions (FlowLayout Chips) oben, zugewiesene Tags mittig, Input-Feld unten. Einheitlicher Chip-Style cross-platform.
+- **Dateien:** TagInputView.swift, TagRedesignUITests.swift (neu), project.pbxproj, sim.sh
+- **Tests:** 3 UI Tests GREEN (Layout-Order, Tap-Suggestion, Remove-Tag)
+- **Spec:** `docs/specs/ios/feature-015-tag-redesign.md`
+
+---
+
 ## BUG_105 — Coach AI-Pitches: generisch + halluziniert + abgeschnitten (ERLEDIGT)
 
 - **Problem:** AI halluzinierte Task-Namen, Text abgeschnitten
@@ -358,6 +368,34 @@
 ### 2026-03-04: Stop-Lock + API-Guard
 ### 2026-03-12: XP/Evolution-System entfernt
 ### 2026-03-12: Monster Coach Phase 2 — Morning Intention Screen
+
+---
+
+## Verschoben am 2026-03-18: Backlog-Aufraeumen nach View-Merge (BUG_109)
+
+### BUG_109: Coach-Backlog macOS: Sidebar-Filter fehlen im Monster-Modus — ERLEDIGT
+- **Fix:** SidebarView fuer beide Modi (Normal + Monster). View-Vereinheitlichung: CoachBacklogView.swift (iOS) + MacCoachBacklogView.swift (macOS) geloescht, Features in BacklogView.swift bzw. ContentView.swift gemergt (~1400 LoC Duplikation eliminiert).
+- **Analyse:** `docs/artifacts/bug-backlog-monster-views/analysis.md`
+
+### BUG_107: Coach-Backlog: Blocked Tasks erscheinen doppelt — ERLEDIGT
+- **Fix:** 4 Filter in CoachBacklogViewModel ergaenzt (`blockerTaskID == nil` / `!isBlocked`). 30/30 Unit Tests gruen.
+
+### BUG_108: Zehnagel-Zombie: Recurring Task ueberlebt Serien-Ende — ERLEDIGT
+- **Fix:** deleteRecurringTemplate neutralisiert completed Tasks (recurrencePattern=none), Startup-Reihenfolge migration→dedup→repair.
+- **Analyse:** `docs/artifacts/bug-108-zehnagel-zombie/analysis.md`
+
+### FEATURE_003: Coach-Backlog macOS: Quick-Add TextField — ERLEDIGT
+- **Fix:** Quick-Add TextField + Button + onAddTask callback. 2 UI Tests gruen.
+
+### FEATURE_004, 006, 007, 008, 009, 013, 014: Coach-Backlog Feature-Gaps — OBSOLET durch View-Merge
+- **Grund:** BUG_109 hat CoachBacklogView.swift (iOS) + MacCoachBacklogView.swift (macOS) geloescht und alle Features in die gemeinsame BacklogView/ContentView gemergt. Monster-Modus erbt automatisch alle Normal-Modus-Features:
+  - FEATURE_004: Suchfunktion (.searchable)
+  - FEATURE_006: Inspector Panel (3-Spalten-Layout)
+  - FEATURE_007: Multi-Selection + Bulk Actions
+  - FEATURE_008: Drag-to-Reorder NextUp
+  - FEATURE_009: Deferred Sort/Completion Feedback
+  - FEATURE_013: Serien-Bearbeitung (Recurring-Dialoge)
+  - FEATURE_014: Apple Reminders Import
 
 ---
 

@@ -14,7 +14,6 @@
 |----|-------|------|---------|-----------|-------------|
 | FEATURE_010 | macOS Backlog: Keyboard Shortcuts | Low | S | macOS | Cmd+N (neuer Task), Cmd+Delete (loeschen), etc. Betrifft beide Modi (Normal + Monster) gleich. |
 | FEATURE_011 | macOS Backlog: Undo (Cmd+Z) | Low | S | macOS | iOS hat Shake-to-Undo. macOS Backlog hat kein Cmd+Z-Undo. Betrifft beide Modi gleich. |
-| FEATURE_015 | UX: Tag-Auswahl redesignen | Medium | S | iOS | Tag-Sektion in TaskFormSheet unuebersichtlich: "Neuer Tag" dominiert, bestehende Tags kommen danach. Redesign: Tags als antippbare Chips, "Neuer Tag" darunter. Vorbild: Apple Erinnerungen. |
 | FEATURE_017 | Stille-Regel: Nudges dynamisch canceln | Low | S | iOS | Geplante Nudges stoppen wenn Intention tagsueber erfuellt wird. |
 | FEATURE_018 | macOS Enhanced Quick Capture | Low | L | macOS | macOS Produktivitaet. Kein Blocker. |
 | FEATURE_019 | macOS Shortcuts.app Integration | Low | L | macOS | macOS Automatisierung. P3. |
@@ -25,6 +24,7 @@
 | TD_002 | View-Duplikation iOS/macOS | Low | L | Beide | ~5900 LoC verbleibend (von ~7300). BUG_109 View-Merge hat ~1400 LoC Duplikation eliminiert (CoachBacklogView.swift + MacCoachBacklogView.swift geloescht, in BacklogView/ContentView gemergt). Langfristig wichtig, kurzfristig kein Blocker. |
 | BUG_109 | Backlog: Relevanz-Sortierung invertiert | High | S | iOS (macOS pruefen) | Backlog zeigt Tasks mit niedrigster Relevanz oben, hoechste unten (18→43→40→71→75 statt 75→71→…→18). Score-Berechnung korrekt, Sortierrichtung invertiert. **Fix-Plan:** 1. Mock-Tests fuer Szenario bauen, 2. Sortierrichtung fixen. Analyse: `docs/artifacts/bug-relevance-sort-direction/analysis.md` |
 | BUG_110 | ~~macOS Coach-Backlog: Doppelte Controls ueber Task-Liste~~ | High | S | macOS | **ERLEDIGT** — Coach-Toolbar (ViewMode-Switcher + Sync/Import) entfernt; Sidebar und App-Toolbar decken alles ab. |
+| BUG_111 | macOS UI Tests: "Enable UI Automation"-Dialog erscheint bei jedem Testlauf | High | S | macOS | **Problem:** Beim Ausfuehren von macOS UI Tests erscheint ein modaler Dialog "XCTest moechte Enable UI Automation. Verwende Touch ID..." auf dem iMac-Screen. Dialog blockiert Test-Ausfuehrung via SSH. **Root Cause:** Der Test-Runner `henemm.FocusBloxMacUITests.xctrunner` hat KEINEN Eintrag in der macOS TCC-Datenbank (`/Library/Application Support/com.apple.TCC/TCC.db`). Ohne TCC-Eintrag zeigt macOS bei jedem Lauf den Genehmigungsdialog. `sudo DevToolsSecurity -enable` loest dies NICHT — es behandelt `task_for_pid`-Debugger-Rechte, aber NICHT `kTCCServiceAccessibility`. **Fix-Ansatz:** Privacy Preferences Policy Control (PPPC) Konfigurationsprofil erstellen das `henemm.FocusBloxMacUITests.xctrunner` fuer `kTCCServiceAccessibility` vorausgewaehrt, installiert via `sudo profiles -I -F`. Analyse: `docs/artifacts/bug-111-macos-ui-test-dialog/analysis.md` |
 
 ---
 

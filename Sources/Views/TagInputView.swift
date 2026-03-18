@@ -18,16 +18,41 @@ struct TagInputView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            // Current tags as chips
+            // Suggestions as FlowLayout chips (prominent, at top)
+            if !suggestions.isEmpty {
+                FlowLayout(spacing: 6) {
+                    ForEach(suggestions, id: \.self) { suggestion in
+                        Button {
+                            if !tags.contains(suggestion) {
+                                tags.append(suggestion)
+                                newTag = ""
+                            }
+                        } label: {
+                            Text(suggestion)
+                                .font(.caption)
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 4)
+                                .background(Capsule().fill(Color.accentColor.opacity(0.15)))
+                                .foregroundStyle(Color.accentColor)
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityIdentifier("tagSuggestion_\(suggestion)")
+                    }
+                }
+                .accessibilityElement(children: .contain)
+            }
+
+            // Assigned tags as chips
             if !tags.isEmpty {
                 FlowLayout(spacing: 6) {
                     ForEach(tags, id: \.self) { tag in
                         tagChip(tag)
                     }
                 }
+                .accessibilityElement(children: .contain)
             }
 
-            // Input field
+            // Input field (at bottom, visually secondary)
             HStack {
                 TextField("Neuer Tag", text: $newTag)
                     .textFieldStyle(.plain)
@@ -45,31 +70,6 @@ struct TagInputView: View {
                 .buttonStyle(.plain)
                 .disabled(newTag.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 .accessibilityIdentifier("addTagButton")
-            }
-
-            // Suggestions
-            if !suggestions.isEmpty {
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 6) {
-                        ForEach(suggestions, id: \.self) { suggestion in
-                            Button {
-                                if !tags.contains(suggestion) {
-                                    tags.append(suggestion)
-                                    newTag = ""
-                                }
-                            } label: {
-                                Text(suggestion)
-                                    .font(.caption)
-                                    .padding(.horizontal, 8)
-                                    .padding(.vertical, 4)
-                                    .background(Capsule().fill(Color.accentColor.opacity(0.15)))
-                                    .foregroundStyle(Color.accentColor)
-                            }
-                            .buttonStyle(.plain)
-                            .accessibilityIdentifier("tagSuggestion_\(suggestion)")
-                        }
-                    }
-                }
             }
         }
         .onAppear { loadUsedTags() }
@@ -90,11 +90,7 @@ struct TagInputView: View {
         }
         .padding(.horizontal, 10)
         .padding(.vertical, 6)
-        #if os(iOS)
-        .background(Capsule().fill(Color(.secondarySystemFill)))
-        #else
-        .background(Capsule().fill(Color(nsColor: .controlBackgroundColor)))
-        #endif
+        .background(Capsule().fill(Color.secondary.opacity(0.15)))
     }
 
     private func addCurrentTag() {
