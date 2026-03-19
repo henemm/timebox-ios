@@ -134,7 +134,6 @@
 		B7A16D322F21003100165284 /* FocusBloxCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B7A16D0C2F20FDD400165284 /* FocusBloxCore.framework */; };
 		B7A16D392F2144A100165284 /* FocusBloxCore.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = B7A16D0C2F20FDD400165284 /* FocusBloxCore.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		B7A16D3B2F21450000165284 /* FocusBloxCore.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = B7A16D0C2F20FDD400165284 /* FocusBloxCore.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		F026BOOST01BUILD0001 /* PriorityViewCoachBoostTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F026BOOST01FREF0001 /* PriorityViewCoachBoostTests.swift */; };
 		B7B87F202F1BCD900069B457 /* EisenhowerMatrixTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7B87F1F2F1BCD900069B457 /* EisenhowerMatrixTests.swift */; };
 		B7B87F222F1BCD9B0069B457 /* EisenhowerMatrixUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7B87F212F1BCD9B0069B457 /* EisenhowerMatrixUITests.swift */; };
 		B7DFC0532F2E73ED009C2881 /* FocusBloxWatch Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = B7DFC0332F2E73EC009C2881 /* FocusBloxWatch Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -254,6 +253,8 @@
 		EDITTSK01BUILD001 /* EditTaskSheetUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDITTSK01FILE0001 /* EditTaskSheetUITests.swift */; };
 		EE490C26458482C3B76400EE /* GapFinder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84C370C5BEDCC25CA912E79F /* GapFinder.swift */; };
 		EFBUI001BUILD000001 /* EditFocusBlockUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFBUI001FILEREF00001 /* EditFocusBlockUITests.swift */; };
+		ERLINSP01BUILD001 /* ErledigtViewInspectionTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = ERLINSP01FILE0001 /* ErledigtViewInspectionTest.swift */; };
+		ERLVW027BUILD0001 /* ErledigtViewUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ERLVW027FILE00001 /* ErledigtViewUITests.swift */; };
 		ERTS03MACBUILD0001 /* EveningReflectionTextService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4E47516E8F4B028B758DE42 /* EveningReflectionTextService.swift */; };
 		EVRC01BUILD0000001 /* EveningReflectionCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = EVRC01FILEREF00001 /* EveningReflectionCard.swift */; };
 		EVRC02BUILD0000001 /* EveningReflectionCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = EVRC01FILEREF00001 /* EveningReflectionCard.swift */; };
@@ -261,6 +262,7 @@
 		F023MACBUILD00000001 /* DisciplineTrendChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0577AA0F051FD6C2DECA3B77 /* DisciplineTrendChart.swift */; };
 		F023UITBUILD00000001 /* DisciplineTrendUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F023UITFREF000000001 /* DisciplineTrendUITests.swift */; };
 		F023UT01BUILD00000001 /* DisciplineTrendServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F023UT01FREF000000001 /* DisciplineTrendServiceTests.swift */; };
+		F026BOOST01BUILD0001 /* PriorityViewCoachBoostTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F026BOOST01FREF0001 /* PriorityViewCoachBoostTests.swift */; };
 		F4222F8AEAECD043130A4C6B /* MenuBarIconStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95142243688D96B229D2FA41 /* MenuBarIconStateTests.swift */; };
 		F92668D0D08597BDEC74CD21 /* NotificationEveningReminderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F5A8CD285199ADAFDD1BAF4 /* NotificationEveningReminderTests.swift */; };
 		F99C220A3B729DDE50461E4A /* TaskCompletionUndoServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 301796C3380CA4E06D1EF41B /* TaskCompletionUndoServiceTests.swift */; };
@@ -833,10 +835,13 @@
 		EDB06B85B45AB03356A14914 /* TaskFormGlassCardUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TaskFormGlassCardUITests.swift; sourceTree = "<group>"; };
 		EDITTSK01FILE0001 /* EditTaskSheetUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditTaskSheetUITests.swift; sourceTree = "<group>"; };
 		EFBUI001FILEREF00001 /* EditFocusBlockUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = EditFocusBlockUITests.swift; sourceTree = "<group>"; };
+		ERLINSP01FILE0001 /* ErledigtViewInspectionTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErledigtViewInspectionTest.swift; sourceTree = "<group>"; };
+		ERLVW027FILE00001 /* ErledigtViewUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErledigtViewUITests.swift; sourceTree = "<group>"; };
 		EVRC01FILEREF00001 /* EveningReflectionCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EveningReflectionCard.swift; sourceTree = "<group>"; };
 		EVRC03FILEREF00001 /* EveningReflectionCardUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = EveningReflectionCardUITests.swift; sourceTree = "<group>"; };
 		F023UITFREF000000001 /* DisciplineTrendUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DisciplineTrendUITests.swift; sourceTree = "<group>"; };
 		F023UT01FREF000000001 /* DisciplineTrendServiceTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DisciplineTrendServiceTests.swift; sourceTree = "<group>"; };
+		F026BOOST01FREF0001 /* PriorityViewCoachBoostTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PriorityViewCoachBoostTests.swift; sourceTree = "<group>"; };
 		F14500A9DA66E837CF6B2B08 /* GetEveningSummaryIntent.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GetEveningSummaryIntent.swift; sourceTree = "<group>"; };
 		F1CCA00FEA15FD7BA149CDDE /* CalendarSelectionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarSelectionTests.swift; sourceTree = "<group>"; };
 		F364C9B1BB1D787792360427 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
@@ -955,7 +960,6 @@
 		TMRCALC01FILEREF001 /* TimerCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerCalculator.swift; sourceTree = "<group>"; };
 		TPSCORING0FILE0001 /* TaskPriorityScoringService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskPriorityScoringService.swift; sourceTree = "<group>"; };
 		TPSCT01FILEREF001 /* TaskPriorityScoringServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskPriorityScoringServiceTests.swift; sourceTree = "<group>"; };
-		F026BOOST01FREF0001 /* PriorityViewCoachBoostTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PriorityViewCoachBoostTests.swift; sourceTree = "<group>"; };
 		TSKBDG01FILE00001 /* TaskBadgesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskBadgesTests.swift; sourceTree = "<group>"; };
 		TSKBDG02FILE00001 /* TaskBadges.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskBadges.swift; sourceTree = "<group>"; };
 		TSKCAT01FILE000001 /* TaskCategoryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskCategoryTests.swift; sourceTree = "<group>"; };
@@ -1230,6 +1234,8 @@
 				FE03027F5FEC9D484559AE39 /* CoachRecurringDialogUITests.swift */,
 				F023UITFREF000000001 /* DisciplineTrendUITests.swift */,
 				D744CADFBE638C0D05663B39 /* CategoryTrendUITests.swift */,
+				ERLINSP01FILE0001 /* ErledigtViewInspectionTest.swift */,
+				ERLVW027FILE00001 /* ErledigtViewUITests.swift */,
 			);
 			path = FocusBloxUITests;
 			sourceTree = "<group>";
@@ -2433,6 +2439,8 @@
 				F023UITBUILD00000001 /* DisciplineTrendUITests.swift in Sources */,
 				C2B70864BF99F814D650C243 /* CategoryTrendUITests.swift in Sources */,
 				61BE4199B7200D96588088BD /* NextUpSortOrderUITests.swift in Sources */,
+				ERLINSP01BUILD001 /* ErledigtViewInspectionTest.swift in Sources */,
+				ERLVW027BUILD0001 /* ErledigtViewUITests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

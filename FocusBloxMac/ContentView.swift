@@ -278,7 +278,7 @@ struct ContentView: View {
 
     // Next Up tasks (sorted by nextUpSortOrder, search-filtered)
     private var nextUpTasks: [LocalTask] {
-        tasks.filter { $0.isNextUp && !$0.isCompleted && !$0.isTemplate && $0.blockerTaskID == nil && matchesSearch($0) }
+        tasks.filter { $0.modelContext != nil && $0.isNextUp && !$0.isCompleted && !$0.isTemplate && $0.blockerTaskID == nil && matchesSearch($0) }
             .sorted { ($0.nextUpSortOrder ?? Int.max) < ($1.nextUpSortOrder ?? Int.max) }
     }
 
@@ -509,7 +509,11 @@ struct ContentView: View {
                     // Non-priority filters: flat list (recent, overdue, completed, recurring)
                     Section {
                         ForEach(regularFilteredTasks, id: \.uuid) { task in
-                            taskRowWithSwipe(task: task)
+                            if selectedFilter == .completed {
+                                completedTaskRowWithSwipe(task: task)
+                            } else {
+                                taskRowWithSwipe(task: task)
+                            }
                         }
                         .onMove { from, to in
                             moveRegularTasks(from: from, to: to)
@@ -522,7 +526,11 @@ struct ContentView: View {
                 }
             }
             .contextMenu(forSelectionType: UUID.self) { selection in
-                backlogContextMenu(for: selection)
+                if selectedFilter == .completed {
+                    completedContextMenu(for: selection)
+                } else {
+                    backlogContextMenu(for: selection)
+                }
             } primaryAction: { selection in
                 // Double-click opens inspector (already selected)
             }
@@ -617,9 +625,14 @@ struct ContentView: View {
                 }
             }
             Button("Alle offenen dieser Serie", role: .destructive) {
-                if let task = taskToDeleteRecurring {
-                    deleteRecurringSeries(task)
-                    taskToDeleteRecurring = nil
+                if let task = taskToDeleteRecurring,
+                   let groupID = task.recurrenceGroupID {
+                    taskToDeleteRecurring = nil    // Referenz freigeben VOR Delete (Bug: BackingData detach)
+                    selectedTasks.removeAll()     // Inspector schließen VOR Delete
+                    let taskSource = LocalTaskSource(modelContext: modelContext)
+                    let engine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
+                    try? engine.deleteRecurringSeries(groupID: groupID)
+                    refreshTasks()
                 }
             }
             Button("Abbrechen", role: .cancel) {
@@ -889,6 +902,56 @@ struct ContentView: View {
         }
     }
 
+    // MARK: - Completed Task Context Menu & Swipe (FEATURE_027)
+
+    @ViewBuilder
+    private func completedContextMenu(for selection: Set<UUID>) -> some View {
+        if !selection.isEmpty {
+            Button {
+                uncompleteTasksByIds(selection)
+            } label: {
+                Label("Wiederherstellen", systemImage: "arrow.uturn.backward.circle")
+            }
+
+            Divider()
+
+            Button("Löschen", role: .destructive) {
+                deleteTasksByIds(selection)
+            }
+        }
+    }
+
+    private func completedTaskRowWithSwipe(task: LocalTask) -> some View {
+        makeBacklogRow(task: task)
+            .id(task.uuid)
+            .tag(task.uuid)
+            .swipeActions(edge: .leading, allowsFullSwipe: true) {
+                Button {
+                    uncompleteTasksByIds([task.uuid])
+                } label: {
+                    Label("Wiederherstellen", systemImage: "arrow.uturn.backward.circle.fill")
+                }
+                .tint(.orange)
+            }
+            .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                Button(role: .destructive) {
+                    deleteTasksByIds([task.uuid])
+                } label: {
+                    Label("Löschen", systemImage: "trash")
+                }
+            }
+    }
+
+    private func uncompleteTasksByIds(_ ids: Set<UUID>) {
+        let taskSource = LocalTaskSource(modelContext: modelContext)
+        let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
+        for id in ids {
+            if let task = tasks.first(where: { $0.uuid == id }) {
+                try? syncEngine.uncompleteTask(itemID: task.id)
+            }
+        }
+    }
+
     private func deleteTasksByIds(_ ids: Set<UUID>) {
         // Single task with recurring pattern? Show confirmation dialog
         if ids.count == 1,
@@ -917,20 +980,6 @@ struct ContentView: View {
         selectedTasks.removeAll()
     }
 
-    private func deleteRecurringSeries(_ task: LocalTask) {
-        guard let groupID = task.recurrenceGroupID else { return }
-        let descriptor = FetchDescriptor<LocalTask>(
-            predicate: #Predicate { $0.recurrenceGroupID == groupID && !$0.isCompleted }
-        )
-        if let seriesTasks = try? modelContext.fetch(descriptor) {
-            for t in seriesTasks {
-                modelContext.delete(t)
-            }
-        }
-        try? modelContext.save()
-        refreshTasks()
-        selectedTasks.removeAll()
-    }
 
     /// Ends a recurring series: deletes template + all open children, preserves completed history.
     private func endSeries(_ task: LocalTask) {
