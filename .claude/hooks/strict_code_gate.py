@@ -63,6 +63,7 @@ CODE_EXTENSIONS = [
 ]
 
 # Directories ALWAYS allowed (whitelist)
+# NOTE: .claude/ is NOT whitelisted — only specific safe subdirs below
 ALWAYS_ALLOWED_DIRS = [
     "Tests/",
     "UITests/",
@@ -71,7 +72,8 @@ ALWAYS_ALLOWED_DIRS = [
     "__tests__/",
     "tests/",
     "docs/",
-    ".claude/",
+    ".claude/commands/",
+    ".claude/agents/",
     "scripts/",
     "tools/",
 ]

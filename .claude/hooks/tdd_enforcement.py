@@ -451,7 +451,8 @@ def main():
         sys.exit(0)
 
     # Skip for workflow infrastructure files (meta-files, not app code)
-    infrastructure_patterns = [".claude/hooks/", ".claude/config", "docs/specs/", "docs/artifacts/"]
+    # NOTE: .claude/hooks/ intentionally NOT skipped — hooks are protected by strict_code_gate
+    infrastructure_patterns = [".claude/config", "docs/specs/", "docs/artifacts/"]
     if any(pattern in file_path for pattern in infrastructure_patterns):
         sys.exit(0)
 

@@ -1168,9 +1168,8 @@ if __name__ == "__main__":
                 else:
                     print(f"Failed to complete workflow '{active}'")
             else:
-                # Check for --force flag
-                force = "--force" in sys.argv
-                success, message = set_phase(active, target_phase, force=force)
+                # --force flag removed: phase skipping is no longer allowed via CLI
+                success, message = set_phase(active, target_phase, force=False)
                 if success:
                     # Sync backlog status when phase changes
                     sync_backlog_status_from_phase(active)
@@ -1188,10 +1187,28 @@ if __name__ == "__main__":
             print(f"Valid options: {', '.join(BACKLOG_STATUSES)}")
     elif cmd == "set-field" and len(sys.argv) > 3:
         field_name = sys.argv[2]
-        # adversary_verdict can ONLY be set via adversary_gate.py (requires test proof)
-        if field_name == "adversary_verdict":
-            print("BLOCKED: adversary_verdict cannot be set via set-field.")
-            print("Use: python3 .claude/hooks/adversary_gate.py <test-output-file>")
+        # Security-critical fields that CANNOT be set via set-field
+        # These fields are managed by specific workflow phases/gates
+        BLOCKED_SET_FIELDS = {
+            "current_phase",        # Managed by phase/advance commands
+            "red_test_done",        # Managed by TDD RED phase
+            "ui_test_red_done",     # Managed by TDD RED phase
+            "ui_test_red_result",   # Managed by TDD RED phase
+            "green_test_done",      # Managed by TDD GREEN phase
+            "ui_test_green_done",   # Managed by TDD GREEN phase
+            "ui_test_green_result", # Managed by TDD GREEN phase
+            "spec_approved",        # Managed by spec approval gate
+            "adversary_verdict",    # Managed by adversary_gate.py
+            "adversary_details",    # Managed by adversary_gate.py
+            "affected_files",       # Managed by spec/analyse phase
+            "test_artifacts",       # Managed by /09-add-artifact
+            "user_override",        # Managed by override_token_listener
+            "phases_completed",     # Managed by phase transitions
+        }
+        if field_name in BLOCKED_SET_FIELDS:
+            print(f"BLOCKED: '{field_name}' cannot be set via set-field.")
+            print(f"This field is managed by its respective workflow phase/gate.")
+            print(f"Blocked fields: {', '.join(sorted(BLOCKED_SET_FIELDS))}")
             sys.exit(1)
         field_value = sys.argv[3]
         with _state_lock():
