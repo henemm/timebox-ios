@@ -138,8 +138,8 @@ final class MacCoachBacklogUITests: XCTestCase {
 
     // MARK: - Test 11: Coach-Boost Section (Bug 104: P3)
 
-    /// Bricht wenn: Coach-Boost-Section nicht angezeigt wird bei gesetztem Coach
-    func test_coachModeOn_withFeuerCoach_showsBoostSection() throws {
+    /// FEATURE_026: Coach-Boost Section wurde durch Score-Boost (+15) ersetzt
+    func test_coachModeOn_withFeuerCoach_noBoostSection() throws {
         app.launchArguments = [
             "-UITesting", "-MockData", "-ApplePersistenceIgnoreState", "YES",
             "-coachModeEnabled", "1",
@@ -151,14 +151,8 @@ final class MacCoachBacklogUITests: XCTestCase {
         navigateToBacklog()
 
         let boostSection = app.descendants(matching: .any)["coachBoostSection"]
-        XCTAssertTrue(boostSection.waitForExistence(timeout: 5),
-                      "Coach-Boost section should appear with Feuer coach (importance=3 tasks)")
-
-        let screenshot = app.screenshot()
-        let attachment = XCTAttachment(screenshot: screenshot)
-        attachment.name = "mac-coach-boost-section-feuer"
-        attachment.lifetime = .keepAlways
-        add(attachment)
+        XCTAssertFalse(boostSection.waitForExistence(timeout: 2),
+                       "Coach-Boost section should NOT exist — FEATURE_026 replaced it with score boost (+15)")
     }
 
     // MARK: - BUG_110: No duplicate controls in coach mode
@@ -347,108 +341,97 @@ final class MacCoachBacklogUITests: XCTestCase {
                       + "Without fix: score=25 (dependentCount not passed to MacBacklogRow).")
     }
 
-    // MARK: - FEATURE_004: Coach-Backlog Search TDD RED Tests
+    // MARK: - FEATURE_004 / FEATURE_023_v2: Coach-Backlog Search Tests
 
-    /// FEATURE_004 TDD RED Test T1:
-    /// Verhalten: Coach-Backlog zeigt ein Suchfeld (.searchable).
-    /// Bricht wenn: MacCoachBacklogView.swift — .searchable(text: $searchText, ...) entfernt wird
-    /// RED-Grund: MacCoachBacklogView hat aktuell keinen .searchable Modifier → SearchField existiert nicht.
+    /// FEATURE_023_v2 / FEATURE_004 Test T1:
+    /// Verhalten: Coach-Backlog zeigt Inline-Suchfeld (backlogSearchField) über der Task-Liste.
+    /// Bricht wenn: ContentView.backlogView — .accessibilityIdentifier("backlogSearchField") fehlt
+    /// RED-Grund: backlogSearchField existiert noch nicht — ContentView hat nur .searchable()
     func test_coachBacklog_searchFieldExists() throws {
         launchWithCoachMode()
         navigateToBacklog()
 
-        let searchField = app.searchFields.firstMatch
+        let searchField = app.textFields["backlogSearchField"]
         XCTAssertTrue(searchField.waitForExistence(timeout: 5),
-                      "Search field should exist in Coach backlog. "
-                      + "RED: MacCoachBacklogView has no .searchable modifier yet.")
+                      "Inline-Suchfeld 'backlogSearchField' muss in Coach-Backlog existieren. "
+                      + "RED: ContentView.backlogView hat noch kein Inline-TextField.")
     }
 
-    /// FEATURE_004 TDD RED Test T2:
-    /// Verhalten: Tippen in Suchfeld filtert Tasks nach Titel — nur Treffer bleiben sichtbar.
-    /// Bricht wenn: MacCoachBacklogView.swift — searchFilteredItems computed property entfernt wird
-    /// RED-Grund: Kein .searchable → Kein SearchField → typeText schlaegt fehl.
+    /// FEATURE_023_v2 / FEATURE_004 Test T2:
+    /// Verhalten: Tippen in Inline-Suchfeld filtert Tasks nach Titel — nur Treffer sichtbar.
+    /// Bricht wenn: ContentView.backlogView — .accessibilityIdentifier("backlogSearchField") fehlt
+    /// RED-Grund: backlogSearchField existiert nicht → typeText schlaegt fehl.
     func test_coachBacklog_searchFiltersByTitle() throws {
         launchWithCoachMode()
         navigateToBacklog()
 
-        let searchField = app.searchFields.firstMatch
+        let searchField = app.textFields["backlogSearchField"]
         XCTAssertTrue(searchField.waitForExistence(timeout: 5),
-                      "Search field must exist before typing")
+                      "Inline-Suchfeld muss existieren bevor getippt wird")
 
-        // Count tasks before search
         let taskList = app.descendants(matching: .any)["coachTaskList"]
         XCTAssertTrue(taskList.waitForExistence(timeout: 5))
 
-        // Type a search term that matches only one mock task
         searchField.click()
         searchField.typeText("[MOCK]")
 
-        // After search: tasks with "[MOCK]" in title should still be visible
-        // The mock data tasks all have "[MOCK]" prefix, so they should appear
         let mockTask = app.staticTexts.matching(
             NSPredicate(format: "value CONTAINS[c] '[MOCK]'")
         ).firstMatch
         XCTAssertTrue(mockTask.waitForExistence(timeout: 5),
-                      "Tasks matching search term '[MOCK]' should remain visible. "
-                      + "RED: No search implemented yet.")
+                      "Tasks mit '[MOCK]' im Titel müssen nach Suche sichtbar bleiben. "
+                      + "RED: Inline-Suchfeld fehlt.")
     }
 
-    /// FEATURE_004 TDD RED Test T3:
-    /// Verhalten: Suche mit nicht-existierendem Text zeigt keine Tasks (oder Empty-State).
-    /// Bricht wenn: MacCoachBacklogView.swift — searchFilteredItems Filter-Logik entfernt wird
-    /// RED-Grund: Kein .searchable → SearchField existiert nicht → Test scheitert.
+    /// FEATURE_023_v2 / FEATURE_004 Test T3:
+    /// Verhalten: Suche ohne Treffer blendet alle Sections aus.
+    /// Bricht wenn: ContentView.matchesSearch() — Filterlogik entfernt wird
+    /// RED-Grund: backlogSearchField existiert nicht → Test scheitert beim Warten.
     func test_coachBacklog_searchNoMatch_showsNoTasks() throws {
         launchWithCoachMode()
         navigateToBacklog()
 
-        let searchField = app.searchFields.firstMatch
+        let searchField = app.textFields["backlogSearchField"]
         XCTAssertTrue(searchField.waitForExistence(timeout: 5),
-                      "Search field must exist before typing")
+                      "Inline-Suchfeld muss existieren")
 
         searchField.click()
         searchField.typeText("ZZZZNONEXISTENT12345")
 
-        // After typing nonsense, no tasks should match
-        // NextUp section should disappear (or be empty)
         let nextUpSection = app.descendants(matching: .any)["coachNextUpSection"]
-        // Give UI time to filter
         Thread.sleep(forTimeInterval: 1)
         XCTAssertFalse(nextUpSection.exists,
-                       "NextUp section should not exist when search has no matches. "
-                       + "RED: No search filtering implemented yet.")
+                       "NextUp-Section darf nicht sichtbar sein wenn Suche keine Treffer hat. "
+                       + "RED: Inline-Suchfeld fehlt.")
     }
 
-    /// FEATURE_004 TDD RED Test T4:
-    /// Verhalten: Leeres Suchfeld zeigt alle Tasks (kein Filter aktiv).
-    /// Bricht wenn: MacCoachBacklogView.swift — guard !searchText.isEmpty else { return planItems } entfernt wird
-    /// RED-Grund: Kein .searchable → SearchField existiert nicht.
+    /// FEATURE_023_v2 / FEATURE_004 Test T4:
+    /// Verhalten: Geleerteses Suchfeld zeigt alle Tasks wieder.
+    /// Bricht wenn: ContentView.searchText nicht an filteredTasks gebunden
+    /// RED-Grund: backlogSearchField existiert nicht → Test scheitert beim Warten.
     func test_coachBacklog_searchClear_showsAllTasks() throws {
         launchWithCoachMode()
         navigateToBacklog()
 
-        let searchField = app.searchFields.firstMatch
+        let searchField = app.textFields["backlogSearchField"]
         XCTAssertTrue(searchField.waitForExistence(timeout: 5),
-                      "Search field must exist")
+                      "Inline-Suchfeld muss existieren")
 
-        // Type something
         searchField.click()
         searchField.typeText("test")
 
-        // Clear search field
         searchField.typeKey("a", modifierFlags: .command)
         searchField.typeKey(.delete, modifierFlags: [])
 
-        // After clearing: tasks should reappear
         let taskList = app.descendants(matching: .any)["coachTaskList"]
         XCTAssertTrue(taskList.waitForExistence(timeout: 5),
-                      "Task list should show all tasks after clearing search. "
-                      + "RED: No search field exists yet.")
+                      "Task-Liste muss nach Löschen der Suche wieder alle Tasks zeigen. "
+                      + "RED: Inline-Suchfeld fehlt.")
 
-        // NextUp section should reappear (mock data has NextUp tasks)
         let nextUpSection = app.descendants(matching: .any)["coachNextUpSection"]
         XCTAssertTrue(nextUpSection.waitForExistence(timeout: 5),
-                      "NextUp section should reappear after clearing search. "
-                      + "RED: No search implemented.")
+                      "NextUp-Section muss nach Löschen der Suche wieder erscheinen. "
+                      + "RED: Inline-Suchfeld fehlt.")
     }
 
 }

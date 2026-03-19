@@ -73,8 +73,8 @@ struct ContentView: View {
     @Environment(DeferredSortController.self) private var deferredSort
     @Environment(DeferredCompletionController.self) private var deferredCompletion
 
-    // Quick Add
-    @State private var newTaskTitle = ""
+    // Task creation via sheet
+    @State private var showCreateTask = false
 
     @State private var searchText = ""
 
@@ -234,7 +234,6 @@ struct ContentView: View {
                 if enriched > 0 { refreshTasks() }
             }
         }
-        .searchable(text: $searchText, prompt: "Tasks durchsuchen")
         .toolbar(id: "mainNavigation") {
             // Main navigation in toolbar
             ToolbarItem(id: "navigationPicker", placement: .principal) {
@@ -302,7 +301,7 @@ struct ContentView: View {
             base = visibleTasks.filter { task in
                 guard !task.isNextUp, task.blockerTaskID == nil, let dueDate = task.dueDate else { return false }
                 return dueDate < startOfToday
-            }.sorted { ($0.dueDate ?? .distantFuture) < ($1.dueDate ?? .distantFuture) }
+            }.sorted { scoreFor($0) > scoreFor($1) }
         case .completed:
             base = tasks.filter { $0.modelContext != nil && $0.isCompleted }  // Bug 78
         case .recurring:
@@ -337,18 +336,18 @@ struct ContentView: View {
             isNextUp: task.isNextUp,
             dependentTaskCount: dependentCount(for: task.id)
         )
-        return deferredSort.effectiveScore(id: task.id, liveScore: liveScore)
+        let base = deferredSort.effectiveScore(id: task.id, liveScore: liveScore)
+        let boost = coachBoostedIDs.contains(task.id) ? TaskPriorityScoringService.coachBoostValue : 0
+        return min(100, base + boost)
     }
 
-    // Overdue tasks (non-NextUp, non-blocked, non-coach-boosted, dueDate before today)
-    // BUG_107: Exclude coach-boosted tasks to prevent cross-section duplicates
+    // Overdue tasks (non-NextUp, non-blocked, dueDate before today, sorted by priority score)
     private var overdueTasks: [LocalTask] {
         let startOfToday = Calendar.current.startOfDay(for: Date())
-        let boostIDs = Set(coachBoostedTasks.map(\.id))
         return visibleTasks.filter { task in
             guard !task.isNextUp, task.blockerTaskID == nil, let dueDate = task.dueDate else { return false }
-            return dueDate < startOfToday && matchesSearch(task) && !boostIDs.contains(task.id)
-        }.sorted { ($0.dueDate ?? .distantFuture) < ($1.dueDate ?? .distantFuture) }
+            return dueDate < startOfToday && matchesSearch(task)
+        }.sorted { scoreFor($0) > scoreFor($1) }
     }
 
     // Color for priority tier section headers
@@ -361,51 +360,40 @@ struct ContentView: View {
         }
     }
 
-    // MARK: - Coach-Boosted Tasks (when coachModeEnabled)
+    // MARK: - Coach-Boosted IDs (score boost instead of separate section)
 
     private var planItems: [PlanItem] {
         visibleTasks.map { PlanItem(localTask: $0) }
     }
 
-    private var coachBoostedTasks: [LocalTask] {
+    /// IDs of tasks that get a +15 score boost from Coach/Monster mode.
+    private var coachBoostedIDs: Set<String> {
         guard coachModeEnabled else { return [] }
-        let boostIDs = Set(CoachBacklogViewModel.coachBoostedTasks(from: planItems, selectedCoach: selectedCoach).map(\.id))
-        return visibleTasks.filter { boostIDs.contains($0.id) && !$0.isNextUp && $0.blockerTaskID == nil }
-    }
-
-    /// Regular tasks for tier sections, excluding coach-boosted when coach mode active.
-    private var tierFilteredTasks: [LocalTask] {
-        guard coachModeEnabled, !coachBoostedTasks.isEmpty else { return regularFilteredTasks }
-        let boostIDs = Set(coachBoostedTasks.map(\.id))
-        return regularFilteredTasks.filter { !boostIDs.contains($0.id) }
+        return Set(CoachBacklogViewModel.coachBoostedTasks(from: planItems, selectedCoach: selectedCoach).map(\.id))
     }
 
     @AppStorage("selectedCoach") private var selectedCoach: String = ""
 
     private var backlogView: some View {
         VStack(spacing: 0) {
-            // Quick Add Bar
-            HStack {
-                TextField("Neuer Task...", text: $newTaskTitle)
-                    .textFieldStyle(.roundedBorder)
-                    .accessibilityIdentifier(coachModeEnabled ? "coachQuickAddTextField" : "newTaskTextField")
-                    .onSubmit { addTask() }
-
-                Button {
-                    addTask()
-                } label: {
-                    Image(systemName: "plus.circle.fill")
-                        .font(.title2)
+            // MARK: - Inline Search (FEATURE_023_v2)
+            HStack(spacing: 8) {
+                Image(systemName: "magnifyingglass")
+                    .foregroundStyle(.secondary)
+                TextField("Tasks durchsuchen", text: $searchText)
+                    .textFieldStyle(.plain)
+                    .accessibilityIdentifier("backlogSearchField")
+                if !searchText.isEmpty {
+                    Button { searchText = "" } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .foregroundStyle(.secondary)
+                    }
+                    .buttonStyle(.plain)
                 }
-                .disabled(newTaskTitle.isEmpty)
-                .buttonStyle(.plain)
-                .foregroundStyle(.blue)
-                .accessibilityIdentifier(coachModeEnabled ? "coachAddTaskButton" : "addTaskButton")
             }
-            .padding()
-
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
             Divider()
-
             // Task List with Multi-Selection and Sections
             List(selection: $selectedTasks) {
                 // Monster header (coach mode only)
@@ -462,31 +450,6 @@ struct ContentView: View {
                     .accessibilityIdentifier(coachModeEnabled ? "coachNextUpSection" : "nextUpSection")
                 }
 
-                // Coach-Boosted Section (between NextUp and Overdue)
-                if coachModeEnabled, !coachBoostedTasks.isEmpty,
-                   let sectionTitle = CoachBacklogViewModel.coachSectionTitle(for: selectedCoach) {
-                    Section {
-                        ForEach(coachBoostedTasks, id: \.uuid) { task in
-                            taskRowWithSwipe(task: task)
-                        }
-                    } header: {
-                        HStack {
-                            Text(sectionTitle)
-                                .font(.headline)
-                                .foregroundStyle(.purple)
-                            Spacer()
-                            Text("\(coachBoostedTasks.count)")
-                                .font(.caption)
-                                .foregroundStyle(.purple)
-                                .padding(.horizontal, 6)
-                                .padding(.vertical, 2)
-                                .background(Color.purple.opacity(0.2))
-                                .clipShape(Capsule())
-                        }
-                    }
-                    .accessibilityIdentifier("coachBoostSection")
-                }
-
                 // MARK: Regular Tasks — Priority Tier Sections or Flat List
                 if selectedFilter == .priority {
                     // Overdue section (at top, like iOS)
@@ -512,9 +475,9 @@ struct ContentView: View {
                         }
                     }
 
-                    // Priority tier sections (uses tierFilteredTasks to exclude coach-boosted)
+                    // Priority tier sections (coach-boosted tasks stay in tier with +15 score boost)
                     ForEach(TaskPriorityScoringService.PriorityTier.allCases, id: \.self) { tier in
-                        let tierTasks = tierFilteredTasks.filter { task in
+                        let tierTasks = regularFilteredTasks.filter { task in
                             let taskTier = TaskPriorityScoringService.PriorityTier.from(score: scoreFor(task))
                             let isOverdue = overdueTasks.contains(where: { $0.uuid == task.uuid })
                             return taskTier == tier && !isOverdue
@@ -574,7 +537,22 @@ struct ContentView: View {
             .accessibilityIdentifier(coachModeEnabled ? "coachTaskList" : "backlogTaskList")
         }
         .navigationTitle(filterTitle)
+        .sheet(isPresented: $showCreateTask) {
+            MacTaskCreateSheet {
+                refreshTasks()
+            }
+        }
         .toolbar {
+            ToolbarItem {
+                Button {
+                    showCreateTask = true
+                } label: {
+                    Image(systemName: "plus")
+                }
+                .accessibilityIdentifier("macAddTaskButton")
+                .help("Neuer Task")
+            }
+
             ToolbarItem {
                 // CloudKit sync status indicator
                 Group {
@@ -753,7 +731,7 @@ struct ContentView: View {
     // MARK: - Keyboard Actions
 
     func focusNewTaskField() {
-        // Native TextField handles focus automatically
+        showCreateTask = true
     }
 
     func completeSelectedTasks() {
@@ -822,50 +800,6 @@ struct ContentView: View {
     }
 
     // MARK: - Task Actions
-
-    private func addTask() {
-        guard !newTaskTitle.isEmpty else { return }
-        let title = newTaskTitle
-        newTaskTitle = ""
-        addTask(with: title)
-    }
-
-    private func addTask(with title: String) {
-        // Bug 94 Fix: Task SOFORT erstellen + Inspector zeigen,
-        // AI-Enrichment laeuft im Hintergrund nach.
-        let cleanedTitle = TaskTitleEngine.stripKeywords(title)
-        let nextSortOrder = (tasks.map(\.sortOrder).max() ?? 0) + 1
-        let newTask = LocalTask(
-            title: cleanedTitle,
-            sortOrder: nextSortOrder,
-            taskType: "",
-            sourceSystem: "local"
-        )
-        modelContext.insert(newTask)
-        try? modelContext.save()
-
-        // Inspector SOFORT setzen (vor AI-Enrichment)
-        refreshTasks()
-        inspectorOverrideTaskID = newTask.uuid
-        scrollToTaskID = newTask.uuid
-
-        // AI-Enrichment im Hintergrund (aktualisiert Titel, Importance, etc.)
-        Task {
-            let enrichment = SmartTaskEnrichmentService(modelContext: modelContext)
-            await enrichment.enrichTask(newTask)
-            newTask.needsTitleImprovement = true
-            let titleEngine = TaskTitleEngine(modelContext: modelContext)
-            await titleEngine.improveTitleIfNeeded(newTask)
-            try? modelContext.save()
-            refreshTasks()
-
-            // Spotlight-Indexierung
-            if SpotlightIndexingService.shared.shouldIndex(newTask),
-               let item = try? SpotlightIndexingService.shared.buildSearchableItem(for: newTask) {
-                CSSearchableIndex.default().indexSearchableItems([item]) { _ in }
-            }
-        }
-    }
 
     private func deleteTasks(at offsets: IndexSet) {
         let tasksToDelete = regularFilteredTasks
