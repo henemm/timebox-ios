@@ -16,6 +16,7 @@ struct BacklogRow: View {
     var isCompletionPending: Bool = false  // Deferred completion: shows filled checkbox before task disappears
     var isBlocked: Bool = false  // Task is blocked by another task (dimmed + indented + checkbox disabled)
     var disciplineColor: Color?  // Optional discipline color for Coach mode checkbox
+    var effectiveScore: Int?  // Coach-boosted score (nil = use item.priorityScore)
 
     // State for inline title editing (double-tap)
     @State private var isEditingTitle = false
@@ -189,8 +190,9 @@ struct BacklogRow: View {
             // 5. Duration Badge
             durationBadge
 
-            // 6. Priority Score Badge
-            PriorityScoreBadge(score: item.priorityScore, tier: item.priorityTier, taskId: item.id)
+            // 6. Priority Score Badge (uses effective/frozen score from parent if available)
+            let displayScore = effectiveScore ?? item.priorityScore
+            PriorityScoreBadge(score: displayScore, tier: TaskPriorityScoringService.PriorityTier.from(score: displayScore), taskId: item.id)
 
             // 7. Due Date Badge
             if let dueDate = item.dueDate {
@@ -199,7 +201,7 @@ struct BacklogRow: View {
                     Text(dueDate.dueDateText())
                 }
                 .font(.caption2)
-                .foregroundStyle(dueDate.isDueToday ? .red : .secondary)
+                .foregroundStyle((dueDate.isDueToday || dueDate.isOverdue) ? .red : .secondary)
                 .lineLimit(1)
             }
         }

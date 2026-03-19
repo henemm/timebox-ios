@@ -2,7 +2,7 @@
 //  FocusBloxMacUITests.swift
 //  FocusBloxMacUITests
 //
-//  UI Tests for macOS App
+//  UI Tests for macOS App — Task Creation via (+) Button + Sheet
 //
 
 import XCTest
@@ -16,51 +16,70 @@ final class FocusBloxMacUITests: XCTestCase {
         app.launchArguments = ["-UITesting", "-MockData", "-ApplePersistenceIgnoreState", "YES"]
         app.launch()
 
-        // Wait for window to appear
         let window = app.windows.firstMatch
-        _ = window.waitForExistence(timeout: 5)
+        XCTAssertTrue(window.waitForExistence(timeout: 10), "App-Window muss erscheinen")
+
+        let toolbar = app.toolbars.firstMatch
+        XCTAssertTrue(toolbar.waitForExistence(timeout: 10), "Toolbar muss erscheinen")
+
+        Thread.sleep(forTimeInterval: 2)
     }
 
     override func tearDownWithError() throws {
+        app?.terminate()
         app = nil
     }
 
     // MARK: - Task Creation Tests
 
-    /// Test: TextField für neue Tasks existiert und akzeptiert Eingabe
+    /// Test: (+) Button oeffnet Sheet mit Titel-TextField
     @MainActor
-    func testNewTaskTextFieldAcceptsInput() throws {
-        let textField = app.textFields["newTaskTextField"]
-        XCTAssertTrue(textField.waitForExistence(timeout: 5), "TextField sollte existieren")
+    func testNewTaskSheetAcceptsInput() throws {
+        let addButton = app.buttons["macAddTaskButton"].firstMatch
+        XCTAssertTrue(addButton.waitForExistence(timeout: 5), "macAddTaskButton muss existieren")
+        addButton.click()
 
-        textField.click()
+        let sheet = app.windows.sheets.firstMatch
+        XCTAssertTrue(sheet.waitForExistence(timeout: 5), "Sheet muss erscheinen")
 
+        let titleField = sheet.textFields["taskTitle"]
+        XCTAssertTrue(titleField.waitForExistence(timeout: 3), "Titel-Feld muss existieren")
+
+        titleField.click()
         let testText = "Test Task \(Int.random(in: 1000...9999))"
-        textField.typeText(testText)
+        titleField.typeText(testText)
 
-        let value = textField.value as? String ?? ""
+        let value = titleField.value as? String ?? ""
         XCTAssertEqual(value, testText, "TextField sollte '\(testText)' enthalten")
     }
 
-    /// Test: Task kann via Enter erstellt werden
+    /// Test: Task kann via Erstellen-Button erstellt werden
     @MainActor
-    func testCreateTaskViaEnter() throws {
-        let textField = app.textFields["newTaskTextField"]
-        XCTAssertTrue(textField.waitForExistence(timeout: 5), "TextField sollte existieren")
+    func testCreateTaskViaSheet() throws {
+        let addButton = app.buttons["macAddTaskButton"].firstMatch
+        XCTAssertTrue(addButton.waitForExistence(timeout: 5), "macAddTaskButton muss existieren")
+        addButton.click()
 
-        textField.click()
+        let sheet = app.windows.sheets.firstMatch
+        XCTAssertTrue(sheet.waitForExistence(timeout: 5), "Sheet muss erscheinen")
 
+        let titleField = sheet.textFields["taskTitle"]
+        XCTAssertTrue(titleField.waitForExistence(timeout: 3), "Titel-Feld muss existieren")
+
+        titleField.click()
         let taskTitle = "UI Test Task \(Int.random(in: 1000...9999))"
-        textField.typeText(taskTitle)
-        textField.typeKey(.return, modifierFlags: [])
+        titleField.typeText(taskTitle)
 
-        // Nach Enter sollte das TextField leer sein
-        Thread.sleep(forTimeInterval: 0.5)
-        let valueAfter = textField.value as? String ?? ""
-        XCTAssertTrue(valueAfter.isEmpty, "TextField sollte nach Enter leer sein")
+        // macOS: Button via Label finden (accessibilityIdentifier nicht immer zuverlaessig in Sheets)
+        let createButton = app.buttons["Erstellen"].firstMatch
+        XCTAssertTrue(createButton.waitForExistence(timeout: 3), "Erstellen-Button muss existieren")
+        createButton.click()
+
+        // Sheet muss geschlossen sein
+        XCTAssertFalse(sheet.waitForExistence(timeout: 3), "Sheet sollte nach Erstellen geschlossen sein")
 
         // Task sollte in der Liste erscheinen
         let taskInList = app.staticTexts[taskTitle]
-        XCTAssertTrue(taskInList.waitForExistence(timeout: 3), "Task sollte in Liste erscheinen")
+        XCTAssertTrue(taskInList.waitForExistence(timeout: 10), "Task sollte in Liste erscheinen")
     }
 }

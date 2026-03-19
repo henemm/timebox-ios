@@ -52,4 +52,9 @@ extension Date {
     var isDueToday: Bool {
         Calendar.current.isDateInToday(self)
     }
+
+    /// Whether this date is before today (overdue).
+    var isOverdue: Bool {
+        self < Calendar.current.startOfDay(for: Date())
+    }
 }

@@ -242,7 +242,6 @@ cmd_unit() {
         -destination "id=$SIM_ID" \
         -only-testing:"FocusBloxTests/$TEST_TARGET" \
         -parallel-testing-enabled NO \
-        CODE_SIGNING_ALLOWED=NO \
         2>&1
 
     local EXIT_CODE=$?

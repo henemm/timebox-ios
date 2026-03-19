@@ -82,7 +82,7 @@ struct TaskPreviewView: View {
             if let dueDate = task.dueDate {
                 Label(dueDate.dueDateText(), systemImage: "calendar")
                     .font(.caption)
-                    .foregroundStyle(dueDate.isDueToday ? .red : .secondary)
+                    .foregroundStyle((dueDate.isDueToday || dueDate.isOverdue) ? .red : .secondary)
             }
 
             // Description

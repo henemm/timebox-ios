@@ -258,7 +258,7 @@ struct MacBacklogRow: View {
                 .lineLimit(1)
         }
         .font(.caption2)
-        .foregroundStyle(date.isDueToday ? .red : .secondary)
+        .foregroundStyle((date.isDueToday || date.isOverdue) ? .red : .secondary)
         .fixedSize()
     }
 

@@ -127,18 +127,12 @@ struct BacklogView: View {
         allBacklogTasks.dependents(of: blockerID)
     }
 
-    // MARK: - Coach-Boosted Tasks (when coachModeEnabled)
-    private var coachBoostedTasks: [PlanItem] {
+    // MARK: - Coach-Boosted IDs (score boost instead of separate section)
+    /// IDs of tasks that get a +15 score boost from Coach/Monster mode.
+    private var coachBoostedIDs: Set<String> {
         guard coachModeEnabled else { return [] }
         let searchFiltered = planItems.filter { matchesSearch($0) }
-        return CoachBacklogViewModel.coachBoostedTasks(from: searchFiltered, selectedCoach: selectedCoach)
-    }
-
-    /// Backlog tasks for tier sections, excluding coach-boosted tasks when coach mode is active.
-    private var tierBacklogTasks: [PlanItem] {
-        guard coachModeEnabled, !coachBoostedTasks.isEmpty else { return backlogTasks }
-        let boostIDs = Set(coachBoostedTasks.map(\.id))
-        return backlogTasks.filter { !boostIDs.contains($0.id) }
+        return Set(CoachBacklogViewModel.coachBoostedTasks(from: searchFiltered, selectedCoach: selectedCoach).map(\.id))
     }
 
     // MARK: - Recurring Tasks (only templates = series overview)
@@ -146,15 +140,13 @@ struct BacklogView: View {
         allRecurringItems.filter { $0.isTemplate && !$0.isCompleted && matchesSearch($0) }
     }
 
-    // MARK: - Overdue Tasks (dueDate < today, excluding coach-boosted)
-    // BUG_107: Exclude coach-boosted tasks to prevent cross-section duplicates
+    // MARK: - Overdue Tasks (dueDate < today, sorted by priority score)
     private var overdueTasks: [PlanItem] {
         let startOfToday = Calendar.current.startOfDay(for: Date())
-        let boostIDs = Set(coachBoostedTasks.map(\.id))
         return backlogTasks.filter { item in
             guard let due = item.dueDate else { return false }
-            return due < startOfToday && !boostIDs.contains(item.id)
-        }.sorted { ($0.dueDate ?? .distantFuture) < ($1.dueDate ?? .distantFuture) }
+            return due < startOfToday
+        }.sorted { effectivePriorityScore(for: $0) > effectivePriorityScore(for: $1) }
     }
 
     // MARK: - Recent Tasks (sorted by most recent date)
@@ -644,7 +636,9 @@ struct BacklogView: View {
     // MARK: - Deferred Sort Helpers (delegate to shared DeferredSortController)
 
     private func effectivePriorityScore(for item: PlanItem) -> Int {
-        deferredSort.effectiveScore(id: item.id, liveScore: item.priorityScore)
+        let base = deferredSort.effectiveScore(id: item.id, liveScore: item.priorityScore)
+        let boost = coachBoostedIDs.contains(item.id) ? TaskPriorityScoringService.coachBoostValue : 0
+        return min(100, base + boost)
     }
 
     private func effectivePriorityTier(for item: PlanItem) -> TaskPriorityScoringService.PriorityTier {
@@ -652,7 +646,7 @@ struct BacklogView: View {
     }
 
     private func freezeSortOrder() {
-        deferredSort.freeze(scores: Dictionary(uniqueKeysWithValues: backlogTasks.map { ($0.id, $0.priorityScore) }))
+        deferredSort.freeze(scores: Dictionary(uniqueKeysWithValues: backlogTasks.map { ($0.id, effectivePriorityScore(for: $0)) }))
     }
 
     private func scheduleDeferredResort(for itemID: String) {
@@ -953,7 +947,8 @@ struct BacklogView: View {
             onDeleteTap: { deleteTask(item) },
             onTitleSave: { newTitle in saveTitleEdit(for: item, title: newTitle) },
             isPendingResort: deferredSort.isPending(item.id),
-            isCompletionPending: deferredCompletion.isPending(item.id)
+            isCompletionPending: deferredCompletion.isPending(item.id),
+            effectiveScore: effectivePriorityScore(for: item)
         )
         .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
         .listRowBackground(Color.clear)
@@ -1089,30 +1084,6 @@ struct BacklogView: View {
 
             nextUpListSection
 
-            // Coach-Boosted Section (between NextUp and Overdue)
-            if !coachBoostedTasks.isEmpty, let sectionTitle = CoachBacklogViewModel.coachSectionTitle(for: selectedCoach) {
-                Section {
-                    ForEach(coachBoostedTasks) { item in
-                        backlogRowWithSwipe(item)
-                    }
-                } header: {
-                    HStack {
-                        Text(sectionTitle)
-                            .font(.headline)
-                            .foregroundStyle(.purple)
-                        Spacer()
-                        Text("\(coachBoostedTasks.count)")
-                            .font(.caption)
-                            .foregroundStyle(.purple)
-                            .padding(.horizontal, 6)
-                            .padding(.vertical, 2)
-                            .background(Color.purple.opacity(0.2))
-                            .clipShape(Capsule())
-                    }
-                }
-                .accessibilityIdentifier("coachBoostSection")
-            }
-
             // Overdue tasks at top
             if !overdueTasks.isEmpty {
                 Section {
@@ -1136,9 +1107,9 @@ struct BacklogView: View {
                 }
             }
 
-            // Priority tiers (uses tierBacklogTasks to exclude coach-boosted)
+            // Priority tiers (coach-boosted tasks stay in their tier with +15 score boost)
             ForEach(TaskPriorityScoringService.PriorityTier.allCases, id: \.self) { tier in
-                let tierTasks = tierBacklogTasks
+                let tierTasks = backlogTasks
                     .filter { task in effectivePriorityTier(for: task) == tier && !overdueTasks.contains(where: { $0.id == task.id }) }
                     .sorted { effectivePriorityScore(for: $0) > effectivePriorityScore(for: $1) }
                 if !tierTasks.isEmpty {

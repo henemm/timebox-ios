@@ -183,7 +183,7 @@ struct TaskDetailSheet: View {
                         .foregroundStyle(.secondary)
                     Spacer()
                     Text(dueDate.dueDateText(style: .full))
-                        .foregroundStyle(dueDate.isDueToday ? .red : .primary)
+                        .foregroundStyle((dueDate.isDueToday || dueDate.isOverdue) ? .red : .primary)
                 }
             }
         }

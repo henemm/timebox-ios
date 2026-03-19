@@ -118,10 +118,10 @@ final class CoachBacklogViewUITests: XCTestCase {
                       "Default ViewMode should show 'Priorität' text")
     }
 
-    // MARK: - Coach-Boost Section (Bug 104: P2b)
+    // MARK: - FEATURE_026: Coach-Boost Section removed (replaced by +15 score boost)
 
-    /// Bricht wenn: Coach-Boost-Section nicht angezeigt wird bei gesetztem Coach
-    func test_coachModeOn_withFeuerCoach_showsBoostSection() throws {
+    /// Bricht wenn: Coach-Boost-Section noch angezeigt wird (FEATURE_026 hat sie durch Score-Boost ersetzt)
+    func test_coachModeOn_withFeuerCoach_noBoostSection() throws {
         app.launchArguments = [
             "-UITesting",
             "-coachModeEnabled", "1",
@@ -131,14 +131,8 @@ final class CoachBacklogViewUITests: XCTestCase {
         navigateToBacklog()
 
         let boostSection = app.descendants(matching: .any)["coachBoostSection"]
-        XCTAssertTrue(boostSection.waitForExistence(timeout: 5),
-                      "Coach-Boost section should appear with Feuer coach (importance=3 tasks in mock data)")
-
-        let screenshot = app.screenshot()
-        let attachment = XCTAttachment(screenshot: screenshot)
-        attachment.name = "coach-boost-section-feuer"
-        attachment.lifetime = .keepAlways
-        add(attachment)
+        XCTAssertFalse(boostSection.waitForExistence(timeout: 2),
+                       "Coach-Boost section should NOT exist — FEATURE_026 replaced it with score boost (+15)")
     }
 
     // MARK: - Completion (Bug 104: P2a)
