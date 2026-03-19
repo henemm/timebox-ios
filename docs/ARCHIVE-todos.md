@@ -5,6 +5,20 @@
 
 ---
 
+## BUG_112 — macOS Series-Delete Crash (LocalTask.tags BackingData detach) — ERLEDIGT
+
+- **Problem:** macOS App crasht beim Rechtsklick → Löschen → "Alle offenen dieser Serie". Crash: `Fatal error: This backing data was detached from a context without resolving attribute faults: \LocalTask.tags`
+- **Root Cause:** `taskToDeleteRecurring: LocalTask?` (class/reference type) wurde NACH `deleteRecurringSeries()` auf nil gesetzt. Die Funktion löschte den Task inkl. sich selbst → backing data sofort detached. SwiftUI Re-render griff auf `task.tags` zu → CRASH.
+- **Fix (ContentView.swift):**
+  1. `taskToDeleteRecurring = nil` + `selectedTasks.removeAll()` VOR dem Delete
+  2. Lokale `deleteRecurringSeries(_ task: LocalTask)` durch `SyncEngine.deleteRecurringSeries(groupID: String)` ersetzt (kein LocalTask-Objekt mehr nach Delete)
+  3. `modelContext != nil` Guard in `nextUpTasks` hinzugefügt (defensive Absicherung)
+- **Tests:** 3 macOS UI Tests (`MacSeriesDeleteCrashUITests`) — alle GREEN
+- **Commit:** `133cb10`
+- **Datum:** 2026-03-19
+
+---
+
 ## FEATURE_015 — UX: Tag-Auswahl redesignen (ERLEDIGT)
 
 - **Problem:** Tag-Sektion in TaskFormSheet unuebersichtlich — "Neuer Tag" Input dominierte, bestehende Tags erschienen erst darunter
