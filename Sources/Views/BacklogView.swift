@@ -1299,11 +1299,7 @@ struct BacklogView: View {
                 .listRowSeparator(.hidden)
             } else {
                 ForEach(completedTasks.filter { matchesSearch($0) }) { item in
-                    CompletedTaskRow(
-                        item: item,
-                        onUncomplete: { uncompleteTask(item) },
-                        onDelete: { deleteTask(item) }
-                    )
+                    CompletedTaskRow(item: item)
                     .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
                     .listRowBackground(Color.clear)
                     .listRowSeparator(.hidden)
@@ -1315,7 +1311,22 @@ struct BacklogView: View {
                         }
                         .tint(.orange)
                     }
-                    .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                    .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                        Button(role: .destructive) {
+                            deleteTask(item)
+                        } label: {
+                            Label("Löschen", systemImage: "trash")
+                        }
+                    }
+                    .contextMenu {
+                        Button {
+                            uncompleteTask(item)
+                        } label: {
+                            Label("Wiederherstellen", systemImage: "arrow.uturn.backward.circle")
+                        }
+
+                        Divider()
+
                         Button(role: .destructive) {
                             deleteTask(item)
                         } label: {
@@ -1361,8 +1372,6 @@ struct BacklogView: View {
 
 struct CompletedTaskRow: View {
     let item: PlanItem
-    let onUncomplete: () -> Void
-    let onDelete: () -> Void
 
     private var completedDateText: String {
         guard let completedAt = item.completedAt else { return "" }
@@ -1394,28 +1403,6 @@ struct CompletedTaskRow: View {
             }
 
             Spacer()
-
-            // Undo button
-            Button {
-                onUncomplete()
-            } label: {
-                Image(systemName: "arrow.uturn.backward.circle")
-                    .font(.title2)
-                    .foregroundStyle(.blue)
-            }
-            .buttonStyle(.plain)
-            .accessibilityIdentifier("undoCompleteButton_\(item.id)")
-
-            // Delete button
-            Button {
-                onDelete()
-            } label: {
-                Image(systemName: "trash.circle")
-                    .font(.title2)
-                    .foregroundStyle(.red.opacity(0.7))
-            }
-            .buttonStyle(.plain)
-            .accessibilityIdentifier("deleteCompletedButton_\(item.id)")
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 10)

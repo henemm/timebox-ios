@@ -5,6 +5,18 @@
 
 ---
 
+## FEATURE_027 — Erledigt-View Kontextmenü & Swipe-Aktionen — ERLEDIGT
+
+- **Beschreibung:** Erledigt-View (Papierkorb-Metapher): Kontextmenü und Swipe-Gesten fokussieren auf Wiederherstellen als primäre Aktion. Löschen ist sekundär.
+- **Änderungen:**
+  - iOS (`BacklogView.swift`): CompletedTaskRow vereinfacht (keine Inline-Buttons), Kontextmenü hinzugefügt (Wiederherstellen + Löschen), trailing Swipe ohne Full-Swipe
+  - macOS (`ContentView.swift`): Eigene `completedTaskRowWithSwipe()`, `completedContextMenu()`, `uncompleteTasksByIds()` — nutzt SyncEngine
+- **Tests:** 2 iOS UI Tests + 4 macOS UI Tests — alle GREEN
+- **Spec:** `docs/specs/features/feature-027-erledigt-view-kontextmenue.md`
+- **Datum:** 2026-03-19
+
+---
+
 ## BUG_112 — macOS Series-Delete Crash (LocalTask.tags BackingData detach) — ERLEDIGT
 
 - **Problem:** macOS App crasht beim Rechtsklick → Löschen → "Alle offenen dieser Serie". Crash: `Fatal error: This backing data was detached from a context without resolving attribute faults: \LocalTask.tags`
