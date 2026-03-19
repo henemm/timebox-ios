@@ -7,7 +7,7 @@ Each workflow tracks its own phase independently.
 
 State File Format (.claude/workflow_state.json):
 {
-  "version": "2.0",
+  "version": "2.1",
   "workflows": {
     "feature-login-oauth": {
       "current_phase": "phase2_spec",
@@ -24,7 +24,11 @@ State File Format (.claude/workflow_state.json):
       ...
     }
   },
-  "active_workflow": "feature-login-oauth"
+  "active_workflow": "feature-login-oauth",
+  "session_workflows": {
+    "a1b2c3d4": { "workflow": "feature-login-oauth", "tty": "/dev/ttys003" },
+    "e5f6g7h8": { "workflow": "bugfix-crash-on-start", "tty": "/dev/ttys005" }
+  }
 }
 
 Phases (in order):
@@ -235,16 +239,69 @@ PHASE_SHORT = {
 }
 
 
-def _tty_id() -> str:
-    """Eindeutige ID fuer das aktuelle TTY (per-Session)."""
+def _tty_path() -> str:
+    """Return the TTY device path for the current session."""
     try:
-        tty = os.ttyname(sys.stdout.fileno())
+        return os.ttyname(sys.stdout.fileno())
     except Exception:
         try:
-            tty = os.ttyname(sys.stdin.fileno())
+            return os.ttyname(sys.stdin.fileno())
         except Exception:
-            tty = os.environ.get("SSH_TTY", "unknown")
-    return hashlib.md5(tty.encode()).hexdigest()[:8]
+            return os.environ.get("SSH_TTY", "unknown")
+
+
+def _tty_id() -> str:
+    """Eindeutige ID fuer das aktuelle TTY (per-Session)."""
+    return hashlib.md5(_tty_path().encode()).hexdigest()[:8]
+
+
+def session_active_name(state: dict = None) -> Optional[str]:
+    """Return the active workflow name for the current session.
+
+    Lookup order:
+    1. session_workflows[_tty_id()] → session-specific
+    2. active_workflow → global fallback (backward compat)
+
+    Pure lookup — no side effects, no file I/O if state is provided.
+    """
+    if state is None:
+        state = load_state()
+    tty = _tty_id()
+    entry = state.get("session_workflows", {}).get(tty)
+    if entry:
+        name = entry.get("workflow")
+        if name and name in state.get("workflows", {}):
+            return name
+    return state.get("active_workflow")
+
+
+def _set_session_entry(state: dict, name: Optional[str]) -> None:
+    """Write or clear the session→workflow mapping.
+
+    Must be called inside _state_lock(). Modifies state in-place.
+    """
+    if "session_workflows" not in state:
+        state["session_workflows"] = {}
+    tty = _tty_id()
+    if name is None:
+        state["session_workflows"].pop(tty, None)
+    else:
+        state["session_workflows"][tty] = {
+            "workflow": name,
+            "tty": _tty_path(),
+        }
+
+
+def _cleanup_stale_sessions(state: dict) -> None:
+    """Remove session entries whose TTY no longer exists. In-place."""
+    sessions = state.get("session_workflows", {})
+    stale = [
+        sid for sid, entry in sessions.items()
+        if not Path(entry.get("tty", "")).exists()
+        and entry.get("tty", "") != "unknown"
+    ]
+    for sid in stale:
+        del sessions[sid]
 
 
 def _update_iterm_title(workflow_name: str = None, phase: str = None):
@@ -420,6 +477,7 @@ def start_workflow(name: str, make_active: bool = True) -> dict:
 
         if make_active:
             state["active_workflow"] = name
+            _set_session_entry(state, name)
 
         _save_state_unlocked(state)
 
@@ -431,11 +489,11 @@ def start_workflow(name: str, make_active: bool = True) -> dict:
 
 
 def get_active_workflow() -> Optional[dict]:
-    """Get the currently active workflow."""
+    """Get the currently active workflow (session-aware)."""
     state = load_state()
-    active_name = state.get("active_workflow")
+    active_name = session_active_name(state)
 
-    if not active_name or active_name not in state["workflows"]:
+    if not active_name or active_name not in state.get("workflows", {}):
         return None
 
     workflow = state["workflows"][active_name]
@@ -444,7 +502,7 @@ def get_active_workflow() -> Optional[dict]:
 
 
 def set_active_workflow(name: str) -> bool:
-    """Switch to a different workflow."""
+    """Switch to a different workflow (session-aware)."""
     with _state_lock():
         state = load_state()
 
@@ -452,11 +510,87 @@ def set_active_workflow(name: str) -> bool:
             return False
 
         state["active_workflow"] = name
+        _set_session_entry(state, name)
         _save_state_unlocked(state)
 
     phase = state["workflows"][name].get("current_phase", "phase0_idle")
     _update_iterm_title(name, phase)
     return True
+
+
+def _validate_phase_prerequisites(workflow: dict, current_phase: str, target_phase: str) -> tuple[bool, str]:
+    """
+    Validate that the current phase is completed before allowing transition.
+    Called by both advance_phase() and set_phase().
+
+    Returns:
+        (allowed, reason) - allowed=True if transition is ok, reason explains why not
+    """
+    # phase0_idle has no prerequisites (reset always allowed)
+    if current_phase == "phase0_idle":
+        return True, ""
+
+    if current_phase == "phase1_context":
+        ctx = workflow.get("context_file")
+        if not ctx:
+            return False, "phase1_context nicht abgeschlossen: context_file nicht gesetzt"
+        if not Path(ctx).exists():
+            return False, f"phase1_context nicht abgeschlossen: context_file existiert nicht: {ctx}"
+
+    elif current_phase == "phase2_analyse":
+        findings = workflow.get("analysis_findings")
+        if not findings:
+            return False, "phase2_analyse nicht abgeschlossen: analysis_findings nicht gesetzt"
+
+    elif current_phase == "phase3_spec":
+        spec = workflow.get("spec_file")
+        if not spec:
+            return False, "phase3_spec nicht abgeschlossen: spec_file nicht gesetzt"
+        if not Path(spec).exists():
+            return False, f"phase3_spec nicht abgeschlossen: spec_file existiert nicht: {spec}"
+
+    elif current_phase == "phase4_approved":
+        if not workflow.get("spec_approved"):
+            return False, "phase4_approved nicht abgeschlossen: spec_approved ist nicht True"
+
+    elif current_phase == "phase5_tdd_red":
+        missing = []
+        if not workflow.get("red_test_done"):
+            missing.append("red_test_done")
+        if not workflow.get("ui_test_red_done"):
+            missing.append("ui_test_red_done")
+        if missing:
+            return False, f"phase5_tdd_red nicht abgeschlossen: {', '.join(missing)} fehlt"
+
+    elif current_phase == "phase6_implement":
+        # Validation for leaving phase6 → phase6b_adversary
+        missing = []
+        if not workflow.get("red_test_done"):
+            missing.append("Unit RED")
+        if not workflow.get("green_test_done"):
+            missing.append("Unit GREEN")
+        if not workflow.get("ui_test_red_done"):
+            missing.append("UI RED")
+        if not workflow.get("ui_test_green_done"):
+            missing.append("UI GREEN")
+        if missing:
+            return False, f"phase6_implement nicht abgeschlossen: {', '.join(missing)} fehlt"
+
+    elif current_phase == "phase6b_adversary":
+        verdict = workflow.get("adversary_verdict")
+        if not verdict:
+            return False, "phase6b_adversary nicht abgeschlossen: adversary_verdict fehlt"
+        if not str(verdict).startswith("VERIFIED"):
+            return False, f"phase6b_adversary nicht abgeschlossen: adversary_verdict={verdict}"
+
+    elif current_phase == "phase7_validate":
+        missing = []
+        if not workflow.get("result_inspection_done"):
+            missing.append("result_inspection_done")
+        if missing:
+            return False, f"phase7_validate nicht abgeschlossen: {', '.join(missing)} fehlt"
+
+    return True, ""
 
 
 def advance_phase(workflow_name: str = None) -> Optional[str]:
@@ -468,7 +602,7 @@ def advance_phase(workflow_name: str = None) -> Optional[str]:
     with _state_lock():
         state = load_state()
 
-        name = workflow_name or state.get("active_workflow")
+        name = workflow_name or session_active_name(state)
         if not name or name not in state["workflows"]:
             return None
 
@@ -479,6 +613,13 @@ def advance_phase(workflow_name: str = None) -> Optional[str]:
             current_index = PHASES.index(current_phase)
             if current_index < len(PHASES) - 1:
                 new_phase = PHASES[current_index + 1]
+
+                # Phase prerequisite validation (skip with override token)
+                if not _has_valid_override_token(name):
+                    allowed, reason = _validate_phase_prerequisites(workflow, current_phase, new_phase)
+                    if not allowed:
+                        print(f"BLOCKED: {reason}", file=sys.stderr)
+                        return None
 
                 # Parallel TDD conflict check before entering TDD phases
                 if new_phase in TDD_BLOCKING_PHASES:
@@ -530,18 +671,36 @@ def set_phase(workflow_name: str, phase: str, force: bool = False) -> tuple[bool
 
         workflow = state["workflows"][workflow_name]
 
-        # Override only required for non-sequential phase jumps (skipping phases)
+        has_override = _has_valid_override_token(workflow_name)
+
         if not force:
             current_phase = workflow.get("current_phase", "phase0_idle")
             try:
                 current_idx = PHASES.index(current_phase)
                 target_idx = PHASES.index(phase)
-                # Allow sequential forward progression and going back without override
-                # Only require override when skipping forward (jumping over phases)
-                if target_idx > current_idx + 1 and not _has_valid_override_token(workflow_name):
+
+                # Backwards jumping: only phase0_idle (reset) allowed without override
+                if target_idx < current_idx:
+                    if phase != "phase0_idle" and not has_override:
+                        return False, (
+                            f"Rueckwaerts-Sprung von {current_phase} nach {phase} "
+                            f"nur zu phase0_idle (Reset) erlaubt. Override noetig fuer andere Ziele."
+                        )
+
+                # Forward: require override when skipping phases
+                if target_idx > current_idx + 1 and not has_override:
                     skipped = PHASES[current_idx + 1:target_idx]
                     skipped_names = [PHASE_NAMES.get(p, p) for p in skipped]
                     return False, f"Override required: skipping phases ({', '.join(skipped_names)})"
+
+                # Phase prerequisite validation for all intermediate phases
+                if target_idx > current_idx and not has_override:
+                    for step_idx in range(current_idx, target_idx):
+                        step_phase = PHASES[step_idx]
+                        allowed, reason = _validate_phase_prerequisites(workflow, step_phase, PHASES[step_idx + 1])
+                        if not allowed:
+                            return False, reason
+
             except ValueError:
                 pass
 
@@ -555,34 +714,6 @@ def set_phase(workflow_name: str, phase: str, force: bool = False) -> tuple[bool
                     f"Andere Workflows in TDD-Phasen: {names}. "
                     f"Warte bis diese fertig sind oder wechsle zum aktiven Workflow."
                 )
-
-        # Validation check for phase7_validate
-        if phase == "phase7_validate" and not force:
-            # Check if both unit and UI tests are complete
-            unit_red = workflow.get("red_test_done", False)
-            unit_green = workflow.get("green_test_done", False)
-            ui_red = workflow.get("ui_test_red_done", False)
-            ui_green = workflow.get("ui_test_green_done", False)
-
-            missing = []
-            if not unit_red:
-                missing.append("Unit RED")
-            if not unit_green:
-                missing.append("Unit GREEN")
-            if not ui_red:
-                missing.append("UI RED")
-            if not ui_green:
-                missing.append("UI GREEN")
-
-            if missing:
-                return False, f"Cannot enter validation phase. Missing: {', '.join(missing)}"
-
-            # Check adversary verdict — must be VERIFIED before validation
-            verdict = workflow.get("adversary_verdict")
-            if not verdict:
-                return False, "Cannot enter validation phase. Adversary verdict missing. Run implementation-validator agent first."
-            if not str(verdict).startswith("VERIFIED"):
-                return False, f"Cannot enter validation phase. Adversary found issues: {verdict}"
 
         state["workflows"][workflow_name]["current_phase"] = phase
         state["workflows"][workflow_name]["last_updated"] = datetime.now().isoformat()
@@ -622,7 +753,7 @@ def get_workflow_status(name: str = None) -> str:
     """Get a human-readable status for a workflow."""
     state = load_state()
 
-    workflow_name = name or state.get("active_workflow")
+    workflow_name = name or session_active_name(state)
     if not workflow_name or workflow_name not in state["workflows"]:
         return "No active workflow"
 
@@ -649,7 +780,7 @@ def get_workflow_status(name: str = None) -> str:
 def list_workflows() -> list:
     """List all workflows with their current phase and backlog status."""
     state = load_state()
-    active = state.get("active_workflow")
+    active = session_active_name(state)
 
     result = []
     for name, workflow in state.get("workflows", {}).items():
@@ -676,7 +807,7 @@ def can_modify_code(workflow_name: str = None) -> tuple[bool, str]:
     """
     state = load_state()
 
-    name = workflow_name or state.get("active_workflow")
+    name = workflow_name or session_active_name(state)
     if not name:
         return False, "No active workflow. Start with /01-context or /02-analyse."
 
@@ -762,6 +893,11 @@ def complete_workflow(name: str) -> bool:
         if state.get("active_workflow") == name:
             state["active_workflow"] = None
 
+        # Clear session entry for this workflow (any session that had it)
+        for sid, entry in list(state.get("session_workflows", {}).items()):
+            if entry.get("workflow") == name:
+                del state["session_workflows"][sid]
+
         _save_state_unlocked(state)
 
     # Show project name when no active workflow
@@ -784,7 +920,7 @@ def mark_red_test_done(workflow_name: str = None, result: str = None) -> bool:
     with _state_lock():
         state = load_state()
 
-        name = workflow_name or state.get("active_workflow")
+        name = workflow_name or session_active_name(state)
         if not name or name not in state["workflows"]:
             return False
 
@@ -832,7 +968,7 @@ def mark_green_test_done(workflow_name: str = None, result: str = None) -> bool:
     with _state_lock():
         state = load_state()
 
-        name = workflow_name or state.get("active_workflow")
+        name = workflow_name or session_active_name(state)
         if not name or name not in state["workflows"]:
             return False
 
@@ -916,7 +1052,7 @@ def mark_ui_test_red_done(workflow_name: str = None, result: str = None) -> bool
     with _state_lock():
         state = load_state()
 
-        name = workflow_name or state.get("active_workflow")
+        name = workflow_name or session_active_name(state)
         if not name or name not in state["workflows"]:
             return False
 
@@ -945,7 +1081,7 @@ def mark_ui_test_green_done(workflow_name: str = None, result: str = None) -> bo
     with _state_lock():
         state = load_state()
 
-        name = workflow_name or state.get("active_workflow")
+        name = workflow_name or session_active_name(state)
         if not name or name not in state["workflows"]:
             return False
 
@@ -966,7 +1102,7 @@ def are_all_tests_complete(workflow_name: str = None) -> tuple[bool, str]:
     """
     state = load_state()
 
-    name = workflow_name or state.get("active_workflow")
+    name = workflow_name or session_active_name(state)
     if not name or name not in state["workflows"]:
         return False, "No active workflow"
 
@@ -1004,7 +1140,7 @@ def get_backlog_status(workflow_name: str = None) -> str:
     """
     state = load_state()
 
-    name = workflow_name or state.get("active_workflow")
+    name = workflow_name or session_active_name(state)
     if not name or name not in state["workflows"]:
         return "open"
 
@@ -1035,7 +1171,7 @@ def set_backlog_status(status: str, workflow_name: str = None) -> bool:
     with _state_lock():
         state = load_state()
 
-        name = workflow_name or state.get("active_workflow")
+        name = workflow_name or session_active_name(state)
         if not name or name not in state["workflows"]:
             return False
 
@@ -1073,7 +1209,7 @@ def pause_workflow(workflow_name: str = None) -> tuple[bool, str]:
     with _state_lock():
         state = load_state()
 
-        name = workflow_name or state.get("active_workflow")
+        name = workflow_name or session_active_name(state)
         if not name or name not in state["workflows"]:
             return False, "No active workflow to pause."
 
@@ -1109,7 +1245,7 @@ def sync_backlog_status_from_phase(workflow_name: str = None) -> bool:
     with _state_lock():
         state = load_state()
 
-        name = workflow_name or state.get("active_workflow")
+        name = workflow_name or session_active_name(state)
         if not name or name not in state["workflows"]:
             return False
 
@@ -1158,7 +1294,7 @@ if __name__ == "__main__":
             print("Cannot advance further")
     elif cmd == "phase" and len(sys.argv) > 2:
         state = load_state()
-        active = state.get("active_workflow")
+        active = session_active_name(state)
         if active:
             target_phase = sys.argv[2]
             # Use complete_workflow() for phase8_complete to ensure proper cleanup
@@ -1204,6 +1340,12 @@ if __name__ == "__main__":
             "test_artifacts",       # Managed by /09-add-artifact
             "user_override",        # Managed by override_token_listener
             "phases_completed",     # Managed by phase transitions
+            "visual_inspection_done",       # Managed by fresh-eyes-inspector
+            "visual_inspection_notes",      # Managed by fresh-eyes-inspector
+            "user_expectation_done",        # Managed by user-advocate
+            "user_expectation_notes",       # Managed by user-advocate
+            "result_inspection_done",       # Managed by fresh-eyes-inspector
+            "result_inspection_notes",      # Managed by fresh-eyes-inspector
         }
         if field_name in BLOCKED_SET_FIELDS:
             print(f"BLOCKED: '{field_name}' cannot be set via set-field.")
@@ -1213,7 +1355,7 @@ if __name__ == "__main__":
         field_value = sys.argv[3]
         with _state_lock():
             state = load_state()
-            active = state.get("active_workflow")
+            active = session_active_name(state)
             if active and active in state.get("workflows", {}):
                 state["workflows"][active][field_name] = field_value
                 state["workflows"][active]["last_updated"] = datetime.now().isoformat()

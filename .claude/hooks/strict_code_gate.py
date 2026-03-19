@@ -29,11 +29,11 @@ from pathlib import Path
 
 # Try to import state manager
 try:
-    from workflow_state_multi import load_state, get_active_workflow, find_workflow_for_file, PHASE_NAMES
+    from workflow_state_multi import load_state, get_active_workflow, find_workflow_for_file, PHASE_NAMES, session_active_name
 except ImportError:
     sys.path.insert(0, str(Path(__file__).parent))
     try:
-        from workflow_state_multi import load_state, get_active_workflow, find_workflow_for_file, PHASE_NAMES
+        from workflow_state_multi import load_state, get_active_workflow, find_workflow_for_file, PHASE_NAMES, session_active_name
     except ImportError:
         def load_state():
             return {"version": "2.0", "workflows": {}, "active_workflow": None}
@@ -137,7 +137,7 @@ def check_user_override(workflow: dict = None, workflow_name: str = None) -> boo
         if workflow_name:
             return token.get("workflow") == workflow_name
         state = load_state()
-        active_name = state.get("active_workflow", "")
+        active_name = session_active_name(state) or ""
         return token.get("workflow") == active_name
     except (json.JSONDecodeError, KeyError, ValueError, OSError):
         return False

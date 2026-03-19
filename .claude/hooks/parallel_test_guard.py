@@ -39,11 +39,11 @@ from pathlib import Path
 
 # Import load_state from the correct module (reads workflow_state.json)
 try:
-    from workflow_state_multi import load_state
+    from workflow_state_multi import load_state, session_active_name
 except ImportError:
     sys.path.insert(0, str(Path(__file__).parent))
     try:
-        from workflow_state_multi import load_state
+        from workflow_state_multi import load_state, session_active_name
     except ImportError:
         def load_state():
             return {"version": "2.0", "workflows": {}, "active_workflow": None}
@@ -90,7 +90,7 @@ def get_conflicting_workflows() -> list[dict]:
     state = load_state()
 
     workflows = state.get("workflows", {})
-    active = state.get("active_workflow", "")
+    active = session_active_name(state) or ""
 
     conflicts = []
     for name, wf in workflows.items():

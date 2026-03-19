@@ -19,6 +19,19 @@ import os
 from datetime import datetime, timedelta
 from pathlib import Path
 
+# Import session helpers
+try:
+    from workflow_state_multi import session_active_name, _tty_id
+except ImportError:
+    sys.path.insert(0, str(Path(__file__).parent))
+    try:
+        from workflow_state_multi import session_active_name, _tty_id
+    except ImportError:
+        def session_active_name(state):
+            return state.get("active_workflow")
+        def _tty_id():
+            return "unknown"
+
 STALE_DAYS = 7
 CLEANUP_INTERVAL_HOURS = 1
 CLEANUP_MARKER = ".claude/workflow_last_cleanup.json"
@@ -79,12 +92,31 @@ def main():
     workflows = state.get("workflows", {})
     active = state.get("active_workflow", "")
 
+    # Collect all session-active workflow names (protect from cleanup)
+    session_active = set()
+    if active:
+        session_active.add(active)
+    for sid, entry in state.get("session_workflows", {}).items():
+        wf_name = entry.get("workflow")
+        if wf_name:
+            session_active.add(wf_name)
+
+    # Clean stale session entries (TTY no longer exists)
+    sessions = state.get("session_workflows", {})
+    stale_sessions = [
+        sid for sid, entry in sessions.items()
+        if not Path(entry.get("tty", "")).exists()
+        and entry.get("tty", "") != "unknown"
+    ]
+    for sid in stale_sessions:
+        del sessions[sid]
+
     removed = []
     kept = {}
 
     for name, wf in workflows.items():
-        # Never remove the active workflow
-        if name == active:
+        # Never remove session-active workflows
+        if name in session_active:
             kept[name] = wf
             continue
 

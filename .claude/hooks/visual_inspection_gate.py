@@ -22,6 +22,16 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
+try:
+    from workflow_state_multi import session_active_name, load_state as load_wf_state
+except ImportError:
+    sys.path.insert(0, str(Path(__file__).parent))
+    try:
+        from workflow_state_multi import session_active_name, load_state as load_wf_state
+    except ImportError:
+        def session_active_name(state):
+            return state.get("active_workflow")
+
 
 def get_state_file() -> Path:
     """Get workflow state file path."""
@@ -71,8 +81,8 @@ def main():
     except (json.JSONDecodeError, Exception):
         sys.exit(0)
 
-    # Get active workflow
-    active_name = state.get("active_workflow")
+    # Get active workflow (session-aware)
+    active_name = session_active_name(state)
     if not active_name:
         sys.exit(0)  # No active workflow
 

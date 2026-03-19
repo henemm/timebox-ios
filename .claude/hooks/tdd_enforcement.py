@@ -33,13 +33,13 @@ from datetime import datetime, timedelta
 try:
     from workflow_state_multi import (
         load_state, get_active_workflow, find_workflow_for_file, PHASES,
-        PHASE_NAMES, TEST_REQUIRED_PHASES
+        PHASE_NAMES, TEST_REQUIRED_PHASES, session_active_name
     )
 except ImportError:
     sys.path.insert(0, str(Path(__file__).parent))
     from workflow_state_multi import (
         load_state, get_active_workflow, find_workflow_for_file, PHASES,
-        PHASE_NAMES, TEST_REQUIRED_PHASES
+        PHASE_NAMES, TEST_REQUIRED_PHASES, session_active_name
     )
 
 
@@ -406,7 +406,7 @@ def check_user_override(workflow_name: str = None) -> bool:
         if workflow_name:
             return token.get("workflow") == workflow_name
         state = load_state()
-        active_name = state.get("active_workflow", "")
+        active_name = session_active_name(state) or ""
         return token.get("workflow") == active_name
     except (json.JSONDecodeError, KeyError, ValueError, OSError):
         return False

@@ -24,10 +24,10 @@ from pathlib import Path
 
 # Import multi-workflow state manager
 try:
-    from workflow_state_multi import load_state
+    from workflow_state_multi import load_state, session_active_name
 except ImportError:
     sys.path.insert(0, str(Path(__file__).parent))
-    from workflow_state_multi import load_state
+    from workflow_state_multi import load_state, session_active_name
 
 
 # Keywords that trigger override token creation
@@ -103,7 +103,7 @@ def main():
         target_name = explicit_name
     else:
         # No explicit name — fall back to active workflow
-        target_name = state.get("active_workflow")
+        target_name = session_active_name(state)
         if not target_name or target_name not in state.get("workflows", {}):
             print("Override requested but no active workflow found.", file=sys.stderr)
             sys.exit(0)

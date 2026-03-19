@@ -26,12 +26,12 @@ except ImportError:
 
 try:
     from workflow_state_multi import (
-        load_state, set_phase, _state_lock, _save_state_unlocked
+        load_state, set_phase, _state_lock, _save_state_unlocked, session_active_name
     )
 except ImportError:
     sys.path.insert(0, str(Path(__file__).parent))
     from workflow_state_multi import (
-        load_state, set_phase, _state_lock, _save_state_unlocked
+        load_state, set_phase, _state_lock, _save_state_unlocked, session_active_name
     )
 
 
@@ -64,7 +64,7 @@ def main():
 
     # Find active workflow in v2 multi-workflow format
     state = load_state()
-    active_name = state.get("active_workflow")
+    active_name = session_active_name(state)
     if not active_name or active_name not in state.get("workflows", {}):
         sys.exit(0)
 

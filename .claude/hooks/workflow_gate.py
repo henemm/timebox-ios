@@ -33,6 +33,7 @@ try:
         load_config, get_state_file_path, get_project_root,
         get_protected_paths, get_always_allowed
     )
+    from workflow_state_multi import session_active_name as _session_active_name
 except ImportError:
     # Fallback for direct execution
     sys.path.insert(0, str(Path(__file__).parent))
@@ -40,6 +41,11 @@ except ImportError:
         load_config, get_state_file_path, get_project_root,
         get_protected_paths, get_always_allowed
     )
+    try:
+        from workflow_state_multi import session_active_name as _session_active_name
+    except ImportError:
+        def _session_active_name(state):
+            return state.get("active_workflow")
 
 
 def load_state() -> dict:
@@ -61,9 +67,9 @@ def load_state() -> dict:
 
 
 def get_active_workflow(state: dict) -> dict | None:
-    """Get the active workflow from v2 state structure."""
-    if "workflows" in state and "active_workflow" in state:
-        active_name = state.get("active_workflow")
+    """Get the active workflow from v2 state structure (session-aware)."""
+    if "workflows" in state:
+        active_name = _session_active_name(state)
         if active_name and active_name in state["workflows"]:
             return state["workflows"][active_name]
     return None
@@ -112,7 +118,7 @@ def resolve_workflow(state: dict, file_path: str) -> tuple[dict | None, str | No
     # Fallback: active workflow ONLY if it has no affected_files defined
     # (i.e., initial state before files are scoped). If affected_files
     # exist but don't match, this file is out of scope - BLOCK.
-    active_name = state.get("active_workflow")
+    active_name = _session_active_name(state)
     if active_name and active_name in state.get("workflows", {}):
         active_wf = state["workflows"][active_name]
         if not active_wf.get("affected_files"):
@@ -383,7 +389,7 @@ def main():
 
     # File doesn't belong to any workflow but workflows exist -> BLOCK
     if not workflow:
-        active_name = state.get("active_workflow", "unknown")
+        active_name = _session_active_name(state) or "unknown"
         print(f"""
 ╔══════════════════════════════════════════════════════════════════╗
 ║  BLOCKED: File Not In Any Workflow!                               ║

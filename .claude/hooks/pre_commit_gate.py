@@ -34,10 +34,12 @@ from pathlib import Path
 # Try to import config loader
 try:
     from config_loader import load_config, get_project_root
+    from workflow_state_multi import session_active_name
 except ImportError:
     sys.path.insert(0, str(Path(__file__).parent))
     try:
         from config_loader import load_config, get_project_root
+        from workflow_state_multi import session_active_name
     except ImportError:
         def load_config():
             return {}
@@ -47,6 +49,8 @@ except ImportError:
                 if (parent / ".git").exists():
                     return parent
             return cwd
+        def session_active_name(state):
+            return state.get("active_workflow")
 
 
 def get_pre_commit_config() -> dict:
@@ -236,7 +240,7 @@ def check_adversary_verdict() -> tuple[bool, str]:
             return True, "No workflow state — skipping adversary check"
 
         workflows = state.get("workflows", {})
-        active_name = state.get("active_workflow")
+        active_name = session_active_name(state)
         if not active_name or active_name not in workflows:
             return True, "No active workflow — skipping adversary check"
 

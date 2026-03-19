@@ -27,6 +27,16 @@ import time
 from datetime import datetime
 from pathlib import Path
 
+try:
+    from workflow_state_multi import session_active_name as _session_active_name
+except ImportError:
+    sys.path.insert(0, str(Path(__file__).parent))
+    try:
+        from workflow_state_multi import session_active_name as _session_active_name
+    except ImportError:
+        def _session_active_name(state):
+            return state.get("active_workflow")
+
 
 def get_state_file() -> Path:
     """Find workflow state file."""
@@ -187,7 +197,7 @@ def validate_screenshot(filepath: str) -> tuple[bool, str]:
 def set_verdict(verdict: str, details: dict):
     """Set adversary_verdict on active workflow."""
     state = load_state()
-    active = state.get("active_workflow")
+    active = _session_active_name(state)
     if not active or active not in state.get("workflows", {}):
         print("ERROR: No active workflow")
         sys.exit(1)
@@ -206,7 +216,7 @@ def main():
 
     if sys.argv[1] == "--check":
         state = load_state()
-        active = state.get("active_workflow")
+        active = _session_active_name(state)
         if not active or active not in state.get("workflows", {}):
             print("No active workflow")
             sys.exit(1)
@@ -240,7 +250,7 @@ def main():
     is_valid, reason, details = validate_test_output(test_output_file)
 
     state = load_state()
-    active = state.get("active_workflow", "unknown")
+    active = _session_active_name(state) or "unknown"
 
     if not is_valid:
         verdict = f"FAILED:{reason}"
