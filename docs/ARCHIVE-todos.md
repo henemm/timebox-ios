@@ -371,6 +371,31 @@
 
 ---
 
+## Verschoben am 2026-03-19: Session-Ergebnisse
+
+### FEATURE_026: Priority View Score-Sortierung & Coach-Boost — ERLEDIGT
+- **Fix:** Alle Sections (Ueberfaellig, Coach) nach Priority Score sortiert. Ueberfaellige Daten rot hervorgehoben. Monster-Modus boostet Score (+15) statt eigener Section. Commit f7ba5f7.
+
+### FEATURE_023 (v2): macOS Suche vereinheitlichen — ERLEDIGT
+- **v1.1:** Quick-Add Bar entfernt, (+) Button + MacTaskCreateSheet.
+- **v2 (2026-03-19):** `.searchable()` Toolbar-Suche durch Inline-TextField ersetzt (backlogSearchField). Alle UI Tests gruen.
+- **Specs:** `docs/specs/macos/feature-023-unified-search.md`, `docs/specs/macos/feature-023-v2-inline-search.md`. Commit 253574d.
+
+### FEATURE_004: Coach-Backlog-Suche (macOS) — ERLEDIGT
+- Implementiert durch FEATURE_023_v2 (Inline-Suchfeld ueber Task-Liste). Coach-Backlog filtert in Echtzeit. 4 TDD-Tests GREEN. Abgeschlossen 2026-03-19.
+
+### BUG_109: Backlog Relevanz-Sortierung invertiert — ERLEDIGT
+- **Root Cause:** Next Up Section hatte keine Score-Sortierung (Tasks in DB-Einfuegereihenfolge statt nach priorityScore absteigend).
+- **Fix:** `.sorted { $0.priorityScore > $1.priorityScore }` in `nextUpTasks`. UI Test: `NextUpSortOrderUITests`. macOS nicht betroffen. Commit 7f4ba90.
+
+### BUG_110: macOS Coach-Backlog Doppelte Controls — ERLEDIGT
+- **Fix:** Coach-Toolbar (ViewMode-Switcher + Sync/Import) entfernt; Sidebar und App-Toolbar decken alles ab. Commit 51ca698.
+
+### TD_003: Workflow-Bypass-Haertung — ERLEDIGT
+- 4 Bypass-Vektoren geschlossen: (1) `state_integrity_guard.py` blockiert Bash-Schreibzugriffe auf State/Hooks/Settings, (2) `set-field` Blocklist auf 16 Felder erweitert, (3) `--force` Flag entfernt, (4) `.claude/hooks/` aus Whitelists entfernt. Commit 5f74211.
+
+---
+
 ## Verschoben am 2026-03-18: Backlog-Aufraeumen nach View-Merge (BUG_109)
 
 ### BUG_109: Coach-Backlog macOS: Sidebar-Filter fehlen im Monster-Modus — ERLEDIGT

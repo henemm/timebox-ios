@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """
-OpenSpec Framework - Workflow State Updater Hook
+OpenSpec Framework - Workflow State Updater Hook (v2.0 Multi-Workflow)
 
 Listens for user approval phrases in UserPromptSubmit events.
-When detected, updates workflow_state.json to mark spec as approved.
+When detected, updates the ACTIVE workflow to mark spec as approved.
 
-This enables the transition: spec_written -> spec_approved
+Uses workflow_state_multi.py API for proper file-locking and v2 format.
 
 Exit Codes:
 - 0: Always (this hook never blocks, only updates state)
@@ -13,51 +13,26 @@ Exit Codes:
 
 import json
 import os
-import sys
 import re
-from pathlib import Path
+import sys
 from datetime import datetime
+from pathlib import Path
 
 try:
-    from config_loader import (
-        load_config, get_state_file_path, get_approval_phrases
+    from config_loader import get_approval_phrases
+except ImportError:
+    sys.path.insert(0, str(Path(__file__).parent))
+    from config_loader import get_approval_phrases
+
+try:
+    from workflow_state_multi import (
+        load_state, set_phase, _state_lock, _save_state_unlocked
     )
 except ImportError:
     sys.path.insert(0, str(Path(__file__).parent))
-    from config_loader import (
-        load_config, get_state_file_path, get_approval_phrases
+    from workflow_state_multi import (
+        load_state, set_phase, _state_lock, _save_state_unlocked
     )
-
-
-def load_state() -> dict:
-    """Load current workflow state."""
-    state_file = get_state_file_path()
-
-    if not state_file.exists():
-        return {
-            "current_phase": "idle",
-            "feature_name": None,
-            "spec_file": None,
-            "spec_approved": False,
-            "tasks_created": False,
-            "implementation_done": False,
-            "validation_done": False,
-            "phases_completed": [],
-            "last_updated": datetime.now().isoformat(),
-        }
-
-    with open(state_file, 'r') as f:
-        return json.load(f)
-
-
-def save_state(state: dict):
-    """Save workflow state."""
-    state_file = get_state_file_path()
-    state_file.parent.mkdir(parents=True, exist_ok=True)
-    state["last_updated"] = datetime.now().isoformat()
-
-    with open(state_file, 'w') as f:
-        json.dump(state, f, indent=2)
 
 
 def is_approval_message(message: str) -> bool:
@@ -66,7 +41,6 @@ def is_approval_message(message: str) -> bool:
     approval_phrases = get_approval_phrases()
 
     for phrase in approval_phrases:
-        # Check if phrase is in message (word boundary aware)
         pattern = r'\b' + re.escape(phrase.lower()) + r'\b'
         if re.search(pattern, message_lower):
             return True
@@ -85,30 +59,37 @@ def main():
     if not user_message:
         sys.exit(0)
 
-    # Check if this is an approval message
     if not is_approval_message(user_message):
         sys.exit(0)
 
-    # Load current state
+    # Find active workflow in v2 multi-workflow format
     state = load_state()
-
-    # Only process if we're in spec_written phase
-    if state.get("current_phase") != "spec_written":
+    active_name = state.get("active_workflow")
+    if not active_name or active_name not in state.get("workflows", {}):
         sys.exit(0)
 
-    # Update state to approved
-    state["spec_approved"] = True
-    state["current_phase"] = "spec_approved"
+    workflow = state["workflows"][active_name]
 
-    if "phases_completed" not in state:
-        state["phases_completed"] = []
-    if "spec_approved" not in state["phases_completed"]:
-        state["phases_completed"].append("spec_approved")
+    # Only process if workflow is in phase3_spec (spec written, awaiting approval)
+    if workflow.get("current_phase") != "phase3_spec":
+        sys.exit(0)
 
-    save_state(state)
+    # Set spec_approved flag with proper file-locking
+    with _state_lock():
+        state = load_state()
+        if active_name not in state["workflows"]:
+            sys.exit(0)
+        state["workflows"][active_name]["spec_approved"] = True
+        state["workflows"][active_name]["last_updated"] = datetime.now().isoformat()
+        _save_state_unlocked(state)
 
-    # Output confirmation (shown as hook output)
-    print(f"Spec approved! You may now run /05-implement")
+    # Advance phase to phase4_approved
+    success, message = set_phase(active_name, "phase4_approved", force=True)
+
+    if success:
+        print(f"Spec approved for '{active_name}'! You may now run /04-tdd-red")
+    else:
+        print(f"Spec approved but phase change failed: {message}", file=sys.stderr)
 
     sys.exit(0)
 
