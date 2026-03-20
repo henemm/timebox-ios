@@ -436,6 +436,36 @@ final class LocalTaskTests: XCTestCase {
         XCTAssertTrue(true, "Priority section uses HStack layout matching duration buttons")
     }
 
+    // MARK: - BUG_114: tags must be optional to handle NULL in SQLite
+
+    /// TDD RED: tags should be [String]? so NULL in SQLite deserializes to nil (not crash).
+    /// EXPECTED: FAIL (compilation) — tags is currently [String], not [String]?
+    func test_localTask_tagsIsOptional_handlesNil() throws {
+        let context = container.mainContext
+        let task = LocalTask(title: "Test", importance: 1)
+        context.insert(task)
+
+        // After fix: tags should be [String]? — nil-assignable
+        task.tags = nil
+        try context.save()
+
+        // Fetch back and verify nil is preserved
+        let fetched = try context.fetch(FetchDescriptor<LocalTask>()).first!
+        XCTAssertNil(fetched.tags, "tags should be nil after nil assignment")
+    }
+
+    /// TDD RED: PlanItem.init should handle nil tags by defaulting to [].
+    /// EXPECTED: FAIL (compilation) — tags is not optional, can't be nil
+    func test_planItem_initWithNilTags_defaultsToEmptyArray() throws {
+        let context = container.mainContext
+        let task = LocalTask(title: "Test", importance: 1)
+        task.tags = nil  // Simulates NULL from SQLite
+        context.insert(task)
+
+        let planItem = PlanItem(localTask: task)
+        XCTAssertEqual(planItem.tags, [], "PlanItem should use empty array for nil tags")
+    }
+
     /// Test: Task creation with priority button should save correctly
     /// GIVEN: User selects priority via quick-select button
     /// WHEN: Task is saved

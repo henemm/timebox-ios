@@ -20,7 +20,7 @@ struct MacBacklogRow: View {
     var isPendingResort: Bool = false  // Deferred sort: shows border when item changed but not yet re-sorted
     var isCompletionPending: Bool = false  // Deferred completion: shows filled checkbox before task disappears
     var isBlocked: Bool = false  // Task is blocked by another task (dimmed + indented + checkbox disabled)
-    var disciplineColor: Color?  // Optional discipline color for Coach mode checkbox
+    var disciplineColor: Color?
     var dependentCount: Int = 0  // DEP-3: Number of tasks depending on this one (for score boost)
     var effectiveScore: Int?  // BACKLOG-011: Frozen score from DeferredSortController (nil = compute live)
     var effectiveTier: TaskPriorityScoringService.PriorityTier?  // BACKLOG-011: Frozen tier
@@ -129,8 +129,8 @@ struct MacBacklogRow: View {
             }
 
             // 5. Tags (Bug 78: guard against detached SwiftData objects)
-            if task.modelContext != nil, !task.tags.isEmpty {
-                TagsBadge(tags: task.tags, taskId: task.id)
+            if task.modelContext != nil, !(task.tags ?? []).isEmpty {
+                TagsBadge(tags: task.tags ?? [], taskId: task.id)
             }
 
             // 6. Duration Badge (macOS Menu Picker)

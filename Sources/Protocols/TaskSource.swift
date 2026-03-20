@@ -9,7 +9,7 @@ protocol TaskSourceData {
     var title: String { get }
     var isCompleted: Bool { get }
     var importance: Int? { get }
-    var tags: [String] { get }
+    var tags: [String]? { get }
     var dueDate: Date? { get }
 
     // MARK: - Phase 1: Enhanced Task Fields

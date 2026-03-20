@@ -48,7 +48,7 @@ struct TaskDetailSheet: View {
                 }
 
                 // Tags
-                if !task.tags.isEmpty {
+                if !(task.tags ?? []).isEmpty {
                     Section("Tags") {
                         tagsSection
                     }
@@ -150,7 +150,7 @@ struct TaskDetailSheet: View {
 
     private var tagsSection: some View {
         FlowLayout(spacing: 8) {
-            ForEach(task.tags, id: \.self) { tag in
+            ForEach(task.tags ?? [], id: \.self) { tag in
                 Text(tag)
                     .font(.caption)
                     .padding(.horizontal, 10)

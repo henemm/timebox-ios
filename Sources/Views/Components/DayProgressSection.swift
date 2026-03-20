@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Shared day progress component for Coach Review views (iOS + macOS).
+/// Shared day progress component for Review views (iOS + macOS).
 /// Shows "X Tasks erledigt" with a checkmark icon.
 struct DayProgressSection: View {
     let completedCount: Int
@@ -18,6 +18,6 @@ struct DayProgressSection: View {
             RoundedRectangle(cornerRadius: 12)
                 .fill(.ultraThinMaterial)
         )
-        .accessibilityIdentifier("coachDayProgress")
+        .accessibilityIdentifier("dayProgress")
     }
 }

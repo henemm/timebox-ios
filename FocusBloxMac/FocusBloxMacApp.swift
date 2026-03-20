@@ -508,7 +508,7 @@ enum MacModelContainer {
                 if task.recurrencePattern != nil { task.recurrencePattern = task.recurrencePattern; touchedFields += 1 }
                 if task.recurrenceWeekdays != nil { task.recurrenceWeekdays = task.recurrenceWeekdays; touchedFields += 1 }
                 if task.recurrenceMonthDay != nil { task.recurrenceMonthDay = task.recurrenceMonthDay; touchedFields += 1 }
-                if !task.tags.isEmpty { task.tags = task.tags; touchedFields += 1 }
+                if !(task.tags ?? []).isEmpty { task.tags = task.tags; touchedFields += 1 }
                 if !task.taskType.isEmpty { task.taskType = task.taskType; touchedFields += 1 }
             }
 
@@ -633,13 +633,5 @@ extension FocusBloxMacApp {
         }
         try? context.save()
 
-        // Pre-set daily coach if requested (for evening reflection UI tests)
-        if ProcessInfo.processInfo.arguments.contains("-MockIntentionSet") {
-            var selection = DailyCoachSelection(
-                date: DailyCoachSelection.todayDateString(),
-                coach: .troll
-            )
-            selection.save()
-        }
     }
 }

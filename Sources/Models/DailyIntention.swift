@@ -42,16 +42,6 @@ enum IntentionOption: String, Codable, CaseIterable {
         }
     }
 
-    var monsterDiscipline: Discipline {
-        switch self {
-        case .survival: .ausdauer
-        case .fokus: .fokus
-        case .bhag: .mut
-        case .balance: .ausdauer
-        case .growth: .fokus
-        case .connection: .konsequenz
-        }
-    }
 }
 
 // MARK: - Intention Filter Logic

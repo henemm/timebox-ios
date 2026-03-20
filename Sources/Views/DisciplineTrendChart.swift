@@ -69,11 +69,9 @@ struct DisciplineTrendChart: View {
 
             if let strongest = strongestDiscipline {
                 HStack(spacing: 6) {
-                    Image(strongest.imageName)
-                        .resizable()
-                        .scaledToFit()
+                    Image(systemName: strongest.icon)
+                        .foregroundStyle(strongest.color)
                         .frame(width: 20, height: 20)
-                        .clipShape(Circle())
                     Text("Staerkste Disziplin: \(strongest.displayName)")
                         .font(.caption.weight(.medium))
                 }

@@ -29,7 +29,7 @@ actor SpotlightIndexingService {
         attributes.contentDescription = task.taskDescription
 
         // Build keywords from tags + taskType
-        var keywords: [String] = task.tags.filter { !$0.isEmpty }
+        var keywords: [String] = (task.tags ?? []).filter { !$0.isEmpty }
         if !task.taskType.isEmpty {
             keywords.append(task.taskType)
         }

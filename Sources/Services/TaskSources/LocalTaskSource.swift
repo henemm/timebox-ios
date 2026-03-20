@@ -209,7 +209,7 @@ final class LocalTaskSource: @preconcurrency TaskSource, @preconcurrency TaskSou
 
         var tagCounts: [String: Int] = [:]
         for task in allTasks {
-            for tag in task.tags {
+            for tag in task.tags ?? [] {
                 tagCounts[tag, default: 0] += 1
             }
         }

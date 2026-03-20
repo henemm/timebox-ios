@@ -140,7 +140,10 @@ struct TaskInspector: View {
                         .font(.headline)
                         .foregroundStyle(.secondary)
 
-                    TagInputView(tags: $task.tags)
+                    TagInputView(tags: Binding(
+                        get: { task.tags ?? [] },
+                        set: { task.tags = $0 }
+                    ))
                 }
                 .padding()
                 .background(RoundedRectangle(cornerRadius: 10).fill(.quaternary))

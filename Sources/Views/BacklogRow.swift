@@ -15,8 +15,8 @@ struct BacklogRow: View {
     var isPendingResort: Bool = false  // Deferred sort: shows border when item changed but not yet re-sorted
     var isCompletionPending: Bool = false  // Deferred completion: shows filled checkbox before task disappears
     var isBlocked: Bool = false  // Task is blocked by another task (dimmed + indented + checkbox disabled)
-    var disciplineColor: Color?  // Optional discipline color for Coach mode checkbox
-    var effectiveScore: Int?  // Coach-boosted score (nil = use item.priorityScore)
+    var disciplineColor: Color?
+    var effectiveScore: Int?
 
     // State for inline title editing (double-tap)
     @State private var isEditingTitle = false

@@ -1,7 +1,7 @@
 import Foundation
 
 /// Aggregates discipline statistics from completed tasks.
-/// Used by CoachMeinTagView to show "Dein Disziplin-Profil" breakdown.
+/// Aggregates discipline statistics from completed tasks for review.
 enum DisciplineStatsService {
 
     /// Compute discipline breakdown for a list of tasks.

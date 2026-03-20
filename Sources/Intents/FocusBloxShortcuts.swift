@@ -46,26 +46,6 @@ struct FocusBloxShortcuts: AppShortcutsProvider {
             systemImageName: "number"
         )
 
-        AppShortcut(
-            intent: GetEveningSummaryIntent(),
-            phrases: [
-                "Wie war mein Tag in \(.applicationName)",
-                "Tagesrueckblick in \(.applicationName)",
-                "Abend-Auswertung in \(.applicationName)"
-            ],
-            shortTitle: "Tagesrueckblick",
-            systemImageName: "moon.stars"
-        )
-
-        AppShortcut(
-            intent: SetDailyIntentionIntent(),
-            phrases: [
-                "Waehle \(\.$coach) als Coach in \(.applicationName)",
-                "Coach \(\.$coach) in \(.applicationName)"
-            ],
-            shortTitle: "Coach waehlen",
-            systemImageName: "sunrise"
-        )
     }
 
     static let shortcutTileColor: ShortcutTileColor = .blue

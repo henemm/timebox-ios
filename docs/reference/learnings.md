@@ -104,5 +104,35 @@ Canvas { context, size in
 
 ---
 
+## SwiftData Reference-Type Crash (nil vor Delete)
+
+**Problem (BUG_112):** macOS crasht beim Löschen einer Wiederholungsserie mit:
+`Fatal error: This backing data was detached from a context without resolving attribute faults: \LocalTask.tags`
+
+**Root Cause:**
+`LocalTask` ist ein SwiftData-Modell und damit ein **Reference Type** (Klasse). Nach dem Aufruf einer Delete-Funktion, die das Objekt selbst löscht, ist das Objekt sofort detached. Jeder nachfolgende Zugriff auf Properties des Objekts (z.B. `.tags` im SwiftUI-Re-render) führt zu einem Fatal Error.
+
+**Falscher Ansatz:**
+```swift
+deleteRecurringSeries(task)   // task ist ab hier detached
+taskToDeleteRecurring = nil   // zu spät — SwiftUI hat bereits re-rendered
+```
+
+**Korrekter Ansatz:**
+```swift
+taskToDeleteRecurring = nil           // 1. State auf nil setzen (UI entkoppeln)
+selectedTasks.removeAll()             // 2. Selektionen leeren
+SyncEngine.deleteRecurringSeries(     // 3. Erst jetzt löschen — kein LocalTask-Objekt mehr
+    groupID: task.recurrenceGroupID
+)
+```
+
+**Generelle Regel:** Bei SwiftData-Objekten, die nach ihrer Deletion noch von SwiftUI referenziert werden könnten:
+1. Immer State-Variablen (Optional, Selection) auf nil/leer setzen **vor** dem Delete
+2. Delete-Funktionen sollten möglichst mit primitiven IDs (String, UUID) arbeiten, nicht mit dem Objekt selbst
+3. `@State var item: LocalTask?` — nach Delete sofort auf `nil` setzen bevor `modelContext.delete(item)` aufgerufen wird
+
+---
+
 Erstellt: 2026-01-23
-Aktualisiert: 2026-02-02 (macOS App Icons, SwiftUI Path in ViewBuilder)
+Aktualisiert: 2026-03-19 (SwiftData Reference-Type Crash, BUG_112)

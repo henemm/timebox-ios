@@ -65,9 +65,6 @@ struct ContentView: View {
     @AppStorage("remindersSyncEnabled") private var remindersSyncEnabled: Bool = true
     @AppStorage("remindersMarkCompleteOnImport") private var remindersMarkCompleteOnImport: Bool = true
 
-    // Coach mode
-    @AppStorage("coachModeEnabled") private var coachModeEnabled: Bool = false
-
     // CloudKit sync monitor
     @Environment(CloudKitSyncMonitor.self) private var cloudKitMonitor
     @Environment(DeferredSortController.self) private var deferredSort
@@ -108,7 +105,7 @@ struct ContentView: View {
         guard !searchText.isEmpty else { return true }
         let query = searchText
         if task.title.localizedCaseInsensitiveContains(query) { return true }
-        if task.tags.contains(where: { $0.localizedCaseInsensitiveContains(query) }) { return true }
+        if (task.tags ?? []).contains(where: { $0.localizedCaseInsensitiveContains(query) }) { return true }
         if let cat = TaskCategory(rawValue: task.taskType),
            cat.localizedName.localizedCaseInsensitiveContains(query) { return true }
         return false
@@ -240,8 +237,8 @@ struct ContentView: View {
                 Picker("Bereich", selection: $selectedSection) {
                     ForEach(MainSection.allCases, id: \.self) { section in
                         Label(
-                            section == .review && coachModeEnabled ? "Mein Tag" : section.rawValue,
-                            systemImage: section == .review && coachModeEnabled ? "sun.and.horizon" : section.icon
+                            section.rawValue,
+                            systemImage: section.icon
                         )
                         .tag(section)
                     }
@@ -266,11 +263,7 @@ struct ContentView: View {
         case .focus:
             MacFocusView()
         case .review:
-            if coachModeEnabled {
-                CoachMeinTagView()
-            } else {
-                MacReviewView()
-            }
+            MacReviewView()
         }
     }
 
@@ -337,8 +330,7 @@ struct ContentView: View {
             dependentTaskCount: dependentCount(for: task.id)
         )
         let base = deferredSort.effectiveScore(id: task.id, liveScore: liveScore)
-        let boost = coachBoostedIDs.contains(task.id) ? TaskPriorityScoringService.coachBoostValue : 0
-        return min(100, base + boost)
+        return base
     }
 
     // Overdue tasks (non-NextUp, non-blocked, dueDate before today, sorted by priority score)
@@ -359,20 +351,6 @@ struct ContentView: View {
         case .someday: return .gray
         }
     }
-
-    // MARK: - Coach-Boosted IDs (score boost instead of separate section)
-
-    private var planItems: [PlanItem] {
-        visibleTasks.map { PlanItem(localTask: $0) }
-    }
-
-    /// IDs of tasks that get a +15 score boost from Coach/Monster mode.
-    private var coachBoostedIDs: Set<String> {
-        guard coachModeEnabled else { return [] }
-        return Set(CoachBacklogViewModel.coachBoostedTasks(from: planItems, selectedCoach: selectedCoach).map(\.id))
-    }
-
-    @AppStorage("selectedCoach") private var selectedCoach: String = ""
 
     private var backlogView: some View {
         VStack(spacing: 0) {
@@ -396,12 +374,6 @@ struct ContentView: View {
             Divider()
             // Task List with Multi-Selection and Sections
             List(selection: $selectedTasks) {
-                // Monster header (coach mode only)
-                if coachModeEnabled {
-                    MonsterIntentionHeader(selectedCoach: selectedCoach, imageHeight: 80)
-                        .listRowSeparator(.hidden)
-                }
-
                 // MARK: Next Up Section (only in "All" filter)
                 if showNextUpSection {
                     Section {
@@ -447,7 +419,7 @@ struct ContentView: View {
                                 .clipShape(Capsule())
                         }
                     }
-                    .accessibilityIdentifier(coachModeEnabled ? "coachNextUpSection" : "nextUpSection")
+                    .accessibilityIdentifier("nextUpSection")
                 }
 
                 // MARK: Regular Tasks — Priority Tier Sections or Flat List
@@ -475,7 +447,7 @@ struct ContentView: View {
                         }
                     }
 
-                    // Priority tier sections (coach-boosted tasks stay in tier with +15 score boost)
+                    // Priority tier sections
                     ForEach(TaskPriorityScoringService.PriorityTier.allCases, id: \.self) { tier in
                         let tierTasks = regularFilteredTasks.filter { task in
                             let taskTier = TaskPriorityScoringService.PriorityTier.from(score: scoreFor(task))
@@ -542,7 +514,7 @@ struct ContentView: View {
                     inspectorOverrideTaskID = nil
                 }
             }
-            .accessibilityIdentifier(coachModeEnabled ? "coachTaskList" : "backlogTaskList")
+            .accessibilityIdentifier("backlogTaskList")
         }
         .navigationTitle(filterTitle)
         .sheet(isPresented: $showCreateTask) {

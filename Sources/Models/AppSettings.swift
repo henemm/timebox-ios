@@ -52,38 +52,4 @@ final class AppSettings: ObservableObject {
     /// Whether AI-powered task scoring is enabled
     @AppStorage("aiScoringEnabled") var aiScoringEnabled: Bool = true
 
-    // MARK: - Monster Coach
-
-    /// Whether Monster Coach mode is enabled
-    @AppStorage("coachModeEnabled") var coachModeEnabled: Bool = false
-
-    /// Whether morning intention reminder is enabled
-    @AppStorage("coachIntentionReminderEnabled") var coachIntentionReminderEnabled: Bool = true
-
-    /// Hour for morning intention reminder (0-23)
-    @AppStorage("coachIntentionReminderHour") var coachIntentionReminderHour: Int = 7
-
-    /// Minute for morning intention reminder (0-59)
-    @AppStorage("coachIntentionReminderMinute") var coachIntentionReminderMinute: Int = 0
-
-    /// Whether daily intention nudge notifications are enabled
-    @AppStorage("coachDailyNudgesEnabled") var coachDailyNudgesEnabled: Bool = true
-
-    /// Maximum number of daily nudge notifications (1, 2 or 3)
-    @AppStorage("coachDailyNudgesMaxCount") var coachDailyNudgesMaxCount: Int = 2
-
-    /// Hour for nudge window start (0-23)
-    @AppStorage("coachNudgeWindowStartHour") var coachNudgeWindowStartHour: Int = 10
-
-    /// Hour for nudge window end (0-23)
-    @AppStorage("coachNudgeWindowEndHour") var coachNudgeWindowEndHour: Int = 18
-
-    /// Whether evening reminder notification is enabled
-    @AppStorage("coachEveningReminderEnabled") var coachEveningReminderEnabled: Bool = true
-
-    /// Hour for evening reminder (0-23)
-    @AppStorage("coachEveningReminderHour") var coachEveningReminderHour: Int = 20
-
-    /// Minute for evening reminder (0-59)
-    @AppStorage("coachEveningReminderMinute") var coachEveningReminderMinute: Int = 0
 }

@@ -78,7 +78,7 @@ struct TaskFormSheet: View {
         _title = State(initialValue: task.title)
         _priority = State(initialValue: task.importance)  // Keep nil if task is TBD
         _duration = State(initialValue: task.estimatedDuration)  // Keep nil if task is TBD
-        _tags = State(initialValue: task.tags)
+        _tags = State(initialValue: task.tags ?? [])
         _urgency = State(initialValue: task.urgency)  // Keep nil if task is TBD
         _taskType = State(initialValue: task.taskType)
         _hasDueDate = State(initialValue: task.dueDate != nil)

@@ -22,11 +22,9 @@ struct DisciplineBar: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
-                Image(stat.discipline.imageName)
-                    .resizable()
-                    .scaledToFit()
+                Image(systemName: stat.discipline.icon)
+                    .foregroundStyle(stat.discipline.color)
                     .frame(width: 24, height: 24)
-                    .clipShape(Circle())
                 Text(stat.discipline.displayName)
                     .font(.subheadline)
                 Spacer()

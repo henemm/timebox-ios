@@ -17,7 +17,6 @@ struct FocusBloxApp: App {
     @State private var quickCaptureTitle = ""
     @State private var selectedTab: AppTab = .backlog
     @State private var permissionRequested = false
-    @AppStorage("intentionJustSet") private var intentionJustSet: Bool = false
     private let settings = AppSettings.shared
     @State private var syncMonitor = CloudKitSyncMonitor()
     @State private var deferredSort = DeferredSortController()
@@ -307,12 +306,6 @@ struct FocusBloxApp: App {
                     showQuickCapture = true
                 }
             }
-            .onChange(of: intentionJustSet) { _, newValue in
-                if newValue {
-                    selectedTab = .backlog
-                    intentionJustSet = false
-                }
-            }
             .onChange(of: scenePhase) { _, newPhase in
                 if newPhase == .active {
                     syncMonitor.triggerSync()
@@ -321,31 +314,6 @@ struct FocusBloxApp: App {
                     syncedSettings.pushToCloud()
                     rescheduleDueDateNotifications()
                     NotificationService.updateOverdueBadge(container: sharedModelContainer)
-                    // Coach intention reminder
-                    let coachSelection = DailyCoachSelection.load()
-                    let selectedCoach = coachSelection.coach
-                    if settings.coachModeEnabled && settings.coachIntentionReminderEnabled {
-                        NotificationService.scheduleIntentionReminder(
-                            hour: settings.coachIntentionReminderHour,
-                            minute: settings.coachIntentionReminderMinute,
-                            coach: selectedCoach)
-                    } else {
-                        NotificationService.cancelIntentionReminder()
-                    }
-                    // Coach evening reminder
-                    if settings.coachModeEnabled,
-                       settings.coachEveningReminderEnabled,
-                       coachSelection.coach != nil {
-                        NotificationService.scheduleEveningReminder(
-                            hour: settings.coachEveningReminderHour,
-                            minute: settings.coachEveningReminderMinute,
-                            coach: selectedCoach
-                        )
-                    } else {
-                        NotificationService.cancelEveningReminder()
-                    }
-                    // Cancel daily nudges if intention fulfilled
-                    checkAndCancelFulfilledNudges()
                 }
                 if newPhase == .background {
                     Task { await deferredCompletion.flushAll() }
@@ -400,27 +368,6 @@ struct FocusBloxApp: App {
             NotificationService.rescheduleAllDueDateNotifications(tasks: tasksWithDueDate)
         } catch {
             print("Failed to fetch tasks for due date notifications: \(error)")
-        }
-    }
-
-    /// Cancel daily nudges if the today's coach goal is already fulfilled.
-    private func checkAndCancelFulfilledNudges() {
-        guard settings.coachModeEnabled, settings.coachDailyNudgesEnabled else { return }
-        let coachSelection = DailyCoachSelection.load()
-        guard let coach = coachSelection.coach else { return }
-
-        let context = sharedModelContainer.mainContext
-        do {
-            let tasks = try context.fetch(FetchDescriptor<LocalTask>())
-            // FocusBlocks require calendar access — use empty array for lightweight check.
-            // Full block evaluation can be added when CalendarService is accessible here.
-            if IntentionEvaluationService.isFulfilled(
-                coach: coach, tasks: tasks, focusBlocks: []
-            ) {
-                NotificationService.cancelDailyNudges()
-            }
-        } catch {
-            print("Failed to check intention fulfillment: \(error)")
         }
     }
 
@@ -484,7 +431,7 @@ struct FocusBloxApp: App {
         if task.urgency != nil { score += 1 }
         if task.estimatedDuration != nil { score += 1 }
         if !task.taskType.isEmpty { score += 1 }
-        if !task.tags.isEmpty { score += 1 }
+        if !(task.tags ?? []).isEmpty { score += 1 }
         return score
     }
 
@@ -536,7 +483,7 @@ struct FocusBloxApp: App {
                 if task.recurrencePattern != nil { task.recurrencePattern = task.recurrencePattern; touchedFields += 1 }
                 if task.recurrenceWeekdays != nil { task.recurrenceWeekdays = task.recurrenceWeekdays; touchedFields += 1 }
                 if task.recurrenceMonthDay != nil { task.recurrenceMonthDay = task.recurrenceMonthDay; touchedFields += 1 }
-                if !task.tags.isEmpty { task.tags = task.tags; touchedFields += 1 }
+                if !(task.tags ?? []).isEmpty { task.tags = task.tags; touchedFields += 1 }
                 if !task.taskType.isEmpty { task.taskType = task.taskType; touchedFields += 1 }
             }
 
@@ -552,25 +499,6 @@ struct FocusBloxApp: App {
 
     /// Reset UserDefaults for UI test isolation
     private func resetUserDefaultsIfNeeded() {
-        // Coach mode via launch argument (UI testing)
-        if ProcessInfo.processInfo.arguments.contains("-UITesting") {
-            if ProcessInfo.processInfo.arguments.contains("-CoachModeEnabled") {
-                UserDefaults.standard.set(true, forKey: "coachModeEnabled")
-            } else {
-                UserDefaults.standard.set(false, forKey: "coachModeEnabled")
-            }
-            // Clear daily coach selection and filter state to avoid test state leakage
-            UserDefaults.standard.removeObject(forKey: "selectedCoach")
-            UserDefaults.standard.removeObject(forKey: "selectedCoachDate")
-            UserDefaults.standard.removeObject(forKey: "intentionJustSet")
-
-            // Bug 102: Re-apply MockSyncedCoach AFTER clearing (simulates pullFromCloud path)
-            if ProcessInfo.processInfo.arguments.contains("-MockSyncedCoach") {
-                UserDefaults.standard.set("troll", forKey: "selectedCoach")
-                UserDefaults.standard.set(DailyCoachSelection.todayDateString(), forKey: "selectedCoachDate")
-            }
-        }
-
         guard ProcessInfo.processInfo.arguments.contains("-ResetUserDefaults") else { return }
         UserDefaults.standard.set(false, forKey: "remindersSyncEnabled")
         UserDefaults.standard.removeObject(forKey: "visibleReminderListIDs")
@@ -821,22 +749,6 @@ struct FocusBloxApp: App {
 
         try? context.save()
 
-        // Pre-set daily coach if requested (for evening reflection UI tests)
-        if ProcessInfo.processInfo.arguments.contains("-MockIntentionSet") {
-            var selection = DailyCoachSelection(
-                date: DailyCoachSelection.todayDateString(),
-                coach: .troll
-            )
-            selection.save()
-        }
-
-        // Bug 102: Simulate synced coach from another device (for CoachSyncUITests)
-        // Writes selectedCoach + selectedCoachDate to UserDefaults.standard
-        // simulating pullFromCloud() path without actual iCloud
-        if ProcessInfo.processInfo.arguments.contains("-MockSyncedCoach") {
-            UserDefaults.standard.set("troll", forKey: "selectedCoach")
-            UserDefaults.standard.set(DailyCoachSelection.todayDateString(), forKey: "selectedCoachDate")
-        }
     }
 }
 

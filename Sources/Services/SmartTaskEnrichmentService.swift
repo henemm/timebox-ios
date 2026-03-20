@@ -189,8 +189,8 @@ final class SmartTaskEnrichmentService {
         var parts: [String] = []
         parts.append("Task: \(task.title)")
 
-        if !task.tags.isEmpty {
-            parts.append("Tags: \(task.tags.joined(separator: ", "))")
+        if !(task.tags ?? []).isEmpty {
+            parts.append("Tags: \((task.tags ?? []).joined(separator: ", "))")
         }
         if let dueDate = task.dueDate {
             let formatter = RelativeDateTimeFormatter()

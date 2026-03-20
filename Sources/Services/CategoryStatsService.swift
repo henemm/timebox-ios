@@ -1,7 +1,7 @@
 import Foundation
 
 /// Aggregates task category statistics from completed tasks.
-/// Used by CoachMeinTagView to show category-based trend charts.
+/// Provides category-based trend data for review views.
 /// Tasks without a category (taskType == "") are counted as "uncategorized".
 enum CategoryStatsService {
 

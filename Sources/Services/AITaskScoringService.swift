@@ -154,8 +154,8 @@ final class AITaskScoringService {
         if !task.taskType.isEmpty {
             parts.append("Kategorie: \(task.taskType)")
         }
-        if !task.tags.isEmpty {
-            parts.append("Tags: \(task.tags.joined(separator: ", "))")
+        if !(task.tags ?? []).isEmpty {
+            parts.append("Tags: \((task.tags ?? []).joined(separator: ", "))")
         }
         if let dueDate = task.dueDate {
             let formatter = RelativeDateTimeFormatter()

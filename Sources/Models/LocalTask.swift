@@ -12,7 +12,7 @@ final class LocalTask {
     var uuid: UUID = UUID()
     var title: String = ""
     var isCompleted: Bool = false
-    var tags: [String] = []  // Multi-select tags (e.g., ["Hausarbeit", "Recherche"])
+    var tags: [String]?  // Multi-select tags — optional to handle NULL from SQLite/CloudKit safely
     var dueDate: Date?
     var createdAt: Date = Date()
     var sortOrder: Int = 0
@@ -157,7 +157,7 @@ final class LocalTask {
         title: String,
         importance: Int? = nil,
         isCompleted: Bool = false,
-        tags: [String] = [],
+        tags: [String]? = [],
         dueDate: Date? = nil,
         createdAt: Date = Date(),
         sortOrder: Int = 0,

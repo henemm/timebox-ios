@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Training disciplines for the Monster Coach system.
+/// Training disciplines for task classification.
 /// Describes which type of resistance a task represents.
 enum Discipline: String, CaseIterable, Codable {
     case konsequenz
@@ -32,15 +32,6 @@ enum Discipline: String, CaseIterable, Codable {
         case .ausdauer: .gray
         case .mut: .red
         case .fokus: .blue
-        }
-    }
-
-    var imageName: String {
-        switch self {
-        case .konsequenz: "monsterKonsequenz"
-        case .ausdauer: "monsterAusdauer"
-        case .mut: "monsterMut"
-        case .fokus: "monsterFokus"
         }
     }
 

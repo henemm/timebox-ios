@@ -5,12 +5,6 @@ import Foundation
 /// Same data = same result, no async, no AI dependencies.
 struct TaskPriorityScoringService {
 
-    // MARK: - Coach Boost
-
-    /// Score boost for coach-recommended tasks (Monster mode).
-    /// +15 shifts a task roughly one tier up — noticeable but not dominant.
-    static let coachBoostValue = 15
-
     // MARK: - Priority Tiers
 
     enum PriorityTier: Int, CaseIterable {

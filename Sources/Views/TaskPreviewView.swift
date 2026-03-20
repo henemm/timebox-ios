@@ -50,9 +50,9 @@ struct TaskPreviewView: View {
             }
 
             // Tags
-            if !task.tags.isEmpty {
+            if !(task.tags ?? []).isEmpty {
                 HStack(spacing: 6) {
-                    ForEach(task.tags.prefix(2), id: \.self) { tag in
+                    ForEach((task.tags ?? []).prefix(2), id: \.self) { tag in
                         Text(tag)
                             .font(.caption)
                             .lineLimit(1)
@@ -64,8 +64,8 @@ struct TaskPreviewView: View {
                                     .fill(Color.secondary.opacity(0.15))
                             )
                     }
-                    if task.tags.count > 2 {
-                        Text("+\(task.tags.count - 2)")
+                    if (task.tags ?? []).count > 2 {
+                        Text("+\((task.tags ?? []).count - 2)")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                             .padding(.horizontal, 8)

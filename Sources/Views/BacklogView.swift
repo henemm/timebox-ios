@@ -47,8 +47,6 @@ struct BacklogView: View {
     @AppStorage("backlogViewMode") private var selectedMode: ViewMode = .priority
     @AppStorage("remindersSyncEnabled") private var remindersSyncEnabled: Bool = false
     @AppStorage("remindersMarkCompleteOnImport") private var remindersMarkCompleteOnImport: Bool = true
-    @AppStorage("selectedCoach") private var selectedCoach: String = ""
-    @AppStorage("coachModeEnabled") private var coachModeEnabled: Bool = false
     @State private var planItems: [PlanItem] = []
     @State private var allRecurringItems: [PlanItem] = []
     @State private var errorMessage: String?
@@ -75,23 +73,6 @@ struct BacklogView: View {
     @State private var undoResultMessage = ""
 
 
-    // MARK: - Coach Filter
-
-    /// Active coach parsed from AppStorage.
-    private var activeCoach: CoachType? {
-        CoachBacklogViewModel.parseCoach(selectedCoach)
-    }
-
-    /// Whether a coach filter is actively narrowing tasks.
-    private var hasActiveCoachFilter: Bool {
-        activeCoach != nil
-    }
-
-    /// Clears the active coach filter.
-    private func clearCoachFilter() {
-        selectedCoach = ""
-    }
-
     // MARK: - Search Filter
     private func matchesSearch(_ item: PlanItem) -> Bool {
         guard !searchText.isEmpty else { return true }
@@ -116,23 +97,12 @@ struct BacklogView: View {
 
     private var backlogTasks: [PlanItem] {
         // Top-level only: exclude blocked tasks (they appear under their blocker)
-        let tasks = allBacklogTasks.topLevelTasks
-        guard let coach = activeCoach else { return tasks }
-        let relevantIDs = Set(CoachType.filterTasks(tasks, coach: coach).map(\.id))
-        return tasks.filter { relevantIDs.contains($0.id) }
+        allBacklogTasks.topLevelTasks
     }
 
     /// Blocked tasks that depend on the given blocker task ID
     private func blockedTasks(for blockerID: String) -> [PlanItem] {
         allBacklogTasks.dependents(of: blockerID)
-    }
-
-    // MARK: - Coach-Boosted IDs (score boost instead of separate section)
-    /// IDs of tasks that get a +15 score boost from Coach/Monster mode.
-    private var coachBoostedIDs: Set<String> {
-        guard coachModeEnabled else { return [] }
-        let searchFiltered = planItems.filter { matchesSearch($0) }
-        return Set(CoachBacklogViewModel.coachBoostedTasks(from: searchFiltered, selectedCoach: selectedCoach).map(\.id))
     }
 
     // MARK: - Recurring Tasks (only templates = series overview)
@@ -194,9 +164,7 @@ struct BacklogView: View {
             }
             .navigationBarTitleDisplayMode(.inline)
             .safeAreaInset(edge: .top) {
-                if let coach = activeCoach {
-                    coachFilterChip(coach)
-                }
+                EmptyView()
             }
             .toolbar {
                 ToolbarItemGroup(placement: .topBarTrailing) {
@@ -637,8 +605,7 @@ struct BacklogView: View {
 
     private func effectivePriorityScore(for item: PlanItem) -> Int {
         let base = deferredSort.effectiveScore(id: item.id, liveScore: item.priorityScore)
-        let boost = coachBoostedIDs.contains(item.id) ? TaskPriorityScoringService.coachBoostValue : 0
-        return min(100, base + boost)
+        return base
     }
 
     private func effectivePriorityTier(for item: PlanItem) -> TaskPriorityScoringService.PriorityTier {
@@ -860,7 +827,7 @@ struct BacklogView: View {
                     .strokeBorder(Color.accentColor.opacity(0.3), lineWidth: 1)
             )
         }
-        .accessibilityIdentifier(coachModeEnabled ? "coachViewModeSwitcher" : "viewModeSwitcher")
+        .accessibilityIdentifier("viewModeSwitcher")
     }
 
     // MARK: - Next Up Section (inline in List)
@@ -928,7 +895,7 @@ struct BacklogView: View {
                         .clipShape(Capsule())
                 }
             }
-            .accessibilityIdentifier(coachModeEnabled ? "coachNextUpSection" : "nextUpSection")
+            .accessibilityIdentifier("nextUpSection")
         }
     }
 
@@ -975,26 +942,6 @@ struct BacklogView: View {
             .tint(.blue)
         }
         .contextMenu {
-            if coachModeEnabled {
-                Section("Disziplin") {
-                    ForEach(Discipline.allCases, id: \.self) { d in
-                        Button {
-                            updateDiscipline(for: item, discipline: d.rawValue)
-                        } label: {
-                            Label(d.displayName, systemImage: d.icon)
-                        }
-                        .tint(d.color)
-                    }
-                    if item.manualDiscipline != nil {
-                        Divider()
-                        Button {
-                            updateDiscipline(for: item, discipline: nil)
-                        } label: {
-                            Label("Zurücksetzen", systemImage: "arrow.counterclockwise")
-                        }
-                    }
-                }
-            }
             if item.dueDate != nil {
                 postponeMenu(for: item)
             }
@@ -1039,49 +986,9 @@ struct BacklogView: View {
         }
     }
 
-    // MARK: - Coach Filter Chip
-
-    private func coachFilterChip(_ coach: CoachType) -> some View {
-        HStack(spacing: 8) {
-            Button {
-                withAnimation(.spring()) {
-                    clearCoachFilter()
-                }
-            } label: {
-                HStack(spacing: 4) {
-                    Image(systemName: coach.icon)
-                        .font(.caption2)
-                    Text(coach.displayName)
-                        .font(.caption)
-                        .lineLimit(1)
-                    Image(systemName: "xmark.circle.fill")
-                        .font(.caption2)
-                        .foregroundStyle(coach.color.opacity(0.6))
-                }
-                .padding(.horizontal, 10)
-                .padding(.vertical, 6)
-                .background(Capsule().fill(coach.color.opacity(0.15)))
-                .overlay(Capsule().stroke(coach.color.opacity(0.3), lineWidth: 1))
-            }
-            .foregroundStyle(coach.color)
-            .accessibilityIdentifier("removeCoachFilter_\(coach.rawValue)")
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.horizontal)
-        .padding(.vertical, 6)
-        .background(.ultraThinMaterial)
-    }
-
     // MARK: - Priority View (with overdue section at top)
     private var priorityView: some View {
         List {
-            // Monster header (coach mode only)
-            if coachModeEnabled {
-                MonsterIntentionHeader(selectedCoach: selectedCoach, imageHeight: 100)
-                    .listRowBackground(Color.clear)
-                    .listRowSeparator(.hidden)
-            }
-
             nextUpListSection
 
             // Overdue tasks at top
@@ -1107,7 +1014,7 @@ struct BacklogView: View {
                 }
             }
 
-            // Priority tiers (coach-boosted tasks stay in their tier with +15 score boost)
+            // Priority tiers
             ForEach(TaskPriorityScoringService.PriorityTier.allCases, id: \.self) { tier in
                 let tierTasks = backlogTasks
                     .filter { task in effectivePriorityTier(for: task) == tier && !overdueTasks.contains(where: { $0.id == task.id }) }
@@ -1137,7 +1044,7 @@ struct BacklogView: View {
         }
         .listStyle(.plain)
         .scrollContentBackground(.hidden)
-        .accessibilityIdentifier(coachModeEnabled ? "coachTaskList" : "backlogTaskList")
+        .accessibilityIdentifier("backlogTaskList")
         .refreshable {
             await loadTasks()
         }

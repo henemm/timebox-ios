@@ -175,7 +175,7 @@ struct PlanItem: Identifiable, Sendable {
         self.createdAt = localTask.createdAt
 
         // Enhanced fields from LocalTask
-        self.tags = localTask.tags
+        self.tags = localTask.tags ?? []
         self.taskType = localTask.taskType
         self.dueDate = localTask.dueDate
         self.taskDescription = localTask.taskDescription

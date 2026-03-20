@@ -82,4 +82,5 @@ final class CloudKitSyncTests: XCTestCase {
         XCTAssertTrue(containerURL?.path.contains("group.com.henning.focusblox") ?? false,
                       "Container path should reference the correct App Group")
     }
+
 }
