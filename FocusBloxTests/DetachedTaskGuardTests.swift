@@ -106,7 +106,7 @@ final class DetachedTaskGuardTests: XCTestCase {
         // Safe tags access with guard
         let tagsAccessSafe: Bool
         if task.modelContext != nil {
-            tagsAccessSafe = !task.tags.isEmpty
+            tagsAccessSafe = !(task.tags ?? []).isEmpty
         } else {
             tagsAccessSafe = false  // Skip detached objects
         }
@@ -123,8 +123,8 @@ final class DetachedTaskGuardTests: XCTestCase {
         try context.save()
 
         // THEN: Tags are accessible normally
-        XCTAssertFalse(task.tags.isEmpty, "Valid task tags should be accessible")
-        XCTAssertEqual(task.tags.count, 2)
-        XCTAssertTrue(task.tags.contains("fitness"))
+        XCTAssertFalse((task.tags ?? []).isEmpty, "Valid task tags should be accessible")
+        XCTAssertEqual((task.tags ?? []).count, 2)
+        XCTAssertTrue((task.tags ?? []).contains("fitness"))
     }
 }

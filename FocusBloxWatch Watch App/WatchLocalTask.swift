@@ -10,7 +10,7 @@ final class LocalTask {
     var title: String = ""
     var importance: Int?
     var isCompleted: Bool = false
-    var tags: [String] = []
+    var tags: [String]?
     var dueDate: Date?
     var createdAt: Date = Date()
     var sortOrder: Int = 0

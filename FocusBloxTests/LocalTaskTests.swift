@@ -32,7 +32,7 @@ final class LocalTaskTests: XCTestCase {
         XCTAssertEqual(task.title, "Test Task")
         XCTAssertFalse(task.isCompleted)
         XCTAssertEqual(task.importance, 1)
-        XCTAssertTrue(task.tags.isEmpty)
+        XCTAssertTrue((task.tags ?? []).isEmpty)
         XCTAssertNil(task.dueDate)
         XCTAssertNotNil(task.createdAt)
         XCTAssertEqual(task.sortOrder, 0)

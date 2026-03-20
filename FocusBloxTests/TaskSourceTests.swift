@@ -8,7 +8,7 @@ struct MockTaskData: TaskSourceData {
     let title: String
     let isCompleted: Bool
     let importance: Int?
-    let tags: [String]
+    let tags: [String]?
     let dueDate: Date?
 
     // MARK: - Enhanced Task Fields
@@ -218,7 +218,7 @@ final class TaskSourceTests: XCTestCase {
             sourceSystem: "mock"
         )
 
-        XCTAssertTrue(task.tags.isEmpty)
+        XCTAssertTrue((task.tags ?? []).isEmpty)
         XCTAssertNil(task.dueDate)
         XCTAssertNil(task.importance)
         XCTAssertNil(task.urgency)
