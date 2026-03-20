@@ -55,45 +55,6 @@ final class DebugHierarchyTest: XCTestCase {
         printStructuredSummary()
     }
 
-    /// Settings with coach mode enabled - scrolled to Monster Coach section
-    func testPrintSettingsCoachMode() {
-        app.terminate()
-        app.launchArguments = ["-UITesting", "-coachModeEnabled", "1"]
-        app.launch()
-
-        let settingsButton = app.buttons["settingsButton"]
-        if settingsButton.waitForExistence(timeout: 5) {
-            settingsButton.tap()
-            sleep(2)
-        }
-
-        // Scroll down to Monster Coach section
-        for _ in 0..<8 {
-            app.swipeUp()
-            sleep(1)
-        }
-
-        // Scroll to coachDailyNudgesToggle using coordinate drags
-        let nudgesToggle = app.switches["coachDailyNudgesToggle"]
-        for _ in 0..<20 {
-            if nudgesToggle.exists && nudgesToggle.isHittable { break }
-            let start = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.7))
-            let end = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.3))
-            start.press(forDuration: 0.05, thenDragTo: end)
-        }
-
-        // Now collect ALL elements near the nudge toggle area
-        let allElements = app.descendants(matching: .any).allElementsBoundByIndex
-        var info: [String] = []
-        for elem in allElements {
-            let id = elem.identifier
-            if id.lowercased().contains("coach") || id.lowercased().contains("nudge") || id.lowercased().contains("max") || id.lowercased().contains("picker") || id.lowercased().contains("window") {
-                info.append("type=\(elem.elementType.rawValue) id=[\(id)] lbl='\(elem.label)'")
-            }
-        }
-        XCTFail("NEAR_NUDGES: \(info.joined(separator: " | "))")
-    }
-
     /// Gibt Hierarchie nach Oeffnen des Add-Task-Sheets aus.
     func testPrintAddTaskSheet() {
         let addButton = app.buttons["addTaskButton"]

@@ -1,0 +1,36 @@
+=== TDD RED: Dead Code Evidence (vor Cleanup) ===
+Datum: 2026-03-20
+
+FAILURE: Tote Dateien existieren noch im Projekt:
+
+1. Sources/Models/DailyIntention.swift
+   - 131 LoC, KEIN Import in gesamtem Projekt
+   - Grep-Ergebnis: 0 Referenzen ausserhalb der Datei selbst
+   - ASSERTION FAILED: Datei sollte nicht existieren
+
+2. FocusBloxUITests/DisciplineHistoryUITests.swift
+   - 80 LoC, testet CoachMeinTagView (geloescht)
+   - launchWithCoachMode() referenziert -coachModeEnabled (nicht mehr unterstuetzt)
+   - ERROR: Test wuerde fehlschlagen weil "Mein Tag" Tab nicht mehr existiert
+
+3. FocusBloxUITests/DisciplineTrendUITests.swift
+   - 73 LoC, testet Trend-Segment in CoachMeinTagView (geloescht)
+   - ERROR: Test wuerde fehlschlagen weil Trend-Segment nicht existiert
+
+4. FocusBloxUITests/CategoryTrendUITests.swift
+   - 71 LoC, testet Category-Trend in Coach-Mode (geloescht)
+   - ERROR: Test wuerde fehlschlagen weil Coach-Mode nicht existiert
+
+5. FocusBloxUITests/DebugHierarchyTest.swift
+   - testPrintSettingsCoachMode() Methode referenziert Coach-Features
+   - ASSERTION FAILED: coachDailyNudgesToggle existiert nicht mehr
+
+6. FocusBloxMacUITests/MacToolbarNavigationUITests.swift
+   - Coach-Fallback "sun.and.horizon" ist toter Code
+   - ASSERTION FAILED: Coach-Mode existiert nicht mehr
+
+7. Sources/Services/AITaskScoringService.swift Zeile 110
+   - "Produktivitaets-Coach" String — Coach-Terminologie nach Entfernung
+   - ERROR: Inkonsistente Terminologie
+
+=== END RED EVIDENCE ===

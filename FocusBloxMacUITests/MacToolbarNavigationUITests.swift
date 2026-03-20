@@ -76,22 +76,12 @@ final class MacToolbarNavigationUITests: XCTestCase {
         }
 
         // Check for all 4 radio buttons by SF Symbol identifier
-        // Note: Review icon is "chart.bar" normally, but "sun.and.horizon" in coach mode
         for symbol in sectionSymbols {
             let radioButton = radioGroup.radioButtons[symbol]
-            if symbol == "chart.bar" && !radioButton.exists {
-                // Coach mode changes Review icon to sun.and.horizon
-                let coachReview = radioGroup.radioButtons["sun.and.horizon"]
-                XCTAssertTrue(
-                    coachReview.exists,
-                    "Picker must have Review radio button ('chart.bar' or 'sun.and.horizon' in coach mode)"
-                )
-            } else {
-                XCTAssertTrue(
-                    radioButton.exists,
-                    "Picker must have radio button with SF Symbol '\(symbol)'"
-                )
-            }
+            XCTAssertTrue(
+                radioButton.exists,
+                "Picker must have radio button with SF Symbol '\(symbol)'"
+            )
         }
     }
 

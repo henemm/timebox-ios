@@ -107,7 +107,7 @@ final class AITaskScoringService {
 
         do {
             let session = LanguageModelSession {
-                "Du bist ein Produktivitaets-Coach. Bewerte Tasks fuer einen Knowledge Worker."
+                "Du bist ein Produktivitaets-Assistent. Bewerte Tasks fuer einen Knowledge Worker."
                 ""
                 "Score (0-100): Kombiniere Wichtigkeit, Dringlichkeit, Deadline-Naehe und strategischen Wert."
                 "- 80-100: Kritisch, sofort erledigen"
