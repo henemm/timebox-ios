@@ -9,7 +9,8 @@ final class UnifiedTabSymbolsTests: XCTestCase {
         ("backlog", "list.bullet"),
         ("planning", "calendar"),
         ("focus", "target"),
-        ("review", "chart.bar")
+        ("review", "chart.bar"),
+        ("refiner", "sparkles")
     ]
 
     /// Verify that all expected symbols are valid SF Symbol names
@@ -22,6 +23,6 @@ final class UnifiedTabSymbolsTests: XCTestCase {
 
     /// Verify we have exactly 4 navigation sections (Bug 101: Assign removed)
     func testFourNavigationSections() {
-        XCTAssertEqual(expectedSymbols.count, 4, "Should have exactly 4 navigation sections (Bug 101)")
+        XCTAssertEqual(expectedSymbols.count, 5, "Should have exactly 5 navigation sections (Bug 101 + RW 1.3 Refiner)")
     }
 }

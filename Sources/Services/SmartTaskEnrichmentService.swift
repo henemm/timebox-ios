@@ -90,7 +90,8 @@ final class SmartTaskEnrichmentService {
         do {
             let allTasks = try modelContext.fetch(descriptor)
             let tasks = allTasks.filter { task in
-                task.importance == nil || task.urgency == nil || task.taskType.isEmpty || task.aiEnergyLevel == nil
+                task.lifecycleStatus != TaskLifecycleStatus.raw.rawValue &&
+                (task.importance == nil || task.urgency == nil || task.taskType.isEmpty || task.aiEnergyLevel == nil)
             }
             var enrichedCount = 0
 

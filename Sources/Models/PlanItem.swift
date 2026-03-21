@@ -63,6 +63,13 @@ struct PlanItem: Identifiable, Sendable {
     /// Lifecycle status: raw/refined/active
     let lifecycleStatus: String
 
+    // AI Suggestions (Refiner — RW 1.2/1.3)
+    let suggestedCategory: String?
+    let suggestedDuration: Int?
+    let suggestedImportance: Int?
+    let suggestedUrgency: String?
+    let suggestedEnergyLevel: String?
+
     /// Number of tasks that depend on this task (populated externally)
     var dependentCount: Int = 0
 
@@ -151,6 +158,12 @@ struct PlanItem: Identifiable, Sendable {
         self.modifiedAt = nil
         self.blockerTaskID = nil
         self.lifecycleStatus = "active"  // Reminders are always active
+
+        self.suggestedCategory    = nil
+        self.suggestedDuration    = nil
+        self.suggestedImportance  = nil
+        self.suggestedUrgency     = nil
+        self.suggestedEnergyLevel = nil
     }
 
     init(localTask: LocalTask) {
@@ -201,6 +214,12 @@ struct PlanItem: Identifiable, Sendable {
         self.modifiedAt = localTask.modifiedAt
         self.blockerTaskID = localTask.blockerTaskID
         self.lifecycleStatus = localTask.lifecycleStatus
+
+        self.suggestedCategory    = localTask.suggestedCategory
+        self.suggestedDuration    = localTask.suggestedDuration
+        self.suggestedImportance  = localTask.suggestedImportance
+        self.suggestedUrgency     = localTask.suggestedUrgency
+        self.suggestedEnergyLevel = localTask.suggestedEnergyLevel
     }
 
     private static func resolveDuration(manual: Int?, title: String?) -> (Int, DurationSource) {

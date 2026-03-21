@@ -264,6 +264,8 @@ struct ContentView: View {
             MacFocusView()
         case .review:
             MacReviewView()
+        case .refiner:
+            RefinerView()
         }
     }
 

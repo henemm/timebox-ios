@@ -73,6 +73,39 @@ final class MonsterRemovalCleanupTests: XCTestCase {
         }
     }
 
+    // MARK: - TD_005: Regression Guards
+
+    /// AppTab must have exactly 5 tabs — no "Mein Tag" or coach tab.
+    /// Bricht wenn: jemand `case meinTag` o.ae. zu AppTab in MainTabView.swift hinzufuegt.
+    /// NOTE: The real guard here is the exhaustive switch below — it causes a COMPILER ERROR
+    /// if a new case is added to AppTab without updating this test.
+    func test_appTab_hasExactlyFourCases() {
+        // AppTab is not CaseIterable — the exhaustive switch is the actual regression guard.
+        // Adding a 5th case to AppTab will cause a compile error here.
+        let allTabs: [AppTab] = [.backlog, .blox, .focus, .review, .refiner]
+
+        for tab in allTabs {
+            switch tab {
+            case .backlog, .blox, .focus, .review, .refiner:
+                break // exhaustive — compiler enforces completeness
+            }
+        }
+    }
+
+    /// AppSettings must not contain any coach/monster-related properties.
+    /// Bricht wenn: jemand @AppStorage("coachMode") o.ae. zu AppSettings.swift hinzufuegt.
+    @MainActor
+    func test_appSettings_noCoachKeys() {
+        let settings = AppSettings.shared
+        let mirror = Mirror(reflecting: settings)
+        let labels = mirror.children.compactMap { $0.label }
+        let forbiddenKeywords = ["coach", "monster", "meinTag", "mein_tag", "intention"]
+        for keyword in forbiddenKeywords {
+            let match = labels.first { $0.localizedCaseInsensitiveContains(keyword) }
+            XCTAssertNil(match, "AppSettings should not contain property matching '\(keyword)', found: \(match ?? "")")
+        }
+    }
+
     // MARK: - Helper
 
     /// Check if a type name exists via NSClassFromString (works for @objc classes).

@@ -13,6 +13,7 @@ enum MainSection: String, Hashable, CaseIterable {
     case planning = "Blox"
     case focus = "Focus"
     case review = "Review"
+    case refiner = "Refiner"
 
     var icon: String {
         switch self {
@@ -20,6 +21,7 @@ enum MainSection: String, Hashable, CaseIterable {
         case .planning: return "calendar"
         case .focus: return "target"
         case .review: return "chart.bar"
+        case .refiner: return "sparkles"
         }
     }
 }

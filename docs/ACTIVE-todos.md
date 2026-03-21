@@ -18,8 +18,8 @@
 | RW_0.1 | 0 Infrastruktur | Smart Notification Engine | High | M | [Spec](specs/rework/0.1-smart-notification-engine.md) |
 | RW_0.2 | 0 Infrastruktur | BehavioralProfileService | High | M | [Spec](specs/rework/0.2-behavioral-profile-service.md) |
 | ~~RW_1.1~~ | ~~1 Erfassung~~ | ~~Quick Dump~~ | ~~High~~ | ~~M~~ | ~~[Spec](specs/rework/1.1-quick-dump.md)~~ ERLEDIGT → [Archiv](ARCHIVE-todos.md) |
-| RW_1.2 | 1 Erfassung | AI Context Extraction | High | L | [Spec](specs/rework/1.2-ai-context-extraction.md) |
-| RW_1.3 | 1 Erfassung | The Refiner | High | L | [Spec](specs/rework/1.3-the-refiner.md) |
+| ~~RW_1.2~~ | ~~1 Erfassung~~ | ~~AI Context Extraction (Schema)~~ | ~~High~~ | ~~L~~ | ~~[Spec](specs/rework/1.2-1.3-refiner-impl.md)~~ ERLEDIGT → [Archiv](ARCHIVE-todos.md) |
+| ~~RW_1.3~~ | ~~1 Erfassung~~ | ~~The Refiner (UI)~~ | ~~High~~ | ~~L~~ | ~~[Spec](specs/rework/1.2-1.3-refiner-impl.md)~~ ERLEDIGT → [Archiv](ARCHIVE-todos.md) |
 | RW_3.1 | 3 Ausfuehrung | Task direkt auf Kalender droppen | Medium | L | [Spec](specs/rework/3.1-calendar-task-drop.md) |
 | RW_3.2 | 3 Ausfuehrung | Focus Sprint ("Los"-Button) | Medium | M | [Spec](specs/rework/3.2-focus-sprint.md) |
 | RW_3.3 | 3 Ausfuehrung | Follow-up Logic | Medium | S | [Spec](specs/rework/3.3-follow-up-logic.md) |

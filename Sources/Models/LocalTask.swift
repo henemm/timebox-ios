@@ -150,6 +150,26 @@ final class LocalTask {
     /// Set to true when created from Share Extension, Siri, Watch, etc.
     var needsTitleImprovement: Bool = false
 
+    // MARK: - AI Suggestions (Refiner — RW 1.2)
+    // Written by SmartTaskEnrichmentService.enrichRawTask().
+    // Promoted to main fields on Refiner confirmation.
+    // All Optional + nil default required for CloudKit migration.
+
+    /// AI-suggested category rawValue (income/maintenance/recharge/learning/giving_back)
+    var suggestedCategory: String?
+
+    /// AI-suggested estimated duration in minutes (5–240)
+    var suggestedDuration: Int?
+
+    /// AI-suggested importance (1–3)
+    var suggestedImportance: Int?
+
+    /// AI-suggested urgency string ("urgent" / "not_urgent")
+    var suggestedUrgency: String?
+
+    /// AI-suggested energy level ("high" / "low")
+    var suggestedEnergyLevel: String?
+
     /// External system identifier for sync (e.g., Notion page ID)
     var externalID: String?
 
@@ -234,6 +254,36 @@ extension LocalTask {
         task.rescheduleCount += 1
         try? context.save()
         return newDue
+    }
+}
+
+// MARK: - Refiner Confirmation
+
+extension LocalTask {
+    /// Promotes suggested* values to main fields and transitions status to .active.
+    /// Only overwrites main fields that are currently nil/empty (respects user edits).
+    /// No-op if lifecycleStatus is not "raw".
+    func confirmSuggestions() {
+        guard lifecycleStatus == TaskLifecycleStatus.raw.rawValue else { return }
+
+        if taskType.isEmpty, let cat = suggestedCategory {
+            taskType = cat
+        }
+        if estimatedDuration == nil, let dur = suggestedDuration {
+            estimatedDuration = dur
+        }
+        if importance == nil, let imp = suggestedImportance {
+            importance = max(1, min(3, imp))
+        }
+        if urgency == nil, let urg = suggestedUrgency {
+            urgency = urg
+        }
+        if aiEnergyLevel == nil, let energy = suggestedEnergyLevel {
+            aiEnergyLevel = energy
+        }
+
+        lifecycleStatus = TaskLifecycleStatus.active.rawValue
+        modifiedAt = Date()
     }
 }
 

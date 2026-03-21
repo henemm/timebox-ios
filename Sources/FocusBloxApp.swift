@@ -739,6 +739,25 @@ struct FocusBloxApp: App {
         recurringChild3.isNextUp = false
         context.insert(recurringChild3)
 
+        // MARK: - Raw Tasks for Refiner UI tests (RW 1.3)
+        if ProcessInfo.processInfo.arguments.contains("-InjectRawTasks") {
+            let rawTask1 = LocalTask(title: "[MOCK] Steuererklärung vorbereiten", importance: nil, estimatedDuration: nil, urgency: nil)
+            rawTask1.lifecycleStatus = TaskLifecycleStatus.raw.rawValue
+            rawTask1.suggestedCategory = "maintenance"
+            rawTask1.suggestedDuration = 60
+            rawTask1.suggestedImportance = 3
+            rawTask1.suggestedUrgency = "urgent"
+            rawTask1.suggestedEnergyLevel = "high"
+            context.insert(rawTask1)
+
+            let rawTask2 = LocalTask(title: "[MOCK] Buch weiterlesen", importance: nil, estimatedDuration: nil, urgency: nil)
+            rawTask2.lifecycleStatus = TaskLifecycleStatus.raw.rawValue
+            rawTask2.suggestedCategory = "recharge"
+            rawTask2.suggestedDuration = 30
+            rawTask2.suggestedImportance = 1
+            context.insert(rawTask2)
+        }
+
         // Completed task outside any FocusBlock (for Review tab testing)
         let completedOutsideBlock = LocalTask(title: "[MOCK] Erledigte Backlog-Aufgabe", importance: 2, estimatedDuration: 20, urgency: "not_urgent")
         completedOutsideBlock.isNextUp = false
