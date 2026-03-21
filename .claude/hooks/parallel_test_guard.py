@@ -54,15 +54,12 @@ STALE_THRESHOLD_HOURS = 48
 
 def has_valid_override_token() -> bool:
     """Check if user has granted an override token (1h TTL)."""
-    token_path = Path(__file__).parent.parent / "user_override_token.json"
-    if not token_path.exists():
-        return False
     try:
-        token = json.loads(token_path.read_text())
-        created = datetime.fromisoformat(token.get("created", ""))
-        return datetime.now() - created < timedelta(hours=1)
-    except (json.JSONDecodeError, ValueError, OSError):
-        return False
+        from override_token import has_valid_token
+    except ImportError:
+        sys.path.insert(0, str(Path(__file__).parent))
+        from override_token import has_valid_token
+    return has_valid_token()  # Any valid token
 
 
 def is_test_command(command: str) -> bool:

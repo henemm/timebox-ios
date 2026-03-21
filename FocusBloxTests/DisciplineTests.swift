@@ -43,6 +43,18 @@ final class DisciplineTests: XCTestCase {
         XCTAssertEqual(discipline, .ausdauer)
     }
 
+    // MARK: - TD_005: Regression Guard
+
+    /// Discipline must have exactly 4 cases — no coach override case.
+    /// Bricht wenn: jemand einen fuenften Case (z.B. .coachOverride) zu Discipline hinzufuegt.
+    func test_discipline_exactlyFourCases() {
+        XCTAssertEqual(Discipline.allCases.count, 4,
+                       "Discipline should have exactly 4 cases, not \(Discipline.allCases.count)")
+        let expected: Set<Discipline> = [.konsequenz, .ausdauer, .mut, .fokus]
+        XCTAssertEqual(Set(Discipline.allCases), expected,
+                       "Discipline cases should be exactly: konsequenz, ausdauer, mut, fokus")
+    }
+
     // MARK: - resolveOpen() Override Tests
 
     /// Verhalten: Override "mut" gewinnt ueber Auto-Berechnung (die .konsequenz waere)

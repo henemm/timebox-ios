@@ -388,28 +388,17 @@ def check_user_override(workflow_name: str = None) -> bool:
         workflow_name: Explicit workflow name to check against token.
                        Falls back to active_workflow if None.
     """
-    token_path = Path(__file__).parent.parent / "user_override_token.json"
-    if not token_path.exists():
-        return False
     try:
-        import json as _json
-        from datetime import datetime as _dt, timedelta as _td
-        token = _json.loads(token_path.read_text())
-        # Check TTL (1 hour)
-        created = token.get("created", "")
-        if created:
-            created_dt = _dt.fromisoformat(created)
-            if _dt.now() - created_dt > _td(hours=1):
-                token_path.unlink(missing_ok=True)
-                return False
-        # Check workflow match — prefer explicit name, fallback to active
-        if workflow_name:
-            return token.get("workflow") == workflow_name
-        state = load_state()
-        active_name = session_active_name(state) or ""
-        return token.get("workflow") == active_name
-    except (json.JSONDecodeError, KeyError, ValueError, OSError):
-        return False
+        from override_token import has_valid_token
+    except ImportError:
+        sys.path.insert(0, str(Path(__file__).parent))
+        from override_token import has_valid_token
+
+    if workflow_name:
+        return has_valid_token(workflow_name)
+    state = load_state()
+    active_name = session_active_name(state) or ""
+    return has_valid_token(active_name)
 
 
 def main():

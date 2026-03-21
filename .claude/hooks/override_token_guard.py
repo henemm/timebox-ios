@@ -47,6 +47,15 @@ def main():
         )
         sys.exit(2)
 
+    # Block any attempt to directly edit the workflow state file
+    if "workflow_state.json" in file_path:
+        print(
+            "BLOCKED: workflow_state.json darf nicht direkt editiert werden.\n"
+            "Nutze die offiziellen Workflow-Kommandos stattdessen.",
+            file=sys.stderr
+        )
+        sys.exit(2)
+
     sys.exit(0)
 
 

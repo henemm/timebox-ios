@@ -185,16 +185,29 @@ def save_lock(lock_data: dict):
         json.dump(lock_data, f, indent=2)
 
 
-def get_active_workflow_name() -> str:
-    """Get name of active workflow."""
+def get_workflow_state() -> tuple[str, dict]:
+    """Get active workflow name and its state dict."""
     try:
-        from workflow_state_multi import get_active_workflow
-        workflow = get_active_workflow()
-        if workflow:
-            return workflow.get("name", "default")
-    except ImportError:
+        from workflow_state_multi import session_active_name
+        state_file = get_project_root() / ".claude" / "workflow_state.json"
+        if state_file.exists():
+            state = json.loads(state_file.read_text())
+            name = session_active_name(state)
+            if name and name in state.get("workflows", {}):
+                return name, state["workflows"][name]
+    except (ImportError, Exception):
         pass
-    return "default"
+    return "default", {}
+
+
+def has_valid_override_token(workflow_name: str) -> bool:
+    """Check if a valid override token exists for this workflow."""
+    try:
+        from override_token import has_valid_token
+    except ImportError:
+        sys.path.insert(0, str(Path(__file__).parent))
+        from override_token import has_valid_token
+    return has_valid_token(workflow_name)
 
 
 def main():
@@ -221,8 +234,20 @@ def main():
     if not is_ui_file(file_path):
         sys.exit(0)
 
-    # Get workflow name
-    workflow_name = get_active_workflow_name()
+    # Get workflow name and state
+    workflow_name, workflow = get_workflow_state()
+
+    # Bypass: inspection_gate.py override set a reason (no screenshot needed)
+    if workflow.get("visual_inspection_override_reason"):
+        sys.exit(0)
+
+    # Bypass: user_override flag in workflow state
+    if workflow.get("user_override", False):
+        sys.exit(0)
+
+    # Bypass: valid override token for this workflow
+    if has_valid_override_token(workflow_name):
+        sys.exit(0)
 
     # Check for recent screenshot
     screenshot = find_recent_screenshot(workflow_name, file_path)

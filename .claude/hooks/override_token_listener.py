@@ -19,15 +19,16 @@ import json
 import os
 import re
 import sys
-from datetime import datetime
 from pathlib import Path
 
 # Import multi-workflow state manager
 try:
     from workflow_state_multi import load_state, session_active_name
+    from override_token import create_token as _create_token
 except ImportError:
     sys.path.insert(0, str(Path(__file__).parent))
     from workflow_state_multi import load_state, session_active_name
+    from override_token import create_token as _create_token
 
 
 # Keywords that trigger override token creation
@@ -37,8 +38,6 @@ OVERRIDE_KEYWORDS = [
     "ich genehmige",
     "ich genehmige das",
 ]
-
-TOKEN_FILE = Path(__file__).parent.parent / "user_override_token.json"
 
 
 def is_override_message(message: str) -> tuple[bool, str | None]:
@@ -64,16 +63,8 @@ def is_override_message(message: str) -> tuple[bool, str | None]:
 
 
 def create_token(workflow_name: str) -> None:
-    """Create the override token file."""
-    token = {
-        "workflow": workflow_name,
-        "created": datetime.now().isoformat(),
-        "granted_by": "user_prompt",
-    }
-
-    TOKEN_FILE.parent.mkdir(parents=True, exist_ok=True)
-    with open(TOKEN_FILE, 'w') as f:
-        json.dump(token, f, indent=2)
+    """Create an override token for a workflow (does NOT overwrite other workflows)."""
+    _create_token(workflow_name)
 
 
 def main():

@@ -137,13 +137,26 @@ TDD_STALE_THRESHOLD_HOURS = 48
 
 
 def _get_conflicting_tdd_workflows(requesting_workflow: str) -> list[dict]:
-    """Find other workflows currently in TDD-blocking phases (< 48h active).
+    """Find other workflows in TDD-blocking phases within the SAME session.
+
+    Session-aware: workflows owned by OTHER sessions are NOT conflicts.
+    Only workflows in the same session (same TTY) or unassigned workflows
+    are considered potential conflicts.
 
     Returns list of dicts with 'name' and 'phase' for each conflicting workflow.
     The requesting workflow itself is never considered a conflict (re-enter allowed).
     """
     state = load_state()
     conflicts = []
+
+    # Build reverse map: workflow_name -> session_tty
+    session_map = {}
+    for _sid, entry in state.get("session_workflows", {}).items():
+        wf_name = entry.get("workflow")
+        if wf_name:
+            session_map[wf_name] = entry.get("tty", "unknown")
+
+    my_tty = _tty_path()
 
     for name, wf in state.get("workflows", {}).items():
         if name == requesting_workflow:
@@ -152,6 +165,11 @@ def _get_conflicting_tdd_workflows(requesting_workflow: str) -> list[dict]:
         phase = wf.get("current_phase", "phase0_idle")
         if phase not in TDD_BLOCKING_PHASES:
             continue
+
+        # Session-aware: skip workflows owned by OTHER sessions
+        other_tty = session_map.get(name)
+        if other_tty and other_tty != my_tty:
+            continue  # Different session — not our conflict
 
         # Check staleness
         ts = wf.get("last_updated") or wf.get("created")
@@ -187,20 +205,10 @@ def _is_stop_locked() -> bool:
 
 def _has_valid_override_token(workflow_name: str = None) -> bool:
     """Check if a valid override token exists for the given workflow."""
-    token_path = Path(__file__).parent.parent / "user_override_token.json"
-    if not token_path.exists():
-        return False
     try:
-        token = json.loads(token_path.read_text())
-        created = token.get("created", "")
-        if created:
-            created_dt = datetime.fromisoformat(created)
-            if (datetime.now() - created_dt).total_seconds() > 3600:
-                return False
-        if workflow_name:
-            return token.get("workflow") == workflow_name
-        return True
-    except (json.JSONDecodeError, ValueError, Exception):
+        from override_token import has_valid_token
+        return has_valid_token(workflow_name)
+    except ImportError:
         return False
 
 
@@ -587,6 +595,8 @@ def _validate_phase_prerequisites(workflow: dict, current_phase: str, target_pha
         missing = []
         if not workflow.get("result_inspection_done"):
             missing.append("result_inspection_done")
+        if not workflow.get("docs_updated"):
+            missing.append("docs_updated (ACTIVE-todos.md + ggf. CLAUDE.md)")
         if missing:
             return False, f"phase7_validate nicht abgeschlossen: {', '.join(missing)} fehlt"
 
@@ -877,12 +887,22 @@ def find_workflow_for_file(file_path: str) -> list[tuple[str, dict]]:
 
 
 def complete_workflow(name: str) -> bool:
-    """Mark a workflow as complete and archive it."""
+    """Mark a workflow as complete and archive it. Validates prerequisites first."""
     with _state_lock():
         state = load_state()
 
         if name not in state["workflows"]:
             return False
+
+        workflow = state["workflows"][name]
+
+        # Validate phase7_validate prerequisites before completing
+        if not _has_valid_override_token(name):
+            current_phase = workflow.get("current_phase", "phase0_idle")
+            allowed, reason = _validate_phase_prerequisites(workflow, current_phase, "phase8_complete")
+            if not allowed:
+                print(f"BLOCKED: {reason}", file=sys.stderr)
+                return False
 
         state["workflows"][name]["current_phase"] = "phase8_complete"
         state["workflows"][name]["backlog_status"] = "done"  # Explicitly set to done
@@ -893,10 +913,10 @@ def complete_workflow(name: str) -> bool:
         if state.get("active_workflow") == name:
             state["active_workflow"] = None
 
-        # Clear session entry for this workflow (any session that had it)
-        for sid, entry in list(state.get("session_workflows", {}).items()):
-            if entry.get("workflow") == name:
-                del state["session_workflows"][sid]
+        # NOTE: Do NOT clear session_workflows entries here.
+        # The session still needs to know its workflow for post-completion
+        # actions (e.g. git commit). Stale entries are cleaned up by
+        # _cleanup_stale_sessions() when the TTY disappears.
 
         _save_state_unlocked(state)
 
@@ -1088,6 +1108,30 @@ def mark_ui_test_green_done(workflow_name: str = None, result: str = None) -> bo
         workflow = state["workflows"][name]
         workflow["ui_test_green_done"] = True
         workflow["ui_test_green_result"] = result
+        workflow["last_updated"] = datetime.now().isoformat()
+
+        _save_state_unlocked(state)
+        return True
+
+
+def mark_docs_updated(workflow_name: str = None, details: str = None) -> bool:
+    """
+    Mark documentation as updated for a workflow.
+
+    Args:
+        workflow_name: Name of workflow (uses active if None)
+        details: Description of what was updated (e.g. "ACTIVE-todos.md: status → done")
+    """
+    with _state_lock():
+        state = load_state()
+
+        name = workflow_name or session_active_name(state)
+        if not name or name not in state["workflows"]:
+            return False
+
+        workflow = state["workflows"][name]
+        workflow["docs_updated"] = True
+        workflow["docs_updated_details"] = details
         workflow["last_updated"] = datetime.now().isoformat()
 
         _save_state_unlocked(state)
@@ -1346,6 +1390,8 @@ if __name__ == "__main__":
             "user_expectation_notes",       # Managed by user-advocate
             "result_inspection_done",       # Managed by fresh-eyes-inspector
             "result_inspection_notes",      # Managed by fresh-eyes-inspector
+            "docs_updated",                 # Managed by mark_docs_updated()
+            "docs_updated_details",         # Managed by mark_docs_updated()
         }
         if field_name in BLOCKED_SET_FIELDS:
             print(f"BLOCKED: '{field_name}' cannot be set via set-field.")
@@ -1363,6 +1409,12 @@ if __name__ == "__main__":
                 print(f"Set {field_name} = {field_value} on workflow {active}")
             else:
                 print("No active workflow")
+    elif cmd == "mark-docs-updated":
+        details = sys.argv[2] if len(sys.argv) > 2 else None
+        if mark_docs_updated(details=details):
+            print(f"Docs marked as updated: {details or '(no details)'}")
+        else:
+            print("Failed to mark docs as updated")
     elif cmd == "pause":
         success, message = pause_workflow()
         print(message)

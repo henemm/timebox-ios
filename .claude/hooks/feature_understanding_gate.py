@@ -42,21 +42,12 @@ def get_state_file() -> Path:
 
 def has_valid_override_token(workflow_name: str = None) -> bool:
     """Check if a valid override token exists."""
-    token_path = get_state_file().parent / "user_override_token.json"
-    if not token_path.exists():
-        return False
     try:
-        token = json.loads(token_path.read_text())
-        created = token.get("created", "")
-        if created:
-            created_dt = datetime.fromisoformat(created)
-            if (datetime.now() - created_dt).total_seconds() > 3600:
-                return False
-        if workflow_name:
-            return token.get("workflow") == workflow_name
-        return True
-    except (json.JSONDecodeError, ValueError, Exception):
-        return False
+        from override_token import has_valid_token
+    except ImportError:
+        sys.path.insert(0, str(Path(__file__).parent))
+        from override_token import has_valid_token
+    return has_valid_token(workflow_name)
 
 
 def main():

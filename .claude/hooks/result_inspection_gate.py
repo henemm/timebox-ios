@@ -1,29 +1,24 @@
 #!/usr/bin/env python3
 """
-Visual Inspection Gate — PFLICHT fuer Bug- und Feature-Workflows
+Result Inspection Gate — Post-Implementation Screenshot Proof
 
-Blockiert Task-Tool-Aufrufe (Investigation Agents) solange keine
-visuelle Inspektion stattgefunden hat.
+Blocks phase transitions to adversary/validate phases unless
+a result screenshot has been validated via inspection_gate.py.
 
-Regel: Bei Bug- und Feature-Workflows MUSS zuerst ein Screenshot
-gemacht und via inspection_gate.py validiert werden,
-BEVOR Investigate-Agents losgeschickt werden.
+Trigger: PreToolUse Bash — blocks commands that advance to phase6b or phase7.
 
-Proof-Based: Das Feld visual_inspection_done kann NUR durch
-inspection_gate.py gesetzt werden (nicht per set-field).
-Zusaetzlich wird geprueft ob die Screenshot-Datei existiert.
-
-Ausnahme: Override-Token vom User (fuer Tasks ohne visuellen Aspekt).
+Proof-Based: result_inspection_done can ONLY be set by inspection_gate.py.
+This gate checks both the flag AND that the screenshot file exists.
 
 Exit Codes:
-- 0: Erlaubt
-- 2: Blockiert (stderr wird Claude angezeigt)
+- 0: Allowed
+- 2: Blocked (stderr shown to Claude)
 """
 
 import json
 import os
+import re
 import sys
-from datetime import datetime
 from pathlib import Path
 
 try:
@@ -56,32 +51,66 @@ def has_valid_override_token(workflow_name: str = None) -> bool:
     return has_valid_token(workflow_name)
 
 
-def main():
-    # Get tool input
+def get_command() -> str:
+    """Extract the bash command from hook input."""
     tool_input = os.environ.get("CLAUDE_TOOL_INPUT", "")
     if not tool_input:
         try:
             data = json.load(sys.stdin)
             tool_input = json.dumps(data.get("tool_input", {}))
         except (json.JSONDecodeError, Exception):
-            sys.exit(0)
+            return ""
+    try:
+        data = json.loads(tool_input) if isinstance(tool_input, str) else tool_input
+    except json.JSONDecodeError:
+        return ""
+    return data.get("command", "")
+
+
+def is_phase_advance_command(command: str) -> bool:
+    """Check if command advances to adversary or validate phase."""
+    # Match phase transitions that need result inspection
+    patterns = [
+        r"phase\s+phase6b",
+        r"phase\s+phase7",
+        r"phase\s+phase8",
+        r"adversary_gate\.py",
+    ]
+    for pattern in patterns:
+        if re.search(pattern, command):
+            return True
+    return False
+
+
+def main():
+    command = get_command()
+    if not command:
+        sys.exit(0)
+
+    # Only check phase-advance commands
+    if not is_phase_advance_command(command):
+        sys.exit(0)
+
+    # Allow running inspection_gate.py itself
+    if "inspection_gate.py" in command:
+        sys.exit(0)
 
     # Load workflow state
     state_file = get_state_file()
     if not state_file.exists():
-        sys.exit(0)  # No state = no enforcement
+        sys.exit(0)
 
     try:
         state = json.loads(state_file.read_text())
     except (json.JSONDecodeError, Exception):
         sys.exit(0)
 
-    # Get active workflow (session-aware)
+    # Get active workflow
     active_name = session_active_name(state)
     if not active_name:
-        sys.exit(0)  # No active workflow
+        sys.exit(0)
 
-    # Enforce for bug AND feature workflows
+    # Only enforce for bug and feature workflows
     if not (active_name.startswith("bug-") or active_name.startswith("feature-")):
         sys.exit(0)
 
@@ -89,43 +118,43 @@ def main():
     if not workflow:
         sys.exit(0)
 
-    # Check if visual inspection is done — proof-based!
-    # Either a real screenshot file must exist, or an override reason must be set
-    if workflow.get("visual_inspection_done", False):
-        screenshot_path = workflow.get("visual_inspection_screenshot", "")
-        if screenshot_path and Path(screenshot_path).exists():
-            sys.exit(0)  # Proof verified — screenshot exists
-        override_reason = workflow.get("visual_inspection_override_reason", "")
-        if override_reason:
-            sys.exit(0)  # Override with justification accepted
-
     # Check for user override
     if workflow.get("user_override", False):
         sys.exit(0)
-
     if has_valid_override_token(active_name):
         sys.exit(0)
 
-    # BLOCK — visual inspection not done (proof-based)
+    # Check if result inspection is done — proof-based!
+    if workflow.get("result_inspection_done", False):
+        screenshot_path = workflow.get("result_inspection_screenshot", "")
+        if screenshot_path and Path(screenshot_path).exists():
+            sys.exit(0)  # Proof verified — screenshot exists
+        override_reason = workflow.get("result_inspection_override_reason", "")
+        if override_reason:
+            sys.exit(0)  # Override with justification accepted
+
+    # BLOCK — result inspection not done
     print(f"""
 ╔══════════════════════════════════════════════════════════════════╗
-║  BLOCKED: Visuelle Inspektion fehlt!                             ║
+║  BLOCKED: Result-Inspektion fehlt!                               ║
 ╠══════════════════════════════════════════════════════════════════╣
 ║                                                                  ║
 ║  Workflow: {active_name[:53]:<53} ║
 ║                                                                  ║
-║  BEVOR du Investigate-Agents losschickst, musst du               ║
-║  dir ZUERST ein eigenes Bild vom Problem machen!                 ║
+║  Du hast Code geschrieben. Jetzt musst du PRUEFEN ob er          ║
+║  funktioniert — BEVOR du zur Adversary-Phase wechselst.          ║
 ║                                                                  ║
 ║  PFLICHT-SCHRITTE:                                               ║
 ║  ┌─────────────────────────────────────────────────────────────┐ ║
-║  │ 1. Screenshot machen:                                       │ ║
-║  │    xcrun simctl io booted screenshot /tmp/inspect.png       │ ║
-║  │ 2. Screenshot ansehen (Read Tool auf die Datei)             │ ║
-║  │ 3. Beschreiben: Was siehst du? Was stimmt nicht?            │ ║
+║  │ 1. App bauen & starten:                                     │ ║
+║  │    ./scripts/sim.sh build && ./scripts/sim.sh launch        │ ║
+║  │ 2. Screenshot machen:                                       │ ║
+║  │    ./scripts/sim.sh screenshot /tmp/result.png              │ ║
+║  │    ODER: xcrun simctl io booted screenshot /tmp/result.png  │ ║
+║  │ 3. Screenshot ansehen (Read Tool)                           │ ║
 ║  │ 4. Screenshot validieren:                                   │ ║
-║  │    python3 .claude/hooks/inspection_gate.py before \\        │ ║
-║  │      /tmp/inspect.png                                       │ ║
+║  │    python3 .claude/hooks/inspection_gate.py after \\         │ ║
+║  │      /tmp/result.png                                        │ ║
 ║  └─────────────────────────────────────────────────────────────┘ ║
 ║                                                                  ║
 ║  KEIN SCREENSHOT MOEGLICH?                                       ║

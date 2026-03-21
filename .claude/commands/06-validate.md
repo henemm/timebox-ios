@@ -156,9 +156,24 @@ Erstelle eine Zusammenfassung:
 4. Re-run tests
 5. Repeat until ALL GREEN
 
+## Docs Update (PFLICHT — Gate-enforced)
+
+**Nach erfolgreicher Validation, VOR phase8_complete:**
+
+1. **`docs/ACTIVE-todos.md`** aktualisieren:
+   - Bug/Feature Status auf `done` setzen
+   - Neue Erkenntnisse/Todos eintragen falls noetig
+
+2. **`CLAUDE.md`** aktualisieren (nur bei Architektur-Aenderungen)
+
+3. **Flag setzen** (blockiert sonst phase8_complete):
+```bash
+python3 .claude/hooks/workflow_state_multi.py mark-docs-updated "ACTIVE-todos.md: [ticket] → done"
+```
+
 ## Next Step
 
-**Only when ALL tests pass:**
+**Only when ALL tests pass AND docs updated:**
 
 > "Validation successful. All checks passed. Ready for commit."
 

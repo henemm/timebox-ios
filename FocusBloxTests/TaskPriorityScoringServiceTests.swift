@@ -183,6 +183,42 @@ final class TaskPriorityScoringServiceTests: XCTestCase {
         XCTAssertEqual(score, 100)
     }
 
+    // MARK: - TD_005: No Coach Boost Regression
+
+    /// Score must equal sum of 6 known factors — no hidden coach boost.
+    /// Bricht wenn: jemand einen Coach-Multiplikator/Summand in calculateScore() einfuegt.
+    func test_scoringService_noCoachBoostFactor() {
+        let now = Date()
+        let fiveDaysAgo = Calendar.current.date(byAdding: .day, value: -5, to: now)!
+        let threeDaysOut = Calendar.current.date(byAdding: .day, value: 3, to: now)!
+
+        // Known inputs with deterministic expected outputs:
+        let eisenhower = TaskPriorityScoringService.eisenhowerScore(importance: 2, urgency: "not_urgent") // 20
+        let deadline = TaskPriorityScoringService.deadlineScore(dueDate: threeDaysOut, now: now) // 18
+        let neglect = TaskPriorityScoringService.neglectScore(createdAt: fiveDaysAgo, rescheduleCount: 1, now: now) // 1 + 1 = 2
+        let completeness = TaskPriorityScoringService.completenessScore(importance: 2, urgency: "not_urgent", duration: 15, taskType: "work") // 5
+        let nextUp = TaskPriorityScoringService.nextUpBonus(isNextUp: false) // 0
+        let blocker = TaskPriorityScoringService.blockerBonus(dependentTaskCount: 1) // 3
+
+        let expectedTotal = eisenhower + deadline + neglect + completeness + nextUp + blocker
+
+        let actualScore = TaskPriorityScoringService.calculateScore(
+            importance: 2,
+            urgency: "not_urgent",
+            dueDate: threeDaysOut,
+            createdAt: fiveDaysAgo,
+            rescheduleCount: 1,
+            estimatedDuration: 15,
+            taskType: "work",
+            isNextUp: false,
+            now: now,
+            dependentTaskCount: 1
+        )
+
+        XCTAssertEqual(actualScore, expectedTotal,
+                       "Score (\(actualScore)) must equal sum of 6 factors (\(expectedTotal)) — no hidden boost allowed")
+    }
+
     // MARK: - PriorityTier.from
 
     func test_priorityTier_score75_isDoNow() {

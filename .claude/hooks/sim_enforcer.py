@@ -28,6 +28,7 @@ ALLOWED_SCRIPTS = [
     "run_resilient_tests.sh",
     "adversary_screenshot.sh",
     "run-mac-ui-tests.sh",
+    "run-mac-unit-tests.sh",
 ]
 
 # Read-only xcrun simctl subcommands (safe, no side effects)
