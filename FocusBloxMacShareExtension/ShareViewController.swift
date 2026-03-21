@@ -157,6 +157,7 @@ struct MacShareSheetView: View {
             let context = ModelContext(container)
 
             let task = LocalTask(title: trimmedTitle)
+            task.lifecycleStatus = TaskLifecycleStatus.raw.rawValue
             task.needsTitleImprovement = true
             task.sourceURL = sourceURL
             context.insert(task)

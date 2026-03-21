@@ -1,6 +1,14 @@
 import Foundation
 import SwiftData
 
+// MARK: - TaskLifecycleStatus (must match iOS definition)
+
+enum TaskLifecycleStatus: String, Codable, CaseIterable {
+    case raw
+    case refined
+    case active
+}
+
 /// LocalTask model for Watch - must match iOS app's LocalTask exactly.
 /// Same class name ensures SwiftData uses the same table in shared App Group.
 /// Note: CloudKit requires all attributes to have default values.
@@ -38,6 +46,7 @@ final class LocalTask {
     var aiEnergyLevel: String?
     var needsTitleImprovement: Bool = false
     var sourceURL: String?
+    var lifecycleStatus: String = "active"
     var modifiedAt: Date?
     var blockerTaskID: String?
 

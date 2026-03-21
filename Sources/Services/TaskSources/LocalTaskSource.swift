@@ -39,8 +39,8 @@ final class LocalTaskSource: @preconcurrency TaskSource, @preconcurrency TaskSou
         descriptor.sortBy = [SortDescriptor(\.createdAt, order: .reverse)]
         let allIncomplete = try modelContext.fetch(descriptor)
 
-        // Hide recurring tasks with future dueDate (uses shared filter on LocalTask)
-        return allIncomplete.filter { $0.isVisibleInBacklog }
+        // Hide recurring tasks with future dueDate and raw (uncurated) tasks
+        return allIncomplete.filter { $0.isVisibleInBacklog && $0.lifecycleStatus != "raw" }
     }
 
     /// Fetch ALL incomplete recurring tasks, ignoring isVisibleInBacklog.
@@ -97,7 +97,8 @@ final class LocalTaskSource: @preconcurrency TaskSource, @preconcurrency TaskSou
         recurrenceMonthDay: Int? = nil,
         recurrenceInterval: Int? = nil,
         description: String? = nil,
-        blockerTaskID: String? = nil
+        blockerTaskID: String? = nil,
+        lifecycleStatus: String = "active"
     ) async throws -> LocalTask {
         let nextSortOrder = try await getNextSortOrder()
         let cleanedTitle = TaskTitleEngine.stripKeywords(title)
@@ -119,6 +120,7 @@ final class LocalTaskSource: @preconcurrency TaskSource, @preconcurrency TaskSou
             sourceSystem: "local"
         )
         task.blockerTaskID = blockerTaskID
+        task.lifecycleStatus = lifecycleStatus
         modelContext.insert(task)
         try modelContext.save()
 

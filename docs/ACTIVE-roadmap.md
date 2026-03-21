@@ -2,96 +2,64 @@
 
 > Zentraler Einstiegspunkt fuer alle geplanten Features.
 > Features werden hier zuerst eingetragen, bevor eine OpenSpec erstellt wird.
+>
+> **Rework-Specs:** `docs/specs/rework/` | **Epic Overview:** `docs/specs/rework/0.0-epic-overview.md`
 
 ---
 
-### Monster Coach Phase 3a — Intention-basierter Backlog-Filter
+## Rework: FocusBlox Neuausrichtung
 
-**Status:** Geplant
-**Prioritaet:** Hoch
-**Kategorie:** Support Feature
-**Aufwand:** Mittel
+Reihenfolge: Epic 0 → 1 → 3 → 2 → 4 (siehe [Epic Overview](specs/rework/0.0-epic-overview.md))
 
-**Kurzbeschreibung:**
-Nach der Morgen-Intention-Auswahl wechselt die App automatisch zum Backlog-Tab und zeigt aktive Filter-Chips passend zur gewaehlten Intention. Der User sieht sofort die relevanten Tasks und kann diese als NextUp markieren. Die Filter sind einzeln abschaltbar.
+### Epic 0: Infrastruktur
 
-**Betroffene Systeme:**
-- `Sources/Models/DailyIntention.swift` (neue `backlogFilter(for:)` Logik)
-- `Sources/Views/MorningIntentionView.swift` (Tab-Wechsel nach Intention-Setzen)
-- `Sources/Views/BacklogView.swift` (IntentionFilter-Chips + gefilterte Task-Listen)
-- `Sources/FocusBloxApp.swift` (AppStorage-Key fuer aktive Intention-Filter)
+| Story | Titel | Status | Aufwand | Spec |
+|-------|-------|--------|---------|------|
+| 0.1 | Smart Notification Engine | Backlog | M | [Spec](specs/rework/0.1-smart-notification-engine.md) |
+| 0.2 | BehavioralProfileService | Backlog | M | [Spec](specs/rework/0.2-behavioral-profile-service.md) |
 
-**Filter-Mapping:**
-| Intention | Filter-Verhalten |
-|-----------|-----------------|
-| Survival | Kein Filter — alle Tasks sichtbar |
-| Fokus | Nur NextUp-Tasks |
-| BHAG | importance == 3 ODER rescheduleCount >= 2 |
-| Balance | Alle Tasks, gruppiert nach Kategorie |
-| Growth | taskType == "learning" |
-| Connection | taskType == "giving_back" |
+### Epic 1: Reibungslose Erfassung & Smarte Veredelung
 
-**Multi-Select-Regeln:**
-- Survival ueberstimmt alles — kein Filter wenn Survival dabei
-- Mehrere andere: Vereinigung (ODER-Logik, Task reicht in einer Gruppe zu stecken)
+| Story | Titel | Status | Aufwand | Spec |
+|-------|-------|--------|---------|------|
+| 1.1 | Quick Dump | Backlog | M | [Spec](specs/rework/1.1-quick-dump.md) |
+| 1.2 | AI Context Extraction | Backlog | L | [Spec](specs/rework/1.2-ai-context-extraction.md) |
+| 1.3 | The Refiner | Backlog | L | [Spec](specs/rework/1.3-the-refiner.md) |
 
-**OpenSpec:** `openspec/changes/monster-coach-phase3a/`
+### Epic 3: Fokussierte Ausfuehrung
 
----
+| Story | Titel | Status | Aufwand | Spec |
+|-------|-------|--------|---------|------|
+| 3.1 | Task direkt auf Kalender droppen | Backlog | L | [Spec](specs/rework/3.1-calendar-task-drop.md) |
+| 3.2 | Focus Sprint ("Los"-Button) | Backlog | M | [Spec](specs/rework/3.2-focus-sprint.md) |
+| 3.3 | Follow-up Logic | Backlog | S | [Spec](specs/rework/3.3-follow-up-logic.md) |
+| 3.4 | Emotional Nudge (Micro-Tasks) | Backlog | M | [Spec](specs/rework/3.4-emotional-nudge.md) |
 
-### Monster Coach Phase 3b — Smart Notifications (Tagesbegleitung)
+### Epic 2: Adaptive Tagesplanung
 
-**Status:** Geplant
-**Prioritaet:** Hoch
-**Kategorie:** Support Feature
-**Aufwand:** Mittel
+| Story | Titel | Status | Aufwand | Spec |
+|-------|-------|--------|---------|------|
+| 2.1 | Tagesansicht ("Dein Tag") | Backlog | XL | [Spec](specs/rework/2.1-day-view.md) |
+| 2.2 | KI-gestuetzte Tagesvorschlaege | Backlog | L | [Spec](specs/rework/2.2-next-up-suggestions.md) |
+| 2.3 | Limitation Guard | Backlog | S | [Spec](specs/rework/2.3-limitation-guard.md) |
+| 2.4 | Backlog UX Rework | Backlog | L | [Spec](specs/rework/2.4-backlog-ux-rework.md) |
 
-**Kurzbeschreibung:**
-Notifications feuern NUR wenn die Morgen-Intention nicht gelebt wird (Luecke zwischen Absicht und Handlung). Survival = absolute Ruhe. Sobald Intention erfuellt → alle Nudges gecancelt (Stille-Regel). Settings: An/Aus, Max pro Tag (1/2/3), Zeitfenster Von/Bis.
+### Epic 4: Tagesabschluss & Reflexion
 
-**Betroffene Systeme:**
-- `Sources/Services/IntentionEvaluationService.swift` (NEU — prueft ob Intention erfuellt, erkennt Gap)
-- `Sources/Services/NotificationService.swift` (neuer MARK-Block Coach Daily Nudges)
-- `Sources/Models/AppSettings.swift` (4 neue Properties: nudgesEnabled, maxCount, windowStart, windowEnd)
-- `Sources/Views/SettingsView.swift` (neue Controls in Monster Coach Section)
-- `Sources/Views/MorningIntentionView.swift` (Nudge-Scheduling nach Intention-Setzen)
-- `Sources/FocusBloxApp.swift` (Foreground-Check → cancel wenn erfuellt)
-
-**Luecken-Logik:**
-
-| Intention | Notification wenn... |
-|-----------|---------------------|
-| Survival | Niemals — absolute Ruhe |
-| BHAG | Kein Block mit BHAG-Task ODER nachmittags BHAG noch unerledigt |
-| Fokus | Kein Focus Block geplant ODER Tasks ausserhalb von Blocks erledigt |
-| Balance | Nur 1-2 Kategorien aktiv (nachmittags) |
-| Growth | Kein "Lernen"-Task erledigt |
-| Connection | Kein "Geben"-Task erledigt |
-
-**Stille-Regel:** App-Foreground prueft Erfuellung → wenn ja, alle Nudges canceln.
-
-**OpenSpec:** `openspec/changes/monster-coach-phase3b/`
+| Story | Titel | Status | Aufwand | Spec |
+|-------|-------|--------|---------|------|
+| 4.1 | Soft Evening Reset | Backlog | M | [Spec](specs/rework/4.1-soft-evening-reset.md) |
+| 4.2 | Success Story Generator | Backlog | L | [Spec](specs/rework/4.2-success-story-generator.md) |
+| 4.3 | Failure Protocol | Backlog | M | [Spec](specs/rework/4.3-failure-protocol.md) |
+| 4.4 | Morning Widget | Backlog | M | [Spec](specs/rework/4.4-morning-widget.md) |
 
 ---
 
-### Monster Coach Phase 4e — Monster in Push-Notifications
+## Legacy Backlog (vor Rework)
 
-**Status:** Geplant
-**Prioritaet:** Niedrig
-**Kategorie:** Support Feature
-**Aufwand:** Klein
-
-**Kurzbeschreibung:**
-Die drei Coach-Notification-Typen (Morgen-Erinnerung, Abend-Erinnerung, Tages-Nudges) erhalten das passende Monster-Bild als Rich Notification Attachment. Welches Monster erscheint haengt von der gesetzten Morgen-Intention ab (via bestehendes `IntentionOption.monsterDiscipline`-Mapping).
-
-**Betroffene Systeme:**
-- `Sources/Services/NotificationService.swift` (neue Hilfsfunktion `buildMonsterAttachment` + Erweiterung von 3 Buildern)
-- `Sources/Views/MorningIntentionView.swift` (Intention an `scheduleIntentionReminder` uebergeben)
-- `Sources/FocusBloxApp.swift` (Intention an `scheduleEveningReminder` uebergeben)
-
-**OpenSpec:** `openspec/changes/monster-coach-phase4e/`
-
----
+> Die folgenden Items stammen aus der Zeit vor dem Rework.
+> Sie werden nach Abschluss des Reworks bewertet — einige werden obsolet,
+> andere koennen in Rework-Stories aufgehen.
 
 ### Sub-Tasks
 
@@ -102,17 +70,6 @@ Die drei Coach-Notification-Typen (Morgen-Erinnerung, Abend-Erinnerung, Tages-Nu
 
 **Kurzbeschreibung:**
 Tasks koennen Sub-Tasks bekommen. Parent-Tasks werden durch Sub-Tasks hoeher gerankt. Sub-Tasks erscheinen eingerueckt unterhalb des uebergeordneten Tasks im Backlog.
-
-**Betroffene Systeme:**
-- `Sources/Models/LocalTask.swift` (neue Property `parentTaskID`)
-- `Sources/Models/PlanItem.swift` (Property-Uebernahme)
-- `Sources/Services/TaskPriorityScoringService.swift` (Scoring-Bonus fuer Parents)
-- `Sources/Views/BacklogView.swift` (Grouping-Logik iOS)
-- `Sources/Views/BacklogRow.swift` (visuelles Indent iOS)
-- `FocusBloxMac/ContentView.swift` (Grouping-Logik macOS) — Phase 2
-- `FocusBloxMac/MacBacklogRow.swift` (visuelles Indent macOS) — Phase 2
-
-**OpenSpec:** `openspec/changes/sub-tasks/` (ausstehend)
 
 **Offene Fragen:**
 - Wie erstellt der User einen Sub-Task? (Swipe-Action / Long-Press / Bearbeitungs-Dialog)

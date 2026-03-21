@@ -100,7 +100,8 @@ final class MockTaskSource: TaskSource, TaskSourceWritable {
         recurrenceMonthDay: Int? = nil,
         recurrenceInterval: Int? = nil,
         description: String? = nil,
-        blockerTaskID: String? = nil
+        blockerTaskID: String? = nil,
+        lifecycleStatus: String = "active"
     ) async throws -> MockTaskData {
         let task = MockTaskData(
             id: UUID().uuidString,

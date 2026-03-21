@@ -43,6 +43,7 @@ struct VoiceInputSheet: View {
 
     private func saveTask(title: String) {
         let task = LocalTask(title: title)
+        task.lifecycleStatus = TaskLifecycleStatus.raw.rawValue
         task.needsTitleImprovement = true
         modelContext.insert(task)
         try? modelContext.save()

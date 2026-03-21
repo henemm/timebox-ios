@@ -5,6 +5,19 @@
 
 ---
 
+## RW_1.1 — Quick Dump — ERLEDIGT (2026-03-21)
+
+- **Epic:** 1 Erfassung | **Spec:** `docs/specs/rework/1.1-quick-dump.md`
+- **Ziel:** Task-Erfassung in < 3 Sekunden, Task landet im Refiner statt im Backlog
+- **Aenderungen:**
+  - `LocalTask.swift`: `TaskLifecycleStatus` Enum (raw/refined/active) + `lifecycleStatus` Property (String, Default "active"), Migration setzt bestehende Tasks auf `.active`
+  - 6 Quick-Capture-Einstiegspunkte setzen `lifecycleStatus = "raw"`: `QuickCaptureView`, `QuickCapturePanel`, `CreateTaskIntent`, iOS ShareExtension, macOS ShareExtension, watchOS VoiceInput
+  - `LocalTaskSource.fetchIncompleteTasks()`: filtert `.raw`-Tasks aus dem Backlog heraus
+  - `WatchLocalTask.swift`: passendes Schema fuer CloudKit-Parity
+  - `PlanItem`: kopiert `lifecycleStatus` von `LocalTask`
+
+---
+
 ## FEATURE_027 — Erledigt-View Kontextmenü & Swipe-Aktionen — ERLEDIGT
 
 - **Beschreibung:** Erledigt-View (Papierkorb-Metapher): Kontextmenü und Swipe-Gesten fokussieren auf Wiederherstellen als primäre Aktion. Löschen ist sekundär.
@@ -394,6 +407,19 @@
 ### 2026-03-04: Stop-Lock + API-Guard
 ### 2026-03-12: XP/Evolution-System entfernt
 ### 2026-03-12: Monster Coach Phase 2 — Morning Intention Screen
+
+---
+
+## Verschoben am 2026-03-20: Backlog-Aufraeumen
+
+### TD_004: Monster-Removal: Dead Code Cleanup — ERLEDIGT
+- 4 tote Dateien geloescht (DailyIntention.swift, 3 Coach-UI-Tests), 3 Dateien bereinigt (DebugHierarchy, MacToolbar, AI-Prompt), PBX-Refs entfernt. -426 LoC. 6 Validierungstests GRUEN.
+
+### BUG_114: FocusBloxMac: SwiftData Cast-Fehler in LocalTask.tags — ERLEDIGT
+- **Root Cause:** `LocalTask.tags` war `[String]` (non-optional). Bei NULL in SQLite (CloudKit sync) → `swift_dynamicCastFailure`. Fix: `tags` auf `[String]?` (optional) + `?? []` an allen ~20 Zugriffspunkten.
+
+### BUG_113: FocusBloxMac: Start-Crash in DEBUG — CloudKit Signing-Assertion — ERLEDIGT
+- **Problem:** macOS App crasht beim Start in DEBUG-Builds mit EXC_BREAKPOINT auf `com.apple.coredata.cloudkit.queue`. Root Cause: CloudKit in DEBUG-Builds mit leerer `codeSigningTeamID`. Nicht mehr reproduzierbar.
 
 ---
 

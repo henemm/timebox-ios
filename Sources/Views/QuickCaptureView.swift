@@ -358,7 +358,8 @@ struct QuickCaptureView: View {
                     importance: capturedImportance,
                     estimatedDuration: capturedDuration,
                     urgency: capturedUrgency,
-                    taskType: capturedTaskType
+                    taskType: capturedTaskType,
+                    lifecycleStatus: TaskLifecycleStatus.raw.rawValue
                 )
 
                 if shouldMarkNextUp {

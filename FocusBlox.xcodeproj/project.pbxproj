@@ -197,6 +197,8 @@
 		DISC01BUILD0000001 /* Discipline.swift in Sources */ = {isa = PBXBuildFile; fileRef = DISC01FILEREF00001 /* Discipline.swift */; };
 		DISC02BUILD0000001 /* Discipline.swift in Sources */ = {isa = PBXBuildFile; fileRef = DISC01FILEREF00001 /* Discipline.swift */; };
 		DSCT01BUILD0000001 /* DisciplineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DSCT01FILEREF00001 /* DisciplineTests.swift */; };
+		LCST01BUILD0000001 /* LifecycleStatusTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = LCST01FILEREF00001 /* LifecycleStatusTests.swift */; };
+		LCST02BUILD0000001 /* LifecycleStatusUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = LCST02FILEREF00001 /* LifecycleStatusUITests.swift */; };
 		DSGNSYS01BUILD0001 /* DesignSystemTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DSGNSYS01FILE00001 /* DesignSystemTests.swift */; };
 		DSGNSYS02BUILD0001 /* DesignSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = DSGNSYS02FILE00001 /* DesignSystem.swift */; };
 		DUEDN01BUILD000001 /* DueDateNotificationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DUEDN01FILE0000001 /* DueDateNotificationTests.swift */; };
@@ -735,6 +737,8 @@
 		DFSRT02FILEREF001 /* DeferredSortController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeferredSortController.swift; sourceTree = "<group>"; };
 		DISC01FILEREF00001 /* Discipline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Discipline.swift; sourceTree = "<group>"; };
 		DSCT01FILEREF00001 /* DisciplineTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DisciplineTests.swift; sourceTree = "<group>"; };
+		LCST01FILEREF00001 /* LifecycleStatusTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LifecycleStatusTests.swift; sourceTree = "<group>"; };
+		LCST02FILEREF00001 /* LifecycleStatusUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LifecycleStatusUITests.swift; sourceTree = "<group>"; };
 		DSGNSYS01FILE00001 /* DesignSystemTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignSystemTests.swift; sourceTree = "<group>"; };
 		DSGNSYS02FILE00001 /* DesignSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignSystem.swift; sourceTree = "<group>"; };
 		DUEDN01FILE0000001 /* DueDateNotificationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DueDateNotificationTests.swift; sourceTree = "<group>"; };
@@ -1123,6 +1127,7 @@
 				35E10E0297BB375AFCD4517E /* DueDateBadgeExtractionUITests.swift */,
 				ERLINSP01FILE0001 /* ErledigtViewInspectionTest.swift */,
 				ERLVW027FILE00001 /* ErledigtViewUITests.swift */,
+				LCST02FILEREF00001 /* LifecycleStatusUITests.swift */,
 			);
 			path = FocusBloxUITests;
 			sourceTree = "<group>";
@@ -1379,6 +1384,7 @@
 				EABF765F6113A4B974211ACE /* FocusBlockTaskCountTests.swift */,
 				8B1F5BC646304B206E7A16D1 /* CalendarDeepLinkTests.swift */,
 				DSCT01FILEREF00001 /* DisciplineTests.swift */,
+				LCST01FILEREF00001 /* LifecycleStatusTests.swift */,
 				TD03A00001FREF000000001 /* GapFinderTests.swift */,
 				TD03A00003FREF000000001 /* FocusBlockActionServiceTests.swift */,
 				7D75178618986DA8EB698748 /* DisciplineStatsServiceTests.swift */,
@@ -2269,6 +2275,7 @@
 				61BE4199B7200D96588088BD /* NextUpSortOrderUITests.swift in Sources */,
 				ERLINSP01BUILD001 /* ErledigtViewInspectionTest.swift in Sources */,
 				ERLVW027BUILD0001 /* ErledigtViewUITests.swift in Sources */,
+				LCST02BUILD0000001 /* LifecycleStatusUITests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2363,6 +2370,7 @@
 				E388ADA5C322C89B3687240F /* FocusBlockTaskCountTests.swift in Sources */,
 				5155F66E588A8366FE0E6D38 /* CalendarDeepLinkTests.swift in Sources */,
 				DSCT01BUILD0000001 /* DisciplineTests.swift in Sources */,
+				LCST01BUILD0000001 /* LifecycleStatusTests.swift in Sources */,
 				TD03A00001BUILD00000001 /* GapFinderTests.swift in Sources */,
 				TD03A00003BUILD00000001 /* FocusBlockActionServiceTests.swift in Sources */,
 				69353F8733B7CE7A1198CE23 /* DisciplineStatsServiceTests.swift in Sources */,

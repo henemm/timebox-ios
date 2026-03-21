@@ -188,7 +188,7 @@ struct QuickCaptureView: View {
 
         Task {
             let taskSource = LocalTaskSource(modelContext: modelContext)
-            let task = try? await taskSource.createTask(title: title, taskType: "")
+            let task = try? await taskSource.createTask(title: title, taskType: "", lifecycleStatus: TaskLifecycleStatus.raw.rawValue)
             if shouldMarkNextUp, let task {
                 task.isNextUp = true
                 task.nextUpSortOrder = Int.max

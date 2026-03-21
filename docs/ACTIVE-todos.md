@@ -8,7 +8,34 @@
 
 ---
 
-## Offene Items
+## Rework: FocusBlox Neuausrichtung
+
+> 18 Stories in 5 Epics. Reihenfolge: Epic 0 → 1 → 3 → 2 → 4.
+> Specs: `docs/specs/rework/` | [Epic Overview](specs/rework/0.0-epic-overview.md)
+
+| ID | Epic | Titel | Prio | Aufwand | Spec |
+|----|------|-------|------|---------|------|
+| RW_0.1 | 0 Infrastruktur | Smart Notification Engine | High | M | [Spec](specs/rework/0.1-smart-notification-engine.md) |
+| RW_0.2 | 0 Infrastruktur | BehavioralProfileService | High | M | [Spec](specs/rework/0.2-behavioral-profile-service.md) |
+| ~~RW_1.1~~ | ~~1 Erfassung~~ | ~~Quick Dump~~ | ~~High~~ | ~~M~~ | ~~[Spec](specs/rework/1.1-quick-dump.md)~~ ERLEDIGT → [Archiv](ARCHIVE-todos.md) |
+| RW_1.2 | 1 Erfassung | AI Context Extraction | High | L | [Spec](specs/rework/1.2-ai-context-extraction.md) |
+| RW_1.3 | 1 Erfassung | The Refiner | High | L | [Spec](specs/rework/1.3-the-refiner.md) |
+| RW_3.1 | 3 Ausfuehrung | Task direkt auf Kalender droppen | Medium | L | [Spec](specs/rework/3.1-calendar-task-drop.md) |
+| RW_3.2 | 3 Ausfuehrung | Focus Sprint ("Los"-Button) | Medium | M | [Spec](specs/rework/3.2-focus-sprint.md) |
+| RW_3.3 | 3 Ausfuehrung | Follow-up Logic | Medium | S | [Spec](specs/rework/3.3-follow-up-logic.md) |
+| RW_3.4 | 3 Ausfuehrung | Emotional Nudge (Micro-Tasks) | Medium | M | [Spec](specs/rework/3.4-emotional-nudge.md) |
+| RW_2.1 | 2 Tagesplanung | Tagesansicht ("Dein Tag") | Medium | XL | [Spec](specs/rework/2.1-day-view.md) |
+| RW_2.2 | 2 Tagesplanung | KI-gestuetzte Tagesvorschlaege | Medium | L | [Spec](specs/rework/2.2-next-up-suggestions.md) |
+| RW_2.3 | 2 Tagesplanung | Limitation Guard | Medium | S | [Spec](specs/rework/2.3-limitation-guard.md) |
+| RW_2.4 | 2 Tagesplanung | Backlog UX Rework | Medium | L | [Spec](specs/rework/2.4-backlog-ux-rework.md) |
+| RW_4.1 | 4 Reflexion | Soft Evening Reset | Low | M | [Spec](specs/rework/4.1-soft-evening-reset.md) |
+| RW_4.2 | 4 Reflexion | Success Story Generator | Low | L | [Spec](specs/rework/4.2-success-story-generator.md) |
+| RW_4.3 | 4 Reflexion | Failure Protocol | Low | M | [Spec](specs/rework/4.3-failure-protocol.md) |
+| RW_4.4 | 4 Reflexion | Morning Widget | Low | M | [Spec](specs/rework/4.4-morning-widget.md) |
+
+---
+
+## Offene Items (Legacy)
 
 | ID | Titel | Prio | Aufwand | Plattform | Beschreibung |
 |----|-------|------|---------|-----------|-------------|

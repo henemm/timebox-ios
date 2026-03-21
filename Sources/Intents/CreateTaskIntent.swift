@@ -16,6 +16,7 @@ struct CreateTaskIntent: AppIntent {
         let container = try SharedModelContainer.create()
         let context = ModelContext(container)
         let task = LocalTask(title: taskTitle)
+        task.lifecycleStatus = TaskLifecycleStatus.raw.rawValue
         // Bug 97: Deterministic date extraction from title keywords (no AI needed)
         task.dueDate = TaskTitleEngine.extractDeterministicDueDate(from: taskTitle)
         // Flag for deferred AI title cleanup on next app launch

@@ -1,6 +1,16 @@
 import Foundation
 import SwiftData
 
+// MARK: - TaskLifecycleStatus
+
+/// Lifecycle status of a task: raw (just captured) → refined (reviewed) → active (in backlog).
+/// Stored as String rawValue on LocalTask for CloudKit compatibility.
+enum TaskLifecycleStatus: String, Codable, CaseIterable {
+    case raw       // Gerade erfasst, nicht veredelt
+    case refined   // Durch Refiner bestaetigt
+    case active    // Im Backlog / Next-Up
+}
+
 /// SwiftData model for locally stored tasks.
 /// Supports CloudKit sync when enabled on the ModelContainer.
 /// Note: CloudKit requires all attributes to have default values.
@@ -149,6 +159,10 @@ final class LocalTask {
     /// Source URL from Share Extension (e.g. Safari link)
     var sourceURL: String?
 
+    /// Lifecycle status: raw (just captured) → refined (reviewed) → active (in backlog)
+    /// Default "active" ensures existing tasks remain visible after migration.
+    var lifecycleStatus: String = "active"
+
     /// String id for TaskSourceData protocol conformance
     var id: String { uuid.uuidString }
 
@@ -172,7 +186,8 @@ final class LocalTask {
         taskDescription: String? = nil,
         externalID: String? = nil,
         sourceSystem: String = "local",
-        nextUpSortOrder: Int? = nil
+        nextUpSortOrder: Int? = nil,
+        lifecycleStatus: String = "active"
     ) {
         self.uuid = uuid
         self.title = title
@@ -194,6 +209,7 @@ final class LocalTask {
         self.externalID = externalID
         self.sourceSystem = sourceSystem
         self.nextUpSortOrder = nextUpSortOrder
+        self.lifecycleStatus = lifecycleStatus
     }
 }
 

@@ -60,6 +60,9 @@ struct PlanItem: Identifiable, Sendable {
     /// ID of the task that blocks this one (nil = no blocker)
     let blockerTaskID: String?
 
+    /// Lifecycle status: raw/refined/active
+    let lifecycleStatus: String
+
     /// Number of tasks that depend on this task (populated externally)
     var dependentCount: Int = 0
 
@@ -147,6 +150,7 @@ struct PlanItem: Identifiable, Sendable {
 
         self.modifiedAt = nil
         self.blockerTaskID = nil
+        self.lifecycleStatus = "active"  // Reminders are always active
     }
 
     init(localTask: LocalTask) {
@@ -196,6 +200,7 @@ struct PlanItem: Identifiable, Sendable {
 
         self.modifiedAt = localTask.modifiedAt
         self.blockerTaskID = localTask.blockerTaskID
+        self.lifecycleStatus = localTask.lifecycleStatus
     }
 
     private static func resolveDuration(manual: Int?, title: String?) -> (Int, DurationSource) {
