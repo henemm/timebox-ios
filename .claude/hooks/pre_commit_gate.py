@@ -251,6 +251,16 @@ def check_adversary_verdict() -> tuple[bool, str]:
         if phase not in ("phase6_implement", "phase7_validate", "phase8_complete"):
             return True, f"Phase {phase} doesn't require adversary verdict"
 
+        # Respect user_override flag and override token
+        if workflow.get("user_override", False):
+            return True, "User override active — skipping adversary check"
+        try:
+            from override_token import has_valid_token
+            if has_valid_token(active_name):
+                return True, "Override token valid — skipping adversary check"
+        except ImportError:
+            pass
+
         verdict = workflow.get("adversary_verdict")
         if not verdict:
             return False, f"""
@@ -364,18 +374,47 @@ def main():
         print("=" * 70, file=sys.stderr)
         sys.exit(2)
 
-    # Check for UI changes - remind about screenshot
-    if config["screenshot_reminder"] and check_for_ui_changes(config):
-        # Don't block, just output reminder
-        print("Note: UI changes detected. Consider adding screenshot artifacts.", file=sys.stderr)
+    # Check for UI changes — HARD BLOCK if AFTER screenshot missing
+    if check_for_ui_changes(config):
+        lock_file = Path(__file__).parent.parent / "ui_screenshot_lock.json"
+        if lock_file.exists():
+            try:
+                lock = json.loads(lock_file.read_text())
+                if lock.get("awaiting_after", False):
+                    # Check if AFTER screenshot exists
+                    wf_name = lock.get("workflow", "default")
+                    after_dir = get_project_root() / "docs" / "artifacts" / wf_name / "screenshots"
+                    has_after = False
+                    if after_dir.exists():
+                        for img in after_dir.iterdir():
+                            if "after" in img.name.lower() and img.stat().st_size > 1000:
+                                has_after = True
+                                break
+                    if not has_after:
+                        print("=" * 70, file=sys.stderr)
+                        print("BLOCKED - AFTER Screenshot fehlt!", file=sys.stderr)
+                        print("=" * 70, file=sys.stderr)
+                        print(file=sys.stderr)
+                        print("Du hast einen BEFORE Screenshot gemacht, aber", file=sys.stderr)
+                        print("keinen AFTER Screenshot zum Vergleich.", file=sys.stderr)
+                        print(file=sys.stderr)
+                        print(f"Speichere AFTER Screenshot in:", file=sys.stderr)
+                        print(f"  {after_dir}/after-*.png", file=sys.stderr)
+                        print("=" * 70, file=sys.stderr)
+                        sys.exit(2)
+            except (json.JSONDecodeError, OSError):
+                pass
 
-    # Clean up override token after successful commit gate pass
-    token_path = Path(__file__).parent.parent / "user_override_token.json"
-    if token_path.exists():
-        try:
-            token_path.unlink()
-        except OSError:
-            pass
+    # Clean up override token for this workflow after successful commit gate pass
+    try:
+        from override_token import remove_token
+        from workflow_state_multi import load_state, session_active_name
+        _state = load_state()
+        _active = session_active_name(_state)
+        if _active:
+            remove_token(_active)
+    except (ImportError, Exception):
+        pass
 
     sys.exit(0)
 

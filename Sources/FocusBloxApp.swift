@@ -5,9 +5,10 @@ import CoreSpotlight
 import FocusBloxCore
 import UserNotifications
 
-// MARK: - Notification Name for Control Center Widget
+// MARK: - Notification Names
 extension Notification.Name {
     static let quickCaptureRequested = Notification.Name("QuickCaptureRequested")
+    static let focusSprintStarted = Notification.Name("FocusSprintStarted")
 }
 
 @main
@@ -151,7 +152,11 @@ struct FocusBloxApp: App {
                 completedTaskIDs: []
             )
 
-            mock.mockFocusBlocks = [focusBlock1, focusBlock2, activeBlock, unalignedBlock]
+            if ProcessInfo.processInfo.arguments.contains("--no-active-block") {
+                mock.mockFocusBlocks = [focusBlock1, focusBlock2, unalignedBlock]
+            } else {
+                mock.mockFocusBlocks = [focusBlock1, focusBlock2, activeBlock, unalignedBlock]
+            }
 
             // Add mock Calendar Events for timeline testing
             let meeting1Start = calendar.date(byAdding: .hour, value: 8, to: startOfDay)!
@@ -329,6 +334,9 @@ struct FocusBloxApp: App {
             }
             .onReceive(NotificationCenter.default.publisher(for: .quickCaptureRequested)) { _ in
                 showQuickCapture = true
+            }
+            .onReceive(NotificationCenter.default.publisher(for: .focusSprintStarted)) { _ in
+                selectedTab = .focus
             }
             .onContinueUserActivity(CSSearchableItemActionType) { _ in
                 // Spotlight task tapped — app opens (deep-link navigation not in scope)

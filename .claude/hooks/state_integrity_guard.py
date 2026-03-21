@@ -32,6 +32,8 @@ PROTECTED_PATTERNS = [
     r"user_override_token\.json",
     r"\.claude/hooks/[^\s]*\.py",
     r"\.claude/settings\.json",
+    r"ui_test_preflight_state\.json",
+    r"ui_screenshot_lock\.json",
 ]
 
 # Write indicators — if a command references a protected file AND contains
@@ -73,8 +75,11 @@ ALLOWED_COMMANDS = [
     "workflow_state_multi.py set-field",
     "workflow_state_multi.py pause",
     "workflow_state_multi.py complete",
+    "workflow_state_multi.py mark-docs-updated",
     # Adversary gate (sets adversary_verdict based on test proof)
     "adversary_gate.py",
+    # Inspection gate (sets visual/result inspection fields based on screenshot proof)
+    "inspection_gate.py",
     # Read-only operations are fine
     "cat .claude/workflow_state.json",
     "cat .claude/settings.json",
@@ -170,10 +175,58 @@ def is_compound_command(command: str) -> bool:
     return bool(re.search(r"[;&|]{1,2}", stripped))
 
 
+INSPECTION_BLOCK_MESSAGE = """
++======================================================================+
+|  BLOCKED: Inspection Field Protection!                                |
++======================================================================+
+|                                                                       |
+|  You cannot directly set inspection fields via set-field.             |
+|  These fields are proof-based — they require a REAL screenshot.       |
+|                                                                       |
+|  The ONLY way to set them:                                            |
+|                                                                       |
+|  BEFORE analysis (visual inspection):                                 |
+|    python3 .claude/hooks/inspection_gate.py before <screenshot.png>   |
+|                                                                       |
+|  AFTER implementation (result inspection):                            |
+|    python3 .claude/hooks/inspection_gate.py after <screenshot.png>    |
+|                                                                       |
+|  Falls kein Screenshot moeglich → FRAGE HENNING um Override.          |
+|  Verbringe KEINE Zeit damit, einen Workaround zu suchen.             |
++======================================================================+
+"""
+
+# Inspection fields that can ONLY be set by inspection_gate.py
+PROTECTED_INSPECTION_FIELDS = [
+    "visual_inspection_done",
+    "visual_inspection_screenshot",
+    "result_inspection_done",
+    "result_inspection_screenshot",
+]
+
+
+def is_inspection_field_manipulation(command: str) -> bool:
+    """Check if command tries to set a protected inspection field via set-field."""
+    for field in PROTECTED_INSPECTION_FIELDS:
+        if f"set-field {field}" in command or f"set-field\t{field}" in command:
+            return True
+    return False
+
+
 def main():
     command = get_command()
     if not command:
         sys.exit(0)
+
+    # FIRST: Block inspection field manipulation via set-field
+    # This runs BEFORE the whitelist check because set-field is whitelisted
+    # but these specific fields must go through inspection_gate.py
+    if is_inspection_field_manipulation(command):
+        # Allow inspection_gate.py to set these fields
+        if "inspection_gate.py" in command:
+            sys.exit(0)
+        print(INSPECTION_BLOCK_MESSAGE, file=sys.stderr)
+        sys.exit(2)
 
     # Quick check: does command reference any protected file?
     if not references_protected_file(command):

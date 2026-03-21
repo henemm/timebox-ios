@@ -140,6 +140,60 @@ enum FocusBlockActionService {
         }
     }
 
+    /// Result of a Focus Sprint start attempt.
+    enum FocusSprintResult: Sendable, Equatable {
+        /// Sprint started successfully. blockID is the new EKEvent ID.
+        case started(blockID: String)
+        /// Another block is currently active — user must stop it first.
+        case blockedByActiveBlock(blockTitle: String)
+    }
+
+    /// Start a Focus Sprint immediately for a given task.
+    /// Creates a new Focus Block (start = now, end = now + durationMinutes),
+    /// assigns the task, and persists assignedFocusBlockID on LocalTask.
+    @MainActor
+    static func startImmediate(
+        taskID: String,
+        eventKitRepo: any EventKitRepositoryProtocol,
+        modelContext: ModelContext,
+        durationMinutes: Int? = nil
+    ) throws -> FocusSprintResult {
+        // 1. Check for already-active block
+        let todayBlocks = (try? eventKitRepo.fetchFocusBlocks(for: Date())) ?? []
+        if let activeBlock = todayBlocks.first(where: { $0.isActive }) {
+            return .blockedByActiveBlock(blockTitle: activeBlock.title)
+        }
+
+        // 2. Resolve duration: parameter → task.estimatedDuration → 60 min default
+        let descriptor = FetchDescriptor<LocalTask>()
+        let allTasks = (try? modelContext.fetch(descriptor)) ?? []
+        guard let task = allTasks.first(where: { $0.id == taskID }) else {
+            return .blockedByActiveBlock(blockTitle: "")
+        }
+
+        let resolvedDuration = durationMinutes ?? task.estimatedDuration ?? 60
+
+        // 3. Create the block (start = now, end = now + duration)
+        let startDate = Date()
+        let endDate = startDate.addingTimeInterval(TimeInterval(resolvedDuration * 60))
+        let blockID = try eventKitRepo.createFocusBlock(startDate: startDate, endDate: endDate)
+
+        // 4. Assign the task to the block
+        try eventKitRepo.updateFocusBlock(
+            eventID: blockID,
+            taskIDs: [taskID],
+            completedTaskIDs: [],
+            taskTimes: [:]
+        )
+
+        // 5. Persist assignedFocusBlockID on LocalTask
+        task.assignedFocusBlockID = blockID
+        task.isNextUp = false
+        try? modelContext.save()
+
+        return .started(blockID: blockID)
+    }
+
     /// Follow-up a task: complete the original and create an editable copy.
     @MainActor
     static func followUpTask(

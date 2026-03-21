@@ -17,6 +17,7 @@ struct MacBacklogRow: View {
     var onUrgencyToggle: ((String?) -> Void)?
     var onCategorySelect: ((String) -> Void)?  // Direct category selection (macOS Menu)
     var onDurationSelect: ((Int?) -> Void)?    // Direct duration selection (macOS Menu)
+    var onStartFocusSprint: (() -> Void)?
     var isPendingResort: Bool = false  // Deferred sort: shows border when item changed but not yet re-sorted
     var isCompletionPending: Bool = false  // Deferred completion: shows filled checkbox before task disappears
     var isBlocked: Bool = false  // Task is blocked by another task (dimmed + indented + checkbox disabled)

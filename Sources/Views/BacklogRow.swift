@@ -11,6 +11,7 @@ struct BacklogRow: View {
     var onCategoryTap: (() -> Void)?
     var onEditTap: (() -> Void)?
     var onDeleteTap: (() -> Void)?
+    var onStartFocusSprint: (() -> Void)?
     var onTitleSave: ((String) -> Void)?  // Inline title edit callback
     var isPendingResort: Bool = false  // Deferred sort: shows border when item changed but not yet re-sorted
     var isCompletionPending: Bool = false  // Deferred completion: shows filled checkbox before task disappears
@@ -51,6 +52,21 @@ struct BacklogRow: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .opacity(isCompletionPending ? 0.5 : 1.0)
                 .strikethrough(isCompletionPending)
+
+            if let onStartFocusSprint {
+                Button {
+                    onStartFocusSprint()
+                } label: {
+                    Image(systemName: "bolt.fill")
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundStyle(.white)
+                        .padding(8)
+                        .background(Circle().fill(.orange))
+                }
+                .buttonStyle(.borderless)
+                .accessibilityIdentifier("focusSprintButton_\(item.id)")
+                .accessibilityLabel("Focus Sprint starten")
+            }
         }
         .padding(12)
         .background(
@@ -78,7 +94,6 @@ struct BacklogRow: View {
         }
         .opacity(isBlocked ? 0.5 : 1.0)
         .padding(.leading, isBlocked ? 24 : 0)
-        .contentShape(Rectangle())
         .userActivity(TaskEntity.activityType, isActive: !item.isCompleted) { activity in
             activity.title = item.title
             activity.isEligibleForSearch = true

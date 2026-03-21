@@ -71,6 +71,8 @@ struct BacklogView: View {
     @State private var showUndoAlert = false
     @State private var showSettings = false
     @State private var undoResultMessage = ""
+    @State private var focusSprintConflictTitle: String?
+    @State private var focusSprintFeedback = false
 
 
     // MARK: - Search Filter
@@ -197,6 +199,15 @@ struct BacklogView: View {
             .sensoryFeedback(.success, trigger: durationFeedback)
             .sensoryFeedback(.success, trigger: nextUpFeedback)
             .sensoryFeedback(.success, trigger: completeFeedback)
+            .sensoryFeedback(.impact(weight: .medium), trigger: focusSprintFeedback)
+            .alert("Aktiver Focus Block", isPresented: Binding(
+                get: { focusSprintConflictTitle != nil },
+                set: { if !$0 { focusSprintConflictTitle = nil } }
+            )) {
+                Button("OK") { focusSprintConflictTitle = nil }
+            } message: {
+                Text("Es läuft bereits ein Focus Block: \"\(focusSprintConflictTitle ?? "")\".\nBitte beende ihn zuerst.")
+            }
             .sheet(item: $selectedItemForDuration) { item in
                 DurationPicker(currentDuration: item.effectiveDuration) { newDuration in
                     updateDuration(for: item, minutes: newDuration)
@@ -500,6 +511,25 @@ struct BacklogView: View {
             scheduleDeferredResort(for: item.id)
         } catch {
             errorMessage = "Dauer konnte nicht gespeichert werden."
+        }
+    }
+
+    private func startFocusSprint(for item: PlanItem) {
+        do {
+            let result = try FocusBlockActionService.startImmediate(
+                taskID: item.id,
+                eventKitRepo: eventKitRepo,
+                modelContext: modelContext
+            )
+            switch result {
+            case .started:
+                focusSprintFeedback.toggle()
+                NotificationCenter.default.post(name: .focusSprintStarted, object: nil)
+            case .blockedByActiveBlock(let title):
+                focusSprintConflictTitle = title
+            }
+        } catch {
+            errorMessage = "Focus Sprint konnte nicht gestartet werden: \(error.localizedDescription)"
         }
     }
 
@@ -846,6 +876,7 @@ struct BacklogView: View {
                         onCategoryTap: { selectedItemForCategory = item },
                         onEditTap: { taskToEditDirectly = item },
                         onDeleteTap: { deleteTask(item) },
+                        onStartFocusSprint: { startFocusSprint(for: item) },
                         onTitleSave: { newTitle in saveTitleEdit(for: item, title: newTitle) },
                         isPendingResort: deferredSort.isPending(item.id),
                         isCompletionPending: deferredCompletion.isPending(item.id)
@@ -894,8 +925,8 @@ struct BacklogView: View {
                         .background(Color.green.opacity(0.2))
                         .clipShape(Capsule())
                 }
+                .accessibilityIdentifier("nextUpSection")
             }
-            .accessibilityIdentifier("nextUpSection")
         }
     }
 
@@ -912,6 +943,7 @@ struct BacklogView: View {
             onCategoryTap: { selectedItemForCategory = item },
             onEditTap: { handleEditTap(item) },
             onDeleteTap: { deleteTask(item) },
+            onStartFocusSprint: { startFocusSprint(for: item) },
             onTitleSave: { newTitle in saveTitleEdit(for: item, title: newTitle) },
             isPendingResort: deferredSort.isPending(item.id),
             isCompletionPending: deferredCompletion.isPending(item.id),
@@ -1045,6 +1077,9 @@ struct BacklogView: View {
         .listStyle(.plain)
         .scrollContentBackground(.hidden)
         .accessibilityIdentifier("backlogTaskList")
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            Color.clear.frame(height: 120)
+        }
         .refreshable {
             await loadTasks()
         }

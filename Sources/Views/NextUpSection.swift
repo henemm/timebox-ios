@@ -7,6 +7,7 @@ struct NextUpSection: View {
     let onRemoveFromNextUp: (String) -> Void
     var onEditTask: ((PlanItem) -> Void)?
     var onDeleteTask: ((PlanItem) -> Void)?
+    var onStartFocusSprint: ((String) -> Void)?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -39,11 +40,21 @@ struct NextUpSection: View {
                 // Task list with swipe actions
                 List {
                     ForEach(tasks) { task in
-                        NextUpRow(task: task) {
+                        NextUpRow(task: task, onRemove: {
                             onRemoveFromNextUp(task.id)
-                        }
+                        }, onStartFocusSprint: onStartFocusSprint != nil ? {
+                            onStartFocusSprint?(task.id)
+                        } : nil)
                         .accessibilityIdentifier("nextUpRow")
                         .contextMenu {
+                            if onStartFocusSprint != nil {
+                                Button {
+                                    onStartFocusSprint?(task.id)
+                                } label: {
+                                    Label("Focus Sprint starten", systemImage: "bolt.fill")
+                                }
+                                Divider()
+                            }
                             Button {
                                 onEditTask?(task)
                             } label: {
@@ -103,6 +114,7 @@ struct NextUpSection: View {
 struct NextUpRow: View {
     let task: PlanItem
     let onRemove: () -> Void
+    var onStartFocusSprint: (() -> Void)?
 
     var body: some View {
         HStack(spacing: 8) {
@@ -119,6 +131,21 @@ struct NextUpRow: View {
             Text("\(task.effectiveDuration) min")
                 .font(.caption)
                 .foregroundStyle(.secondary)
+
+            if let onStartFocusSprint {
+                Button {
+                    onStartFocusSprint()
+                } label: {
+                    Image(systemName: "bolt.fill")
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundStyle(.white)
+                        .padding(6)
+                        .background(Circle().fill(.orange))
+                }
+                .buttonStyle(.plain)
+                .accessibilityIdentifier("nextUpSprintButton_\(task.id)")
+                .accessibilityLabel("Focus Sprint starten")
+            }
 
             Button {
                 onRemove()

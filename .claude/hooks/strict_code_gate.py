@@ -120,27 +120,17 @@ def check_user_override(workflow: dict = None, workflow_name: str = None) -> boo
         workflow_name: Explicit workflow name to check against token.
                        Falls back to active_workflow if None.
     """
-    token_path = Path(__file__).parent.parent / "user_override_token.json"
-    if not token_path.exists():
-        return False
     try:
-        from datetime import datetime as _dt, timedelta as _td
-        token = json.loads(token_path.read_text())
-        # Check TTL (1 hour)
-        created = token.get("created", "")
-        if created:
-            created_dt = _dt.fromisoformat(created)
-            if _dt.now() - created_dt > _td(hours=1):
-                token_path.unlink(missing_ok=True)
-                return False
-        # Check workflow match — prefer explicit name, fallback to active
-        if workflow_name:
-            return token.get("workflow") == workflow_name
-        state = load_state()
-        active_name = session_active_name(state) or ""
-        return token.get("workflow") == active_name
-    except (json.JSONDecodeError, KeyError, ValueError, OSError):
-        return False
+        from override_token import has_valid_token
+    except ImportError:
+        sys.path.insert(0, str(Path(__file__).parent))
+        from override_token import has_valid_token
+
+    if workflow_name:
+        return has_valid_token(workflow_name)
+    state = load_state()
+    active_name = session_active_name(state) or ""
+    return has_valid_token(active_name)
 
 
 def check_red_test_done(workflow: dict) -> bool:
@@ -219,6 +209,31 @@ def main():
 
     if not file_path:
         sys.exit(0)
+
+    # PROTECTED STATE FILES — block Write/Edit even though .json is whitelisted
+    # These files control hook behavior and must only be written by their
+    # respective hook/skill (e.g., /inspect-ui writes ui_test_preflight_state.json)
+    PROTECTED_STATE_FILES = [
+        "ui_test_preflight_state.json",
+        "ui_screenshot_lock.json",
+        "workflow_state.json",
+        "user_override_token.json",
+    ]
+    for protected in PROTECTED_STATE_FILES:
+        if file_path.endswith(protected):
+            print(f"""
++======================================================================+
+|  BLOCKED: Protected State File!                                       |
++======================================================================+
+|                                                                       |
+|  You cannot directly write to: {protected:<37}|
+|  This file is managed by its respective hook/skill.                   |
+|                                                                       |
+|  Use the official workflow commands instead.                          |
+|  DO NOT attempt to bypass by writing the file directly.               |
++======================================================================+
+""", file=sys.stderr)
+            sys.exit(2)
 
     # Check if file is in whitelist (docs, tests, config)
     if is_always_allowed(file_path):

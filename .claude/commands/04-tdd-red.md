@@ -150,6 +150,40 @@ print('RED artifacts registered with verified failure')
 "
 ```
 
+### 6. Test-Snapshot erstellen (Regressions-Schutz)
+
+**PFLICHT:** Snapshot aller Test-Methoden speichern. Der `test_regression_guard` Hook
+blockt spaeter jedes Entfernen von Tests ohne PO-Genehmigung.
+
+```bash
+python3 -c "
+import re, sys, glob
+sys.path.insert(0, '.claude/hooks')
+from workflow_state_multi import load_state, save_state
+
+state = load_state()
+active = state['active_workflow']
+
+# Extract test method names from all test files
+pattern = re.compile(r'^\s*func\s+(test\w+)\s*\(\s*\)', re.MULTILINE)
+snapshot = {}
+
+for test_dir in ['FocusBloxTests', 'FocusBloxUITests']:
+    for f in glob.glob(f'{test_dir}/*.swift'):
+        with open(f) as fh:
+            methods = pattern.findall(fh.read())
+        if methods:
+            snapshot[f] = methods
+            print(f'  {f}: {len(methods)} tests')
+
+state['workflows'][active]['red_test_snapshot'] = snapshot
+save_state(state)
+
+total = sum(len(v) for v in snapshot.values())
+print(f'Snapshot saved: {total} tests in {len(snapshot)} files')
+"
+```
+
 ## RED Phase Checklist
 
 - [ ] Ich kann fuer JEDEN Test sagen welche Zeile ihn brechen wuerde
@@ -159,6 +193,7 @@ print('RED artifacts registered with verified failure')
 - [ ] UI Tests ausgefuehrt und FEHLGESCHLAGEN
 - [ ] `ui_test_red_done: true` gesetzt
 - [ ] Alle Artefakte registriert
+- [ ] Test-Snapshot erstellt (`red_test_snapshot` im Workflow State)
 
 ## Next Step
 

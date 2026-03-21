@@ -21,6 +21,17 @@ import os
 from datetime import datetime, timedelta
 from pathlib import Path
 
+# Import multi-workflow state manager for TDD RED phase detection
+try:
+    from workflow_state_multi import (
+        load_state, session_active_name
+    )
+except ImportError:
+    sys.path.insert(0, str(Path(__file__).parent))
+    from workflow_state_multi import (
+        load_state, session_active_name
+    )
+
 
 PREFLIGHT_MAX_AGE_MINUTES = 15
 STATE_FILE_NAME = "ui_test_preflight_state.json"
@@ -40,6 +51,21 @@ ANTI_PATTERNS = [
         'Nutze stattdessen: app.tabBars.buttons["TabLabel"]',
     ),
 ]
+
+
+def is_tdd_red_phase() -> bool:
+    """Check if the active workflow is in TDD RED phase.
+    During TDD RED, views don't exist yet, so /inspect-ui cannot be run."""
+    try:
+        state = load_state()
+        active_name = session_active_name(state)
+        if not active_name:
+            return False
+        workflows = state.get("workflows", {})
+        workflow = workflows.get(active_name, {})
+        return workflow.get("current_phase") == "phase5_tdd_red"
+    except Exception:
+        return False
 
 
 def get_project_root() -> Path:
@@ -109,8 +135,11 @@ def main():
     if is_exception_file(file_path):
         sys.exit(0)
 
-    # Check if /inspect-ui was run recently
-    if not preflight_is_recent():
+    # Skip preflight in TDD RED phase — views don't exist yet, nothing to inspect
+    if is_tdd_red_phase():
+        # Still check anti-patterns below, but skip /inspect-ui requirement
+        pass
+    elif not preflight_is_recent():
         basename = Path(file_path).name
         print(f"""
 BLOCKED: UI Test Preflight erforderlich!

@@ -134,5 +134,23 @@ SyncEngine.deleteRecurringSeries(     // 3. Erst jetzt löschen — kein LocalTa
 
 ---
 
+## SwiftUI List: Mehrere interaktive Buttons pro Zeile (RW_3.2)
+
+**Problem:** Ein zweiter Button in einer `List`-Zeile (z.B. ein "Los"-Sprint-Button neben bestehendem Content) wird nicht zuverlässig getappt — stattdessen triggert die Zeile die Row-Aktion.
+
+**Root Causes & Fixes:**
+
+1. **`.buttonStyle(.plain)` in List-Zeilen** leitet Taps manchmal an die übergeordnete Geste weiter. Verwende stattdessen **`.buttonStyle(.borderless)`** — das isoliert den Tappable-Bereich korrekt.
+
+2. **`.contentShape(Rectangle())`** auf dem HStack einer Zeile überschreibt das Hit-Testing und fängt alle Taps für die gesamte Zeile ab — auch solche, die für Buttons innerhalb des HStack gedacht sind. Lösung: `.contentShape(Rectangle())` entfernen, wenn mehrere Buttons in der Zeile existieren.
+
+3. **Section-Level `.accessibilityIdentifier`** überschreibt die Identifier aller Kind-Elemente. Identifier immer auf einem konkreten View (z.B. `HStack`) setzen, nicht auf `Section`.
+
+4. **Tab-Bar verdeckt letzte Zeile:** Ein Button in der letzten List-Zeile kann nicht getappt werden, wenn er unter der Tab-Bar liegt. Fix: `.safeAreaInset(edge: .bottom)` mit ausreichend Abstand (z.B. 120 pt) auf der `List` oder dem umgebenden `ScrollView`.
+
+**Generelle Regel:** In SwiftUI Lists mit mehreren interaktiven Elementen pro Zeile immer `.buttonStyle(.borderless)` verwenden und kein `.contentShape(Rectangle())` auf dem äußersten HStack.
+
+---
+
 Erstellt: 2026-01-23
-Aktualisiert: 2026-03-19 (SwiftData Reference-Type Crash, BUG_112)
+Aktualisiert: 2026-03-21 (SwiftUI List multi-button row, RW_3.2)

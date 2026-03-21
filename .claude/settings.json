@@ -92,6 +92,11 @@
             "type": "command",
             "command": "python3 .claude/hooks/ui_test_preflight.py",
             "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/test_regression_guard.py",
+            "timeout": 5
           }
         ]
       },
@@ -126,6 +131,11 @@
           {
             "type": "command",
             "command": "python3 .claude/hooks/adversary_verdict_guard.py",
+            "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/result_inspection_gate.py",
             "timeout": 5
           },
           {

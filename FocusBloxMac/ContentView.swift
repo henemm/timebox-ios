@@ -843,6 +843,15 @@ struct ContentView: View {
                 removeFromNextUp(selection)
             }
 
+            if selection.count == 1, let uuid = selection.first,
+               let task = incompleteTasks.first(where: { $0.uuid == uuid }) {
+                Button {
+                    startFocusSprint(for: task)
+                } label: {
+                    Label("Focus Sprint starten", systemImage: "bolt.fill")
+                }
+            }
+
             singleTaskContextMenuItems(for: selection)
 
             Divider()
@@ -1020,6 +1029,24 @@ struct ContentView: View {
             if let task = tasks.first(where: { $0.uuid == id }), task.blockerTaskID == nil {
                 try? syncEngine.updateNextUp(itemID: task.id, isNextUp: true)
             }
+        }
+    }
+
+    private func startFocusSprint(for task: LocalTask) {
+        do {
+            let result = try FocusBlockActionService.startImmediate(
+                taskID: task.id,
+                eventKitRepo: eventKitRepo,
+                modelContext: modelContext
+            )
+            switch result {
+            case .started:
+                break // macOS tab switch is out of scope for RW 3.2
+            case .blockedByActiveBlock:
+                break // macOS alert is out of scope for RW 3.2
+            }
+        } catch {
+            // Silent fail on macOS for now
         }
     }
 
