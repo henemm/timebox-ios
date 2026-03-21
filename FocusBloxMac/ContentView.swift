@@ -382,7 +382,8 @@ struct ContentView: View {
                                 .tag(task.uuid)
                                 .swipeActions(edge: .leading, allowsFullSwipe: true) {
                                     Button {
-                                        removeFromNextUp([task.uuid])
+                                        let ids: Set<UUID> = [task.uuid]
+                                        DispatchQueue.main.async { removeFromNextUp(ids) }
                                     } label: {
                                         Label("Entfernen", systemImage: "arrow.down.circle.fill")
                                     }
@@ -390,13 +391,15 @@ struct ContentView: View {
                                 }
                                 .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                                     Button(role: .destructive) {
-                                        deleteTasksByIds([task.uuid])
+                                        let ids: Set<UUID> = [task.uuid]
+                                        DispatchQueue.main.async { deleteTasksByIds(ids) }
                                     } label: {
                                         Label("Löschen", systemImage: "trash")
                                     }
 
                                     Button {
-                                        selectedTasks = [task.uuid]
+                                        let id = task.uuid
+                                        DispatchQueue.main.async { selectedTasks = [id] }
                                     } label: {
                                         Label("Bearbeiten", systemImage: "pencil")
                                     }
@@ -1061,10 +1064,14 @@ struct ContentView: View {
             .tag(task.uuid)
             .swipeActions(edge: .leading, allowsFullSwipe: true) {
                 Button {
-                    if task.isNextUp {
-                        removeFromNextUp([task.uuid])
-                    } else {
-                        addToNextUp([task.uuid])
+                    let ids: Set<UUID> = [task.uuid]
+                    let wasNextUp = task.isNextUp
+                    DispatchQueue.main.async {
+                        if wasNextUp {
+                            removeFromNextUp(ids)
+                        } else {
+                            addToNextUp(ids)
+                        }
                     }
                 } label: {
                     Label(
@@ -1076,13 +1083,15 @@ struct ContentView: View {
             }
             .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                 Button(role: .destructive) {
-                    deleteTasksByIds([task.uuid])
+                    let ids: Set<UUID> = [task.uuid]
+                    DispatchQueue.main.async { deleteTasksByIds(ids) }
                 } label: {
                     Label("Löschen", systemImage: "trash")
                 }
 
                 Button {
-                    selectedTasks = [task.uuid]
+                    let id = task.uuid
+                    DispatchQueue.main.async { selectedTasks = [id] }
                 } label: {
                     Label("Bearbeiten", systemImage: "pencil")
                 }
