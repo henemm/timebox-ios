@@ -925,6 +925,30 @@ def complete_workflow(name: str) -> bool:
     return True
 
 
+def purge_completed() -> list[str]:
+    """Remove all completed workflows from state. Returns list of purged names."""
+    with _state_lock():
+        state = load_state()
+        purged = []
+        active = state.get("active_workflow")
+
+        for name in list(state.get("workflows", {}).keys()):
+            wf = state["workflows"][name]
+            if wf.get("current_phase") == "phase8_complete" and name != active:
+                del state["workflows"][name]
+                purged.append(name)
+
+        # Clean session_workflows pointing to purged workflows
+        for sid in list(state.get("session_workflows", {}).keys()):
+            if state["session_workflows"][sid].get("workflow") in purged:
+                del state["session_workflows"][sid]
+
+        if purged:
+            _save_state_unlocked(state)
+
+    return purged
+
+
 def mark_red_test_done(workflow_name: str = None, result: str = None) -> bool:
     """
     Mark RED test as done for a workflow.
@@ -1311,7 +1335,7 @@ if __name__ == "__main__":
 
     if len(sys.argv) < 2:
         print("Usage: workflow_state_multi.py <command> [args]")
-        print("Commands: status, list, start <name>, switch <name>, advance, phase <phase>, backlog <status>, set-field <field> <value>, pause")
+        print("Commands: status, list, start <name>, switch <name>, advance, phase <phase>, backlog <status>, set-field <field> <value>, purge, pause")
         sys.exit(1)
 
     cmd = sys.argv[1]
@@ -1415,6 +1439,14 @@ if __name__ == "__main__":
             print(f"Docs marked as updated: {details or '(no details)'}")
         else:
             print("Failed to mark docs as updated")
+    elif cmd == "purge":
+        purged = purge_completed()
+        if purged:
+            print(f"Purged {len(purged)} completed workflows:")
+            for name in purged:
+                print(f"  - {name}")
+        else:
+            print("No completed workflows to purge.")
     elif cmd == "pause":
         success, message = pause_workflow()
         print(message)

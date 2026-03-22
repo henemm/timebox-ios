@@ -75,6 +75,7 @@ ALLOWED_COMMANDS = [
     "workflow_state_multi.py set-field",
     "workflow_state_multi.py pause",
     "workflow_state_multi.py complete",
+    "workflow_state_multi.py purge",
     "workflow_state_multi.py mark-docs-updated",
     # Adversary gate (sets adversary_verdict based on test proof)
     "adversary_gate.py",
