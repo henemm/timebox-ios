@@ -95,7 +95,7 @@ final class SmartNotificationEnginePhaseCTests: XCTestCase {
     func test_delegate_hasEventKitRepositoryProperty() throws {
         let config = ModelConfiguration(isStoredInMemoryOnly: true)
         let container = try ModelContainer(for: LocalTask.self, configurations: config)
-        let delegate = NotificationActionDelegate(container: container)
+        let delegate = NotificationActionDelegate(container: container, eventKitRepository: MockEventKitRepository())
 
         // Per Reflection pruefen ob eventKitRepository als Property existiert
         let mirror = Mirror(reflecting: delegate)
@@ -110,7 +110,7 @@ final class SmartNotificationEnginePhaseCTests: XCTestCase {
     func test_delegate_init_injectsEventKitRepository() throws {
         let config = ModelConfiguration(isStoredInMemoryOnly: true)
         let container = try ModelContainer(for: LocalTask.self, configurations: config)
-        let delegate = NotificationActionDelegate(container: container)
+        let delegate = NotificationActionDelegate(container: container, eventKitRepository: MockEventKitRepository())
 
         // Nach Phase C: eventKitRepository muss vom Typ EventKitRepositoryProtocol sein
         let mirror = Mirror(reflecting: delegate)

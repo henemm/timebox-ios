@@ -38,7 +38,7 @@ struct FocusBloxApp: App {
         // Using .onAppear was too late when iOS launched the app for a notification action.
         let container = sharedModelContainer
         NotificationService.registerDueDateActions()
-        let delegate = NotificationActionDelegate(container: container)
+        let delegate = NotificationActionDelegate(container: container, eventKitRepository: eventKitRepository)
         UNUserNotificationCenter.current().delegate = delegate
         _notificationDelegate = State(initialValue: delegate)
     }

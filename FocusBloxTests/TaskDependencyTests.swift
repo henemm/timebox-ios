@@ -585,7 +585,7 @@ final class TaskDependencyTests: XCTestCase {
         blocked.blockerTaskID = blocker.id
         try container.mainContext.save()
 
-        let delegate = NotificationActionDelegate(container: container)
+        let delegate = NotificationActionDelegate(container: container, eventKitRepository: MockEventKitRepository())
         delegate.handleActionForTesting(NotificationService.actionComplete, taskID: blocked.id)
 
         XCTAssertFalse(blocked.isCompleted,
@@ -600,7 +600,7 @@ final class TaskDependencyTests: XCTestCase {
         dep.blockerTaskID = blocker.id
         try container.mainContext.save()
 
-        let delegate = NotificationActionDelegate(container: container)
+        let delegate = NotificationActionDelegate(container: container, eventKitRepository: MockEventKitRepository())
         delegate.handleActionForTesting(NotificationService.actionComplete, taskID: blocker.id)
 
         XCTAssertNil(dep.blockerTaskID,

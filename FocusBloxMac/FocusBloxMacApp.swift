@@ -304,7 +304,7 @@ struct FocusBloxMacApp: App {
                     )
                     // Register interactive notification actions + delegate
                     NotificationService.registerDueDateActions()
-                    let delegate = NotificationActionDelegate(container: container)
+                    let delegate = NotificationActionDelegate(container: container, eventKitRepository: eventKitRepository)
                     UNUserNotificationCenter.current().delegate = delegate
                     notificationDelegate = delegate
                     // Request notification permission + schedule due date notifications

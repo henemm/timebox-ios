@@ -4,6 +4,7 @@ import SwiftData
 struct CreateTaskView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.eventKitRepository) private var eventKitRepo
 
     @State private var title = ""
     @State private var tags: [String] = []
@@ -272,14 +273,12 @@ struct CreateTaskView: View {
                     description: taskDescription.isEmpty ? nil : taskDescription
                 )
 
-                // Schedule due date notifications
-                if let taskDueDate = newTask.dueDate {
-                    NotificationService.scheduleDueDateNotifications(
-                        taskID: newTask.id,
-                        title: newTask.title,
-                        dueDate: taskDueDate
-                    )
-                }
+                // Reconcile notifications (replaces direct schedule calls)
+                await SmartNotificationEngine.reconcile(
+                    reason: .taskChanged,
+                    context: modelContext,
+                    eventKitRepo: eventKitRepo
+                )
 
                 await MainActor.run {
                     onSave?()

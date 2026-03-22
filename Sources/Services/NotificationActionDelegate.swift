@@ -8,9 +8,11 @@ import UserNotifications
 @MainActor
 final class NotificationActionDelegate: NSObject, @preconcurrency UNUserNotificationCenterDelegate {
     let container: ModelContainer
+    let eventKitRepository: any EventKitRepositoryProtocol
 
-    init(container: ModelContainer) {
+    init(container: ModelContainer, eventKitRepository: any EventKitRepositoryProtocol) {
         self.container = container
+        self.eventKitRepository = eventKitRepository
     }
 
     nonisolated func userNotificationCenter(
@@ -59,20 +61,10 @@ final class NotificationActionDelegate: NSObject, @preconcurrency UNUserNotifica
             task.nextUpSortOrder = maxOrder + 1
 
         case NotificationService.actionPostponeTomorrow:
-            if let newDue = LocalTask.postpone(task, byDays: 1, context: context) {
-                NotificationService.cancelDueDateNotifications(taskID: taskID)
-                NotificationService.scheduleDueDateNotifications(
-                    taskID: taskID, title: task.title, dueDate: newDue
-                )
-            }
+            _ = LocalTask.postpone(task, byDays: 1, context: context)
 
         case NotificationService.actionPostponeNextWeek:
-            if let newDue = LocalTask.postpone(task, byDays: 7, context: context) {
-                NotificationService.cancelDueDateNotifications(taskID: taskID)
-                NotificationService.scheduleDueDateNotifications(
-                    taskID: taskID, title: task.title, dueDate: newDue
-                )
-            }
+            _ = LocalTask.postpone(task, byDays: 7, context: context)
 
         case NotificationService.actionComplete:
             // DEP-4b: Blocked tasks cannot be completed
@@ -80,7 +72,6 @@ final class NotificationActionDelegate: NSObject, @preconcurrency UNUserNotifica
             let taskSource = LocalTaskSource(modelContext: context)
             let syncEngine = SyncEngine(taskSource: taskSource, modelContext: context)
             try? syncEngine.completeTask(itemID: task.id)
-            NotificationService.cancelDueDateNotifications(taskID: taskID)
 
         default:
             break
@@ -88,6 +79,14 @@ final class NotificationActionDelegate: NSObject, @preconcurrency UNUserNotifica
 
         task.modifiedAt = Date()
         try? context.save()
+
+        Task {
+            await SmartNotificationEngine.reconcile(
+                reason: .taskChanged,
+                container: container,
+                eventKitRepo: eventKitRepository
+            )
+        }
 
         #if !os(macOS)
         NotificationService.updateOverdueBadge(container: container)

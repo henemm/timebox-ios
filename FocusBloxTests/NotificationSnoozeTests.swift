@@ -35,7 +35,7 @@ struct NotificationSnoozeTests {
         try context.save()
 
         // ACTION_POSTPONE_NEXT_WEEK hits default case currently → dueDate unchanged
-        let delegate = NotificationActionDelegate(container: container)
+        let delegate = NotificationActionDelegate(container: container, eventKitRepository: MockEventKitRepository())
         delegate.handleActionForTesting("ACTION_POSTPONE_NEXT_WEEK", taskID: task.id)
 
         let fetched = try context.fetch(FetchDescriptor<LocalTask>()).first
@@ -50,7 +50,7 @@ struct NotificationSnoozeTests {
         context.insert(task)
         try context.save()
 
-        let delegate = NotificationActionDelegate(container: container)
+        let delegate = NotificationActionDelegate(container: container, eventKitRepository: MockEventKitRepository())
         delegate.handleActionForTesting("ACTION_POSTPONE_NEXT_WEEK", taskID: task.id)
 
         let fetched = try context.fetch(FetchDescriptor<LocalTask>()).first
@@ -65,7 +65,7 @@ struct NotificationSnoozeTests {
         try context.save()
 
         // ACTION_POSTPONE_TOMORROW currently hits default case → dueDate unchanged
-        let delegate = NotificationActionDelegate(container: container)
+        let delegate = NotificationActionDelegate(container: container, eventKitRepository: MockEventKitRepository())
         delegate.handleActionForTesting("ACTION_POSTPONE_TOMORROW", taskID: task.id)
 
         let fetched = try context.fetch(FetchDescriptor<LocalTask>()).first

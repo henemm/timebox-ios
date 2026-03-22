@@ -804,10 +804,12 @@ struct ContentView: View {
     // MARK: - Postpone (Bug 85-C)
 
     private func postponeTask(_ task: LocalTask, byDays days: Int) {
-        if let newDue = LocalTask.postpone(task, byDays: days, context: modelContext) {
-            NotificationService.cancelDueDateNotifications(taskID: task.id)
-            NotificationService.scheduleDueDateNotifications(
-                taskID: task.id, title: task.title, dueDate: newDue
+        _ = LocalTask.postpone(task, byDays: days, context: modelContext)
+        Task {
+            await SmartNotificationEngine.reconcile(
+                reason: .taskChanged,
+                context: modelContext,
+                eventKitRepo: eventKitRepo
             )
         }
     }

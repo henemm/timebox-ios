@@ -7,6 +7,7 @@ import SwiftData
 struct TaskFormSheet: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.eventKitRepository) private var eventKitRepo
 
     // MARK: - Mode
 
@@ -508,14 +509,12 @@ struct TaskFormSheet: View {
                         blockerTaskID: capturedBlockerTaskID
                     )
 
-                    // Schedule due date notifications
-                    if let taskDueDate = newTask.dueDate {
-                        NotificationService.scheduleDueDateNotifications(
-                            taskID: newTask.id,
-                            title: newTask.title,
-                            dueDate: taskDueDate
-                        )
-                    }
+                    // Reconcile notifications (replaces direct schedule calls)
+                    await SmartNotificationEngine.reconcile(
+                        reason: .taskChanged,
+                        context: modelContext,
+                        eventKitRepo: eventKitRepo
+                    )
 
                     // ITB-G1: Donate intent so Siri learns task creation patterns
                     let donationIntent = CreateTaskIntent()

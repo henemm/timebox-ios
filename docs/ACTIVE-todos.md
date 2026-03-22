@@ -17,7 +17,7 @@
 |----|------|-------|------|---------|------|
 | RW_0.1a | 0 Infrastruktur | Smart Notification Engine — Phase A (Foundation) | High | M | [Spec](specs/rework/0.1-smart-notification-engine-impl.md) ERLEDIGT → [Archiv](ARCHIVE-todos.md) |
 | ~~RW_0.1b~~ | ~~0 Infrastruktur~~ | ~~Smart Notification Engine — Phase B (FocusBlock Migration)~~ | ~~High~~ | ~~M~~ | ~~[Spec](specs/rework/0.1b-smart-notification-phase-b-impl.md)~~ ERLEDIGT → [Archiv](ARCHIVE-todos.md) |
-| RW_0.1c | 0 Infrastruktur | Smart Notification Engine — Phase C (DueDate Migration) | High | M | [Spec](specs/rework/0.1c-smart-notification-phase-c-impl.md) |
+| ~~RW_0.1c~~ | ~~0 Infrastruktur~~ | ~~Smart Notification Engine — Phase C (DueDate Migration)~~ | ~~High~~ | ~~M~~ | ~~[Spec](specs/rework/0.1c-smart-notification-phase-c-impl.md)~~ ERLEDIGT → [Archiv](ARCHIVE-todos.md) |
 | RW_0.1d | 0 Infrastruktur | Smart Notification Engine — Phase D (Review/Nudge + Settings UI) | High | M | |
 | RW_0.2 | 0 Infrastruktur | BehavioralProfileService | High | M | [Spec](specs/rework/0.2-behavioral-profile-service.md) |
 | ~~RW_1.1~~ | ~~1 Erfassung~~ | ~~Quick Dump~~ | ~~High~~ | ~~M~~ | ~~[Spec](specs/rework/1.1-quick-dump.md)~~ ERLEDIGT → [Archiv](ARCHIVE-todos.md) |

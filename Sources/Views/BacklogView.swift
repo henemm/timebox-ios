@@ -552,13 +552,14 @@ struct BacklogView: View {
             let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
             try syncEngine.updateTask(itemID: task.id, title: title, importance: priority, duration: duration, tags: tags, urgency: urgency, taskType: taskType, dueDate: dueDate, description: description, recurrencePattern: recurrencePattern, recurrenceWeekdays: recurrenceWeekdays, recurrenceMonthDay: recurrenceMonthDay, recurrenceInterval: recurrenceInterval)
 
-            // Reschedule due date notifications
-            NotificationService.cancelDueDateNotifications(taskID: task.id)
-            if let dueDate {
-                NotificationService.scheduleDueDateNotifications(taskID: task.id, title: title, dueDate: dueDate)
+            Task {
+                await SmartNotificationEngine.reconcile(
+                    reason: .taskChanged,
+                    context: modelContext,
+                    eventKitRepo: eventKitRepo
+                )
+                await refreshLocalTasks()
             }
-
-            Task { await refreshLocalTasks() }
         } catch {
             errorMessage = "Task konnte nicht aktualisiert werden."
         }
@@ -670,10 +671,12 @@ struct BacklogView: View {
             let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
             try syncEngine.deleteTask(itemID: task.id)
 
-            // Cancel due date notifications
-            NotificationService.cancelDueDateNotifications(taskID: task.id)
-
             Task {
+                await SmartNotificationEngine.reconcile(
+                    reason: .taskChanged,
+                    context: modelContext,
+                    eventKitRepo: eventKitRepo
+                )
                 await loadTasks()
             }
         } catch {
@@ -802,13 +805,15 @@ struct BacklogView: View {
             predicate: #Predicate<LocalTask> { $0.uuid == taskUUID }
         )
         guard let task = try? modelContext.fetch(descriptor).first else { return }
-        if let newDue = LocalTask.postpone(task, byDays: days, context: modelContext) {
-            NotificationService.cancelDueDateNotifications(taskID: task.id)
-            NotificationService.scheduleDueDateNotifications(
-                taskID: task.id, title: task.title, dueDate: newDue
+        _ = LocalTask.postpone(task, byDays: days, context: modelContext)
+        Task {
+            await SmartNotificationEngine.reconcile(
+                reason: .taskChanged,
+                context: modelContext,
+                eventKitRepo: eventKitRepo
             )
+            await loadTasks()
         }
-        Task { await loadTasks() }
     }
 
     private func completeTask(_ item: PlanItem) {
