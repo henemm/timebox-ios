@@ -7,7 +7,7 @@
 # Project Information
 project:
   name: "FocusBlox"
-  base_path: "/Users/hem/Developer/my-daily-sprints"  # Will be auto-detected if not set
+  # base_path: auto-detected from project root (no need to hardcode)
 
 # Workflow Configuration (v2.0)
 workflow:
