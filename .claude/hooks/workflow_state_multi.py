@@ -1525,6 +1525,49 @@ if __name__ == "__main__":
                 print(f"Failed to add artifact to {active}")
         else:
             print("No active workflow")
+    elif cmd == "set-affected-files" and len(sys.argv) > 2:
+        # Usage: set-affected-files [--replace] file1 file2 file3 ...
+        # Sets affected_files on the active workflow.
+        # --replace: Replace entire list (default: merge with existing)
+        # Allowed in phases: context, analyse, spec, tdd-red, implement, validate
+        args = sys.argv[2:]
+        replace_mode = False
+        if args and args[0] == "--replace":
+            replace_mode = True
+            args = args[1:]
+        files = [f for f in args if f]  # filter empty strings
+        if not files:
+            print("Usage: set-affected-files [--replace] file1 file2 ...")
+            sys.exit(1)
+        with _state_lock():
+            state = load_state()
+            active = session_active_name(state)
+            if not active or active not in state.get("workflows", {}):
+                print("No active workflow")
+                sys.exit(1)
+            workflow = state["workflows"][active]
+            phase = workflow.get("current_phase", "phase0_idle")
+            ALLOWED_PHASES = [
+                "phase1_context",
+                "phase2_analyse",
+                "phase3_spec",
+                "phase5_tdd_red",
+                "phase6_implement",
+                "phase7_validate",
+            ]
+            if phase not in ALLOWED_PHASES:
+                print(f"BLOCKED: Cannot set affected_files in phase {phase}")
+                print(f"Allowed phases: {', '.join(ALLOWED_PHASES)}")
+                sys.exit(1)
+            if replace_mode:
+                merged = sorted(set(files))
+            else:
+                existing = set(workflow.get("affected_files", []))
+                merged = sorted(existing | set(files))
+            workflow["affected_files"] = merged
+            workflow["last_updated"] = datetime.now().isoformat()
+            _save_state_unlocked(state)
+            print(f"Set affected_files on {active}: {merged}")
     elif cmd == "pause":
         success, message = pause_workflow()
         print(message)

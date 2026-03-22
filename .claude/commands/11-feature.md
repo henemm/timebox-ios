@@ -85,11 +85,16 @@ python3 .claude/hooks/workflow_state_multi.py set-field user_expectation_done tr
 3. **Bei AENDERUNG:** Aktuellen Zustand dokumentieren, Delta identifizieren
 4. Bestehende Systeme pruefen (KRITISCH!)
 5. Scoping (Max 4-5 Dateien, +/-250 LoC)
-6. ⛔ **ERST Tests definieren** in `openspec/changes/[feature-name]/tests.md`
-7. Dokumentiere in DOCS/ACTIVE-roadmap.md
-8. **NEU:** Erstelle OpenSpec Proposal in `openspec/changes/[feature-name]/`
-9. **AENDERUNG:** Aktualisiere bestehende Spec in `openspec/specs/`
-10. Implementieren
+6. ⛔ **Affected Files registrieren** (PFLICHT — Code Gate blockiert sonst!):
+   ```bash
+   python3 .claude/hooks/workflow_state_multi.py set-affected-files --replace \
+     "Sources/path/to/file.swift" "Tests/path/to/Test.swift"
+   ```
+7. ⛔ **ERST Tests definieren** in `openspec/changes/[feature-name]/tests.md`
+8. Dokumentiere in DOCS/ACTIVE-roadmap.md
+9. **NEU:** Erstelle OpenSpec Proposal in `openspec/changes/[feature-name]/`
+10. **AENDERUNG:** Aktualisiere bestehende Spec in `openspec/specs/`
+11. Implementieren
 
 ---
 
@@ -166,8 +171,8 @@ Ohne `VERIFIED` Verdict blockiert `workflow_gate.py` die Validation-Phase.
 
 ### Dann: Validate
 
-11. ⛔ **Adversary bestanden** (siehe oben)
-12. ⛔ **Alle Tests gruen** (Unit + UI)
+12. ⛔ **Adversary bestanden** (siehe oben)
+13. ⛔ **Alle Tests gruen** (Unit + UI)
 
 ```bash
 python3 .claude/hooks/workflow_state_multi.py phase phase7_validate

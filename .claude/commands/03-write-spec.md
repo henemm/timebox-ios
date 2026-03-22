@@ -59,6 +59,13 @@ Task (general-purpose/haiku): "Du bist der spec-validator Agent.
 # Update spec file path in workflow
 python3 .claude/hooks/workflow_state_multi.py set-field spec_file "docs/specs/[category]/[entity].md"
 
+# Register affected files from the spec (MANDATORY — code gate needs this!)
+# Use --replace if analyse already set them and spec refined the list
+python3 .claude/hooks/workflow_state_multi.py set-affected-files --replace \
+  "Sources/path/to/file1.swift" \
+  "Sources/path/to/file2.swift" \
+  "Tests/path/to/TestFile.swift"
+
 # Advance to spec_written phase
 python3 .claude/hooks/workflow_state_multi.py phase phase3_spec
 ```

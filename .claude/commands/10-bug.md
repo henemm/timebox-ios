@@ -244,6 +244,17 @@ Erst nach OK:
    - Bekannte Divergenz: BacklogView (iOS) vs. ContentView (macOS) — oft BEIDE betroffen
 6. **Warte erneut auf Freigabe**
 
+## Schritt 7.5: Affected Files registrieren (PFLICHT)
+
+Registriere ALLE Dateien die vom Fix betroffen sind — ohne das blockiert der Code Gate spaeter.
+
+```bash
+python3 .claude/hooks/workflow_state_multi.py set-affected-files --replace \
+  "Sources/path/to/affected1.swift" \
+  "Sources/path/to/affected2.swift" \
+  "Tests/path/to/TestFile.swift"
+```
+
 ## Schritt 8: TDD RED + Implementierung
 
 Nach Freigabe — normaler TDD-Zyklus:

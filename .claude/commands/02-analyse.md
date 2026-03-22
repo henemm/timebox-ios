@@ -93,7 +93,21 @@ Fasse die Ergebnisse zusammen und aktualisiere `docs/context/[workflow-name].md`
 - [ ] Question 1?
 ```
 
-### Step 5: Update Workflow State
+### Step 5: Register Affected Files
+
+Register ALL affected files from the analysis in the workflow state. This is **MANDATORY** — without it, the code gate will block implementation later.
+
+```bash
+# Register all files that will be modified/created
+python3 .claude/hooks/workflow_state_multi.py set-affected-files \
+  "Sources/Models/Auth.swift" \
+  "Sources/Config.swift" \
+  "Tests/AuthTests.swift"
+```
+
+Use `--replace` to overwrite previous entries, or omit it to merge with existing.
+
+### Step 6: Update Workflow State
 
 ```bash
 python3 .claude/hooks/workflow_state_multi.py phase phase3_spec
