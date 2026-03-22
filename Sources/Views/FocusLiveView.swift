@@ -202,7 +202,13 @@ struct FocusLiveView: View {
                 // Immediately update with task-level end date
                 updateLiveActivity(for: block)
                 // Bug 55B: Update end notification with actual task counts
-                rescheduleEndNotification(for: block)
+                Task {
+                    await SmartNotificationEngine.reconcile(
+                        reason: .blockChanged,
+                        context: modelContext,
+                        eventKitRepo: eventKitRepo
+                    )
+                }
             } catch {
                 // Live Activity couldn't be started - not critical
                 liveActivityStarted = false
@@ -560,7 +566,6 @@ struct FocusLiveView: View {
         }
     }
     private func markTaskComplete(taskID: String, block: FocusBlock) {
-        NotificationService.cancelTaskNotification(taskID: taskID)
         Task {
             do {
                 _ = try FocusBlockActionService.completeTask(
@@ -576,7 +581,11 @@ struct FocusLiveView: View {
                 await loadData()
                 if let updatedBlock = activeBlock {
                     updateLiveActivity(for: updatedBlock)
-                    rescheduleEndNotification(for: updatedBlock)
+                    await SmartNotificationEngine.reconcile(
+                        reason: .blockChanged,
+                        context: modelContext,
+                        eventKitRepo: eventKitRepo
+                    )
                 }
             } catch {
                 errorMessage = "Task konnte nicht als erledigt markiert werden."
@@ -585,7 +594,6 @@ struct FocusLiveView: View {
     }
     /// Follow-up: complete current task and open copy for editing
     private func performFollowUp(taskID: String, block: FocusBlock) {
-        NotificationService.cancelTaskNotification(taskID: taskID)
         Task {
             do {
                 let result = try FocusBlockActionService.followUpTask(
@@ -601,7 +609,11 @@ struct FocusLiveView: View {
                 await loadData()
                 if let updatedBlock = activeBlock {
                     updateLiveActivity(for: updatedBlock)
-                    rescheduleEndNotification(for: updatedBlock)
+                    await SmartNotificationEngine.reconcile(
+                        reason: .blockChanged,
+                        context: modelContext,
+                        eventKitRepo: eventKitRepo
+                    )
                 }
                 // Open the copy in TaskFormSheet for editing
                 if case .followedUp(let newTaskID) = result {
@@ -621,7 +633,6 @@ struct FocusLiveView: View {
     /// Skip task without marking as complete - moves to next task in queue
     /// Bug 15 Fix: If all tasks have been skipped once, end the block instead of looping
     private func skipTask(taskID: String, block: FocusBlock) {
-        NotificationService.cancelTaskNotification(taskID: taskID)
         Task {
             do {
                 _ = try FocusBlockActionService.skipTask(
@@ -637,7 +648,11 @@ struct FocusLiveView: View {
                 await loadData()
                 if let updatedBlock = activeBlock {
                     updateLiveActivity(for: updatedBlock)
-                    rescheduleEndNotification(for: updatedBlock)
+                    await SmartNotificationEngine.reconcile(
+                        reason: .blockChanged,
+                        context: modelContext,
+                        eventKitRepo: eventKitRepo
+                    )
                 }
             } catch {
                 errorMessage = "Task konnte nicht übersprungen werden."
@@ -691,17 +706,7 @@ struct FocusLiveView: View {
             Task { await loadData() }
         }
     }
-    /// Bug 55B: Re-schedule end notification with current completed/total counts
-    private func rescheduleEndNotification(for block: FocusBlock) {
-        NotificationService.cancelFocusBlockNotification(blockID: block.id)
-        NotificationService.scheduleFocusBlockEndNotification(
-            blockID: block.id,
-            blockTitle: block.title,
-            endDate: block.endDate,
-            completedCount: block.resolvedCompletedCount(knownTaskIDs: Set(allTasks.map(\.id))),
-            totalCount: block.resolvedTaskCount(knownTaskIDs: Set(allTasks.map(\.id)))
-        )
-    }
+    // rescheduleEndNotification removed — replaced by SmartNotificationEngine.reconcile()
     /// Check if current task is overdue and play reminder every 2 minutes
     private func checkTaskOverdue() {
         guard let block = activeBlock else { return }
@@ -734,7 +739,7 @@ struct FocusLiveView: View {
         if lastTaskID != taskID {
             // Cancel previous task notification
             if let previousTaskID = lastTaskID {
-                NotificationService.cancelTaskNotification(taskID: previousTaskID)
+                SmartNotificationEngine.cancelTaskOverdue(taskID: previousTaskID)
             }
             lastTaskID = taskID
             taskStartTime = Date()
@@ -751,7 +756,7 @@ struct FocusLiveView: View {
                     )
                     let remainingSec = TimerCalculator.remainingSeconds(until: plannedEnd)
                     if remainingSec > 0 {
-                        NotificationService.scheduleTaskOverdueNotification(
+                        SmartNotificationEngine.scheduleTaskOverdue(
                             taskID: taskID,
                             taskTitle: task.title,
                             durationMinutes: max(1, remainingSec / 60)

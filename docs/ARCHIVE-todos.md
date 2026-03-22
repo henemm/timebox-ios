@@ -5,6 +5,19 @@
 
 ---
 
+## TD_005 — Monster-Removal Validierungstests — ERLEDIGT (2026-03-22)
+
+- **Typ:** Tech Debt / Regression Guards | **Spec:** `docs/specs/refactoring/td-005-monster-removal-validation.md`
+- **Ziel:** Regressionstests die dauerhaft absichern, dass Coach/Monster-Code nicht zurueckkehrt
+- **Tests (bereits vorhanden):**
+  - `MonsterRemovalCleanupTests.test_appTab_hasExactlyFourCases` — kein Coach-Tab
+  - `MonsterRemovalCleanupTests.test_appSettings_noCoachKeys` — keine Coach-Settings
+  - `TaskPriorityScoringServiceTests.test_scoringService_noCoachBoostFactor` — kein Coach-Boost
+  - `DisciplineTests.test_discipline_exactlyFourCases` — keine Coach-Override-Discipline
+- **Hinweis:** Tests wurden zusammen mit TD_004 implementiert. Testlauf durch unrelated Build-Fehler (RW_0.1b TDD RED) blockiert — syntaktisch korrekt.
+
+---
+
 ## RW_0.1a — Smart Notification Engine Phase A (Foundation) — ERLEDIGT (2026-03-22)
 
 - **Epic:** 0 Infrastruktur | **Spec:** `docs/specs/rework/0.1-smart-notification-engine-impl.md`

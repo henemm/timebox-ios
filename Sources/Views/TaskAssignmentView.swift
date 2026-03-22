@@ -290,16 +290,12 @@ struct TaskAssignmentView: View {
         Task {
             do {
                 try eventKitRepo.updateFocusBlockTime(eventID: block.id, startDate: startDate, endDate: endDate)
-
-                // Reschedule notification with new start time
-                NotificationService.cancelFocusBlockNotification(blockID: block.id)
-                NotificationService.scheduleFocusBlockStartNotification(
-                    blockID: block.id,
-                    blockTitle: block.title,
-                    startDate: startDate
-                )
-
                 await loadData()
+                await SmartNotificationEngine.reconcile(
+                    reason: .blockChanged,
+                    context: modelContext,
+                    eventKitRepo: eventKitRepo
+                )
             } catch {
                 errorMessage = "Block konnte nicht aktualisiert werden."
             }
@@ -310,8 +306,12 @@ struct TaskAssignmentView: View {
         Task {
             do {
                 try eventKitRepo.deleteFocusBlock(eventID: block.id)
-                NotificationService.cancelFocusBlockNotification(blockID: block.id)
                 await loadData()
+                await SmartNotificationEngine.reconcile(
+                    reason: .blockChanged,
+                    context: modelContext,
+                    eventKitRepo: eventKitRepo
+                )
             } catch {
                 errorMessage = "Block konnte nicht gelöscht werden."
             }

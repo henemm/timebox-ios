@@ -437,8 +437,12 @@ struct BlockPlanningView: View {
         Task {
             do {
                 try eventKitRepo.deleteFocusBlock(eventID: block.id)
-                NotificationService.cancelFocusBlockNotification(blockID: block.id)
                 await loadData()
+                await SmartNotificationEngine.reconcile(
+                    reason: .blockChanged,
+                    context: modelContext,
+                    eventKitRepo: eventKitRepo
+                )
             } catch {
                 errorMessage = "Block konnte nicht gelöscht werden."
             }
@@ -449,24 +453,12 @@ struct BlockPlanningView: View {
         Task {
             do {
                 try eventKitRepo.updateFocusBlockTime(eventID: block.id, startDate: startDate, endDate: endDate)
-
-                // Reschedule notifications with new title and times
-                let updatedTitle = FocusBlock.generateTitle(for: startDate)
-                NotificationService.cancelFocusBlockNotification(blockID: block.id)
-                NotificationService.scheduleFocusBlockStartNotification(
-                    blockID: block.id,
-                    blockTitle: updatedTitle,
-                    startDate: startDate
-                )
-                NotificationService.scheduleFocusBlockEndNotification(
-                    blockID: block.id,
-                    blockTitle: updatedTitle,
-                    endDate: endDate,
-                    completedCount: block.completedTaskIDs.count,
-                    totalCount: block.taskIDs.count
-                )
-
                 await loadData()
+                await SmartNotificationEngine.reconcile(
+                    reason: .blockChanged,
+                    context: modelContext,
+                    eventKitRepo: eventKitRepo
+                )
             } catch {
                 errorMessage = "Block konnte nicht aktualisiert werden."
             }
@@ -556,25 +548,13 @@ struct BlockPlanningView: View {
     private func createFocusBlock(startDate: Date, endDate: Date) {
         Task {
             do {
-                let blockID = try eventKitRepo.createFocusBlock(startDate: startDate, endDate: endDate)
-
-                let formatter = DateFormatter()
-                formatter.timeStyle = .short
-                let title = "FocusBlox \(formatter.string(from: startDate))"
-                NotificationService.scheduleFocusBlockStartNotification(
-                    blockID: blockID,
-                    blockTitle: title,
-                    startDate: startDate
-                )
-                NotificationService.scheduleFocusBlockEndNotification(
-                    blockID: blockID,
-                    blockTitle: title,
-                    endDate: endDate,
-                    completedCount: 0,
-                    totalCount: 0
-                )
-
+                _ = try eventKitRepo.createFocusBlock(startDate: startDate, endDate: endDate)
                 await loadData()
+                await SmartNotificationEngine.reconcile(
+                    reason: .blockChanged,
+                    context: modelContext,
+                    eventKitRepo: eventKitRepo
+                )
             } catch {
                 errorMessage = "FocusBlox konnte nicht erstellt werden."
             }

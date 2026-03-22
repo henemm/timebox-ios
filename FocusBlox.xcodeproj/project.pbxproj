@@ -203,6 +203,8 @@
 		'DUEDN02BUILD000001' = {isa = PBXBuildFile; fileRef = DUEDN02FILE0000001; };
 		'SMTNOT01BUILD00001' = {isa = PBXBuildFile; fileRef = SMTNOT01FILE000001; };
 		'SMTNOT02BUILD00001' = {isa = PBXBuildFile; fileRef = SMTNOT02FILE000001; };
+		'SMTNOTB1BUILD0001' = {isa = PBXBuildFile; fileRef = SMTNOTB1FILE00001; };
+		'SMTNOTB2BUILD0001' = {isa = PBXBuildFile; fileRef = SMTNOTB2FILE00001; };
 		'DUEDT01BUILD000001' = {isa = PBXBuildFile; fileRef = DUEDT01FILE0000001; };
 		'DUEDT02BUILD000001' = {isa = PBXBuildFile; fileRef = DUEDT01FILE0000001; };
 		'DUEDT03BUILD000001' = {isa = PBXBuildFile; fileRef = DUEDT03FILE0000001; };
@@ -755,6 +757,8 @@
 		'DUEDN02FILE0000001' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DueDateNotificationUITests.swift; sourceTree = "<group>"; };
 		'SMTNOT01FILE000001' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartNotificationEngineTests.swift; sourceTree = "<group>"; };
 		'SMTNOT02FILE000001' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartNotificationEngineUITests.swift; sourceTree = "<group>"; };
+		'SMTNOTB1FILE00001' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartNotificationEnginePhaseBTests.swift; sourceTree = "<group>"; };
+		'SMTNOTB2FILE00001' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartNotificationEnginePhaseBUITests.swift; sourceTree = "<group>"; };
 		'DUEDT01FILE0000001' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+DueDate.swift"; sourceTree = "<group>"; };
 		'DUEDT03FILE0000001' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DueDateFormattingTests.swift; sourceTree = "<group>"; };
 		'DUEDT04FILE0000001' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DueDateTimeDisplayTests.swift; sourceTree = "<group>"; };
@@ -1123,6 +1127,7 @@
 				AISCORE01UIFILE001,
 				DUEDN02FILE0000001,
 				SMTNOT02FILE000001,
+				SMTNOTB2FILE00001,
 				BSRCH01FILE000001,
 				LVCLN01UIFILE0001,
 				RECTMPLUI01FIL001,
@@ -1382,6 +1387,7 @@
 				AISCORE01FILE00001,
 				DUEDN01FILE0000001,
 				SMTNOT01FILE000001,
+				SMTNOTB1FILE00001,
 				LVCLN01FILE000001,
 				301796C3380CA4E06D1EF41B /* TaskCompletionUndoServiceTests.swift */,
 				8D6520F9246BDCE0D9B157B6 /* SpotlightIndexingServiceTests.swift */,
@@ -2282,6 +2288,7 @@
 				NXLP01UIBLD0001,
 				DUEDN02BUILD000001,
 				SMTNOT02BUILD00001,
+				SMTNOTB2BUILD0001,
 				BSRCH01BUILD00001,
 				LVCLN01UIBUILD001,
 				RECTMPLUI01BLD001,
@@ -2381,6 +2388,7 @@
 				AISCORE01BUILD0001,
 				DUEDN01BUILD000001,
 				SMTNOT01BUILD00001,
+				SMTNOTB1BUILD0001,
 				LVCLN01BUILD00001,
 				F99C220A3B729DDE50461E4A /* TaskCompletionUndoServiceTests.swift in Sources */,
 				30515A046C05070B90FD3C90 /* SpotlightIndexingServiceTests.swift in Sources */,

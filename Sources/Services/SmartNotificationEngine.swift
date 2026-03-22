@@ -189,6 +189,123 @@ enum SmartNotificationEngine {
         return Array(requests.prefix(budgetTasks))
     }
 
+    // MARK: - Reconcile (ModelContext Overload — fuer Views ohne ModelContainer-Zugriff)
+
+    static func reconcile(
+        reason: ReconciliationReason,
+        context: ModelContext,
+        eventKitRepo: any EventKitRepositoryProtocol
+    ) async {
+        let start = Date()
+        let center = UNUserNotificationCenter.current()
+
+        center.removeAllPendingNotificationRequests()
+
+        let requests = await buildAllRequests(
+            profile: AppSettings.shared.notificationProfile,
+            context: context,
+            eventKitRepo: eventKitRepo
+        )
+
+        let capped = Array(requests.prefix(64))
+        for request in capped {
+            try? await center.add(request)
+        }
+
+        let elapsed = Date().timeIntervalSince(start) * 1000
+        print("SmartNotificationEngine: reconcile(\(reason)) — \(capped.count) notifications, \(String(format: "%.1f", elapsed))ms")
+    }
+
+    static func buildAllRequests(
+        profile: NotificationProfile,
+        context: ModelContext,
+        eventKitRepo: any EventKitRepositoryProtocol
+    ) async -> [UNNotificationRequest] {
+        var requests: [UNNotificationRequest] = []
+
+        requests += buildTimerRequests(eventKitRepo: eventKitRepo)
+
+        if profile == .balanced || profile == .active {
+            requests += buildTaskRequests(context: context)
+        }
+
+        if profile == .balanced || profile == .active {
+            requests += buildReviewRequests()
+        }
+
+        if profile == .active {
+            requests += buildNudgeRequests()
+        }
+
+        return Array(requests.prefix(64))
+    }
+
+    // MARK: - Prio 2: Task Requests (ModelContext Overload)
+
+    private static func buildTaskRequests(
+        context: ModelContext
+    ) -> [UNNotificationRequest] {
+        let settings = AppSettings.shared
+        guard settings.dueDateMorningReminderEnabled || settings.dueDateAdvanceReminderEnabled else {
+            return []
+        }
+
+        let descriptor = FetchDescriptor<LocalTask>(
+            predicate: #Predicate<LocalTask> { !$0.isCompleted && !$0.isTemplate && $0.dueDate != nil },
+            sortBy: [SortDescriptor(\.dueDate)]
+        )
+        guard let tasks = try? context.fetch(descriptor) else { return [] }
+
+        let now = Date()
+        var requests: [UNNotificationRequest] = []
+
+        for task in tasks {
+            guard let dueDate = task.dueDate, dueDate > now else { continue }
+            if settings.dueDateMorningReminderEnabled,
+               let req = NotificationService.buildDueDateMorningRequest(
+                   taskID: task.id,
+                   title: task.title,
+                   dueDate: dueDate,
+                   morningHour: settings.dueDateMorningReminderHour,
+                   morningMinute: settings.dueDateMorningReminderMinute,
+                   now: now
+               ) {
+                requests.append(req)
+            }
+            if settings.dueDateAdvanceReminderEnabled,
+               let req = NotificationService.buildDueDateAdvanceRequest(
+                   taskID: task.id,
+                   title: task.title,
+                   dueDate: dueDate,
+                   advanceMinutes: settings.dueDateAdvanceReminderMinutes,
+                   now: now
+               ) {
+                requests.append(req)
+            }
+            if requests.count >= budgetTasks { break }
+        }
+
+        return Array(requests.prefix(budgetTasks))
+    }
+
+    // MARK: - Task Overdue (Laufzeit-State — nicht Teil von reconcile)
+
+    static func scheduleTaskOverdue(
+        taskID: String,
+        taskTitle: String,
+        durationMinutes: Int
+    ) {
+        NotificationService.scheduleTaskOverdueNotification(
+            taskID: taskID,
+            taskTitle: taskTitle,
+            durationMinutes: durationMinutes
+        )
+    }
+
+    static func cancelTaskOverdue(taskID: String) {
+        NotificationService.cancelTaskNotification(taskID: taskID)
+    }
+
     // MARK: - Prio 3: Review / Morning Requests (Phase C)
 
     private static func buildReviewRequests() -> [UNNotificationRequest] {
