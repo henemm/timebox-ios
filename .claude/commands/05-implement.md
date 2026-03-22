@@ -24,17 +24,7 @@ python3 .claude/hooks/workflow_state_multi.py status
 ### Step 1: Verify RED Phase Complete
 
 ```bash
-python3 -c "
-import sys; sys.path.insert(0, '.claude/hooks')
-from workflow_state_multi import get_active_workflow
-
-w = get_active_workflow()
-if w:
-    artifacts = [a for a in w.get('test_artifacts', []) if a.get('phase') == 'phase5_tdd_red']
-    print(f'RED artifacts: {len(artifacts)}')
-    for a in artifacts:
-        print(f'  - {a[\"type\"]}: {a[\"description\"][:50]}...')
-"
+python3 .claude/hooks/workflow_state_multi.py status
 ```
 
 ### Step 2: Kontext laden (Explore/Haiku)
@@ -89,20 +79,7 @@ xcodebuild test -project FocusBlox.xcodeproj -scheme FocusBlox \
   -destination 'id=548B4A2F-FDFF-4F9E-8335-1A7A7B98E492' \
   2>&1 > docs/artifacts/[workflow]/test-green-output.txt
 
-python3 -c "
-import sys; sys.path.insert(0, '.claude/hooks')
-from workflow_state_multi import add_test_artifact, load_state
-
-state = load_state()
-active = state['active_workflow']
-
-add_test_artifact(active, {
-    'type': 'test_output',
-    'path': 'docs/artifacts/[workflow]/test-green-output.txt',
-    'description': 'All tests PASSED',
-    'phase': 'phase6_implement'
-})
-"
+python3 .claude/hooks/workflow_state_multi.py add-artifact test_output "docs/artifacts/[workflow]/test-green-output.txt" "All tests PASSED" phase6_implement
 ```
 
 ### Step 6: Update Workflow State to Adversary Phase

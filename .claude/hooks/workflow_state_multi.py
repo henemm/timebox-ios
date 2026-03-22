@@ -1335,7 +1335,10 @@ if __name__ == "__main__":
 
     if len(sys.argv) < 2:
         print("Usage: workflow_state_multi.py <command> [args]")
-        print("Commands: status, list, start <name>, switch <name>, advance, phase <phase>, backlog <status>, set-field <field> <value>, purge, pause")
+        print("Commands: status, list, start <name>, switch <name>, advance, phase <phase>,")
+        print("         backlog <status>, set-field <field> <value>, purge, pause,")
+        print("         mark-red <result>, mark-ui-red <result>, mark-green <result>, mark-ui-green <result>,")
+        print("         mark-docs-updated [details], add-artifact <type> <path> <desc> [phase]")
         sys.exit(1)
 
     cmd = sys.argv[1]
@@ -1439,6 +1442,57 @@ if __name__ == "__main__":
             print(f"Docs marked as updated: {details or '(no details)'}")
         else:
             print("Failed to mark docs as updated")
+    elif cmd == "snapshot-tests":
+        import glob as _glob
+        import re as _re
+        with _state_lock():
+            state = load_state()
+            active = session_active_name(state)
+            if active and active in state.get("workflows", {}):
+                pattern = _re.compile(r'^\s*func\s+(test\w+)\s*\(\s*\)', _re.MULTILINE)
+                snapshot = {}
+                for test_dir in ['FocusBloxTests', 'FocusBloxUITests']:
+                    for f in _glob.glob(f'{test_dir}/*.swift'):
+                        with open(f) as fh:
+                            methods = pattern.findall(fh.read())
+                        if methods:
+                            snapshot[f] = methods
+                            print(f"  {f}: {len(methods)} tests")
+                state["workflows"][active]["red_test_snapshot"] = snapshot
+                state["workflows"][active]["last_updated"] = datetime.now().isoformat()
+                _save_state_unlocked(state)
+                total = sum(len(v) for v in snapshot.values())
+                print(f"Snapshot saved: {total} tests in {len(snapshot)} files")
+            else:
+                print("No active workflow")
+    elif cmd == "mark-red":
+        result = sys.argv[2] if len(sys.argv) > 2 else None
+        if mark_red_test_done(result=result):
+            print(f"RED unit test marked done: {result or '(no result)'}")
+        else:
+            print("Failed to mark red test done")
+            sys.exit(1)
+    elif cmd == "mark-ui-red":
+        result = sys.argv[2] if len(sys.argv) > 2 else None
+        if mark_ui_test_red_done(result=result):
+            print(f"RED UI test marked done: {result or '(no result)'}")
+        else:
+            print("Failed to mark UI red test done")
+            sys.exit(1)
+    elif cmd == "mark-green":
+        result = sys.argv[2] if len(sys.argv) > 2 else None
+        if mark_green_test_done(result=result):
+            print(f"GREEN unit test marked done: {result or '(no result)'}")
+        else:
+            print("Failed to mark green test done")
+            sys.exit(1)
+    elif cmd == "mark-ui-green":
+        result = sys.argv[2] if len(sys.argv) > 2 else None
+        if mark_ui_test_green_done(result=result):
+            print(f"GREEN UI test marked done: {result or '(no result)'}")
+        else:
+            print("Failed to mark UI green test done")
+            sys.exit(1)
     elif cmd == "purge":
         purged = purge_completed()
         if purged:

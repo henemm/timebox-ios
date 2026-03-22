@@ -95,28 +95,14 @@ Task (general-purpose/sonnet): "Du bist der docs-updater Agent.
 **Only after ALL tests pass:**
 
 ```bash
-python3 -c "
-import sys; sys.path.insert(0, '.claude/hooks')
-from workflow_state_multi import load_state, save_state, add_test_artifact
+# Register GREEN test artifact
+python3 .claude/hooks/workflow_state_multi.py add-artifact ui_test_output "docs/artifacts/[workflow]/validation-test-output.txt" "ALL TESTS PASSED: [N] unit tests, [M] UI tests green" phase7_validate
 
-state = load_state()
-active = state['active_workflow']
+# Mark GREEN flags
+python3 .claude/hooks/workflow_state_multi.py mark-green "All [N] unit tests passed"
+python3 .claude/hooks/workflow_state_multi.py mark-ui-green "All [M] UI tests passed"
 
-# Add GREEN test artifact
-add_test_artifact(active, {
-    'type': 'ui_test_output',
-    'path': 'docs/artifacts/[workflow]/validation-test-output.txt',
-    'description': 'ALL TESTS PASSED: [N] unit tests, [M] UI tests green',
-    'phase': 'phase7_validate'
-})
-
-# Update flags
-state['workflows'][active]['ui_test_green_done'] = True
-state['workflows'][active]['ui_test_green_result'] = 'All [N] tests passed'
-state['workflows'][active]['current_phase'] = 'phase7_validate'
-save_state(state)
-"
-
+# Advance to validation phase
 python3 .claude/hooks/workflow_state_multi.py phase phase7_validate
 ```
 

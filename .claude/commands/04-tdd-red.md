@@ -117,37 +117,13 @@ grep -E "(passed|failed|error:)" docs/artifacts/[workflow]/ui-test-red-output.tx
 ### 5. RED-Artefakte registrieren
 
 ```bash
-python3 -c "
-import sys; sys.path.insert(0, '.claude/hooks')
-from workflow_state_multi import add_test_artifact, load_state, save_state
+# Register artifacts
+python3 .claude/hooks/workflow_state_multi.py add-artifact test_output "docs/artifacts/[workflow]/unit-test-red-output.txt" "Unit Test FAILED: [describe what failed]" phase5_tdd_red
+python3 .claude/hooks/workflow_state_multi.py add-artifact ui_test_output "docs/artifacts/[workflow]/ui-test-red-output.txt" "UI Test FAILED: [describe what failed]" phase5_tdd_red
 
-state = load_state()
-active = state['active_workflow']
-
-# Unit test artifact
-add_test_artifact(active, {
-    'type': 'test_output',
-    'path': 'docs/artifacts/[workflow]/unit-test-red-output.txt',
-    'description': 'Unit Test FAILED: [describe what failed]',
-    'phase': 'phase5_tdd_red'
-})
-
-# UI test artifact
-add_test_artifact(active, {
-    'type': 'ui_test_output',
-    'path': 'docs/artifacts/[workflow]/ui-test-red-output.txt',
-    'description': 'UI Test FAILED: [describe what failed]',
-    'phase': 'phase5_tdd_red'
-})
-
-# SET THE MANDATORY FLAGS
-state['workflows'][active]['red_test_done'] = True
-state['workflows'][active]['red_test_result'] = 'failed: [describe what failed]'
-state['workflows'][active]['ui_test_red_done'] = True
-state['workflows'][active]['ui_test_red_result'] = 'failed: [describe what failed]'
-save_state(state)
-print('RED artifacts registered with verified failure')
-"
+# Set mandatory RED flags
+python3 .claude/hooks/workflow_state_multi.py mark-red "failed: [describe what failed]"
+python3 .claude/hooks/workflow_state_multi.py mark-ui-red "failed: [describe what failed]"
 ```
 
 ### 6. Test-Snapshot erstellen (Regressions-Schutz)
@@ -156,32 +132,7 @@ print('RED artifacts registered with verified failure')
 blockt spaeter jedes Entfernen von Tests ohne PO-Genehmigung.
 
 ```bash
-python3 -c "
-import re, sys, glob
-sys.path.insert(0, '.claude/hooks')
-from workflow_state_multi import load_state, save_state
-
-state = load_state()
-active = state['active_workflow']
-
-# Extract test method names from all test files
-pattern = re.compile(r'^\s*func\s+(test\w+)\s*\(\s*\)', re.MULTILINE)
-snapshot = {}
-
-for test_dir in ['FocusBloxTests', 'FocusBloxUITests']:
-    for f in glob.glob(f'{test_dir}/*.swift'):
-        with open(f) as fh:
-            methods = pattern.findall(fh.read())
-        if methods:
-            snapshot[f] = methods
-            print(f'  {f}: {len(methods)} tests')
-
-state['workflows'][active]['red_test_snapshot'] = snapshot
-save_state(state)
-
-total = sum(len(v) for v in snapshot.values())
-print(f'Snapshot saved: {total} tests in {len(snapshot)} files')
-"
+python3 .claude/hooks/workflow_state_multi.py snapshot-tests
 ```
 
 ## RED Phase Checklist
