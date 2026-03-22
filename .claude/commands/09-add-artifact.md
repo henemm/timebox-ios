@@ -16,27 +16,17 @@ When you have captured a test artifact:
 
 1. **Save the artifact** to `docs/artifacts/[workflow-name]/`
 
-2. **Register it**:
+2. **Register it** via CLI:
 ```bash
-python3 -c "
-from pathlib import Path
-import sys
-sys.path.insert(0, '.claude/hooks')
-from workflow_state_multi import add_test_artifact, load_state
+python3 .claude/hooks/workflow_state_multi.py add-artifact <type> <path> <description> [phase]
+```
 
-state = load_state()
-active = state.get('active_workflow')
-if active:
-    add_test_artifact(active, {
-        'type': 'screenshot',  # or: email, api_response, log, file, test_output
-        'path': 'docs/artifacts/[workflow]/[filename]',
-        'description': 'Screenshot showing test failure: expected X but got Y',
-        'phase': 'phase5_tdd_red'  # or: phase7_validate
-    })
-    print(f'Artifact added to {active}')
-else:
-    print('No active workflow')
-"
+Example:
+```bash
+python3 .claude/hooks/workflow_state_multi.py add-artifact screenshot \
+  "docs/artifacts/my-feature/test-failure.png" \
+  "Screenshot showing test failure: expected X but got Y" \
+  phase5_tdd_red
 ```
 
 ## Artifact Types
@@ -74,16 +64,9 @@ For validation (`phase7_validate`), artifacts show **test success**:
 # After running failing test, capture the output
 ./run-tests.sh > docs/artifacts/feature-login/test-output-red.txt 2>&1
 
-# Register it
-python3 -c "
-import sys; sys.path.insert(0, '.claude/hooks')
-from workflow_state_multi import add_test_artifact, load_state
-state = load_state()
-add_test_artifact(state['active_workflow'], {
-    'type': 'test_output',
-    'path': 'docs/artifacts/feature-login/test-output-red.txt',
-    'description': 'Test failed: LoginService.authenticate() not implemented - assertion error on line 42',
-    'phase': 'phase5_tdd_red'
-})
-"
+# Register it via CLI
+python3 .claude/hooks/workflow_state_multi.py add-artifact test_output \
+  "docs/artifacts/feature-login/test-output-red.txt" \
+  "Test failed: LoginService.authenticate() not implemented - assertion error on line 42" \
+  phase5_tdd_red
 ```

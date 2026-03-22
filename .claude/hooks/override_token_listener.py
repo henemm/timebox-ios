@@ -87,11 +87,15 @@ def main():
     state = load_state()
 
     if explicit_name:
+        # Special infrastructure token — always allowed without workflow
+        if explicit_name == "__infra__":
+            target_name = "__infra__"
         # Explicit workflow name provided — validate it exists
-        if explicit_name not in state.get("workflows", {}):
+        elif explicit_name not in state.get("workflows", {}):
             print(f"Override requested for unknown workflow: {explicit_name}", file=sys.stderr)
             sys.exit(0)
-        target_name = explicit_name
+        else:
+            target_name = explicit_name
     else:
         # No explicit name — fall back to active workflow
         target_name = session_active_name(state)

@@ -1447,6 +1447,30 @@ if __name__ == "__main__":
                 print(f"  - {name}")
         else:
             print("No completed workflows to purge.")
+    elif cmd == "add-artifact" and len(sys.argv) > 4:
+        # Usage: add-artifact <type> <path> <description> [phase]
+        artifact_type = sys.argv[2]
+        artifact_path = sys.argv[3]
+        artifact_desc = sys.argv[4]
+        artifact_phase = sys.argv[5] if len(sys.argv) > 5 else None
+
+        state = load_state()
+        active = session_active_name(state)
+        if active:
+            if not artifact_phase:
+                artifact_phase = state["workflows"][active].get("current_phase", "unknown")
+            artifact = {
+                "type": artifact_type,
+                "path": artifact_path,
+                "description": artifact_desc,
+                "phase": artifact_phase,
+            }
+            if add_test_artifact(active, artifact):
+                print(f"Artifact added to {active}: {artifact_type} ({artifact_desc})")
+            else:
+                print(f"Failed to add artifact to {active}")
+        else:
+            print("No active workflow")
     elif cmd == "pause":
         success, message = pause_workflow()
         print(message)

@@ -108,8 +108,9 @@ def is_code_file(file_path: str) -> bool:''',
         scg,
         old='''    # CODE FILE → Workflow required!''',
         new='''    # INFRASTRUCTURE FILE → Override token required, but no workflow
+    # Accept ANY valid override token — if user said "override", they approved it
     if is_infrastructure_file(file_path):
-        if check_user_override(workflow=None, workflow_name="__infra__"):
+        if check_user_override(workflow=None, workflow_name="__infra__") or check_user_override():
             sys.exit(0)
         print("""
 ╔══════════════════════════════════════════════════════════════════╗
@@ -138,6 +139,7 @@ def is_code_file(file_path: str) -> bool:''',
 
     otl = HOOKS_DIR / "override_token_listener.py"
 
+    # 2a: __infra__ fallback when no active workflow
     patch_file(
         otl,
         old='''    else:
@@ -154,6 +156,28 @@ def is_code_file(file_path: str) -> bool:''',
             # This allows editing hooks/agents without a full workflow
             target_name = "__infra__"''',
         description="Create __infra__ token when no workflow active"
+    )
+
+    # 2b: Accept "override __infra__" as explicit name even though it's not a real workflow
+    patch_file(
+        otl,
+        old='''    if explicit_name:
+        # Explicit workflow name provided — validate it exists
+        if explicit_name not in state.get("workflows", {}):
+            print(f"Override requested for unknown workflow: {explicit_name}", file=sys.stderr)
+            sys.exit(0)
+        target_name = explicit_name''',
+        new='''    if explicit_name:
+        # Special infrastructure token — always allowed without workflow
+        if explicit_name == "__infra__":
+            target_name = "__infra__"
+        # Explicit workflow name provided — validate it exists
+        elif explicit_name not in state.get("workflows", {}):
+            print(f"Override requested for unknown workflow: {explicit_name}", file=sys.stderr)
+            sys.exit(0)
+        else:
+            target_name = explicit_name''',
+        description="Accept __infra__ as explicit override target"
     )
 
     print()
