@@ -87,6 +87,7 @@
 		A056E12CD65C0F6401860BDB /* CalendarEventTransfer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D1F03B35977548B59D7269F /* CalendarEventTransfer.swift */; };
 		A37B483E47D5F1A662D498CC /* SchedulingUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7ED51F72D6039EFAC3D85A3 /* SchedulingUITests.swift */; };
 		A4A8AF1E9B1B715FE913F6F4 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 350DD1256F45268992636DEA /* NotificationService.swift */; };
+		SMTNOTENG01BLD001 /* SmartNotificationEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = SMTNOTENG01FREF01 /* SmartNotificationEngine.swift */; };
 		A908C829057E6E41882110A1 /* CategoryTrendChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B00FF52557F6F42E8194A77 /* CategoryTrendChart.swift */; };
 		AA657A3EBF3967B2DECE4314 /* CreateTaskView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04068491AA7CD2368A273C00 /* CreateTaskView.swift */; };
 		AAF3C0B9F1D9D79682D3680F /* Bug81StaleBlockAssignmentUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BE6C24124E626E4489ECDFA /* Bug81StaleBlockAssignmentUITests.swift */; };
@@ -200,6 +201,8 @@
 		'DSGNSYS02BUILD0001' = {isa = PBXBuildFile; fileRef = DSGNSYS02FILE00001; };
 		'DUEDN01BUILD000001' = {isa = PBXBuildFile; fileRef = DUEDN01FILE0000001; };
 		'DUEDN02BUILD000001' = {isa = PBXBuildFile; fileRef = DUEDN02FILE0000001; };
+		'SMTNOT01BUILD00001' = {isa = PBXBuildFile; fileRef = SMTNOT01FILE000001; };
+		'SMTNOT02BUILD00001' = {isa = PBXBuildFile; fileRef = SMTNOT02FILE000001; };
 		'DUEDT01BUILD000001' = {isa = PBXBuildFile; fileRef = DUEDT01FILE0000001; };
 		'DUEDT02BUILD000001' = {isa = PBXBuildFile; fileRef = DUEDT01FILE0000001; };
 		'DUEDT03BUILD000001' = {isa = PBXBuildFile; fileRef = DUEDT03FILE0000001; };
@@ -268,6 +271,7 @@
 		'MACSHARE01BUILD003' = {isa = PBXBuildFile; fileRef = 414BC475930C1DCDA3E9033B /* TaskSource.swift */; };
 		'MACSHARE01BUILD004' = {isa = PBXBuildFile; fileRef = MACSHARE04FREF0001; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		'NOTIF02BUILD000001' = {isa = PBXBuildFile; fileRef = 350DD1256F45268992636DEA /* NotificationService.swift */; };
+		SMTNOTENG01BLD002 /* SmartNotificationEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = SMTNOTENG01FREF01 /* SmartNotificationEngine.swift */; };
 		'NOTIFACT01BUILD001' = {isa = PBXBuildFile; fileRef = NOTIFACT01FREF001; };
 		'NOTIFACT01BUILD002' = {isa = PBXBuildFile; fileRef = NOTIFACT01FREF001; };
 		'NOTSNZ01BUILD0001' = {isa = PBXBuildFile; fileRef = NOTSNZ01FILE00001; };
@@ -602,6 +606,7 @@
 		339BBA1A3799CB0C6CF5897A /* BacklogViewUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BacklogViewUITests.swift; sourceTree = "<group>"; };
 		34D186C26C7135F80A5E3B0B /* SyncEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncEngine.swift; sourceTree = "<group>"; };
 		350DD1256F45268992636DEA /* NotificationService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
+		SMTNOTENG01FREF01 /* SmartNotificationEngine.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SmartNotificationEngine.swift; sourceTree = "<group>"; };
 		35E10E0297BB375AFCD4517E /* DueDateBadgeExtractionUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DueDateBadgeExtractionUITests.swift; sourceTree = "<group>"; };
 		37586E91853A38D88E035A33 /* MockEventKitRepositoryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockEventKitRepositoryTests.swift; sourceTree = "<group>"; };
 		37FD5047036F6943519870D4 /* FocusBlockDragDropUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = FocusBlockDragDropUITests.swift; sourceTree = "<group>"; };
@@ -748,6 +753,8 @@
 		'DSGNSYS02FILE00001' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignSystem.swift; sourceTree = "<group>"; };
 		'DUEDN01FILE0000001' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DueDateNotificationTests.swift; sourceTree = "<group>"; };
 		'DUEDN02FILE0000001' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DueDateNotificationUITests.swift; sourceTree = "<group>"; };
+		'SMTNOT01FILE000001' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartNotificationEngineTests.swift; sourceTree = "<group>"; };
+		'SMTNOT02FILE000001' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartNotificationEngineUITests.swift; sourceTree = "<group>"; };
 		'DUEDT01FILE0000001' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+DueDate.swift"; sourceTree = "<group>"; };
 		'DUEDT03FILE0000001' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DueDateFormattingTests.swift; sourceTree = "<group>"; };
 		'DUEDT04FILE0000001' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DueDateTimeDisplayTests.swift; sourceTree = "<group>"; };
@@ -1115,6 +1122,7 @@
 				NXLP01UIREF0001,
 				AISCORE01UIFILE001,
 				DUEDN02FILE0000001,
+				SMTNOT02FILE000001,
 				BSRCH01FILE000001,
 				LVCLN01UIFILE0001,
 				RECTMPLUI01FIL001,
@@ -1373,6 +1381,7 @@
 				NXSWIPE01UTREF01,
 				AISCORE01FILE00001,
 				DUEDN01FILE0000001,
+				SMTNOT01FILE000001,
 				LVCLN01FILE000001,
 				301796C3380CA4E06D1EF41B /* TaskCompletionUndoServiceTests.swift */,
 				8D6520F9246BDCE0D9B157B6 /* SpotlightIndexingServiceTests.swift */,
@@ -1455,6 +1464,7 @@
 				CKSM02FILE000001,
 				76D00C9F307A1EC64537A9C7 /* TaskSources */,
 				350DD1256F45268992636DEA /* NotificationService.swift */,
+				SMTNOTENG01FREF01 /* SmartNotificationEngine.swift */,
 				NOTIFACT01FREF001,
 				RECRSVC02FILE0001,
 				60DE55FC2A796A308478E2B9 /* MenuBarIconState.swift */,
@@ -2170,6 +2180,7 @@
 				TSKDTL01BUILDFILE0001,
 				1800BB7020E3D6044A62475A /* DailyReviewView.swift in Sources */,
 				A4A8AF1E9B1B715FE913F6F4 /* NotificationService.swift in Sources */,
+				SMTNOTENG01BLD001 /* SmartNotificationEngine.swift in Sources */,
 				NOTIFACT01BUILD001,
 				INTENT01BUILD00001,
 				INTENT02BUILD00001,
@@ -2270,6 +2281,7 @@
 				NXSWIPE01UIBLD01,
 				NXLP01UIBLD0001,
 				DUEDN02BUILD000001,
+				SMTNOT02BUILD00001,
 				BSRCH01BUILD00001,
 				LVCLN01UIBUILD001,
 				RECTMPLUI01BLD001,
@@ -2368,6 +2380,7 @@
 				NXSWIPE01UTBLD01,
 				AISCORE01BUILD0001,
 				DUEDN01BUILD000001,
+				SMTNOT01BUILD00001,
 				LVCLN01BUILD00001,
 				F99C220A3B729DDE50461E4A /* TaskCompletionUndoServiceTests.swift in Sources */,
 				30515A046C05070B90FD3C90 /* SpotlightIndexingServiceTests.swift in Sources */,
@@ -2504,6 +2517,7 @@
 				REFNRCD02BUILD00001,
 				CTC1SERV0BUILD0002,
 				NOTIF02BUILD000001,
+				SMTNOTENG01BLD002 /* SmartNotificationEngine.swift in Sources */,
 				NOTIFACT01BUILD002,
 				MAC024BUILD00000001,
 				MAC024BUILD00000002,

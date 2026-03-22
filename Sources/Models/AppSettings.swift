@@ -52,4 +52,18 @@ final class AppSettings: ObservableObject {
     /// Whether AI-powered task scoring is enabled
     @AppStorage("aiScoringEnabled") var aiScoringEnabled: Bool = true
 
+    // MARK: - Notification Profile
+
+    @AppStorage("notificationProfile") var notificationProfileRaw: String =
+        SmartNotificationEngine.NotificationProfile.balanced.rawValue
+
+    var notificationProfile: SmartNotificationEngine.NotificationProfile {
+        get {
+            SmartNotificationEngine.NotificationProfile(rawValue: notificationProfileRaw) ?? .balanced
+        }
+        set {
+            notificationProfileRaw = newValue.rawValue
+        }
+    }
+
 }

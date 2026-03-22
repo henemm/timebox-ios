@@ -317,11 +317,26 @@ struct FocusBloxApp: App {
                     checkCCQuickCaptureTrigger()
                     syncedSettings.pullFromCloud()  // Bug 102: Pull BEFORE push
                     syncedSettings.pushToCloud()
-                    rescheduleDueDateNotifications()
+                    Task {
+                        await SmartNotificationEngine.reconcile(
+                            reason: .appForeground,
+                            container: sharedModelContainer,
+                            eventKitRepo: eventKitRepository
+                        )
+                    }
+                    #if !os(macOS)
                     NotificationService.updateOverdueBadge(container: sharedModelContainer)
+                    #endif
                 }
                 if newPhase == .background {
                     Task { await deferredCompletion.flushAll() }
+                    Task {
+                        await SmartNotificationEngine.reconcile(
+                            reason: .appBackground,
+                            container: sharedModelContainer,
+                            eventKitRepo: eventKitRepository
+                        )
+                    }
                 }
             }
             .onOpenURL { url in
@@ -359,25 +374,16 @@ struct FocusBloxApp: App {
             if !isUITesting {
                 _ = await NotificationService.requestPermission()
             }
+            #if !os(macOS)
+            SmartNotificationEngine.registerBackgroundTask()
+            SmartNotificationEngine.scheduleBackgroundRefresh()
+            #endif
             await MainActor.run {
                 permissionRequested = true
             }
         }
     }
 
-    /// Batch reschedule due date notifications for all tasks with due dates.
-    private func rescheduleDueDateNotifications() {
-        let context = sharedModelContainer.mainContext
-        do {
-            let allTasks = try context.fetch(FetchDescriptor<LocalTask>())
-            let tasksWithDueDate = allTasks
-                .filter { $0.dueDate != nil && !$0.isCompleted }
-                .map { (id: $0.id, title: $0.title, dueDate: $0.dueDate!) }
-            NotificationService.rescheduleAllDueDateNotifications(tasks: tasksWithDueDate)
-        } catch {
-            print("Failed to fetch tasks for due date notifications: \(error)")
-        }
-    }
 
     /// Check if Control Center triggered Quick Capture (via App Group flag)
     private func checkCCQuickCaptureTrigger() {

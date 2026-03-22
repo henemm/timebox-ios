@@ -5,6 +5,27 @@
 
 ---
 
+## RW_0.1a — Smart Notification Engine Phase A (Foundation) — ERLEDIGT (2026-03-22)
+
+- **Epic:** 0 Infrastruktur | **Spec:** `docs/specs/rework/0.1-smart-notification-engine-impl.md`
+- **Ziel:** Zentraler SmartNotificationEngine-Service mit Reconcile-on-Event-Strategie, 3 Notification-Profile, Budget-Priorisierung (64 Slots)
+- **Aenderungen:**
+  - `Sources/Services/SmartNotificationEngine.swift` — NEU: Engine Core mit reconcile(), buildAllRequests(), Timer/Task-Request-Builder, BGAppRefreshTask
+  - `Sources/Models/AppSettings.swift` — Notification Profile Property (quiet/balanced/active)
+  - `Sources/FocusBloxApp.swift` — reconcile() Integration bei Foreground/Background, rescheduleDueDateNotifications() entfernt
+- **Tests:** 12 Unit Tests + 2 UI Tests (alle gruen)
+- **Naechste Phasen:** RW_0.1b (FocusBlock Migration), RW_0.1c (DueDate + Settings UI)
+
+---
+
+## RW_3.2 — Focus Sprint ("Los"-Button) — ERLEDIGT (2026-03-21)
+
+- **Epic:** 3 Ausfuehrung | **Spec:** `docs/specs/rework/3.2-focus-sprint-impl.md`
+- **Ziel:** Focus Sprint direkt aus dem Backlog starten ueber "Los"-Button
+- **Commit:** `72bfc9d`
+
+---
+
 ## RW_1.1 — Quick Dump — ERLEDIGT (2026-03-21)
 
 - **Epic:** 1 Erfassung | **Spec:** `docs/specs/rework/1.1-quick-dump.md`

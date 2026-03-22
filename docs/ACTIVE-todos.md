@@ -15,13 +15,15 @@
 
 | ID | Epic | Titel | Prio | Aufwand | Spec |
 |----|------|-------|------|---------|------|
-| RW_0.1 | 0 Infrastruktur | Smart Notification Engine | High | M | [Spec](specs/rework/0.1-smart-notification-engine.md) |
+| RW_0.1a | 0 Infrastruktur | Smart Notification Engine — Phase A (Foundation) | High | M | [Spec](specs/rework/0.1-smart-notification-engine-impl.md) ERLEDIGT → [Archiv](ARCHIVE-todos.md) |
+| RW_0.1b | 0 Infrastruktur | Smart Notification Engine — Phase B (FocusBlock Migration) | High | M | [Spec](specs/rework/0.1-smart-notification-engine.md) |
+| RW_0.1c | 0 Infrastruktur | Smart Notification Engine — Phase C (DueDate + Settings UI) | High | M | [Spec](specs/rework/0.1-smart-notification-engine.md) |
 | RW_0.2 | 0 Infrastruktur | BehavioralProfileService | High | M | [Spec](specs/rework/0.2-behavioral-profile-service.md) |
 | ~~RW_1.1~~ | ~~1 Erfassung~~ | ~~Quick Dump~~ | ~~High~~ | ~~M~~ | ~~[Spec](specs/rework/1.1-quick-dump.md)~~ ERLEDIGT → [Archiv](ARCHIVE-todos.md) |
 | ~~RW_1.2~~ | ~~1 Erfassung~~ | ~~AI Context Extraction (Schema)~~ | ~~High~~ | ~~L~~ | ~~[Spec](specs/rework/1.2-1.3-refiner-impl.md)~~ ERLEDIGT → [Archiv](ARCHIVE-todos.md) |
 | ~~RW_1.3~~ | ~~1 Erfassung~~ | ~~The Refiner (UI)~~ | ~~High~~ | ~~L~~ | ~~[Spec](specs/rework/1.2-1.3-refiner-impl.md)~~ ERLEDIGT → [Archiv](ARCHIVE-todos.md) |
 | RW_3.1 | 3 Ausfuehrung | Task direkt auf Kalender droppen | Medium | L | [Spec](specs/rework/3.1-calendar-task-drop.md) |
-| ~~RW_3.2~~ | ~~3 Ausfuehrung~~ | ~~Focus Sprint ("Los"-Button)~~ | ~~Medium~~ | ~~M~~ | ~~[Spec](specs/rework/3.2-focus-sprint-impl.md)~~ ERLEDIGT |
+| ~~RW_3.2~~ | ~~3 Ausfuehrung~~ | ~~Focus Sprint ("Los"-Button)~~ | ~~Medium~~ | ~~M~~ | ~~[Spec](specs/rework/3.2-focus-sprint-impl.md)~~ ERLEDIGT → [Archiv](ARCHIVE-todos.md) |
 | RW_3.3 | 3 Ausfuehrung | Follow-up Logic | Medium | S | [Spec](specs/rework/3.3-follow-up-logic.md) |
 | RW_3.4 | 3 Ausfuehrung | Emotional Nudge (Micro-Tasks) | Medium | M | [Spec](specs/rework/3.4-emotional-nudge.md) |
 | RW_2.1 | 2 Tagesplanung | Tagesansicht ("Dein Tag") | Medium | XL | [Spec](specs/rework/2.1-day-view.md) |
@@ -46,11 +48,11 @@
 | FEATURE_020 | macOS Focus Mode Integration | Low | M | macOS | macOS System-Integration. P3. |
 | FEATURE_021 | OrganizeMyDay Intent | Low | XL | iOS | Komplexer Intent. Kann warten. |
 | FEATURE_022 | CaptureContextIntent | Low | M | iOS | WARTEND auf Apple APIs (iOS 26.5/27). |
-| FEATURE_023 | Focus Sprint: Inline-Duration-Picker | Low | S | iOS | Vor Sprint-Start Dauer anpassen (Inline-Picker, kein Sheet). Follow-up aus RW_3.2 — bewusst ausgescoped um LoC-Limit einzuhalten. Default-Dauer (estimatedDuration oder 60 Min) reicht vorerst. |
+| FEATURE_028 | Focus Sprint: Inline-Duration-Picker | Low | S | iOS | Vor Sprint-Start Dauer anpassen (Inline-Picker, kein Sheet). Follow-up aus RW_3.2 — bewusst ausgescoped um LoC-Limit einzuhalten. Default-Dauer (estimatedDuration oder 60 Min) reicht vorerst. |
 | TD_001 | God-Views aufbrechen | Low | L | Beide | BacklogView 1181 LoC, BlockPlanningView 1400 LoC — Wartbarkeit. |
 | TD_002 | View-Duplikation iOS/macOS | Low | L | Beide | Verbleibende Duplikation zwischen Sources/Views und FocusBloxMac. Langfristig wichtig, kurzfristig kein Blocker. |
-| TD_003 | Dead Code nach Monster-Entfernung | Low | S | Beide | Nach Commit 5f6ae47 haben folgende Dateien KEINE Aufrufer mehr in Views: `DisciplineTrendChart.swift` (kein Aufrufer), `ReviewComponents.swift` (DisciplineBar-Structs ohne Aufrufer), `DisciplineStatsService.swift` (nur noch in Unit Tests referenziert). Compilieren fehlerfrei, werden aber nie gerendert. |
-| TD_005 | Monster-Removal: Validierungstests | High | S | Beide | **Ticket B.** Regressionstests nach Monster-Entfernung: Negative Tests (kein Coach-Tab, keine Coach-Settings, keine Monster-Images), Scoring ohne Coach-Boost, Discipline ohne Coach-Override. ~+80 LoC. Abhaengig von TD_004. Analyse: `docs/context/monster-removal-validation.md` |
+| TD_006 | Dead Code nach Monster-Entfernung | Low | S | Beide | Nach Commit 5f6ae47 haben folgende Dateien KEINE Aufrufer mehr in Views: `DisciplineTrendChart.swift` (kein Aufrufer), `ReviewComponents.swift` (DisciplineBar-Structs ohne Aufrufer), `DisciplineStatsService.swift` (nur noch in Unit Tests referenziert). Compilieren fehlerfrei, werden aber nie gerendert. |
+| TD_005 | Monster-Removal: Validierungstests | High | S | Beide | **Ticket B.** Regressionstests nach Monster-Entfernung: Negative Tests (kein Coach-Tab, keine Coach-Settings, keine Monster-Images), Scoring ohne Coach-Boost, Discipline ohne Coach-Override. ~+80 LoC. ~~Abhaengig von TD_004~~ TD_004 ERLEDIGT → **unblocked**. Analyse: `docs/context/monster-removal-validation.md` |
 | BUG_115 | Unit Test: BadgeOverdueNotificationTests erwartet 3 Actions, bekommt 4 | Medium | S | iOS | `test_dueDateCategory_isRegistered` erwartet 3 Notification-Aktionen, findet aber 4. Vermutlich wurde eine Aktion hinzugefuegt ohne den Test anzupassen. |
 | BUG_116 | Unit Test: LocalTaskSourceTests + SyncEngineTests Sortierung falsch | Medium | S | iOS | `test_fetchIncompleteTasks_sortsBySortOrder` und `test_sync_sortsByRank`: Tasks sind in falscher Reihenfolge. Sort-Logik in LocalTaskSource/SyncEngine stimmt nicht mit Test-Erwartungen ueberein. |
 | BUG_117 | Unit Test: LocalTaskTests Default-Werte phase/category fehlen | Medium | S | iOS | `test_localTask_defaultValues_phase1`: Erwartet `phase="not_urgent"` und `category="maintenance"`, bekommt `nil`/`""`. Defaultwerte fehlen oder wurden geaendert. |
