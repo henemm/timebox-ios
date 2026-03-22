@@ -96,8 +96,9 @@ def main():
         # No explicit name — fall back to active workflow
         target_name = session_active_name(state)
         if not target_name or target_name not in state.get("workflows", {}):
-            print("Override requested but no active workflow found.", file=sys.stderr)
-            sys.exit(0)
+            # No active workflow — create infrastructure token
+            # This allows editing hooks/agents without a full workflow
+            target_name = "__infra__"
 
     # Create the token
     create_token(target_name)

@@ -73,9 +73,15 @@ ALWAYS_ALLOWED_DIRS = [
     "tests/",
     "docs/",
     ".claude/commands/",
-    ".claude/agents/",
     "scripts/",
     "tools/",
+]
+
+# Infrastructure directories — require __infra__ override token, NOT full workflow
+# These contain workflow enforcement logic itself (chicken-and-egg protection)
+INFRASTRUCTURE_DIRS = [
+    ".claude/hooks/",
+    ".claude/agents/",
 ]
 
 # File patterns ALWAYS allowed (whitelist)
@@ -104,6 +110,14 @@ def is_always_allowed(file_path: str) -> bool:
         if re.search(pattern, file_path, re.IGNORECASE):
             return True
 
+    return False
+
+
+def is_infrastructure_file(file_path: str) -> bool:
+    """Check if file is workflow infrastructure (hooks, agents)."""
+    for infra_dir in INFRASTRUCTURE_DIRS:
+        if infra_dir in file_path:
+            return True
     return False
 
 
@@ -242,6 +256,26 @@ def main():
     # Check if file is a code file
     if not is_code_file(file_path):
         sys.exit(0)
+
+    # INFRASTRUCTURE FILE → Override token required, but no workflow
+    if is_infrastructure_file(file_path):
+        if check_user_override(workflow=None, workflow_name="__infra__"):
+            sys.exit(0)
+        print("""
+╔══════════════════════════════════════════════════════════════════╗
+║  BLOCKED: Infrastructure File — Override Required!               ║
+╠══════════════════════════════════════════════════════════════════╣
+║  You're trying to modify workflow infrastructure (hooks/agents). ║
+║                                                                  ║
+║  These files control enforcement logic and need explicit         ║
+║  user approval — but NO full workflow is required.               ║
+║                                                                  ║
+║  REQUIRED: User must type 'override' in chat.                    ║
+║                                                                  ║
+║  This protects against Claude weakening its own enforcement.     ║
+╚══════════════════════════════════════════════════════════════════╝
+""", file=sys.stderr)
+        sys.exit(2)
 
     # CODE FILE → Workflow required!
     # PRIMARY: Find workflow by file ownership (affected_files)

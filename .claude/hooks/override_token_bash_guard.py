@@ -44,6 +44,18 @@ def main():
         )
         sys.exit(2)
 
+    # Block direct manipulation of workflow_state.json via Bash.
+    # ALLOWED: workflow_state_multi.py (official CLI tool called by slash commands)
+    # BLOCKED: everything else (python3 -c, echo, cat >, etc.)
+    if "workflow_state" in command and "workflow_state_multi.py" not in command:
+        print(
+            "BLOCKED: workflow_state.json darf nicht direkt via Bash manipuliert werden.\n"
+            "Nutze das offizielle CLI: python3 .claude/hooks/workflow_state_multi.py\n"
+            "Zum Lesen nutze das Read-Tool statt Bash.",
+            file=sys.stderr
+        )
+        sys.exit(2)
+
     sys.exit(0)
 
 
