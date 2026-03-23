@@ -13,28 +13,69 @@
 > 18 Stories in 5 Epics. Reihenfolge: Epic 0 → 1 → 3 → 2 → 4.
 > Specs: `docs/specs/rework/` | [Epic Overview](specs/rework/0.0-epic-overview.md)
 
-| ID | Epic | Titel | Prio | Aufwand | Spec |
-|----|------|-------|------|---------|------|
-| RW_0.1a | 0 Infrastruktur | Smart Notification Engine — Phase A (Foundation) | High | M | [Spec](specs/rework/0.1-smart-notification-engine-impl.md) ERLEDIGT → [Archiv](ARCHIVE-todos.md) |
-| ~~RW_0.1b~~ | ~~0 Infrastruktur~~ | ~~Smart Notification Engine — Phase B (FocusBlock Migration)~~ | ~~High~~ | ~~M~~ | ~~[Spec](specs/rework/0.1b-smart-notification-phase-b-impl.md)~~ ERLEDIGT → [Archiv](ARCHIVE-todos.md) |
-| ~~RW_0.1c~~ | ~~0 Infrastruktur~~ | ~~Smart Notification Engine — Phase C (DueDate Migration)~~ | ~~High~~ | ~~M~~ | ~~[Spec](specs/rework/0.1c-smart-notification-phase-c-impl.md)~~ ERLEDIGT → [Archiv](ARCHIVE-todos.md) |
-| ~~RW_0.1d~~ | ~~0 Infrastruktur~~ | ~~Smart Notification Engine — Phase D (Review/Nudge + Settings UI)~~ | ~~High~~ | ~~M~~ | ~~[Spec](specs/rework/0.1d-smart-notification-phase-d-impl.md)~~ ERLEDIGT → [Archiv](ARCHIVE-todos.md) |
-| RW_0.2 | 0 Infrastruktur | BehavioralProfileService | High | M | [Spec](specs/rework/0.2-behavioral-profile-service.md) |
-| ~~RW_1.1~~ | ~~1 Erfassung~~ | ~~Quick Dump~~ | ~~High~~ | ~~M~~ | ~~[Spec](specs/rework/1.1-quick-dump.md)~~ ERLEDIGT → [Archiv](ARCHIVE-todos.md) |
-| ~~RW_1.2~~ | ~~1 Erfassung~~ | ~~AI Context Extraction (Schema)~~ | ~~High~~ | ~~L~~ | ~~[Spec](specs/rework/1.2-1.3-refiner-impl.md)~~ ERLEDIGT → [Archiv](ARCHIVE-todos.md) |
-| ~~RW_1.3~~ | ~~1 Erfassung~~ | ~~The Refiner (UI)~~ | ~~High~~ | ~~L~~ | ~~[Spec](specs/rework/1.2-1.3-refiner-impl.md)~~ ERLEDIGT → [Archiv](ARCHIVE-todos.md) |
-| RW_3.1 | 3 Ausfuehrung | Task direkt auf Kalender droppen | Medium | L | [Spec](specs/rework/3.1-calendar-task-drop.md) |
-| ~~RW_3.2~~ | ~~3 Ausfuehrung~~ | ~~Focus Sprint ("Los"-Button)~~ | ~~Medium~~ | ~~M~~ | ~~[Spec](specs/rework/3.2-focus-sprint-impl.md)~~ ERLEDIGT → [Archiv](ARCHIVE-todos.md) |
-| RW_3.3 | 3 Ausfuehrung | Follow-up Logic | Medium | S | [Spec](specs/rework/3.3-follow-up-logic.md) |
-| RW_3.4 | 3 Ausfuehrung | Emotional Nudge (Micro-Tasks) | Medium | M | [Spec](specs/rework/3.4-emotional-nudge.md) |
-| RW_2.1 | 2 Tagesplanung | Tagesansicht ("Dein Tag") | Medium | XL | [Spec](specs/rework/2.1-day-view.md) |
-| RW_2.2 | 2 Tagesplanung | KI-gestuetzte Tagesvorschlaege | Medium | L | [Spec](specs/rework/2.2-next-up-suggestions.md) |
-| RW_2.3 | 2 Tagesplanung | Limitation Guard | Medium | S | [Spec](specs/rework/2.3-limitation-guard.md) |
-| RW_2.4 | 2 Tagesplanung | Backlog UX Rework | Medium | L | [Spec](specs/rework/2.4-backlog-ux-rework.md) |
-| RW_4.1 | 4 Reflexion | Soft Evening Reset | Low | M | [Spec](specs/rework/4.1-soft-evening-reset.md) |
-| RW_4.2 | 4 Reflexion | Success Story Generator | Low | L | [Spec](specs/rework/4.2-success-story-generator.md) |
-| RW_4.3 | 4 Reflexion | Failure Protocol | Low | M | [Spec](specs/rework/4.3-failure-protocol.md) |
-| RW_4.4 | 4 Reflexion | Morning Widget | Low | M | [Spec](specs/rework/4.4-morning-widget.md) |
+| ID | Epic | Titel | Prio | Aufwand | macOS | Spec |
+|----|------|-------|------|---------|-------|------|
+| ~~RW_0.1a~~ | ~~0 Infrastruktur~~ | ~~Smart Notification Engine — Phase A (Foundation)~~ | ~~High~~ | ~~M~~ | ~~Shared~~ | ~~[Spec](specs/rework/0.1-smart-notification-engine-impl.md)~~ ERLEDIGT → [Archiv](ARCHIVE-todos.md) |
+| ~~RW_0.1b~~ | ~~0 Infrastruktur~~ | ~~Smart Notification Engine — Phase B (FocusBlock Migration)~~ | ~~High~~ | ~~M~~ | ~~Shared~~ | ~~[Spec](specs/rework/0.1b-smart-notification-phase-b-impl.md)~~ ERLEDIGT → [Archiv](ARCHIVE-todos.md) |
+| ~~RW_0.1c~~ | ~~0 Infrastruktur~~ | ~~Smart Notification Engine — Phase C (DueDate Migration)~~ | ~~High~~ | ~~M~~ | ~~Shared~~ | ~~[Spec](specs/rework/0.1c-smart-notification-phase-c-impl.md)~~ ERLEDIGT → [Archiv](ARCHIVE-todos.md) |
+| ~~RW_0.1d~~ | ~~0 Infrastruktur~~ | ~~Smart Notification Engine — Phase D (Review/Nudge + Settings UI)~~ | ~~High~~ | ~~M~~ | ~~UI fehlt~~ | ~~[Spec](specs/rework/0.1d-smart-notification-phase-d-impl.md)~~ ERLEDIGT → [Archiv](ARCHIVE-todos.md) |
+| ~~RW_0.2~~ | ~~0 Infrastruktur~~ | ~~BehavioralProfileService (Affinitaet, Kapazitaet, Schaetzgenauigkeit)~~ | ~~High~~ | ~~M~~ | ~~Shared~~ | ~~[Spec](specs/rework/0.2-behavioral-profile-impl.md)~~ ERLEDIGT → [Archiv](ARCHIVE-todos.md) |
+| RW_0.2b | 0 Infrastruktur | BehavioralProfileService Phase B (Kalender-Korrelation, Verschiebungs-Muster) | High | S | Shared | Spec folgt |
+| ~~RW_1.1~~ | ~~1 Erfassung~~ | ~~Quick Dump~~ | ~~High~~ | ~~M~~ | ~~Shared~~ | ~~[Spec](specs/rework/1.1-quick-dump.md)~~ ERLEDIGT → [Archiv](ARCHIVE-todos.md) |
+| ~~RW_1.2~~ | ~~1 Erfassung~~ | ~~AI Context Extraction (Schema)~~ | ~~High~~ | ~~L~~ | ~~Shared~~ | ~~[Spec](specs/rework/1.2-1.3-refiner-impl.md)~~ ERLEDIGT → [Archiv](ARCHIVE-todos.md) |
+| ~~RW_1.3~~ | ~~1 Erfassung~~ | ~~The Refiner (UI)~~ | ~~High~~ | ~~L~~ | ~~UI fehlt~~ | ~~[Spec](specs/rework/1.2-1.3-refiner-impl.md)~~ ERLEDIGT → [Archiv](ARCHIVE-todos.md) |
+| RW_3.1 | 3 Ausfuehrung | Task direkt auf Kalender droppen | Medium | L | Eigene View | [Spec](specs/rework/3.1-calendar-task-drop.md) |
+| ~~RW_3.2~~ | ~~3 Ausfuehrung~~ | ~~Focus Sprint ("Los"-Button)~~ | ~~Medium~~ | ~~M~~ | ~~UI fehlt~~ | ~~[Spec](specs/rework/3.2-focus-sprint-impl.md)~~ ERLEDIGT → [Archiv](ARCHIVE-todos.md) |
+| RW_3.3 | 3 Ausfuehrung | Follow-up Logic | Medium | S | Shared | [Spec](specs/rework/3.3-follow-up-logic.md) |
+| RW_3.4 | 3 Ausfuehrung | Emotional Nudge (Micro-Tasks) | Medium | M | Eigene View | [Spec](specs/rework/3.4-emotional-nudge.md) |
+| RW_2.1 | 2 Tagesplanung | Tagesansicht ("Dein Tag") | Medium | XL | Eigene View | [Spec](specs/rework/2.1-day-view.md) |
+| RW_2.2 | 2 Tagesplanung | KI-gestuetzte Tagesvorschlaege | Medium | L | Shared | [Spec](specs/rework/2.2-next-up-suggestions.md) |
+| RW_2.3 | 2 Tagesplanung | Limitation Guard | Medium | S | Shared | [Spec](specs/rework/2.3-limitation-guard.md) |
+| RW_2.4 | 2 Tagesplanung | Backlog UX Rework | Medium | L | Eigene View | [Spec](specs/rework/2.4-backlog-ux-rework.md) |
+| RW_4.1 | 4 Reflexion | Soft Evening Reset | Low | M | Shared | [Spec](specs/rework/4.1-soft-evening-reset.md) |
+| RW_4.2 | 4 Reflexion | Success Story Generator | Low | L | Shared | [Spec](specs/rework/4.2-success-story-generator.md) |
+| RW_4.3 | 4 Reflexion | Failure Protocol | Low | M | Shared | [Spec](specs/rework/4.3-failure-protocol.md) |
+| RW_4.4 | 4 Reflexion | Morning Widget | Low | M | iOS-only | [Spec](specs/rework/4.4-morning-widget.md) |
+
+### macOS-Spalte Legende
+
+| Wert | Bedeutung |
+|------|-----------|
+| **Shared** | Logik + UI in `Sources/`, funktioniert auf beiden Plattformen ohne Anpassung |
+| **Eigene View** | Logik shared in `Sources/`, macOS braucht eigene View in `FocusBloxMac/` |
+| **UI fehlt** | iOS fertig, macOS-UI noch nicht implementiert (siehe Paritaets-Todos) |
+| **iOS-only** | Feature existiert nur auf iOS (z.B. Lock Screen Widget) |
+
+---
+
+## macOS Paritaet — Erledigte Rework Stories
+
+> Offene macOS-Arbeiten fuer bereits abgeschlossene iOS-Features.
+> Logik ist jeweils shared in `Sources/` — nur macOS-UI fehlt.
+
+| ID | Bezug | Titel | Prio | Aufwand | Beschreibung |
+|----|-------|-------|------|---------|-------------|
+| MAC_RW_0.1d | RW_0.1d | Notification Profile Picker in MacSettingsView | Medium | S | `MacSettingsView.swift`: `notificationProfile` @AppStorage Property + Picker UI im Notifications-Tab (~30 LoC) |
+| MAC_RW_1.3 | RW_1.3 | Refiner Sidebar-Eintrag + Navigation (macOS) | Medium | S | `SidebarView.swift`: Refiner als Sidebar-Item + Navigation-Wiring zu shared `RefinerView` (~35 LoC) |
+| MAC_RW_3.2a | RW_3.2 | Focus Sprint Context Menu in MacBacklogRow | Medium | S | `MacBacklogRow.swift`: Context Menu Item "Focus Sprint starten" → `FocusBlockActionService.startImmediate()` (~20 LoC) |
+| MAC_RW_3.2b | RW_3.2 | Focus Sprint Sidebar-Switch bei Start | Low | S | macOS Root View: `.onReceive(focusSprintStarted)` → Sidebar-Selection auf Focus wechseln (~10 LoC) |
+
+---
+
+## macOS Infrastruktur & Feature-Paritaet
+
+> Ehemals separates macOS-Backlog. Jetzt hier integriert.
+> Specs: `docs/specs/macos/` | Spec-Referenz: `docs/specs/macos/BACKLOG.md`
+
+| ID | Titel | Prio | Aufwand | Rework-Bezug | Beschreibung |
+|----|-------|------|---------|--------------|-------------|
+| MAC_024 | Sync + UI Alignment (Sandbox-Fix) | **Critical** | M | — | Sandbox-Entitlement kaputt → macOS kann NICHT mit iOS syncen. Chip-Layout + UI-Alignment. [Spec](specs/macos/MAC-024-sync-ui-alignment.md) |
+| MAC_025a | Next Up Button in MacBacklogRow | Medium | S | — | iOS BacklogRow hat "Next Up"-Button, macOS nicht. Isolierter Port. [Spec](specs/macos/MAC-025-nextup-button.md) |
+| MAC_025b | Reminders Sync auf macOS | High | S | — | iOS hat RemindersSyncService aktiv, macOS nur lokal. Environment-Setup fehlt. [Spec](specs/macos/MAC-025-reminders-sync.md) |
+| MAC_026 | Enhanced Quick Capture (Metadaten) | Medium | M | — | macOS Quick Capture hat nur Titel, iOS hat volle Metadaten. Hotkey-Migration. [Spec](specs/macos/MAC-026-quick-capture-enhanced.md) |
+| MAC_MENU | MenuBar FocusBlock Status + Timer | Medium | M | — | macOS-Aequivalent zu iOS Live Activity: Timer + Task + Complete/Skip im MenuBar-Popover. [Spec](specs/macos/menubar-focusblock-status.md) |
+| MAC_020 | Drag & Drop Planung | Low | M | RW_3.1 | Aufgaben aus Backlog in Kalender ziehen. Wird durch RW_3.1 teilweise abgedeckt. [Spec](specs/macos/BACKLOG.md#mac-020) |
+| MAC_021 | Review Dashboard | Low | L | RW_2.1 | Statistik-Uebersicht. Wird durch RW_2.1 (DayView) teilweise abgedeckt. [Spec](specs/macos/BACKLOG.md#mac-021) |
 
 ---
 
@@ -44,14 +85,15 @@
 |----|-------|------|---------|-----------|-------------|
 | FEATURE_010 | macOS Backlog: Keyboard Shortcuts | Low | S | macOS | Cmd+N (neuer Task), Cmd+Delete (loeschen), etc. |
 | FEATURE_011 | macOS Backlog: Undo (Cmd+Z) | Low | S | macOS | iOS hat Shake-to-Undo. macOS Backlog hat kein Cmd+Z-Undo. |
-| FEATURE_018 | macOS Enhanced Quick Capture | Low | L | macOS | macOS Produktivitaet. Kein Blocker. |
+| ~~FEATURE_018~~ | ~~macOS Enhanced Quick Capture~~ | — | — | ~~macOS~~ | Ersetzt durch MAC_026 (siehe macOS Infrastruktur) |
 | FEATURE_019 | macOS Shortcuts.app Integration | Low | L | macOS | macOS Automatisierung. P3. |
 | FEATURE_020 | macOS Focus Mode Integration | Low | M | macOS | macOS System-Integration. P3. |
 | FEATURE_021 | OrganizeMyDay Intent | Low | XL | iOS | Komplexer Intent. Kann warten. |
 | FEATURE_022 | CaptureContextIntent | Low | M | iOS | WARTEND auf Apple APIs (iOS 26.5/27). |
 | FEATURE_028 | Focus Sprint: Inline-Duration-Picker | Low | S | iOS | Vor Sprint-Start Dauer anpassen (Inline-Picker, kein Sheet). Follow-up aus RW_3.2 — bewusst ausgescoped um LoC-Limit einzuhalten. Default-Dauer (estimatedDuration oder 60 Min) reicht vorerst. |
 | TD_001 | God-Views aufbrechen | Low | L | Beide | BacklogView 1181 LoC, BlockPlanningView 1400 LoC — Wartbarkeit. |
-| TD_002 | View-Duplikation iOS/macOS | Low | L | Beide | Verbleibende Duplikation zwischen Sources/Views und FocusBloxMac. Langfristig wichtig, kurzfristig kein Blocker. |
+| TD_002 | View-Duplikation iOS/macOS konsolidieren | Medium | L | Beide | Verbleibende Duplikation zwischen Sources/Views und FocusBloxMac. **Wird mit jedem Rework-Feature teurer.** Perspektivisch konsolidieren. |
+| TD_007 | macOS UI Tests in Workflow integrieren | Medium | M | macOS | sim.sh hat mac-build + mac-unit, aber macOS UI Tests fehlen noch. BUG_111 (TCC-Dialog) blockiert automatisierte Ausfuehrung via SSH. Nach BUG_111-Fix: mac-test Befehl in sim.sh + Adversary-Gate fuer macOS UI Tests erweitern. |
 | TD_006 | Dead Code nach Monster-Entfernung | Low | S | Beide | Nach Commit 5f6ae47 haben folgende Dateien KEINE Aufrufer mehr in Views: `DisciplineTrendChart.swift` (kein Aufrufer), `ReviewComponents.swift` (DisciplineBar-Structs ohne Aufrufer), `DisciplineStatsService.swift` (nur noch in Unit Tests referenziert). Compilieren fehlerfrei, werden aber nie gerendert. `.safeAreaInset(edge: .top) { EmptyView() }` in BacklogView.swift — ERLEDIGT (verursachte schwarzen Gap). |
 | ~~TD_005~~ | ~~Monster-Removal: Validierungstests~~ | ~~High~~ | ~~S~~ | ~~Beide~~ | ERLEDIGT → [Archiv](ARCHIVE-todos.md) |
 | BUG_115 | Unit Test: BadgeOverdueNotificationTests erwartet 3 Actions, bekommt 4 | Medium | S | iOS | `test_dueDateCategory_isRegistered` erwartet 3 Notification-Aktionen, findet aber 4. Vermutlich wurde eine Aktion hinzugefuegt ohne den Test anzupassen. |
