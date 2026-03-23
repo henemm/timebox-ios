@@ -134,9 +134,28 @@ def check_user_override(state: dict, file_path: str = "") -> bool:
         return True
 
     # Resolve the relevant workflow for this file
-    workflow, _ = resolve_workflow(state, file_path) if file_path else (get_active_workflow(state), None)
+    workflow, wf_name = resolve_workflow(state, file_path) if file_path else (get_active_workflow(state), None)
     if workflow and workflow.get("user_override", False):
         return True
+
+    # Check override token file (user_override_token.json)
+    try:
+        from override_token import has_valid_token
+    except ImportError:
+        try:
+            sys.path.insert(0, str(Path(__file__).parent))
+            from override_token import has_valid_token
+        except ImportError:
+            return False
+
+    # Check token for specific workflow first, then any valid token
+    if wf_name and has_valid_token(wf_name):
+        return True
+    if not wf_name:
+        # No workflow resolved — check active workflow name
+        active_name = _session_active_name(state)
+        if active_name and has_valid_token(active_name):
+            return True
 
     return False
 

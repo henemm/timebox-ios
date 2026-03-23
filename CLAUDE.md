@@ -63,6 +63,22 @@ xcodebuild test -project FocusBlox.xcodeproj -scheme FocusBlox \
   -destination 'id=1EC79950-6704-47D0-BDF8-2C55236B4B40'
 ```
 
+## Xcode-Projekt: Dateien hinzufuegen
+
+**NIEMALS `project.pbxproj` direkt editieren** — das Dateiformat ist fragil und manuelle Edits korrumpieren das Projekt.
+
+**Neue `.swift`-Dateien zum Projekt hinzufuegen:**
+```python
+python3 -c "
+from pbxproj import XcodeProject
+proj = XcodeProject.load('FocusBlox.xcodeproj/project.pbxproj')
+proj.add_file('Sources/Pfad/NeueDatei.swift', target_name='FocusBlox')
+proj.save()
+"
+```
+
+Target-Namen: `FocusBlox` (iOS App), `FocusBloxTests` (Unit Tests), `FocusBloxUITests` (UI Tests), `FocusBloxMac` (macOS App)
+
 ## Specs & Documentation
 
 - Specs: `docs/specs/[category]/[entity].md` (Template: `docs/specs/_template.md`)

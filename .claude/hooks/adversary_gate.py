@@ -99,7 +99,7 @@ def validate_test_output(filepath: str) -> tuple[bool, str, dict]:
         return False, f"File doesn't look like xcodebuild test output (matched {matches}/4 patterns).", {}
 
     # 4b. Must contain BOTH unit tests AND UI tests
-    has_unit_tests = bool(re.search(r"FocusBloxTests", content))
+    has_unit_tests = bool(re.search(r"FocusBlox(?:Mac)?Tests", content))
     has_ui_tests = bool(re.search(r"FocusBlox(?:Mac)?UITests", content))  # accepts iOS + macOS
 
     if not has_unit_tests and not has_ui_tests:

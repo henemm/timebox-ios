@@ -1,0 +1,38 @@
+2026-03-23 13:54:12.563019+0100 FocusBlox[81799:73257377] [CloudKit] CoreData+CloudKit: -[NSCloudKitMirroringDelegate recoverFromError:](2304): <NSCloudKitMirroringDelegate: 0x600003b02ca0> - Attempting recovery from error: Error Domain=NSCocoaErrorDomain Code=134400 "Unable to initialize without an iCloud account (CKAccountStatusNoAccount)." UserInfo={NSLocalizedFailureReason=Unable to initialize without an iCloud account (CKAccountStatusNoAccount).}
+2026-03-23 13:54:12.563331+0100 FocusBlox[81799:73257377] [CloudKit] CoreData+CloudKit: -[NSCloudKitMirroringDelegate _recoverFromError:withZoneIDs:forStore:inMonitor:](2617): <NSCloudKitMirroringDelegate: 0x600003b02ca0> - Failed to recover from error: NSCocoaErrorDomain:134400
+Recovery encountered the following error: (null):0
+Test Case '-[FocusBloxTests.BehavioralProfileServiceTests test_avgMinutesPerDay_correctConversion]' started.
+Test Case '-[FocusBloxTests.BehavioralProfileServiceTests test_avgMinutesPerDay_correctConversion]' passed (0.006 seconds).
+Test Case '-[FocusBloxTests.BehavioralProfileServiceTests test_avgTasksPerDay_belowThreshold_returnsNil]' started.
+Test Case '-[FocusBloxTests.BehavioralProfileServiceTests test_avgTasksPerDay_belowThreshold_returnsNil]' passed (0.000 seconds).
+Test Case '-[FocusBloxTests.BehavioralProfileServiceTests test_avgTasksPerDay_fiveDays_correctAverage]' started.
+Test Case '-[FocusBloxTests.BehavioralProfileServiceTests test_avgTasksPerDay_fiveDays_correctAverage]' passed (0.001 seconds).
+Test Case '-[FocusBloxTests.BehavioralProfileServiceTests test_avgTasksPerDay_onlyActiveDaysCount]' started.
+Test Case '-[FocusBloxTests.BehavioralProfileServiceTests test_avgTasksPerDay_onlyActiveDaysCount]' passed (0.001 seconds).
+Test Case '-[FocusBloxTests.BehavioralProfileServiceTests test_dayPeriod_boundaryHours_correct]' started.
+Test Case '-[FocusBloxTests.BehavioralProfileServiceTests test_dayPeriod_boundaryHours_correct]' passed (0.001 seconds).
+Test Case '-[FocusBloxTests.BehavioralProfileServiceTests test_estimationFactor_50percentOver_returns1point5]' started.
+Test Case '-[FocusBloxTests.BehavioralProfileServiceTests test_estimationFactor_50percentOver_returns1point5]' passed (0.001 seconds).
+Test Case '-[FocusBloxTests.BehavioralProfileServiceTests test_estimationFactor_belowThreshold_returnsNil]' started.
+Test Case '-[FocusBloxTests.BehavioralProfileServiceTests test_estimationFactor_belowThreshold_returnsNil]' passed (0.000 seconds).
+Test Case '-[FocusBloxTests.BehavioralProfileServiceTests test_estimationFactor_perfectEstimation_returns1point0]' started.
+Test Case '-[FocusBloxTests.BehavioralProfileServiceTests test_estimationFactor_perfectEstimation_returns1point0]' passed (0.001 seconds).
+Test Case '-[FocusBloxTests.BehavioralProfileServiceTests test_estimationFactor_taskInMultipleBlocks_timeSummed]' started.
+Test Case '-[FocusBloxTests.BehavioralProfileServiceTests test_estimationFactor_taskInMultipleBlocks_timeSummed]' passed (0.001 seconds).
+Test Case '-[FocusBloxTests.BehavioralProfileServiceTests test_rollingWindow_taskAtWindowBoundary_included]' started.
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/BehavioralProfileServiceTests.swift:319: error: -[FocusBloxTests.BehavioralProfileServiceTests test_rollingWindow_taskAtWindowBoundary_included] : XCTAssertNotNil failed - Task von vor 28 Tagen zaehlt → 5 Tage → nicht nil
+Test Case '-[FocusBloxTests.BehavioralProfileServiceTests test_rollingWindow_taskAtWindowBoundary_included]' failed (0.126 seconds).
+Test Case '-[FocusBloxTests.BehavioralProfileServiceTests test_rollingWindow_taskOutsideWindow_excluded]' started.
+Test Case '-[FocusBloxTests.BehavioralProfileServiceTests test_rollingWindow_taskOutsideWindow_excluded]' passed (0.003 seconds).
+Test Case '-[FocusBloxTests.BehavioralProfileServiceTests test_timeAffinity_allMorningTasks_morningIs1]' started.
+Test Case '-[FocusBloxTests.BehavioralProfileServiceTests test_timeAffinity_allMorningTasks_morningIs1]' passed (0.006 seconds).
+Test Case '-[FocusBloxTests.BehavioralProfileServiceTests test_timeAffinity_belowThreshold_returnsNil]' started.
+Test Case '-[FocusBloxTests.BehavioralProfileServiceTests test_timeAffinity_belowThreshold_returnsNil]' passed (0.001 seconds).
+Test Case '-[FocusBloxTests.BehavioralProfileServiceTests test_timeAffinity_evenSplit_correctProportions]' started.
+Test Case '-[FocusBloxTests.BehavioralProfileServiceTests test_timeAffinity_evenSplit_correctProportions]' passed (0.001 seconds).
+Test Case '-[FocusBloxTests.BehavioralProfileServiceTests test_timeAffinity_uncategorizedTasksIgnored]' started.
+Test Case '-[FocusBloxTests.BehavioralProfileServiceTests test_timeAffinity_uncategorizedTasksIgnored]' passed (0.001 seconds).
+	 Executed 15 tests, with 1 failure (0 unexpected) in 0.149 (0.177) seconds
+	 Executed 15 tests, with 1 failure (0 unexpected) in 0.149 (0.178) seconds
+	 Executed 15 tests, with 1 failure (0 unexpected) in 0.149 (0.178) seconds
+** TEST FAILED **

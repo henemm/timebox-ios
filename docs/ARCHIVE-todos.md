@@ -21,6 +21,7 @@
 ## RW_0.1a — Smart Notification Engine Phase A (Foundation) — ERLEDIGT (2026-03-22)
 
 - **Epic:** 0 Infrastruktur | **Spec:** `docs/specs/rework/0.1-smart-notification-engine-impl.md`
+- **macOS:** ✅ Shared — Engine + reconcile() in `Sources/`, macOS-Trigger in `FocusBloxMacApp.swift` bereits verdrahtet
 - **Ziel:** Zentraler SmartNotificationEngine-Service mit Reconcile-on-Event-Strategie, 3 Notification-Profile, Budget-Priorisierung (64 Slots)
 - **Aenderungen:**
   - `Sources/Services/SmartNotificationEngine.swift` — NEU: Engine Core mit reconcile(), buildAllRequests(), Timer/Task-Request-Builder, BGAppRefreshTask
@@ -31,9 +32,34 @@
 
 ---
 
+## RW_0.1b — Smart Notification Engine Phase B (FocusBlock Migration) — ERLEDIGT (2026-03-22)
+
+- **Epic:** 0 Infrastruktur | **Spec:** `docs/specs/rework/0.1b-smart-notification-phase-b-impl.md`
+- **macOS:** ✅ Shared — Alle 16 entfernten View-Level-Aufrufe waren in `Sources/`, reconcile() bereits verdrahtet
+- **Ziel:** Alle direkten NotificationService schedule/cancel Aufrufe in Views durch reconcile() ersetzt
+
+---
+
+## RW_0.1c — Smart Notification Engine Phase C (DueDate Migration) — ERLEDIGT (2026-03-22)
+
+- **Epic:** 0 Infrastruktur | **Spec:** `docs/specs/rework/0.1c-smart-notification-phase-c-impl.md`
+- **macOS:** ✅ Shared — Alle 14 Due-Date-Notification-Sites in `Sources/` migriert
+- **Ziel:** Verbleibende DueDate-Notification-Aufrufe (14 Sites) durch reconcile() ersetzt
+
+---
+
+## RW_0.1d — Smart Notification Engine Phase D (Review/Nudge + Settings UI) — ERLEDIGT (2026-03-22)
+
+- **Epic:** 0 Infrastruktur | **Spec:** `docs/specs/rework/0.1d-smart-notification-phase-d-impl.md`
+- **macOS:** ⚠️ UI fehlt — `MacSettingsView.swift` braucht Notification Profile Picker → **MAC_RW_0.1d** in ACTIVE-todos
+- **Ziel:** Review/Nudge Request-Builder + Settings UI fuer Notification Profile Auswahl
+
+---
+
 ## RW_3.2 — Focus Sprint ("Los"-Button) — ERLEDIGT (2026-03-21)
 
 - **Epic:** 3 Ausfuehrung | **Spec:** `docs/specs/rework/3.2-focus-sprint-impl.md`
+- **macOS:** ⚠️ UI fehlt — `MacBacklogRow.swift` Context Menu + Sidebar-Switch → **MAC_RW_3.2a/b** in ACTIVE-todos
 - **Ziel:** Focus Sprint direkt aus dem Backlog starten ueber "Los"-Button
 - **Commit:** `72bfc9d`
 
@@ -42,6 +68,7 @@
 ## RW_1.1 — Quick Dump — ERLEDIGT (2026-03-21)
 
 - **Epic:** 1 Erfassung | **Spec:** `docs/specs/rework/1.1-quick-dump.md`
+- **macOS:** ✅ Shared — `QuickCapturePanel` (macOS) + macOS ShareExtension setzen bereits `lifecycleStatus = "raw"`
 - **Ziel:** Task-Erfassung in < 3 Sekunden, Task landet im Refiner statt im Backlog
 - **Aenderungen:**
   - `LocalTask.swift`: `TaskLifecycleStatus` Enum (raw/refined/active) + `lifecycleStatus` Property (String, Default "active"), Migration setzt bestehende Tasks auf `.active`
@@ -49,6 +76,19 @@
   - `LocalTaskSource.fetchIncompleteTasks()`: filtert `.raw`-Tasks aus dem Backlog heraus
   - `WatchLocalTask.swift`: passendes Schema fuer CloudKit-Parity
   - `PlanItem`: kopiert `lifecycleStatus` von `LocalTask`
+
+---
+
+## RW_1.2 + RW_1.3 — AI Context Extraction + The Refiner — ERLEDIGT (2026-03-21)
+
+- **Epic:** 1 Erfassung | **Spec:** `docs/specs/rework/1.2-1.3-refiner-impl.md`
+- **macOS:** ⚠️ UI fehlt — Refiner Sidebar-Eintrag + Navigation in `SidebarView.swift` → **MAC_RW_1.3** in ACTIVE-todos. Schema (RW_1.2) + Service sind shared.
+- **Ziel:** 5 `suggested*`-Felder auf LocalTask, SmartTaskEnrichmentService, RefinerView als 5. Tab (iOS)
+- **Aenderungen:**
+  - `LocalTask.swift`: 5 neue Felder (suggestedCategory, suggestedDuration, suggestedImportance, suggestedUrgency, suggestedEnergyLevel)
+  - `SmartTaskEnrichmentService.swift`: Apple Intelligence Enrichment
+  - `RefinerView.swift` + `RefinerTaskCard.swift`: Swipe-basierte Bestaetigungs-UI
+  - `MainTabView.swift`: 5. Tab "Refiner" mit Badge
 
 ---
 

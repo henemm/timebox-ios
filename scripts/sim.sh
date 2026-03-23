@@ -17,6 +17,9 @@
 #   ./scripts/sim.sh test TestClass/testMethod      # Einzelnen Test ausfuehren
 #   ./scripts/sim.sh unit TestClass                 # Unit Test ausfuehren
 #   ./scripts/sim.sh unit TestClass/testMethod      # Einzelnen Unit Test ausfuehren
+#   ./scripts/sim.sh mac-build                      # macOS App bauen (nativ, kein Simulator)
+#   ./scripts/sim.sh mac-unit TestClass              # macOS Unit Test ausfuehren
+#   ./scripts/sim.sh mac-unit TestClass/testMethod   # Einzelnen macOS Unit Test ausfuehren
 #
 
 set -eo pipefail
@@ -24,10 +27,11 @@ set -eo pipefail
 # ============================================
 # KONFIGURATION — Einzige Quelle der Wahrheit
 # ============================================
-SIM_ID="16F28771-6A3E-4FF3-862A-ECB185744184"
+SIM_ID="1EC79950-6704-47D0-BDF8-2C55236B4B40"
 SIM_NAME="FocusBlox"
 PROJECT="FocusBlox.xcodeproj"
 SCHEME="FocusBlox"
+MAC_SCHEME="FocusBloxMac"
 PROJECT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 DERIVED_DATA="$HOME/Library/Developer/Xcode/DerivedData"
 
@@ -255,6 +259,59 @@ cmd_unit() {
     return $EXIT_CODE
 }
 
+cmd_mac_build() {
+    info "Baue macOS App (nativ)..."
+    cd "$PROJECT_DIR"
+
+    xcodebuild build \
+        -project "$PROJECT" \
+        -scheme "$MAC_SCHEME" \
+        -destination "platform=macOS" \
+        CODE_SIGNING_ALLOWED=NO \
+        -quiet \
+        2>&1
+
+    if [ $? -eq 0 ]; then
+        success "macOS Build erfolgreich."
+    else
+        error "macOS Build fehlgeschlagen!"
+        return 1
+    fi
+}
+
+cmd_mac_unit() {
+    local TEST_TARGET="${1:-}"
+
+    if [ -z "$TEST_TARGET" ]; then
+        error "Test-Name fehlt!"
+        echo "Usage: ./scripts/sim.sh mac-unit TestClass"
+        echo "       ./scripts/sim.sh mac-unit TestClass/testMethod"
+        return 1
+    fi
+
+    info "Fuehre macOS Unit Test aus: $TEST_TARGET"
+    cd "$PROJECT_DIR"
+
+    xcodebuild test \
+        -project "$PROJECT" \
+        -scheme "$MAC_SCHEME" \
+        -destination "platform=macOS" \
+        -only-testing:"FocusBloxMacTests/$TEST_TARGET" \
+        -parallel-testing-enabled NO \
+        CODE_SIGNING_ALLOWED=NO \
+        2>&1
+
+    local EXIT_CODE=$?
+
+    if [ $EXIT_CODE -eq 0 ]; then
+        success "macOS Test bestanden!"
+    else
+        error "macOS Test fehlgeschlagen (Exit $EXIT_CODE)"
+    fi
+
+    return $EXIT_CODE
+}
+
 cmd_help() {
     echo "sim.sh — FocusBlox Simulator-Toolkit"
     echo ""
@@ -268,6 +325,8 @@ cmd_help() {
     echo "  screenshot [path]               Screenshot (default: /tmp/sim_screenshot.png)"
     echo "  test <TestClass[/method]>        UI Test ausfuehren"
     echo "  unit <TestClass[/method]>        Unit Test ausfuehren"
+    echo "  mac-build                       macOS App bauen (nativ)"
+    echo "  mac-unit <TestClass[/method]>   macOS Unit Test ausfuehren"
     echo "  help                            Diese Hilfe"
     echo ""
     echo "Simulator: $SIM_NAME ($SIM_ID)"
@@ -288,6 +347,8 @@ case "$COMMAND" in
     screenshot) cmd_screenshot "$@" ;;
     test)       cmd_test "$@" ;;
     unit)       cmd_unit "$@" ;;
+    mac-build)  cmd_mac_build ;;
+    mac-unit)   cmd_mac_unit "$@" ;;
     help|--help|-h) cmd_help ;;
     *)
         error "Unbekannter Befehl: $COMMAND"

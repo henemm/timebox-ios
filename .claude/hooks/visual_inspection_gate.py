@@ -81,8 +81,9 @@ def main():
     if not active_name:
         sys.exit(0)  # No active workflow
 
-    # Enforce for bug AND feature workflows
-    if not (active_name.startswith("bug-") or active_name.startswith("feature-")):
+    # Skip only explicitly non-inspectable workflows (e.g. chore/docs)
+    SKIP_PREFIXES = ("chore-", "docs-", "refactor-")
+    if active_name.startswith(SKIP_PREFIXES):
         sys.exit(0)
 
     workflow = state.get("workflows", {}).get(active_name)

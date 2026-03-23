@@ -2,13 +2,28 @@
 
 > Erstellt: 2026-01-31
 > Basis: `docs/project/stories/timebox-macos.md`
-> Letzte Aktualisierung: 2026-02-13
+> Letzte Aktualisierung: 2026-03-23
 
-**ACHTUNG:** Dies ist KEINE eigenstaendige Aufgabenliste. Das zentrale Backlog mit Prioritaeten und Aufwandsschaetzungen ist **`docs/ACTIVE-todos.md`** - dort stehen ALLE offenen Items (iOS + macOS).
+**ACHTUNG:** Dies ist KEINE eigenstaendige Aufgabenliste und KEIN separates Backlog.
+Das zentrale Backlog ist **`docs/ACTIVE-todos.md`** — dort stehen ALLE offenen Items (iOS + macOS + Paritaet).
 
-Diese Datei ist eine **Spec-Referenz** fuer macOS-spezifische Features mit technischen Details.
+Diese Datei ist eine **Spec-Referenz** fuer macOS-spezifische technische Details.
 
 **Architektur-Entscheidung:** Native SwiftUI macOS App mit Shared Core (Models, Services).
+
+## Rework-Bezuege
+
+> Rework-Features die macOS betreffen sind in `docs/ACTIVE-todos.md` unter "Rework" (macOS-Spalte) und "macOS Paritaet" dokumentiert.
+
+| Rework-Story | macOS-Impact | Details |
+|--------------|-------------|---------|
+| RW_0.1d | Settings UI fehlt | MAC_RW_0.1d in ACTIVE-todos |
+| RW_1.3 | Refiner Sidebar fehlt | MAC_RW_1.3 in ACTIVE-todos |
+| RW_3.2 | Focus Sprint Context Menu fehlt | MAC_RW_3.2a/b in ACTIVE-todos |
+| RW_2.1 | DayView braucht Sidebar-Integration | Spec hat Plattform-Sektion |
+| RW_2.4 | Parkdeck in MacBacklogRow | Spec hat Plattform-Sektion |
+| RW_3.1 | Drop in MacPlanningView/MacTimelineView | Spec hat Plattform-Sektion, ersetzt MAC_020 |
+| RW_3.4 | Nudge in MacBacklogRow | Spec hat Plattform-Sektion |
 
 ## Priorisierung
 

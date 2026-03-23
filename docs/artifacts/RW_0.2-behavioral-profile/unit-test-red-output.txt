@@ -1,0 +1,28 @@
+Test Case '-[FocusBloxTests.BehavioralProfileServiceTests test_avgMinutesPerDay_correctConversion]' started.
+Test Case '-[FocusBloxTests.BehavioralProfileServiceTests test_avgTasksPerDay_belowThreshold_returnsNil]' started.
+Test Case '-[FocusBloxTests.BehavioralProfileServiceTests test_avgTasksPerDay_belowThreshold_returnsNil]' passed (0.002 seconds).
+Test Case '-[FocusBloxTests.BehavioralProfileServiceTests test_avgTasksPerDay_fiveDays_correctAverage]' started.
+Test Case '-[FocusBloxTests.BehavioralProfileServiceTests test_avgTasksPerDay_onlyActiveDaysCount]' started.
+Test Case '-[FocusBloxTests.BehavioralProfileServiceTests test_dayPeriod_boundaryHours_correct]' started.
+Test Case '-[FocusBloxTests.BehavioralProfileServiceTests test_dayPeriod_boundaryHours_correct]' failed (0.129 seconds).
+Test Case '-[FocusBloxTests.BehavioralProfileServiceTests test_estimationFactor_50percentOver_returns1point5]' started.
+Test Case '-[FocusBloxTests.BehavioralProfileServiceTests test_estimationFactor_belowThreshold_returnsNil]' started.
+Test Case '-[FocusBloxTests.BehavioralProfileServiceTests test_estimationFactor_belowThreshold_returnsNil]' passed (0.002 seconds).
+Test Case '-[FocusBloxTests.BehavioralProfileServiceTests test_estimationFactor_perfectEstimation_returns1point0]' started.
+Test Case '-[FocusBloxTests.BehavioralProfileServiceTests test_estimationFactor_taskInMultipleBlocks_timeSummed]' started.
+Test Case '-[FocusBloxTests.BehavioralProfileServiceTests test_rollingWindow_taskAtWindowBoundary_included]' started.
+Test Case '-[FocusBloxTests.BehavioralProfileServiceTests test_rollingWindow_taskAtWindowBoundary_included]' failed (0.113 seconds).
+Test Case '-[FocusBloxTests.BehavioralProfileServiceTests test_rollingWindow_taskOutsideWindow_excluded]' started.
+Test Case '-[FocusBloxTests.BehavioralProfileServiceTests test_rollingWindow_taskOutsideWindow_excluded]' passed (0.000 seconds).
+Test Case '-[FocusBloxTests.BehavioralProfileServiceTests test_timeAffinity_allMorningTasks_morningIs1]' started.
+Test Case '-[FocusBloxTests.BehavioralProfileServiceTests test_timeAffinity_allMorningTasks_morningIs1]' failed (0.002 seconds).
+Test Case '-[FocusBloxTests.BehavioralProfileServiceTests test_timeAffinity_belowThreshold_returnsNil]' started.
+Test Case '-[FocusBloxTests.BehavioralProfileServiceTests test_timeAffinity_belowThreshold_returnsNil]' passed (0.000 seconds).
+Test Case '-[FocusBloxTests.BehavioralProfileServiceTests test_timeAffinity_evenSplit_correctProportions]' started.
+Test Case '-[FocusBloxTests.BehavioralProfileServiceTests test_timeAffinity_evenSplit_correctProportions]' failed (0.005 seconds).
+Test Case '-[FocusBloxTests.BehavioralProfileServiceTests test_timeAffinity_uncategorizedTasksIgnored]' started.
+Test Case '-[FocusBloxTests.BehavioralProfileServiceTests test_timeAffinity_uncategorizedTasksIgnored]' passed (0.001 seconds).
+	 Executed 6 tests, with 5 failures (0 unexpected) in 0.122 (0.123) seconds
+	 Executed 6 tests, with 5 failures (0 unexpected) in 0.122 (0.123) seconds
+	 Executed 6 tests, with 5 failures (0 unexpected) in 0.122 (0.123) seconds
+** TEST FAILED **

@@ -3,7 +3,7 @@ from __future__ import annotations
 """
 Workflow State Cleanup
 
-Runs on UserPromptSubmit. Removes stale entries from workflow_state_multi.json:
+Runs on UserPromptSubmit. Removes stale entries from workflow_state.json:
 - Completed workflows (phase8_complete) → sofort entfernen
 - Workflows ohne Aktivitaet seit 7+ Tagen → entfernen
 
@@ -79,7 +79,7 @@ def main():
     if not should_run_cleanup():
         sys.exit(0)
 
-    state_file = get_project_root() / ".claude" / "workflow_state_multi.json"
+    state_file = get_project_root() / ".claude" / "workflow_state.json"
     if not state_file.exists():
         sys.exit(0)
 
