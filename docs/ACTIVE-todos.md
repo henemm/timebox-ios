@@ -20,7 +20,7 @@
 | ~~RW_0.1c~~ | ~~0 Infrastruktur~~ | ~~Smart Notification Engine — Phase C (DueDate Migration)~~ | ~~High~~ | ~~M~~ | ~~Shared~~ | ~~[Spec](specs/rework/0.1c-smart-notification-phase-c-impl.md)~~ ERLEDIGT → [Archiv](ARCHIVE-todos.md) |
 | ~~RW_0.1d~~ | ~~0 Infrastruktur~~ | ~~Smart Notification Engine — Phase D (Review/Nudge + Settings UI)~~ | ~~High~~ | ~~M~~ | ~~UI fehlt~~ | ~~[Spec](specs/rework/0.1d-smart-notification-phase-d-impl.md)~~ ERLEDIGT → [Archiv](ARCHIVE-todos.md) |
 | ~~RW_0.2~~ | ~~0 Infrastruktur~~ | ~~BehavioralProfileService (Affinitaet, Kapazitaet, Schaetzgenauigkeit)~~ | ~~High~~ | ~~M~~ | ~~Shared~~ | ~~[Spec](specs/rework/0.2-behavioral-profile-impl.md)~~ ERLEDIGT → [Archiv](ARCHIVE-todos.md) |
-| RW_0.2b | 0 Infrastruktur | BehavioralProfileService Phase B (Kalender-Korrelation, Verschiebungs-Muster) | High | S | Shared | Spec folgt |
+| ~~RW_0.2b~~ | ~~0 Infrastruktur~~ | ~~BehavioralProfileService Phase B (Kalender-Korrelation, Verschiebungs-Muster)~~ | ~~High~~ | ~~S~~ | ~~Shared~~ | ~~[Spec](specs/rework/0.2b-behavioral-profile-phase-b-impl.md)~~ ERLEDIGT → [Archiv](ARCHIVE-todos.md) |
 | ~~RW_1.1~~ | ~~1 Erfassung~~ | ~~Quick Dump~~ | ~~High~~ | ~~M~~ | ~~Shared~~ | ~~[Spec](specs/rework/1.1-quick-dump.md)~~ ERLEDIGT → [Archiv](ARCHIVE-todos.md) |
 | ~~RW_1.2~~ | ~~1 Erfassung~~ | ~~AI Context Extraction (Schema)~~ | ~~High~~ | ~~L~~ | ~~Shared~~ | ~~[Spec](specs/rework/1.2-1.3-refiner-impl.md)~~ ERLEDIGT → [Archiv](ARCHIVE-todos.md) |
 | ~~RW_1.3~~ | ~~1 Erfassung~~ | ~~The Refiner (UI)~~ | ~~High~~ | ~~L~~ | ~~UI fehlt~~ | ~~[Spec](specs/rework/1.2-1.3-refiner-impl.md)~~ ERLEDIGT → [Archiv](ARCHIVE-todos.md) |

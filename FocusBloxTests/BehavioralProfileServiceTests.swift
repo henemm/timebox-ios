@@ -424,4 +424,202 @@ final class BehavioralProfileServiceTests: XCTestCase {
         XCTAssertEqual(result!, 1.5, accuracy: 0.001,
             "Nur die 10 Tasks mit Schaetzung zaehlen → 1.5, Tasks ohne Schaetzung ignoriert")
     }
+
+    // MARK: - Helpers (Phase B)
+
+    /// Erstellt einen CalendarEvent an einem bestimmten Tag.
+    private func makeEvent(
+        title: String = "Meeting",
+        daysAgo: Int = 1,
+        hour: Int = 10,
+        durationMinutes: Int = 60,
+        isAllDay: Bool = false,
+        now: Date = Date()
+    ) -> CalendarEvent {
+        let day = calendar.date(byAdding: .day, value: -daysAgo, to: now)!
+        let start = calendar.date(bySettingHour: hour, minute: 0, second: 0, of: day)!
+        let end = start.addingTimeInterval(Double(durationMinutes) * 60)
+        return CalendarEvent(
+            id: UUID().uuidString,
+            title: title,
+            startDate: start,
+            endDate: end,
+            isAllDay: isAllDay,
+            calendarColor: nil,
+            notes: nil
+        )
+    }
+
+    /// Erstellt einen Task mit rescheduleCount (optional nicht-completed).
+    private func makeProcrastinatedTask(
+        category: String = "income",
+        rescheduleCount: Int = 3,
+        importance: Int? = nil,
+        isCompleted: Bool = false,
+        daysAgo: Int = 1,
+        now: Date = Date()
+    ) -> LocalTask {
+        let task = LocalTask(title: "Procrastinated", importance: importance, taskType: category)
+        task.rescheduleCount = rescheduleCount
+        task.isCompleted = isCompleted
+        if isCompleted {
+            let day = calendar.date(byAdding: .day, value: -daysAgo, to: now)!
+            task.completedAt = calendar.date(bySettingHour: 10, minute: 0, second: 0, of: day)
+        }
+        return task
+    }
+
+    // MARK: - Komponente 4: Kalender-Korrelation
+
+    /// Verhalten: 5 Tage mit je 1 Meeting und 3 completed Tasks → low-Bucket avg = 3.0
+    /// Bricht wenn: computeCapacityByMeetingLoad() Meeting-Count falsch zaehlt oder Avg falsch berechnet.
+    func test_capacityByMeetingLoad_lowDays_correctAvg() {
+        let now = Date()
+        var tasks: [LocalTask] = []
+        var events: [CalendarEvent] = []
+
+        for day in 1...5 {
+            // 3 completed Tasks pro Tag
+            for _ in 0..<3 {
+                tasks.append(makeTask(completedHour: 10, daysAgo: day, now: now))
+            }
+            // 1 Meeting pro Tag → low (0-2)
+            events.append(makeEvent(daysAgo: day, now: now))
+        }
+
+        let result = BehavioralProfileService.computeCapacityByMeetingLoad(
+            from: tasks, calendarEvents: events, now: now
+        )
+
+        XCTAssertNotNil(result, "5 Tage mit Daten → nicht nil")
+        XCTAssertEqual(result?[.low] ?? -1, 3.0, accuracy: 0.001, "1 Meeting/Tag = low, 3 Tasks/Tag → avg 3.0")
+    }
+
+    /// Verhalten: 3 low-Tage (4 Tasks) + 3 high-Tage (1 Task) → getrennte Buckets
+    /// Bricht wenn: Buckets nicht separat berechnet werden oder MeetingLoad-Klassifikation falsch.
+    func test_capacityByMeetingLoad_mixedLoad_separateBuckets() {
+        let now = Date()
+        var tasks: [LocalTask] = []
+        var events: [CalendarEvent] = []
+
+        // 3 low-Tage: je 1 Meeting, je 4 Tasks
+        for day in 1...3 {
+            for _ in 0..<4 {
+                tasks.append(makeTask(completedHour: 10, daysAgo: day, now: now))
+            }
+            events.append(makeEvent(title: "Standup", daysAgo: day, hour: 9, now: now))
+        }
+
+        // 3 high-Tage: je 6 Meetings, je 1 Task
+        for day in 4...6 {
+            tasks.append(makeTask(completedHour: 16, daysAgo: day, now: now))
+            for h in 8...13 { // 6 Meetings
+                events.append(makeEvent(title: "Meeting \(h)", daysAgo: day, hour: h, now: now))
+            }
+        }
+
+        let result = BehavioralProfileService.computeCapacityByMeetingLoad(
+            from: tasks, calendarEvents: events, now: now
+        )
+
+        XCTAssertNotNil(result)
+        XCTAssertEqual(result?[.low] ?? -1, 4.0, accuracy: 0.001, "Low-Tage: 4 Tasks/Tag")
+        XCTAssertEqual(result?[.high] ?? -1, 1.0, accuracy: 0.001, "High-Tage: 1 Task/Tag")
+    }
+
+    /// Verhalten: AllDay-Events zaehlen NICHT als Meetings → Tage bleiben "low".
+    /// Bricht wenn: isAllDay-Filter in computeCapacityByMeetingLoad() fehlt.
+    func test_capacityByMeetingLoad_allDayEventsIgnored() {
+        let now = Date()
+        var tasks: [LocalTask] = []
+        var events: [CalendarEvent] = []
+
+        for day in 1...5 {
+            tasks.append(makeTask(completedHour: 10, daysAgo: day, now: now))
+            // 3 allDay-Events pro Tag → sollten NICHT als Meetings zaehlen
+            for _ in 0..<3 {
+                events.append(makeEvent(title: "Holiday", daysAgo: day, isAllDay: true, now: now))
+            }
+            // 1 normaler Termin → low
+            events.append(makeEvent(title: "Standup", daysAgo: day, hour: 9, now: now))
+        }
+
+        let result = BehavioralProfileService.computeCapacityByMeetingLoad(
+            from: tasks, calendarEvents: events, now: now
+        )
+
+        XCTAssertNotNil(result)
+        // Nur 1 non-allDay Meeting pro Tag → alle Tage sind "low"
+        XCTAssertEqual(result?[.low] ?? -1, 1.0, accuracy: 0.001, "1 Task/Tag im low-Bucket")
+        XCTAssertNil(result?[.high], "Kein high-Bucket (allDay zaehlt nicht)")
+    }
+
+    // MARK: - Komponente 5: Verschiebungs-Muster
+
+    /// Verhalten: 2 Tasks mit rescheduleCount >= 3 (unter Schwelle 3) → nil
+    /// Bricht wenn: Schwellen-Check in computeProcrastinationPatterns() fehlt.
+    func test_procrastination_belowThreshold_returnsNil() {
+        let tasks = [
+            makeProcrastinatedTask(rescheduleCount: 5),
+            makeProcrastinatedTask(rescheduleCount: 4),
+        ]
+
+        let result = BehavioralProfileService.computeProcrastinationPatterns(from: tasks)
+
+        XCTAssertNil(result, "Nur 2 Tasks mit rescheduleCount >= 3 → unter Schwelle → nil")
+    }
+
+    /// Verhalten: 4 income + 3 maintenance Tasks mit rescheduleCount >= 3 → 2 Patterns, income zuerst (mehr Tasks).
+    /// Bricht wenn: Gruppierung nach Kategorie falsch oder Sortierung nicht nach taskCount.
+    func test_procrastination_clustersByCategory() {
+        var tasks: [LocalTask] = []
+        for _ in 0..<4 {
+            tasks.append(makeProcrastinatedTask(category: "income", rescheduleCount: 4))
+        }
+        for _ in 0..<3 {
+            tasks.append(makeProcrastinatedTask(category: "maintenance", rescheduleCount: 5))
+        }
+
+        let result = BehavioralProfileService.computeProcrastinationPatterns(from: tasks)
+
+        XCTAssertNotNil(result, "7 Tasks → ueber Schwelle")
+        XCTAssertEqual(result?.count, 2, "2 Kategorien → 2 Patterns")
+        XCTAssertEqual(result?.first?.category, .income, "Income hat 4 Tasks → kommt zuerst")
+        XCTAssertEqual(result?.first?.taskCount, 4, "4 income-Tasks")
+        XCTAssertEqual(result?.last?.category, .essentials, "Maintenance = essentials, 3 Tasks → kommt danach")
+        XCTAssertEqual(result?.last?.taskCount, 3, "3 maintenance-Tasks")
+    }
+
+    /// Verhalten: Nicht-completed Tasks mit rescheduleCount >= 3 werden einbezogen.
+    /// Bricht wenn: computeProcrastinationPatterns() nur completed Tasks betrachtet.
+    func test_procrastination_includesNonCompleted() {
+        let tasks = [
+            makeProcrastinatedTask(category: "income", rescheduleCount: 5, isCompleted: false),
+            makeProcrastinatedTask(category: "income", rescheduleCount: 4, isCompleted: false),
+            makeProcrastinatedTask(category: "income", rescheduleCount: 3, isCompleted: false),
+        ]
+
+        let result = BehavioralProfileService.computeProcrastinationPatterns(from: tasks)
+
+        XCTAssertNotNil(result, "3 nicht-completed Tasks mit rescheduleCount >= 3 → Pattern vorhanden")
+        XCTAssertEqual(result?.first?.taskCount, 3, "Alle 3 nicht-completed Tasks zaehlen")
+        XCTAssertEqual(result?.first?.avgRescheduleCount ?? -1, 4.0, accuracy: 0.001,
+            "(5+4+3)/3 = 4.0")
+    }
+
+    /// Verhalten: avgImportance berechnet aus Tasks mit importance 1, 2, 3 → 2.0
+    /// Bricht wenn: Importance-Durchschnitt falsch oder nil-Handling kaputt.
+    func test_procrastination_avgImportance_correct() {
+        let tasks = [
+            makeProcrastinatedTask(category: "income", rescheduleCount: 3, importance: 1),
+            makeProcrastinatedTask(category: "income", rescheduleCount: 4, importance: 2),
+            makeProcrastinatedTask(category: "income", rescheduleCount: 5, importance: 3),
+        ]
+
+        let result = BehavioralProfileService.computeProcrastinationPatterns(from: tasks)
+
+        XCTAssertNotNil(result)
+        XCTAssertEqual(result?.first?.avgImportance ?? -1, 2.0, accuracy: 0.001,
+            "(1+2+3)/3 = 2.0")
+    }
 }
