@@ -165,9 +165,6 @@ struct BacklogView: View {
                 }
             }
             .navigationBarTitleDisplayMode(.inline)
-            .safeAreaInset(edge: .top) {
-                EmptyView()
-            }
             .toolbar {
                 ToolbarItemGroup(placement: .topBarTrailing) {
                     Button {

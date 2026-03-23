@@ -348,6 +348,7 @@
 		SMTNOTC2BUILD0001 /* SmartNotificationPhaseCUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = SMTNOTC2FILE00001 /* SmartNotificationPhaseCUITests.swift */; };
 		SMTNOTD1BUILD0001 /* SmartNotificationEnginePhaseDTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = SMTNOTD1FILE00001 /* SmartNotificationEnginePhaseDTests.swift */; };
 		SMTNOTD2BUILD0001 /* SmartNotificationPhaseDUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = SMTNOTD2FILE00001 /* SmartNotificationPhaseDUITests.swift */; };
+		BKLGGAP01BUILD01 /* BacklogGapUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BKLGGAP01FILE001 /* BacklogGapUITests.swift */; };
 		SMTNOTENG01BLD001 /* SmartNotificationEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = SMTNOTENG01FREF01 /* SmartNotificationEngine.swift */; };
 		SMTNOTENG01BLD002 /* SmartNotificationEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = SMTNOTENG01FREF01 /* SmartNotificationEngine.swift */; };
 		SMTSK01BUILD00001 /* SmartTaskInterpretationUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = SMTSK01FILE000001 /* SmartTaskInterpretationUITests.swift */; };
@@ -872,6 +873,7 @@
 		SMTNOTC2FILE00001 /* SmartNotificationPhaseCUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartNotificationPhaseCUITests.swift; sourceTree = "<group>"; };
 		SMTNOTD1FILE00001 /* SmartNotificationEnginePhaseDTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartNotificationEnginePhaseDTests.swift; sourceTree = "<group>"; };
 		SMTNOTD2FILE00001 /* SmartNotificationPhaseDUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartNotificationPhaseDUITests.swift; sourceTree = "<group>"; };
+		BKLGGAP01FILE001 /* BacklogGapUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BacklogGapUITests.swift; sourceTree = "<group>"; };
 		SMTNOTENG01FREF01 /* SmartNotificationEngine.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SmartNotificationEngine.swift; sourceTree = "<group>"; };
 		SMTSK01FILE000001 /* SmartTaskInterpretationUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartTaskInterpretationUITests.swift; sourceTree = "<group>"; };
 		SNDSVC01FILEREF00001 /* SoundServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundServiceTests.swift; sourceTree = "<group>"; };
@@ -1275,6 +1277,7 @@
 				SMTNOTB2FILE00001 /* SmartNotificationEnginePhaseBUITests.swift */,
 				SMTNOTC2FILE00001 /* SmartNotificationPhaseCUITests.swift */,
 				SMTNOTD2FILE00001 /* SmartNotificationPhaseDUITests.swift */,
+				BKLGGAP01FILE001 /* BacklogGapUITests.swift */,
 				BSRCH01FILE000001 /* BacklogSearchUITests.swift */,
 				LVCLN01UIFILE0001 /* ListViewsCleanupUITests.swift */,
 				RECTMPLUI01FIL001 /* RecurringTemplateUITests.swift */,
@@ -2441,6 +2444,7 @@
 				SMTNOTB2BUILD0001 /* SmartNotificationEnginePhaseBUITests.swift in Sources */,
 				SMTNOTC2BUILD0001 /* SmartNotificationPhaseCUITests.swift in Sources */,
 				SMTNOTD2BUILD0001 /* SmartNotificationPhaseDUITests.swift in Sources */,
+				BKLGGAP01BUILD01 /* BacklogGapUITests.swift in Sources */,
 				BSRCH01BUILD00001 /* BacklogSearchUITests.swift in Sources */,
 				LVCLN01UIBUILD001 /* ListViewsCleanupUITests.swift in Sources */,
 				RECTMPLUI01BLD001 /* RecurringTemplateUITests.swift in Sources */,
