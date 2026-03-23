@@ -230,11 +230,11 @@ enum SmartNotificationEngine {
         }
 
         if profile == .balanced || profile == .active {
-            requests += buildReviewRequests()
+            requests += buildReviewRequests(now: Date())
         }
 
         if profile == .active {
-            requests += buildNudgeRequests()
+            requests += buildNudgeRequests(now: Date())
         }
 
         return Array(requests.prefix(64))
