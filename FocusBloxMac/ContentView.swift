@@ -846,7 +846,7 @@ struct ContentView: View {
             }
 
             if selection.count == 1, let uuid = selection.first,
-               let task = incompleteTasks.first(where: { $0.uuid == uuid }) {
+               let task = tasks.first(where: { $0.uuid == uuid }) {
                 Button {
                     startFocusSprint(for: task)
                 } label: {
