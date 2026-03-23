@@ -18,6 +18,7 @@ struct SettingsView: View {
     @AppStorage("dueDateMorningReminderMinute") private var dueDateMorningReminderMinute: Int = 0
     @AppStorage("dueDateAdvanceReminderEnabled") private var dueDateAdvanceReminderEnabled: Bool = false
     @AppStorage("dueDateAdvanceReminderMinutes") private var dueDateAdvanceReminderMinutes: Int = 60
+    @AppStorage("notificationProfile") private var notificationProfileRaw: String = "balanced"
     @Environment(\.eventKitRepository) private var eventKitRepo
     @Environment(\.modelContext) private var modelContext
     @State private var isEnriching = false
@@ -32,6 +33,20 @@ struct SettingsView: View {
     var body: some View {
         NavigationStack {
             Form {
+                // Section: Notification Profile
+                Section {
+                    Picker("Benachrichtigungsprofil", selection: $notificationProfileRaw) {
+                        Text("Leise").tag("quiet")
+                        Text("Ausgeglichen").tag("balanced")
+                        Text("Aktiv").tag("active")
+                    }
+                    .accessibilityIdentifier("notificationProfilePicker")
+                } header: {
+                    Text("Profil")
+                } footer: {
+                    Text("Leise: nur Sprint-Timer. Ausgeglichen: Timer + Fristen + Tagesreview. Aktiv: alle inkl. Motivations-Nudges.")
+                }
+
                 // Section 0: Sound Settings
                 Section {
                     Toggle(isOn: $soundEnabled) {
@@ -236,6 +251,15 @@ struct SettingsView: View {
                 }
             }
             .navigationTitle("Settings")
+            .onChange(of: notificationProfileRaw) { _, _ in
+                Task {
+                    await SmartNotificationEngine.reconcile(
+                        reason: .profileChanged,
+                        context: modelContext,
+                        eventKitRepo: eventKitRepo
+                    )
+                }
+            }
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Fertig") {

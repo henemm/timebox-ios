@@ -90,11 +90,11 @@ enum SmartNotificationEngine {
         }
 
         if profile == .balanced || profile == .active {
-            requests += buildReviewRequests()
+            requests += buildReviewRequests(now: Date())
         }
 
         if profile == .active {
-            requests += buildNudgeRequests()
+            requests += buildNudgeRequests(now: Date())
         }
 
         return Array(requests.prefix(64))
@@ -306,16 +306,101 @@ enum SmartNotificationEngine {
         NotificationService.cancelTaskNotification(taskID: taskID)
     }
 
-    // MARK: - Prio 3: Review / Morning Requests (Phase C)
+    // MARK: - Prio 3: Review / Morning Requests
 
-    private static func buildReviewRequests() -> [UNNotificationRequest] {
-        return []
+    static func buildReviewRequests(now: Date = Date()) -> [UNNotificationRequest] {
+        let cal = Calendar.current
+        let today = cal.startOfDay(for: now)
+        var requests: [UNNotificationRequest] = []
+
+        // 1. Evening Review — 20:00 heute
+        if let eveningDate = cal.date(bySettingHour: 20, minute: 0, second: 0, of: today),
+           eveningDate > now {
+            let content = UNMutableNotificationContent()
+            content.title = "Tagesreview"
+            content.body = "Zeit fuer dein Tagesreview — was hast du heute geschafft?"
+            content.sound = .default
+
+            let interval = eveningDate.timeIntervalSince(now)
+            let trigger = UNTimeIntervalNotificationTrigger(timeInterval: interval, repeats: false)
+            let dateStr = dateString(from: today)
+            requests.append(UNNotificationRequest(
+                identifier: "focusblox.review.\(dateStr)",
+                content: content,
+                trigger: trigger
+            ))
+        }
+
+        // 2. Morning Nudge — 08:00 morgen
+        if let tomorrow = cal.date(byAdding: .day, value: 1, to: today),
+           let morningDate = cal.date(bySettingHour: 8, minute: 0, second: 0, of: tomorrow),
+           morningDate > now {
+            let content = UNMutableNotificationContent()
+            content.title = "Guten Morgen"
+            content.body = "Dein Tag wartet — was packst du heute an?"
+            content.sound = .default
+
+            let interval = morningDate.timeIntervalSince(now)
+            let trigger = UNTimeIntervalNotificationTrigger(timeInterval: interval, repeats: false)
+            let dateStr = dateString(from: tomorrow)
+            requests.append(UNNotificationRequest(
+                identifier: "focusblox.morning.\(dateStr)",
+                content: content,
+                trigger: trigger
+            ))
+        }
+
+        return Array(requests.prefix(budgetReview))
     }
 
-    // MARK: - Prio 4: Nudge Requests (Phase C)
+    // MARK: - Prio 4: Nudge Requests
 
-    private static func buildNudgeRequests() -> [UNNotificationRequest] {
-        return []
+    static func buildNudgeRequests(now: Date = Date()) -> [UNNotificationRequest] {
+        let cal = Calendar.current
+        let today = cal.startOfDay(for: now)
+
+        // Feste Arbeitszeit-Slots: 9, 11, 13, 15, 17, 19 Uhr
+        let nudgeHours = [9, 11, 13, 15, 17, 19]
+
+        let nudgeTexts: [(title: String, body: String)] = [
+            ("Wie laeuft dein Tag?", "Schau mal in dein Backlog — vielleicht ist ein Quick Win dabei."),
+            ("Zeit fuer den naechsten Sprint?", "Ein kurzer Focus Block kann viel bewegen."),
+            ("Dein Backlog wartet", "Welchen Task koenntest du jetzt angehen?"),
+            ("Kurze Pause vorbei?", "Der naechste kleine Schritt wartet auf dich."),
+            ("Halbzeit!", "Guter Zeitpunkt fuer einen Focus Sprint."),
+            ("Endspurt!", "Noch ein Task vor Feierabend?"),
+        ]
+
+        var requests: [UNNotificationRequest] = []
+
+        for (index, hour) in nudgeHours.enumerated() {
+            guard let fireDate = cal.date(bySettingHour: hour, minute: 0, second: 0, of: today),
+                  fireDate > now else { continue }
+
+            let text = nudgeTexts[index % nudgeTexts.count]
+            let content = UNMutableNotificationContent()
+            content.title = text.title
+            content.body = text.body
+            content.sound = .default
+
+            let interval = fireDate.timeIntervalSince(now)
+            let trigger = UNTimeIntervalNotificationTrigger(timeInterval: interval, repeats: false)
+            requests.append(UNNotificationRequest(
+                identifier: "focusblox.nudge.work.\(hour)",
+                content: content,
+                trigger: trigger
+            ))
+        }
+
+        return Array(requests.prefix(budgetNudges))
+    }
+
+    // MARK: - Helpers
+
+    private static func dateString(from date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        return formatter.string(from: date)
     }
 
     // MARK: - BGAppRefreshTask Registration (iOS only)

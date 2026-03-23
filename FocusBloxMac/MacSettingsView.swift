@@ -25,6 +25,7 @@ struct MacSettingsView: View {
     @AppStorage("dueDateMorningReminderMinute") private var dueDateMorningReminderMinute: Int = 0
     @AppStorage("dueDateAdvanceReminderEnabled") private var dueDateAdvanceReminderEnabled: Bool = false
     @AppStorage("dueDateAdvanceReminderMinutes") private var dueDateAdvanceReminderMinutes: Int = 60
+    @AppStorage("notificationProfile") private var notificationProfileRaw: String = "balanced"
 
     // MARK: - State
 
@@ -259,6 +260,19 @@ struct MacSettingsView: View {
     private var notificationsTab: some View {
         Form {
             Section {
+                Picker("Benachrichtigungsprofil", selection: $notificationProfileRaw) {
+                    Text("Leise").tag("quiet")
+                    Text("Ausgeglichen").tag("balanced")
+                    Text("Aktiv").tag("active")
+                }
+                .accessibilityIdentifier("notificationProfilePicker")
+            } header: {
+                Text("Profil")
+            } footer: {
+                Text("Leise: nur Sprint-Timer. Ausgeglichen: Timer + Fristen + Tagesreview. Aktiv: alle inkl. Motivations-Nudges.")
+            }
+
+            Section {
                 Toggle("Sound bei Block-Ende", isOn: $soundEnabled)
                     .accessibilityIdentifier("soundToggle")
             } header: {
@@ -317,6 +331,15 @@ struct MacSettingsView: View {
         }
         .formStyle(.grouped)
         .padding()
+        .onChange(of: notificationProfileRaw) { _, _ in
+            Task {
+                await SmartNotificationEngine.reconcile(
+                    reason: .profileChanged,
+                    context: modelContext,
+                    eventKitRepo: eventKitRepo
+                )
+            }
+        }
     }
 
     private var morningTimeBinding: Binding<Date> {
