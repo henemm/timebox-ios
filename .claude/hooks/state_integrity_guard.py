@@ -81,6 +81,8 @@ ALLOWED_COMMANDS = [
     "adversary_gate.py",
     # Inspection gate (sets visual/result inspection fields based on screenshot proof)
     "inspection_gate.py",
+    # Preflight gate (sets ui_test_preflight_state after /inspect-ui)
+    "preflight_gate.py",
     # Git operations — staging/committing protected files is safe
     # (the files are already modified via approved Edit/Write tools)
     "git add",

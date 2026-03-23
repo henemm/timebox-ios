@@ -75,15 +75,10 @@ Fasse die relevanten Informationen zusammen:
 
 ```bash
 # State-File schreiben (nach erfolgreichem Hierarchy-Dump)
-python3 -c "
-import json
-from datetime import datetime
-state = {'last_run': datetime.now().isoformat(), 'screen': 'main'}
-with open('.claude/ui_test_preflight_state.json', 'w') as f:
-    json.dump(state, f, indent=2)
-print('Preflight state saved.')
-"
+python3 .claude/hooks/preflight_gate.py main
 ```
+
+Ersetze `main` durch den tatsaechlichen Screen-Namen (z.B. `backlog`, `settings`).
 
 Dies ist **PFLICHT** nach jeder `/inspect-ui` Ausfuehrung — der Hook `ui_test_preflight.py` blockiert UI-Test-Edits wenn dieses File fehlt oder aelter als 15 Minuten ist.
 
