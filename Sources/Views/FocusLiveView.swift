@@ -61,6 +61,7 @@ struct FocusLiveView: View {
     @State private var followUpTask: LocalTask?
     @State private var followUpSaved = false
     @State private var followUpTaskID: String?
+    @State private var isAbortingBlock = false
     private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     private let overdueReminderInterval: TimeInterval = 120 // 2 Minuten
     // Live Activity Manager
@@ -147,7 +148,9 @@ struct FocusLiveView: View {
                         block: block,
                         tasks: tasksForBlock(block),
                         completedTaskIDs: block.completedTaskIDs,
+                        isAborted: isAbortingBlock,
                         onDismiss: {
+                            isAbortingBlock = false
                             reviewDismissed = true
                             Task {
                                 // Unerledigte Tasks zurueck nach Next Up
@@ -339,6 +342,17 @@ struct FocusLiveView: View {
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
+
+            // Abort button (RW 3.3)
+            Button {
+                isAbortingBlock = true
+                showSprintReview = true
+            } label: {
+                Label("Abbrechen", systemImage: "xmark.circle")
+                    .font(.subheadline)
+                    .foregroundStyle(.red)
+            }
+            .accessibilityIdentifier("abortBlockButton")
         }
         .padding()
         .background(.ultraThinMaterial)

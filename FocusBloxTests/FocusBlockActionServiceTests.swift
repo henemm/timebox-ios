@@ -677,4 +677,260 @@ final class FocusBlockActionServiceTests: XCTestCase {
         XCTAssertEqual(task.assignedFocusBlockID, blockID,
                        "assignedFocusBlockID must match the created block's ID")
     }
+
+    // MARK: - abortWithFollowUp — Titel
+
+    /// Verhalten: Follow-up-Task bekommt Titel "Weiter: [Original-Titel]"
+    /// Bricht wenn: FocusBlockActionService.abortWithFollowUp — Titel-Konstruktion geaendert
+    func test_abortWithFollowUp_createsTaskWithCorrectTitle() throws {
+        let task = makeTask(title: "Report schreiben")
+        let block = makeBlock(taskIDs: [task.id])
+
+        let result = try FocusBlockActionService.abortWithFollowUp(
+            taskID: task.id,
+            block: block,
+            progressNote: nil,
+            modelContext: context
+        )
+
+        guard case .abortedWithFollowUp(let newTaskID) = result else {
+            XCTFail("Expected .abortedWithFollowUp, got \(result)")
+            return
+        }
+
+        let descriptor = FetchDescriptor<LocalTask>()
+        let allTasks = try context.fetch(descriptor)
+        let followUp = allTasks.first { $0.id == newTaskID }
+
+        XCTAssertEqual(followUp?.title, "Weiter: Report schreiben")
+    }
+
+    // MARK: - abortWithFollowUp — Metadaten-Vererbung
+
+    /// Verhalten: Follow-up erbt Kategorie, Importance, Tags, Urgency vom Original
+    /// Bricht wenn: FocusBlockActionService.abortWithFollowUp — Feld-Kopierung unvollstaendig
+    func test_abortWithFollowUp_inheritsMetadata() throws {
+        let task = makeTask(title: "Praesentation vorbereiten")
+        task.importance = 3
+        task.urgency = "urgent"
+        task.taskType = "income"
+        task.tags = ["Arbeit", "Deadline"]
+        task.taskDescription = "Slides fuer Montag"
+        try context.save()
+
+        let block = makeBlock(taskIDs: [task.id])
+
+        let result = try FocusBlockActionService.abortWithFollowUp(
+            taskID: task.id,
+            block: block,
+            progressNote: nil,
+            modelContext: context
+        )
+
+        guard case .abortedWithFollowUp(let newTaskID) = result else {
+            XCTFail("Expected .abortedWithFollowUp")
+            return
+        }
+
+        let descriptor = FetchDescriptor<LocalTask>()
+        let allTasks = try context.fetch(descriptor)
+        let followUp = allTasks.first { $0.id == newTaskID }!
+
+        XCTAssertEqual(followUp.importance, 3, "Importance should be inherited")
+        XCTAssertEqual(followUp.urgency, "urgent", "Urgency should be inherited")
+        XCTAssertEqual(followUp.taskType, "income", "TaskType should be inherited")
+        XCTAssertEqual(followUp.tags, ["Arbeit", "Deadline"], "Tags should be inherited")
+        XCTAssertEqual(followUp.taskDescription, "Slides fuer Montag", "Description should be inherited")
+    }
+
+    // MARK: - abortWithFollowUp — Restdauer-Berechnung
+
+    /// Verhalten: Restdauer = Original (60min) - elapsed (20min) = 40min
+    /// Bricht wenn: FocusBlockActionService.abortWithFollowUp — Restdauer-Formel geaendert
+    func test_abortWithFollowUp_calculatesRemainingDuration() throws {
+        let task = makeTask(title: "Langer Task")
+        task.estimatedDuration = 60
+        try context.save()
+
+        // 20 Minuten = 1200 Sekunden bereits investiert
+        let block = makeBlock(taskIDs: [task.id], taskTimes: [task.id: 1200])
+
+        let result = try FocusBlockActionService.abortWithFollowUp(
+            taskID: task.id,
+            block: block,
+            progressNote: nil,
+            modelContext: context
+        )
+
+        guard case .abortedWithFollowUp(let newTaskID) = result else {
+            XCTFail("Expected .abortedWithFollowUp")
+            return
+        }
+
+        let descriptor = FetchDescriptor<LocalTask>()
+        let allTasks = try context.fetch(descriptor)
+        let followUp = allTasks.first { $0.id == newTaskID }!
+
+        XCTAssertEqual(followUp.estimatedDuration, 40, "Remaining: 60 - 20 = 40 minutes")
+    }
+
+    // MARK: - abortWithFollowUp — Minimum 15 Minuten
+
+    /// Verhalten: Wenn Restdauer < 15min → auf 15min aufgerundet
+    /// Bricht wenn: FocusBlockActionService.abortWithFollowUp — max(15, ...) entfernt
+    func test_abortWithFollowUp_minimumDuration15Minutes() throws {
+        let task = makeTask(title: "Fast fertiger Task")
+        task.estimatedDuration = 30
+        try context.save()
+
+        // 28 Minuten = 1680 Sekunden investiert → Restdauer waere 2min → Minimum 15
+        let block = makeBlock(taskIDs: [task.id], taskTimes: [task.id: 1680])
+
+        let result = try FocusBlockActionService.abortWithFollowUp(
+            taskID: task.id,
+            block: block,
+            progressNote: nil,
+            modelContext: context
+        )
+
+        guard case .abortedWithFollowUp(let newTaskID) = result else {
+            XCTFail("Expected .abortedWithFollowUp")
+            return
+        }
+
+        let descriptor = FetchDescriptor<LocalTask>()
+        let allTasks = try context.fetch(descriptor)
+        let followUp = allTasks.first { $0.id == newTaskID }!
+
+        XCTAssertEqual(followUp.estimatedDuration, 15, "Minimum duration should be 15 minutes")
+    }
+
+    // MARK: - abortWithFollowUp — Flache Kette (erster Follow-up)
+
+    /// Verhalten: Erstes Follow-up bekommt parentTaskID = original.id
+    /// Bricht wenn: FocusBlockActionService.abortWithFollowUp — parentTaskID-Zuweisung fehlt
+    func test_abortWithFollowUp_flatChain_firstFollowUp() throws {
+        let task = makeTask(title: "Erstmaliger Abbruch")
+        // original.parentTaskID ist nil (kein Follow-up)
+        let block = makeBlock(taskIDs: [task.id])
+
+        let result = try FocusBlockActionService.abortWithFollowUp(
+            taskID: task.id,
+            block: block,
+            progressNote: nil,
+            modelContext: context
+        )
+
+        guard case .abortedWithFollowUp(let newTaskID) = result else {
+            XCTFail("Expected .abortedWithFollowUp")
+            return
+        }
+
+        let descriptor = FetchDescriptor<LocalTask>()
+        let allTasks = try context.fetch(descriptor)
+        let followUp = allTasks.first { $0.id == newTaskID }!
+
+        XCTAssertEqual(followUp.parentTaskID, task.id, "First follow-up should point to original task")
+    }
+
+    // MARK: - abortWithFollowUp — Flache Kette (zweiter Follow-up)
+
+    /// Verhalten: Zweites Follow-up bekommt parentTaskID = ROOT (nicht Zwischenglied)
+    /// Bricht wenn: FocusBlockActionService.abortWithFollowUp — `original.parentTaskID ?? original.id` Logik falsch
+    func test_abortWithFollowUp_flatChain_secondFollowUp() throws {
+        let rootTask = makeTask(title: "Root-Aufgabe")
+        let firstFollowUp = makeTask(title: "Weiter: Root-Aufgabe")
+        firstFollowUp.parentTaskID = rootTask.id  // verweist auf Root
+        try context.save()
+
+        let block = makeBlock(taskIDs: [firstFollowUp.id])
+
+        let result = try FocusBlockActionService.abortWithFollowUp(
+            taskID: firstFollowUp.id,
+            block: block,
+            progressNote: nil,
+            modelContext: context
+        )
+
+        guard case .abortedWithFollowUp(let newTaskID) = result else {
+            XCTFail("Expected .abortedWithFollowUp")
+            return
+        }
+
+        let descriptor = FetchDescriptor<LocalTask>()
+        let allTasks = try context.fetch(descriptor)
+        let secondFollowUp = allTasks.first { $0.id == newTaskID }!
+
+        XCTAssertEqual(
+            secondFollowUp.parentTaskID, rootTask.id,
+            "Second follow-up should point to ROOT task, not intermediate follow-up"
+        )
+    }
+
+    // MARK: - abortWithFollowUp — Original NICHT completed
+
+    /// Verhalten: Original-Task bleibt offen (isCompleted = false)
+    /// Bricht wenn: FocusBlockActionService.abortWithFollowUp — `original.isCompleted = true` hinzugefuegt
+    func test_abortWithFollowUp_originalNotCompleted() throws {
+        let task = makeTask(title: "Abgebrochener Task")
+        let block = makeBlock(taskIDs: [task.id])
+
+        _ = try FocusBlockActionService.abortWithFollowUp(
+            taskID: task.id,
+            block: block,
+            progressNote: "Halbfertig",
+            modelContext: context
+        )
+
+        XCTAssertFalse(task.isCompleted, "Original task should NOT be marked completed on abort")
+        XCTAssertNil(task.completedAt, "Original task should NOT have completedAt on abort")
+    }
+
+    // MARK: - abortWithFollowUp — progressNote auf Original
+
+    /// Verhalten: progressNote wird auf dem Original-Task gespeichert
+    /// Bricht wenn: FocusBlockActionService.abortWithFollowUp — progressNote-Zuweisung entfernt
+    func test_abortWithFollowUp_progressNoteOnOriginal() throws {
+        let task = makeTask(title: "Task mit Notiz")
+        let block = makeBlock(taskIDs: [task.id])
+
+        _ = try FocusBlockActionService.abortWithFollowUp(
+            taskID: task.id,
+            block: block,
+            progressNote: "Kapitel 1 und 2 fertig, Kapitel 3 fehlt",
+            modelContext: context
+        )
+
+        XCTAssertEqual(
+            task.progressNote, "Kapitel 1 und 2 fertig, Kapitel 3 fehlt",
+            "progressNote should be saved on original task"
+        )
+    }
+
+    // MARK: - abortWithFollowUp — lifecycleStatus active
+
+    /// Verhalten: Follow-up hat lifecycleStatus = "active" (sofort im Backlog)
+    /// Bricht wenn: FocusBlockActionService.abortWithFollowUp — lifecycleStatus nicht auf "active" gesetzt
+    func test_abortWithFollowUp_lifecycleStatusActive() throws {
+        let task = makeTask(title: "Status-Check")
+        let block = makeBlock(taskIDs: [task.id])
+
+        let result = try FocusBlockActionService.abortWithFollowUp(
+            taskID: task.id,
+            block: block,
+            progressNote: nil,
+            modelContext: context
+        )
+
+        guard case .abortedWithFollowUp(let newTaskID) = result else {
+            XCTFail("Expected .abortedWithFollowUp")
+            return
+        }
+
+        let descriptor = FetchDescriptor<LocalTask>()
+        let allTasks = try context.fetch(descriptor)
+        let followUp = allTasks.first { $0.id == newTaskID }!
+
+        XCTAssertEqual(followUp.lifecycleStatus, "active", "Follow-up should be active in backlog")
+    }
 }

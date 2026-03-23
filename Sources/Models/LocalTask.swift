@@ -118,6 +118,16 @@ final class LocalTask {
     /// nil = no blocker, task is freely actionable.
     var blockerTaskID: String?
 
+    // MARK: - Follow-up Chain (RW 3.3)
+
+    /// ID of the original task in a follow-up chain (flat: always points to root).
+    /// nil = no follow-up, standalone task.
+    var parentTaskID: String?
+
+    /// Progress note captured on abort ("Wie weit bist du?").
+    /// nil = no abort or no note provided.
+    var progressNote: String?
+
     /// Checks if setting `blockerID` as blocker of `taskID` would create a cycle.
     /// Walks the blocker chain from `blockerID` upward; if it reaches `taskID`, it's a cycle.
     static func wouldCreateCycle(settingBlocker blockerID: String, on taskID: String, allTasks: [LocalTask]) -> Bool {

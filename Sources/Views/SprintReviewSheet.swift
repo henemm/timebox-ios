@@ -4,19 +4,26 @@ struct SprintReviewSheet: View {
     let block: FocusBlock
     let tasks: [PlanItem]
     let initialCompletedTaskIDs: [String]
+    let isAborted: Bool
     let onDismiss: () -> Void
 
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.modelContext) private var modelContext
     @State private var eventKitRepo = EventKitRepository()
 
     // Local state for editing
     @State private var localCompletedIDs: Set<String> = []
     @State private var hasChanges = false
 
-    init(block: FocusBlock, tasks: [PlanItem], completedTaskIDs: [String], onDismiss: @escaping () -> Void) {
+    // Follow-up state (RW 3.3)
+    @State private var progressNotes: [String: String] = [:]
+    @State private var followUpCreated: Set<String> = []
+
+    init(block: FocusBlock, tasks: [PlanItem], completedTaskIDs: [String], isAborted: Bool = false, onDismiss: @escaping () -> Void) {
         self.block = block
         self.tasks = tasks
         self.initialCompletedTaskIDs = completedTaskIDs
+        self.isAborted = isAborted
         self.onDismiss = onDismiss
         self._localCompletedIDs = State(initialValue: Set(completedTaskIDs))
     }
@@ -197,13 +204,62 @@ struct SprintReviewSheet: View {
 
             VStack(spacing: 8) {
                 ForEach(incompleteTasks) { task in
-                    InteractiveReviewTaskRow(
-                        task: task,
-                        isCompleted: false,
-                        plannedMinutes: task.effectiveDuration,
-                        actualSeconds: actualTime(for: task.id),
-                        onToggle: { toggleTaskCompletion(task.id) }
-                    )
+                    VStack(alignment: .leading, spacing: 8) {
+                        InteractiveReviewTaskRow(
+                            task: task,
+                            isCompleted: false,
+                            plannedMinutes: task.effectiveDuration,
+                            actualSeconds: actualTime(for: task.id),
+                            onToggle: { toggleTaskCompletion(task.id) }
+                        )
+
+                        if isAborted && !followUpCreated.contains(task.id) {
+                            TextField(
+                                "Wie weit bist du? (optional)",
+                                text: Binding(
+                                    get: { progressNotes[task.id] ?? "" },
+                                    set: { progressNotes[task.id] = $0 }
+                                )
+                            )
+                            .textFieldStyle(.roundedBorder)
+                            .font(.caption)
+                            .accessibilityIdentifier("progressNote_\(task.id)")
+
+                            Button {
+                                createFollowUp(for: task)
+                            } label: {
+                                Label("Follow-up erstellen", systemImage: "arrow.uturn.right.circle.fill")
+                                    .font(.subheadline)
+                            }
+                            .tint(.orange)
+                            .accessibilityIdentifier("createFollowUpButton_\(task.id)")
+                        }
+
+                        if followUpCreated.contains(task.id) {
+                            Label("Follow-up erstellt", systemImage: "checkmark.circle.fill")
+                                .font(.caption)
+                                .foregroundStyle(.green)
+                                .accessibilityIdentifier("followUpConfirmation_\(task.id)")
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // MARK: - Follow-up Creation (RW 3.3)
+
+    private func createFollowUp(for task: PlanItem) {
+        Task {
+            let result = try? FocusBlockActionService.abortWithFollowUp(
+                taskID: task.id,
+                block: block,
+                progressNote: progressNotes[task.id],
+                modelContext: modelContext
+            )
+            if case .abortedWithFollowUp = result {
+                withAnimation(.spring(duration: 0.3)) {
+                    followUpCreated.insert(task.id)
                 }
             }
         }

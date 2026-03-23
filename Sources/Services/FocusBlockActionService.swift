@@ -16,6 +16,8 @@ enum FocusBlockActionService {
         case skippedLast
         /// Task was completed and a follow-up copy was created
         case followedUp(newTaskID: String)
+        /// Task was aborted and a follow-up with remaining duration was created
+        case abortedWithFollowUp(newTaskID: String)
     }
 
     /// Mark a task as completed: update completedTaskIDs, record time, persist to SwiftData.
@@ -234,5 +236,59 @@ enum FocusBlockActionService {
         try? modelContext.save()
 
         return .followedUp(newTaskID: copy.id)
+    }
+
+    /// Abort a task during a Focus Block: save progress note, create follow-up with remaining duration.
+    /// Original task is NOT marked completed — it stays open with the progress note.
+    @MainActor
+    static func abortWithFollowUp(
+        taskID: String,
+        block: FocusBlock,
+        progressNote: String?,
+        modelContext: ModelContext
+    ) throws -> TaskActionResult {
+        // 1. Load original task
+        let descriptor = FetchDescriptor<LocalTask>()
+        guard let allTasks = try? modelContext.fetch(descriptor),
+              let original = allTasks.first(where: { $0.id == taskID }) else {
+            return .completed
+        }
+
+        // 2. Save progress note on original (if provided)
+        if let note = progressNote, !note.isEmpty {
+            original.progressNote = note
+        }
+
+        // 3. Return original to backlog (NOT completed)
+        original.assignedFocusBlockID = nil
+        original.isNextUp = false
+        original.modifiedAt = Date()
+
+        // 4. Calculate remaining duration
+        let elapsedSeconds = block.taskTimes[taskID] ?? 0
+        let elapsedMinutes = elapsedSeconds / 60
+        let originalDuration = original.estimatedDuration ?? 60
+        let remainingDuration = max(15, originalDuration - elapsedMinutes)
+
+        // 5. Create follow-up task
+        let followUp = LocalTask(
+            title: "Weiter: \(original.title)",
+            importance: original.importance,
+            tags: original.tags,
+            estimatedDuration: remainingDuration,
+            urgency: original.urgency,
+            taskType: original.taskType,
+            taskDescription: original.taskDescription,
+            lifecycleStatus: "active"
+        )
+
+        // 6. Flat chain: always point to root task
+        followUp.parentTaskID = original.parentTaskID ?? original.id
+
+        // 7. Persist
+        modelContext.insert(followUp)
+        try? modelContext.save()
+
+        return .abortedWithFollowUp(newTaskID: followUp.id)
     }
 }

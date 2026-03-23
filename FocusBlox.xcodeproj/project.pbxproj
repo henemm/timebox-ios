@@ -142,8 +142,8 @@
 		'BUG35SNP02BUILD0001' = {isa = PBXBuildFile; fileRef = BUG35SNP02FILEREF01; };
 		'BUG35SNP03BUILD0001' = {isa = PBXBuildFile; fileRef = BUG35SNP03FILEREF01; };
 		'BUG35SNP04BUILD0001' = {isa = PBXBuildFile; fileRef = BUG35SNP04FILEREF01; };
-		'BUG36CC01BUILD00001' = {isa = PBXBuildFile; fileRef = BUG36CC01FILEREF001; };
-		'BUG36CC01BUILD00002' = {isa = PBXBuildFile; fileRef = BUG36CC01FILEREF001; };
+		BUG36CC01BUILD00001 = {isa = PBXBuildFile; fileRef = BUG36CC01FILEREF001; };
+		BUG36CC01BUILD00002 = {isa = PBXBuildFile; fileRef = BUG36CC01FILEREF001; };
 		'BUG36DIAG01BUILD00001' = {isa = PBXBuildFile; fileRef = BUG36DIAG01FILEREF001; };
 		'BUG39LC01BUILD0001' = {isa = PBXBuildFile; fileRef = BUG39LC01FILE00001; };
 		'BUG50RO01BUILD001' = {isa = PBXBuildFile; fileRef = BUG50RO01FILE0001; };
@@ -402,6 +402,7 @@
 		'WDGTWCH01EMBED0002' = {isa = PBXBuildFile; fileRef = WDGTWCH01FILEREF001; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		'WKDYBTN01BUILD001' = {isa = PBXBuildFile; fileRef = WKDYBTN01FILE0001; };
 		'WKDYBTN01BUILD002' = {isa = PBXBuildFile; fileRef = WKDYBTN01FILE0001; };
+		RW33ABRT01BFIL0001 /* AbortFollowUpUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = RW33ABRT01FREF0001 /* AbortFollowUpUITests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -720,7 +721,7 @@
 		'BUG35SNP02FILEREF01' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickCaptureState.swift; sourceTree = "<group>"; };
 		'BUG35SNP03FILEREF01' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickCaptureSnippetView.swift; sourceTree = "<group>"; };
 		'BUG35SNP04FILEREF01' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickCaptureSubIntents.swift; sourceTree = "<group>"; };
-		'BUG36CC01FILEREF001' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CCQuickAddIntents.swift; sourceTree = "<group>"; };
+		BUG36CC01FILEREF001 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CCQuickAddIntents.swift; sourceTree = "<group>"; };
 		'BUG36DIAG01FILEREF001' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CCQuickTaskDiagTests.swift; sourceTree = "<group>"; };
 		'BUG39LC01FILE00001' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusBlockLifecycleTests.swift; sourceTree = "<group>"; };
 		'BUG50RO01FILE0001' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarEventReadOnlyTests.swift; sourceTree = "<group>"; };
@@ -919,6 +920,7 @@
 		'WARNUI01FILEREF00001' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WarningSettingsUITests.swift; sourceTree = "<group>"; };
 		'WDGTWCH01FILEREF001' = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = FocusBloxWatchWidgetsExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		'WKDYBTN01FILE0001' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeekdayButton.swift; sourceTree = "<group>"; };
+		RW33ABRT01FREF0001 /* AbortFollowUpUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AbortFollowUpUITests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -1080,6 +1082,7 @@
 			isa = PBXGroup;
 			children = (
 				EFBUI001FILEREF00001,
+				RW33ABRT01FREF0001 /* AbortFollowUpUITests.swift */,
 				B7B87F212F1BCD9B0069B457 /* EisenhowerMatrixUITests.swift */,
 				339BBA1A3799CB0C6CF5897A /* BacklogViewUITests.swift */,
 				9356580BE3C5699878A6B87D /* BeforeScreenshotTest.swift */,
@@ -2251,6 +2254,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				CF2E7692295B675D8541312A /* BacklogViewUITests.swift in Sources */,
+				RW33ABRT01BFIL0001 /* AbortFollowUpUITests.swift in Sources */,
 				4702F3D2CAF394E0AC9AAF96 /* BeforeScreenshotTest.swift in Sources */,
 				6C17452E66E837CD8225506C /* DebugLogReaderTest.swift in Sources */,
 				DEFSORT01BUILD0001,
