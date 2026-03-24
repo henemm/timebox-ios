@@ -169,6 +169,9 @@ struct PlanningView: View {
                     date: startTime,
                     duration: transfer.duration
                 )
+                await SmartNotificationEngine.reconcile(
+                    reason: .taskChanged, context: modelContext, eventKitRepo: eventKitRepo
+                )
 
                 await loadData()
                 scheduleFeedback.toggle()
@@ -206,6 +209,9 @@ struct PlanningView: View {
                 let taskSource = LocalTaskSource(modelContext: modelContext)
                 let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
                 try syncEngine.unscheduleTask(itemID: taskID)
+                await SmartNotificationEngine.reconcile(
+                    reason: .taskChanged, context: modelContext, eventKitRepo: eventKitRepo
+                )
 
                 await loadData()
                 scheduleFeedback.toggle()

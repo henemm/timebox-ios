@@ -108,6 +108,37 @@ final class ScheduledTaskBlockUITests: XCTestCase {
         )
     }
 
+    // MARK: - GapFinder Integration (RW_3.1d)
+
+    /// Verhalten: Scheduled Task Block darf NICHT als Free Slot vorgeschlagen werden
+    /// Bricht wenn: GapFinder.swift — scheduledTasks Loop entfernt (busyPeriods ignoriert scheduledTasks)
+    func test_scheduledTask_notSuggestedAsFreeSlot() throws {
+        navigateToBlox()
+
+        let scheduledBlock = app.descendants(matching: .any).matching(
+            NSPredicate(format: "identifier BEGINSWITH 'scheduledTaskBlock_'")
+        ).firstMatch
+
+        guard scheduledBlock.waitForExistence(timeout: 5) else {
+            XCTFail("Scheduled Task Block muss auf Timeline existieren")
+            return
+        }
+
+        let freeSlots = app.descendants(matching: .any).matching(
+            NSPredicate(format: "identifier BEGINSWITH 'freeSlot_'")
+        )
+
+        let blockFrame = scheduledBlock.frame
+        for i in 0..<freeSlots.count {
+            let slot = freeSlots.element(boundBy: i)
+            if slot.exists {
+                let slotFrame = slot.frame
+                let overlaps = slotFrame.minY < blockFrame.maxY && slotFrame.maxY > blockFrame.minY
+                XCTAssertFalse(overlaps, "Free Slot darf NICHT mit Scheduled Task Block ueberlappen")
+            }
+        }
+    }
+
     // MARK: - Helpers
 
     private func navigateToBlox() {

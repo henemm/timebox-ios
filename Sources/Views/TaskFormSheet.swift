@@ -173,7 +173,9 @@ struct TaskFormSheet: View {
                             )
                         }
                         .buttonStyle(.plain)
+                        #if os(iOS)
                         .sensoryFeedback(.impact(weight: .medium), trigger: urgency)
+                        #endif
                         .accessibilityIdentifier("urgencyFlameToggle")
 
                         Text("Dringend = Deadline oder zeitkritisch")
@@ -365,9 +367,15 @@ struct TaskFormSheet: View {
                 .padding()
             }
             .accessibilityIdentifier("taskFormScrollView")
+            #if os(iOS)
             .background(Color(.systemGroupedBackground))
+            #else
+            .background(Color(nsColor: .windowBackgroundColor))
+            #endif
             .navigationTitle(mode.title)
+            #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
+            #endif
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Abbrechen") {

@@ -523,7 +523,7 @@ struct ContentView: View {
         }
         .navigationTitle(filterTitle)
         .sheet(isPresented: $showCreateTask) {
-            MacTaskCreateSheet {
+            TaskFormSheet {
                 refreshTasks()
             }
         }

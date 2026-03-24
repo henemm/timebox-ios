@@ -31,6 +31,9 @@ struct MacPlanningView: View {
     // All tasks loaded via SyncEngine (for FocusBlockTasksSheet)
     @State private var allPlanItems: [PlanItem] = []
 
+    // Scheduled tasks for timeline display (RW_3.1d)
+    @State private var scheduledTasks: [TimelineItem] = []
+
     // Sheet state for event category assignment
     @State private var eventToCategories: CalendarEvent?
 
@@ -42,9 +45,10 @@ struct MacPlanningView: View {
         calendarEvents.compactMap { FocusBlock(from: $0) }
     }
 
-    // Free time slots for smart suggestions
+    // Free time slots for smart suggestions (RW_3.1d: includes scheduled tasks as busy)
     private var computedFreeSlots: [TimeSlot] {
-        let finder = GapFinder(events: calendarEvents, focusBlocks: focusBlocks, date: selectedDate)
+        let busyTasks = scheduledTasks.map { (start: $0.startDate, end: $0.endDate) }
+        let finder = GapFinder(events: calendarEvents, focusBlocks: focusBlocks, scheduledTasks: busyTasks, date: selectedDate)
         return finder.findFreeSlots(minMinutes: 30, maxMinutes: 60)
     }
 
@@ -79,17 +83,20 @@ struct MacPlanningView: View {
         .task {
             await requestCalendarAccess()
             await loadPlanItems()
+            loadScheduledTasks()
         }
         .onChange(of: selectedDate) {
             Task {
                 await loadCalendarEvents()
                 await loadPlanItems()
+                loadScheduledTasks()
             }
         }
         .onChange(of: eventKitRepo.eventStoreChangeCount) {
             Task {
                 await loadCalendarEvents()
                 await loadPlanItems()
+                loadScheduledTasks()
             }
         }
         .sheet(item: $blockToEdit) { block in
@@ -161,7 +168,11 @@ struct MacPlanningView: View {
                 date: selectedDate,
                 events: calendarEvents,
                 focusBlocks: focusBlocks,
+                scheduledTasks: scheduledTasks,
                 freeSlots: computedFreeSlots,
+                onScheduleTask: { task, time in
+                    scheduleTaskOnMac(task, at: time)
+                },
                 onCreateFocusBlock: { startTime, duration, taskID in
                     Task { await createFocusBlock(at: startTime, duration: duration, taskID: taskID) }
                 },
@@ -185,6 +196,12 @@ struct MacPlanningView: View {
                 },
                 onResizeBlock: { block, newEndDate in
                     resizeFocusBlock(block, newEndDate: newEndDate)
+                },
+                onUnscheduleTask: { taskID in
+                    unscheduleTaskOnMac(taskID)
+                },
+                onStartFocusSprint: { taskID in
+                    startFocusSprintOnMac(taskID)
                 }
             )
         }
@@ -514,6 +531,68 @@ struct MacPlanningView: View {
             Task { await loadCalendarEvents(showSpinner: false) }
         } catch {
             errorMessage = "Fehler beim Speichern: \(error.localizedDescription)"
+        }
+    }
+
+    // MARK: - Scheduled Task Actions (RW_3.1d)
+
+    private func loadScheduledTasks() {
+        let calendar = Calendar.current
+        let dayStart = calendar.startOfDay(for: selectedDate)
+        guard let dayEnd = calendar.date(byAdding: .day, value: 1, to: dayStart) else { return }
+
+        let descriptor = FetchDescriptor<LocalTask>(
+            predicate: #Predicate<LocalTask> { !$0.isCompleted && $0.scheduledDate != nil }
+        )
+        guard let allTasks = try? modelContext.fetch(descriptor) else { return }
+
+        scheduledTasks = allTasks
+            .filter { $0.scheduledDate! >= dayStart && $0.scheduledDate! < dayEnd }
+            .map { TimelineItem(
+                scheduledTaskID: $0.id,
+                title: $0.title,
+                scheduledDate: $0.scheduledDate!,
+                durationMinutes: $0.scheduledDuration ?? $0.estimatedDuration ?? 30
+            )}
+    }
+
+    private func scheduleTaskOnMac(_ task: MacTaskTransfer, at time: Date) {
+        Task {
+            let taskSource = LocalTaskSource(modelContext: modelContext)
+            let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
+            try? syncEngine.scheduleTask(itemID: task.id, date: time, duration: task.duration)
+            await SmartNotificationEngine.reconcile(
+                reason: .taskChanged, context: modelContext, eventKitRepo: eventKitRepo
+            )
+            loadScheduledTasks()
+        }
+    }
+
+    private func unscheduleTaskOnMac(_ taskID: String) {
+        Task {
+            let taskSource = LocalTaskSource(modelContext: modelContext)
+            let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
+            try? syncEngine.unscheduleTask(itemID: taskID)
+            await SmartNotificationEngine.reconcile(
+                reason: .taskChanged, context: modelContext, eventKitRepo: eventKitRepo
+            )
+            loadScheduledTasks()
+        }
+    }
+
+    private func startFocusSprintOnMac(_ taskID: String) {
+        Task {
+            do {
+                _ = try FocusBlockActionService.startImmediate(
+                    taskID: taskID,
+                    eventKitRepo: eventKitRepo,
+                    modelContext: modelContext
+                )
+                await loadCalendarEvents(showSpinner: false)
+                loadScheduledTasks()
+            } catch {
+                errorMessage = "Focus Sprint konnte nicht gestartet werden."
+            }
         }
     }
 

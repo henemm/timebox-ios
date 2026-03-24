@@ -274,6 +274,67 @@ final class GapFinderTests: XCTestCase {
         XCTAssertEqual(firstSlotHour, 6, "Future date should start gap search from 06:00")
     }
 
+    // MARK: - Scheduled Tasks as Busy Periods (RW_3.1d)
+
+    /// Verhalten: ScheduledTasks zaehlen als busy — kein Free Slot wo ein Task liegt
+    /// Bricht wenn: GapFinder.swift:69-71 — scheduledTasks Loop entfernt
+    func test_scheduledTasks_countAsBusyPeriods() {
+        // Event 08-09, ScheduledTask 11-12, Event 15-17
+        let events = [
+            makeEvent(startHour: 8, endHour: 9),
+            makeEvent(startHour: 15, endHour: 17),
+        ]
+        let scheduledTasks = [
+            (start: futureDate(hour: 11), end: futureDate(hour: 12))
+        ]
+        let finder = GapFinder(
+            events: events, focusBlocks: [],
+            scheduledTasks: scheduledTasks, date: tomorrowDate
+        )
+        let slots = finder.findFreeSlots(minMinutes: 30, maxMinutes: 60)
+
+        // No slot should start at 11:00 — that's a scheduled task
+        let slotHours = slots.map { Calendar.current.component(.hour, from: $0.startDate) }
+        XCTAssertFalse(
+            slotHours.contains(11),
+            "Scheduled Task 11-12 muss als busy zaehlen — kein Slot bei 11:00"
+        )
+    }
+
+    /// Verhalten: ScheduledTasks reduzieren verfuegbare Gaps (busy day, nicht default suggestions)
+    /// Bricht wenn: GapFinder.swift:69-71 — scheduledTasks nicht in busyPeriods
+    func test_scheduledTasks_reduceAvailableGaps() {
+        // Busy day (>2h events) + ScheduledTask 13-14 blocks the 12-14 gap
+        let events = [
+            makeEvent(startHour: 8, endHour: 12),   // 4h busy → no default suggestions
+            makeEvent(startHour: 15, endHour: 18),   // 3h busy
+        ]
+        // Without scheduledTask: gap 12-15 (3h) → slot at 12:00
+        let finderWithout = GapFinder(
+            events: events, focusBlocks: [], date: tomorrowDate
+        )
+        // With scheduledTask 13-14: gap 12-13 (1h) then 14-15 (1h)
+        let scheduledTasks = [
+            (start: futureDate(hour: 13), end: futureDate(hour: 14))
+        ]
+        let finderWith = GapFinder(
+            events: events, focusBlocks: [],
+            scheduledTasks: scheduledTasks, date: tomorrowDate
+        )
+
+        let slotsWithout = finderWithout.findFreeSlots(minMinutes: 30, maxMinutes: 60)
+        let slotsWith = finderWith.findFreeSlots(minMinutes: 30, maxMinutes: 60)
+
+        // Both should find slot at 12:00, but "with" should also have slot at 14:00
+        // (gap split by scheduled task)
+        let hoursWithout = Set(slotsWithout.map { Calendar.current.component(.hour, from: $0.startDate) })
+        let hoursWith = Set(slotsWith.map { Calendar.current.component(.hour, from: $0.startDate) })
+
+        XCTAssertTrue(hoursWithout.contains(12), "Without: gap at 12:00 should exist")
+        XCTAssertTrue(hoursWith.contains(14),
+            "With scheduledTask 13-14: new gap at 14:00 must appear (gap split)")
+    }
+
     // MARK: - End-of-Day Gap
 
     /// Verhalten: Luecke am Ende des Tages (nach letztem Event bis 22:00) wird gefunden

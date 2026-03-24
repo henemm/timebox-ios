@@ -381,7 +381,8 @@ struct BlockPlanningView: View {
     }
 
     private var computedFreeSlots: [TimeSlot] {
-        let finder = GapFinder(events: calendarEvents, focusBlocks: focusBlocks, date: selectedDate)
+        let busyTasks = scheduledTasks.map { (start: $0.startDate, end: $0.endDate) }
+        let finder = GapFinder(events: calendarEvents, focusBlocks: focusBlocks, scheduledTasks: busyTasks, date: selectedDate)
         return finder.findFreeSlots(minMinutes: 30, maxMinutes: 60)
     }
 

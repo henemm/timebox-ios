@@ -16,7 +16,9 @@ struct MacTimelineView: View {
     let date: Date
     let events: [CalendarEvent]
     let focusBlocks: [FocusBlock]
+    var scheduledTasks: [TimelineItem] = []
     var freeSlots: [TimeSlot] = []
+    var onScheduleTask: ((MacTaskTransfer, Date) -> Void)?
     var onCreateFocusBlock: ((Date, Int, String) -> Void)?
     var onAddTaskToBlock: ((String, String) -> Void)?
     var onTapBlock: ((FocusBlock) -> Void)?
@@ -25,6 +27,8 @@ struct MacTimelineView: View {
     var onTapEvent: ((CalendarEvent) -> Void)?
     var onMoveFocusBlock: ((String, Date) -> Void)?
     var onResizeBlock: ((FocusBlock, Date) -> Void)?
+    var onUnscheduleTask: ((String) -> Void)?
+    var onStartFocusSprint: ((String) -> Void)?
 
     // Timeline configuration
     private let startHour = 6
@@ -94,6 +98,27 @@ struct MacTimelineView: View {
                             )
                         }
 
+                        // Scheduled tasks (RW_3.1d)
+                        ForEach(positionedScheduledTasks) { positioned in
+                            ScheduledTaskBlock(
+                                taskID: positioned.taskID,
+                                title: positioned.title,
+                                startDate: positioned.startDate,
+                                endDate: positioned.endDate,
+                                onUnschedule: { onUnscheduleTask?(positioned.taskID) },
+                                onStartFocusSprint: onStartFocusSprint != nil
+                                    ? { onStartFocusSprint?(positioned.taskID) }
+                                    : nil
+                            )
+                            .timelinePosition(
+                                hour: Calendar.current.component(.hour, from: positioned.startDate),
+                                minute: Calendar.current.component(.minute, from: positioned.startDate),
+                                durationMinutes: Int(positioned.endDate.timeIntervalSince(positioned.startDate) / 60),
+                                column: positioned.column,
+                                totalColumns: positioned.totalColumns
+                            )
+                        }
+
                         // Free slots (suggestions for new blocks)
                         ForEach(freeSlots) { slot in
                             FreeSlotView(
@@ -143,9 +168,9 @@ struct MacTimelineView: View {
                 return true
             }
 
-            // Otherwise create new focus block at this time
+            // Default: schedule task at drop time (RW_3.1d)
             let dropTime = calculateTimeFromLocation(location)
-            onCreateFocusBlock?(dropTime, task.duration, task.id)
+            onScheduleTask?(task, dropTime)
             return true
         } isTargeted: { targeted in
             isDropTargeted = targeted
@@ -181,10 +206,11 @@ struct MacTimelineView: View {
             event.durationMinutes <= 480 // 8 hours max
         }
 
-        // Combine events and focus blocks into unified items
+        // Combine events, focus blocks, and scheduled tasks into unified items
         var allItems: [TimelineItem] = []
         allItems.append(contentsOf: regularEvents.map { TimelineItem(event: $0) })
         allItems.append(contentsOf: focusBlocks.map { TimelineItem(block: $0) })
+        allItems.append(contentsOf: scheduledTasks)
 
         // Run unified collision detection
         let groups = TimelineItem.groupOverlapping(allItems)
@@ -227,6 +253,24 @@ struct MacTimelineView: View {
                 return PositionedFocusBlock(
                     id: positioned.id,
                     block: block,
+                    column: positioned.column,
+                    totalColumns: positioned.totalColumns
+                )
+            }
+            return nil
+        }
+    }
+
+    /// Extracts positioned scheduled tasks from the unified positioned items (RW_3.1d)
+    private var positionedScheduledTasks: [PositionedScheduledTask] {
+        positionedItems.compactMap { positioned -> PositionedScheduledTask? in
+            if case .scheduledTask(let id, let title) = positioned.item.type {
+                return PositionedScheduledTask(
+                    id: positioned.id,
+                    taskID: id,
+                    title: title,
+                    startDate: positioned.item.startDate,
+                    endDate: positioned.item.endDate,
                     column: positioned.column,
                     totalColumns: positioned.totalColumns
                 )
@@ -700,8 +744,7 @@ struct FreeSlotView: View {
     MacTimelineView(
         date: Date(),
         events: [],
-        focusBlocks: [],
-        freeSlots: []
+        focusBlocks: []
     )
     .frame(width: 400, height: 600)
 }

@@ -27,7 +27,7 @@
 | ~~RW_3.1a~~ | ~~3 Ausfuehrung~~ | ~~Calendar Task Drop — Phase A: Model Layer~~ | ~~Medium~~ | ~~S~~ | ~~Shared~~ | ~~[Spec](specs/rework/3.1a-calendar-task-drop-model-layer.md)~~ ERLEDIGT → [Archiv](ARCHIVE-todos.md) |
 | ~~RW_3.1b~~ | ~~3 Ausfuehrung~~ | ~~Calendar Task Drop — Phase B: iOS Schedule/Unschedule Logic~~ | ~~Medium~~ | ~~S~~ | ~~Shared~~ | ~~[Spec](specs/rework/3.1b-calendar-task-drop-schedule-logic.md)~~ ERLEDIGT |
 | ~~RW_3.1c~~ | ~~3 Ausfuehrung~~ | ~~Calendar Task Drop — Phase C: ScheduledTaskBlock + Context Menu~~ | ~~Medium~~ | ~~S~~ | ~~Eigene View~~ | ~~[Spec](specs/rework/3.1c-scheduled-task-block.md)~~ ERLEDIGT |
-| RW_3.1d | 3 Ausfuehrung | Calendar Task Drop — Phase D: GapFinder + Notifications + macOS | Medium | S | Eigene View | [Spec](specs/rework/3.1-calendar-task-drop.md) |
+| ~~RW_3.1d~~ | ~~3 Ausfuehrung~~ | ~~Calendar Task Drop — Phase D: GapFinder + Notifications + macOS~~ | ~~Medium~~ | ~~S~~ | ~~Eigene View~~ | ~~[Spec](specs/rework/3.1d-gapfinder-notifications-macos.md)~~ ERLEDIGT |
 | ~~RW_3.2~~ | ~~3 Ausfuehrung~~ | ~~Focus Sprint ("Los"-Button)~~ | ~~Medium~~ | ~~M~~ | ~~UI fehlt~~ | ~~[Spec](specs/rework/3.2-focus-sprint-impl.md)~~ ERLEDIGT → [Archiv](ARCHIVE-todos.md) |
 | ~~RW_3.3~~ | ~~3 Ausfuehrung~~ | ~~Follow-up Logic~~ | ~~Medium~~ | ~~S~~ | ~~Shared~~ | ~~[Spec](specs/rework/3.3-follow-up-logic-impl.md)~~ ERLEDIGT → [Archiv](ARCHIVE-todos.md) |
 | ~~RW_3.4~~ | ~~3 Ausfuehrung~~ | ~~Emotional Nudge (Micro-Tasks)~~ | ~~Medium~~ | ~~M~~ | ~~Eigene View~~ | ~~[Spec](specs/rework/3.4-emotional-nudge-impl.md)~~ ERLEDIGT → [Archiv](ARCHIVE-todos.md) |

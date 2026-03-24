@@ -215,7 +215,9 @@ struct CreateTaskView: View {
                 }
             }
             .navigationTitle("Neuer Task")
+            #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
+            #endif
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Abbrechen") {

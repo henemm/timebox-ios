@@ -26,7 +26,15 @@ struct TimeSlot: Identifiable {
 struct GapFinder {
     let events: [CalendarEvent]
     let focusBlocks: [FocusBlock]
+    let scheduledTasks: [(start: Date, end: Date)]
     let date: Date
+
+    init(events: [CalendarEvent], focusBlocks: [FocusBlock], scheduledTasks: [(start: Date, end: Date)] = [], date: Date) {
+        self.events = events
+        self.focusBlocks = focusBlocks
+        self.scheduledTasks = scheduledTasks
+        self.date = date
+    }
 
     private let startHour = 6
     private let endHour = 22
@@ -56,6 +64,10 @@ struct GapFinder {
 
         for block in focusBlocks {
             busyPeriods.append((block.startDate, block.endDate))
+        }
+
+        for task in scheduledTasks {
+            busyPeriods.append((task.start, task.end))
         }
 
         // Sort by start time
