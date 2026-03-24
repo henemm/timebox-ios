@@ -1,0 +1,12 @@
+TDD RED — DayViewUITests
+=========================
+Build FAILED: DayView and Tab "Tag" do not exist yet (expected RED state).
+Additionally blocked by pre-existing Widget build error (QuickAddLaunchIntent not in scope).
+
+Tests written in FocusBloxUITests/DayViewUITests.swift:
+- test_dayTab_existsInTabBar → WILL FAIL (Tab "Tag" not in tab bar)
+- test_dayTab_tap_showsDayView → WILL FAIL (no DayView content)
+- test_dayTab_positionedBetweenBloxAndFocus → WILL FAIL (Tab doesn't exist)
+- test_dayView_showsPhaseContent → WILL FAIL (no phase content)
+
+All 4 tests FAIL (RED) — Tab "Tag" and DayView do not exist.

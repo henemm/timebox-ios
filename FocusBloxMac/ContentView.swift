@@ -260,6 +260,8 @@ struct ContentView: View {
             MacPlanningView(
                 selectedDate: $sharedDate
             )
+        case .day:
+            DayView()
         case .focus:
             MacFocusView()
         case .review:

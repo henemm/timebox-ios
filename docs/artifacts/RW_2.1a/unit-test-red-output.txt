@@ -1,0 +1,19 @@
+TDD RED — DayPhaseTests
+========================
+Build FAILED: DayPhase type does not exist yet (expected RED state).
+Additionally blocked by pre-existing Widget build error (QuickAddLaunchIntent not in scope).
+
+Tests written in FocusBloxTests/DayPhaseTests.swift:
+- test_earlyMorning_returnsMorning → CANNOT COMPILE (DayPhase not found)
+- test_midnight_returnsMorning → CANNOT COMPILE
+- test_lastMorningHour_returnsMorning → CANNOT COMPILE
+- test_exactMorningEnd_returnsDaytime → CANNOT COMPILE
+- test_afternoon_returnsDaytime → CANNOT COMPILE
+- test_lastDaytimeHour_returnsDaytime → CANNOT COMPILE
+- test_exactEveningStart_returnsEvening → CANNOT COMPILE
+- test_lateEvening_returnsEvening → CANNOT COMPILE
+- test_lastHourOfDay_returnsEvening → CANNOT COMPILE
+- test_customMorningEnd_shiftsTransition → CANNOT COMPILE
+- test_customEveningStart_shiftsTransition → CANNOT COMPILE
+
+All 11 tests FAIL (RED) — DayPhase type does not exist.

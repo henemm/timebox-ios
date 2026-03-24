@@ -11,6 +11,7 @@ import SwiftUI
 enum MainSection: String, Hashable, CaseIterable {
     case backlog = "Backlog"
     case planning = "Blox"
+    case day = "Tag"
     case focus = "Focus"
     case review = "Review"
     case refiner = "Refiner"
@@ -19,6 +20,7 @@ enum MainSection: String, Hashable, CaseIterable {
         switch self {
         case .backlog: return "list.bullet"
         case .planning: return "calendar"
+        case .day: return "calendar.badge.clock"
         case .focus: return "target"
         case .review: return "chart.bar"
         case .refiner: return "sparkles"

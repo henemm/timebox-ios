@@ -2,7 +2,7 @@ import SwiftUI
 import SwiftData
 
 enum AppTab: Hashable {
-    case backlog, blox, focus, review, refiner
+    case backlog, blox, day, focus, review, refiner
 }
 
 struct MainTabView: View {
@@ -25,6 +25,12 @@ struct MainTabView: View {
                     Label("Blox", systemImage: "calendar")
                 }
                 .tag(AppTab.blox)
+
+            DayView()
+                .tabItem {
+                    Label("Tag", systemImage: "calendar.badge.clock")
+                }
+                .tag(AppTab.day)
 
             FocusLiveView()
                 .tabItem {

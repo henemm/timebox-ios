@@ -58,6 +58,14 @@ final class AppSettings: ObservableObject {
     @AppStorage("nudgeLastDate") var nudgeLastDate: String = ""
     @AppStorage("nudgeTaskIDs") var nudgeTaskIDs: String = ""
 
+    // MARK: - Day View Settings
+
+    /// Hour when morning phase ends (0-23, default 12)
+    @AppStorage("morningEndHour") var morningEndHour: Int = 12
+
+    /// Hour when evening phase starts (0-23, default 18)
+    @AppStorage("eveningStartHour") var eveningStartHour: Int = 18
+
     // MARK: - Notification Profile
 
     @AppStorage("notificationProfile") var notificationProfileRaw: String =

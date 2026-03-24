@@ -149,6 +149,10 @@
 		'BUG35SNP04BUILD0001' = {isa = PBXBuildFile; fileRef = BUG35SNP04FILEREF01; };
 		'BUG36CC01BUILD00001' = {isa = PBXBuildFile; fileRef = BUG36CC01FILEREF001; };
 		'BUG36CC01BUILD00002' = {isa = PBXBuildFile; fileRef = BUG36CC01FILEREF001; };
+		RW21A001BUILD00001 = {isa = PBXBuildFile; fileRef = RW21A001FILE000001; };
+		RW21A001BUILD00002 = {isa = PBXBuildFile; fileRef = RW21A001FILE000001; };
+		RW21A002BUILD00001 = {isa = PBXBuildFile; fileRef = RW21A002FILE000001; };
+		RW21A003BUILD00001 = {isa = PBXBuildFile; fileRef = RW21A003FILE000001; };
 		'BUG36DIAG01BUILD00001' = {isa = PBXBuildFile; fileRef = BUG36DIAG01FILEREF001; };
 		'BUG39LC01BUILD0001' = {isa = PBXBuildFile; fileRef = BUG39LC01FILE00001; };
 		'BUG50RO01BUILD001' = {isa = PBXBuildFile; fileRef = BUG50RO01FILE0001; };
@@ -863,6 +867,9 @@
 		'REFNRCD01FILE00001' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RefinerTaskCard.swift; sourceTree = "<group>"; };
 		'REFNRUI01FILE00001' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RefinerUITests.swift; sourceTree = "<group>"; };
 		'REFNRVW01FILE00001' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RefinerView.swift; sourceTree = "<group>"; };
+		RW21A001FILE000001 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayView.swift; sourceTree = "<group>"; };
+		RW21A002FILE000001 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayPhaseTests.swift; sourceTree = "<group>"; };
+		RW21A003FILE000001 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayViewUITests.swift; sourceTree = "<group>"; };
 		'REMIMP01FILEREF0001' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemindersImportServiceTests.swift; sourceTree = "<group>"; };
 		'REMIMPORT_FILEREF01' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemindersImportService.swift; sourceTree = "<group>"; };
 		'REMLIST1FILEREF0001' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReminderListsUITests.swift; sourceTree = "<group>"; };
@@ -1196,6 +1203,7 @@
 				BBEBA20D99CFA97B16E3B26F /* NotificationMigrationPhaseCUITests.swift */,
 				A5C4410415E5DDF308F6F87A /* EmotionalNudgeUITests.swift */,
 				RW31C001FILEREF001 /* ScheduledTaskBlockUITests.swift */,
+				RW21A003FILE000001,
 			);
 			path = FocusBloxUITests;
 			sourceTree = "<group>";
@@ -1327,6 +1335,7 @@
 				1B00FF52557F6F42E8194A77 /* CategoryTrendChart.swift */,
 				REFNRVW01FILE00001,
 				REFNRCD01FILE00001,
+				RW21A001FILE000001,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -1467,6 +1476,7 @@
 				45E6417CA9AB4B2D688478D7 /* CategoryStatsServiceTests.swift */,
 				F023UT01FREF000000001,
 				B713F2CFF3AC8221977A1D96 /* EmotionalNudgeServiceTests.swift */,
+				RW21A002FILE000001,
 			);
 			path = FocusBloxTests;
 			sourceTree = SOURCE_ROOT;
@@ -2194,6 +2204,7 @@
 				C89E9F957213671FF1B0DC91 /* MainTabView.swift in Sources */,
 				REFNRVW01BUILD00001,
 				REFNRCD01BUILD00001,
+				RW21A001BUILD00001,
 				586B7D1F1588622970BCEED8 /* MiniBacklogView.swift in Sources */,
 				46A4C7615027C65CC8412D37 /* MiniTaskCard.swift in Sources */,
 				BC2B829A833F87522CFFB6BC /* MockEventKitRepository.swift in Sources */,
@@ -2378,6 +2389,7 @@
 				642E6B2948BD87B6F9B80FE9 /* NotificationMigrationPhaseCUITests.swift in Sources */,
 				9F846B980036BD136A9E4A27 /* EmotionalNudgeUITests.swift in Sources */,
 				RW31C001BUILD00001 /* ScheduledTaskBlockUITests.swift in Sources */,
+				RW21A003BUILD00001,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2486,6 +2498,7 @@
 				F16A4D838934D07E38895FEE /* BehavioralProfileServiceTests.swift in Sources */,
 				5FF3774BCC0BD9E12669937A /* EmotionalNudgeServiceTests.swift in Sources */,
 				5C5C464D880F773CD20DCD42 /* ScheduledTaskModelTests.swift in Sources */,
+				RW21A002BUILD00001,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2590,6 +2603,7 @@
 				SMARTENR00BUILD002,
 				REFNRVW02BUILD00001,
 				REFNRCD02BUILD00001,
+				RW21A001BUILD00002,
 				CTC1SERV0BUILD0002,
 				NOTIF02BUILD000001,
 				SMTNOTENG01BLD002,
