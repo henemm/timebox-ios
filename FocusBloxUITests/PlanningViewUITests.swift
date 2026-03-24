@@ -14,27 +14,27 @@ final class PlanningViewUITests: XCTestCase {
     func testTabNavigationExists() throws {
         // Verify tabs exist
         let backlogTab = app.tabBars.buttons["Backlog"]
-        let bloeckeTab = app.tabBars.buttons["Blöcke"]
+        let bloxTab = app.tabBars.buttons["Blox"]
 
         XCTAssertTrue(backlogTab.exists, "Backlog tab should exist")
-        XCTAssertTrue(bloeckeTab.exists, "Blöcke tab should exist")
+        XCTAssertTrue(bloxTab.exists, "Blox tab should exist")
     }
 
     func testCanSwitchToBloeckeTab() throws {
-        // Tap on Blöcke tab
-        let bloeckeTab = app.tabBars.buttons["Blöcke"]
-        bloeckeTab.tap()
+        // Tap on Blox tab
+        let bloxTab = app.tabBars.buttons["Blox"]
+        bloxTab.tap()
 
         // Wait for navigation
-        let bloeckeTitle = app.navigationBars["Blöcke"]
-        let exists = bloeckeTitle.waitForExistence(timeout: 5)
+        let bloxTitle = app.navigationBars["Blox"]
+        let exists = bloxTitle.waitForExistence(timeout: 5)
 
-        XCTAssertTrue(exists, "Blöcke navigation bar should appear after tapping tab")
+        XCTAssertTrue(exists, "Blox navigation bar should appear after tapping tab")
     }
 
     func testTimelineShowsHours() throws {
         // Switch to Blöcke tab
-        app.tabBars.buttons["Blöcke"].tap()
+        app.tabBars.buttons["Blox"].tap()
 
         // Wait for content to load
         sleep(2)
@@ -49,13 +49,13 @@ final class PlanningViewUITests: XCTestCase {
 
     func testBloeckeTabScreenshot() throws {
         // Switch to Blöcke tab
-        app.tabBars.buttons["Blöcke"].tap()
+        app.tabBars.buttons["Blox"].tap()
         sleep(2)
 
         // Take screenshot
         let screenshot = app.screenshot()
         let attachment = XCTAttachment(screenshot: screenshot)
-        attachment.name = "Blöcke Tab"
+        attachment.name = "Blox Tab"
         attachment.lifetime = .keepAlways
         add(attachment)
     }
@@ -239,12 +239,46 @@ final class PlanningViewUITests: XCTestCase {
         )
     }
 
-    // MARK: - Helper
+    // MARK: - Scheduled Task Tests (RW_3.1b — TDD RED)
+
+    /// Verhalten: Scheduled Tasks erscheinen auf der Timeline mit eigenem Identifier
+    /// Bricht wenn: BlockPlanningView scheduled Tasks nicht in positionedItems einfuegt
+    func testScheduledTaskAppearsOnTimeline() throws {
+        navigateToBlox()
+
+        // Scheduled Tasks MUESSEN als eigener Block auf der Timeline erscheinen
+        // Format: scheduledTaskBlock_{taskID}
+        let scheduledBlock = app.descendants(matching: .any).matching(
+            NSPredicate(format: "identifier BEGINSWITH 'scheduledTaskBlock_'")
+        ).firstMatch
+
+        XCTAssertTrue(
+            scheduledBlock.waitForExistence(timeout: 5),
+            "Scheduled Task MUSS auf Timeline mit Identifier 'scheduledTaskBlock_' erscheinen"
+        )
+    }
+
+    /// Verhalten: Scheduled Tasks verschwinden aus Backlog nach Scheduling
+    /// Bricht wenn: BacklogView scheduled Tasks nicht filtert
+    func testScheduledTaskNotInBacklog() throws {
+        // Navigate to Backlog tab
+        let backlogTab = app.tabBars.buttons["Backlog"]
+        guard backlogTab.waitForExistence(timeout: 5) else { return }
+        backlogTab.tap()
+        _ = app.navigationBars.firstMatch.waitForExistence(timeout: 3)
+
+        // The mock scheduled task should NOT appear in backlog
+        let scheduledTaskInBacklog = app.staticTexts["[MOCK] Scheduled: Bericht schreiben"]
+        XCTAssertFalse(
+            scheduledTaskInBacklog.waitForExistence(timeout: 3),
+            "Scheduled Tasks DUERFEN NICHT im Backlog erscheinen"
+        )
+    }
 
     private func navigateToBlox() {
-        let bloxTab = app.tabBars.buttons["Blöcke"]
-        XCTAssertTrue(bloxTab.waitForExistence(timeout: 5), "Blöcke tab should exist")
+        let bloxTab = app.tabBars.buttons["Blox"]
+        XCTAssertTrue(bloxTab.waitForExistence(timeout: 5), "Blox tab should exist")
         bloxTab.tap()
-        sleep(2)
+        _ = app.scrollViews["planningTimeline"].waitForExistence(timeout: 5)
     }
 }

@@ -6,6 +6,7 @@ struct PlanningView: View {
     @Environment(\.eventKitRepository) private var eventKitRepo
     @State private var selectedDate = Date()
     @State private var calendarEvents: [CalendarEvent] = []
+    @State private var scheduledTasks: [TimelineItem] = []
     @State private var unscheduledTasks: [PlanItem] = []
     @State private var isLoading = false
     @State private var errorMessage: String?
@@ -13,6 +14,8 @@ struct PlanningView: View {
     @State private var scheduleFeedback = false
     @State private var selectedEvent: CalendarEvent?
     @State private var showEventActions = false
+    @State private var selectedScheduledTaskID: String?
+    @State private var showScheduledTaskActions = false
 
     var body: some View {
         NavigationStack {
@@ -46,11 +49,16 @@ struct PlanningView: View {
                     TimelineView(
                         date: selectedDate,
                         events: calendarEvents,
+                        scheduledTasks: scheduledTasks,
                         onScheduleTask: scheduleTask,
                         onMoveEvent: moveEvent,
                         onEventTap: { event in
                             selectedEvent = event
                             showEventActions = true
+                        },
+                        onScheduledTaskTap: { taskID in
+                            selectedScheduledTaskID = taskID
+                            showScheduledTaskActions = true
                         },
                         onRefresh: loadData
                     )
@@ -91,6 +99,18 @@ struct PlanningView: View {
                     Button("Abbrechen", role: .cancel) {}
                 }
             }
+            .confirmationDialog(
+                "Geplanter Task",
+                isPresented: $showScheduledTaskActions,
+                titleVisibility: .visible
+            ) {
+                if let taskID = selectedScheduledTaskID {
+                    Button("Entplanen (zurück in Backlog)") {
+                        unscheduleTask(taskID)
+                    }
+                    Button("Abbrechen", role: .cancel) {}
+                }
+            }
         }
         .task {
             await loadData()
@@ -120,10 +140,27 @@ struct PlanningView: View {
             // Load calendar events
             calendarEvents = try eventKitRepo.fetchCalendarEvents(for: selectedDate)
 
-            // Load unscheduled tasks
+            // Load tasks via SyncEngine
             let taskSource = LocalTaskSource(modelContext: modelContext)
             let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
-            unscheduledTasks = try await syncEngine.sync()
+            let allTasks = try await syncEngine.sync()
+
+            // Split: scheduled tasks for timeline, unscheduled for backlog
+            let dayStart = Calendar.current.startOfDay(for: selectedDate)
+            let dayEnd = Calendar.current.date(byAdding: .day, value: 1, to: dayStart)!
+
+            scheduledTasks = allTasks
+                .filter { $0.isScheduled && $0.scheduledDate! >= dayStart && $0.scheduledDate! < dayEnd }
+                .map { item in
+                    TimelineItem(
+                        scheduledTaskID: item.id,
+                        title: item.title,
+                        scheduledDate: item.scheduledDate!,
+                        durationMinutes: item.scheduledDuration ?? item.estimatedDuration ?? 30
+                    )
+                }
+
+            unscheduledTasks = allTasks.filter { !$0.isScheduled }
 
         } catch {
             errorMessage = error.localizedDescription
@@ -135,25 +172,19 @@ struct PlanningView: View {
     private func scheduleTask(_ transfer: PlanItemTransfer, at startTime: Date) {
         Task {
             do {
-                let endTime = Calendar.current.date(
-                    byAdding: .minute,
-                    value: transfer.duration,
-                    to: startTime
-                ) ?? startTime
-
-                try eventKitRepo.createCalendarEvent(
-                    title: transfer.title,
-                    startDate: startTime,
-                    endDate: endTime,
-                    reminderID: transfer.id
+                let taskSource = LocalTaskSource(modelContext: modelContext)
+                let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
+                try syncEngine.scheduleTask(
+                    itemID: transfer.id,
+                    date: startTime,
+                    duration: transfer.duration
                 )
 
-                // Reload data to show new event
                 await loadData()
                 scheduleFeedback.toggle()
 
             } catch {
-                errorMessage = "Event konnte nicht erstellt werden."
+                errorMessage = "Task konnte nicht eingeplant werden."
             }
         }
     }
@@ -175,6 +206,22 @@ struct PlanningView: View {
 
             } catch {
                 errorMessage = "Event konnte nicht entfernt werden."
+            }
+        }
+    }
+
+    private func unscheduleTask(_ taskID: String) {
+        Task {
+            do {
+                let taskSource = LocalTaskSource(modelContext: modelContext)
+                let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
+                try syncEngine.unscheduleTask(itemID: taskID)
+
+                await loadData()
+                scheduleFeedback.toggle()
+
+            } catch {
+                errorMessage = "Task konnte nicht entplant werden."
             }
         }
     }

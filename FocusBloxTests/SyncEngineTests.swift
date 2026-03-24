@@ -344,6 +344,125 @@ final class SyncEngineTests: XCTestCase {
 
     // MARK: - updateSortOrder Tests
 
+    // MARK: - Schedule/Unschedule Tests (RW_3.1b)
+
+    /// Verhalten: scheduleTask setzt scheduledDate + scheduledDuration auf dem Task
+    /// Bricht wenn: SyncEngine.scheduleTask() fehlt oder task.scheduledDate = date entfernt
+    func test_scheduleTask_setsDateAndDuration() throws {
+        let context = container.mainContext
+        let task = LocalTask(title: "Steuererklaerung machen")
+        context.insert(task)
+        try context.save()
+
+        let scheduleDate = Calendar.current.date(bySettingHour: 14, minute: 0, second: 0, of: Date())!
+        let beforeModified = task.modifiedAt
+
+        try syncEngine.scheduleTask(itemID: task.id, date: scheduleDate, duration: 45)
+
+        XCTAssertEqual(task.scheduledDate, scheduleDate, "scheduledDate muss auf die Drop-Zeit gesetzt werden")
+        XCTAssertEqual(task.scheduledDuration, 45, "scheduledDuration muss auf die uebergebene Dauer gesetzt werden")
+        XCTAssertTrue(task.isScheduled, "Task muss nach Scheduling isScheduled == true melden")
+        XCTAssertGreaterThan(task.modifiedAt ?? .distantPast, beforeModified ?? .distantPast,
+            "modifiedAt muss aktualisiert werden fuer CloudKit-Sync")
+    }
+
+    /// Verhalten: scheduleTask raeumt assignedFocusBlockID (Mutual Exclusion)
+    /// Bricht wenn: task.assignedFocusBlockID = nil Zeile in scheduleTask() fehlt
+    func test_scheduleTask_clearsAssignedFocusBlockID() throws {
+        let context = container.mainContext
+        let task = LocalTask(title: "Task mit FocusBlock")
+        task.assignedFocusBlockID = "block-123"
+        context.insert(task)
+        try context.save()
+
+        let scheduleDate = Calendar.current.date(bySettingHour: 10, minute: 0, second: 0, of: Date())!
+        try syncEngine.scheduleTask(itemID: task.id, date: scheduleDate, duration: 30)
+
+        XCTAssertNil(task.assignedFocusBlockID,
+            "assignedFocusBlockID MUSS geraeumt werden — Mutual Exclusion: scheduled XOR focusBlock")
+        XCTAssertEqual(task.scheduledDate, scheduleDate,
+            "scheduledDate muss trotzdem gesetzt werden")
+    }
+
+    /// Verhalten: scheduleTask mit duration: nil laesst scheduledDuration auf nil
+    /// Bricht wenn: scheduleTask() einen Default-Wert fuer nil-Duration einsetzt (z.B. 30)
+    func test_scheduleTask_withNilDuration_keepsNil() throws {
+        let context = container.mainContext
+        let task = LocalTask(title: "Kurze Aufgabe")
+        task.estimatedDuration = 15
+        context.insert(task)
+        try context.save()
+
+        let scheduleDate = Date()
+        try syncEngine.scheduleTask(itemID: task.id, date: scheduleDate, duration: nil)
+
+        XCTAssertNil(task.scheduledDuration,
+            "scheduledDuration darf NICHT auf Default gesetzt werden — nil heisst: estimatedDuration verwenden")
+        XCTAssertNotNil(task.scheduledDate, "scheduledDate muss trotzdem gesetzt sein")
+    }
+
+    // MARK: - unscheduleTask Tests
+
+    /// Verhalten: unscheduleTask raeumt scheduledDate + scheduledDuration
+    /// Bricht wenn: SyncEngine.unscheduleTask() fehlt oder task.scheduledDate = nil entfernt
+    func test_unscheduleTask_clearsScheduleFields() throws {
+        let context = container.mainContext
+        let task = LocalTask(title: "Geplanter Task")
+        task.scheduledDate = Date()
+        task.scheduledDuration = 60
+        context.insert(task)
+        try context.save()
+
+        try syncEngine.unscheduleTask(itemID: task.id)
+
+        XCTAssertNil(task.scheduledDate, "scheduledDate muss nach Unschedule nil sein")
+        XCTAssertNil(task.scheduledDuration, "scheduledDuration muss nach Unschedule nil sein")
+        XCTAssertFalse(task.isScheduled, "Task darf nach Unschedule nicht mehr als scheduled gelten")
+    }
+
+    // MARK: - Mutual Exclusion in bestehenden Methoden
+
+    /// Verhalten: completeTask raeumt scheduledDate (zusaetzlich zu assignedFocusBlockID)
+    /// Bricht wenn: task.scheduledDate = nil Zeile in completeTask() fehlt
+    func test_completeTask_clearsScheduledDate() throws {
+        let context = container.mainContext
+        let task = LocalTask(title: "Geplanter Task zum Abschliessen")
+        task.scheduledDate = Date()
+        task.scheduledDuration = 30
+        context.insert(task)
+        try context.save()
+
+        try syncEngine.completeTask(itemID: task.id)
+
+        XCTAssertTrue(task.isCompleted, "Task muss als completed markiert sein")
+        XCTAssertNil(task.scheduledDate,
+            "scheduledDate MUSS bei Completion geraeumt werden — sonst erscheint completed Task noch auf Timeline")
+        XCTAssertNil(task.scheduledDuration,
+            "scheduledDuration muss bei Completion geraeumt werden")
+    }
+
+    /// Verhalten: updateAssignedFocusBlock raeumt scheduledDate wenn focusBlockID gesetzt wird
+    /// Bricht wenn: if focusBlockID != nil { task.scheduledDate = nil } in updateAssignedFocusBlock() fehlt
+    func test_updateAssignedFocusBlock_clearsScheduledDate() throws {
+        let context = container.mainContext
+        let task = LocalTask(title: "Scheduled Task bekommt FocusBlock")
+        task.scheduledDate = Date()
+        task.scheduledDuration = 45
+        context.insert(task)
+        try context.save()
+
+        try syncEngine.updateAssignedFocusBlock(itemID: task.id, focusBlockID: "block-456")
+
+        XCTAssertEqual(task.assignedFocusBlockID, "block-456",
+            "FocusBlock-Zuweisung muss funktionieren")
+        XCTAssertNil(task.scheduledDate,
+            "scheduledDate MUSS geraeumt werden — Mutual Exclusion: scheduled XOR focusBlock")
+        XCTAssertNil(task.scheduledDuration,
+            "scheduledDuration muss bei FocusBlock-Zuweisung geraeumt werden")
+    }
+
+    // MARK: - updateSortOrder Tests
+
     func test_updateSortOrder_updatesTasksSortOrder() async throws {
         let context = container.mainContext
         let task1 = LocalTask(title: "Task 1", importance: 0)

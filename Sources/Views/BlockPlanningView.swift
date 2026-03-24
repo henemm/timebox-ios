@@ -17,6 +17,9 @@ struct BlockPlanningView: View {
     @State private var eventToCategories: CalendarEvent?
     @State private var assignmentFeedback = false
     @State private var dropTargetTime: Date?
+    @State private var scheduledTasks: [TimelineItem] = []
+    @State private var selectedScheduledTaskID: String?
+    @State private var showScheduledTaskActions = false
 
     private let hourHeight: CGFloat = 60
     private let startHour = 6
@@ -94,6 +97,18 @@ struct BlockPlanningView: View {
                 )
             }
             .sensoryFeedback(.success, trigger: assignmentFeedback)
+            .confirmationDialog(
+                "Geplanter Task",
+                isPresented: $showScheduledTaskActions,
+                titleVisibility: .visible
+            ) {
+                if let taskID = selectedScheduledTaskID {
+                    Button("Entplanen (zurück in Backlog)") {
+                        unscheduleTask(taskID)
+                    }
+                    Button("Abbrechen", role: .cancel) {}
+                }
+            }
             .sheet(item: $blockForTasks) { block in
                 FocusBlockTasksSheet(
                     block: block,
@@ -197,6 +212,28 @@ struct BlockPlanningView: View {
                             totalColumns: 1
                         )
                     }
+
+                    // Scheduled tasks (RW_3.1b)
+                    ForEach(positionedScheduledTasks) { positioned in
+                        TimelineScheduledTaskRow(
+                            taskID: positioned.taskID,
+                            title: positioned.title,
+                            startDate: positioned.startDate,
+                            endDate: positioned.endDate,
+                            onTap: {
+                                selectedScheduledTaskID = positioned.taskID
+                                showScheduledTaskActions = true
+                            }
+                        )
+                        .frame(maxHeight: .infinity)
+                        .timelinePosition(
+                            hour: Calendar.current.component(.hour, from: positioned.startDate),
+                            minute: Calendar.current.component(.minute, from: positioned.startDate),
+                            durationMinutes: max(Int(positioned.endDate.timeIntervalSince(positioned.startDate) / 60), 15),
+                            column: positioned.column,
+                            totalColumns: positioned.totalColumns
+                        )
+                    }
                 }
                 .padding(.leading, timeColumnWidth)
 
@@ -241,6 +278,7 @@ struct BlockPlanningView: View {
         var allItems: [TimelineItem] = []
         allItems.append(contentsOf: regularEvents.map { TimelineItem(event: $0) })
         allItems.append(contentsOf: focusBlocks.map { TimelineItem(block: $0) })
+        allItems.append(contentsOf: scheduledTasks)
 
         let groups = TimelineItem.groupOverlapping(allItems)
 
@@ -274,6 +312,19 @@ struct BlockPlanningView: View {
             if case .focusBlock(let block) = positioned.item.type {
                 return PositionedFocusBlock(
                     id: positioned.id, block: block,
+                    column: positioned.column, totalColumns: positioned.totalColumns
+                )
+            }
+            return nil
+        }
+    }
+
+    private var positionedScheduledTasks: [PositionedScheduledTask] {
+        positionedItems.compactMap { positioned -> PositionedScheduledTask? in
+            if case .scheduledTask(let taskID, let title) = positioned.item.type {
+                return PositionedScheduledTask(
+                    id: positioned.id, taskID: taskID, title: title,
+                    startDate: positioned.item.startDate, endDate: positioned.item.endDate,
                     column: positioned.column, totalColumns: positioned.totalColumns
                 )
             }
@@ -522,6 +573,20 @@ struct BlockPlanningView: View {
             if cleaned > 0 {
                 allTasks = try await syncEngine.sync() // Refresh to show recovered tasks
             }
+
+            // RW_3.1b: Build timeline items for scheduled tasks on this day
+            let dayStart = Calendar.current.startOfDay(for: selectedDate)
+            let dayEnd = Calendar.current.date(byAdding: .day, value: 1, to: dayStart)!
+            scheduledTasks = allTasks
+                .filter { $0.isScheduled && $0.scheduledDate! >= dayStart && $0.scheduledDate! < dayEnd }
+                .map { item in
+                    TimelineItem(
+                        scheduledTaskID: item.id,
+                        title: item.title,
+                        scheduledDate: item.scheduledDate!,
+                        durationMinutes: item.scheduledDuration ?? item.estimatedDuration ?? 30
+                    )
+                }
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -543,6 +608,22 @@ struct BlockPlanningView: View {
     private func backlogTasksNotInBlock(_ block: FocusBlock) -> [PlanItem] {
         let blockTaskIDs = Set(block.taskIDs)
         return allTasks.filter { !$0.isCompleted && !$0.isNextUp && !blockTaskIDs.contains($0.id) }
+    }
+
+    // MARK: - Schedule/Unschedule (RW_3.1b)
+
+    private func unscheduleTask(_ taskID: String) {
+        Task {
+            do {
+                let taskSource = LocalTaskSource(modelContext: modelContext)
+                let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
+                try syncEngine.unscheduleTask(itemID: taskID)
+                await loadData()
+                assignmentFeedback.toggle()
+            } catch {
+                errorMessage = "Task konnte nicht entplant werden."
+            }
+        }
     }
 
     private func createFocusBlock(startDate: Date, endDate: Date) {
@@ -1190,6 +1271,46 @@ struct TimelineEventRow: View {
             onTap()
         }
         .accessibilityIdentifier("timelineEvent_\(event.id)")
+    }
+}
+
+// MARK: - Scheduled Task Row (RW_3.1b)
+
+struct TimelineScheduledTaskRow: View {
+    let taskID: String
+    let title: String
+    let startDate: Date
+    let endDate: Date
+    let onTap: () -> Void
+
+    var body: some View {
+        HStack(spacing: 8) {
+            RoundedRectangle(cornerRadius: 2)
+                .fill(.orange)
+                .frame(width: 4)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.subheadline.bold())
+                    .foregroundStyle(.orange)
+                    .lineLimit(1)
+            }
+
+            Spacer()
+        }
+        .padding(.vertical, 6)
+        .padding(.horizontal, 8)
+        .background(
+            RoundedRectangle(cornerRadius: 8)
+                .fill(.orange.opacity(0.1))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 8)
+                .strokeBorder(.orange.opacity(0.3), lineWidth: 1)
+        )
+        .contentShape(Rectangle())
+        .onTapGesture { onTap() }
+        .accessibilityIdentifier("scheduledTaskBlock_\(taskID)")
     }
 }
 

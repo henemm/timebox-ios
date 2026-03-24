@@ -779,6 +779,13 @@ struct FocusBloxApp: App {
             context.insert(rawTask2)
         }
 
+        // MARK: - Scheduled Task Mock Data (RW_3.1b)
+        let scheduledTask = LocalTask(title: "[MOCK] Scheduled: Bericht schreiben", importance: 2, estimatedDuration: 45, urgency: "not_urgent")
+        scheduledTask.isNextUp = false
+        scheduledTask.scheduledDate = Calendar.current.date(byAdding: .hour, value: 11, to: Calendar.current.startOfDay(for: Date()))
+        scheduledTask.scheduledDuration = 45
+        context.insert(scheduledTask)
+
         // Completed task outside any FocusBlock (for Review tab testing)
         let completedOutsideBlock = LocalTask(title: "[MOCK] Erledigte Backlog-Aufgabe", importance: 2, estimatedDuration: 20, urgency: "not_urgent")
         completedOutsideBlock.isNextUp = false

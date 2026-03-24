@@ -171,6 +171,8 @@ final class SyncEngine {
         task.completedAt = Date()
         // Clear assignment when completing
         task.assignedFocusBlockID = nil
+        task.scheduledDate = nil
+        task.scheduledDuration = nil
         task.isNextUp = false
 
         // DEP-1: Free all tasks that depend on this blocker
@@ -245,6 +247,11 @@ final class SyncEngine {
             task.rescheduleCount += 1
         }
         task.assignedFocusBlockID = focusBlockID
+        // Mutual Exclusion: scheduled XOR focusBlock
+        if focusBlockID != nil {
+            task.scheduledDate = nil
+            task.scheduledDuration = nil
+        }
         try modelContext.save()
     }
 
@@ -276,6 +283,26 @@ final class SyncEngine {
 
     /// Clears blockerTaskID on all tasks that depend on the given task.
     /// Called when a blocker is completed or deleted to free its dependents.
+    // MARK: - Schedule/Unschedule (RW_3.1b)
+
+    func scheduleTask(itemID: String, date: Date, duration: Int?) throws {
+        guard let task = try findTask(byID: itemID) else { return }
+        // Mutual Exclusion: scheduled XOR focusBlock
+        task.assignedFocusBlockID = nil
+        task.scheduledDate = date
+        task.scheduledDuration = duration
+        task.modifiedAt = Date()
+        try modelContext.save()
+    }
+
+    func unscheduleTask(itemID: String) throws {
+        guard let task = try findTask(byID: itemID) else { return }
+        task.scheduledDate = nil
+        task.scheduledDuration = nil
+        task.modifiedAt = Date()
+        try modelContext.save()
+    }
+
     private func freeDependents(of blockerID: String) throws {
         let descriptor = FetchDescriptor<LocalTask>(
             predicate: #Predicate { $0.blockerTaskID == blockerID }

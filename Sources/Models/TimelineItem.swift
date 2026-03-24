@@ -164,6 +164,17 @@ struct PositionedFocusBlock: Identifiable, Sendable {
     let totalColumns: Int
 }
 
+/// Represents a positioned scheduled task with column information (RW_3.1b).
+struct PositionedScheduledTask: Identifiable, Sendable {
+    let id: String
+    let taskID: String
+    let title: String
+    let startDate: Date
+    let endDate: Date
+    let column: Int
+    let totalColumns: Int
+}
+
 // MARK: - Timeline Location Calculator
 
 /// Pure function: converts a Y pixel position on the timeline to a Date.
