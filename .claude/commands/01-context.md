@@ -22,6 +22,17 @@ Or switch to existing:
 python3 .claude/hooks/workflow_state_multi.py switch "[feature-name]"
 ```
 
+### 1b. New UI or Change to Existing?
+
+**Ask the user immediately after starting the workflow:**
+
+> "Ist das komplett neues UI (es gibt noch keinen Screen dafuer) oder eine Aenderung an bestehendem UI?"
+> "Bei neuem UI: Antworte mit **'neues ui'** — das setzt automatisch das Flag und die Screenshot-Pflicht entfaellt."
+
+- **Neues UI** → User tippt "neues ui" → Listener setzt `is_new_ui=true` automatisch
+- **Aenderung an bestehendem UI** → Nichts noetig, Screenshot-Pflicht bleibt aktiv
+- **Du kannst `is_new_ui` NICHT selbst setzen** — das Feld ist geschuetzt.
+
 ### 2. Gather Context
 
 Search and collect:

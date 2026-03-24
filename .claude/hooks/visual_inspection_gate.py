@@ -90,6 +90,10 @@ def main():
     if not workflow:
         sys.exit(0)
 
+    # New UI features have nothing to screenshot yet — skip inspection
+    if workflow.get("is_new_ui", False):
+        sys.exit(0)
+
     # Check if visual inspection is done — proof-based!
     # Either a real screenshot file must exist, or an override reason must be set
     if workflow.get("visual_inspection_done", False):

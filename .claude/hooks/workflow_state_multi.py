@@ -444,6 +444,8 @@ def create_workflow(name: str) -> dict:
         "context_file": None,
         "test_artifacts": [],
         "affected_files": [],
+        # New UI flag (v2.6) - set at workflow start, skips visual inspection
+        "is_new_ui": False,
         # Visual inspection (v2.4) - PFLICHT for bug workflows
         "visual_inspection_done": False,
         "visual_inspection_notes": None,  # What was observed
@@ -1411,6 +1413,7 @@ if __name__ == "__main__":
             "test_artifacts",       # Managed by /09-add-artifact
             "user_override",        # Managed by override_token_listener
             "phases_completed",     # Managed by phase transitions
+            "is_new_ui",                        # Managed by new_ui_listener.py
             "visual_inspection_done",       # Managed by fresh-eyes-inspector
             "visual_inspection_notes",      # Managed by fresh-eyes-inspector
             "user_expectation_done",        # Managed by user-advocate
