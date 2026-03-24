@@ -52,6 +52,12 @@ final class AppSettings: ObservableObject {
     /// Whether AI-powered task scoring is enabled
     @AppStorage("aiScoringEnabled") var aiScoringEnabled: Bool = true
 
+    // MARK: - Emotional Nudge Tracking
+
+    @AppStorage("nudgeDailyCount") var nudgeDailyCount: Int = 0
+    @AppStorage("nudgeLastDate") var nudgeLastDate: String = ""
+    @AppStorage("nudgeTaskIDs") var nudgeTaskIDs: String = ""
+
     // MARK: - Notification Profile
 
     @AppStorage("notificationProfile") var notificationProfileRaw: String =

@@ -62,6 +62,7 @@ struct FocusLiveView: View {
     @State private var followUpSaved = false
     @State private var followUpTaskID: String?
     @State private var isAbortingBlock = false
+    @State private var showNudgeContinueDialog = false
     private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     private let overdueReminderInterval: TimeInterval = 120 // 2 Minuten
     // Live Activity Manager
@@ -162,6 +163,20 @@ struct FocusLiveView: View {
                         }
                     )
                 }
+            }
+            .confirmationDialog(
+                "Weitermachen?",
+                isPresented: $showNudgeContinueDialog,
+                titleVisibility: .visible
+            ) {
+                Button("Ja, weitermachen") {
+                    extendNudgeBlock()
+                }
+                Button("Nein, beenden", role: .cancel) {
+                    showSprintReview = true
+                }
+            } message: {
+                Text("Du hast 2 Minuten gemacht. Willst du weitermachen?")
             }
         }
         .task {
@@ -711,7 +726,13 @@ struct FocusLiveView: View {
                 taskStartTime = nil
             }
             SoundService.playEndGong()
-            showSprintReview = true
+            // Nudge-Sprint erkennen (2-Min Block) → "Weitermachen?" statt SprintReview
+            let blockDurationMinutes = Int(block.endDate.timeIntervalSince(block.startDate) / 60)
+            if blockDurationMinutes <= 2 {
+                showNudgeContinueDialog = true
+            } else {
+                showSprintReview = true
+            }
             warningPlayed = false  // Reset for next block
             // End Live Activity
             liveActivityManager.endActivity()
@@ -719,6 +740,22 @@ struct FocusLiveView: View {
             // Reload to get fresh taskTimes for Sprint Review
             Task { await loadData() }
         }
+    }
+    /// Verlängert einen Nudge-Sprint um die geschätzte Task-Dauer.
+    private func extendNudgeBlock() {
+        guard let block = activeBlock else { return }
+        let tasks = tasksForBlock(block)
+        let remainingTasks = tasks.filter { !block.completedTaskIDs.contains($0.id) }
+        let extraMinutes = remainingTasks.first?.estimatedDuration ?? 25
+        let newEndDate = Date().addingTimeInterval(Double(extraMinutes) * 60)
+        try? eventKitRepo.updateFocusBlockTime(
+            eventID: block.id,
+            startDate: block.startDate,
+            endDate: newEndDate
+        )
+        reviewDismissed = false
+        warningPlayed = false
+        Task { await loadData() }
     }
     // rescheduleEndNotification removed — replaced by SmartNotificationEngine.reconcile()
     /// Check if current task is overdue and play reminder every 2 minutes

@@ -27,7 +27,7 @@
 | RW_3.1 | 3 Ausfuehrung | Task direkt auf Kalender droppen | Medium | L | Eigene View | [Spec](specs/rework/3.1-calendar-task-drop.md) |
 | ~~RW_3.2~~ | ~~3 Ausfuehrung~~ | ~~Focus Sprint ("Los"-Button)~~ | ~~Medium~~ | ~~M~~ | ~~UI fehlt~~ | ~~[Spec](specs/rework/3.2-focus-sprint-impl.md)~~ ERLEDIGT → [Archiv](ARCHIVE-todos.md) |
 | ~~RW_3.3~~ | ~~3 Ausfuehrung~~ | ~~Follow-up Logic~~ | ~~Medium~~ | ~~S~~ | ~~Shared~~ | ~~[Spec](specs/rework/3.3-follow-up-logic-impl.md)~~ ERLEDIGT → [Archiv](ARCHIVE-todos.md) |
-| RW_3.4 | 3 Ausfuehrung | Emotional Nudge (Micro-Tasks) | Medium | M | Eigene View | [Spec](specs/rework/3.4-emotional-nudge.md) |
+| ~~RW_3.4~~ | ~~3 Ausfuehrung~~ | ~~Emotional Nudge (Micro-Tasks)~~ | ~~Medium~~ | ~~M~~ | ~~Eigene View~~ | ~~[Spec](specs/rework/3.4-emotional-nudge-impl.md)~~ ERLEDIGT → [Archiv](ARCHIVE-todos.md) |
 | RW_2.1 | 2 Tagesplanung | Tagesansicht ("Dein Tag") | Medium | XL | Eigene View | [Spec](specs/rework/2.1-day-view.md) |
 | RW_2.2 | 2 Tagesplanung | KI-gestuetzte Tagesvorschlaege | Medium | L | Shared | [Spec](specs/rework/2.2-next-up-suggestions.md) |
 | RW_2.3 | 2 Tagesplanung | Limitation Guard | Medium | S | Shared | [Spec](specs/rework/2.3-limitation-guard.md) |

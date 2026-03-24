@@ -599,6 +599,12 @@ struct FocusBloxApp: App {
         tbdTask.taskType = "maintenance"
         tbdTask.sortOrder = -1  // Appear first in backlog
 
+        // Stuck Task (rescheduleCount >= 3) for Emotional Nudge (RW_3.4)
+        let stuckTask = LocalTask(title: "[MOCK] Stuck Task - 5x verschoben", importance: 2, estimatedDuration: 30, urgency: "not_urgent")
+        stuckTask.isNextUp = true
+        stuckTask.rescheduleCount = 5
+        stuckTask.taskType = "deep_work"
+
         context.insert(task1)
         context.insert(task2)
         context.insert(task3)
@@ -606,6 +612,7 @@ struct FocusBloxApp: App {
         context.insert(backlogTask1)
         context.insert(backlogTask2)
         context.insert(tbdTask)
+        context.insert(stuckTask)
 
         // Create Focus Block mock tasks with known UUIDs
         // These match the taskIDs in FocusLiveView.createMockRepository()

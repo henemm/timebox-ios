@@ -4,6 +4,7 @@ struct TaskDetailSheet: View {
     let task: PlanItem
     let onSave: (String, Int?, Int?, [String], String?, String, Date?, String?, String, [Int]?, Int?, Int?) -> Void
     let onDelete: () -> Void
+    var onStartNudgeSprint: (() -> Void)?
 
     @State private var showEditSheet = false
     @Environment(\.dismiss) private var dismiss
@@ -65,6 +66,31 @@ struct TaskDetailSheet: View {
                         Text(desc)
                             .font(.body)
                             .foregroundStyle(.primary)
+                    }
+                }
+
+                // Nudge Section (only for stuck tasks with available nudge budget)
+                if task.rescheduleCount >= 3, EmotionalNudgeService.canShowNudge(for: task.id) {
+                    Section {
+                        VStack(alignment: .leading, spacing: 10) {
+                            Text(EmotionalNudgeService.nudgeText())
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                                .accessibilityIdentifier("nudgeText")
+
+                            Button {
+                                onStartNudgeSprint?()
+                            } label: {
+                                Label("Nur 2 Minuten anfangen", systemImage: "bolt.fill")
+                                    .frame(maxWidth: .infinity)
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .tint(.orange)
+                            .accessibilityIdentifier("startNudgeSprintButton")
+                        }
+                        .padding(.vertical, 4)
+                    } header: {
+                        Text("Haengst du fest?")
                     }
                 }
             }

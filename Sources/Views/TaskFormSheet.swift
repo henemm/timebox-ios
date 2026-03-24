@@ -26,6 +26,7 @@ struct TaskFormSheet: View {
     let mode: Mode
     let onSave: ((String, Int?, Int?, [String], String?, String, Date?, String?, String, [Int]?, Int?, Int?) -> Void)?
     let onDelete: (() -> Void)?
+    var onStartNudgeSprint: (() -> Void)?
     var onCreateComplete: (() -> Void)?
 
     // MARK: - State
@@ -69,10 +70,12 @@ struct TaskFormSheet: View {
     /// Edit mode initializer
     init(task: PlanItem,
          onSave: @escaping (String, Int?, Int?, [String], String?, String, Date?, String?, String, [Int]?, Int?, Int?) -> Void,
-         onDelete: @escaping () -> Void) {
+         onDelete: @escaping () -> Void,
+         onStartNudgeSprint: (() -> Void)? = nil) {
         self.mode = .edit(task)
         self.onSave = onSave
         self.onDelete = onDelete
+        self.onStartNudgeSprint = onStartNudgeSprint
         self.onCreateComplete = nil
 
         // Initialize state from task - preserve nil for TBD fields
@@ -340,6 +343,9 @@ struct TaskFormSheet: View {
                             }
                     }
 
+                    // MARK: - Emotional Nudge (stuck tasks only)
+                    nudgeSection
+
                     // MARK: - Delete (Edit mode only)
                     if case .edit = mode, let onDelete {
                         Button(role: .destructive) {
@@ -431,6 +437,31 @@ struct TaskFormSheet: View {
     }
 
     // MARK: - Glass Card Section Helper
+
+    private let nudgeMotivationText = "Nur 2 Minuten. Einfach anfangen."
+
+    @ViewBuilder
+    private var nudgeSection: some View {
+        // Nudge section rendered below for stuck tasks
+        if case .edit(let task) = mode,
+           task.rescheduleCount >= 3 {
+            Text(nudgeMotivationText)
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .accessibilityIdentifier("nudgeText")
+
+            Button {
+                onStartNudgeSprint?()
+                dismiss()
+            } label: {
+                Label("Nur 2 Minuten anfangen", systemImage: "bolt.fill")
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.borderedProminent)
+            .tint(.orange)
+            .accessibilityIdentifier("startNudgeSprintButton")
+        }
+    }
 
     @ViewBuilder
     private func glassCardSection<Content: View>(
