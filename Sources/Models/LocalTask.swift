@@ -128,6 +128,19 @@ final class LocalTask {
     /// nil = no abort or no note provided.
     var progressNote: String?
 
+    // MARK: - Direct Scheduling (RW 3.1)
+
+    /// Date when this task is scheduled on the timeline (nil = not scheduled).
+    /// MUTUALLY EXCLUSIVE with assignedFocusBlockID — a task cannot be both
+    /// scheduled independently AND assigned to a FocusBlock.
+    var scheduledDate: Date?
+
+    /// Duration override for scheduled display in minutes (nil = use estimatedDuration or default 30).
+    var scheduledDuration: Int?
+
+    /// Whether this task is directly scheduled on the timeline (not via FocusBlock).
+    var isScheduled: Bool { scheduledDate != nil }
+
     /// Checks if setting `blockerID` as blocker of `taskID` would create a cycle.
     /// Walks the blocker chain from `blockerID` upward; if it reaches `taskID`, it's a cycle.
     static func wouldCreateCycle(settingBlocker blockerID: String, on taskID: String, allTasks: [LocalTask]) -> Bool {

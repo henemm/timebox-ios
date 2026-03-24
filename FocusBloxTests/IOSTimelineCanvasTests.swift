@@ -153,6 +153,8 @@ final class IOSTimelineCanvasTests: XCTestCase {
                         id: item.id, event: e,
                         column: index, totalColumns: group.count
                     ))
+                case .scheduledTask:
+                    break  // Not relevant for this test
                 }
             }
         }

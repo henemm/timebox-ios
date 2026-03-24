@@ -22,6 +22,7 @@ struct TimelineItem: Identifiable, Sendable {
     enum ItemType: Sendable {
         case event(CalendarEvent)
         case focusBlock(FocusBlock)
+        case scheduledTask(id: String, title: String)
     }
 
     init(event: CalendarEvent) {
@@ -36,6 +37,17 @@ struct TimelineItem: Identifiable, Sendable {
         self.startDate = block.startDate
         self.endDate = block.endDate
         self.type = .focusBlock(block)
+    }
+
+    /// Creates a TimelineItem from a scheduled LocalTask.
+    /// Uses scheduledDate as start and scheduledDate + duration as end.
+    init(scheduledTaskID: String, title: String, scheduledDate: Date, durationMinutes: Int) {
+        self.id = "scheduled_\(scheduledTaskID)"
+        self.startDate = scheduledDate
+        self.endDate = Calendar.current.date(
+            byAdding: .minute, value: durationMinutes, to: scheduledDate
+        ) ?? scheduledDate
+        self.type = .scheduledTask(id: scheduledTaskID, title: title)
     }
 
     init(id: String, startDate: Date, endDate: Date) {

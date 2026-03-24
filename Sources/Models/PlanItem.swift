@@ -63,6 +63,17 @@ struct PlanItem: Identifiable, Sendable {
     /// Lifecycle status: raw/refined/active
     let lifecycleStatus: String
 
+    // Direct Scheduling (RW 3.1)
+
+    /// Scheduled date on timeline (nil = not scheduled)
+    let scheduledDate: Date?
+
+    /// Scheduled duration override in minutes
+    let scheduledDuration: Int?
+
+    /// Whether this task is scheduled on the timeline
+    var isScheduled: Bool { scheduledDate != nil }
+
     // AI Suggestions (Refiner — RW 1.2/1.3)
     let suggestedCategory: String?
     let suggestedDuration: Int?
@@ -159,6 +170,9 @@ struct PlanItem: Identifiable, Sendable {
         self.blockerTaskID = nil
         self.lifecycleStatus = "active"  // Reminders are always active
 
+        self.scheduledDate = nil
+        self.scheduledDuration = nil
+
         self.suggestedCategory    = nil
         self.suggestedDuration    = nil
         self.suggestedImportance  = nil
@@ -214,6 +228,9 @@ struct PlanItem: Identifiable, Sendable {
         self.modifiedAt = localTask.modifiedAt
         self.blockerTaskID = localTask.blockerTaskID
         self.lifecycleStatus = localTask.lifecycleStatus
+
+        self.scheduledDate = localTask.scheduledDate
+        self.scheduledDuration = localTask.scheduledDuration
 
         self.suggestedCategory    = localTask.suggestedCategory
         self.suggestedDuration    = localTask.suggestedDuration
