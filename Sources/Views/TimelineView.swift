@@ -7,7 +7,8 @@ struct TimelineView: View {
     let onScheduleTask: ((PlanItemTransfer, Date) -> Void)?
     let onMoveEvent: ((CalendarEventTransfer, Date) -> Void)?
     let onEventTap: ((CalendarEvent) -> Void)?
-    let onScheduledTaskTap: ((String) -> Void)?
+    let onUnscheduleTask: ((String) -> Void)?
+    let onStartFocusSprint: ((String) -> Void)?
     let onRefresh: (() async -> Void)?
 
     private let hourHeight: CGFloat = 60
@@ -21,7 +22,8 @@ struct TimelineView: View {
         onScheduleTask: ((PlanItemTransfer, Date) -> Void)? = nil,
         onMoveEvent: ((CalendarEventTransfer, Date) -> Void)? = nil,
         onEventTap: ((CalendarEvent) -> Void)? = nil,
-        onScheduledTaskTap: ((String) -> Void)? = nil,
+        onUnscheduleTask: ((String) -> Void)? = nil,
+        onStartFocusSprint: ((String) -> Void)? = nil,
         onRefresh: (() async -> Void)? = nil
     ) {
         self.date = date
@@ -30,7 +32,8 @@ struct TimelineView: View {
         self.onScheduleTask = onScheduleTask
         self.onMoveEvent = onMoveEvent
         self.onEventTap = onEventTap
-        self.onScheduledTaskTap = onScheduledTaskTap
+        self.onUnscheduleTask = onUnscheduleTask
+        self.onStartFocusSprint = onStartFocusSprint
         self.onRefresh = onRefresh
     }
 
@@ -61,14 +64,9 @@ struct TimelineView: View {
                         )
                     }
 
-                    // Scheduled tasks overlay (RW_3.1b)
+                    // Scheduled tasks overlay (RW_3.1c)
                     ForEach(scheduledTasks) { item in
-                        ScheduledTaskOverlay(
-                            item: item,
-                            hourHeight: hourHeight,
-                            startHour: startHour,
-                            onTap: scheduledTaskTapHandler(for: item)
-                        )
+                        scheduledTaskView(for: item)
                     }
                 }
                 .padding(.top, 8)
@@ -85,60 +83,29 @@ struct TimelineView: View {
         events.filter { !$0.isAllDay }
     }
 
-    private func scheduledTaskTapHandler(for item: TimelineItem) -> (() -> Void)? {
-        guard let onTap = onScheduledTaskTap else { return nil }
-        if case .scheduledTask(let id, _) = item.type {
-            return { onTap(id) }
-        }
-        return nil
-    }
-}
+    @ViewBuilder
+    private func scheduledTaskView(for item: TimelineItem) -> some View {
+        if case .scheduledTask(let id, let title) = item.type {
+            let startMinutes = minutesSinceMidnight(item.startDate)
+            let endMinutes = minutesSinceMidnight(item.endDate)
+            let topOffset = CGFloat(startMinutes - startHour * 60) * hourHeight / 60
+            let height = max(CGFloat(endMinutes - startMinutes) * hourHeight / 60, 20)
 
-// MARK: - Scheduled Task Overlay (RW_3.1b)
-
-struct ScheduledTaskOverlay: View {
-    let item: TimelineItem
-    let hourHeight: CGFloat
-    let startHour: Int
-    let onTap: (() -> Void)?
-
-    private var taskTitle: String {
-        if case .scheduledTask(_, let title) = item.type { return title }
-        return ""
-    }
-
-    private var taskID: String {
-        if case .scheduledTask(let id, _) = item.type { return id }
-        return item.id
-    }
-
-    var body: some View {
-        let startMinutes = minutesSinceMidnight(item.startDate)
-        let endMinutes = minutesSinceMidnight(item.endDate)
-        let topOffset = CGFloat(startMinutes - startHour * 60) * hourHeight / 60
-        let height = max(CGFloat(endMinutes - startMinutes) * hourHeight / 60, 20)
-
-        HStack {
-            Spacer().frame(width: 53)
-            RoundedRectangle(cornerRadius: 8)
-                .fill(.orange.opacity(0.2))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 8)
-                        .strokeBorder(.orange, lineWidth: 1.5)
+            HStack {
+                Spacer().frame(width: 53)
+                ScheduledTaskBlock(
+                    taskID: id,
+                    title: title,
+                    startDate: item.startDate,
+                    endDate: item.endDate,
+                    onUnschedule: { onUnscheduleTask?(id) },
+                    onStartFocusSprint: onStartFocusSprint != nil ? { onStartFocusSprint?(id) } : nil
                 )
-                .overlay(alignment: .leading) {
-                    Text(taskTitle)
-                        .font(.caption.bold())
-                        .foregroundStyle(.orange)
-                        .lineLimit(1)
-                        .padding(.horizontal, 8)
-                }
                 .frame(height: height)
-                .accessibilityIdentifier("scheduledTaskBlock_\(taskID)")
-                .onTapGesture { onTap?() }
-            Spacer().frame(width: 16)
+                Spacer().frame(width: 16)
+            }
+            .offset(y: topOffset)
         }
-        .offset(y: topOffset)
     }
 
     private func minutesSinceMidnight(_ date: Date) -> Int {

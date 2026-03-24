@@ -18,8 +18,6 @@ struct BlockPlanningView: View {
     @State private var assignmentFeedback = false
     @State private var dropTargetTime: Date?
     @State private var scheduledTasks: [TimelineItem] = []
-    @State private var selectedScheduledTaskID: String?
-    @State private var showScheduledTaskActions = false
 
     private let hourHeight: CGFloat = 60
     private let startHour = 6
@@ -97,18 +95,6 @@ struct BlockPlanningView: View {
                 )
             }
             .sensoryFeedback(.success, trigger: assignmentFeedback)
-            .confirmationDialog(
-                "Geplanter Task",
-                isPresented: $showScheduledTaskActions,
-                titleVisibility: .visible
-            ) {
-                if let taskID = selectedScheduledTaskID {
-                    Button("Entplanen (zurück in Backlog)") {
-                        unscheduleTask(taskID)
-                    }
-                    Button("Abbrechen", role: .cancel) {}
-                }
-            }
             .sheet(item: $blockForTasks) { block in
                 FocusBlockTasksSheet(
                     block: block,
@@ -215,15 +201,13 @@ struct BlockPlanningView: View {
 
                     // Scheduled tasks (RW_3.1b)
                     ForEach(positionedScheduledTasks) { positioned in
-                        TimelineScheduledTaskRow(
+                        ScheduledTaskBlock(
                             taskID: positioned.taskID,
                             title: positioned.title,
                             startDate: positioned.startDate,
                             endDate: positioned.endDate,
-                            onTap: {
-                                selectedScheduledTaskID = positioned.taskID
-                                showScheduledTaskActions = true
-                            }
+                            onUnschedule: { unscheduleTask(positioned.taskID) },
+                            onStartFocusSprint: { startFocusSprint(positioned.taskID) }
                         )
                         .frame(maxHeight: .infinity)
                         .timelinePosition(
@@ -622,6 +606,22 @@ struct BlockPlanningView: View {
                 assignmentFeedback.toggle()
             } catch {
                 errorMessage = "Task konnte nicht entplant werden."
+            }
+        }
+    }
+
+    private func startFocusSprint(_ taskID: String) {
+        Task {
+            do {
+                _ = try FocusBlockActionService.startImmediate(
+                    taskID: taskID,
+                    eventKitRepo: eventKitRepo,
+                    modelContext: modelContext
+                )
+                await loadData()
+                assignmentFeedback.toggle()
+            } catch {
+                errorMessage = "Focus Sprint konnte nicht gestartet werden."
             }
         }
     }
@@ -1271,46 +1271,6 @@ struct TimelineEventRow: View {
             onTap()
         }
         .accessibilityIdentifier("timelineEvent_\(event.id)")
-    }
-}
-
-// MARK: - Scheduled Task Row (RW_3.1b)
-
-struct TimelineScheduledTaskRow: View {
-    let taskID: String
-    let title: String
-    let startDate: Date
-    let endDate: Date
-    let onTap: () -> Void
-
-    var body: some View {
-        HStack(spacing: 8) {
-            RoundedRectangle(cornerRadius: 2)
-                .fill(.orange)
-                .frame(width: 4)
-
-            VStack(alignment: .leading, spacing: 2) {
-                Text(title)
-                    .font(.subheadline.bold())
-                    .foregroundStyle(.orange)
-                    .lineLimit(1)
-            }
-
-            Spacer()
-        }
-        .padding(.vertical, 6)
-        .padding(.horizontal, 8)
-        .background(
-            RoundedRectangle(cornerRadius: 8)
-                .fill(.orange.opacity(0.1))
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: 8)
-                .strokeBorder(.orange.opacity(0.3), lineWidth: 1)
-        )
-        .contentShape(Rectangle())
-        .onTapGesture { onTap() }
-        .accessibilityIdentifier("scheduledTaskBlock_\(taskID)")
     }
 }
 

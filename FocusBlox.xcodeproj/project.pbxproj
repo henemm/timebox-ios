@@ -89,6 +89,7 @@
 		9E4DE0DFDA16F42B8D28D6CD /* ManualBlockCreationUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41F2A36E471937592F06F0C9 /* ManualBlockCreationUITests.swift */; };
 		9F1DC97AB13A71771934D083 /* DayProgressSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1CF56B22F7EC70EBA401ED8 /* DayProgressSection.swift */; };
 		9F846B980036BD136A9E4A27 /* EmotionalNudgeUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5C4410415E5DDF308F6F87A /* EmotionalNudgeUITests.swift */; };
+		RW31C001BUILD00001 /* ScheduledTaskBlockUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = RW31C001FILEREF001 /* ScheduledTaskBlockUITests.swift */; };
 		9F9185F5A9BD5A8CFF79DECA /* ErrorStateUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B596C16F99039490702E0B7 /* ErrorStateUITests.swift */; };
 		9FA22769CF0B14E779B904FA /* FocusBlockDropIndicatorUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC7B2E12D270CC49B824429F /* FocusBlockDropIndicatorUITests.swift */; };
 		A056E12CD65C0F6401860BDB /* CalendarEventTransfer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D1F03B35977548B59D7269F /* CalendarEventTransfer.swift */; };
@@ -219,6 +220,7 @@
 		E6DF69A28B0DB868B330DADD /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5F22CE94E29A523114817BF /* ContentView.swift */; };
 		E907CB03C20C1B55A48C4B1B /* BacklogRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92133F2683BB9B90566D7646 /* BacklogRow.swift */; };
 		E98A667A603886CE7A68D968 /* EventBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B77251F3B87AF26FD6473763 /* EventBlock.swift */; };
+		RW31C002BUILD00001 /* ScheduledTaskBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = RW31C002FILEREF001 /* ScheduledTaskBlock.swift */; };
 		EA6560340794C06D21D9CD85 /* PlanningView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8537E6312F33871F310A843F /* PlanningView.swift */; };
 		ED4DB7732BC3C933CBA5B55A /* TaskCompletionUndoService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 233B665A0DF1A421C1CDF80A /* TaskCompletionUndoService.swift */; };
 		EDE19804EA6D5CB9BCCB6981 /* CalendarSelectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1CCA00FEA15FD7BA149CDDE /* CalendarSelectionTests.swift */; };
@@ -688,6 +690,7 @@
 		A36E40124EBA31D7428EAA80 /* DailyReviewView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DailyReviewView.swift; sourceTree = "<group>"; };
 		A5A1455FAAF026662CA2846F /* FocusSprintUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FocusSprintUITests.swift; path = FocusBloxUITests/FocusSprintUITests.swift; sourceTree = SOURCE_ROOT; };
 		A5C4410415E5DDF308F6F87A /* EmotionalNudgeUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = EmotionalNudgeUITests.swift; sourceTree = "<group>"; };
+		RW31C001FILEREF001 /* ScheduledTaskBlockUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduledTaskBlockUITests.swift; sourceTree = "<group>"; };
 		AB1AD4FECCC4DD0F13D886B5 /* ITB_G_SiriTipUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ITB_G_SiriTipUITests.swift; sourceTree = "<group>"; };
 		AC217D1BAA414B7974854ECE /* TagRedesignUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TagRedesignUITests.swift; sourceTree = "<group>"; };
 		'AISCORE01FILE00001' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AITaskScoringServiceTests.swift; sourceTree = "<group>"; };
@@ -701,6 +704,7 @@
 		B31CB18EF0C80E62953F34D6 /* SprintReviewSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SprintReviewSheet.swift; sourceTree = "<group>"; };
 		B713F2CFF3AC8221977A1D96 /* EmotionalNudgeServiceTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = EmotionalNudgeServiceTests.swift; sourceTree = "<group>"; };
 		B77251F3B87AF26FD6473763 /* EventBlock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventBlock.swift; sourceTree = "<group>"; };
+		RW31C002FILEREF001 /* ScheduledTaskBlock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduledTaskBlock.swift; sourceTree = "<group>"; };
 		B7A1604A2F4AD5F5001FD20C /* FocusBloxShareExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = FocusBloxShareExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		B7A16CD02F1FE3BC00165284 /* FocusBloxWidgetsExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = FocusBloxWidgetsExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		B7A16CD22F1FE3BC00165284 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
@@ -1189,6 +1193,7 @@
 				LCST02FILEREF00001,
 				BBEBA20D99CFA97B16E3B26F /* NotificationMigrationPhaseCUITests.swift */,
 				A5C4410415E5DDF308F6F87A /* EmotionalNudgeUITests.swift */,
+				RW31C001FILEREF001 /* ScheduledTaskBlockUITests.swift */,
 			);
 			path = FocusBloxUITests;
 			sourceTree = "<group>";
@@ -1293,6 +1298,7 @@
 				QKEDIT04FILE00001,
 				TAGINP01FILEREF0001,
 				B77251F3B87AF26FD6473763 /* EventBlock.swift */,
+				RW31C002FILEREF001 /* ScheduledTaskBlock.swift */,
 				710817B02FE720EDA21132FA /* FocusLiveView.swift */,
 				821E6E3E951900DF99190196 /* HourRow.swift */,
 				4383C656C07E4B4F56335921 /* MainTabView.swift */,
@@ -2167,6 +2173,7 @@
 				QKEDIT04BUILD0001,
 				TAGINP01BUILD000001,
 				E98A667A603886CE7A68D968 /* EventBlock.swift in Sources */,
+				RW31C002BUILD00001 /* ScheduledTaskBlock.swift in Sources */,
 				C3F49C8B0CD3C6552054BE7D /* EventKitRepository.swift in Sources */,
 				APPSET01BUILDFILE0001,
 				SYNSET02BUILD0001,
@@ -2368,6 +2375,7 @@
 				FDB14640BC5B478303608792 /* FocusSprintUITests.swift in Sources */,
 				642E6B2948BD87B6F9B80FE9 /* NotificationMigrationPhaseCUITests.swift in Sources */,
 				9F846B980036BD136A9E4A27 /* EmotionalNudgeUITests.swift in Sources */,
+				RW31C001BUILD00001 /* ScheduledTaskBlockUITests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

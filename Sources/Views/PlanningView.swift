@@ -14,8 +14,7 @@ struct PlanningView: View {
     @State private var scheduleFeedback = false
     @State private var selectedEvent: CalendarEvent?
     @State private var showEventActions = false
-    @State private var selectedScheduledTaskID: String?
-    @State private var showScheduledTaskActions = false
+    @State private var focusSprintFeedback = false
 
     var body: some View {
         NavigationStack {
@@ -56,9 +55,11 @@ struct PlanningView: View {
                             selectedEvent = event
                             showEventActions = true
                         },
-                        onScheduledTaskTap: { taskID in
-                            selectedScheduledTaskID = taskID
-                            showScheduledTaskActions = true
+                        onUnscheduleTask: { taskID in
+                            unscheduleTask(taskID)
+                        },
+                        onStartFocusSprint: { taskID in
+                            startFocusSprint(taskID)
                         },
                         onRefresh: loadData
                     )
@@ -99,18 +100,7 @@ struct PlanningView: View {
                     Button("Abbrechen", role: .cancel) {}
                 }
             }
-            .confirmationDialog(
-                "Geplanter Task",
-                isPresented: $showScheduledTaskActions,
-                titleVisibility: .visible
-            ) {
-                if let taskID = selectedScheduledTaskID {
-                    Button("Entplanen (zurück in Backlog)") {
-                        unscheduleTask(taskID)
-                    }
-                    Button("Abbrechen", role: .cancel) {}
-                }
-            }
+            .sensoryFeedback(.success, trigger: focusSprintFeedback)
         }
         .task {
             await loadData()
@@ -234,6 +224,22 @@ struct PlanningView: View {
                 scheduleFeedback.toggle()
             } catch {
                 errorMessage = "Event konnte nicht gelöscht werden."
+            }
+        }
+    }
+
+    private func startFocusSprint(_ taskID: String) {
+        Task {
+            do {
+                _ = try FocusBlockActionService.startImmediate(
+                    taskID: taskID,
+                    eventKitRepo: eventKitRepo,
+                    modelContext: modelContext
+                )
+                await loadData()
+                focusSprintFeedback.toggle()
+            } catch {
+                errorMessage = "Focus Sprint konnte nicht gestartet werden."
             }
         }
     }
