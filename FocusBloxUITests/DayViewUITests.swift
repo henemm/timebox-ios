@@ -133,6 +133,35 @@ final class DayViewUITests: XCTestCase {
         )
     }
 
+    /// Verhalten: Im Morgen-Modus ohne Events/Tasks zeigt die DayView einen Empty-State
+    /// Bricht wenn: morningContent nicht den ContentUnavailableView rendert bei leeren Daten
+    func test_morningMode_showsEmptyState() throws {
+        app = XCUIApplication()
+        app.launchArguments = ["-UITesting", "-morningEndHour", "24", "--empty-morning"]
+        app.launch()
+
+        let tagTab = app.tabBars.buttons["Tag"]
+        XCTAssertTrue(tagTab.waitForExistence(timeout: 5))
+        tagTab.tap()
+
+        // Empty State: "Keine Vorschlaege" + "Plan deinen Tag selbst" (DayView.swift:82-86)
+        let emptyTitle = app.staticTexts["Keine Vorschlaege"]
+        XCTAssertTrue(
+            emptyTitle.waitForExistence(timeout: 5),
+            "Morgen-Modus ohne Events sollte 'Keine Vorschlaege' anzeigen"
+        )
+
+        let emptyDescription = app.staticTexts["Plan deinen Tag selbst"]
+        XCTAssertTrue(
+            emptyDescription.exists,
+            "Empty-State sollte 'Plan deinen Tag selbst' als Beschreibung zeigen"
+        )
+
+        // Kalender-Sektionen duerfen NICHT erscheinen
+        let termine = app.staticTexts["Termine"]
+        XCTAssertFalse(termine.exists, "Keine 'Termine'-Sektion bei leerem Kalender")
+    }
+
     /// Verhalten: Im Morgen-Modus zeigt die DayView freie Zeitluecken (GapFinder)
     /// Bricht wenn: GapFinder nicht aufgerufen oder freeSlots-Sektion nicht gerendert wird
     func test_morningMode_showsFreeTimeSlots() throws {

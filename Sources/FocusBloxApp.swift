@@ -88,7 +88,8 @@ struct FocusBloxApp: App {
             // Seed mock data BEFORE any view loads
             // Fixes race condition: child .task fires before parent .onAppear,
             // so FocusLiveView.loadData() would find empty store if seeded in .onAppear
-            if isUITesting {
+            // --empty-morning: Skip seeding to test empty state in DayView morning mode
+            if isUITesting && !ProcessInfo.processInfo.arguments.contains("--empty-morning") {
                 FocusBloxApp.seedUITestData(into: container.mainContext)
             }
 
@@ -160,10 +161,12 @@ struct FocusBloxApp: App {
                 completedTaskIDs: []
             )
 
-            if ProcessInfo.processInfo.arguments.contains("--no-active-block") {
-                mock.mockFocusBlocks = [focusBlock1, focusBlock2, unalignedBlock]
-            } else {
-                mock.mockFocusBlocks = [focusBlock1, focusBlock2, activeBlock, unalignedBlock]
+            if !ProcessInfo.processInfo.arguments.contains("--empty-morning") {
+                if ProcessInfo.processInfo.arguments.contains("--no-active-block") {
+                    mock.mockFocusBlocks = [focusBlock1, focusBlock2, unalignedBlock]
+                } else {
+                    mock.mockFocusBlocks = [focusBlock1, focusBlock2, activeBlock, unalignedBlock]
+                }
             }
 
             // Add mock Calendar Events for timeline testing
@@ -218,7 +221,13 @@ struct FocusBloxApp: App {
                 notes: nil
             )
 
-            mock.mockEvents = [meeting1, meeting2, workshop, longEvent]
+            // --empty-morning: Leere Events/FocusBlocks fuer Empty-State-Test
+            if ProcessInfo.processInfo.arguments.contains("--empty-morning") {
+                mock.mockEvents = []
+                mock.mockFocusBlocks = []
+            } else {
+                mock.mockEvents = [meeting1, meeting2, workshop, longEvent]
+            }
 
             // Add mock Reminders for testing Reminders Sync
             // List IDs for filtering
