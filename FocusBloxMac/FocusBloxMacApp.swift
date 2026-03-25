@@ -452,13 +452,21 @@ enum MacModelContainer {
 
     static func create() throws -> ModelContainer {
         let schema = Schema([LocalTask.self, TaskMetadata.self])
+        let hasICloud = FileManager.default.ubiquityIdentityToken != nil
 
         let appGroupURL = FileManager.default.containerURL(
             forSecurityApplicationGroupIdentifier: appGroupID
         )
 
         let config: ModelConfiguration
-        if appGroupURL != nil {
+        if !hasICloud {
+            print("[CloudKit] macOS: Kein iCloud-Account — lokaler Speicher ohne CloudKit")
+            config = ModelConfiguration(
+                schema: schema,
+                isStoredInMemoryOnly: false,
+                cloudKitDatabase: .none
+            )
+        } else if appGroupURL != nil {
             print("[CloudKit] macOS: App Group verfuegbar, CloudKit .private(iCloud.com.henning.focusblox)")
             config = ModelConfiguration(
                 schema: schema,

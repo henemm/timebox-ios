@@ -50,12 +50,20 @@ struct FocusBloxApp: App {
         ])
 
         let isUITesting = ProcessInfo.processInfo.arguments.contains("-UITesting")
+        let hasICloud = FileManager.default.ubiquityIdentityToken != nil
 
         let modelConfiguration: ModelConfiguration
         if isUITesting {
             modelConfiguration = ModelConfiguration(
                 schema: schema,
                 isStoredInMemoryOnly: true,
+                cloudKitDatabase: .none
+            )
+        } else if !hasICloud {
+            print("[CloudKit] iOS: Kein iCloud-Account — lokaler Speicher ohne CloudKit")
+            modelConfiguration = ModelConfiguration(
+                schema: schema,
+                isStoredInMemoryOnly: false,
                 cloudKitDatabase: .none
             )
         } else if FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: appGroupID) != nil {

@@ -1,0 +1,33 @@
+# TDD RED Assessment: bug-cloudkit-crash
+
+## Warum kein separater Test
+
+Der Bug ist ein SIGTRAP-Crash bei CloudKit-Initialisierung (Zeile 78 in FocusBloxApp.swift).
+
+- **Kein Unit Test möglich:** ModelContainer-Init ist eine static lazy property. Der SIGTRAP 
+  passiert VOR jeglichem Swift-Code und ist nicht mit try/catch abfangbar.
+- **Kein UI Test möglich:** UI Tests laufen mit -UITesting Flag (cloudKitDatabase: .none).
+  Ohne dieses Flag würde der Test den CloudKit-Crash reproduzieren statt zu testen.
+
+## Verifizierungsstrategie
+
+1. VOR Fix: ./scripts/sim.sh launch → App crasht (Crash Report in DiagnosticReports)
+2. NACH Fix: ./scripts/sim.sh launch → App startet und zeigt UI
+3. Screenshot als Beweis
+
+## Bestehende Tests
+
+Die bestehenden DayViewUITests (mit -UITesting) stellen sicher dass der In-Memory-Pfad 
+weiterhin funktioniert. Der Fix fügt nur eine Guard-Prüfung VOR dem CloudKit-Pfad hinzu.
+
+## RED-Nachweis
+
+Der Bug SELBST ist der RED-Zustand: App crasht bei jedem normalen Start.
+Crash Reports:
+- FocusBlox-2026-03-25-063541.ips
+- FocusBlox-2026-03-25-063601.ips  
+- FocusBlox-2026-03-25-063758.ips
+- FocusBlox-2026-03-25-065204.ips
+- FocusBlox-2026-03-25-065404.ips
+- FocusBlox-2026-03-25-070405.ips
+
