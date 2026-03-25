@@ -70,13 +70,13 @@ final class FocusBloxMacUITests: XCTestCase {
         let taskTitle = "UI Test Task \(Int.random(in: 1000...9999))"
         titleField.typeText(taskTitle)
 
-        // macOS: Button via Label finden (accessibilityIdentifier nicht immer zuverlaessig in Sheets)
-        let createButton = app.buttons["Erstellen"].firstMatch
-        XCTAssertTrue(createButton.waitForExistence(timeout: 3), "Erstellen-Button muss existieren")
+        // macOS: Button via Label finden (TaskFormSheet uses toolbar confirmationAction)
+        let createButton = app.buttons["Speichern"].firstMatch
+        XCTAssertTrue(createButton.waitForExistence(timeout: 3), "Speichern-Button muss existieren")
         createButton.click()
 
         // Sheet muss geschlossen sein
-        XCTAssertFalse(sheet.waitForExistence(timeout: 3), "Sheet sollte nach Erstellen geschlossen sein")
+        XCTAssertFalse(sheet.waitForExistence(timeout: 3), "Sheet sollte nach Speichern geschlossen sein")
 
         // Task sollte in der Liste erscheinen
         let taskInList = app.staticTexts[taskTitle]

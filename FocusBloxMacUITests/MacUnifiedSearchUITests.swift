@@ -60,7 +60,7 @@ final class MacUnifiedSearchUITests: XCTestCase {
         )
     }
 
-    /// Klick auf (+) oeffnet MacTaskCreateSheet.
+    /// Klick auf (+) oeffnet TaskFormSheet (shared Rich Edit Dialog).
     @MainActor
     func testAddTaskButtonOpensFormSheet() throws {
         let addButton = app.buttons["macAddTaskButton"].firstMatch
@@ -68,11 +68,11 @@ final class MacUnifiedSearchUITests: XCTestCase {
 
         addButton.click()
 
-        // MacTaskCreateSheet hat accessibilityIdentifier "taskFormScrollView"
+        // TaskFormSheet hat accessibilityIdentifier "taskFormScrollView"
         let formSheet = app.windows.sheets.firstMatch
         XCTAssertTrue(
             formSheet.waitForExistence(timeout: 5),
-            "FEATURE_023: MacTaskCreateSheet muss sich nach Klick auf (+) oeffnen"
+            "TaskFormSheet muss sich nach Klick auf (+) oeffnen"
         )
     }
 

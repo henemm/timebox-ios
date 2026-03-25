@@ -225,6 +225,7 @@
 		E907CB03C20C1B55A48C4B1B /* BacklogRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92133F2683BB9B90566D7646 /* BacklogRow.swift */; };
 		E98A667A603886CE7A68D968 /* EventBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B77251F3B87AF26FD6473763 /* EventBlock.swift */; };
 		RW31C002BUILD00001 /* ScheduledTaskBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = RW31C002FILEREF001 /* ScheduledTaskBlock.swift */; };
+		RW31C002BUILD00002 /* ScheduledTaskBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = RW31C002FILEREF001 /* ScheduledTaskBlock.swift */; };
 		EA6560340794C06D21D9CD85 /* PlanningView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8537E6312F33871F310A843F /* PlanningView.swift */; };
 		ED4DB7732BC3C933CBA5B55A /* TaskCompletionUndoService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 233B665A0DF1A421C1CDF80A /* TaskCompletionUndoService.swift */; };
 		EDE19804EA6D5CB9BCCB6981 /* CalendarSelectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1CCA00FEA15FD7BA149CDDE /* CalendarSelectionTests.swift */; };
@@ -2627,6 +2628,7 @@
 				767B31C6347E419FD1A9F9E4 /* EmotionalNudgeService.swift in Sources */,
 				TASKFORM02BUILD0002,
 				CREATETV02BUILD0001,
+				RW31C002BUILD00002,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

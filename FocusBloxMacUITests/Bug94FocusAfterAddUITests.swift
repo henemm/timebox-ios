@@ -53,9 +53,9 @@ final class Bug94FocusAfterAddUITests: XCTestCase {
         let taskTitle = "[TEST] Bug94 \(Int.random(in: 1000...9999))"
         titleField.typeText(taskTitle)
 
-        // Erstellen-Button klicken
-        let createButton = app.buttons["Erstellen"].firstMatch
-        XCTAssertTrue(createButton.waitForExistence(timeout: 3), "Erstellen-Button muss existieren")
+        // Speichern-Button klicken (TaskFormSheet uses toolbar confirmationAction)
+        let createButton = app.buttons["Speichern"].firstMatch
+        XCTAssertTrue(createButton.waitForExistence(timeout: 3), "Speichern-Button muss existieren")
         createButton.click()
 
         // Task muss in der Liste erscheinen

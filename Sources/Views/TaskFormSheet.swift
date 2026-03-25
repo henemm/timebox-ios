@@ -556,9 +556,11 @@ struct TaskFormSheet: View {
                     )
 
                     // ITB-G1: Donate intent so Siri learns task creation patterns
+                    #if !os(macOS)
                     let donationIntent = CreateTaskIntent()
                     donationIntent.taskTitle = newTask.title
                     try? await IntentDonationManager.shared.donate(intent: donationIntent)
+                    #endif
                 } catch {
                     print("[TaskFormSheet] Create task failed: \(error)")
                 }
