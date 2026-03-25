@@ -71,12 +71,83 @@ final class DayViewUITests: XCTestCase {
         XCTAssertTrue(tagTab.waitForExistence(timeout: 5))
         tagTab.tap()
 
-        // Mindestens ein Platzhalter-Text muss sichtbar sein
-        let hasPlaceholder =
-            app.staticTexts["Kalender-Uebersicht kommt bald"].waitForExistence(timeout: 3) ||
-            app.staticTexts["Timeline kommt bald"].exists ||
-            app.staticTexts["Reflexion kommt bald"].exists
+        // Daytime/Evening zeigen weiterhin Platzhalter, Morning zeigt echten Content
+        // Dieser Test akzeptiert beides (zeitunabhaengig)
+        let hasMorningContent = app.staticTexts["Team Meeting"].waitForExistence(timeout: 5)
+        let hasDaytimePlaceholder = app.staticTexts["Timeline kommt bald"].exists
+        let hasEveningPlaceholder = app.staticTexts["Reflexion kommt bald"].exists
 
-        XCTAssertTrue(hasPlaceholder, "DayView sollte einen Platzhalter-Text fuer die aktuelle Phase zeigen")
+        XCTAssertTrue(
+            hasMorningContent || hasDaytimePlaceholder || hasEveningPlaceholder,
+            "DayView sollte Content zeigen: Morning=Kalender-Events, Daytime/Evening=Platzhalter"
+        )
+    }
+
+    // MARK: - Morning Mode Content (RW_2.1b)
+
+    /// Helper: App im erzwungenen Morgen-Modus starten
+    private func launchInMorningMode() {
+        app = XCUIApplication()
+        app.launchArguments = ["-UITesting", "-morningEndHour", "24"]
+        app.launch()
+    }
+
+    /// Verhalten: Im Morgen-Modus zeigt die DayView echte Kalender-Events statt Platzhalter
+    /// Bricht wenn: loadMorningData() nicht aufgerufen wird oder morningContent keine Events-Sektion rendert
+    func test_morningMode_showsCalendarEvents() throws {
+        launchInMorningMode()
+
+        let tagTab = app.tabBars.buttons["Tag"]
+        XCTAssertTrue(tagTab.waitForExistence(timeout: 5))
+        tagTab.tap()
+
+        // Mock-Daten enthalten "Team Meeting" (08:00-08:30) — muss im Morgen-Modus sichtbar sein
+        let teamMeeting = app.staticTexts["Team Meeting"]
+        XCTAssertTrue(
+            teamMeeting.waitForExistence(timeout: 5),
+            "Morgen-Modus sollte Kalender-Events anzeigen (z.B. 'Team Meeting')"
+        )
+
+        // Alter Platzhalter-Text darf NICHT mehr erscheinen
+        let placeholder = app.staticTexts["Kalender-Uebersicht kommt bald"]
+        XCTAssertFalse(
+            placeholder.exists,
+            "Morgen-Modus sollte keinen Platzhalter mehr zeigen"
+        )
+    }
+
+    /// Verhalten: Im Morgen-Modus zeigt die DayView "Next Up" Tasks
+    /// Bricht wenn: SyncEngine.sync() nicht aufgerufen oder nextUpTasks nicht gefiltert/gerendert werden
+    func test_morningMode_showsNextUpTasks() throws {
+        launchInMorningMode()
+
+        let tagTab = app.tabBars.buttons["Tag"]
+        XCTAssertTrue(tagTab.waitForExistence(timeout: 5))
+        tagTab.tap()
+
+        // Mock-Daten enthalten "[MOCK] Task 1 #30min" mit isNextUp=true
+        let nextUpTask = app.staticTexts["[MOCK] Task 1 #30min"]
+        XCTAssertTrue(
+            nextUpTask.waitForExistence(timeout: 5),
+            "Morgen-Modus sollte Next-Up Tasks anzeigen"
+        )
+    }
+
+    /// Verhalten: Im Morgen-Modus zeigt die DayView freie Zeitluecken (GapFinder)
+    /// Bricht wenn: GapFinder nicht aufgerufen oder freeSlots-Sektion nicht gerendert wird
+    func test_morningMode_showsFreeTimeSlots() throws {
+        launchInMorningMode()
+
+        let tagTab = app.tabBars.buttons["Tag"]
+        XCTAssertTrue(tagTab.waitForExistence(timeout: 5))
+        tagTab.tap()
+
+        // GapFinder berechnet Luecken zwischen Mock-Events/FocusBlocks.
+        // Die Sektion "Freie Luecken" muss sichtbar sein mit mindestens einem Slot.
+        let gapsSection = app.staticTexts["Freie Luecken"]
+        XCTAssertTrue(
+            gapsSection.waitForExistence(timeout: 5),
+            "Morgen-Modus sollte eine 'Freie Luecken'-Sektion anzeigen"
+        )
     }
 }

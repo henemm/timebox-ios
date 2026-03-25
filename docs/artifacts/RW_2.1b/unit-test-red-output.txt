@@ -1,0 +1,21 @@
+RW_2.1b Unit Test Assessment
+=============================
+
+No new unit tests needed for RW_2.1b (Morning Mode).
+
+Reason: No new business logic. All services already unit-tested:
+- GapFinder.findFreeSlots() → GapFinderTests (16 tests)
+- DayPhase.from() → DayPhaseTests (11 tests)
+- SyncEngine.sync() → SyncEngineTests (22 tests)
+- PlanItem.isNextUp/isActionable → NextUpTests (11 tests)
+
+New code is pure view wiring:
+- loadMorningData() calls existing services
+- morningContent renders results
+- Filter: allTasks.filter { $0.isNextUp && !$0.isCompleted && $0.isActionable }
+  (trivial composition of existing tested properties)
+
+UI Tests cover the behavior:
+- test_morningMode_showsCalendarEvents → FAILED (RED)
+- test_morningMode_showsNextUpTasks → FAILED (RED)
+- test_morningMode_showsFreeTimeSlots → FAILED (RED)
