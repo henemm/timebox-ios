@@ -71,15 +71,15 @@ final class DayViewUITests: XCTestCase {
         XCTAssertTrue(tagTab.waitForExistence(timeout: 5))
         tagTab.tap()
 
-        // Daytime/Evening zeigen weiterhin Platzhalter, Morning zeigt echten Content
-        // Dieser Test akzeptiert beides (zeitunabhaengig)
+        // Morning zeigt Kalender-Events, Daytime zeigt Timeline, Evening zeigt Platzhalter
+        // Dieser Test akzeptiert alle drei (zeitunabhaengig)
         let hasMorningContent = app.staticTexts["Team Meeting"].waitForExistence(timeout: 5)
-        let hasDaytimePlaceholder = app.staticTexts["Timeline kommt bald"].exists
+        let hasDaytimeTimeline = app.staticTexts["08:00"].exists
         let hasEveningPlaceholder = app.staticTexts["Reflexion kommt bald"].exists
 
         XCTAssertTrue(
-            hasMorningContent || hasDaytimePlaceholder || hasEveningPlaceholder,
-            "DayView sollte Content zeigen: Morning=Kalender-Events, Daytime/Evening=Platzhalter"
+            hasMorningContent || hasDaytimeTimeline || hasEveningPlaceholder,
+            "DayView sollte Content zeigen: Morning=Events, Daytime=Timeline, Evening=Platzhalter"
         )
     }
 
@@ -177,6 +177,100 @@ final class DayViewUITests: XCTestCase {
         XCTAssertTrue(
             gapsSection.waitForExistence(timeout: 5),
             "Morgen-Modus sollte eine 'Freie Luecken'-Sektion anzeigen"
+        )
+    }
+
+    // MARK: - Daytime Mode Content (RW_2.1c)
+
+    /// Helper: App im erzwungenen Daytime-Modus starten
+    /// morningEndHour=0 → Morning ist sofort vorbei
+    /// eveningStartHour=24 → Evening beginnt nie
+    private func launchInDaytimeMode() {
+        app = XCUIApplication()
+        app.launchArguments = ["-UITesting", "-morningEndHour", "0", "-eveningStartHour", "24"]
+        app.launch()
+    }
+
+    /// Helper: Zum Tag-Tab navigieren
+    private func navigateToDayTab() {
+        let tagTab = app.tabBars.buttons["Tag"]
+        XCTAssertTrue(tagTab.waitForExistence(timeout: 5), "Tag-Tab muss existieren")
+        tagTab.tap()
+    }
+
+    /// Verhalten: Im Daytime-Modus zeigt die DayView eine Timeline mit Stunden-Labels (06:00, 07:00, ...)
+    /// Bricht wenn: daytimeContent nicht TimelineView rendert sondern weiterhin den Placeholder zeigt
+    func test_daytimeMode_showsTimeline() throws {
+        launchInDaytimeMode()
+        navigateToDayTab()
+
+        // TimelineView rendert Stunden-Labels wie "08:00", "12:00" etc.
+        // Wenn diese sichtbar sind, ist die Timeline aktiv (nicht der Placeholder)
+        let hourLabel = app.staticTexts["08:00"]
+        XCTAssertTrue(
+            hourLabel.waitForExistence(timeout: 5),
+            "Daytime-Modus sollte Timeline mit Stunden-Labels zeigen (z.B. '08:00')"
+        )
+
+        // Alter Placeholder-Text darf NICHT mehr erscheinen
+        let placeholder = app.staticTexts["Timeline kommt bald"]
+        XCTAssertFalse(
+            placeholder.exists,
+            "Daytime-Modus sollte keinen Platzhalter mehr zeigen"
+        )
+    }
+
+    /// Verhalten: Im Daytime-Modus zeigt die Timeline Kalender-Events als Bloecke
+    /// Bricht wenn: loadDaytimeData() keine Events laedt oder events nicht an TimelineView uebergeben werden
+    func test_daytimeMode_showsCalendarEvents() throws {
+        launchInDaytimeMode()
+        navigateToDayTab()
+
+        // Mock-Events: "Team Meeting" (08:00), "Lunch Meeting" (12:00), "Workshop" (16:00)
+        // EventBlock rendert den Titel als StaticText
+        let lunchMeeting = app.staticTexts["Lunch Meeting"]
+        XCTAssertTrue(
+            lunchMeeting.waitForExistence(timeout: 5),
+            "Daytime-Timeline sollte Kalender-Events anzeigen (z.B. 'Lunch Meeting')"
+        )
+    }
+
+    /// Verhalten: Im Daytime-Modus zeigt die Timeline geplante Tasks als orange Bloecke
+    /// Bricht wenn: scheduledTasks nicht aus SyncEngine geladen oder nicht als TimelineItem gemappt werden
+    func test_daytimeMode_showsScheduledTasks() throws {
+        launchInDaytimeMode()
+        navigateToDayTab()
+
+        // Mock-Daten enthalten "[MOCK] Scheduled: Bericht schreiben" um 11:00, 45min
+        // ScheduledTaskBlock hat accessibilityIdentifier "scheduledTaskBlock_<id>"
+        // Wir suchen nach dem Titel-Text
+        let scheduledTask = app.staticTexts["[MOCK] Scheduled: Bericht schreiben"]
+        XCTAssertTrue(
+            scheduledTask.waitForExistence(timeout: 5),
+            "Daytime-Timeline sollte geplante Tasks anzeigen"
+        )
+    }
+
+    /// Verhalten: Im Daytime-Modus ohne Events/Tasks zeigt die DayView einen Empty-State
+    /// Bricht wenn: daytimeContent nicht den ContentUnavailableView rendert bei leeren Daten
+    func test_daytimeMode_showsEmptyState() throws {
+        app = XCUIApplication()
+        app.launchArguments = ["-UITesting", "-morningEndHour", "0", "-eveningStartHour", "24", "--empty-morning"]
+        app.launch()
+        navigateToDayTab()
+
+        // Empty State: "Keine Termine" + "Dein Tag ist frei"
+        let emptyTitle = app.staticTexts["Keine Termine"]
+        XCTAssertTrue(
+            emptyTitle.waitForExistence(timeout: 5),
+            "Daytime-Modus ohne Events sollte 'Keine Termine' anzeigen"
+        )
+
+        // Timeline-Elemente duerfen NICHT erscheinen
+        let hourLabel = app.staticTexts["08:00"]
+        XCTAssertFalse(
+            hourLabel.exists,
+            "Empty-State sollte keine Timeline-Stunden zeigen"
         )
     }
 }

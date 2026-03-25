@@ -32,6 +32,7 @@ struct DayView: View {
     @State private var focusBlocks: [FocusBlock] = []
     @State private var nextUpTasks: [PlanItem] = []
     @State private var freeSlots: [TimeSlot] = []
+    @State private var scheduledTasks: [TimelineItem] = []
     @State private var isLoading = false
     @State private var isPermissionDenied = false
 
@@ -46,7 +47,11 @@ struct DayView: View {
                 .navigationTitle(navigationTitle)
         }
         .task {
-            if phase == .morning { await loadMorningData() }
+            switch phase {
+            case .morning: await loadMorningData()
+            case .daytime: await loadDaytimeData()
+            case .evening: break
+            }
         }
     }
 
@@ -56,17 +61,45 @@ struct DayView: View {
         case .morning:
             morningContent
         case .daytime:
-            ContentUnavailableView(
-                "Dein Tag",
-                systemImage: "sun.max",
-                description: Text("Timeline kommt bald")
-            )
+            daytimeContent
         case .evening:
             ContentUnavailableView(
                 "Tagesrueckblick",
                 systemImage: "moon.stars",
                 description: Text("Reflexion kommt bald")
             )
+        }
+    }
+
+    // MARK: - Daytime Content
+
+    @ViewBuilder
+    private var daytimeContent: some View {
+        if isLoading {
+            ProgressView("Lade Timeline...")
+        } else if isPermissionDenied {
+            permissionDeniedContent
+        } else if calendarEvents.isEmpty && scheduledTasks.isEmpty {
+            ContentUnavailableView(
+                "Keine Termine",
+                systemImage: "calendar",
+                description: Text("Dein Tag ist frei")
+            )
+        } else {
+            #if os(iOS)
+            TimelineView(
+                date: Date(),
+                events: calendarEvents,
+                scheduledTasks: scheduledTasks,
+                onRefresh: { await loadDaytimeData() }
+            )
+            #else
+            ContentUnavailableView(
+                "Dein Tag",
+                systemImage: "sun.max",
+                description: Text("Timeline kommt bald")
+            )
+            #endif
         }
     }
 
@@ -206,6 +239,46 @@ struct DayView: View {
         } catch {
             // Silently fail — view shows empty state
         }
+    }
+
+    private func loadDaytimeData() async {
+        isLoading = true
+        defer { isLoading = false }
+
+        do {
+            let hasAccess = try await eventKitRepo.requestAccess()
+            guard hasAccess else {
+                isPermissionDenied = true
+                return
+            }
+            calendarEvents = try eventKitRepo.fetchCalendarEvents(for: Date())
+            focusBlocks = try eventKitRepo.fetchFocusBlocks(for: Date())
+
+            let taskSource = LocalTaskSource(modelContext: modelContext)
+            let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
+            let allTasks = try await syncEngine.sync()
+
+            scheduledTasks = Self.scheduledTimelineItems(from: allTasks, for: Date())
+        } catch {
+            // Silently fail — view shows empty state
+        }
+    }
+
+    // MARK: - Data Mapping
+
+    /// Filters scheduled tasks for a given date and maps them to TimelineItems.
+    /// Extracted for unit testability.
+    static func scheduledTimelineItems(from tasks: [PlanItem], for date: Date) -> [TimelineItem] {
+        tasks
+            .filter { $0.isScheduled && Calendar.current.isDate($0.scheduledDate!, inSameDayAs: date) }
+            .map { task in
+                TimelineItem(
+                    scheduledTaskID: task.id,
+                    title: task.title,
+                    scheduledDate: task.scheduledDate!,
+                    durationMinutes: task.scheduledDuration ?? task.estimatedDuration ?? 30
+                )
+            }
     }
 
     // MARK: - Navigation

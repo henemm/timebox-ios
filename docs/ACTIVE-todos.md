@@ -33,7 +33,7 @@
 | ~~RW_3.4~~ | ~~3 Ausfuehrung~~ | ~~Emotional Nudge (Micro-Tasks)~~ | ~~Medium~~ | ~~M~~ | ~~Eigene View~~ | ~~[Spec](specs/rework/3.4-emotional-nudge-impl.md)~~ ERLEDIGT → [Archiv](ARCHIVE-todos.md) |
 | ~~RW_2.1a~~ | ~~2 Tagesplanung~~ | ~~DayView — Phase A: Grundstruktur + Modi-Wechsel + Tab/Sidebar + Settings~~ | ~~Medium~~ | ~~M~~ | ~~Eigene View~~ | ~~[Spec](specs/rework/2.1a-day-view-skeleton.md)~~ ERLEDIGT |
 | ~~RW_2.1b~~ | ~~2 Tagesplanung~~ | ~~DayView — Phase B: Morgen-Modus (Kalender-Luecken + Task-Liste)~~ | ~~Medium~~ | ~~M~~ | ~~Eigene View~~ | ~~[Spec](specs/rework/2.1b-day-view-morning-mode.md)~~ ERLEDIGT |
-| RW_2.1c | 2 Tagesplanung | DayView — Phase C: Tages-Timeline (TimelineView Integration) | Medium | M | Eigene View | [Spec](specs/rework/2.1-day-view.md) |
+| ~~RW_2.1c~~ | ~~2 Tagesplanung~~ | ~~DayView — Phase C: Tages-Timeline (TimelineView Integration)~~ | ~~Medium~~ | ~~M~~ | ~~Eigene View~~ | ~~[Spec](specs/rework/2.1c-day-view-daytime-timeline.md)~~ ERLEDIGT |
 | RW_2.1d | 2 Tagesplanung | DayView — Phase D: Abend-Modus (Zusammenfassung + Stubs fuer 4.2/4.3) | Medium | M | Eigene View | [Spec](specs/rework/2.1-day-view.md) |
 | RW_2.2 | 2 Tagesplanung | KI-gestuetzte Tagesvorschlaege | Medium | L | Shared | [Spec](specs/rework/2.2-next-up-suggestions.md) |
 | RW_2.3 | 2 Tagesplanung | Limitation Guard | Medium | S | Shared | [Spec](specs/rework/2.3-limitation-guard.md) |
@@ -65,6 +65,9 @@
 | MAC_RW_1.3 | RW_1.3 | Refiner Sidebar-Eintrag + Navigation (macOS) | Medium | S | `SidebarView.swift`: Refiner als Sidebar-Item + Navigation-Wiring zu shared `RefinerView` (~35 LoC) |
 | MAC_RW_3.2a | RW_3.2 | Focus Sprint Context Menu in MacBacklogRow | Medium | S | `MacBacklogRow.swift`: Context Menu Item "Focus Sprint starten" → `FocusBlockActionService.startImmediate()` (~20 LoC) |
 | MAC_RW_3.2b | RW_3.2 | Focus Sprint Sidebar-Switch bei Start | Low | S | macOS Root View: `.onReceive(focusSprintStarted)` → Sidebar-Selection auf Focus wechseln (~10 LoC) |
+| MAC_RW_3.3 | RW_3.3 | Follow-up Logic in MacFocusView/SprintReview | Medium | S | iOS SprintReview hat `abortWithFollowUp()` + `progressNotes`. `MacFocusView.swift` (MacSprintReviewSheet) hat KEIN Follow-up — weder UI noch Logic. Port: Follow-up-Button + progressNotes-TextField + `createFollowUp()` Handler (~50 LoC) |
+| MAC_RW_3.4 | RW_3.4 | Emotional Nudge Dialog auf macOS | Medium | S | iOS zeigt Micro-Task-Dialog bei chronisch verschobenen Tasks. macOS hat nur Context Menu `startNudgeSprint()` ohne Nudge-Dialog-UI. Port: Dialog mit Micro-Task-Vorschlaegen analog iOS `EmotionalNudgeView` (~40 LoC) |
+| MAC_RW_2.1_TL | RW_2.1c | DayView Daytime Timeline auf macOS | Medium | M | macOS DayView zeigt im Daytime-Modus nur "Timeline kommt bald" Platzhalter (`Sources/Views/DayView.swift:97`, `#else` Block). iOS hat volle `TimelineView` mit Events + Scheduled Tasks. Entweder shared `TimelineView` macOS-kompatibel machen oder macOS-Aequivalent in `FocusBloxMac/` bauen. |
 
 ---
 
