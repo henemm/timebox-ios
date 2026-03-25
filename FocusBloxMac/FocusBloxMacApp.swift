@@ -10,6 +10,7 @@ import SwiftData
 import CoreSpotlight
 import AppKit
 import UserNotifications
+import Security
 
 // MARK: - Menu Bar Controller
 
@@ -230,7 +231,9 @@ struct FocusBloxMacApp: App {
                 container = try MacModelContainer.create()
             }
             QuickCaptureController.shared.setup(with: container)
-            indexQuickCaptureAction()
+            if !isUITesting && !ProcessInfo.processInfo.environment.keys.contains("XCTestBundlePath") {
+                indexQuickCaptureAction()
+            }
         } catch {
             fatalError("Failed to create ModelContainer: \(error)")
         }
@@ -450,17 +453,44 @@ struct FocusBloxMacApp: App {
 enum MacModelContainer {
     private static let appGroupID = "group.com.henning.focusblox"
 
+    /// Runtime check: verify CloudKit entitlement is embedded in the running binary.
+    /// Debug builds launched by launchd (auto-launch at login) may lack proper entitlements,
+    /// causing a SIGTRAP in PFCloudKitContainerProvider that cannot be caught.
+    private static func hasCloudKitEntitlement() -> Bool {
+        var staticCode: SecStaticCode?
+        guard SecStaticCodeCreateWithPath(
+            Bundle.main.bundleURL as CFURL, [], &staticCode
+        ) == errSecSuccess, let code = staticCode else {
+            print("[CloudKit] macOS: Code-Signatur nicht pruefbar")
+            return false
+        }
+
+        var signingInfo: CFDictionary?
+        guard SecCodeCopySigningInformation(
+            code, SecCSFlags(rawValue: kSecCSSigningInformation), &signingInfo
+        ) == errSecSuccess,
+              let info = signingInfo as? [String: Any],
+              let entitlements = info[kSecCodeInfoEntitlementsDict as String] as? [String: Any],
+              let services = entitlements["com.apple.developer.icloud-services"] as? [String]
+        else {
+            print("[CloudKit] macOS: CloudKit-Entitlement nicht gefunden in Code-Signatur")
+            return false
+        }
+        return services.contains("CloudKit")
+    }
+
     static func create() throws -> ModelContainer {
         let schema = Schema([LocalTask.self, TaskMetadata.self])
         let hasICloud = FileManager.default.ubiquityIdentityToken != nil
+        let hasEntitlement = hasCloudKitEntitlement()
 
         let appGroupURL = FileManager.default.containerURL(
             forSecurityApplicationGroupIdentifier: appGroupID
         )
 
         let config: ModelConfiguration
-        if !hasICloud {
-            print("[CloudKit] macOS: Kein iCloud-Account — lokaler Speicher ohne CloudKit")
+        if !hasICloud || !hasEntitlement {
+            print("[CloudKit] macOS: iCloud=\(hasICloud), Entitlement=\(hasEntitlement) — lokaler Speicher ohne CloudKit")
             config = ModelConfiguration(
                 schema: schema,
                 isStoredInMemoryOnly: false,
