@@ -34,7 +34,7 @@
 | ~~RW_2.1a~~ | ~~2 Tagesplanung~~ | ~~DayView — Phase A: Grundstruktur + Modi-Wechsel + Tab/Sidebar + Settings~~ | ~~Medium~~ | ~~M~~ | ~~Eigene View~~ | ~~[Spec](specs/rework/2.1a-day-view-skeleton.md)~~ ERLEDIGT |
 | ~~RW_2.1b~~ | ~~2 Tagesplanung~~ | ~~DayView — Phase B: Morgen-Modus (Kalender-Luecken + Task-Liste)~~ | ~~Medium~~ | ~~M~~ | ~~Eigene View~~ | ~~[Spec](specs/rework/2.1b-day-view-morning-mode.md)~~ ERLEDIGT |
 | ~~RW_2.1c~~ | ~~2 Tagesplanung~~ | ~~DayView — Phase C: Tages-Timeline (TimelineView Integration)~~ | ~~Medium~~ | ~~M~~ | ~~Eigene View~~ | ~~[Spec](specs/rework/2.1c-day-view-daytime-timeline.md)~~ ERLEDIGT |
-| RW_2.1d | 2 Tagesplanung | DayView — Phase D: Abend-Modus (Zusammenfassung + Stubs fuer 4.2/4.3) | Medium | M | Eigene View | [Spec](specs/rework/2.1-day-view.md) |
+| ~~RW_2.1d~~ | ~~2 Tagesplanung~~ | ~~DayView — Phase D: Abend-Modus (Zusammenfassung + Stubs fuer 4.2/4.3)~~ | ~~Medium~~ | ~~M~~ | ~~Eigene View~~ | ~~[Spec](specs/rework/2.1d-day-view-evening-mode.md)~~ ERLEDIGT |
 | RW_2.2 | 2 Tagesplanung | KI-gestuetzte Tagesvorschlaege | Medium | L | Shared | [Spec](specs/rework/2.2-next-up-suggestions.md) |
 | RW_2.3 | 2 Tagesplanung | Limitation Guard | Medium | S | Shared | [Spec](specs/rework/2.3-limitation-guard.md) |
 | RW_2.4 | 2 Tagesplanung | Backlog UX Rework | Medium | L | Eigene View | [Spec](specs/rework/2.4-backlog-ux-rework.md) |

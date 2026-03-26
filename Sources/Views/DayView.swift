@@ -1,6 +1,60 @@
 import SwiftData
 import SwiftUI
 
+// MARK: - Day Timeline Segment
+
+struct DayTimelineSegment: Identifiable, Equatable {
+    let id = UUID()
+    let startMinute: Int
+    let endMinute: Int
+    let kind: SegmentKind
+
+    enum SegmentKind: Equatable {
+        case completed
+        case calendar
+        case missed
+    }
+
+    var color: Color {
+        switch kind {
+        case .completed: .green
+        case .calendar:  .secondary
+        case .missed:    .orange
+        }
+    }
+
+    static func == (lhs: DayTimelineSegment, rhs: DayTimelineSegment) -> Bool {
+        lhs.startMinute == rhs.startMinute && lhs.endMinute == rhs.endMinute && lhs.kind == rhs.kind
+    }
+}
+
+// MARK: - Day Timeline Bar
+
+struct DayTimelineBar: View {
+    let segments: [DayTimelineSegment]
+    private let totalMinutes: CGFloat = 1440
+
+    var body: some View {
+        GeometryReader { geo in
+            ZStack(alignment: .leading) {
+                RoundedRectangle(cornerRadius: 6)
+                    .fill(Color(.systemFill))
+                    .frame(height: 24)
+                ForEach(segments) { seg in
+                    let x = CGFloat(seg.startMinute) / totalMinutes * geo.size.width
+                    let w = CGFloat(seg.endMinute - seg.startMinute) / totalMinutes * geo.size.width
+                    RoundedRectangle(cornerRadius: 3)
+                        .fill(seg.color)
+                        .frame(width: max(w, 3), height: 24)
+                        .offset(x: x)
+                }
+            }
+        }
+        .frame(height: 24)
+        .accessibilityIdentifier("dayTimelineBar")
+    }
+}
+
 // MARK: - Day Phase
 
 enum DayPhase: Equatable {
@@ -33,6 +87,9 @@ struct DayView: View {
     @State private var nextUpTasks: [PlanItem] = []
     @State private var freeSlots: [TimeSlot] = []
     @State private var scheduledTasks: [TimelineItem] = []
+    @State private var completedTasks: [PlanItem] = []
+    @State private var unfinishedTasks: [PlanItem] = []
+    @State private var timelineSegments: [DayTimelineSegment] = []
     @State private var isLoading = false
     @State private var isPermissionDenied = false
 
@@ -50,7 +107,7 @@ struct DayView: View {
             switch phase {
             case .morning: await loadMorningData()
             case .daytime: await loadDaytimeData()
-            case .evening: break
+            case .evening: await loadEveningData()
             }
         }
     }
@@ -63,11 +120,7 @@ struct DayView: View {
         case .daytime:
             daytimeContent
         case .evening:
-            ContentUnavailableView(
-                "Tagesrueckblick",
-                systemImage: "moon.stars",
-                description: Text("Reflexion kommt bald")
-            )
+            eveningContent
         }
     }
 
@@ -204,6 +257,88 @@ struct DayView: View {
         }
     }
 
+    // MARK: - Evening Content
+
+    @ViewBuilder
+    private var eveningContent: some View {
+        if isLoading {
+            ProgressView("Lade Tagesrueckblick...")
+        } else if isPermissionDenied {
+            permissionDeniedContent
+        } else if completedTasks.isEmpty && unfinishedTasks.isEmpty {
+            ContentUnavailableView(
+                "Noch nichts erledigt",
+                systemImage: "moon.stars",
+                description: Text("Starte deinen Tag um etwas zu sehen")
+            )
+        } else {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 20) {
+                    DayTimelineBar(segments: timelineSegments)
+                    if !completedTasks.isEmpty { completedTasksSection }
+                    if !unfinishedTasks.isEmpty { unfinishedTasksSection }
+                    successStoryStub
+                    failureQuickSelectStub
+                }
+                .padding()
+            }
+        }
+    }
+
+    // MARK: - Evening Sections
+
+    private var completedTasksSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Label("\(completedTasks.count) erledigt", systemImage: "checkmark.circle.fill")
+                .foregroundStyle(.green)
+                .font(.headline)
+            ForEach(completedTasks) { task in
+                Text(task.title)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("eveningCompletedSection")
+    }
+
+    private var unfinishedTasksSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Label("Nicht erledigt", systemImage: "circle.dotted")
+                .foregroundStyle(.orange)
+                .font(.headline)
+            ForEach(unfinishedTasks) { task in
+                Text(task.title)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("eveningUnfinishedSection")
+    }
+
+    private var successStoryStub: some View {
+        HStack {
+            Label("Erfolgs-Story kommt bald", systemImage: "lock.fill")
+                .foregroundStyle(.secondary)
+            Spacer()
+        }
+        .padding()
+        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12))
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("successStoryStubCard")
+    }
+
+    private var failureQuickSelectStub: some View {
+        HStack {
+            Label("Reflexion kommt bald", systemImage: "lock.fill")
+                .foregroundStyle(.secondary)
+            Spacer()
+        }
+        .padding()
+        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12))
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("failureQuickSelectStubCard")
+    }
+
     // MARK: - Data Loading
 
     private func loadMorningData() async {
@@ -264,6 +399,45 @@ struct DayView: View {
         }
     }
 
+    private func loadEveningData() async {
+        isLoading = true
+        defer { isLoading = false }
+
+        do {
+            let hasAccess = try await eventKitRepo.requestAccess()
+            guard hasAccess else {
+                isPermissionDenied = true
+                return
+            }
+
+            calendarEvents = try eventKitRepo.fetchCalendarEvents(for: Date())
+            focusBlocks = try eventKitRepo.fetchFocusBlocks(for: Date())
+
+            let taskSource = LocalTaskSource(modelContext: modelContext)
+            let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
+            let allTasks = try await syncEngine.sync()
+            let recentlyCompleted = try await syncEngine.syncCompletedTasks(days: 1)
+
+            let startOfDay = Calendar.current.startOfDay(for: Date())
+
+            completedTasks = recentlyCompleted.filter {
+                guard let completedAt = $0.completedAt else { return false }
+                return completedAt >= startOfDay
+            }
+
+            unfinishedTasks = allTasks.filter {
+                !$0.isCompleted &&
+                ($0.isNextUp || ($0.isScheduled && Calendar.current.isDateInToday($0.scheduledDate!)))
+            }
+
+            timelineSegments = Self.buildEveningSegments(
+                events: calendarEvents, completed: completedTasks, unfinished: unfinishedTasks
+            )
+        } catch {
+            // Silently fail — view stays in empty state
+        }
+    }
+
     // MARK: - Data Mapping
 
     /// Filters scheduled tasks for a given date and maps them to TimelineItems.
@@ -279,6 +453,43 @@ struct DayView: View {
                     durationMinutes: task.scheduledDuration ?? task.estimatedDuration ?? 30
                 )
             }
+    }
+
+    /// Builds timeline segments for the evening summary bar.
+    /// Pure function, extracted for unit testability.
+    static func buildEveningSegments(
+        events: [CalendarEvent],
+        completed: [PlanItem],
+        unfinished: [PlanItem]
+    ) -> [DayTimelineSegment] {
+        var segments: [DayTimelineSegment] = []
+
+        for event in events where !event.isAllDay && !event.isFocusBlock {
+            let start = minutesFromMidnight(event.startDate)
+            let end = minutesFromMidnight(event.endDate)
+            segments.append(DayTimelineSegment(startMinute: start, endMinute: end, kind: .calendar))
+        }
+
+        for task in completed {
+            guard let date = task.completedAt else { continue }
+            let start = minutesFromMidnight(date)
+            let duration = task.estimatedDuration ?? 30
+            segments.append(DayTimelineSegment(startMinute: start, endMinute: start + duration, kind: .completed))
+        }
+
+        for task in unfinished {
+            guard let date = task.scheduledDate else { continue }
+            let start = minutesFromMidnight(date)
+            let duration = task.scheduledDuration ?? task.estimatedDuration ?? 30
+            segments.append(DayTimelineSegment(startMinute: start, endMinute: start + duration, kind: .missed))
+        }
+
+        return segments.sorted { $0.startMinute < $1.startMinute }
+    }
+
+    static func minutesFromMidnight(_ date: Date) -> Int {
+        let components = Calendar.current.dateComponents([.hour, .minute], from: date)
+        return (components.hour ?? 0) * 60 + (components.minute ?? 0)
     }
 
     // MARK: - Navigation

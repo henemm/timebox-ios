@@ -273,4 +273,88 @@ final class DayViewUITests: XCTestCase {
             "Empty-State sollte keine Timeline-Stunden zeigen"
         )
     }
+
+    // MARK: - Evening Mode Content (RW_2.1d)
+
+    /// Helper: App im erzwungenen Abend-Modus starten
+    /// eveningStartHour=0 → Evening startet um Mitternacht, also ist es IMMER Abend
+    private func launchInEveningMode() {
+        app = XCUIApplication()
+        app.launchArguments = ["-UITesting", "-eveningStartHour", "0"]
+        app.launch()
+    }
+
+    /// Verhalten: Im Abend-Modus zeigt die DayView den Titel "Tagesrueckblick"
+    /// Bricht wenn: navigationTitle im evening case nicht "Tagesrueckblick" liefert
+    func test_eveningMode_showsTagesrueckblick() throws {
+        launchInEveningMode()
+        navigateToDayTab()
+
+        let title = app.navigationBars["Tagesrueckblick"]
+        XCTAssertTrue(
+            title.waitForExistence(timeout: 5),
+            "Abend-Modus sollte 'Tagesrueckblick' als NavigationBar-Titel zeigen"
+        )
+
+        // "Reflexion kommt bald" existiert nun als Stub-Card (failureQuickSelectStub)
+        // statt als alleinstehender Platzhalter — pruefe Stub-Card
+        let stubCard = app.otherElements["failureQuickSelectStubCard"]
+        XCTAssertTrue(
+            stubCard.waitForExistence(timeout: 5),
+            "Abend-Modus sollte die Failure-Stub-Card zeigen"
+        )
+    }
+
+    /// Verhalten: Im Abend-Modus zeigt die DayView erledigte Tasks
+    /// Bricht wenn: eveningContent den completedTasksSection ViewBuilder nicht rendert
+    func test_eveningMode_showsCompletedSection() throws {
+        launchInEveningMode()
+        navigateToDayTab()
+
+        // Mock-Daten enthalten "[MOCK] Erledigte Backlog-Aufgabe" mit completedAt=Date()
+        let completedSection = app.otherElements["eveningCompletedSection"]
+        XCTAssertTrue(
+            completedSection.waitForExistence(timeout: 5),
+            "Abend-Modus sollte eine Sektion fuer erledigte Tasks zeigen"
+        )
+
+        // Der erledigte Mock-Task muss sichtbar sein
+        let completedTask = app.staticTexts["[MOCK] Erledigte Backlog-Aufgabe"]
+        XCTAssertTrue(
+            completedTask.waitForExistence(timeout: 3),
+            "Abend-Modus sollte den erledigten Mock-Task anzeigen"
+        )
+    }
+
+    /// Verhalten: Im Abend-Modus zeigt die DayView die DayTimelineBar
+    /// Bricht wenn: eveningContent die DayTimelineBar nicht einbindet
+    func test_eveningMode_showsTimelineBar() throws {
+        launchInEveningMode()
+        navigateToDayTab()
+
+        let timelineBar = app.otherElements["dayTimelineBar"]
+        XCTAssertTrue(
+            timelineBar.waitForExistence(timeout: 5),
+            "Abend-Modus sollte die DayTimelineBar anzeigen"
+        )
+    }
+
+    /// Verhalten: Im Abend-Modus zeigt die DayView Stub-Cards fuer Success Story und Failure Protocol
+    /// Bricht wenn: successStoryStub oder failureQuickSelectStub ViewBuilder fehlen
+    func test_eveningMode_showsStubCards() throws {
+        launchInEveningMode()
+        navigateToDayTab()
+
+        let successStub = app.otherElements["successStoryStubCard"]
+        XCTAssertTrue(
+            successStub.waitForExistence(timeout: 5),
+            "Abend-Modus sollte die Success-Story-Stub-Card zeigen"
+        )
+
+        let failureStub = app.otherElements["failureQuickSelectStubCard"]
+        XCTAssertTrue(
+            failureStub.exists,
+            "Abend-Modus sollte die Failure-QuickSelect-Stub-Card zeigen"
+        )
+    }
 }
