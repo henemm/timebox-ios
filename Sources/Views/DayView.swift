@@ -266,19 +266,15 @@ struct DayView: View {
             ProgressView("Lade Tagesrueckblick...")
         } else if isPermissionDenied {
             permissionDeniedContent
-        } else if completedTasks.isEmpty && unfinishedTasks.isEmpty {
-            ContentUnavailableView(
-                "Noch nichts erledigt",
-                systemImage: "moon.stars",
-                description: Text("Starte deinen Tag um etwas zu sehen")
-            )
         } else {
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
-                    DayTimelineBar(segments: timelineSegments)
+                    if !timelineSegments.isEmpty {
+                        DayTimelineBar(segments: timelineSegments)
+                    }
                     if !completedTasks.isEmpty { completedTasksSection }
                     if !unfinishedTasks.isEmpty { unfinishedTasksSection }
-                    successStoryStub
+                    SuccessStoryView(completedTasks: completedTasks, focusBlocks: focusBlocks)
                     failureQuickSelectStub
                 }
                 .padding()
@@ -314,18 +310,6 @@ struct DayView: View {
         }
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("eveningUnfinishedSection")
-    }
-
-    private var successStoryStub: some View {
-        HStack {
-            Label("Erfolgs-Story kommt bald", systemImage: "lock.fill")
-                .foregroundStyle(.secondary)
-            Spacer()
-        }
-        .padding()
-        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12))
-        .accessibilityElement(children: .contain)
-        .accessibilityIdentifier("successStoryStubCard")
     }
 
     private var failureQuickSelectStub: some View {

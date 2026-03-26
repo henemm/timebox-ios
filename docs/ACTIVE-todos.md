@@ -40,7 +40,7 @@
 | RW_2.4 | 2 Tagesplanung | Backlog UX Rework | Medium | L | Eigene View | [Spec](specs/rework/2.4-backlog-ux-rework.md) |
 | RW_3.5 | 3 Ausfuehrung | Recurring Stacking — Visuelle Gruppierung + Priority Boost | Medium | M | Eigene View | [Spec](specs/rework/3.5-recurring-stacking.md) |
 | RW_4.1 | 4 Reflexion | Soft Evening Reset | Low | M | Shared | [Spec](specs/rework/4.1-soft-evening-reset.md) |
-| RW_4.2 | 4 Reflexion | Success Story Generator | Low | L | Shared | [Spec](specs/rework/4.2-success-story-generator.md) |
+| ~~RW_4.2~~ | ~~4 Reflexion~~ | ~~Success Story Generator~~ | ~~Low~~ | ~~L~~ | ~~Shared~~ | ~~[Spec](specs/rework/4.2-success-story-generator-impl.md)~~ ERLEDIGT |
 | RW_4.3 | 4 Reflexion | Failure Protocol | Low | M | Shared | [Spec](specs/rework/4.3-failure-protocol.md) |
 | RW_4.4 | 4 Reflexion | Morning Widget | Low | M | iOS-only | [Spec](specs/rework/4.4-morning-widget.md) |
 

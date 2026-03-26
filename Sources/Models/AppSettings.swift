@@ -75,6 +75,14 @@ final class AppSettings: ObservableObject {
     /// Hour of day at which the reset threshold is crossed (0-23, default 0 = midnight).
     @AppStorage("resetHour") var resetHour: Int = 0
 
+    // MARK: - Success Story Cache
+
+    /// Cached success story text for today (empty = not generated yet)
+    @AppStorage("cachedSuccessStory") var cachedSuccessStory: String = ""
+
+    /// ISO-8601 date of the cached story (e.g. "2026-03-26")
+    @AppStorage("cachedSuccessStoryDate") var cachedSuccessStoryDate: String = ""
+
     // MARK: - Notification Profile
 
     @AppStorage("notificationProfile") var notificationProfileRaw: String =

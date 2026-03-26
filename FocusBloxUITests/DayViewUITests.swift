@@ -277,10 +277,10 @@ final class DayViewUITests: XCTestCase {
     // MARK: - Evening Mode Content (RW_2.1d)
 
     /// Helper: App im erzwungenen Abend-Modus starten
-    /// morningEndHour=0 + eveningStartHour=0 → Phase ist IMMER evening (auch morgens)
+    /// eveningStartHour=0 → Evening startet um Mitternacht, also ist es IMMER Abend
     private func launchInEveningMode() {
         app = XCUIApplication()
-        app.launchArguments = ["-UITesting", "-morningEndHour", "0", "-eveningStartHour", "0"]
+        app.launchArguments = ["-UITesting", "-eveningStartHour", "0"]
         app.launch()
     }
 
@@ -296,12 +296,11 @@ final class DayViewUITests: XCTestCase {
             "Abend-Modus sollte 'Tagesrueckblick' als NavigationBar-Titel zeigen"
         )
 
-        // "Reflexion kommt bald" existiert nun als Stub-Card (failureQuickSelectStub)
-        // statt als alleinstehender Platzhalter — pruefe Stub-Card
-        let stubCard = app.otherElements["failureQuickSelectStubCard"]
-        XCTAssertTrue(
-            stubCard.waitForExistence(timeout: 5),
-            "Abend-Modus sollte die Failure-Stub-Card zeigen"
+        // Alter Platzhalter-Text darf NICHT mehr erscheinen
+        let placeholder = app.staticTexts["Reflexion kommt bald"]
+        XCTAssertFalse(
+            placeholder.exists,
+            "Abend-Modus sollte keinen Platzhalter mehr zeigen"
         )
     }
 
@@ -339,16 +338,16 @@ final class DayViewUITests: XCTestCase {
         )
     }
 
-    /// Verhalten: Im Abend-Modus zeigt die DayView Stub-Cards fuer Success Story und Failure Protocol
-    /// Bricht wenn: successStoryStub oder failureQuickSelectStub ViewBuilder fehlen
+    /// Verhalten: Im Abend-Modus zeigt die DayView Success Story Card und Failure Protocol Stub
+    /// Bricht wenn: SuccessStoryView oder failureQuickSelectStub ViewBuilder fehlen
     func test_eveningMode_showsStubCards() throws {
         launchInEveningMode()
         navigateToDayTab()
 
-        let successStub = app.otherElements["successStoryStubCard"]
+        let successCard = app.otherElements["successStoryCard"]
         XCTAssertTrue(
-            successStub.waitForExistence(timeout: 5),
-            "Abend-Modus sollte die Success-Story-Stub-Card zeigen"
+            successCard.waitForExistence(timeout: 10),
+            "Abend-Modus sollte die Success-Story-Card zeigen"
         )
 
         let failureStub = app.otherElements["failureQuickSelectStubCard"]
