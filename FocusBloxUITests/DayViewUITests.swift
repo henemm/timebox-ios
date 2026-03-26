@@ -277,10 +277,10 @@ final class DayViewUITests: XCTestCase {
     // MARK: - Evening Mode Content (RW_2.1d)
 
     /// Helper: App im erzwungenen Abend-Modus starten
-    /// eveningStartHour=0 → Evening startet um Mitternacht, also ist es IMMER Abend
+    /// morningEndHour=0 + eveningStartHour=0 → Phase ist IMMER evening (auch morgens)
     private func launchInEveningMode() {
         app = XCUIApplication()
-        app.launchArguments = ["-UITesting", "-eveningStartHour", "0"]
+        app.launchArguments = ["-UITesting", "-morningEndHour", "0", "-eveningStartHour", "0"]
         app.launch()
     }
 

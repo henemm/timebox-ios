@@ -51,6 +51,7 @@ struct DayTimelineBar: View {
             }
         }
         .frame(height: 24)
+        .accessibilityElement(children: .contain)
         .accessibilityIdentifier("dayTimelineBar")
     }
 }
