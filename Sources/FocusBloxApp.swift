@@ -304,6 +304,7 @@ struct FocusBloxApp: App {
                     // BUG_108: Order matters — migrate + dedup first to ensure clean state, then repair
                     RecurrenceService.migrateToTemplateModel(in: sharedModelContainer.mainContext)
                     RecurrenceService.deduplicateTemplates(in: sharedModelContainer.mainContext)
+                    RecurrenceService.deduplicateChildInstances(in: sharedModelContainer.mainContext)
                     RecurrenceService.repairOrphanedRecurringSeries(in: sharedModelContainer.mainContext)
                     // Background title improvement for tasks from Share Extension, Siri, Watch
                     let titleEngine = TaskTitleEngine(modelContext: sharedModelContainer.mainContext)

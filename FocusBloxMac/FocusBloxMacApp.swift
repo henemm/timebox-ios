@@ -289,6 +289,7 @@ struct FocusBloxMacApp: App {
                         // BUG_108: Order matters — migrate + dedup first to ensure clean state, then repair
                         RecurrenceService.migrateToTemplateModel(in: container.mainContext)
                         RecurrenceService.deduplicateTemplates(in: container.mainContext)
+                        RecurrenceService.deduplicateChildInstances(in: container.mainContext)
                         RecurrenceService.repairOrphanedRecurringSeries(in: container.mainContext)
                         // Background title improvement + enrichment for tasks from Watch, Siri, etc.
                         let mainContext = container.mainContext

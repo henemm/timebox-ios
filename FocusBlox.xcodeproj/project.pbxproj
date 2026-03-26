@@ -317,6 +317,7 @@
 		'RECRSVC01BUILD0001' = {isa = PBXBuildFile; fileRef = RECRSVC01FILE00001; };
 		'RECRSVC02BUILD001' = {isa = PBXBuildFile; fileRef = RECRSVC02FILE0001; };
 		'RECRSVC02BUILD002' = {isa = PBXBuildFile; fileRef = RECRSVC02FILE0001; };
+		'RCDDUP01BUILD0001' = {isa = PBXBuildFile; fileRef = RCDDUP01FILE00001; };
 		'RECTMPL01BUILD001' = {isa = PBXBuildFile; fileRef = RECTMPL01FILE0001; };
 		'RECTMPLUI01BLD001' = {isa = PBXBuildFile; fileRef = RECTMPLUI01FIL001; };
 		'RECVISFILT01BLD01' = {isa = PBXBuildFile; fileRef = RECVISFILT01FIL01; };
@@ -870,6 +871,7 @@
 		'RECRPAT02FILE0001' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecurrencePattern.swift; sourceTree = "<group>"; };
 		'RECRSVC01FILE00001' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecurrenceServiceTests.swift; sourceTree = "<group>"; };
 		'RECRSVC02FILE0001' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecurrenceService.swift; sourceTree = "<group>"; };
+		RCDDUP01FILE00001 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecurringChildDedupTests.swift; sourceTree = "<group>"; };
 		'RECTMPL01FILE0001' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecurringTemplateTests.swift; sourceTree = "<group>"; };
 		'RECTMPLUI01FIL001' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecurringTemplateUITests.swift; sourceTree = "<group>"; };
 		'RECVISFILT01FIL01' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecurringVisibilityFilterTests.swift; sourceTree = "<group>"; };
@@ -1442,6 +1444,7 @@
 				FBENTITY01FILE001,
 				ITBFLITE01FILE001,
 				RECRSVC01FILE00001,
+				RCDDUP01FILE00001,
 				RECTMPL01FILE0001,
 				TMPDEDUP01FILE001,
 				RECVISFILT01FIL01,
@@ -2469,6 +2472,7 @@
 				FBENTITY01BUILD01,
 				ITBFLITE01BUILD01,
 				RECRSVC01BUILD0001,
+				RCDDUP01BUILD0001,
 				RECTMPL01BUILD001,
 				TMPDEDUP01BUILD01,
 				RECVISFILT01BLD01,

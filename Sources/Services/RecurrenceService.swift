@@ -370,6 +370,52 @@ enum RecurrenceService {
         return template
     }
 
+    // MARK: - Child Instance Deduplication
+
+    /// Removes duplicate open child instances within the same series and date.
+    /// After deduplicateTemplates() reassigns children from deleted templates to the survivor,
+    /// multiple open instances can exist for the same (groupID, dueDate). This function
+    /// keeps the oldest instance per group and deletes the rest.
+    /// Returns the number of deleted duplicates.
+    @MainActor
+    @discardableResult
+    static func deduplicateChildInstances(in modelContext: ModelContext) -> Int {
+        let descriptor = FetchDescriptor<LocalTask>(
+            predicate: #Predicate<LocalTask> { !$0.isCompleted && !$0.isTemplate }
+        )
+        guard let openChildren = try? modelContext.fetch(descriptor) else { return 0 }
+
+        let recurring = openChildren.filter { $0.recurrenceGroupID != nil && $0.recurrencePattern != "none" }
+        guard recurring.count > 1 else { return 0 }
+
+        let cal = Calendar.current
+        // Group by (recurrenceGroupID, startOfDay(dueDate))
+        var groups: [String: [LocalTask]] = [:]
+        for task in recurring {
+            guard let gid = task.recurrenceGroupID, let due = task.dueDate else { continue }
+            let key = "\(gid)_\(cal.startOfDay(for: due).timeIntervalSince1970)"
+            groups[key, default: []].append(task)
+        }
+
+        var deleted = 0
+        for (_, group) in groups where group.count > 1 {
+            // Keep oldest (earliest createdAt), delete rest
+            let sorted = group.sorted { $0.createdAt < $1.createdAt }
+            for duplicate in sorted.dropFirst() {
+                print("[ChildDedup] Deleting duplicate '\(duplicate.title)' (created: \(duplicate.createdAt), due: \(duplicate.dueDate?.description ?? "nil"))")
+                modelContext.delete(duplicate)
+                deleted += 1
+            }
+        }
+
+        if deleted > 0 {
+            try? modelContext.save()
+            print("[ChildDedup] Deleted \(deleted) duplicate child instance(s)")
+        }
+
+        return deleted
+    }
+
     // MARK: - Repair Orphaned Series
 
     /// Finds completed recurring tasks whose series has no open successor,
