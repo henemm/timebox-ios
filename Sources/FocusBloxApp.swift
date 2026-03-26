@@ -314,6 +314,26 @@ struct FocusBloxApp: App {
                     // Spotlight: reindex all active tasks so they appear in system search
                     let spotlightContext = sharedModelContainer.mainContext
                     Task { try? await SpotlightIndexingService.shared.reindexAllTasks(context: spotlightContext) }
+                    // RW_4.1: Soft Evening Reset — clear unfinished Next-Up on new day
+                    let resetCount = (try? EveningResetService.performResetIfNeeded(
+                        context: sharedModelContainer.mainContext
+                    )) ?? 0
+                    if resetCount > 0 {
+                        Task {
+                            await SmartNotificationEngine.reconcile(
+                                reason: .taskChanged,
+                                container: sharedModelContainer,
+                                eventKitRepo: eventKitRepository
+                            )
+                        }
+                    }
+                }
+                // RW_4.1: Simulate Evening Reset for UI testing
+                if ProcessInfo.processInfo.arguments.contains("-SimulateEveningReset") {
+                    AppSettings.shared.lastResetDate = "2020-01-01"
+                    let _ = try? EveningResetService.performResetIfNeeded(
+                        context: sharedModelContainer.mainContext
+                    )
                 }
                 // Register App Shortcuts with Siri so voice commands are discoverable
                 FocusBloxShortcuts.updateAppShortcutParameters()

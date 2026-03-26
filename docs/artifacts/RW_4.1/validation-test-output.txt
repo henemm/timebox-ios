@@ -1,0 +1,52 @@
+═══════════════════════════════════════════════════════════════════
+RW_4.1: Evening Reset Feature — Test Validation
+═══════════════════════════════════════════════════════════════════
+
+Test Execution: 2026-03-26 09:30:18 - 09:31:45
+
+───────────────────────────────────────────────────────────────────
+UNIT TESTS: EveningResetServiceTests
+───────────────────────────────────────────────────────────────────
+
+Tests Passed: 8
+Tests Failed: 0
+Duration: ~1.0 seconds
+
+Results:
+  ✓ test_resetClearsExpiredScheduledDate (0.128s)
+  ✓ test_resetClearsNextUp (0.016s)
+  ✓ test_resetIncrementsRescheduleCount (0.078s)
+  ✓ test_resetIsIdempotent (0.080s)
+  ✓ test_resetPreservesTodayScheduledDate (0.074s)
+  ✓ test_resetSkipsCompletedTasks (0.081s)
+  ✓ test_resetUpdatesLastResetDate (0.071s)
+  ✓ test_resetUpdatesModifiedAt (0.071s)
+
+Status: PASSED
+
+───────────────────────────────────────────────────────────────────
+UI TESTS: EveningResetUITests
+───────────────────────────────────────────────────────────────────
+
+Tests Passed: 2
+Tests Failed: 0
+Duration: ~38.3 seconds
+
+Results:
+  ✓ test_appStartResetsNextUp (24.661s)
+  ✓ test_resetDoesNotShowUI (13.642s)
+
+Status: PASSED
+
+───────────────────────────────────────────────────────────────────
+SUMMARY
+───────────────────────────────────────────────────────────────────
+
+Total Tests:        10
+Passed:             10
+Failed:             0
+Overall Duration:   ~39.3 seconds
+
+Status: ALL TESTS PASSED ✓
+
+The RW_4.1 Evening Reset feature is fully validated.

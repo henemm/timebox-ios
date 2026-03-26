@@ -299,6 +299,19 @@ struct FocusBloxMacApp: App {
                         // Spotlight: reindex all active tasks so they appear in system search
                         let spotlightContext = container.mainContext
                         Task { try? await SpotlightIndexingService.shared.reindexAllTasks(context: spotlightContext) }
+                        // RW_4.1: Soft Evening Reset — clear unfinished Next-Up on new day
+                        let resetCount = (try? EveningResetService.performResetIfNeeded(
+                            context: container.mainContext
+                        )) ?? 0
+                        if resetCount > 0 {
+                            Task {
+                                await SmartNotificationEngine.reconcile(
+                                    reason: .taskChanged,
+                                    container: container,
+                                    eventKitRepo: eventKitRepository
+                                )
+                            }
+                        }
                     }
                     // Bug 58: Menu bar icon (after app is fully initialized)
                     MenuBarController.shared.setup(

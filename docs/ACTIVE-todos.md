@@ -38,7 +38,7 @@
 | RW_2.2 | 2 Tagesplanung | KI-gestuetzte Tagesvorschlaege | Medium | L | Shared | [Spec](specs/rework/2.2-next-up-suggestions.md) |
 | RW_2.3 | 2 Tagesplanung | Limitation Guard | Medium | S | Shared | [Spec](specs/rework/2.3-limitation-guard.md) |
 | RW_2.4 | 2 Tagesplanung | Backlog UX Rework | Medium | L | Eigene View | [Spec](specs/rework/2.4-backlog-ux-rework.md) |
-| RW_4.1 | 4 Reflexion | Soft Evening Reset | Low | M | Shared | [Spec](specs/rework/4.1-soft-evening-reset.md) |
+| ~~RW_4.1~~ | ~~4 Reflexion~~ | ~~Soft Evening Reset~~ | ~~Low~~ | ~~M~~ | ~~Shared~~ | ~~[Spec](specs/rework/4.1-soft-evening-reset.md)~~ ERLEDIGT |
 | RW_4.2 | 4 Reflexion | Success Story Generator | Low | L | Shared | [Spec](specs/rework/4.2-success-story-generator.md) |
 | RW_4.3 | 4 Reflexion | Failure Protocol | Low | M | Shared | [Spec](specs/rework/4.3-failure-protocol.md) |
 | RW_4.4 | 4 Reflexion | Morning Widget | Low | M | iOS-only | [Spec](specs/rework/4.4-morning-widget.md) |
