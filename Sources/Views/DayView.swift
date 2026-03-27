@@ -94,6 +94,13 @@ struct DayView: View {
     @State private var timelineSegments: [DayTimelineSegment] = []
     @State private var isLoading = false
     @State private var isPermissionDenied = false
+    @State private var behavioralProfile: BehavioralProfile?
+    @State private var limitationWarningDismissed = false
+
+    private var activeLimitationWarning: LimitationWarning? {
+        guard !limitationWarningDismissed, let profile = behavioralProfile else { return nil }
+        return LimitationGuardService.evaluate(tasks: nextUpTasks, profile: profile)
+    }
 
     private var phase: DayPhase {
         let hour = Calendar.current.component(.hour, from: Date())
@@ -111,6 +118,9 @@ struct DayView: View {
             case .daytime: await loadDaytimeData()
             case .evening: await loadEveningData()
             }
+        }
+        .onChange(of: nextUpTasks.count) {
+            limitationWarningDismissed = false
         }
     }
 
@@ -189,7 +199,9 @@ struct DayView: View {
                             },
                             onDismiss: { suggestion in
                                 morningSuggestions.removeAll { $0.id == suggestion.id }
-                            }
+                            },
+                            limitationWarning: nextUpTasks.isEmpty ? activeLimitationWarning : nil,
+                            onDismissWarning: { limitationWarningDismissed = true }
                         )
                     }
                     if !nextUpTasks.isEmpty { morningNextUpSection }
@@ -259,6 +271,11 @@ struct DayView: View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Next Up")
                 .font(.headline)
+
+            if let warning = activeLimitationWarning {
+                LimitationWarningBanner(warning: warning, onDismiss: { limitationWarningDismissed = true })
+            }
+
             ForEach(nextUpTasks) { task in
                 HStack {
                     Text(task.title)
@@ -376,11 +393,27 @@ struct DayView: View {
                 scheduledTasks: scheduledPairs, date: Date()
             ).findFreeSlots(minMinutes: 30, maxMinutes: 60)
 
-            let profile = BehavioralProfileService.profile(
-                tasks: try await LocalTaskSource(modelContext: modelContext).fetchIncompleteTasks(),
-                focusBlocks: focusBlocks,
-                calendarEvents: calendarEvents
-            )
+            let profile: BehavioralProfile
+            if ProcessInfo.processInfo.arguments.contains("--mock-limitation-profile") {
+                profile = BehavioralProfile(
+                    computedAt: Date(), categoryTimeAffinity: nil,
+                    avgTasksPerDay: 2.0, avgMinutesPerDay: 60.0,
+                    estimationFactor: nil, capacityByMeetingLoad: nil, procrastinationPatterns: nil
+                )
+            } else if ProcessInfo.processInfo.arguments.contains("--mock-high-profile") {
+                profile = BehavioralProfile(
+                    computedAt: Date(), categoryTimeAffinity: nil,
+                    avgTasksPerDay: 20.0, avgMinutesPerDay: 600.0,
+                    estimationFactor: nil, capacityByMeetingLoad: nil, procrastinationPatterns: nil
+                )
+            } else {
+                profile = BehavioralProfileService.profile(
+                    tasks: try await LocalTaskSource(modelContext: modelContext).fetchIncompleteTasks(),
+                    focusBlocks: focusBlocks,
+                    calendarEvents: calendarEvents
+                )
+            }
+            behavioralProfile = profile
             morningSuggestions = NextUpSuggestionService.suggestions(
                 items: allTasks, slots: freeSlots,
                 profile: profile, calendarEvents: calendarEvents

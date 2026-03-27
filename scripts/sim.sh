@@ -11,6 +11,9 @@
 #   ./scripts/sim.sh build                          # App fuer Simulator bauen
 #   ./scripts/sim.sh launch                         # App installieren + starten
 #   ./scripts/sim.sh launch --mock                  # App mit Mock-Daten starten
+#   ./scripts/sim.sh launch --screen day             # App starten + zum Screen navigieren
+#   ./scripts/sim.sh launch --mock --screen review  # Mock-Daten + Screen
+#   ./scripts/sim.sh navigate day                   # App neu starten + zum Screen navigieren
 #   ./scripts/sim.sh screenshot                     # Screenshot → /tmp/sim_screenshot.png
 #   ./scripts/sim.sh screenshot /path/to/output.png # Screenshot → custom path
 #   ./scripts/sim.sh test TestClass                 # UI Test ausfuehren
@@ -129,13 +132,35 @@ cmd_build() {
 }
 
 cmd_launch() {
-    local MOCK_FLAG=""
-    if [ "${1:-}" = "--mock" ]; then
-        MOCK_FLAG="-UITesting"
-        info "Starte App mit Mock-Daten..."
-    else
-        info "Starte App..."
-    fi
+    local EXTRA_ARGS=()
+    local SCREEN=""
+
+    # Parse arguments
+    while [ $# -gt 0 ]; do
+        case "$1" in
+            --mock)
+                EXTRA_ARGS+=("-UITesting")
+                info "Mock-Daten aktiviert"
+                ;;
+            --screen)
+                shift
+                SCREEN="${1:-}"
+                if [ -z "$SCREEN" ]; then
+                    error "--screen braucht einen Screen-Namen!"
+                    echo "Verfuegbar: backlog, blox, day, focus, review, refiner"
+                    return 1
+                fi
+                EXTRA_ARGS+=("--screen" "$SCREEN")
+                info "Navigiere zu Screen: $SCREEN"
+                ;;
+            *)
+                EXTRA_ARGS+=("$1")
+                ;;
+        esac
+        shift
+    done
+
+    info "Starte App..."
 
     # Sicherstellen dass Simulator laeuft
     cmd_boot
@@ -154,9 +179,34 @@ cmd_launch() {
     # App beenden, installieren, starten
     xcrun simctl terminate "$SIM_ID" "$BUNDLE_ID" 2>/dev/null || true
     xcrun simctl install "$SIM_ID" "$APP_PATH"
-    xcrun simctl launch "$SIM_ID" "$BUNDLE_ID" $MOCK_FLAG
+    xcrun simctl launch "$SIM_ID" "$BUNDLE_ID" "${EXTRA_ARGS[@]}"
 
     success "App gestartet ($BUNDLE_ID)"
+}
+
+cmd_navigate() {
+    local SCREEN="${1:-}"
+
+    if [ -z "$SCREEN" ]; then
+        error "Screen-Name fehlt!"
+        echo "Usage: ./scripts/sim.sh navigate <screen>"
+        echo ""
+        echo "Screens: backlog, blox, day, focus, review, refiner"
+        return 1
+    fi
+
+    # Validate screen name
+    case "$SCREEN" in
+        backlog|blox|day|focus|review|refiner) ;;
+        *)
+            error "Unbekannter Screen: $SCREEN"
+            echo "Verfuegbar: backlog, blox, day, focus, review, refiner"
+            return 1
+            ;;
+    esac
+
+    # Relaunch app with --screen argument
+    cmd_launch --screen "$SCREEN"
 }
 
 cmd_screenshot() {
@@ -321,7 +371,9 @@ cmd_help() {
     echo "  status                          Simulator-Status pruefen"
     echo "  boot                            Simulator starten"
     echo "  build                           App fuer Simulator bauen"
-    echo "  launch [--mock]                 App installieren + starten"
+    echo "  launch [--mock] [--screen name] App installieren + starten"
+    echo "  navigate <screen>               App neu starten + zum Screen navigieren"
+    echo "                                  Screens: backlog, blox, day, focus, review, refiner"
     echo "  screenshot [path]               Screenshot (default: /tmp/sim_screenshot.png)"
     echo "  test <TestClass[/method]>        UI Test ausfuehren"
     echo "  unit <TestClass[/method]>        Unit Test ausfuehren"
@@ -344,6 +396,7 @@ case "$COMMAND" in
     boot)       cmd_boot ;;
     build)      cmd_build ;;
     launch)     cmd_launch "$@" ;;
+    navigate)   cmd_navigate "$@" ;;
     screenshot) cmd_screenshot "$@" ;;
     test)       cmd_test "$@" ;;
     unit)       cmd_unit "$@" ;;

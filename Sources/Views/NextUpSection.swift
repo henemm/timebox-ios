@@ -5,6 +5,8 @@ import SwiftUI
 struct NextUpSection: View {
     let tasks: [PlanItem]
     let onRemoveFromNextUp: (String) -> Void
+    var limitationWarning: LimitationWarning? = nil
+    var onDismissWarning: (() -> Void)? = nil
     var onEditTask: ((PlanItem) -> Void)?
     var onDeleteTask: ((PlanItem) -> Void)?
     var onStartFocusSprint: ((String) -> Void)?
@@ -28,6 +30,12 @@ struct NextUpSection: View {
                 }
             }
             .padding(.horizontal)
+
+            // Limitation Guard Banner
+            if let warning = limitationWarning {
+                LimitationWarningBanner(warning: warning, onDismiss: { onDismissWarning?() })
+                    .padding(.horizontal)
+            }
 
             if tasks.isEmpty {
                 // Empty state

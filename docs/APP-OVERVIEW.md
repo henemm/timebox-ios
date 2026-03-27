@@ -51,13 +51,13 @@ FocusBlox/
 | Kategorie | Anzahl |
 |-----------|--------|
 | Services | 25 |
-| Models | 19 |
-| Shared Views | 45 |
+| Models | 20 |
+| Shared Views | 46 |
 | macOS Views | 18 |
 | App Intents | 13 |
-| Test-Dateien gesamt | 244 |
-| — iOS Unit Tests | 105 |
-| — iOS UI Tests | 108 |
+| Test-Dateien gesamt | 246 |
+| — iOS Unit Tests | 106 |
+| — iOS UI Tests | 109 |
 | — macOS Unit Tests | 6 |
 | — macOS UI Tests | 20 |
 | — Watch Tests | 4 |
@@ -65,7 +65,7 @@ FocusBlox/
 
 ---
 
-### Services (24)
+### Services (25)
 
 | Service | Pfad | Beschreibung |
 |---------|------|-------------|
@@ -77,6 +77,7 @@ FocusBlox/
 | DisciplineStatsService | `Sources/Services/DisciplineStatsService.swift` | Aggregiert Disziplin-Statistiken fuer Review-Views; Multi-Wochen-Historie |
 | EventKitRepository | `Sources/Services/EventKitRepository.swift` | EventKit-Wrapper fuer Kalender/Erinnerungen mit Change-Notifications |
 | FocusBlockActionService | `Sources/Services/FocusBlockActionService.swift` | Task-Aktionen (Complete, Skip, Follow-up) waehrend FocusBlock; iOS + macOS |
+| LimitationGuardService | `Sources/Services/LimitationGuardService.swift` | Prueft ob Next-Up-Tasks den historischen Tagesdurchschnitt um 1.5x ueberschreiten; gibt `LimitationWarning?` zurueck |
 | LiveActivityManager | `Sources/Services/LiveActivityManager.swift` | Live Activity Lifecycle fuer Lock Screen und Dynamic Island |
 | LocalTaskSource | `Sources/Services/TaskSources/LocalTaskSource.swift` | TaskSource-Implementierung fuer lokale Tasks via SwiftData + CloudKit |
 | MenuBarIconState | `Sources/Services/MenuBarIconState.swift` | State-Logik fuer macOS Menu Bar Icon (idle/active/done) |
@@ -95,7 +96,7 @@ FocusBlox/
 | WidgetDataPublisher | `Sources/Services/WidgetDataPublisher.swift` | Schreibt aggregierte Task-Daten (nextUpCount, completedToday, oldestWaitingDays) in App Group UserDefaults (`group.com.henning.focusblox`) und triggert Widget-Reload via WidgetCenter |
 | WidgetRelevanceCalculator | `Sources/Services/WidgetRelevanceCalculator.swift` | Widget-Relevanz fuer Smart Stack (10.0 idle bis 100.0 aktiver Block) |
 
-### Models (19)
+### Models (20)
 
 | Model | Pfad | Beschreibung |
 |-------|------|-------------|
@@ -106,6 +107,7 @@ FocusBlox/
 | FocusBlock | `Sources/Models/FocusBlock.swift` | Zeitslot fuer fokussierte Arbeit mit Task-Zuweisung und Tracking |
 | FocusBlockActivityAttributes | `Sources/Models/FocusBlockActivityAttributes.swift` | ActivityKit-Attributes fuer Live Activities |
 | GapFinder | `Sources/Models/GapFinder.swift` | Findet freie Zeitslots zwischen Kalender-Events und Focus Blocks |
+| LimitationWarning | `Sources/Services/LimitationGuardService.swift` | Struct mit geplanten Tasks/Minuten und historischen Durchschnittswerten; Ergebnis von `LimitationGuardService.evaluate()` |
 | LocalTask | `Sources/Models/LocalTask.swift` | SwiftData @Model fuer lokale Tasks mit CloudKit-Sync |
 | PlanItem | `Sources/Models/PlanItem.swift` | Unified Plan-Item (Task + Event kombiniert) mit Ranking |
 | PlanItemTransfer | `Sources/Models/PlanItemTransfer.swift` | Transferable fuer Drag&Drop von Plan-Items |
@@ -119,7 +121,7 @@ FocusBlox/
 | TimelineItem | `Sources/Models/TimelineItem.swift` | Unified Timeline-Item fuer Kollisionserkennung |
 | WarningTiming | `Sources/Models/WarningTiming.swift` | Enum: short (90%), standard (80%), early (70%) |
 
-### Shared Views (45)
+### Shared Views (46)
 
 **Hauptscreens:**
 
@@ -159,7 +161,8 @@ FocusBlox/
 | TaskPreviewView | `Sources/Views/TaskPreviewView.swift` | Task-Vorschau Kompakt-Ansicht |
 | EventBlock | `Sources/Views/EventBlock.swift` | Kalender-Event in Timeline |
 | HourRow | `Sources/Views/HourRow.swift` | Stundenzeile in Timeline |
-| NextUpSection | `Sources/Views/NextUpSection.swift` | Next-Up Tasks Sektion |
+| NextUpSection | `Sources/Views/NextUpSection.swift` | Next-Up Tasks Sektion; zeigt optionalen `LimitationWarningBanner` |
+| LimitationWarningBanner | `Sources/Services/LimitationGuardService.swift` | Inline-Banner (nicht-modal) warnt wenn Next-Up den historischen Tagesdurchschnitt um 1.5x ueberschreitet; Dismiss-Button blendet Banner aus bis naechster Task hinzugefuegt wird |
 
 **Picker & Badges:**
 
@@ -274,6 +277,7 @@ FocusBlox/
 | **Focus Live** | Aktiver Timer mit Task-Tracking, Gong am Ende, Warning vor Ende, Sprint Review | `FocusLiveView`, `FocusBlockActionService`, `SoundService`, `TimerCalculator` |
 | **Daily Review** | Erledigte Tasks nach Focus Blocks gruppiert, Today/Week Ansicht | `DailyReviewView`, `SprintReviewSheet`, `ReviewComponents` |
 | **Quick Capture** | Schnelle Task-Eingabe auf iOS, Watch-Diktat, Mac-Hotkey | `QuickCaptureView`, `QuickCapturePanel`, `VoiceInputSheet` |
+| **Limitation Guard** | Inline-Banner warnt wenn Next-Up-Tasks den historischen Tagesdurchschnitt (Tasks oder Minuten) um 1.5x ueberschreiten; nicht-modal, dismissbar, re-trigger bei Listenveraenderung | `LimitationGuardService`, `LimitationWarningBanner`, `DayView`, `NextUpSection`, `MorningCoachingSection` |
 
 ### Task-Management
 

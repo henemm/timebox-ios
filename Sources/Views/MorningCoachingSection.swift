@@ -4,11 +4,19 @@ struct MorningCoachingSection: View {
     let suggestions: [NextUpSuggestion]
     let onConfirm: (NextUpSuggestion) -> Void
     let onDismiss: (NextUpSuggestion) -> Void
+    var limitationWarning: LimitationWarning? = nil
+    var onDismissWarning: (() -> Void)? = nil
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Vorschlaege")
                 .font(.headline)
+
+            // Limitation Guard Banner
+            if let warning = limitationWarning {
+                LimitationWarningBanner(warning: warning, onDismiss: { onDismissWarning?() })
+            }
+
             ForEach(suggestions) { suggestion in
                 suggestionRow(suggestion)
             }

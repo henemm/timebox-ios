@@ -34,12 +34,12 @@
 | ~~RW_2.1a~~ | ~~2 Tagesplanung~~ | ~~DayView — Phase A: Grundstruktur + Modi-Wechsel + Tab/Sidebar + Settings~~ | ~~Medium~~ | ~~M~~ | ~~Eigene View~~ | ~~[Spec](specs/rework/2.1a-day-view-skeleton.md)~~ ERLEDIGT |
 | ~~RW_2.1b~~ | ~~2 Tagesplanung~~ | ~~DayView — Phase B: Morgen-Modus (Kalender-Luecken + Task-Liste)~~ | ~~Medium~~ | ~~M~~ | ~~Eigene View~~ | ~~[Spec](specs/rework/2.1b-day-view-morning-mode.md)~~ ERLEDIGT |
 | ~~RW_2.1c~~ | ~~2 Tagesplanung~~ | ~~DayView — Phase C: Tages-Timeline (TimelineView Integration)~~ | ~~Medium~~ | ~~M~~ | ~~Eigene View~~ | ~~[Spec](specs/rework/2.1c-day-view-daytime-timeline.md)~~ ERLEDIGT |
-| RW_2.1d | 2 Tagesplanung | DayView — Phase D: Abend-Modus (Zusammenfassung + Stubs fuer 4.2/4.3) | Medium | M | Eigene View | [Spec](specs/rework/2.1-day-view.md) |
+| ~~RW_2.1d~~ | ~~2 Tagesplanung~~ | ~~DayView — Phase D: Abend-Modus (Zusammenfassung + Stubs fuer 4.2/4.3)~~ | ~~Medium~~ | ~~M~~ | ~~Eigene View~~ | ~~[Spec](specs/rework/2.1-day-view.md)~~ ERLEDIGT |
 | ~~RW_2.2~~ | ~~2 Tagesplanung~~ | ~~KI-gestuetzte Tagesvorschlaege~~ | ~~Medium~~ | ~~L~~ | ~~Shared~~ | ~~[Spec](specs/rework/2.2-next-up-suggestions-impl.md)~~ ERLEDIGT |
-| RW_2.3 | 2 Tagesplanung | Limitation Guard | Medium | S | Shared | [Spec](specs/rework/2.3-limitation-guard.md) |
+| ~~RW_2.3~~ | ~~2 Tagesplanung~~ | ~~Limitation Guard~~ | ~~Medium~~ | ~~S~~ | ~~Shared~~ | ~~[Spec](specs/rework/2.3-limitation-guard-impl.md)~~ ERLEDIGT |
 | RW_2.4 | 2 Tagesplanung | Backlog UX Rework | Medium | L | Eigene View | [Spec](specs/rework/2.4-backlog-ux-rework.md) |
 | RW_3.5 | 3 Ausfuehrung | Recurring Stacking — Visuelle Gruppierung + Priority Boost | Medium | M | Eigene View | [Spec](specs/rework/3.5-recurring-stacking.md) |
-| RW_4.1 | 4 Reflexion | Soft Evening Reset | Low | M | Shared | [Spec](specs/rework/4.1-soft-evening-reset.md) |
+| ~~RW_4.1~~ | ~~4 Reflexion~~ | ~~Soft Evening Reset~~ | ~~Low~~ | ~~M~~ | ~~Shared~~ | ~~[Spec](specs/rework/4.1-soft-evening-reset.md)~~ ERLEDIGT |
 | ~~RW_4.2~~ | ~~4 Reflexion~~ | ~~Success Story Generator~~ | ~~Low~~ | ~~L~~ | ~~Shared~~ | ~~[Spec](specs/rework/4.2-success-story-generator-impl.md)~~ ERLEDIGT |
 | ~~RW_4.3~~ | ~~4 Reflexion~~ | ~~Failure Protocol~~ | ~~Low~~ | ~~M~~ | ~~Shared~~ | ~~[Spec](specs/rework/4.3-failure-protocol-impl.md)~~ ERLEDIGT |
 | ~~RW_4.4~~ | ~~4 Reflexion~~ | ~~Morning Widget~~ | ~~Low~~ | ~~M~~ | ~~iOS-only~~ | ~~[Spec](specs/rework/4.4-morning-widget-impl.md)~~ ERLEDIGT |

@@ -353,6 +353,20 @@ struct FocusBloxApp: App {
                 if ProcessInfo.processInfo.arguments.contains("-DayViewDeepLink") {
                     selectedTab = .day
                 }
+                // Generic --screen argument for sim.sh navigate
+                if let screenIndex = ProcessInfo.processInfo.arguments.firstIndex(of: "--screen"),
+                   screenIndex + 1 < ProcessInfo.processInfo.arguments.count {
+                    let screen = ProcessInfo.processInfo.arguments[screenIndex + 1]
+                    switch screen {
+                    case "backlog": selectedTab = .backlog
+                    case "blox": selectedTab = .blox
+                    case "day": selectedTab = .day
+                    case "focus": selectedTab = .focus
+                    case "review": selectedTab = .review
+                    case "refiner": selectedTab = .refiner
+                    default: break
+                    }
+                }
             }
             .onChange(of: scenePhase) { _, newPhase in
                 if newPhase == .active {

@@ -57,11 +57,39 @@ For bug fixes: `/10-bug <description>` triggers Analysis-First → Spec → TDD 
 - **Never ask for manual testing** — fix the code until tests are green
 - `tdd_enforcement.py` hook verifies real test artifacts with timestamps
 
-**Test Simulator:**
+**Build & Test Tool: `./scripts/sim.sh`**
+
+**IMMER dieses Script benutzen** — NIEMALS `xcrun`/`xcodebuild` manuell zusammenbauen!
+
 ```bash
-xcodebuild test -project FocusBlox.xcodeproj -scheme FocusBlox \
-  -destination 'id=1EC79950-6704-47D0-BDF8-2C55236B4B40'
+./scripts/sim.sh build              # App bauen
+./scripts/sim.sh test TestClass     # UI Test ausfuehren
+./scripts/sim.sh unit TestClass     # Unit Test ausfuehren
+./scripts/sim.sh screenshot [pfad]  # Screenshot vom Simulator
+./scripts/sim.sh mac-build          # macOS App bauen
+./scripts/sim.sh mac-unit TestClass # macOS Unit Test
 ```
+
+Bei Shared-Code-Aenderungen (`Sources/`): AUCH `mac-build` ausfuehren!
+
+## UI Test Konventionen
+
+**Pre-Flight (PFLICHT vor JEDEM UI Test):**
+1. View-Datei lesen → alle `.accessibilityIdentifier()` notieren
+2. `/inspect-ui` ausfuehren fuer den Ziel-Screen
+3. Identifier-Mapping erstellen: Element → Actual ID → Type
+4. Erst DANN Test schreiben — NIEMALS IDs raten oder aus Gedaechtnis
+
+**AccessibilityIdentifier-Muster:**
+- Buttons: `camelCase` + `Button` (z.B. `addTaskButton`, `saveButton`)
+- Toggles: `camelCase` + `Toggle` (z.B. `remindersSyncToggle`)
+- Dynamische Rows: `prefix_<uuid>` (z.B. `taskTitle_<id>`)
+- Container mit ID: MUSS `.accessibilityElement(children: .contain)` haben
+- Listen-Items: IMMER dynamische ID mit UUID, NIE statisch
+
+**Tab Navigation:** `app.tabBars.buttons["Backlog"]` (Label-basiert, NICHT `app.buttons["backlogTab"]`)
+
+**Verboten:** `sleep(N)` — stattdessen `waitForExistence(timeout:)`
 
 ## Xcode-Projekt: Dateien hinzufuegen
 

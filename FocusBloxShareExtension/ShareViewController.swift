@@ -1,6 +1,5 @@
 import UIKit
 import SwiftUI
-import SwiftData
 import UniformTypeIdentifiers
 
 // MARK: - ShareViewController
@@ -143,41 +142,21 @@ struct ShareSheetView: View {
         )
         guard !trimmedTitle.isEmpty else { return }
 
-        do {
-            let schema = Schema([LocalTask.self, TaskMetadata.self])
-            let config: ModelConfiguration
-
-            // Try App Group + CloudKit first, fallback to App Group only
-            if FileManager.default.containerURL(
-                forSecurityApplicationGroupIdentifier: "group.com.henning.focusblox"
-            ) != nil {
-                config = ModelConfiguration(
-                    schema: schema,
-                    groupContainer: .identifier("group.com.henning.focusblox"),
-                    cloudKitDatabase: .private("iCloud.com.henning.focusblox")
-                )
-            } else {
-                config = ModelConfiguration(
-                    schema: schema,
-                    isStoredInMemoryOnly: false,
-                    cloudKitDatabase: .private("iCloud.com.henning.focusblox")
-                )
-            }
-
-            let container = try ModelContainer(for: schema, configurations: [config])
-            let context = ModelContext(container)
-
-            let task = LocalTask(title: trimmedTitle)
-            task.lifecycleStatus = TaskLifecycleStatus.raw.rawValue
-            task.needsTitleImprovement = true
-            task.sourceURL = sourceURL
-            context.insert(task)
-            try context.save()
-
-            extensionContext?.completeRequest(returningItems: [], completionHandler: nil)
-        } catch {
-            errorMessage = "Fehler beim Speichern: \(error.localizedDescription)"
+        // Save via App Group UserDefaults — main app picks up on next launch
+        let defaults = UserDefaults(suiteName: "group.com.henning.focusblox")
+        var pending = defaults?.array(forKey: "pendingSharedTasks") as? [[String: String]] ?? []
+        var entry: [String: String] = [
+            "title": trimmedTitle,
+            "id": UUID().uuidString,
+            "createdAt": ISO8601DateFormatter().string(from: Date())
+        ]
+        if let sourceURL {
+            entry["sourceURL"] = sourceURL
         }
+        pending.append(entry)
+        defaults?.set(pending, forKey: "pendingSharedTasks")
+
+        extensionContext?.completeRequest(returningItems: [], completionHandler: nil)
     }
 
     // MARK: - Cancel
