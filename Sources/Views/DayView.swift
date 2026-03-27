@@ -290,8 +290,10 @@ struct DayView: View {
                     }
                     if !completedTasks.isEmpty { completedTasksSection }
                     if !unfinishedTasks.isEmpty { unfinishedTasksSection }
+                    #if os(iOS)
                     SuccessStoryView(completedTasks: completedTasks, focusBlocks: focusBlocks)
                     failureQuickSelectSection
+                    #endif
                 }
                 .padding()
             }
@@ -328,6 +330,7 @@ struct DayView: View {
         .accessibilityIdentifier("eveningUnfinishedSection")
     }
 
+    #if os(iOS)
     @ViewBuilder
     private var failureQuickSelectSection: some View {
         if !unfinishedTasks.isEmpty {
@@ -338,6 +341,7 @@ struct DayView: View {
             }
         }
     }
+    #endif
 
     // MARK: - Data Loading
 
