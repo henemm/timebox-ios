@@ -17,6 +17,9 @@ struct FocusBloxWidgetsBundle: WidgetBundle {
         // Home/Lock Screen Widget for quick task capture
         QuickCaptureWidget()
 
+        // Lock Screen Widget for daily status (morning/evening)
+        DayStatusWidget()
+
         // Live Activity for Focus Blocks
         FocusBlockLiveActivity()
     }

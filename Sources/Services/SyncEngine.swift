@@ -192,6 +192,9 @@ final class SyncEngine {
 
         try modelContext.save()
 
+        // RW_4.4: Update widget data after task completion
+        WidgetDataPublisher.publish(context: modelContext)
+
         // ITB-G1: Donate intent so Siri learns completion patterns
         #if !os(macOS)
         Task {

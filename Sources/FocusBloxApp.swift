@@ -46,7 +46,8 @@ struct FocusBloxApp: App {
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
             LocalTask.self,
-            TaskMetadata.self
+            TaskMetadata.self,
+            TaskFailureRecord.self
         ])
 
         let isUITesting = ProcessInfo.processInfo.arguments.contains("-UITesting")
@@ -313,8 +314,8 @@ struct FocusBloxApp: App {
                     let enrichment = SmartTaskEnrichmentService(modelContext: sharedModelContainer.mainContext)
                     Task { await enrichment.enrichAllTbdTasks() }
                     // Spotlight: reindex all active tasks so they appear in system search
-                    let spotlightContext = sharedModelContainer.mainContext
-                    Task { try? await SpotlightIndexingService.shared.reindexAllTasks(context: spotlightContext) }
+                    nonisolated(unsafe) let spotlightCtx = sharedModelContainer.mainContext
+                    Task { try? await SpotlightIndexingService.shared.reindexAllTasks(context: spotlightCtx) }
                     // RW_4.1: Soft Evening Reset — clear unfinished Next-Up on new day
                     let resetCount = (try? EveningResetService.performResetIfNeeded(
                         context: sharedModelContainer.mainContext
@@ -348,6 +349,10 @@ struct FocusBloxApp: App {
                     || ProcessInfo.processInfo.arguments.contains("-SimulateCCTrigger") {
                     showQuickCapture = true
                 }
+                // RW_4.4: Simulate deep link for UI testing
+                if ProcessInfo.processInfo.arguments.contains("-DayViewDeepLink") {
+                    selectedTab = .day
+                }
             }
             .onChange(of: scenePhase) { _, newPhase in
                 if newPhase == .active {
@@ -365,6 +370,7 @@ struct FocusBloxApp: App {
                     #if !os(macOS)
                     NotificationService.updateOverdueBadge(container: sharedModelContainer)
                     #endif
+                    WidgetDataPublisher.publish(context: sharedModelContainer.mainContext)
                 }
                 if newPhase == .background {
                     Task { await deferredCompletion.flushAll() }
@@ -375,10 +381,13 @@ struct FocusBloxApp: App {
                             eventKitRepo: eventKitRepository
                         )
                     }
+                    WidgetDataPublisher.publish(context: sharedModelContainer.mainContext)
                 }
             }
             .onOpenURL { url in
-                if url.host == "create-task" {
+                if url.host == "day-view" {
+                    selectedTab = .day
+                } else if url.host == "create-task" {
                     quickCaptureTitle = ""
                     showQuickCapture = true
                 } else if FocusBlock.eventID(from: url) != nil {

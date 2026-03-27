@@ -88,12 +88,12 @@ final class LiveActivityManager: Sendable {
         )
 
         print("🔄 [LiveActivity] UPDATE: task='\(currentTask ?? "nil")', completed=\(completedCount)")
+        nonisolated(unsafe) let capturedActivity = activity
+        let staleDate = Date().addingTimeInterval(15)
+        let content = ActivityContent(state: newState, staleDate: staleDate)
+        nonisolated(unsafe) let capturedContent = content
         Task {
-            // Use staleDate for better background updates
-            let staleDate = Date().addingTimeInterval(15)
-            await activity.update(
-                ActivityContent(state: newState, staleDate: staleDate)
-            )
+            await capturedActivity.update(capturedContent)
         }
     }
 
@@ -106,11 +106,10 @@ final class LiveActivityManager: Sendable {
 
         print("🛑 [LiveActivity] END called")
 
-        Task {
-            // End with nil content using immediate dismissal
-            await activity.end(nil, dismissalPolicy: .immediate)
+        nonisolated(unsafe) let capturedActivity = activity
+        Task { @MainActor in
+            await capturedActivity.end(nil, dismissalPolicy: .immediate)
 
-            // Also end any orphaned activities
             for orphan in Activity<FocusBlockActivityAttributes>.activities {
                 await orphan.end(nil, dismissalPolicy: .immediate)
             }

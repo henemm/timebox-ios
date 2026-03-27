@@ -1,6 +1,6 @@
 # FocusBlox — App-Bestandsaufnahme
 
-> Stand: 2026-03-20 | Zweck: Referenz-Dokument fuer geplantes Rework
+> Stand: 2026-03-27 | Zweck: Referenz-Dokument fuer geplantes Rework
 
 ---
 
@@ -22,7 +22,7 @@
 FocusBlox/
 ├── Sources/                          # Shared Code (111 Swift-Dateien)
 │   ├── Models/         (19)          #   Datenstrukturen
-│   ├── Services/       (24)          #   Business-Logik
+│   ├── Services/       (25)          #   Business-Logik
 │   ├── Views/          (45)          #   Plattformuebergreifende UI
 │   ├── Intents/        (13)          #   App Intents / Siri Shortcuts
 │   ├── Helpers/        (4)           #   Utilities
@@ -50,7 +50,7 @@ FocusBlox/
 
 | Kategorie | Anzahl |
 |-----------|--------|
-| Services | 24 |
+| Services | 25 |
 | Models | 19 |
 | Shared Views | 45 |
 | macOS Views | 18 |
@@ -92,6 +92,7 @@ FocusBlox/
 | TaskPriorityScoringService | `Sources/Services/TaskPriorityScoringService.swift` | Deterministisches Priority-Scoring: doNow/planSoon/eventually/someday |
 | TaskTitleEngine | `Sources/Services/TaskTitleEngine.swift` | AI-Verbesserung von Task-Titeln via Apple Intelligence |
 | TimerCalculator | `Sources/Services/TimerCalculator.swift` | Shared Timer-Berechnungen fuer Task-Fortschritt (iOS + macOS) |
+| WidgetDataPublisher | `Sources/Services/WidgetDataPublisher.swift` | Schreibt aggregierte Task-Daten (nextUpCount, completedToday, oldestWaitingDays) in App Group UserDefaults (`group.com.henning.focusblox`) und triggert Widget-Reload via WidgetCenter |
 | WidgetRelevanceCalculator | `Sources/Services/WidgetRelevanceCalculator.swift` | Widget-Relevanz fuer Smart Stack (10.0 idle bis 100.0 aktiver Block) |
 
 ### Models (19)
@@ -224,11 +225,12 @@ FocusBlox/
 
 ### Extensions & Widgets
 
-**iOS Widgets (4 Dateien):**
+**iOS Widgets (5 Dateien):**
 - `FocusBloxWidgets/FocusBloxWidgetsBundle.swift` — Widget Bundle
 - `FocusBloxWidgets/FocusBlockLiveActivity.swift` — Live Activity (Lock Screen + Dynamic Island)
 - `FocusBloxWidgets/QuickAddTaskControl.swift` — Quick Add Control
 - `FocusBloxWidgets/QuickCaptureWidget.swift` — Quick Capture Widget
+- `FocusBloxWidgets/DayStatusWidget.swift` — Lock Screen Widget (Morgen/Abend-Modus; Tagesstatus via App Group UserDefaults)
 
 **watchOS (6+2 Dateien):**
 - `FocusBloxWatch Watch App/FocusBloxWatchApp.swift` — App Entry Point
@@ -302,7 +304,7 @@ FocusBlox/
 | **Notifications** | Due-Date Reminders mit interaktiven Actions (NextUp, Postpone, Complete) | `NotificationService`, `NotificationActionDelegate` |
 | **Siri Shortcuts** | 5+ App Intents fuer Automatisierung (Create, Complete, Count, GetNextUp) | `Sources/Intents/` (13 Dateien) |
 | **Spotlight** | Tasks durchsuchbar via Spotlight | `SpotlightIndexingService` |
-| **Widgets** | Quick Capture Widget, Live Activity, Watch Complication | `FocusBloxWidgets/`, `FocusBloxWatchWidgets/` |
+| **Widgets** | Quick Capture Widget, Live Activity, Watch Complication, Lock Screen Day Status Widget (Morgen/Abend) | `FocusBloxWidgets/`, `FocusBloxWatchWidgets/`, `WidgetDataPublisher` |
 | **Share Extension** | Tasks aus anderen Apps erstellen (iOS + macOS) | `FocusBloxShareExtension/`, `FocusBloxMacShareExtension/` |
 | **Menu Bar (macOS)** | Status-Item mit Focus-State und Quick Actions | `MenuBarView`, `MenuBarIconState` |
 

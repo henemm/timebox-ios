@@ -1,0 +1,382 @@
+[0;34m[sim][0m Fuehre UI Test aus: DayStatusWidgetUITests
+[0;34m[sim][0m Starte Simulator...
+[0;34m[sim][0m Warte auf Boot...
+Monitoring boot status for FocusBlox (1EC79950-6704-47D0-BDF8-2C55236B4B40).
+Device already booted, nothing to do.
+
+[0;32m[sim][0m Simulator bereit.
+Command line invocation:
+    /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild test -project FocusBlox.xcodeproj -scheme FocusBlox -destination id=1EC79950-6704-47D0-BDF8-2C55236B4B40 "-only-testing:FocusBloxUITests/DayStatusWidgetUITests" -parallel-testing-enabled NO -disable-concurrent-destination-testing CODE_SIGNING_ALLOWED=NO
+
+Build settings from command line:
+    CODE_SIGNING_ALLOWED = NO
+
+ComputePackagePrebuildTargetDependencyGraph
+
+Prepare packages
+
+CreateBuildRequest
+
+SendProjectDescription
+
+CreateBuildOperation
+
+ComputeTargetDependencyGraph
+note: Building targets in dependency order
+note: Target dependency graph (8 targets)
+    Target 'FocusBloxCoreTests' in project 'FocusBlox'
+        ➜ Explicit dependency on target 'FocusBloxCore' in project 'FocusBlox'
+        ➜ Explicit dependency on target 'FocusBlox' in project 'FocusBlox'
+    Target 'FocusBloxUITests' in project 'FocusBlox'
+        ➜ Explicit dependency on target 'FocusBlox' in project 'FocusBlox'
+    Target 'FocusBloxTests' in project 'FocusBlox'
+        ➜ Explicit dependency on target 'FocusBlox' in project 'FocusBlox'
+    Target 'FocusBlox' in project 'FocusBlox'
+        ➜ Explicit dependency on target 'FocusBloxWidgetsExtension' in project 'FocusBlox'
+        ➜ Explicit dependency on target 'FocusBloxCore' in project 'FocusBlox'
+        ➜ Explicit dependency on target 'FocusBloxWatch Watch App' in project 'FocusBlox'
+        ➜ Explicit dependency on target 'FocusBloxShareExtension' in project 'FocusBlox'
+    Target 'FocusBloxShareExtension' in project 'FocusBlox' (no dependencies)
+    Target 'FocusBloxWatch Watch App' in project 'FocusBlox' (no dependencies)
+    Target 'FocusBloxWidgetsExtension' in project 'FocusBlox'
+        ➜ Explicit dependency on target 'FocusBloxCore' in project 'FocusBlox'
+    Target 'FocusBloxCore' in project 'FocusBlox' (no dependencies)
+
+GatherProvisioningInputs
+
+CreateBuildDescription
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -v -E -dM -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.4.sdk -x c -c /dev/null
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/usr/bin/actool --version --output-format xml1
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/usr/bin/actool --print-asset-tag-combinations --output-format xml1 /Users/hem/Developer/my-daily-sprints/FocusBloxWatch Watch App/Assets.xcassets
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc --version
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/usr/bin/ibtool --version --output-format xml1
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -v -E -dM -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.4.sdk -x c -c /dev/null
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -v -E -dM -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/WatchSimulator.platform/Developer/SDKs/WatchSimulator26.4.sdk -x c -c /dev/null
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld -version_details
+
+ReadFileContents /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/share/docc/features.json
+
+Build description signature: 75f8fe090dda87856d14256b073fae73
+Build description path: /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/XCBuildData/75f8fe090dda87856d14256b073fae73.xcbuilddata
+ClangStatCache /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.4.sdk /Users/hem/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator26.4-23E237-686eebb5dc1d8ecb277353a59184f4aa.sdkstatcache
+    cd /Users/hem/Developer/my-daily-sprints/FocusBlox.xcodeproj
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.4.sdk -o /Users/hem/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator26.4-23E237-686eebb5dc1d8ecb277353a59184f4aa.sdkstatcache
+
+ClangStatCache /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode.app/Contents/Developer/Platforms/WatchSimulator.platform/Developer/SDKs/WatchSimulator26.4.sdk /Users/hem/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/watchsimulator26.4-23T238-8aa186fa658f8d2cb200b6f26918d89b.sdkstatcache
+    cd /Users/hem/Developer/my-daily-sprints/FocusBlox.xcodeproj
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode.app/Contents/Developer/Platforms/WatchSimulator.platform/Developer/SDKs/WatchSimulator26.4.sdk -o /Users/hem/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/watchsimulator26.4-23T238-8aa186fa658f8d2cb200b6f26918d89b.sdkstatcache
+
+ProcessInfoPlistFile /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-iphonesimulator/FocusBloxCore.framework/Info.plist /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxCore.build/empty-FocusBloxCore.plist (in target 'FocusBloxCore' from project 'FocusBlox')
+    cd /Users/hem/Developer/my-daily-sprints
+    builtin-infoPlistUtility /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxCore.build/empty-FocusBloxCore.plist -producttype com.apple.product-type.framework -expandbuildsettings -format binary -platform iphonesimulator -o /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-iphonesimulator/FocusBloxCore.framework/Info.plist
+
+WriteAuxiliaryFile /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxShareExtension.build/Objects-normal/arm64/FocusBloxShareExtension.SwiftConstValuesFileList (in target 'FocusBloxShareExtension' from project 'FocusBlox')
+    cd /Users/hem/Developer/my-daily-sprints
+    write-file /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxShareExtension.build/Objects-normal/arm64/FocusBloxShareExtension.SwiftConstValuesFileList
+
+WriteAuxiliaryFile /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxShareExtension.build/Objects-normal/arm64/FocusBloxShareExtension.SwiftFileList (in target 'FocusBloxShareExtension' from project 'FocusBlox')
+    cd /Users/hem/Developer/my-daily-sprints
+    write-file /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxShareExtension.build/Objects-normal/arm64/FocusBloxShareExtension.SwiftFileList
+
+WriteAuxiliaryFile /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxShareExtension.build/Objects-normal/arm64/FocusBloxShareExtension.LinkFileList (in target 'FocusBloxShareExtension' from project 'FocusBlox')
+    cd /Users/hem/Developer/my-daily-sprints
+    write-file /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxShareExtension.build/Objects-normal/arm64/FocusBloxShareExtension.LinkFileList
+
+WriteAuxiliaryFile /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxShareExtension.build/Objects-normal/arm64/FocusBloxShareExtension-OutputFileMap.json (in target 'FocusBloxShareExtension' from project 'FocusBlox')
+    cd /Users/hem/Developer/my-daily-sprints
+    write-file /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxShareExtension.build/Objects-normal/arm64/FocusBloxShareExtension-OutputFileMap.json
+
+WriteAuxiliaryFile /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBlox.build/Objects-normal/arm64/FocusBlox.SwiftFileList (in target 'FocusBlox' from project 'FocusBlox')
+    cd /Users/hem/Developer/my-daily-sprints
+    write-file /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBlox.build/Objects-normal/arm64/FocusBlox.SwiftFileList
+
+WriteAuxiliaryFile /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBlox.build/Objects-normal/arm64/FocusBlox.LinkFileList (in target 'FocusBlox' from project 'FocusBlox')
+    cd /Users/hem/Developer/my-daily-sprints
+    write-file /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBlox.build/Objects-normal/arm64/FocusBlox.LinkFileList
+
+WriteAuxiliaryFile /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxWidgetsExtension.build/Objects-normal/arm64/FocusBloxWidgetsExtension.SwiftFileList (in target 'FocusBloxWidgetsExtension' from project 'FocusBlox')
+    cd /Users/hem/Developer/my-daily-sprints
+    write-file /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxWidgetsExtension.build/Objects-normal/arm64/FocusBloxWidgetsExtension.SwiftFileList
+
+WriteAuxiliaryFile /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxWidgetsExtension.build/Objects-normal/arm64/FocusBloxWidgetsExtension.SwiftConstValuesFileList (in target 'FocusBloxWidgetsExtension' from project 'FocusBlox')
+    cd /Users/hem/Developer/my-daily-sprints
+    write-file /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxWidgetsExtension.build/Objects-normal/arm64/FocusBloxWidgetsExtension.SwiftConstValuesFileList
+
+WriteAuxiliaryFile /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxWidgetsExtension.build/Objects-normal/arm64/FocusBloxWidgetsExtension.LinkFileList (in target 'FocusBloxWidgetsExtension' from project 'FocusBlox')
+    cd /Users/hem/Developer/my-daily-sprints
+    write-file /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxWidgetsExtension.build/Objects-normal/arm64/FocusBloxWidgetsExtension.LinkFileList
+
+WriteAuxiliaryFile /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxWidgetsExtension.build/Objects-normal/arm64/FocusBloxWidgetsExtension-OutputFileMap.json (in target 'FocusBloxWidgetsExtension' from project 'FocusBlox')
+    cd /Users/hem/Developer/my-daily-sprints
+    write-file /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxWidgetsExtension.build/Objects-normal/arm64/FocusBloxWidgetsExtension-OutputFileMap.json
+
+WriteAuxiliaryFile /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBlox.build/Objects-normal/arm64/FocusBlox.SwiftConstValuesFileList (in target 'FocusBlox' from project 'FocusBlox')
+    cd /Users/hem/Developer/my-daily-sprints
+    write-file /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBlox.build/Objects-normal/arm64/FocusBlox.SwiftConstValuesFileList
+
+WriteAuxiliaryFile /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBlox.build/Objects-normal/arm64/FocusBlox-OutputFileMap.json (in target 'FocusBlox' from project 'FocusBlox')
+    cd /Users/hem/Developer/my-daily-sprints
+    write-file /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBlox.build/Objects-normal/arm64/FocusBlox-OutputFileMap.json
+
+WriteAuxiliaryFile /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBlox.build/FocusBlox.DependencyMetadataFileList (in target 'FocusBlox' from project 'FocusBlox')
+    cd /Users/hem/Developer/my-daily-sprints
+    write-file /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBlox.build/FocusBlox.DependencyMetadataFileList
+
+WriteAuxiliaryFile /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBlox.build/FocusBlox-generated-files.hmap (in target 'FocusBlox' from project 'FocusBlox')
+    cd /Users/hem/Developer/my-daily-sprints
+    write-file /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBlox.build/FocusBlox-generated-files.hmap
+
+MkDir /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-iphonesimulator/FocusBloxUITests-Runner.app/PlugIns/FocusBloxUITests.xctest (in target 'FocusBloxUITests' from project 'FocusBlox')
+    cd /Users/hem/Developer/my-daily-sprints
+    /bin/mkdir -p /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-iphonesimulator/FocusBloxUITests-Runner.app/PlugIns/FocusBloxUITests.xctest
+
+WriteAuxiliaryFile /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-watchsimulator/FocusBloxWatch\ Watch\ App.build/FocusBloxWatch\ Watch\ App.DependencyMetadataFileList (in target 'FocusBloxWatch Watch App' from project 'FocusBlox')
+    cd /Users/hem/Developer/my-daily-sprints
+    write-file /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-watchsimulator/FocusBloxWatch\ Watch\ App.build/FocusBloxWatch\ Watch\ App.DependencyMetadataFileList
+
+ProcessInfoPlistFile /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-iphonesimulator/FocusBloxShareExtension.appex/Info.plist /Users/hem/Developer/my-daily-sprints/FocusBloxShareExtension/Info.plist (in target 'FocusBloxShareExtension' from project 'FocusBlox')
+    cd /Users/hem/Developer/my-daily-sprints
+    builtin-infoPlistUtility /Users/hem/Developer/my-daily-sprints/FocusBloxShareExtension/Info.plist -producttype com.apple.product-type.app-extension -expandbuildsettings -format binary -platform iphonesimulator -additionalcontentfile /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxShareExtension.build/Base.lproj/MainInterface-SBPartialInfo.plist -o /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-iphonesimulator/FocusBloxShareExtension.appex/Info.plist
+
+SwiftDriver FocusBloxShareExtension normal arm64 com.apple.xcode.tools.swift.compiler (in target 'FocusBloxShareExtension' from project 'FocusBlox')
+    cd /Users/hem/Developer/my-daily-sprints
+    builtin-SwiftDriver -- /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name FocusBloxShareExtension -Onone @/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxShareExtension.build/Objects-normal/arm64/FocusBloxShareExtension.SwiftFileList -DDEBUG -DDEBUG -enable-bare-slash-regex -enable-upcoming-feature DisableOutwardActorInference -enable-upcoming-feature InferSendableFromCaptures -enable-upcoming-feature GlobalActorIsolatedTypesUsability -enable-upcoming-feature MemberImportVisibility -enable-upcoming-feature InferIsolatedConformances -enable-upcoming-feature NonisolatedNonsendingByDefault -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.4.sdk -target arm64-apple-ios26.2-simulator -g -module-cache-path /Users/hem/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -Xfrontend -serialize-debugging-options -application-extension -profile-coverage-mapping -profile-generate -enable-testing -index-store-path /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Index.noindex/DataStore -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -swift-version 5 -I /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-iphonesimulator -F /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-iphonesimulator -parse-as-library -emit-localized-strings -emit-localized-strings-path /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxShareExtension.build/Objects-normal/arm64 -c -j10 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /Users/hem/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator26.4-23E237-686eebb5dc1d8ecb277353a59184f4aa.sdkstatcache -output-file-map /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxShareExtension.build/Objects-normal/arm64/FocusBloxShareExtension-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -explicit-module-build -module-cache-path /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -clang-scanner-module-cache-path /Users/hem/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -sdk-module-cache-path /Users/hem/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxShareExtension.build/Objects-normal/arm64/FocusBloxShareExtension.swiftmodule -validate-clang-modules-once -clang-build-session-file /Users/hem/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxShareExtension.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxShareExtension.build/Objects-normal/arm64/FocusBloxShareExtension_const_extract_protocols.json -Xcc -iquote -Xcc /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxShareExtension.build/FocusBloxShareExtension-generated-files.hmap -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxShareExtension.build/FocusBloxShareExtension-own-target-headers.hmap -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxShareExtension.build/FocusBloxShareExtension-all-target-headers.hmap -Xcc -iquote -Xcc /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxShareExtension.build/FocusBloxShareExtension-project-headers.hmap -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-iphonesimulator/include -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxShareExtension.build/DerivedSources-normal/arm64 -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxShareExtension.build/DerivedSources/arm64 -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxShareExtension.build/DerivedSources -Xcc -DDEBUG\=1 -Xcc -DDEBUG\=1 -emit-objc-header -emit-objc-header-path /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxShareExtension.build/Objects-normal/arm64/FocusBloxShareExtension-Swift.h -working-directory /Users/hem/Developer/my-daily-sprints -experimental-emit-module-separately -disable-cmo
+
+ExtractAppIntentsMetadata (in target 'FocusBloxWatch Watch App' from project 'FocusBlox')
+    cd /Users/hem/Developer/my-daily-sprints
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/appintentsmetadataprocessor --toolchain-dir /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain --module-name FocusBloxWatch_Watch_App --sdk-root /Applications/Xcode.app/Contents/Developer/Platforms/WatchSimulator.platform/Developer/SDKs/WatchSimulator26.4.sdk --xcode-version 17E192 --platform-family watchOS --deployment-target 26.2 --bundle-identifier com.henning.timebox.watchkitapp --output /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-watchsimulator/FocusBloxWatch\ Watch\ App.app --target-triple arm64-apple-watchos26.2-simulator --target-triple x86_64-apple-watchos26.2-simulator --binary-file /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-watchsimulator/FocusBloxWatch\ Watch\ App.app/FocusBloxWatch\ Watch\ App --dependency-file /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-watchsimulator/FocusBloxWatch\ Watch\ App.build/Objects-normal/arm64/FocusBloxWatch\ Watch\ App_dependency_info.dat --dependency-file /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-watchsimulator/FocusBloxWatch\ Watch\ App.build/Objects-normal/x86_64/FocusBloxWatch\ Watch\ App_dependency_info.dat --stringsdata-file /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-watchsimulator/FocusBloxWatch\ Watch\ App.build/Objects-normal/arm64/ExtractedAppShortcutsMetadata.stringsdata --stringsdata-file /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-watchsimulator/FocusBloxWatch\ Watch\ App.build/Objects-normal/x86_64/ExtractedAppShortcutsMetadata.stringsdata --source-file-list /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-watchsimulator/FocusBloxWatch\ Watch\ App.build/Objects-normal/arm64/FocusBloxWatch\ Watch\ App.SwiftFileList --source-file-list /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-watchsimulator/FocusBloxWatch\ Watch\ App.build/Objects-normal/x86_64/FocusBloxWatch\ Watch\ App.SwiftFileList --metadata-file-list /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-watchsimulator/FocusBloxWatch\ Watch\ App.build/FocusBloxWatch\ Watch\ App.DependencyMetadataFileList --static-metadata-file-list /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-watchsimulator/FocusBloxWatch\ Watch\ App.build/FocusBloxWatch\ Watch\ App.DependencyStaticMetadataFileList --swift-const-vals-list /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-watchsimulator/FocusBloxWatch\ Watch\ App.build/Objects-normal/arm64/FocusBloxWatch\ Watch\ App.SwiftConstValuesFileList --swift-const-vals-list /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-watchsimulator/FocusBloxWatch\ Watch\ App.build/Objects-normal/x86_64/FocusBloxWatch\ Watch\ App.SwiftConstValuesFileList --compile-time-extraction --deployment-aware-processing --validate-assistant-intents --no-app-shortcuts-localization
+2026-03-27 07:39:37.816 appintentsmetadataprocessor[13779:81443754] Starting appintentsmetadataprocessor export
+2026-03-27 07:39:37.823 appintentsmetadataprocessor[13779:81443754] warning: Metadata extraction skipped. No AppIntents.framework dependency found.
+
+ProcessInfoPlistFile /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-watchsimulator/FocusBloxWatch\ Watch\ App.app/Info.plist /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-watchsimulator/FocusBloxWatch\ Watch\ App.build/empty-FocusBloxWatch\ Watch\ App.plist (in target 'FocusBloxWatch Watch App' from project 'FocusBlox')
+    cd /Users/hem/Developer/my-daily-sprints
+    builtin-infoPlistUtility /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-watchsimulator/FocusBloxWatch\ Watch\ App.build/empty-FocusBloxWatch\ Watch\ App.plist -producttype com.apple.product-type.application -genpkginfo /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-watchsimulator/FocusBloxWatch\ Watch\ App.app/PkgInfo -expandbuildsettings -format binary -platform watchsimulator -additionalcontentfile /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-watchsimulator/FocusBloxWatch\ Watch\ App.build/assetcatalog_generated_info.plist -o /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-watchsimulator/FocusBloxWatch\ Watch\ App.app/Info.plist
+
+SwiftDriver FocusBloxWidgetsExtension normal arm64 com.apple.xcode.tools.swift.compiler (in target 'FocusBloxWidgetsExtension' from project 'FocusBlox')
+    cd /Users/hem/Developer/my-daily-sprints
+    builtin-SwiftDriver -- /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name FocusBloxWidgetsExtension -Onone @/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxWidgetsExtension.build/Objects-normal/arm64/FocusBloxWidgetsExtension.SwiftFileList -DDEBUG -DDEBUG -enable-bare-slash-regex -enable-upcoming-feature DisableOutwardActorInference -enable-upcoming-feature InferSendableFromCaptures -enable-upcoming-feature GlobalActorIsolatedTypesUsability -enable-upcoming-feature MemberImportVisibility -enable-upcoming-feature InferIsolatedConformances -enable-upcoming-feature NonisolatedNonsendingByDefault -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.4.sdk -target arm64-apple-ios26.2-simulator -g -module-cache-path /Users/hem/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -Xfrontend -serialize-debugging-options -application-extension -profile-coverage-mapping -profile-generate -enable-testing -index-store-path /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Index.noindex/DataStore -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -swift-version 5 -I /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-iphonesimulator -F /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-iphonesimulator -emit-localized-strings -emit-localized-strings-path /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxWidgetsExtension.build/Objects-normal/arm64 -c -j10 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /Users/hem/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator26.4-23E237-686eebb5dc1d8ecb277353a59184f4aa.sdkstatcache -output-file-map /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxWidgetsExtension.build/Objects-normal/arm64/FocusBloxWidgetsExtension-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -explicit-module-build -module-cache-path /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -clang-scanner-module-cache-path /Users/hem/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -sdk-module-cache-path /Users/hem/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxWidgetsExtension.build/Objects-normal/arm64/FocusBloxWidgetsExtension.swiftmodule -validate-clang-modules-once -clang-build-session-file /Users/hem/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxWidgetsExtension.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxWidgetsExtension.build/Objects-normal/arm64/FocusBloxWidgetsExtension_const_extract_protocols.json -Xcc -iquote -Xcc /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxWidgetsExtension.build/FocusBloxWidgetsExtension-generated-files.hmap -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxWidgetsExtension.build/FocusBloxWidgetsExtension-own-target-headers.hmap -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxWidgetsExtension.build/FocusBloxWidgetsExtension-all-target-headers.hmap -Xcc -iquote -Xcc /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxWidgetsExtension.build/FocusBloxWidgetsExtension-project-headers.hmap -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-iphonesimulator/include -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxWidgetsExtension.build/DerivedSources-normal/arm64 -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxWidgetsExtension.build/DerivedSources/arm64 -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxWidgetsExtension.build/DerivedSources -Xcc -DDEBUG\=1 -Xcc -DDEBUG\=1 -emit-objc-header -emit-objc-header-path /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxWidgetsExtension.build/Objects-normal/arm64/FocusBloxWidgetsExtension-Swift.h -working-directory /Users/hem/Developer/my-daily-sprints -experimental-emit-module-separately -disable-cmo
+
+ProcessInfoPlistFile /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-iphonesimulator/FocusBloxWidgetsExtension.appex/Info.plist /Users/hem/Developer/my-daily-sprints/FocusBloxWidgets/Info.plist (in target 'FocusBloxWidgetsExtension' from project 'FocusBlox')
+    cd /Users/hem/Developer/my-daily-sprints
+    builtin-infoPlistUtility /Users/hem/Developer/my-daily-sprints/FocusBloxWidgets/Info.plist -producttype com.apple.product-type.app-extension -expandbuildsettings -format binary -platform iphonesimulator -additionalcontentfile /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxWidgetsExtension.build/assetcatalog_generated_info.plist -o /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-iphonesimulator/FocusBloxWidgetsExtension.appex/Info.plist
+
+SwiftCompile normal arm64 Compiling\ ShareViewController.swift /Users/hem/Developer/my-daily-sprints/FocusBloxShareExtension/ShareViewController.swift (in target 'FocusBloxShareExtension' from project 'FocusBlox')
+
+SwiftCompile normal arm64 /Users/hem/Developer/my-daily-sprints/FocusBloxShareExtension/ShareViewController.swift (in target 'FocusBloxShareExtension' from project 'FocusBlox')
+    cd /Users/hem/Developer/my-daily-sprints
+    
+
+SwiftEmitModule normal arm64 Emitting\ module\ for\ FocusBloxShareExtension (in target 'FocusBloxShareExtension' from project 'FocusBlox')
+SwiftCompile normal arm64 /Users/hem/Developer/my-daily-sprints/FocusBloxShareExtension/ShareViewController.swift (in target 'FocusBloxShareExtension' from project 'FocusBlox')
+    cd /Users/hem/Developer/my-daily-sprints
+    
+
+SwiftEmitModule normal arm64 Emitting\ module\ for\ FocusBloxWidgetsExtension (in target 'FocusBloxWidgetsExtension' from project 'FocusBlox')
+
+EmitSwiftModule normal arm64 (in target 'FocusBloxWidgetsExtension' from project 'FocusBlox')
+    cd /Users/hem/Developer/my-daily-sprints
+    
+
+SwiftCompile normal arm64 Compiling\ GeneratedAssetSymbols.swift /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxWidgetsExtension.build/DerivedSources/GeneratedAssetSymbols.swift (in target 'FocusBloxWidgetsExtension' from project 'FocusBlox')
+SwiftCompile normal arm64 /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxWidgetsExtension.build/DerivedSources/GeneratedAssetSymbols.swift (in target 'FocusBloxWidgetsExtension' from project 'FocusBlox')
+    cd /Users/hem/Developer/my-daily-sprints
+    
+
+SwiftCompile normal arm64 Compiling\ FocusBloxWidgetsBundle.swift /Users/hem/Developer/my-daily-sprints/FocusBloxWidgets/FocusBloxWidgetsBundle.swift (in target 'FocusBloxWidgetsExtension' from project 'FocusBlox')
+
+SwiftCompile normal arm64 /Users/hem/Developer/my-daily-sprints/FocusBloxWidgets/FocusBloxWidgetsBundle.swift (in target 'FocusBloxWidgetsExtension' from project 'FocusBlox')
+    cd /Users/hem/Developer/my-daily-sprints
+    
+
+SwiftCompile normal arm64 Compiling\ QuickAddTaskControl.swift /Users/hem/Developer/my-daily-sprints/FocusBloxWidgets/QuickAddTaskControl.swift (in target 'FocusBloxWidgetsExtension' from project 'FocusBlox')
+Failed frontend command:
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swift-frontend -frontend -c /Users/hem/Developer/my-daily-sprints/FocusBloxWidgets/FocusBlockLiveActivity.swift /Users/hem/Developer/my-daily-sprints/FocusBloxWidgets/FocusBloxWidgetsBundle.swift -primary-file /Users/hem/Developer/my-daily-sprints/FocusBloxWidgets/QuickAddTaskControl.swift /Users/hem/Developer/my-daily-sprints/FocusBloxWidgets/QuickCaptureWidget.swift /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxWidgetsExtension.build/DerivedSources/GeneratedAssetSymbols.swift -emit-dependencies-path /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxWidgetsExtension.build/Objects-normal/arm64/QuickAddTaskControl.d -emit-const-values-path /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxWidgetsExtension.build/Objects-normal/arm64/QuickAddTaskControl.swiftconstvalues -emit-reference-dependencies-path /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxWidgetsExtension.build/Objects-normal/arm64/QuickAddTaskControl.swiftdeps -serialize-diagnostics-path /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxWidgetsExtension.build/Objects-normal/arm64/QuickAddTaskControl.dia -emit-localized-strings -emit-localized-strings-path /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxWidgetsExtension.build/Objects-normal/arm64 -target arm64-apple-ios26.2-simulator -module-can-import-version DeveloperToolsSupport 23.40.26 23.40.26 -module-can-import-version SwiftUI 7.4.27.1 7.4.27 -module-can-import-version UIKit 9126.4.27.1 9126.4.27 -disable-cross-import-overlay-search -swift-module-cross-import AppIntents /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator.sdk/System/Library/Frameworks/AppIntents.framework/Modules/AppIntents.swiftcrossimport/SwiftUI.swiftoverlay -swift-module-cross-import AppIntents /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator.sdk/System/Library/Frameworks/AppIntents.framework/Modules/AppIntents.swiftcrossimport/UIKit.swiftoverlay -swift-module-cross-import AppIntents /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.4.sdk/System/Library/Frameworks/AppIntents.framework/Modules/AppIntents.swiftcrossimport/SwiftUI.swiftoverlay -swift-module-cross-import AppIntents /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.4.sdk/System/Library/Frameworks/AppIntents.framework/Modules/AppIntents.swiftcrossimport/UIKit.swiftoverlay -swift-module-cross-import RelevanceKit /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator.sdk/System/Library/Frameworks/RelevanceKit.framework/Modules/RelevanceKit.swiftcrossimport/MapKit.swiftoverlay -swift-module-cross-import RelevanceKit /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.4.sdk/System/Library/Frameworks/RelevanceKit.framework/Modules/RelevanceKit.swiftcrossimport/MapKit.swiftoverlay -load-resolved-plugin /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/lib/swift/host/plugins/libAppIntentsMacros.dylib\#/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server\#AppIntentsMacros -load-resolved-plugin /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/lib/swift/host/plugins/libFoundationMacros.dylib\#/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server\#FoundationMacros -load-resolved-plugin /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/lib/swift/host/plugins/libObservationMacros.dylib\#/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server\#ObservationMacros -load-resolved-plugin /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/lib/swift/host/plugins/libPreviewsMacros.dylib\#/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server\#PreviewsMacros -load-resolved-plugin /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/lib/swift/host/plugins/libSwiftMacros.dylib\#/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server\#SwiftMacros -load-resolved-plugin /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/lib/swift/host/plugins/libSwiftUIMacros.dylib\#/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server\#SwiftUIMacros -disable-implicit-swift-modules -Xcc -fno-implicit-modules -Xcc -fno-implicit-module-maps -explicit-swift-module-map-file /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxWidgetsExtension.build/Objects-normal/arm64/FocusBloxWidgetsExtension-dependencies-1.json -debug-module-path /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxWidgetsExtension.build/Objects-normal/arm64/FocusBloxWidgetsExtension.swiftmodule -Xllvm -aarch64-use-tbi -enable-objc-interop -sdk /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.4.sdk -I /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-iphonesimulator -F /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-iphonesimulator -no-color-diagnostics -Xcc -fno-color-diagnostics -application-extension -enable-testing -g -debug-info-format\=dwarf -dwarf-version\=5 -module-cache-path /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -profile-generate -profile-coverage-mapping -swift-version 5 -Onone -D DEBUG -D DEBUG -serialize-debugging-options -const-gather-protocols-file /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxWidgetsExtension.build/Objects-normal/arm64/FocusBloxWidgetsExtension_const_extract_protocols.json -enable-upcoming-feature DisableOutwardActorInference -enable-upcoming-feature InferSendableFromCaptures -enable-upcoming-feature GlobalActorIsolatedTypesUsability -enable-upcoming-feature MemberImportVisibility -enable-upcoming-feature InferIsolatedConformances -enable-upcoming-feature NonisolatedNonsendingByDefault -enable-experimental-feature DebugDescriptionMacro -enable-bare-slash-regex -empty-abi-descriptor -validate-clang-modules-once -clang-build-session-file /Users/hem/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -working-directory -Xcc /Users/hem/Developer/my-daily-sprints -enable-anonymous-context-mangled-names -file-compilation-dir /Users/hem/Developer/my-daily-sprints -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -Xcc -ivfsstatcache -Xcc /Users/hem/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator26.4-23E237-686eebb5dc1d8ecb277353a59184f4aa.sdkstatcache -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxWidgetsExtension.build/swift-overrides.hmap -Xcc -iquote -Xcc /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxWidgetsExtension.build/FocusBloxWidgetsExtension-generated-files.hmap -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxWidgetsExtension.build/FocusBloxWidgetsExtension-own-target-headers.hmap -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxWidgetsExtension.build/FocusBloxWidgetsExtension-all-target-headers.hmap -Xcc -iquote -Xcc /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxWidgetsExtension.build/FocusBloxWidgetsExtension-project-headers.hmap -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-iphonesimulator/include -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxWidgetsExtension.build/DerivedSources-normal/arm64 -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxWidgetsExtension.build/DerivedSources/arm64 -Xcc -I/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxWidgetsExtension.build/DerivedSources -Xcc -DDEBUG\=1 -Xcc -DDEBUG\=1 -no-auto-bridging-header-chaining -module-name FocusBloxWidgetsExtension -frontend-parseable-output -disable-clang-spi -clang-target arm64-apple-ios26.4-simulator -target-sdk-version 26.4 -target-sdk-name iphonesimulator26.4 -in-process-plugin-server-path /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/libSwiftInProcPluginServer.dylib -o /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxWidgetsExtension.build/Objects-normal/arm64/QuickAddTaskControl.o -index-unit-output-path /FocusBlox.build/Debug-iphonesimulator/FocusBloxWidgetsExtension.build/Objects-normal/arm64/QuickAddTaskControl.o -index-store-path /Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Index.noindex/DataStore -index-system-modules
+
+SwiftCompile normal arm64 /Users/hem/Developer/my-daily-sprints/FocusBloxWidgets/QuickAddTaskControl.swift (in target 'FocusBloxWidgetsExtension' from project 'FocusBlox')
+    cd /Users/hem/Developer/my-daily-sprints
+    
+/Users/hem/Developer/my-daily-sprints/FocusBloxWidgets/QuickAddTaskControl.swift:14:41: error: cannot find 'QuickAddLaunchIntent' in scope
+            ControlWidgetButton(action: QuickAddLaunchIntent()) {
+                                        ^~~~~~~~~~~~~~~~~~~~
+
+SwiftCompile normal arm64 Compiling\ QuickCaptureWidget.swift /Users/hem/Developer/my-daily-sprints/FocusBloxWidgets/QuickCaptureWidget.swift (in target 'FocusBloxWidgetsExtension' from project 'FocusBlox')
+
+SwiftCompile normal arm64 /Users/hem/Developer/my-daily-sprints/FocusBloxWidgets/QuickCaptureWidget.swift (in target 'FocusBloxWidgetsExtension' from project 'FocusBlox')
+    cd /Users/hem/Developer/my-daily-sprints
+    
+
+SwiftCompile normal arm64 Compiling\ FocusBlockLiveActivity.swift /Users/hem/Developer/my-daily-sprints/FocusBloxWidgets/FocusBlockLiveActivity.swift (in target 'FocusBloxWidgetsExtension' from project 'FocusBlox')
+
+SwiftCompile normal arm64 /Users/hem/Developer/my-daily-sprints/FocusBloxWidgets/FocusBlockLiveActivity.swift (in target 'FocusBloxWidgetsExtension' from project 'FocusBlox')
+    cd /Users/hem/Developer/my-daily-sprints
+    
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxWidgetsExtension.build/Objects-normal/arm64/CCQuickAddIntents.o'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/DerivedSources/Entitlements-Simulated.plist'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxWidgetsExtension.build/Objects-normal/arm64/CCQuickAddIntents.stringsdata'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxWidgetsExtension.build/Objects-normal/arm64/CCQuickAddIntents.swiftconstvalues'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBlox.build/DerivedSources/GeneratedAssetSymbols-Index.plist'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBlox.build/DerivedSources/GeneratedAssetSymbols.h'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxShareExtension.build/Objects-normal/arm64/LocalTask.o'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBlox.build/DerivedSources/GeneratedAssetSymbols.swift'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxShareExtension.build/Objects-normal/arm64/LocalTask.stringsdata'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBlox.build/Objects-normal/arm64/AITaskScoringService.swiftconstvalues'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxShareExtension.build/Objects-normal/arm64/LocalTask.swiftconstvalues'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxShareExtension.build/Objects-normal/arm64/TaskMetadata.o'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxShareExtension.build/Objects-normal/arm64/TaskMetadata.stringsdata'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxShareExtension.build/Objects-normal/arm64/TaskMetadata.swiftconstvalues'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBlox.build/Objects-normal/arm64/CCQuickAddIntents.o'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxShareExtension.build/Objects-normal/arm64/TaskSource.o'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBlox.build/Objects-normal/arm64/CCQuickAddIntents.swiftconstvalues'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxShareExtension.build/Objects-normal/arm64/TaskSource.stringsdata'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxShareExtension.build/Objects-normal/arm64/TaskSource.swiftconstvalues'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBlox.build/Objects-normal/arm64/CloudKitSyncMonitor.swiftconstvalues'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBlox.build/Objects-normal/arm64/CompleteTaskIntent.o'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBlox.build/Objects-normal/arm64/CompleteTaskIntent.swiftconstvalues'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBlox.build/Objects-normal/arm64/CountOpenTasksIntent.o'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBlox.build/Objects-normal/arm64/CountOpenTasksIntent.swiftconstvalues'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBlox.build/Objects-normal/arm64/CreateTaskIntent.o'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBlox.build/Objects-normal/arm64/CreateTaskIntent.swiftconstvalues'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBlox.build/Objects-normal/arm64/CreateTaskSnippetIntent.o'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBlox.build/Objects-normal/arm64/CreateTaskSnippetIntent.swiftconstvalues'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBlox.build/Objects-normal/arm64/DayView.o'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBlox.build/Objects-normal/arm64/DeferredCompletionController.swiftconstvalues'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBlox.build/Objects-normal/arm64/DeferredSortController.swiftconstvalues'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBlox.build/Objects-normal/arm64/FocusBlockActionService.o'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBlox.build/Objects-normal/arm64/FocusBlockActionService.swiftconstvalues'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBlox.build/Objects-normal/arm64/FocusBlockEntity.o'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBlox.build/Objects-normal/arm64/FocusBlockEntity.swiftconstvalues'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBlox.build/Objects-normal/arm64/FocusBloxShortcuts.o'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBlox.build/Objects-normal/arm64/FocusBloxShortcuts.swiftconstvalues'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBlox.build/Objects-normal/arm64/GeneratedAssetSymbols.o'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBlox.build/Objects-normal/arm64/GeneratedAssetSymbols.swiftconstvalues'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBlox.build/Objects-normal/arm64/GetNextUpIntent.o'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBlox.build/Objects-normal/arm64/GetNextUpIntent.swiftconstvalues'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBlox.build/Objects-normal/arm64/LiveActivityManager.swiftconstvalues'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBlox.build/Objects-normal/arm64/NotificationActionDelegate.o'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBlox.build/Objects-normal/arm64/NotificationActionDelegate.swiftconstvalues'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBlox.build/Objects-normal/arm64/QuickCaptureSnippetView.o'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBlox.build/Objects-normal/arm64/QuickCaptureSnippetView.swiftconstvalues'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBlox.build/Objects-normal/arm64/QuickCaptureState.o'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBlox.build/Objects-normal/arm64/QuickCaptureState.swiftconstvalues'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBlox.build/Objects-normal/arm64/QuickCaptureSubIntents.o'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBlox.build/Objects-normal/arm64/QuickCaptureSubIntents.swiftconstvalues'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBlox.build/Objects-normal/arm64/RecurrencePattern.swiftconstvalues'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBlox.build/Objects-normal/arm64/RecurrenceService.swiftconstvalues'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBlox.build/Objects-normal/arm64/RefinerTaskCard.o'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBlox.build/Objects-normal/arm64/RefinerView.o'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBlox.build/Objects-normal/arm64/ReminderListInfo.o'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBlox.build/Objects-normal/arm64/RemindersImportService.swiftconstvalues'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBlox.build/Objects-normal/arm64/SharedSheets.o'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBlox.build/Objects-normal/arm64/SharedSheets.swiftconstvalues'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBlox.build/Objects-normal/arm64/SmartNotificationEngine.o'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBlox.build/Objects-normal/arm64/SmartNotificationEngine.swiftconstvalues'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBlox.build/Objects-normal/arm64/SyncedSettings.o'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBlox.build/Objects-normal/arm64/TaskEntity.o'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBlox.build/Objects-normal/arm64/TaskEntity.swiftconstvalues'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBlox.build/Objects-normal/arm64/TaskEnums.o'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBlox.build/Objects-normal/arm64/TaskEnums.swiftconstvalues'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBlox.build/Objects-normal/arm64/TaskMetadataUI.o'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBlox.build/Objects-normal/arm64/WarningTiming.o'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBlox.build/Objects-normal/arm64/WeekdayButton.swiftconstvalues'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBlox.build/assetcatalog_output/thinned'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBlox.build/assetcatalog_output/unthinned'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBlox.build/assetcatalog_signature'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-watchsimulator/FocusBloxWatch Watch App.app/PlugIns'
+
+note: Run script build phase 'Inject Git Hash' will be run during every build because the option to run the script phase "Based on dependency analysis" is unchecked. (in target 'FocusBlox' from project 'FocusBlox')
+
+Test session results, code coverage, and logs:
+	/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Logs/Test/Test-FocusBlox-2026.03.27_07-39-33-+0100.xcresult
+
+Testing failed:
+	Cannot find 'QuickAddLaunchIntent' in scope
+	Testing cancelled because the build failed.
+
+** TEST FAILED **
+
+
+The following build commands failed:
+	SwiftCompile normal arm64 Compiling\ QuickAddTaskControl.swift /Users/hem/Developer/my-daily-sprints/FocusBloxWidgets/QuickAddTaskControl.swift (in target 'FocusBloxWidgetsExtension' from project 'FocusBlox')
+	SwiftCompile normal arm64 /Users/hem/Developer/my-daily-sprints/FocusBloxWidgets/QuickAddTaskControl.swift (in target 'FocusBloxWidgetsExtension' from project 'FocusBlox')
+	Testing project FocusBlox with scheme FocusBlox
+(3 failures)
