@@ -52,6 +52,7 @@ struct BacklogView: View {
     @State private var errorMessage: String?
     @State private var isLoading = false
     @State private var importStatusMessage: String?
+    @State private var isParkdeckExpanded: Bool = false
     @State private var reorderTrigger = false
     @State private var selectedItemForDuration: PlanItem?
     @State private var selectedItemForImportance: PlanItem?
@@ -119,6 +120,21 @@ struct BacklogView: View {
             guard let due = item.dueDate else { return false }
             return due < startOfToday
         }.sorted { effectivePriorityScore(for: $0) > effectivePriorityScore(for: $1) }
+    }
+
+    // MARK: - Active Tasks (doNow + planSoon, not manually parked, not overdue)
+    private var activeTasks: [PlanItem] {
+        let overdueIDs = Set(overdueTasks.map(\.id))
+        return backlogTasks
+            .filter { !$0.isInParkdeck && !overdueIDs.contains($0.id) }
+            .sorted { effectivePriorityScore(for: $0) > effectivePriorityScore(for: $1) }
+    }
+
+    // MARK: - Parkdeck Tasks (eventually + someday + manually parked)
+    private var parkdeckTasks: [PlanItem] {
+        backlogTasks
+            .filter { $0.isInParkdeck }
+            .sorted { effectivePriorityScore(for: $0) > effectivePriorityScore(for: $1) }
     }
 
     // MARK: - Recent Tasks (sorted by most recent date)
@@ -842,6 +858,28 @@ struct BacklogView: View {
         }
     }
 
+    // MARK: - Parkdeck Actions (RW 2.4)
+
+    private func parkTask(_ item: PlanItem) {
+        guard let itemUUID = UUID(uuidString: item.id) else { return }
+        let descriptor = FetchDescriptor<LocalTask>(predicate: #Predicate { $0.uuid == itemUUID })
+        guard let task = try? modelContext.fetch(descriptor).first else { return }
+        task.isParked = true
+        task.modifiedAt = Date()
+        try? modelContext.save()
+        Task { await loadTasks() }
+    }
+
+    private func activateTask(_ item: PlanItem) {
+        guard let itemUUID = UUID(uuidString: item.id) else { return }
+        let descriptor = FetchDescriptor<LocalTask>(predicate: #Predicate { $0.uuid == itemUUID })
+        guard let task = try? modelContext.fetch(descriptor).first else { return }
+        task.isParked = false
+        task.modifiedAt = Date()
+        try? modelContext.save()
+        Task { await loadTasks() }
+    }
+
     private func completeTask(_ item: PlanItem) {
         completeFeedback.toggle()
 
@@ -1079,32 +1117,76 @@ struct BacklogView: View {
                 }
             }
 
-            // Priority tiers
-            ForEach(TaskPriorityScoringService.PriorityTier.allCases, id: \.self) { tier in
-                let tierTasks = backlogTasks
-                    .filter { task in effectivePriorityTier(for: task) == tier && !overdueTasks.contains(where: { $0.id == task.id }) }
-                    .sorted { effectivePriorityScore(for: $0) > effectivePriorityScore(for: $1) }
-                if !tierTasks.isEmpty {
-                    Section {
-                        ForEach(tierTasks) { item in
-                            backlogRowWithSwipe(item)
-                        }
-                    } header: {
-                        HStack {
-                            Text(tier.label)
-                                .font(.headline)
-                                .foregroundStyle(tierColor(tier))
-                            Spacer()
-                            Text("\(tierTasks.count)")
-                                .font(.caption)
-                                .foregroundStyle(tierColor(tier))
-                                .padding(.horizontal, 6)
-                                .padding(.vertical, 2)
-                                .background(tierColor(tier).opacity(0.2))
-                                .clipShape(Capsule())
-                        }
+            // Active Tasks (doNow + planSoon, not manually parked)
+            if !activeTasks.isEmpty {
+                Section {
+                    ForEach(activeTasks) { item in
+                        backlogRowWithSwipe(item)
+                            .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                                Button {
+                                    parkTask(item)
+                                } label: {
+                                    Label("Parken", systemImage: "car.fill")
+                                }
+                                .tint(.gray)
+                            }
+                    }
+                } header: {
+                    HStack {
+                        Text("Aktive Tasks")
+                            .font(.headline)
+                            .foregroundStyle(.primary)
+                        Spacer()
+                        Text("\(activeTasks.count)")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 2)
+                            .background(Color.secondary.opacity(0.15))
+                            .clipShape(Capsule())
+                    }
+                    .accessibilityIdentifier("activeTasksSection")
+                }
+            }
+
+            // Parkdeck (collapsed by default, expanded during search)
+            Section {
+                if isParkdeckExpanded || !searchText.isEmpty {
+                    ForEach(parkdeckTasks) { item in
+                        backlogRowWithSwipe(item)
+                            .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                                Button {
+                                    activateTask(item)
+                                } label: {
+                                    Label("Aktivieren", systemImage: "arrow.up.circle")
+                                }
+                                .tint(.blue)
+                            }
                     }
                 }
+            } header: {
+                Button {
+                    withAnimation(.smooth) { isParkdeckExpanded.toggle() }
+                } label: {
+                    HStack {
+                        Image(systemName: (isParkdeckExpanded || !searchText.isEmpty) ? "chevron.down" : "chevron.right")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                        Text("Parkdeck")
+                            .font(.headline)
+                            .foregroundStyle(.secondary)
+                        Spacer()
+                        Text("\(parkdeckTasks.count)")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 2)
+                            .background(Color.secondary.opacity(0.15))
+                            .clipShape(Capsule())
+                    }
+                }
+                .accessibilityIdentifier("parkdeckSection")
+                .buttonStyle(.plain)
             }
         }
         .listStyle(.plain)

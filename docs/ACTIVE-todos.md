@@ -37,7 +37,7 @@
 | ~~RW_2.1d~~ | ~~2 Tagesplanung~~ | ~~DayView — Phase D: Abend-Modus (Zusammenfassung + Stubs fuer 4.2/4.3)~~ | ~~Medium~~ | ~~M~~ | ~~Eigene View~~ | ~~[Spec](specs/rework/2.1-day-view.md)~~ ERLEDIGT |
 | ~~RW_2.2~~ | ~~2 Tagesplanung~~ | ~~KI-gestuetzte Tagesvorschlaege~~ | ~~Medium~~ | ~~L~~ | ~~Shared~~ | ~~[Spec](specs/rework/2.2-next-up-suggestions-impl.md)~~ ERLEDIGT |
 | ~~RW_2.3~~ | ~~2 Tagesplanung~~ | ~~Limitation Guard~~ | ~~Medium~~ | ~~S~~ | ~~Shared~~ | ~~[Spec](specs/rework/2.3-limitation-guard-impl.md)~~ ERLEDIGT |
-| RW_2.4 | 2 Tagesplanung | Backlog UX Rework | Medium | L | Eigene View | [Spec](specs/rework/2.4-backlog-ux-rework.md) |
+| ~~RW_2.4~~ | ~~2 Tagesplanung~~ | ~~Backlog UX Rework (Parkdeck-Metapher)~~ | ~~Medium~~ | ~~L~~ | ~~Eigene View~~ | ~~[Spec](specs/rework/2.4-backlog-ux-rework-impl.md)~~ ERLEDIGT |
 | RW_3.5 | 3 Ausfuehrung | Recurring Stacking — Visuelle Gruppierung + Priority Boost | Medium | M | Eigene View | [Spec](specs/rework/3.5-recurring-stacking.md) |
 | ~~RW_4.1~~ | ~~4 Reflexion~~ | ~~Soft Evening Reset~~ | ~~Low~~ | ~~M~~ | ~~Shared~~ | ~~[Spec](specs/rework/4.1-soft-evening-reset.md)~~ ERLEDIGT |
 | ~~RW_4.2~~ | ~~4 Reflexion~~ | ~~Success Story Generator~~ | ~~Low~~ | ~~L~~ | ~~Shared~~ | ~~[Spec](specs/rework/4.2-success-story-generator-impl.md)~~ ERLEDIGT |
@@ -69,6 +69,7 @@
 | MAC_RW_3.3 | RW_3.3 | Follow-up Logic in MacFocusView/SprintReview | Medium | S | iOS SprintReview hat `abortWithFollowUp()` + `progressNotes`. `MacFocusView.swift` (MacSprintReviewSheet) hat KEIN Follow-up — weder UI noch Logic. Port: Follow-up-Button + progressNotes-TextField + `createFollowUp()` Handler (~50 LoC) |
 | MAC_RW_3.4 | RW_3.4 | Emotional Nudge Dialog auf macOS | Medium | S | iOS zeigt Micro-Task-Dialog bei chronisch verschobenen Tasks. macOS hat nur Context Menu `startNudgeSprint()` ohne Nudge-Dialog-UI. Port: Dialog mit Micro-Task-Vorschlaegen analog iOS `EmotionalNudgeView` (~40 LoC) |
 | MAC_RW_2.1_TL | RW_2.1c | DayView Daytime Timeline auf macOS | Medium | M | macOS DayView zeigt im Daytime-Modus nur "Timeline kommt bald" Platzhalter (`Sources/Views/DayView.swift:97`, `#else` Block). iOS hat volle `TimelineView` mit Events + Scheduled Tasks. Entweder shared `TimelineView` macOS-kompatibel machen oder macOS-Aequivalent in `FocusBloxMac/` bauen. |
+| MAC_RW_2.4 | RW_2.4 | Backlog Parkdeck-Metapher auf macOS | Medium | S | iOS hat Aktiv/Parkdeck-Aufteilung mit collapsible Section + Swipe-Actions. macOS `ContentView.swift` Backlog-Section braucht identische Partition (Aktiv vs. Parkdeck) mit Context Menu "Parken"/"Aktivieren" statt Swipe. Logik shared via `isParked` Flag auf `LocalTask`, nur macOS-UI fehlt (~60-80 LoC). |
 
 ---
 

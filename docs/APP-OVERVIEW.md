@@ -55,9 +55,9 @@ FocusBlox/
 | Shared Views | 46 |
 | macOS Views | 18 |
 | App Intents | 13 |
-| Test-Dateien gesamt | 246 |
-| — iOS Unit Tests | 106 |
-| — iOS UI Tests | 109 |
+| Test-Dateien gesamt | 248 |
+| — iOS Unit Tests | 107 |
+| — iOS UI Tests | 110 |
 | — macOS Unit Tests | 6 |
 | — macOS UI Tests | 20 |
 | — Watch Tests | 4 |
@@ -108,8 +108,8 @@ FocusBlox/
 | FocusBlockActivityAttributes | `Sources/Models/FocusBlockActivityAttributes.swift` | ActivityKit-Attributes fuer Live Activities |
 | GapFinder | `Sources/Models/GapFinder.swift` | Findet freie Zeitslots zwischen Kalender-Events und Focus Blocks |
 | LimitationWarning | `Sources/Services/LimitationGuardService.swift` | Struct mit geplanten Tasks/Minuten und historischen Durchschnittswerten; Ergebnis von `LimitationGuardService.evaluate()` |
-| LocalTask | `Sources/Models/LocalTask.swift` | SwiftData @Model fuer lokale Tasks mit CloudKit-Sync |
-| PlanItem | `Sources/Models/PlanItem.swift` | Unified Plan-Item (Task + Event kombiniert) mit Ranking |
+| LocalTask | `Sources/Models/LocalTask.swift` | SwiftData @Model fuer lokale Tasks mit CloudKit-Sync; `isParked: Bool` steuert Parkdeck-Zugehoerigkeit (RW_2.4) |
+| PlanItem | `Sources/Models/PlanItem.swift` | Unified Plan-Item (Task + Event kombiniert) mit Ranking; `isParked` + `isInParkdeck` computed property (RW_2.4) |
 | PlanItemTransfer | `Sources/Models/PlanItemTransfer.swift` | Transferable fuer Drag&Drop von Plan-Items |
 | RecurrencePattern | `Sources/Models/RecurrencePattern.swift` | Enum: none, daily, weekly, monthly, quarterly, yearly, custom |
 | ReminderData | `Sources/Models/ReminderData.swift` | DTO fuer Apple Reminders aus EventKit |
@@ -129,7 +129,7 @@ FocusBlox/
 |------|------|-------------|
 | MainTabView | `Sources/Views/MainTabView.swift` | Root-Navigation: 4 Tabs (Backlog, Blox, Focus, Review) |
 | ContentView | `Sources/Views/ContentView.swift` | iOS App Root View |
-| BacklogView | `Sources/Views/BacklogView.swift` | Task-Liste mit 5 View-Modi (Priority, Recent, Overdue, Recurring, Completed) |
+| BacklogView | `Sources/Views/BacklogView.swift` | Task-Liste mit 5 View-Modi (Priority, Recent, Overdue, Recurring, Completed); Priority-View unterteilt in "Aktive Tasks" (Score >= 35) + collapsible "Parkdeck" (Score < 35 oder manuell geparkt) mit Swipe-Actions zum Parken/Aktivieren (RW_2.4) |
 | BlockPlanningView | `Sources/Views/BlockPlanningView.swift` | Block-Planung und Task-Zuweisung |
 | PlanningView | `Sources/Views/PlanningView.swift` | Timeline mit Kalender-Events, Luecken und unzugeordneten Tasks |
 | FocusLiveView | `Sources/Views/FocusLiveView.swift` | Aktiver Focus-Block Timer mit Task-Progression |

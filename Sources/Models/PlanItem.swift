@@ -63,6 +63,15 @@ struct PlanItem: Identifiable, Sendable {
     /// Lifecycle status: raw/refined/active
     let lifecycleStatus: String
 
+    /// Manuell ins Parkdeck verschoben (RW 2.4)
+    let isParked: Bool
+
+    /// True wenn dieser Task im Parkdeck erscheinen soll.
+    /// Entweder manuell geparkt ODER Score-Tier ist eventually/someday.
+    var isInParkdeck: Bool {
+        isParked || priorityTier == .eventually || priorityTier == .someday
+    }
+
     // Direct Scheduling (RW 3.1)
 
     /// Scheduled date on timeline (nil = not scheduled)
@@ -169,6 +178,7 @@ struct PlanItem: Identifiable, Sendable {
         self.modifiedAt = nil
         self.blockerTaskID = nil
         self.lifecycleStatus = "active"  // Reminders are always active
+        self.isParked = false  // Reminders have no parkdeck concept
 
         self.scheduledDate = nil
         self.scheduledDuration = nil
@@ -228,6 +238,7 @@ struct PlanItem: Identifiable, Sendable {
         self.modifiedAt = localTask.modifiedAt
         self.blockerTaskID = localTask.blockerTaskID
         self.lifecycleStatus = localTask.lifecycleStatus
+        self.isParked = localTask.isParked
 
         self.scheduledDate = localTask.scheduledDate
         self.scheduledDuration = localTask.scheduledDuration

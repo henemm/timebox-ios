@@ -1,0 +1,40 @@
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBloxUITests.build/FocusBloxUITests.xctest-Simulated.xcent.der'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-iphonesimulator/FocusBlox.app/PlugIns/FocusBloxCoreTests.xctest/_CodeSignature'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Intermediates.noindex/FocusBlox.build/Debug-iphonesimulator/FocusBlox.build/FocusBlox.app.xcent.der'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-iphonesimulator/FocusBloxShareExtension.appex/_CodeSignature'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-watchsimulator/FocusBloxWatch Watch App.app/_CodeSignature'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-watchsimulator/FocusBloxWatchWidgetsExtension.appex/_CodeSignature'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-iphonesimulator/FocusBloxWidgetsExtension.appex/_CodeSignature'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-iphonesimulator/FocusBlox.app/Frameworks/FocusBloxCore.framework/_CodeSignature'
+
+
+Test session results, code coverage, and logs:
+	/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Logs/Test/Test-FocusBlox-2026.03.27_18-57-49-+0100.xcresult
+
+Testing failed:
+	Value of type 'PlanItem' has no member 'isInParkdeck'
+	Value of type 'LocalTask' has no member 'isParked'
+	Value of type 'PlanItem' has no member 'isInParkdeck'
+	Value of type 'PlanItem' has no member 'isInParkdeck'
+	Value of type 'PlanItem' has no member 'isInParkdeck'
+	Value of type 'PlanItem' has no member 'isInParkdeck'
+	Value of type 'LocalTask' has no member 'isParked'
+	Value of type 'PlanItem' has no member 'isInParkdeck'
+	Testing cancelled because the build failed.
+
+** TEST FAILED **
+
+
+The following build commands failed:
+	SwiftCompile normal arm64 Compiling\ ParkdeckClassificationTests.swift /Users/hem/Developer/my-daily-sprints/FocusBloxTests/ParkdeckClassificationTests.swift (in target 'FocusBloxTests' from project 'FocusBlox')
+	SwiftCompile normal arm64 /Users/hem/Developer/my-daily-sprints/FocusBloxTests/ParkdeckClassificationTests.swift (in target 'FocusBloxTests' from project 'FocusBlox')
+	Testing project FocusBlox with scheme FocusBlox
+(3 failures)

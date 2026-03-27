@@ -118,6 +118,13 @@ final class LocalTask {
     /// nil = no blocker, task is freely actionable.
     var blockerTaskID: String?
 
+    // MARK: - Parkdeck (RW 2.4)
+
+    /// Manuell ins Parkdeck verschoben.
+    /// Tasks mit eventually/someday-Tier landen automatisch im Parkdeck.
+    /// isParked = true zwingt einen Task unabhaengig vom Score ins Parkdeck.
+    var isParked: Bool = false
+
     // MARK: - Follow-up Chain (RW 3.3)
 
     /// ID of the original task in a follow-up chain (flat: always points to root).

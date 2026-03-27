@@ -1,0 +1,40 @@
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/ParkdeckClassificationTests.swift:47:28: error: value of type 'PlanItem' has no member 'isInParkdeck'
+        XCTAssertTrue(item.isInParkdeck, "Eventually/someday-Task muss automatisch im Parkdeck sein")
+                      ~~~~ ^~~~~~~~~~~~
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/ParkdeckClassificationTests.swift:59:28: error: value of type 'PlanItem' has no member 'isInParkdeck'
+        XCTAssertTrue(item.isInParkdeck, "Someday-Task muss im Parkdeck sein")
+                      ~~~~ ^~~~~~~~~~~~
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/ParkdeckClassificationTests.swift:72:29: error: value of type 'PlanItem' has no member 'isInParkdeck'
+        XCTAssertFalse(item.isInParkdeck, "planSoon-Task ohne isParked sollte NICHT im Parkdeck sein")
+                       ~~~~ ^~~~~~~~~~~~
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/ParkdeckClassificationTests.swift:81:14: error: value of type 'LocalTask' has no member 'isParked'
+        task.isParked = false
+        ~~~~ ^~~~~~~~
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/ParkdeckClassificationTests.swift:85:28: error: value of type 'PlanItem' has no member 'isInParkdeck'
+        XCTAssertTrue(item.isInParkdeck, "Niedrig priorisierter Task bleibt im Parkdeck auch wenn isParked=false")
+                      ~~~~ ^~~~~~~~~~~~
+
+note: Run script build phase 'Inject Git Hash' will be run during every build because the option to run the script phase "Based on dependency analysis" is unchecked. (in target 'FocusBlox' from project 'FocusBlox')
+
+Test session results, code coverage, and logs:
+	/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Logs/Test/Test-FocusBlox-2026.03.27_18-57-35-+0100.xcresult
+
+Testing failed:
+	Value of type 'PlanItem' has no member 'isInParkdeck'
+	Value of type 'LocalTask' has no member 'isParked'
+	Value of type 'PlanItem' has no member 'isInParkdeck'
+	Value of type 'PlanItem' has no member 'isInParkdeck'
+	Value of type 'PlanItem' has no member 'isInParkdeck'
+	Value of type 'PlanItem' has no member 'isInParkdeck'
+	Value of type 'LocalTask' has no member 'isParked'
+	Value of type 'PlanItem' has no member 'isInParkdeck'
+	Testing cancelled because the build failed.
+
+** TEST FAILED **
+
+
+The following build commands failed:
+	SwiftCompile normal arm64 Compiling\ ParkdeckClassificationTests.swift /Users/hem/Developer/my-daily-sprints/FocusBloxTests/ParkdeckClassificationTests.swift (in target 'FocusBloxTests' from project 'FocusBlox')
+	SwiftCompile normal arm64 /Users/hem/Developer/my-daily-sprints/FocusBloxTests/ParkdeckClassificationTests.swift (in target 'FocusBloxTests' from project 'FocusBlox')
+	Testing project FocusBlox with scheme FocusBlox
+(3 failures)
