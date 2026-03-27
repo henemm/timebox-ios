@@ -338,8 +338,8 @@ final class DayViewUITests: XCTestCase {
         )
     }
 
-    /// Verhalten: Im Abend-Modus zeigt die DayView Success Story Card und Failure Protocol Stub
-    /// Bricht wenn: SuccessStoryView oder failureQuickSelectStub ViewBuilder fehlen
+    /// Verhalten: Im Abend-Modus zeigt die DayView Success Story Card und Failure QuickSelect Cards
+    /// Bricht wenn: SuccessStoryView oder failureQuickSelectSection ViewBuilder fehlen
     func test_eveningMode_showsStubCards() throws {
         launchInEveningMode()
         navigateToDayTab()
@@ -350,10 +350,12 @@ final class DayViewUITests: XCTestCase {
             "Abend-Modus sollte die Success-Story-Card zeigen"
         )
 
-        let failureStub = app.otherElements["failureQuickSelectStubCard"]
+        let failureCards = app.otherElements.matching(
+            NSPredicate(format: "identifier BEGINSWITH 'failureQuickSelect_'")
+        )
         XCTAssertTrue(
-            failureStub.exists,
-            "Abend-Modus sollte die Failure-QuickSelect-Stub-Card zeigen"
+            failureCards.firstMatch.waitForExistence(timeout: 5),
+            "Abend-Modus sollte mindestens eine FailureQuickSelect-Card zeigen"
         )
     }
 }

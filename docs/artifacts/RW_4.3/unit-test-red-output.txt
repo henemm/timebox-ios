@@ -1,0 +1,20 @@
+	Cannot find 'FailureProtocolService' in scope
+	Cannot infer contextual base in reference to member 'blocked'
+	Cannot find 'FailureProtocolService' in scope
+	Cannot find 'FailureProtocolService' in scope
+	Cannot find 'FailureReason' in scope
+	Cannot find 'FailureReason' in scope
+	Cannot find 'FailureProtocolService' in scope
+	Cannot find type 'TaskFailureRecord' in scope
+	Generic parameter 'T' could not be inferred
+	Cannot find 'FailureReason' in scope
+	Testing cancelled because the build failed.
+
+** TEST FAILED **
+
+
+The following build commands failed:
+	SwiftCompile normal arm64 Compiling\ GapFinderTests.swift,\ FocusBlockActionServiceTests.swift,\ DisciplineTrendServiceTests.swift,\ DayPhaseTests.swift,\ DayViewDaytimeTests.swift,\ DayViewEveningTests.swift,\ FailureProtocolServiceTests.swift /Users/hem/Developer/my-daily-sprints/FocusBloxTests/GapFinderTests.swift /Users/hem/Developer/my-daily-sprints/FocusBloxTests/FocusBlockActionServiceTests.swift /Users/hem/Developer/my-daily-sprints/FocusBloxTests/DisciplineTrendServiceTests.swift /Users/hem/Developer/my-daily-sprints/FocusBloxTests/DayPhaseTests.swift /Users/hem/Developer/my-daily-sprints/FocusBloxTests/DayViewDaytimeTests.swift /Users/hem/Developer/my-daily-sprints/FocusBloxTests/DayViewEveningTests.swift /Users/hem/Developer/my-daily-sprints/FocusBloxTests/FailureProtocolServiceTests.swift (in target 'FocusBloxTests' from project 'FocusBlox')
+	SwiftCompile normal arm64 /Users/hem/Developer/my-daily-sprints/FocusBloxTests/FailureProtocolServiceTests.swift (in target 'FocusBloxTests' from project 'FocusBlox')
+	Testing project FocusBlox with scheme FocusBlox
+(3 failures)

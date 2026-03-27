@@ -275,7 +275,7 @@ struct DayView: View {
                     if !completedTasks.isEmpty { completedTasksSection }
                     if !unfinishedTasks.isEmpty { unfinishedTasksSection }
                     SuccessStoryView(completedTasks: completedTasks, focusBlocks: focusBlocks)
-                    failureQuickSelectStub
+                    failureQuickSelectSection
                 }
                 .padding()
             }
@@ -312,16 +312,15 @@ struct DayView: View {
         .accessibilityIdentifier("eveningUnfinishedSection")
     }
 
-    private var failureQuickSelectStub: some View {
-        HStack {
-            Label("Reflexion kommt bald", systemImage: "lock.fill")
-                .foregroundStyle(.secondary)
-            Spacer()
+    @ViewBuilder
+    private var failureQuickSelectSection: some View {
+        if !unfinishedTasks.isEmpty {
+            VStack(alignment: .leading, spacing: 12) {
+                ForEach(unfinishedTasks) { task in
+                    FailureQuickSelectView(task: task)
+                }
+            }
         }
-        .padding()
-        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12))
-        .accessibilityElement(children: .contain)
-        .accessibilityIdentifier("failureQuickSelectStubCard")
     }
 
     // MARK: - Data Loading
