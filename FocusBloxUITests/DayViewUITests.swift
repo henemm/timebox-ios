@@ -358,4 +358,96 @@ final class DayViewUITests: XCTestCase {
             "Abend-Modus sollte mindestens eine FailureQuickSelect-Card zeigen"
         )
     }
+
+    // MARK: - Morning Coaching Section (RW_2.2)
+
+    /// Verhalten: Im Morgen-Modus zeigt die DayView eine MorningCoachingSection mit Vorschlaegen
+    /// Bricht wenn: MorningCoachingSection nicht in morningContent eingebunden oder nicht gerendert wird
+    func test_morningCoachingSection_isVisible() throws {
+        launchInMorningMode()
+        navigateToDayTab()
+
+        let coachingSection = app.otherElements["morningCoachingSection"]
+        XCTAssertTrue(
+            coachingSection.waitForExistence(timeout: 5),
+            "Morgen-Modus sollte die MorningCoachingSection mit Vorschlaegen zeigen"
+        )
+
+        // Mindestens eine Suggestion-Row muss existieren
+        let suggestionRows = app.otherElements.matching(
+            NSPredicate(format: "identifier BEGINSWITH 'suggestionRow_'")
+        )
+        XCTAssertTrue(
+            suggestionRows.firstMatch.waitForExistence(timeout: 3),
+            "MorningCoachingSection sollte mindestens einen Vorschlag anzeigen"
+        )
+    }
+
+    /// Verhalten: Tap auf Confirm-Button entfernt den Vorschlag aus der Liste
+    /// Bricht wenn: onConfirm-Callback nicht die Suggestion aus morningSuggestions entfernt
+    func test_suggestionRow_confirmTap_removesRow() throws {
+        launchInMorningMode()
+        navigateToDayTab()
+
+        // Warte auf erste Suggestion-Row
+        let suggestionRows = app.otherElements.matching(
+            NSPredicate(format: "identifier BEGINSWITH 'suggestionRow_'")
+        )
+        let firstRow = suggestionRows.firstMatch
+        XCTAssertTrue(firstRow.waitForExistence(timeout: 5), "Suggestion-Row muss existieren")
+
+        // Finde den Confirm-Button in der ersten Row
+        let confirmButtons = app.buttons.matching(
+            NSPredicate(format: "identifier BEGINSWITH 'confirmSuggestion_'")
+        )
+        let confirmButton = confirmButtons.firstMatch
+        XCTAssertTrue(confirmButton.waitForExistence(timeout: 3), "Confirm-Button muss existieren")
+
+        // Merke die ID
+        let rowId = firstRow.identifier
+
+        // Tap confirm
+        confirmButton.tap()
+
+        // Row muss verschwinden
+        let removedRow = app.otherElements[rowId]
+        XCTAssertFalse(
+            removedRow.waitForExistence(timeout: 2),
+            "Suggestion-Row soll nach Confirm verschwinden"
+        )
+    }
+
+    /// Verhalten: Tap auf Dismiss-Button entfernt den Vorschlag aus der Liste
+    /// Bricht wenn: onDismiss-Callback nicht die Suggestion aus morningSuggestions entfernt
+    func test_suggestionRow_dismissTap_removesRow() throws {
+        launchInMorningMode()
+        navigateToDayTab()
+
+        // Warte auf erste Suggestion-Row
+        let suggestionRows = app.otherElements.matching(
+            NSPredicate(format: "identifier BEGINSWITH 'suggestionRow_'")
+        )
+        let firstRow = suggestionRows.firstMatch
+        XCTAssertTrue(firstRow.waitForExistence(timeout: 5), "Suggestion-Row muss existieren")
+
+        // Finde den Dismiss-Button in der ersten Row
+        let dismissButtons = app.buttons.matching(
+            NSPredicate(format: "identifier BEGINSWITH 'dismissSuggestion_'")
+        )
+        let dismissButton = dismissButtons.firstMatch
+        XCTAssertTrue(dismissButton.waitForExistence(timeout: 3), "Dismiss-Button muss existieren")
+
+        // Merke die ID
+        let rowId = firstRow.identifier
+
+        // Tap dismiss
+        dismissButton.tap()
+
+        // Row muss verschwinden
+        let removedRow = app.otherElements[rowId]
+        XCTAssertFalse(
+            removedRow.waitForExistence(timeout: 2),
+            "Suggestion-Row soll nach Dismiss verschwinden"
+        )
+    }
 }

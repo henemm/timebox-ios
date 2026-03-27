@@ -87,6 +87,7 @@ struct DayView: View {
     @State private var focusBlocks: [FocusBlock] = []
     @State private var nextUpTasks: [PlanItem] = []
     @State private var freeSlots: [TimeSlot] = []
+    @State private var morningSuggestions: [NextUpSuggestion] = []
     @State private var scheduledTasks: [TimelineItem] = []
     @State private var completedTasks: [PlanItem] = []
     @State private var unfinishedTasks: [PlanItem] = []
@@ -176,6 +177,21 @@ struct DayView: View {
                 VStack(alignment: .leading, spacing: 16) {
                     if !calendarEvents.isEmpty { morningEventsSection }
                     if !freeSlots.isEmpty { morningGapsSection }
+                    if !morningSuggestions.isEmpty {
+                        MorningCoachingSection(
+                            suggestions: morningSuggestions,
+                            onConfirm: { suggestion in
+                                let taskSource = LocalTaskSource(modelContext: modelContext)
+                                let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
+                                try? syncEngine.updateNextUp(itemID: suggestion.id, isNextUp: true)
+                                NextUpSuggestionService.invalidateCache()
+                                morningSuggestions.removeAll { $0.id == suggestion.id }
+                            },
+                            onDismiss: { suggestion in
+                                morningSuggestions.removeAll { $0.id == suggestion.id }
+                            }
+                        )
+                    }
                     if !nextUpTasks.isEmpty { morningNextUpSection }
                 }
                 .padding()
@@ -355,6 +371,16 @@ struct DayView: View {
                 events: calendarEvents, focusBlocks: focusBlocks,
                 scheduledTasks: scheduledPairs, date: Date()
             ).findFreeSlots(minMinutes: 30, maxMinutes: 60)
+
+            let profile = BehavioralProfileService.profile(
+                tasks: try await LocalTaskSource(modelContext: modelContext).fetchIncompleteTasks(),
+                focusBlocks: focusBlocks,
+                calendarEvents: calendarEvents
+            )
+            morningSuggestions = NextUpSuggestionService.suggestions(
+                items: allTasks, slots: freeSlots,
+                profile: profile, calendarEvents: calendarEvents
+            )
         } catch {
             // Silently fail — view shows empty state
         }

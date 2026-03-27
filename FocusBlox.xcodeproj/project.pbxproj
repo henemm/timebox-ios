@@ -335,7 +335,6 @@
 		6E8284A6F06C79DBE93A383E /* TaskMetadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42790F5402B3E1F632874F5A /* TaskMetadata.swift */; };
 		6FCF2913C09B03CD3681047E /* BacklogSwipeActionsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 999425519C2EA7E01EFD2490 /* BacklogSwipeActionsUITests.swift */; };
 		720A4CC3BD147493C706190E /* WidgetDataPublisherTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BE14B1DA859F48BC2A77EE6 /* WidgetDataPublisherTests.swift */; };
-		AA44BB55CC66DD77EE881122 /* WidgetDataPublisher.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB39490FB9868A1CDF5ABDFC /* WidgetDataPublisher.swift */; };
 		758F42B5E9777672A5F78F06 /* SuccessStoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5850078865CF21FABB28AD9F /* SuccessStoryView.swift */; };
 		767B31C6347E419FD1A9F9E4 /* EmotionalNudgeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F883289F0EE64AA5C5BB87F4 /* EmotionalNudgeService.swift */; };
 		792737AC7F345E919BFF3453 /* FocusBlockTasksSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74598614EAF4B9965981C7CB /* FocusBlockTasksSheet.swift */; };
@@ -366,11 +365,13 @@
 		A4A8AF1E9B1B715FE913F6F4 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 350DD1256F45268992636DEA /* NotificationService.swift */; };
 		A62EAAE7CAEC04AF7DD89D2E /* EveningResetService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7431A2BD04896D56962DDC5 /* EveningResetService.swift */; };
 		A908C829057E6E41882110A1 /* CategoryTrendChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B00FF52557F6F42E8194A77 /* CategoryTrendChart.swift */; };
+		AA44BB55CC66DD77EE881122 /* WidgetDataPublisher.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB39490FB9868A1CDF5ABDFC /* WidgetDataPublisher.swift */; };
 		AA657A3EBF3967B2DECE4314 /* CreateTaskView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04068491AA7CD2368A273C00 /* CreateTaskView.swift */; };
 		AAF3C0B9F1D9D79682D3680F /* Bug81StaleBlockAssignmentUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BE6C24124E626E4489ECDFA /* Bug81StaleBlockAssignmentUITests.swift */; };
 		AC44830774F8C544E3F39995 /* UndoCompletionUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B242DB168BAB2F3CF8A63404 /* UndoCompletionUITests.swift */; };
 		AD52DB9608DDF4562B67279F /* MenuBarIconState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60DE55FC2A796A308478E2B9 /* MenuBarIconState.swift */; };
 		ADEEAB024BB9B2C40CD6313D /* DebugLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71582A64B51A62129A2409B7 /* DebugLogger.swift */; };
+		AFF14827AB249970A3471374 /* NextUpSuggestionServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5AB41B49361F9C4F2416C80 /* NextUpSuggestionServiceTests.swift */; };
 		B18EE1353A17B948EB328686 /* SuccessStoryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1F900DD6600DBC1E2C448F6 /* SuccessStoryService.swift */; };
 		B2607FE51C4B30E5069AA807 /* EventKitRepositoryEnvironment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F276F67582A827E523D8ED6 /* EventKitRepositoryEnvironment.swift */; };
 		B46449CB5D5E8C093E07C2D9 /* DurationPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = F91103B45CFB1388E6B12F3C /* DurationPicker.swift */; };
@@ -435,6 +436,8 @@
 		F99C220A3B729DDE50461E4A /* TaskCompletionUndoServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 301796C3380CA4E06D1EF41B /* TaskCompletionUndoServiceTests.swift */; };
 		FCC11A29B4F2AF8988F782D3 /* FocusBloxTests/WatchEnrichmentGapTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1950589463657F7EB526D130 /* FocusBloxTests/WatchEnrichmentGapTests.swift */; };
 		FDB14640BC5B478303608792 /* FocusSprintUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5A1455FAAF026662CA2846F /* FocusSprintUITests.swift */; };
+		254BA311864B4038A8BC9F46 /* NextUpSuggestionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A517BBCD30754CE69598B71A /* NextUpSuggestionService.swift */; };
+		A8A08C6878B74D789ECE9734 /* MorningCoachingSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = A243DD5301F14089BF9880CE /* MorningCoachingSection.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -842,6 +845,8 @@
 		20D808247CA55763ACF23BC5 /* BlockPlanningView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockPlanningView.swift; sourceTree = "<group>"; };
 		2224B7322726CC9CD1E9C9E3 /* WidgetRelevanceCalculator.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WidgetRelevanceCalculator.swift; sourceTree = "<group>"; };
 		233B665A0DF1A421C1CDF80A /* TaskCompletionUndoService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TaskCompletionUndoService.swift; sourceTree = "<group>"; };
+		234340A8B266225A03BE4C8A /* MorningCoachingSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MorningCoachingSection.swift; path = Sources/Views/MorningCoachingSection.swift; sourceTree = SOURCE_ROOT; };
+		23C64BFA8782C6A106D23BE6 /* MorningCoachingSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MorningCoachingSection.swift; path = Sources/Views/MorningCoachingSection.swift; sourceTree = SOURCE_ROOT; };
 		26CD9467C8156E2C66B2DC9C /* SettingsToolbarModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsToolbarModifier.swift; sourceTree = "<group>"; };
 		2CB34BE9ACA2FA753F4F5EC7 /* BehavioralProfileService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = BehavioralProfileService.swift; path = Sources/Services/BehavioralProfileService.swift; sourceTree = SOURCE_ROOT; };
 		2D314D238A7A0F2C4BEE1AAB /* FailureProtocolService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FailureProtocolService.swift; path = Sources/Services/FailureProtocolService.swift; sourceTree = SOURCE_ROOT; };
@@ -860,6 +865,7 @@
 		3B596C16F99039490702E0B7 /* ErrorStateUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorStateUITests.swift; sourceTree = "<group>"; };
 		3BE6C24124E626E4489ECDFA /* Bug81StaleBlockAssignmentUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Bug81StaleBlockAssignmentUITests.swift; sourceTree = "<group>"; };
 		3C256CDC6B3B5BA25279A4AA /* IOSTimelineCanvasUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = IOSTimelineCanvasUITests.swift; sourceTree = "<group>"; };
+		3E284B3E881E745000F98D71 /* NextUpSuggestionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = NextUpSuggestionService.swift; path = Sources/Services/NextUpSuggestionService.swift; sourceTree = SOURCE_ROOT; };
 		3F276F67582A827E523D8ED6 /* EventKitRepositoryEnvironment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventKitRepositoryEnvironment.swift; sourceTree = "<group>"; };
 		407BE145C7716D6B1A1BB67F /* FocusBloxApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusBloxApp.swift; sourceTree = "<group>"; };
 		414BC475930C1DCDA3E9033B /* TaskSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskSource.swift; sourceTree = "<group>"; };
@@ -920,6 +926,7 @@
 		A0B1EE7295AF0AD91CA0027A /* FocusBlock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusBlock.swift; sourceTree = "<group>"; };
 		A36E40124EBA31D7428EAA80 /* DailyReviewView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DailyReviewView.swift; sourceTree = "<group>"; };
 		A5A1455FAAF026662CA2846F /* FocusSprintUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FocusSprintUITests.swift; path = FocusBloxUITests/FocusSprintUITests.swift; sourceTree = SOURCE_ROOT; };
+		A5AB41B49361F9C4F2416C80 /* NextUpSuggestionServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = NextUpSuggestionServiceTests.swift; path = FocusBloxTests/NextUpSuggestionServiceTests.swift; sourceTree = SOURCE_ROOT; };
 		A5C4410415E5DDF308F6F87A /* EmotionalNudgeUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = EmotionalNudgeUITests.swift; sourceTree = "<group>"; };
 		AB1AD4FECCC4DD0F13D886B5 /* ITB_G_SiriTipUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ITB_G_SiriTipUITests.swift; sourceTree = "<group>"; };
 		AC217D1BAA414B7974854ECE /* TagRedesignUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TagRedesignUITests.swift; sourceTree = "<group>"; };
@@ -957,6 +964,7 @@
 		CC7B2E12D270CC49B824429F /* FocusBlockDropIndicatorUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = FocusBlockDropIndicatorUITests.swift; sourceTree = "<group>"; };
 		CE21F83C52F46219D0186198 /* FocusBlockDragTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = FocusBlockDragTests.swift; sourceTree = "<group>"; };
 		D3E74EBAAA6FB2D024DA0E5F /* DayStatusWidgetUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DayStatusWidgetUITests.swift; path = FocusBloxUITests/DayStatusWidgetUITests.swift; sourceTree = SOURCE_ROOT; };
+		D42047E4A074FC3EE1C65D09 /* NextUpSuggestionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = NextUpSuggestionService.swift; path = Sources/Services/NextUpSuggestionService.swift; sourceTree = SOURCE_ROOT; };
 		D5F22CE94E29A523114817BF /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		D7431A2BD04896D56962DDC5 /* EveningResetService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = EveningResetService.swift; sourceTree = "<group>"; };
 		D7ED51F72D6039EFAC3D85A3 /* SchedulingUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchedulingUITests.swift; sourceTree = "<group>"; };
@@ -980,6 +988,8 @@
 		F95163D6FEA76345387E9219 /* EveningResetServiceTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = EveningResetServiceTests.swift; sourceTree = "<group>"; };
 		F9BA59D11A5C274B3D9F4469 /* BlockerPickerSearchUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BlockerPickerSearchUITests.swift; sourceTree = "<group>"; };
 		FDD319A3F7DEE05F6A8885FC /* DurationBadge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DurationBadge.swift; sourceTree = "<group>"; };
+		A517BBCD30754CE69598B71A /* NextUpSuggestionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = NextUpSuggestionService.swift; path = Sources/Services/NextUpSuggestionService.swift; sourceTree = SOURCE_ROOT; };
+		A243DD5301F14089BF9880CE /* MorningCoachingSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MorningCoachingSection.swift; path = Sources/Views/MorningCoachingSection.swift; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -1660,6 +1670,11 @@
 				6BE14B1DA859F48BC2A77EE6 /* WidgetDataPublisherTests.swift */,
 				D3E74EBAAA6FB2D024DA0E5F /* DayStatusWidgetUITests.swift */,
 				BB39490FB9868A1CDF5ABDFC /* WidgetDataPublisher.swift */,
+				A5AB41B49361F9C4F2416C80 /* NextUpSuggestionServiceTests.swift */,
+				3E284B3E881E745000F98D71 /* NextUpSuggestionService.swift */,
+				23C64BFA8782C6A106D23BE6 /* MorningCoachingSection.swift */,
+				D42047E4A074FC3EE1C65D09 /* NextUpSuggestionService.swift */,
+				234340A8B266225A03BE4C8A /* MorningCoachingSection.swift */,
 			);
 			sourceTree = "<group>";
 		};
@@ -2235,6 +2250,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				E907CB03C20C1B55A48C4B1B /* BacklogRow.swift in Sources */,
+				254BA311864B4038A8BC9F46 /* NextUpSuggestionService.swift in Sources */,
+				A8A08C6878B74D789ECE9734 /* MorningCoachingSection.swift in Sources */,
 				TLI01IOSBLD00001,
 				TLL01IOSBLD00001,
 				58649A426A8AF17A4944DBCF /* NextUpSection.swift in Sources */,
@@ -2587,6 +2604,7 @@
 				B77E484CB2341400040A6EF3 /* SuccessStoryServiceTests.swift in Sources */,
 				3E894416B5C5A23FF89D0A9E /* FailureProtocolServiceTests.swift in Sources */,
 				720A4CC3BD147493C706190E /* WidgetDataPublisherTests.swift in Sources */,
+				AFF14827AB249970A3471374 /* NextUpSuggestionServiceTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

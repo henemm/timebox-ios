@@ -210,6 +210,57 @@ final class DebugHierarchyTest: XCTestCase {
         printStructuredSummary()
     }
 
+    /// Debug: Morning-Mode DayView Tab Hierarchie ausgeben
+    func testPrintMorningDayView() {
+        app = XCUIApplication()
+        app.launchArguments = ["-UITesting", "-morningEndHour", "24"]
+        app.launch()
+
+        let tagTab = app.tabBars.buttons["Tag"]
+        guard tagTab.waitForExistence(timeout: 5) else {
+            print("ERROR: Tag tab not found!")
+            return
+        }
+        tagTab.tap()
+
+        // Wait for async data loading
+        let morningTitle = app.navigationBars["Guten Morgen"]
+        _ = morningTitle.waitForExistence(timeout: 5)
+
+        // Wait extra for suggestions to load
+        let coachingSection = app.otherElements["morningCoachingSection"]
+        _ = coachingSection.waitForExistence(timeout: 5)
+
+        print("\n=== MORNING DAYVIEW HIERARCHY ===")
+        print(app.debugDescription)
+        print("=== END ===\n")
+
+        // Specifically search for suggestion elements
+        print("\n=== SUGGESTION ELEMENTS ===")
+        let suggestionRows = app.descendants(matching: .any).matching(
+            NSPredicate(format: "identifier BEGINSWITH 'suggestionRow_'")
+        ).allElementsBoundByIndex
+        print("suggestionRow_ count: \(suggestionRows.count)")
+        for row in suggestionRows {
+            print("  - [\(row.identifier)]")
+        }
+
+        let confirmButtons = app.buttons.matching(
+            NSPredicate(format: "identifier BEGINSWITH 'confirmSuggestion_'")
+        ).allElementsBoundByIndex
+        print("confirmSuggestion_ count: \(confirmButtons.count)")
+
+        let dismissButtons = app.buttons.matching(
+            NSPredicate(format: "identifier BEGINSWITH 'dismissSuggestion_'")
+        ).allElementsBoundByIndex
+        print("dismissSuggestion_ count: \(dismissButtons.count)")
+
+        print("\nCoaching section exists: \(coachingSection.exists)")
+        print("=== END SUGGESTIONS ===\n")
+
+        printStructuredSummary()
+    }
+
     // MARK: - Hilfsmethoden
 
     /// Strukturierte Zusammenfassung der wichtigsten Elemente.
