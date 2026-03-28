@@ -284,6 +284,8 @@ struct FocusBloxMacApp: App {
                         syncMonitor.startRemoteChangeMonitoring(container: container)
                         // One-time cleanup: Remove leaked test data from persistent store
                         Self.cleanupLeakedTestData(in: container.mainContext)
+                        // MAC_025b: Migrate reminders-sourced tasks to local (idempotent, same as iOS)
+                        RemindersImportService.migrateRemindersToLocal(in: container.mainContext)
                         // Bug 38: Force CloudKit to sync all extended attribute fields
                         MacModelContainer.forceCloudKitFieldSync(in: container.mainContext)
                         // BUG_108: Order matters — migrate + dedup first to ensure clean state, then repair

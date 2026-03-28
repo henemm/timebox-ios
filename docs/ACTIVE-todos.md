@@ -61,7 +61,7 @@
 
 | ID | Titel | Prio | Aufwand | Beschreibung |
 |----|-------|------|---------|-------------|
-| MAC_025b | Reminders Sync auf macOS | High | S | `migrateRemindersToLocal()` Aufruf in `FocusBloxMacApp.swift` fehlt (~3 LoC). [Spec](specs/macos/MAC-025-reminders-sync.md) |
+| ~~MAC_025b~~ | ~~Reminders Sync auf macOS~~ | ~~High~~ | ~~S~~ | ~~`migrateRemindersToLocal()` Aufruf in `FocusBloxMacApp.swift` fehlt (~3 LoC). [Spec](specs/macos/MAC-025-reminders-sync.md)~~ ERLEDIGT |
 | ~~MAC_027~~ | ~~Focus Sprint Workflow Paritaet~~ | ~~Medium~~ | ~~S~~ | ~~Sidebar-Switch + Follow-up + Nudge Dialog~~ ERLEDIGT |
 | MAC_028 | Backlog Paritaet (Parkdeck + Stacking) | Medium | S | **Buendelt:** Parkdeck-Metapher (~70 LoC, ex MAC_RW_2.4) + Recurring Stacking (~40 LoC, ex MAC_RW_3.5). Dateien: `ContentView.swift`, `MacBacklogRow.swift`. ~110 LoC gesamt. |
 | MAC_026 | Enhanced Quick Capture (Metadaten) | Medium | M | macOS Quick Capture hat nur Titel, iOS hat volle Metadaten (Importance, Urgency, Category, Duration). [Spec](specs/macos/MAC-026-quick-capture-enhanced.md) |
