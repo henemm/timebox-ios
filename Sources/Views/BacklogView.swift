@@ -392,6 +392,7 @@ struct BacklogView: View {
             let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
             planItems = try await syncEngine.sync()
             planItems.populateDependentCounts()
+            applyRecurringStacking()
             allRecurringItems = try await syncEngine.syncRecurringTasks()
             completedTasks = try await syncEngine.syncCompletedTasks(days: 7)
         } catch {
@@ -462,6 +463,7 @@ struct BacklogView: View {
             let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
             planItems = try await syncEngine.sync()
             planItems.populateDependentCounts()
+            applyRecurringStacking()
             allRecurringItems = try await syncEngine.syncRecurringTasks()
 
             // Enrich remote tasks (Watch, Share Extension, Siri) that arrived without attributes
@@ -470,6 +472,7 @@ struct BacklogView: View {
             if enriched > 0 {
                 planItems = try await syncEngine.sync()
                 planItems.populateDependentCounts()
+            applyRecurringStacking()
             }
 
             print("[CloudKit Debug] refreshLocalTasks() DONE - new planItems: \(planItems.count), enriched: \(enriched)")
@@ -883,15 +886,66 @@ struct BacklogView: View {
     private func completeTask(_ item: PlanItem) {
         completeFeedback.toggle()
 
+        // For stacked recurring tasks: complete the oldest instance (earliest dueDate)
+        let targetID: String
+        if item.stackedInstanceCount > 1, let groupID = item.recurrenceGroupID {
+            let siblings = planItems.filter {
+                $0.recurrenceGroupID == groupID && !$0.isCompleted && !$0.isTemplate
+            }
+            targetID = siblings
+                .sorted { ($0.dueDate ?? .distantFuture) < ($1.dueDate ?? .distantFuture) }
+                .first?.id ?? item.id
+        } else {
+            targetID = item.id
+        }
+
         deferredCompletion.scheduleCompletion(id: item.id) { [modelContext] in
             do {
                 let taskSource = LocalTaskSource(modelContext: modelContext)
                 let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
-                try syncEngine.completeTask(itemID: item.id)
+                try syncEngine.completeTask(itemID: targetID)
                 await loadTasks()
             } catch {
                 errorMessage = "Task konnte nicht als erledigt markiert werden."
             }
+        }
+    }
+
+    // MARK: - Recurring Stacking (RW_3.5)
+
+    /// Groups recurring instances by recurrenceGroupID.
+    /// The oldest instance (earliest dueDate) becomes the representative,
+    /// with stackedInstanceCount set to the group size.
+    /// Non-representative instances are removed from planItems.
+    private func applyRecurringStacking() {
+        // Group items by recurrenceGroupID + parked status (only non-nil, non-template, non-completed)
+        // Parked and active instances are grouped independently per spec
+        var groups: [String: [Int]] = [:]  // "groupID_parked/active" -> indices
+        for (index, item) in planItems.enumerated() {
+            guard let groupID = item.recurrenceGroupID,
+                  !item.isTemplate,
+                  !item.isCompleted else { continue }
+            let key = "\(groupID)_\(item.isInParkdeck ? "parked" : "active")"
+            groups[key, default: []].append(index)
+        }
+
+        // For each group with 2+ instances: mark representative, remove others
+        var indicesToRemove: Set<Int> = []
+        for (_, indices) in groups where indices.count >= 2 {
+            // Find the representative: oldest dueDate (earliest)
+            let representativeIndex = indices.min { a, b in
+                (planItems[a].dueDate ?? .distantFuture) < (planItems[b].dueDate ?? .distantFuture)
+            } ?? indices[0]
+
+            planItems[representativeIndex].stackedInstanceCount = indices.count
+            for idx in indices where idx != representativeIndex {
+                indicesToRemove.insert(idx)
+            }
+        }
+
+        // Remove non-representative items (iterate in reverse to preserve indices)
+        for idx in indicesToRemove.sorted().reversed() {
+            planItems.remove(at: idx)
         }
     }
 

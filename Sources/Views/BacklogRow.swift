@@ -73,6 +73,11 @@ struct BacklogRow: View {
         .background(
             RoundedRectangle(cornerRadius: 16)
                 .fill(.ultraThinMaterial)
+                .overlay(
+                    item.stackedInstanceCount >= 3
+                        ? RoundedRectangle(cornerRadius: 16).fill(Color.orange.opacity(0.06))
+                        : nil
+                )
         )
         .overlay {
             if isPendingResort {
@@ -208,6 +213,21 @@ struct BacklogRow: View {
             // 3b. Recurrence Badge (only if recurring)
             if let pattern = item.recurrencePattern, pattern != "none" {
                 RecurrenceBadge(pattern: pattern, taskId: item.id)
+            }
+
+            // 3c. Stacking Badge (only if 2+ recurring instances stacked)
+            if item.stackedInstanceCount >= 2 {
+                Text("x\(item.stackedInstanceCount)")
+                    .font(.caption2.weight(.bold))
+                    .foregroundStyle(item.stackedInstanceCount >= 3 ? .orange : .secondary)
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 3)
+                    .background(
+                        Capsule()
+                            .fill(item.stackedInstanceCount >= 3 ? Color.orange.opacity(0.2) : Color.secondary.opacity(0.15))
+                    )
+                    .accessibilityIdentifier("stackingBadge_\(item.id)")
+                    .accessibilityLabel("\(item.stackedInstanceCount) aufgelaufene Instanzen")
             }
 
             // 4. Tags

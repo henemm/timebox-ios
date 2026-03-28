@@ -755,7 +755,7 @@ struct FocusBloxApp: App {
         recurringTemplate1.isNextUp = false
         context.insert(recurringTemplate1)
 
-        let recurringChild1 = LocalTask(
+        let recurringChild1a = LocalTask(
             title: "[MOCK] Taeglich lesen",
             importance: 2,
             tags: ["learning"],
@@ -764,8 +764,21 @@ struct FocusBloxApp: App {
             recurrencePattern: "daily",
             recurrenceGroupID: recurringGroupID1
         )
-        recurringChild1.isNextUp = false
-        context.insert(recurringChild1)
+        recurringChild1a.isNextUp = false
+        context.insert(recurringChild1a)
+
+        // Stacked child (yesterday, not completed) — triggers x2 stacking badge
+        let recurringChild1b = LocalTask(
+            title: "[MOCK] Taeglich lesen",
+            importance: 2,
+            tags: ["learning"],
+            dueDate: Calendar.current.date(byAdding: .day, value: -1, to: Date()),
+            estimatedDuration: 15,
+            recurrencePattern: "daily",
+            recurrenceGroupID: recurringGroupID1
+        )
+        recurringChild1b.isNextUp = false
+        context.insert(recurringChild1b)
 
         // Series 2: Weekly — template + open child
         let recurringGroupID2 = "uitest-recurring-group-2"
@@ -782,7 +795,7 @@ struct FocusBloxApp: App {
         recurringTemplate2.isNextUp = false
         context.insert(recurringTemplate2)
 
-        let recurringChild2 = LocalTask(
+        let recurringChild2a = LocalTask(
             title: "[MOCK] Wochenreview",
             importance: 3,
             tags: ["planning"],
@@ -792,8 +805,35 @@ struct FocusBloxApp: App {
             recurrenceWeekdays: [5],
             recurrenceGroupID: recurringGroupID2
         )
-        recurringChild2.isNextUp = false
-        context.insert(recurringChild2)
+        recurringChild2a.isNextUp = false
+        context.insert(recurringChild2a)
+
+        // Two stacked children (last week + 2 weeks ago) — triggers x3 stacking badge
+        let recurringChild2b = LocalTask(
+            title: "[MOCK] Wochenreview",
+            importance: 3,
+            tags: ["planning"],
+            dueDate: Calendar.current.date(byAdding: .day, value: -7, to: Date()),
+            estimatedDuration: 30,
+            recurrencePattern: "weekly",
+            recurrenceWeekdays: [5],
+            recurrenceGroupID: recurringGroupID2
+        )
+        recurringChild2b.isNextUp = false
+        context.insert(recurringChild2b)
+
+        let recurringChild2c = LocalTask(
+            title: "[MOCK] Wochenreview",
+            importance: 3,
+            tags: ["planning"],
+            dueDate: Calendar.current.date(byAdding: .day, value: -14, to: Date()),
+            estimatedDuration: 30,
+            recurrencePattern: "weekly",
+            recurrenceWeekdays: [5],
+            recurrenceGroupID: recurringGroupID2
+        )
+        recurringChild2c.isNextUp = false
+        context.insert(recurringChild2c)
 
         // Series 3: Biweekly — template + open child (for recurrence display consistency test)
         let recurringGroupID3 = "uitest-recurring-group-3"

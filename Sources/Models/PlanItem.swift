@@ -93,6 +93,9 @@ struct PlanItem: Identifiable, Sendable {
     /// Number of tasks that depend on this task (populated externally)
     var dependentCount: Int = 0
 
+    /// Number of stacked recurring instances (populated externally during grouping)
+    var stackedInstanceCount: Int = 1
+
     /// Whether this task is blocked by another task
     var isBlocked: Bool { blockerTaskID != nil }
 
@@ -115,7 +118,8 @@ struct PlanItem: Identifiable, Sendable {
             estimatedDuration: estimatedDuration,
             taskType: taskType,
             isNextUp: isNextUp,
-            dependentTaskCount: dependentCount
+            dependentTaskCount: dependentCount,
+            stackedInstanceCount: stackedInstanceCount
         )
     }
 

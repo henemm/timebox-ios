@@ -45,7 +45,8 @@ struct TaskPriorityScoringService {
         taskType: String,
         isNextUp: Bool,
         now: Date = Date(),
-        dependentTaskCount: Int = 0
+        dependentTaskCount: Int = 0,
+        stackedInstanceCount: Int = 1
     ) -> Int {
         let eisenhower = eisenhowerScore(importance: importance, urgency: urgency)
         let deadline = deadlineScore(dueDate: dueDate, now: now)
@@ -58,8 +59,9 @@ struct TaskPriorityScoringService {
         )
         let nextUp = nextUpBonus(isNextUp: isNextUp)
         let blocker = blockerBonus(dependentTaskCount: dependentTaskCount)
+        let stacking = stackingBoost(instanceCount: stackedInstanceCount)
 
-        return min(100, eisenhower + deadline + neglect + completeness + nextUp + blocker)
+        return min(100, eisenhower + deadline + neglect + completeness + nextUp + blocker + stacking)
     }
 
     // MARK: - Eisenhower Matrix (0-50)
@@ -147,5 +149,13 @@ struct TaskPriorityScoringService {
     /// +3 per dependent task, capped at +9 (3 dependents).
     static func blockerBonus(dependentTaskCount: Int) -> Int {
         min(9, dependentTaskCount * 3)
+    }
+
+    // MARK: - Stacking Boost (0-15)
+
+    /// Recurring tasks with multiple open instances get a priority boost.
+    /// +5 per extra instance beyond the first, capped at +15 (4+ instances).
+    static func stackingBoost(instanceCount: Int) -> Int {
+        min(15, 5 * max(0, instanceCount - 1))
     }
 }

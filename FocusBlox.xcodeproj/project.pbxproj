@@ -10,7 +10,6 @@
 		03A94D15FBA2530D8C629546 /* BacklogRowRedesignUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54C8A326C1D84FA7A3BD27A8 /* BacklogRowRedesignUITests.swift */; };
 		062C2C62A78FAAB837F02EA6 /* EventKitRepositoryEnvironment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F276F67582A827E523D8ED6 /* EventKitRepositoryEnvironment.swift */; };
 		083F4E94B7CAB57935831D64 /* SuccessStoryUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B334C3C80A1A6187A2DD945 /* SuccessStoryUITests.swift */; };
-		0A76DEF9F3AA7A26322F066F /* DayProgressSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1CF56B22F7EC70EBA401ED8 /* DayProgressSection.swift */; };
 		0AD14E1CA3B1D61146618D3D /* LimitationGuardUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B64E4008A8607B3C5545F3CF /* LimitationGuardUITests.swift */; };
 		0B30790C22063E68AD1A34AE /* SpotlightIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E693153139C30E62D300D923 /* SpotlightIntegrationTests.swift */; };
 		0E82487280F787D98D8C8580 /* MorningCoachingSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8313480AA9BC90E4F214351E /* MorningCoachingSection.swift */; };
@@ -104,7 +103,6 @@
 		99A9D9F812F3D5E2E99489C1 /* SpotlightIndexingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FEFD473342A7BED5A2A93AF /* SpotlightIndexingService.swift */; };
 		9BE17D13495121E5FCD4665B /* BlockerPickerSearchUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9BA59D11A5C274B3D9F4469 /* BlockerPickerSearchUITests.swift */; };
 		9E4DE0DFDA16F42B8D28D6CD /* ManualBlockCreationUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41F2A36E471937592F06F0C9 /* ManualBlockCreationUITests.swift */; };
-		9F1DC97AB13A71771934D083 /* DayProgressSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1CF56B22F7EC70EBA401ED8 /* DayProgressSection.swift */; };
 		9F846B980036BD136A9E4A27 /* EmotionalNudgeUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5C4410415E5DDF308F6F87A /* EmotionalNudgeUITests.swift */; };
 		9F9185F5A9BD5A8CFF79DECA /* ErrorStateUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B596C16F99039490702E0B7 /* ErrorStateUITests.swift */; };
 		9FA22769CF0B14E779B904FA /* FocusBlockDropIndicatorUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC7B2E12D270CC49B824429F /* FocusBlockDropIndicatorUITests.swift */; };
@@ -164,6 +162,7 @@
 		'BKGCMP01BUILD0001' = {isa = PBXBuildFile; fileRef = BKGCMP01FILE00001; };
 		'BKLGGAP01BUILD01' = {isa = PBXBuildFile; fileRef = BKLGGAP01FILE001; };
 		'BSRCH01BUILD00001' = {isa = PBXBuildFile; fileRef = BSRCH01FILE000001; };
+		'BSTK001BUILD0001' = {isa = PBXBuildFile; fileRef = BSTK001FILE00001; };
 		'BUG14DUR01BUILD000001' = {isa = PBXBuildFile; fileRef = BUG14DUR01FILEREF0001; };
 		'BUG34DDP01BUILD000001' = {isa = PBXBuildFile; fileRef = BUG34DDP01FILEREF0001; };
 		'BUG35QCI01BUILD000001' = {isa = PBXBuildFile; fileRef = BUG35QCI01FILEREF0001; };
@@ -329,6 +328,7 @@
 		'QKEDIT03BUILD0001' = {isa = PBXBuildFile; fileRef = QKEDIT03FILE00001; };
 		'QKEDIT04BUILD0001' = {isa = PBXBuildFile; fileRef = QKEDIT04FILE00001; };
 		'RCDDUP01BUILD0001' = {isa = PBXBuildFile; fileRef = RCDDUP01FILE00001; };
+		'RCSTK01BUILD0001' = {isa = PBXBuildFile; fileRef = RCSTK01FILE00001; };
 		'RECRBDG01BUILD0001' = {isa = PBXBuildFile; fileRef = RECRBDG01FILE00001; };
 		'RECREDT01BUILD0001' = {isa = PBXBuildFile; fileRef = RECREDT01FILE00001; };
 		'RECRPAT01BUILD0001' = {isa = PBXBuildFile; fileRef = RECRPAT01FILE00001; };
@@ -786,6 +786,7 @@
 		'BKGCMP01FILE00001' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BacklogCompletionUITests.swift; sourceTree = "<group>"; };
 		'BKLGGAP01FILE001' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BacklogGapUITests.swift; sourceTree = "<group>"; };
 		'BSRCH01FILE000001' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BacklogSearchUITests.swift; sourceTree = "<group>"; };
+		'BSTK001FILE00001' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BacklogStackingUITests.swift; sourceTree = "<group>"; };
 		'BUG14DUR01FILEREF0001' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusBlockDurationTests.swift; sourceTree = "<group>"; };
 		'BUG34DDP01FILEREF0001' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DedupCleanupTests.swift; sourceTree = "<group>"; };
 		'BUG35QCI01FILEREF0001' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickCaptureIntentTests.swift; sourceTree = "<group>"; };
@@ -850,7 +851,6 @@
 		'DUEDT03FILE0000001' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DueDateFormattingTests.swift; sourceTree = "<group>"; };
 		'DUEDT04FILE0000001' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DueDateTimeDisplayTests.swift; sourceTree = "<group>"; };
 		'DYNISLD01FILE00001' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DynamicIslandUITests.swift; sourceTree = "<group>"; };
-		E1CF56B22F7EC70EBA401ED8 /* DayProgressSection.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DayProgressSection.swift; sourceTree = "<group>"; };
 		E1F3228806B919AB0836326F /* ReminderData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReminderData.swift; sourceTree = "<group>"; };
 		E4544C4E951FB64D23E637CE /* FailureQuickSelectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FailureQuickSelectView.swift; path = Sources/Views/FailureQuickSelectView.swift; sourceTree = SOURCE_ROOT; };
 		E693153139C30E62D300D923 /* SpotlightIntegrationTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SpotlightIntegrationTests.swift; sourceTree = "<group>"; };
@@ -917,6 +917,7 @@
 		'QKEDIT03FILE00001' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportancePicker.swift; sourceTree = "<group>"; };
 		'QKEDIT04FILE00001' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryPicker.swift; sourceTree = "<group>"; };
 		'RCDDUP01FILE00001' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecurringChildDedupTests.swift; sourceTree = "<group>"; };
+		'RCSTK01FILE00001' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecurringStackingTests.swift; sourceTree = "<group>"; };
 		'RECRBDG01FILE00001' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecurrenceBadgeUITests.swift; sourceTree = "<group>"; };
 		'RECREDT01FILE00001' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecurrenceEditingUITests.swift; sourceTree = "<group>"; };
 		'RECRPAT01FILE00001' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecurrencePatternTests.swift; sourceTree = "<group>"; };
@@ -1242,6 +1243,7 @@
 				SMTNOTD2FILE00001,
 				BKLGGAP01FILE001,
 				BSRCH01FILE000001,
+				BSTK001FILE00001,
 				LVCLN01UIFILE0001,
 				RECTMPLUI01FIL001,
 				B242DB168BAB2F3CF8A63404 /* UndoCompletionUITests.swift */,
@@ -1499,6 +1501,7 @@
 				ITBFLITE01FILE001,
 				RECRSVC01FILE00001,
 				RCDDUP01FILE00001,
+				RCSTK01FILE00001,
 				RECTMPL01FILE0001,
 				TMPDEDUP01FILE001,
 				RECVISFILT01FIL01,
@@ -1702,7 +1705,6 @@
 				TSKBDG02FILE00001,
 				SHRSHT02FILE00001,
 				WKDYBTN01FILE0001,
-				E1CF56B22F7EC70EBA401ED8 /* DayProgressSection.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -2374,7 +2376,6 @@
 				E338397EBDBBEEA357D5A910 /* BlockerPickerSheet.swift in Sources */,
 				867B45575EC103458F65763D /* DisciplineTrendChart.swift in Sources */,
 				66C0D68335223400522071A4 /* CategoryTrendChart.swift in Sources */,
-				0A76DEF9F3AA7A26322F066F /* DayProgressSection.swift in Sources */,
 				43E9F6A3AF10E5D8A3CD341B /* DisciplineStatsService.swift in Sources */,
 				C5E5E1ECDF2B7CE371F3087B /* CategoryStatsService.swift in Sources */,
 				6AE84B88BD9C4E3A5E89A645 /* BehavioralProfile.swift in Sources */,
@@ -2467,6 +2468,7 @@
 				SMTNOTD2BUILD0001,
 				BKLGGAP01BUILD01,
 				BSRCH01BUILD00001,
+				BSTK001BUILD0001,
 				LVCLN01UIBUILD001,
 				RECTMPLUI01BLD001,
 				AC44830774F8C544E3F39995 /* UndoCompletionUITests.swift in Sources */,
@@ -2567,6 +2569,7 @@
 				ITBFLITE01BUILD01,
 				RECRSVC01BUILD0001,
 				RCDDUP01BUILD0001,
+				RCSTK01BUILD0001,
 				RECTMPL01BUILD001,
 				TMPDEDUP01BUILD01,
 				RECVISFILT01BLD01,
@@ -2743,7 +2746,6 @@
 				99A9D9F812F3D5E2E99489C1 /* SpotlightIndexingService.swift in Sources */,
 				A056E12CD65C0F6401860BDB /* CalendarEventTransfer.swift in Sources */,
 				25CC4B80B3B8983B7FC4CF9C /* BlockerPickerSheet.swift in Sources */,
-				9F1DC97AB13A71771934D083 /* DayProgressSection.swift in Sources */,
 				582E9E6FA6358FA19463844F /* DisciplineStatsService.swift in Sources */,
 				6319203D4702E3A23F2BB009 /* CategoryStatsService.swift in Sources */,
 				F023MACBUILD00000001,
