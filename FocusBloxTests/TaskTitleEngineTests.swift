@@ -316,16 +316,11 @@ final class TaskTitleEngineTests: XCTestCase {
         XCTAssertEqual(task.urgency, "not_urgent", "Existing urgency must NOT be overwritten")
     }
 
-    // MARK: - AI Title Improvement (nur wenn verfuegbar)
+    // MARK: - RW_1.4: Deterministic Email Cleanup via improveTitleIfNeeded
 
-    /// Verhalten: KI verbessert kryptischen E-Mail-Subject zu actionable Titel
-    /// Bricht wenn: performImprovement() den KI-Call oder die Titel-Zuweisung entfernt
-    func test_improveTitleIfNeeded_improvesEmailSubject_whenAvailable() async throws {
-        guard TaskTitleEngine.isAvailable else {
-            // Test nur sinnvoll wenn Apple Intelligence verfuegbar
-            throw XCTSkip("Apple Intelligence not available on this device")
-        }
-
+    /// Verhalten: E-Mail-Artefakte werden deterministisch (nicht AI) aus Titel entfernt
+    /// Bricht wenn: improveTitleIfNeeded() cleanTitle() nicht aufruft
+    func test_improveTitleIfNeeded_cleansEmailArtifactsDeterministically() async throws {
         let context = container.mainContext
         let task = LocalTask(title: "Re: Fwd: AW: WG: Quarterly Budget Review Meeting")
         task.needsTitleImprovement = true
@@ -335,12 +330,13 @@ final class TaskTitleEngineTests: XCTestCase {
         let engine = TaskTitleEngine(modelContext: context)
         await engine.improveTitleIfNeeded(task)
 
-        // Titel sollte verbessert sein (keine Re:/Fwd:/AW:/WG: Artefakte mehr)
-        XCTAssertFalse(task.title.contains("Re:"), "Improved title should not contain 'Re:'")
-        XCTAssertFalse(task.title.contains("Fwd:"), "Improved title should not contain 'Fwd:'")
-        XCTAssertFalse(task.title.contains("AW:"), "Improved title should not contain 'AW:'")
-        XCTAssertFalse(task.needsTitleImprovement, "Flag should be false after improvement")
-        XCTAssertNotNil(task.taskDescription, "Original should be saved in description")
+        // Auch ohne AI muessen E-Mail-Artefakte deterministisch entfernt werden
+        XCTAssertFalse(task.title.contains("Re:"), "cleanTitle must remove 'Re:'")
+        XCTAssertFalse(task.title.contains("Fwd:"), "cleanTitle must remove 'Fwd:'")
+        XCTAssertFalse(task.title.contains("AW:"), "cleanTitle must remove 'AW:'")
+        XCTAssertFalse(task.title.contains("WG:"), "cleanTitle must remove 'WG:'")
+        XCTAssertEqual(task.title, "Quarterly Budget Review Meeting",
+                       "RW_1.4: Title should be deterministically cleaned")
     }
 
     // MARK: - Deterministic Keyword Stripping (Bug: title keywords not removed)
@@ -402,72 +398,129 @@ final class TaskTitleEngineTests: XCTestCase {
                        "Category-style colon prefixes must NOT be stripped")
     }
 
-    // MARK: - Safety Guard: shouldAcceptImprovedTitle (Bug: Title prefix removed)
+    // MARK: - RW_1.4: cleanTitle() — Deterministische Titel-Bereinigung
 
-    /// Verhalten: AI-Output das signifikant kuerzer ist OHNE bekannte Muster wird abgelehnt
-    /// Bricht wenn: shouldAcceptImprovedTitle() nicht existiert oder immer true liefert
-    func test_shouldAcceptImprovedTitle_rejectsAggressiveShortening() {
-        let accepted = TaskTitleEngine.shouldAcceptImprovedTitle(
-            original: "Lohnsteuererklärung: Rechnungsübersicht erstellen",
-            improved: "Rechnungsübersicht erstellen"
-        )
-        XCTAssertFalse(accepted,
-                       "Should reject when AI removes significant content without known removable patterns")
+    /// Verhalten: E-Mail-Prefixe (Re:, Fwd:, AW:, WG:, FW:) werden entfernt
+    /// Bricht wenn: cleanTitle() das Regex-Pattern fuer E-Mail-Prefixe nicht hat
+    func test_cleanTitle_removesEmailPrefixes() {
+        let result = TaskTitleEngine.cleanTitle("Re: Fwd: AW: WG: Quarterly Budget Review")
+        XCTAssertEqual(result, "Quarterly Budget Review",
+                       "All email prefixes (Re:, Fwd:, AW:, WG:) must be removed")
     }
 
-    /// Verhalten: AI-Output das bekannte Artefakte entfernt wird akzeptiert (auch wenn viel kuerzer)
-    /// Bricht wenn: shouldAcceptImprovedTitle() E-Mail-Artefakt-Entfernung blockiert
-    func test_shouldAcceptImprovedTitle_allowsKnownPatternRemoval() {
-        let accepted = TaskTitleEngine.shouldAcceptImprovedTitle(
-            original: "Re: Fwd: AW: WG: Quarterly Budget Review",
-            improved: "Quarterly Budget Review"
-        )
-        XCTAssertTrue(accepted,
-                      "Should accept when removed content is known email artifacts")
+    /// Verhalten: Einleitungsfloskeln werden entfernt
+    /// Bricht wenn: cleanTitle() die Floskel-Patterns nicht enthaelt
+    func test_cleanTitle_removesIntroPhrases() {
+        let result = TaskTitleEngine.cleanTitle("Erinnere mich daran Herrn Mueller anzurufen")
+        XCTAssertEqual(result, "Herrn Mueller anzurufen",
+                       "Intro phrase 'Erinnere mich daran' must be removed")
     }
 
-    /// Verhalten: AI-Output das Einleitungsfloskeln entfernt wird akzeptiert
-    /// Bricht wenn: shouldAcceptImprovedTitle() Floskel-Entfernung blockiert
-    func test_shouldAcceptImprovedTitle_allowsIntroPhrasesRemoval() {
-        let accepted = TaskTitleEngine.shouldAcceptImprovedTitle(
-            original: "Erinnere mich daran Herrn Mueller anzurufen",
-            improved: "Herrn Mueller anrufen"
-        )
-        XCTAssertTrue(accepted,
-                      "Should accept when removed content is intro phrases")
+    /// Verhalten: "Ich muss noch" Floskel wird entfernt
+    /// Bricht wenn: cleanTitle() "Ich muss noch" nicht in der Floskel-Liste hat
+    func test_cleanTitle_removesIchMussNoch() {
+        let result = TaskTitleEngine.cleanTitle("Ich muss noch Steuern machen")
+        XCTAssertEqual(result, "Steuern machen",
+                       "Intro phrase 'Ich muss noch' must be removed")
     }
 
-    /// Verhalten: Minimale Aenderungen werden immer akzeptiert
-    /// Bricht wenn: shouldAcceptImprovedTitle() minimale Aenderungen blockiert
-    func test_shouldAcceptImprovedTitle_allowsMinorChanges() {
-        let accepted = TaskTitleEngine.shouldAcceptImprovedTitle(
-            original: "Einkaufen gehen ",
-            improved: "Einkaufen gehen"
-        )
-        XCTAssertTrue(accepted,
-                      "Should accept minor whitespace changes")
+    /// Verhalten: Umlaute und Sonderzeichen bleiben IMMER erhalten
+    /// Bricht wenn: cleanTitle() Umlaute/Sonderzeichen veraendert
+    func test_cleanTitle_preservesUmlautsAndSpecialChars() {
+        let result = TaskTitleEngine.cleanTitle("Flüge für Ärzte & Übernachtung buchen")
+        XCTAssertEqual(result, "Flüge für Ärzte & Übernachtung buchen",
+                       "Umlauts and special characters must NEVER be modified")
     }
 
-    /// Verhalten: Titel mit "Projekt:" Prefix wird geschuetzt
-    /// Bricht wenn: Safety Guard beliebige Doppelpunkt-Prefixe nicht erkennt
-    func test_shouldAcceptImprovedTitle_rejectsProjektPrefixRemoval() {
-        let accepted = TaskTitleEngine.shouldAcceptImprovedTitle(
-            original: "Projekt: Aufgabe erledigen",
-            improved: "Aufgabe erledigen"
-        )
-        XCTAssertFalse(accepted,
-                       "Should reject removal of 'Projekt:' prefix — it's user content, not metadata")
+    /// Verhalten: Doppelpunkt-Prefixe die User-Content sind bleiben erhalten
+    /// Bricht wenn: cleanTitle() beliebige Doppelpunkt-Prefixe entfernt statt nur E-Mail-Artefakte
+    func test_cleanTitle_preservesCategoryColonPrefix() {
+        let result = TaskTitleEngine.cleanTitle("Lohnsteuererklärung: Rechnungsübersicht erstellen")
+        XCTAssertEqual(result, "Lohnsteuererklärung: Rechnungsübersicht erstellen",
+                       "Category-style colon prefix is user content — must NOT be removed")
     }
 
-    /// Verhalten: AI-Output das Urgency-Keywords entfernt wird akzeptiert
-    /// Bricht wenn: shouldAcceptImprovedTitle() Urgency-Entfernung blockiert
-    func test_shouldAcceptImprovedTitle_allowsUrgencyRemoval() {
-        let accepted = TaskTitleEngine.shouldAcceptImprovedTitle(
-            original: "Dringend: Server-Problem fixen ASAP!",
-            improved: "Server-Problem fixen"
-        )
-        XCTAssertTrue(accepted,
-                      "Should accept when removed content is urgency keywords")
+    /// Verhalten: Whitespace wird normalisiert (mehrfache Leerzeichen → eins)
+    /// Bricht wenn: cleanTitle() Whitespace-Normalisierung fehlt
+    func test_cleanTitle_normalizesWhitespace() {
+        let result = TaskTitleEngine.cleanTitle("Re:   Fwd:   Meeting   planen  ")
+        XCTAssertEqual(result, "Meeting planen",
+                       "Multiple whitespace should be normalized to single space, trimmed")
+    }
+
+    // MARK: - RW_1.4: AI Suggestions (Kategorie + Dauer)
+
+    /// Verhalten: improveTitleIfNeeded setzt suggestedCategory wenn AI verfuegbar
+    /// Bricht wenn: enrichWithSuggestions() suggestedCategory nicht aus TaskSuggestion uebernimmt
+    func test_improveTitleIfNeeded_setsSuggestedCategory_whenAvailable() async throws {
+        guard TaskTitleEngine.isAvailable else {
+            throw XCTSkip("Apple Intelligence not available")
+        }
+
+        let context = container.mainContext
+        let task = LocalTask(title: "Wohnung putzen und aufräumen")
+        task.needsTitleImprovement = true
+        context.insert(task)
+        try context.save()
+
+        let engine = TaskTitleEngine(modelContext: context)
+        await engine.improveTitleIfNeeded(task)
+
+        let validCategories = ["income", "maintenance", "recharge", "learning", "giving_back"]
+        XCTAssertNotNil(task.suggestedCategory,
+                        "suggestedCategory must be set after enrichment")
+        if let cat = task.suggestedCategory {
+            XCTAssertTrue(validCategories.contains(cat),
+                          "suggestedCategory '\(cat)' must be one of: \(validCategories)")
+        }
+    }
+
+    /// Verhalten: improveTitleIfNeeded setzt suggestedDuration wenn AI verfuegbar
+    /// Bricht wenn: enrichWithSuggestions() suggestedDuration nicht aus TaskSuggestion uebernimmt
+    func test_improveTitleIfNeeded_setsSuggestedDuration_whenAvailable() async throws {
+        guard TaskTitleEngine.isAvailable else {
+            throw XCTSkip("Apple Intelligence not available")
+        }
+
+        let context = container.mainContext
+        let task = LocalTask(title: "Zahnarzt Termin wahrnehmen")
+        task.needsTitleImprovement = true
+        context.insert(task)
+        try context.save()
+
+        let engine = TaskTitleEngine(modelContext: context)
+        await engine.improveTitleIfNeeded(task)
+
+        let validDurations = [5, 15, 30, 60]
+        XCTAssertNotNil(task.suggestedDuration,
+                        "suggestedDuration must be set after enrichment")
+        if let dur = task.suggestedDuration {
+            XCTAssertTrue(validDurations.contains(dur),
+                          "suggestedDuration \(dur) must be one of: \(validDurations)")
+        }
+    }
+
+    // MARK: - RW_1.4: Titel wird NICHT durch AI veraendert
+
+    /// Verhalten: Nach improveTitleIfNeeded wird der Titel nur deterministisch bereinigt, NIE durch AI veraendert
+    /// Bricht wenn: performImprovement() den Titel noch per AI-Response ueberschreibt
+    func test_improveTitleIfNeeded_titleOnlyCleanedDeterministically() async throws {
+        guard TaskTitleEngine.isAvailable else {
+            throw XCTSkip("Apple Intelligence not available")
+        }
+
+        let context = container.mainContext
+        // Titel ohne E-Mail-Artefakte oder Floskeln — sollte unveraendert bleiben
+        let task = LocalTask(title: "Kruder & Dorfmeister Tickets buchen")
+        task.needsTitleImprovement = true
+        context.insert(task)
+        try context.save()
+
+        let engine = TaskTitleEngine(modelContext: context)
+        await engine.improveTitleIfNeeded(task)
+
+        XCTAssertEqual(task.title, "Kruder & Dorfmeister Tickets buchen",
+                       "RW_1.4: Title must NOT be changed by AI — only deterministic cleanup allowed")
     }
 
     // MARK: - Bug 95: titleContainsDateKeyword (deterministische Keyword-Pruefung)

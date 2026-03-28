@@ -47,33 +47,47 @@ final class TaskTitleEngine {
         return cleaned.trimmingCharacters(in: .whitespaces)
     }
 
-    // MARK: - Safety Guard
+    // MARK: - Deterministic Title Cleanup (RW_1.4)
 
-    /// Checks whether the AI-improved title should be accepted.
-    /// Rejects aggressive shortening where the AI removed user content
-    /// that isn't a known removable pattern (email artifacts, urgency, intro phrases).
-    static func shouldAcceptImprovedTitle(original: String, improved: String) -> Bool {
-        let originalLen = original.count
-        let improvedLen = improved.count
-        guard originalLen > 0 else { return true }
+    /// Cleans task titles deterministically using regex — no AI involved.
+    /// Removes email prefixes, intro phrases, and urgency keywords.
+    /// Umlauts and special characters are NEVER modified.
+    static func cleanTitle(_ title: String) -> String {
+        var cleaned = title
 
-        // If less than 30% was removed, always accept (minor cleanup)
-        let removedRatio = 1.0 - Double(improvedLen) / Double(originalLen)
-        if removedRatio <= 0.3 { return true }
+        // Email prefixes: Re:, Fwd:, AW:, WG:, FW: (case-insensitive, chained)
+        cleaned = cleaned.replacingOccurrences(
+            of: #"(?:(?:Re|Fwd|AW|WG|FW)\s*:\s*)+"#,
+            with: "",
+            options: [.regularExpression, .caseInsensitive]
+        )
 
-        // More than 30% was removed — check if the removed content was a known pattern
-        let lower = original.lowercased()
-        let knownPatterns = [
-            "re:", "fwd:", "aw:", "wg:", "fw:",
-            "erinnere mich", "ich muss noch", "vergiss nicht", "denk daran",
-            "dringend", "urgent", "asap", "sofort", "eilig",
-            "heute erledigen", "bitte"
+        // Intro phrases (case-insensitive, at start of string)
+        let introPhrases = [
+            "erinnere mich daran",
+            "ich muss noch",
+            "vergiss nicht",
+            "denk daran",
         ]
-        let hasKnownPattern = knownPatterns.contains { lower.contains($0) }
-        if hasKnownPattern { return true }
+        for phrase in introPhrases {
+            cleaned = cleaned.replacingOccurrences(
+                of: "(?i)^\(NSRegularExpression.escapedPattern(for: phrase))\\s*",
+                with: "",
+                options: .regularExpression
+            )
+        }
 
-        // Significant content removed without known pattern — reject
-        return false
+        // Urgency keywords via existing stripKeywords()
+        cleaned = stripKeywords(cleaned)
+
+        // Normalize whitespace (multiple spaces → single, trim)
+        cleaned = cleaned.replacingOccurrences(
+            of: #"\s{2,}"#,
+            with: " ",
+            options: .regularExpression
+        )
+
+        return cleaned.trimmingCharacters(in: .whitespaces)
     }
 
     // MARK: - Date Keyword Detection (Bug 95)
@@ -168,20 +182,17 @@ final class TaskTitleEngine {
         return cal.date(byAdding: .day, value: daysAhead, to: date)!
     }
 
-    // MARK: - Structured Output
+    // MARK: - Structured Output (RW_1.4: Category + Duration only)
 
     #if canImport(FoundationModels)
     @available(iOS 26.0, macOS 26.0, *)
     @Generable
-    struct ImprovedTask {
-        @Guide(description: "Cleaned task title (max 80 chars). Keep ALL original words, names, and abbreviations exactly as they are. NEVER remove text before colons unless it is a known email artifact (Re:, Fwd:, AW:, WG:). Remove ONLY: email artifacts, urgency phrases (dringend, ASAP, sofort), and intro phrases (Erinnere mich daran, Ich muss noch, Vergiss nicht). Example: 'Lohnsteuererklaerung: Rechnungsuebersicht erstellen' stays unchanged. Example: 'Erinnere mich heute daran Herrn Mueller anzurufen' becomes 'Herrn Mueller anrufen'. Start with verb in infinitive form. Keep input language.")
-        let title: String
+    struct TaskSuggestion {
+        @Guide(description: "Task category", .anyOf(["income", "maintenance", "recharge", "learning", "giving_back"]))
+        let category: String
 
-        @Guide(description: "Relative due date extracted from the text. Return 'heute' for heute/today/sofort, 'morgen' for morgen/tomorrow, 'uebermorgen' for uebermorgen/day after tomorrow, 'naechste woche' for naechste Woche/next week, or a weekday name like 'montag'/'freitag' if mentioned (e.g. 'bis Freitag' → 'freitag'). Return nil if no date mentioned.")
-        let dueDateRelative: String?
-
-        @Guide(description: "True if the text expresses urgency (heute erledigen, dringend, ASAP, sofort, urgent, exclamation marks). False otherwise.")
-        let isUrgent: Bool
+        @Guide(description: "Estimated duration in minutes", .anyOf(["5", "15", "30", "60"]))
+        let estimatedMinutes: String
     }
     #endif
 
@@ -196,16 +207,47 @@ final class TaskTitleEngine {
     // MARK: - Public API
 
     /// Improve the title of a single task if needed.
+    /// RW_1.4: Title is cleaned deterministically, AI only suggests category + duration.
     func improveTitleIfNeeded(_ task: LocalTask) async {
-        guard Self.isAvailable else { return }
         guard AppSettings.shared.aiScoringEnabled else { return }
         guard task.needsTitleImprovement else { return }
 
-        #if canImport(FoundationModels)
-        if #available(iOS 26.0, macOS 26.0, *) {
-            await performImprovement(task)
+        // Preserve original title in description (if description is empty)
+        if task.taskDescription == nil || task.taskDescription?.isEmpty == true {
+            task.taskDescription = task.title
         }
-        #endif
+
+        // Step 1: Deterministic title cleanup (always runs, no AI needed)
+        task.title = Self.cleanTitle(task.title)
+
+        // Step 2: Deterministic urgency extraction
+        let originalTitle = task.taskDescription ?? task.title
+        if task.urgency == nil {
+            let lower = originalTitle.lowercased()
+            let urgencyKeywords = ["dringend", "urgent", "asap", "sofort", "eilig"]
+            if urgencyKeywords.contains(where: { lower.contains($0) }) {
+                task.urgency = "urgent"
+            }
+        }
+
+        // Step 3: Deterministic date extraction
+        if task.dueDate == nil,
+           Self.titleContainsDateKeyword(originalTitle),
+           let date = Self.extractDeterministicDueDate(from: originalTitle) {
+            task.dueDate = date
+        }
+
+        // Step 3: AI suggestions for category + duration (if available)
+        if Self.isAvailable {
+            #if canImport(FoundationModels)
+            if #available(iOS 26.0, macOS 26.0, *) {
+                await enrichWithSuggestions(task)
+            }
+            #endif
+        }
+
+        task.needsTitleImprovement = false
+        try? modelContext.save()
     }
 
     /// Batch: Improve all tasks with needsTitleImprovement flag.
@@ -228,58 +270,33 @@ final class TaskTitleEngine {
         return improved
     }
 
-    // MARK: - Private
+    // MARK: - Private: AI Enrichment (RW_1.4)
 
     #if canImport(FoundationModels)
     @available(iOS 26.0, macOS 26.0, *)
-    private func performImprovement(_ task: LocalTask) async {
-        let originalTitle = task.title
-
-        // Preserve original title in description (if description is empty)
-        if task.taskDescription == nil || task.taskDescription?.isEmpty == true {
-            task.taskDescription = task.title
-        }
-
+    private func enrichWithSuggestions(_ task: LocalTask) async {
         do {
             let session = LanguageModelSession {
-                "Du bereinigst Task-Titel und extrahierst Metadaten. Regeln:"
-                "- KEINE Woerter, Abkuerzungen oder Namen aendern — Originalwoerter beibehalten"
-                "- Nur kuerzen durch Weglassen, NICHT durch Umschreiben"
-                "- Entferne NUR diese bekannten Artefakte: E-Mail-Prefixe (Re:, Fwd:, AW:, WG:)"
-                "- Entferne Dringlichkeits-Hinweise aus dem Titel (heute erledigen, dringend, ASAP, sofort)"
-                "- Entferne Einleitungsfloskeln: 'Erinnere mich daran', 'Ich muss noch', 'Vergiss nicht', 'Denk daran'"
-                "- WICHTIG: Text vor Doppelpunkten ist IMMER Teil des Titels und darf NICHT entfernt werden, ausser es ist ein bekanntes E-Mail-Artefakt (Re:, Fwd:, AW:, WG:)"
-                "- Beispiel: 'Lohnsteuererklaerung: Rechnungsuebersicht erstellen' → title='Lohnsteuererklaerung: Rechnungsuebersicht erstellen' (KEINE Aenderung!)"
-                "- Beispiel: 'Projekt: Dokumentation schreiben' → title='Projekt: Dokumentation schreiben' (KEINE Aenderung!)"
-                "- Extrahiere Zeitangaben aus Floskeln: 'heute', 'morgen', 'naechste Woche', 'bis Freitag', 'uebermorgen'"
-                "- Beispiel: 'Erinnere mich heute daran Herrn Mueller anzurufen' → title='Herrn Mueller anrufen', dueDate='heute'"
-                "- Beispiel: 'Ich muss morgen noch Steuern machen' → title='Steuern machen', dueDate='morgen'"
-                "- Beispiel: 'Einkaufen gehen' → title='Einkaufen gehen', dueDate=nil (KEIN Datum im Titel!)"
-                "- Beginne mit Verb im Infinitiv wenn moeglich"
-                "- Behalte die Sprache des Inputs bei"
-                "- Extrahiere Faelligkeit und Dringlichkeit separat"
+                "Categorize tasks and estimate duration."
+                "Categories: income (work/career/money), maintenance (household/errands/health), recharge (exercise/hobbies/rest), learning (study/reading/courses), giving_back (family/friends/social)"
+                "Duration: 5 (quick call/message), 15 (short errand), 30 (medium task), 60 (long/deep work)"
             }
 
-            let prompt = "Bereinige diesen Task-Titel: \(task.title)"
-            let response = try await session.respond(to: prompt, generating: ImprovedTask.self)
+            let prompt = "Task: \(task.title)"
+            let response = try await session.respond(to: prompt, generating: TaskSuggestion.self)
             let result = response.content
-            let improved = result.title.trimmingCharacters(in: .whitespacesAndNewlines)
 
-            if !improved.isEmpty && Self.shouldAcceptImprovedTitle(original: task.title, improved: improved) {
-                task.title = String(improved.prefix(200))
+            let validCategories = ["income", "maintenance", "recharge", "learning", "giving_back"]
+            if task.suggestedCategory == nil, validCategories.contains(result.category) {
+                task.suggestedCategory = result.category
             }
-            if task.dueDate == nil,
-               Self.titleContainsDateKeyword(originalTitle),
-               let date = Self.relativeDateFrom(result.dueDateRelative) {
-                task.dueDate = date
+
+            if task.suggestedDuration == nil, let minutes = Int(result.estimatedMinutes),
+               [5, 15, 30, 60].contains(minutes) {
+                task.suggestedDuration = minutes
             }
-            if task.urgency == nil, result.isUrgent {
-                task.urgency = "urgent"
-            }
-            task.needsTitleImprovement = false
-            try modelContext.save()
         } catch {
-            print("[TaskTitleEngine] Failed for '\(task.title)': \(error)")
+            print("[TaskTitleEngine] AI suggestion failed for '\(task.title)': \(error)")
         }
     }
     #endif
