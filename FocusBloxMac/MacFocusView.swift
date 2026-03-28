@@ -19,6 +19,7 @@ struct MacFocusView: View {
     @State private var isLoading = false
     @State private var errorMessage: String?
     @State private var showSprintReview = false
+    @State private var showNudgeContinueDialog = false
     @State private var reviewDismissed = false
     @State private var warningPlayed = false
 
@@ -81,6 +82,20 @@ struct MacFocusView: View {
                     }
                 )
             }
+        }
+        .confirmationDialog(
+            "Weitermachen?",
+            isPresented: $showNudgeContinueDialog,
+            titleVisibility: .visible
+        ) {
+            Button("Ja, weitermachen") {
+                extendNudgeBlock()
+            }
+            Button("Nein, beenden", role: .cancel) {
+                showSprintReview = true
+            }
+        } message: {
+            Text("Du hast 2 Minuten gemacht. Willst du weitermachen?")
         }
     }
 
@@ -549,7 +564,7 @@ struct MacFocusView: View {
             SoundService.playWarning()
             warningPlayed = true
         }
-        if block.isPast && !showSprintReview && !reviewDismissed {
+        if block.isPast && !showSprintReview && !showNudgeContinueDialog && !reviewDismissed {
             // Bug 55C: Save current task's time before showing sprint review
             if let startTime = taskStartTime {
                 let tasks = tasksForBlock(block)
@@ -568,11 +583,34 @@ struct MacFocusView: View {
                 taskStartTime = nil
             }
             SoundService.playEndGong()
-            showSprintReview = true
+            // Nudge-Sprint erkennen (2-Min Block) → "Weitermachen?" statt SprintReview
+            let blockDurationMinutes = Int(block.endDate.timeIntervalSince(block.startDate) / 60)
+            if blockDurationMinutes <= 2 {
+                showNudgeContinueDialog = true
+            } else {
+                showSprintReview = true
+            }
             warningPlayed = false
             // Reload to get fresh taskTimes for Sprint Review
             Task { await loadData() }
         }
+    }
+
+    /// Verlängert einen Nudge-Sprint um die geschätzte Task-Dauer.
+    private func extendNudgeBlock() {
+        guard let block = activeBlock else { return }
+        let tasks = tasksForBlock(block)
+        let remainingTasks = tasks.filter { !block.completedTaskIDs.contains($0.id) }
+        let extraMinutes = remainingTasks.first?.estimatedDuration ?? 25
+        let newEndDate = Date().addingTimeInterval(Double(extraMinutes) * 60)
+        try? eventKitRepo.updateFocusBlockTime(
+            eventID: block.id,
+            startDate: block.startDate,
+            endDate: newEndDate
+        )
+        reviewDismissed = false
+        warningPlayed = false
+        Task { await loadData() }
     }
 
     /// Unerledigte Tasks nach Sprint Review zurueck in Next Up
@@ -658,10 +696,13 @@ struct MacSprintReviewSheet: View {
 
     @Environment(\.dismiss) private var dismiss
     @Environment(\.eventKitRepository) private var eventKitRepo
+    @Environment(\.modelContext) private var modelContext
 
     // Local state for interactive editing
     @State private var localCompletedIDs: Set<String> = []
     @State private var hasChanges = false
+    @State private var progressNotes: [String: String] = [:]
+    @State private var followUpCreated: Set<String> = []
 
     init(block: FocusBlock, tasks: [LocalTask], onDismiss: @escaping () -> Void) {
         self.block = block
@@ -806,12 +847,60 @@ struct MacSprintReviewSheet: View {
                 .foregroundStyle(.secondary)
 
             ForEach(incompleteTasks, id: \.uuid) { task in
-                MacReviewTaskRow(
-                    task: task,
-                    isCompleted: false,
-                    actualSeconds: actualTime(for: task.id),
-                    onToggle: { toggleTaskCompletion(task.id) }
-                )
+                VStack(alignment: .leading, spacing: 4) {
+                    MacReviewTaskRow(
+                        task: task,
+                        isCompleted: false,
+                        actualSeconds: actualTime(for: task.id),
+                        onToggle: { toggleTaskCompletion(task.id) }
+                    )
+
+                    if !followUpCreated.contains(task.id) {
+                        TextField(
+                            "Wie weit bist du? (optional)",
+                            text: Binding(
+                                get: { progressNotes[task.id] ?? "" },
+                                set: { progressNotes[task.id] = $0 }
+                            )
+                        )
+                        .textFieldStyle(.roundedBorder)
+                        .font(.caption)
+                        .accessibilityIdentifier("progressNoteField")
+
+                        Button {
+                            createFollowUp(for: task)
+                        } label: {
+                            Label("Follow-up erstellen", systemImage: "arrow.uturn.right.circle.fill")
+                                .font(.subheadline)
+                        }
+                        .tint(.orange)
+                        .accessibilityIdentifier("followUpButton")
+                    }
+
+                    if followUpCreated.contains(task.id) {
+                        Label("Follow-up erstellt", systemImage: "checkmark.circle.fill")
+                            .font(.caption)
+                            .foregroundStyle(.green)
+                    }
+                }
+            }
+        }
+    }
+
+    // MARK: - Follow-up Creation (MAC_027)
+
+    private func createFollowUp(for task: LocalTask) {
+        Task {
+            let result = try? FocusBlockActionService.abortWithFollowUp(
+                taskID: task.id,
+                block: block,
+                progressNote: progressNotes[task.id],
+                modelContext: modelContext
+            )
+            if case .abortedWithFollowUp = result {
+                withAnimation(.spring(duration: 0.3)) {
+                    followUpCreated.insert(task.id)
+                }
             }
         }
     }

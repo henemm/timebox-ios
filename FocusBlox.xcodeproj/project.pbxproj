@@ -81,6 +81,7 @@
 		720A4CC3BD147493C706190E /* WidgetDataPublisherTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BE14B1DA859F48BC2A77EE6 /* WidgetDataPublisherTests.swift */; };
 		758F42B5E9777672A5F78F06 /* SuccessStoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5850078865CF21FABB28AD9F /* SuccessStoryView.swift */; };
 		767B31C6347E419FD1A9F9E4 /* EmotionalNudgeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F883289F0EE64AA5C5BB87F4 /* EmotionalNudgeService.swift */; };
+		76A84BDB9F25A5B323DF9160 /* MacFocusSprintParityUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F5648DF989F427EA8334814 /* MacFocusSprintParityUITests.swift */; };
 		792737AC7F345E919BFF3453 /* FocusBlockTasksSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74598614EAF4B9965981C7CB /* FocusBlockTasksSheet.swift */; };
 		7C2B47479B1125727570DF8D /* BehavioralProfileService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9C7465188D008F0C7E695F6 /* BehavioralProfileService.swift */; };
 		7F3072E8F964D76F3A908E76 /* WidgetRelevanceCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2224B7322726CC9CD1E9C9E3 /* WidgetRelevanceCalculator.swift */; };
@@ -729,6 +730,7 @@
 		8D1A9F10EFE384592B5CDA71 /* TimelineCollisionTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TimelineCollisionTests.swift; sourceTree = "<group>"; };
 		8D6520F9246BDCE0D9B157B6 /* SpotlightIndexingServiceTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SpotlightIndexingServiceTests.swift; sourceTree = "<group>"; };
 		8EFF4FDF9298A227383D4DE9 /* BehavioralProfileServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = BehavioralProfileServiceTests.swift; path = FocusBloxTests/BehavioralProfileServiceTests.swift; sourceTree = SOURCE_ROOT; };
+		8F5648DF989F427EA8334814 /* MacFocusSprintParityUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MacFocusSprintParityUITests.swift; path = FocusBloxMacUITests/MacFocusSprintParityUITests.swift; sourceTree = SOURCE_ROOT; };
 		92133F2683BB9B90566D7646 /* BacklogRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BacklogRow.swift; sourceTree = "<group>"; };
 		9356580BE3C5699878A6B87D /* BeforeScreenshotTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BeforeScreenshotTest.swift; sourceTree = "<group>"; };
 		9429869559454AC74078E98A /* AssignTabScrollUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AssignTabScrollUITests.swift; sourceTree = "<group>"; };
@@ -1054,15 +1056,15 @@
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		B7A1604B2F4AD5F5001FD20C /* FocusBloxShareExtension */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (B7A160582F4AD5F6001FD20C, ); explicitFileTypes = {}; explicitFolders = (); path = FocusBloxShareExtension; sourceTree = "<group>"; };
 		B7A16CD62F1FE3BC00165284 /* FocusBloxWidgets */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (B75DB2432F3D2D3500345726, B7A16CEA2F1FE3BE00165284, ); explicitFileTypes = {}; explicitFolders = (); path = FocusBloxWidgets; sourceTree = "<group>"; };
-		B7A16D0D2F20FDD400165284 /* FocusBloxCore */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (); explicitFileTypes = {}; explicitFolders = (); path = FocusBloxCore; sourceTree = "<group>"; };
-		B7A16D1C2F20FDD400165284 /* FocusBloxCoreTests */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (); explicitFileTypes = {}; explicitFolders = (); path = FocusBloxCoreTests; sourceTree = "<group>"; };
-		B7DFC0342F2E73EC009C2881 /* FocusBloxWatch Watch App */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (); explicitFileTypes = {}; explicitFolders = (); path = "FocusBloxWatch Watch App"; sourceTree = "<group>"; };
-		B7DFC0422F2E73ED009C2881 /* FocusBloxWatch Watch AppTests */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (); explicitFileTypes = {}; explicitFolders = (); path = "FocusBloxWatch Watch AppTests"; sourceTree = "<group>"; };
-		B7DFC04C2F2E73ED009C2881 /* FocusBloxWatch Watch AppUITests */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (); explicitFileTypes = {}; explicitFolders = (); path = "FocusBloxWatch Watch AppUITests"; sourceTree = "<group>"; };
-		B7DFC06E2F2E8C60009C2881 /* FocusBloxMac */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (); explicitFileTypes = {}; explicitFolders = (); path = FocusBloxMac; sourceTree = "<group>"; };
-		B7DFC07C2F2E8C62009C2881 /* FocusBloxMacTests */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (); explicitFileTypes = {}; explicitFolders = (); path = FocusBloxMacTests; sourceTree = "<group>"; };
-		B7DFC0862F2E8C62009C2881 /* FocusBloxMacUITests */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (); explicitFileTypes = {}; explicitFolders = (); path = FocusBloxMacUITests; sourceTree = "<group>"; };
-		'MACSHARE06FSSRG001' = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (); explicitFileTypes = {}; explicitFolders = (); path = FocusBloxMacShareExtension; sourceTree = "<group>"; };
+		B7A16D0D2F20FDD400165284 /* FocusBloxCore */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = FocusBloxCore; sourceTree = "<group>"; };
+		B7A16D1C2F20FDD400165284 /* FocusBloxCoreTests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = FocusBloxCoreTests; sourceTree = "<group>"; };
+		B7DFC0342F2E73EC009C2881 /* FocusBloxWatch Watch App */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = "FocusBloxWatch Watch App"; sourceTree = "<group>"; };
+		B7DFC0422F2E73ED009C2881 /* FocusBloxWatch Watch AppTests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = "FocusBloxWatch Watch AppTests"; sourceTree = "<group>"; };
+		B7DFC04C2F2E73ED009C2881 /* FocusBloxWatch Watch AppUITests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = "FocusBloxWatch Watch AppUITests"; sourceTree = "<group>"; };
+		B7DFC06E2F2E8C60009C2881 /* FocusBloxMac */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = FocusBloxMac; sourceTree = "<group>"; };
+		B7DFC07C2F2E8C62009C2881 /* FocusBloxMacTests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = FocusBloxMacTests; sourceTree = "<group>"; };
+		B7DFC0862F2E8C62009C2881 /* FocusBloxMacUITests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = FocusBloxMacUITests; sourceTree = "<group>"; };
+		'MACSHARE06FSSRG001' = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = FocusBloxMacShareExtension; sourceTree = "<group>"; };
 		'RESRC001SYNCGROUP00001' = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (RESRC001EXCEPTION00001, ); explicitFileTypes = {}; explicitFolders = (); path = Resources; sourceTree = "<group>"; };
 		'WDGTWCH01FOLDER0001' = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (WDGTWCH01EXCEPT0001, ); explicitFileTypes = {}; explicitFolders = (); path = FocusBloxWatchWidgets; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -1556,6 +1558,17 @@
 			path = FocusBloxTests;
 			sourceTree = SOURCE_ROOT;
 		};
+		B7767F4C2F77AEAD00D03E79 /* Recovered References */ = {
+			isa = PBXGroup;
+			children = (
+				A517BBCD30754CE69598B71A /* NextUpSuggestionService.swift */,
+				A243DD5301F14089BF9880CE /* MorningCoachingSection.swift */,
+				B1F900DD6600DBC1E2C448F6 /* SuccessStoryService.swift */,
+				5850078865CF21FABB28AD9F /* SuccessStoryView.swift */,
+			);
+			name = "Recovered References";
+			sourceTree = "<group>";
+		};
 		B7A16CD12F1FE3BC00165284 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -1667,6 +1680,8 @@
 				B64E4008A8607B3C5545F3CF /* LimitationGuardUITests.swift */,
 				DD5C44C48C2724678ACD2DB6 /* ParkdeckClassificationTests.swift */,
 				ACAD471A879DD844257AC3A7 /* BacklogParkdeckUITests.swift */,
+				B7767F4C2F77AEAD00D03E79 /* Recovered References */,
+				8F5648DF989F427EA8334814 /* MacFocusSprintParityUITests.swift */,
 			);
 			sourceTree = "<group>";
 		};
@@ -2773,6 +2788,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				76A84BDB9F25A5B323DF9160 /* MacFocusSprintParityUITests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

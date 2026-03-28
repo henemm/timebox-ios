@@ -55,39 +55,33 @@
 
 ---
 
-## macOS Paritaet — Erledigte Rework Stories
+## macOS Paritaet — Offene Items
 
-> Offene macOS-Arbeiten fuer bereits abgeschlossene iOS-Features.
 > Logik ist jeweils shared in `Sources/` — nur macOS-UI fehlt.
 
-| ID | Bezug | Titel | Prio | Aufwand | Beschreibung |
-|----|-------|-------|------|---------|-------------|
-| MAC_RW_0.1d | RW_0.1d | Notification Profile Picker in MacSettingsView | Medium | S | `MacSettingsView.swift`: `notificationProfile` @AppStorage Property + Picker UI im Notifications-Tab (~30 LoC) |
-| MAC_RW_1.3 | RW_1.3 | Refiner Sidebar-Eintrag + Navigation (macOS) | Medium | S | `SidebarView.swift`: Refiner als Sidebar-Item + Navigation-Wiring zu shared `RefinerView` (~35 LoC) |
-| MAC_RW_3.2a | RW_3.2 | Focus Sprint Context Menu in MacBacklogRow | Medium | S | `MacBacklogRow.swift`: Context Menu Item "Focus Sprint starten" → `FocusBlockActionService.startImmediate()` (~20 LoC) |
-| MAC_RW_3.2b | RW_3.2 | Focus Sprint Sidebar-Switch bei Start | Low | S | macOS Root View: `.onReceive(focusSprintStarted)` → Sidebar-Selection auf Focus wechseln (~10 LoC) |
-| MAC_RW_3.3 | RW_3.3 | Follow-up Logic in MacFocusView/SprintReview | Medium | S | iOS SprintReview hat `abortWithFollowUp()` + `progressNotes`. `MacFocusView.swift` (MacSprintReviewSheet) hat KEIN Follow-up — weder UI noch Logic. Port: Follow-up-Button + progressNotes-TextField + `createFollowUp()` Handler (~50 LoC) |
-| MAC_RW_3.4 | RW_3.4 | Emotional Nudge Dialog auf macOS | Medium | S | iOS zeigt Micro-Task-Dialog bei chronisch verschobenen Tasks. macOS hat nur Context Menu `startNudgeSprint()` ohne Nudge-Dialog-UI. Port: Dialog mit Micro-Task-Vorschlaegen analog iOS `EmotionalNudgeView` (~40 LoC) |
-| MAC_RW_2.1_TL | RW_2.1c | DayView Daytime Timeline auf macOS | Medium | M | macOS DayView zeigt im Daytime-Modus nur "Timeline kommt bald" Platzhalter (`Sources/Views/DayView.swift:97`, `#else` Block). iOS hat volle `TimelineView` mit Events + Scheduled Tasks. Entweder shared `TimelineView` macOS-kompatibel machen oder macOS-Aequivalent in `FocusBloxMac/` bauen. |
-| MAC_RW_2.4 | RW_2.4 | Backlog Parkdeck-Metapher auf macOS | Medium | S | iOS hat Aktiv/Parkdeck-Aufteilung mit collapsible Section + Swipe-Actions. macOS `ContentView.swift` Backlog-Section braucht identische Partition (Aktiv vs. Parkdeck) mit Context Menu "Parken"/"Aktivieren" statt Swipe. Logik shared via `isParked` Flag auf `LocalTask`, nur macOS-UI fehlt (~60-80 LoC). |
-| MAC_RW_3.5 | RW_3.5 | Recurring Stacking auf macOS | Medium | S | iOS hat Stacking-Badge + Gruppierung in BacklogView. macOS `ContentView.swift` braucht `applyRecurringStacking()` Aufruf + Stacking-Badge in `MacBacklogRow.swift`. Logik shared via `PlanItem.stackedInstanceCount`, nur macOS-UI fehlt (~40 LoC). |
+| ID | Titel | Prio | Aufwand | Beschreibung |
+|----|-------|------|---------|-------------|
+| MAC_025b | Reminders Sync auf macOS | High | S | `migrateRemindersToLocal()` Aufruf in `FocusBloxMacApp.swift` fehlt (~3 LoC). [Spec](specs/macos/MAC-025-reminders-sync.md) |
+| ~~MAC_027~~ | ~~Focus Sprint Workflow Paritaet~~ | ~~Medium~~ | ~~S~~ | ~~Sidebar-Switch + Follow-up + Nudge Dialog~~ ERLEDIGT |
+| MAC_028 | Backlog Paritaet (Parkdeck + Stacking) | Medium | S | **Buendelt:** Parkdeck-Metapher (~70 LoC, ex MAC_RW_2.4) + Recurring Stacking (~40 LoC, ex MAC_RW_3.5). Dateien: `ContentView.swift`, `MacBacklogRow.swift`. ~110 LoC gesamt. |
+| MAC_026 | Enhanced Quick Capture (Metadaten) | Medium | M | macOS Quick Capture hat nur Titel, iOS hat volle Metadaten (Importance, Urgency, Category, Duration). [Spec](specs/macos/MAC-026-quick-capture-enhanced.md) |
+| MAC_RW_2.1_TL | DayView Daytime Timeline auf macOS | Medium | M | Platzhalter "Timeline kommt bald" ersetzen. Entweder shared `TimelineView` macOS-kompatibel machen oder macOS-Aequivalent bauen. |
 
----
+### Erledigte macOS-Items
 
-## macOS Infrastruktur & Feature-Paritaet
+> Bereits implementiert, verifiziert am 2026-03-28.
 
-> Ehemals separates macOS-Backlog. Jetzt hier integriert.
-> Specs: `docs/specs/macos/` | Spec-Referenz: `docs/specs/macos/BACKLOG.md`
-
-| ID | Titel | Prio | Aufwand | Rework-Bezug | Beschreibung |
-|----|-------|------|---------|--------------|-------------|
-| MAC_024 | Sync + UI Alignment (Sandbox-Fix) | **Critical** | M | — | Sandbox-Entitlement kaputt → macOS kann NICHT mit iOS syncen. Chip-Layout + UI-Alignment. [Spec](specs/macos/MAC-024-sync-ui-alignment.md) |
-| MAC_025a | Next Up Button in MacBacklogRow | Medium | S | — | iOS BacklogRow hat "Next Up"-Button, macOS nicht. Isolierter Port. [Spec](specs/macos/MAC-025-nextup-button.md) |
-| MAC_025b | Reminders Sync auf macOS | High | S | — | iOS hat RemindersSyncService aktiv, macOS nur lokal. Environment-Setup fehlt. [Spec](specs/macos/MAC-025-reminders-sync.md) |
-| MAC_026 | Enhanced Quick Capture (Metadaten) | Medium | M | — | macOS Quick Capture hat nur Titel, iOS hat volle Metadaten. Hotkey-Migration. [Spec](specs/macos/MAC-026-quick-capture-enhanced.md) |
-| MAC_MENU | MenuBar FocusBlock Status + Timer | Medium | M | — | macOS-Aequivalent zu iOS Live Activity: Timer + Task + Complete/Skip im MenuBar-Popover. [Spec](specs/macos/menubar-focusblock-status.md) |
-| MAC_020 | Drag & Drop Planung | Low | M | RW_3.1 | Aufgaben aus Backlog in Kalender ziehen. Wird durch RW_3.1 teilweise abgedeckt. [Spec](specs/macos/BACKLOG.md#mac-020) |
-| MAC_021 | Review Dashboard | Low | L | RW_2.1 | Statistik-Uebersicht. Wird durch RW_2.1 (DayView) teilweise abgedeckt. [Spec](specs/macos/BACKLOG.md#mac-021) |
+| ID | Titel |
+|----|-------|
+| ~~MAC_024~~ | Sync + UI Alignment (Sandbox-Fix) |
+| ~~MAC_025a~~ | Next Up Button in MacBacklogRow |
+| ~~MAC_MENU~~ | MenuBar FocusBlock Status + Timer |
+| ~~MAC_020~~ | Drag & Drop Planung |
+| ~~MAC_021~~ | Review Dashboard |
+| ~~MAC_RW_0.1d~~ | Notification Profile Picker |
+| ~~MAC_RW_1.3~~ | Refiner Navigation |
+| ~~MAC_RW_3.2a~~ | Focus Sprint Context Menu |
+| ~~MAC_027~~ | Focus Sprint Workflow Paritaet (Sidebar-Switch + Follow-up + Nudge) |
 
 ---
 

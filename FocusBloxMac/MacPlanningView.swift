@@ -16,6 +16,7 @@ struct MacPlanningView: View {
     private var nextUpTasks: [LocalTask]
 
     @Binding var selectedDate: Date
+    @Binding var selectedSection: MainSection
 
     @State private var calendarEvents: [CalendarEvent] = []
     @State private var isLoading = false
@@ -583,11 +584,14 @@ struct MacPlanningView: View {
     private func startFocusSprintOnMac(_ taskID: String) {
         Task {
             do {
-                _ = try FocusBlockActionService.startImmediate(
+                let result = try FocusBlockActionService.startImmediate(
                     taskID: taskID,
                     eventKitRepo: eventKitRepo,
                     modelContext: modelContext
                 )
+                if case .started = result {
+                    selectedSection = .focus
+                }
                 await loadCalendarEvents(showSpinner: false)
                 loadScheduledTasks()
             } catch {
@@ -736,7 +740,8 @@ struct MacDateNavigator: View {
 
 #Preview {
     MacPlanningView(
-        selectedDate: .constant(Date())
+        selectedDate: .constant(Date()),
+        selectedSection: .constant(.planning)
     )
     .frame(width: 800, height: 600)
 }

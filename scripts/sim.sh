@@ -362,6 +362,38 @@ cmd_mac_unit() {
     return $EXIT_CODE
 }
 
+cmd_mac_test() {
+    local TEST_TARGET="${1:-}"
+
+    if [ -z "$TEST_TARGET" ]; then
+        error "Test-Name fehlt!"
+        echo "Usage: ./scripts/sim.sh mac-test TestClass"
+        echo "       ./scripts/sim.sh mac-test TestClass/testMethod"
+        return 1
+    fi
+
+    info "Fuehre macOS UI Test aus: $TEST_TARGET"
+    cd "$PROJECT_DIR"
+
+    xcodebuild test \
+        -project "$PROJECT" \
+        -scheme "$MAC_SCHEME" \
+        -destination "platform=macOS" \
+        -only-testing:"FocusBloxMacUITests/$TEST_TARGET" \
+        -parallel-testing-enabled NO \
+        2>&1
+
+    local EXIT_CODE=$?
+
+    if [ $EXIT_CODE -eq 0 ]; then
+        success "macOS UI Test bestanden!"
+    else
+        error "macOS UI Test fehlgeschlagen (Exit $EXIT_CODE)"
+    fi
+
+    return $EXIT_CODE
+}
+
 cmd_help() {
     echo "sim.sh — FocusBlox Simulator-Toolkit"
     echo ""
@@ -379,6 +411,7 @@ cmd_help() {
     echo "  unit <TestClass[/method]>        Unit Test ausfuehren"
     echo "  mac-build                       macOS App bauen (nativ)"
     echo "  mac-unit <TestClass[/method]>   macOS Unit Test ausfuehren"
+    echo "  mac-test <TestClass[/method]>   macOS UI Test ausfuehren"
     echo "  help                            Diese Hilfe"
     echo ""
     echo "Simulator: $SIM_NAME ($SIM_ID)"
@@ -402,6 +435,7 @@ case "$COMMAND" in
     unit)       cmd_unit "$@" ;;
     mac-build)  cmd_mac_build ;;
     mac-unit)   cmd_mac_unit "$@" ;;
+    mac-test)   cmd_mac_test "$@" ;;
     help|--help|-h) cmd_help ;;
     *)
         error "Unbekannter Befehl: $COMMAND"

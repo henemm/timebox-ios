@@ -258,7 +258,8 @@ struct ContentView: View {
             backlogView
         case .planning:
             MacPlanningView(
-                selectedDate: $sharedDate
+                selectedDate: $sharedDate,
+                selectedSection: $selectedSection
             )
         case .day:
             DayView()
@@ -1053,7 +1054,7 @@ struct ContentView: View {
             )
             switch result {
             case .started:
-                break // macOS tab switch is out of scope for RW 3.2
+                selectedSection = .focus
             case .blockedByActiveBlock:
                 break // macOS alert is out of scope for RW 3.2
             }
@@ -1072,6 +1073,7 @@ struct ContentView: View {
             )
             if case .started = result {
                 EmotionalNudgeService.recordNudge(for: task.id)
+                selectedSection = .focus
             }
         } catch {
             // Silent fail on macOS for now
