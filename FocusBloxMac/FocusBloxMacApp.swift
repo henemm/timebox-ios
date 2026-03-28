@@ -638,17 +638,21 @@ extension FocusBloxMacApp {
         let backlogTask2 = LocalTask(title: "[MOCK] Backlog Task 2", importance: 1, estimatedDuration: 15, urgency: "not_urgent")
         backlogTask2.taskType = "shallow_work"
 
-        // Recurring: daily template + child
+        // Recurring: daily template + 3 children (MAC_028: stacking needs 2+ children)
+        // All children use today's date so they land in the SAME tier section (not split across overdue)
         let group1 = "uitest-recurring-group-1"
         let tmpl1 = LocalTask(title: "[MOCK] Taeglich lesen", importance: 2, tags: ["learning"], estimatedDuration: 15, recurrencePattern: "daily", recurrenceGroupID: group1)
         tmpl1.isTemplate = true
         let child1 = LocalTask(title: "[MOCK] Taeglich lesen", importance: 2, tags: ["learning"], dueDate: Date(), estimatedDuration: 15, recurrencePattern: "daily", recurrenceGroupID: group1)
+        let child1b = LocalTask(title: "[MOCK] Taeglich lesen", importance: 2, tags: ["learning"], dueDate: Date(), estimatedDuration: 15, recurrencePattern: "daily", recurrenceGroupID: group1)
+        let child1c = LocalTask(title: "[MOCK] Taeglich lesen", importance: 2, tags: ["learning"], dueDate: Date(), estimatedDuration: 15, recurrencePattern: "daily", recurrenceGroupID: group1)
 
-        // Recurring: weekly template + child
+        // Recurring: weekly template + 2 children (MAC_028: stacking needs 2+ children)
         let group2 = "uitest-recurring-group-2"
         let tmpl2 = LocalTask(title: "[MOCK] Wochenreview", importance: 3, tags: ["planning"], estimatedDuration: 30, recurrencePattern: "weekly", recurrenceWeekdays: [5], recurrenceGroupID: group2)
         tmpl2.isTemplate = true
         let child2 = LocalTask(title: "[MOCK] Wochenreview", importance: 3, tags: ["planning"], dueDate: Date(), estimatedDuration: 30, recurrencePattern: "weekly", recurrenceWeekdays: [5], recurrenceGroupID: group2)
+        let child2b = LocalTask(title: "[MOCK] Wochenreview", importance: 3, tags: ["planning"], dueDate: Date(), estimatedDuration: 30, recurrencePattern: "weekly", recurrenceWeekdays: [5], recurrenceGroupID: group2)
 
         // Recurring: biweekly template + child (for recurrence display test)
         let group3 = "uitest-recurring-group-3"
@@ -675,7 +679,7 @@ extension FocusBloxMacApp {
         let depDependent = LocalTask(title: "[MOCK] DEP-Dependent Task", importance: 1, estimatedDuration: 15, urgency: "not_urgent")
         depDependent.blockerTaskID = depBlocker.id
 
-        for task in [task1, task2, task3, longTitleTask, backlogTask1, backlogTask2, tmpl1, child1, tmpl2, child2, tmpl3, child3, completed, depBlocker, depDependent] {
+        for task in [task1, task2, task3, longTitleTask, backlogTask1, backlogTask2, tmpl1, child1, child1b, child1c, tmpl2, child2, child2b, tmpl3, child3, completed, depBlocker, depDependent] {
             context.insert(task)
         }
         try? context.save()

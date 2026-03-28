@@ -43,7 +43,7 @@
 | ~~RW_4.2~~ | ~~4 Reflexion~~ | ~~Success Story Generator~~ | ~~Low~~ | ~~L~~ | ~~Shared~~ | ~~[Spec](specs/rework/4.2-success-story-generator-impl.md)~~ ERLEDIGT |
 | ~~RW_4.3~~ | ~~4 Reflexion~~ | ~~Failure Protocol~~ | ~~Low~~ | ~~M~~ | ~~Shared~~ | ~~[Spec](specs/rework/4.3-failure-protocol-impl.md)~~ ERLEDIGT |
 | ~~RW_4.4~~ | ~~4 Reflexion~~ | ~~Morning Widget~~ | ~~Low~~ | ~~M~~ | ~~iOS-only~~ | ~~[Spec](specs/rework/4.4-morning-widget-impl.md)~~ ERLEDIGT |
-| RW_1.4 | 1 Erfassung | AI Enrichment Rework (Kategorie + Zeitschaetzung statt Titel-AI) | High | S | Shared | [Spec](specs/rework/1.4-ai-enrichment-rework-impl.md) OFFEN |
+| ~~RW_1.4~~ | ~~1 Erfassung~~ | ~~AI Enrichment Rework (Kategorie + Zeitschaetzung statt Titel-AI)~~ | ~~High~~ | ~~S~~ | ~~Shared~~ | ~~[Spec](specs/rework/1.4-ai-enrichment-rework-impl.md)~~ ERLEDIGT |
 
 ### macOS-Spalte Legende
 
