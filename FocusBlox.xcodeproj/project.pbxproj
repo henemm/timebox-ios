@@ -19,9 +19,11 @@
 		170C6E63339A92E86F659F7E /* TaskFormGlassCardUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDB06B85B45AB03356A14914 /* TaskFormGlassCardUITests.swift */; };
 		1800BB7020E3D6044A62475A /* DailyReviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A36E40124EBA31D7428EAA80 /* DailyReviewView.swift */; };
 		186664F5A9219E0AC9A4588A /* ShakeGestureModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14CEC8C14442ABE7F65B5EE8 /* ShakeGestureModifier.swift */; };
+		1A6E494C905259CEFD4B91E7 /* AITitleQualityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A57496C9D79BFC5EEBB9403 /* AITitleQualityTests.swift */; };
 		1B13403DB0FC03838EE6DDD2 /* FailureQuickSelectUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68194B0A85F7A75D11FB968B /* FailureQuickSelectUITests.swift */; };
 		1B489799D0D38661913FCC34 /* TimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C945F5092F6FFB66C11FD4C2 /* TimelineView.swift */; };
 		1BE17D024684A97F79C468DA /* EveningResetUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 352D28EB37EA9AC8D48E3A96 /* EveningResetUITests.swift */; };
+		1CEC4456AD6C94BC7DB4977B /* MacBacklogParkdeckStackingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 577D4F2A95D6C50E813C12A8 /* MacBacklogParkdeckStackingTests.swift */; };
 		1D22359BADEDFEF0CE024E7B /* RemindersQuickEditUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6010F2B272B933C827183F0A /* RemindersQuickEditUITests.swift */; };
 		1F8A2A35834A2A5AFFB0D683 /* TimelineCollisionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D1A9F10EFE384592B5CDA71 /* TimelineCollisionTests.swift */; };
 		22AA189C61A4045FE2B36B64 /* DurationBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDD319A3F7DEE05F6A8885FC /* DurationBadge.swift */; };
@@ -119,6 +121,7 @@
 		AA657A3EBF3967B2DECE4314 /* CreateTaskView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04068491AA7CD2368A273C00 /* CreateTaskView.swift */; };
 		AAF3C0B9F1D9D79682D3680F /* Bug81StaleBlockAssignmentUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BE6C24124E626E4489ECDFA /* Bug81StaleBlockAssignmentUITests.swift */; };
 		AC44830774F8C544E3F39995 /* UndoCompletionUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B242DB168BAB2F3CF8A63404 /* UndoCompletionUITests.swift */; };
+		AC904BA8A2B760F39957B04D /* CCQuickAddIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED064620BC7E5A21F85DBCCF /* CCQuickAddIntents.swift */; };
 		AD52DB9608DDF4562B67279F /* MenuBarIconState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60DE55FC2A796A308478E2B9 /* MenuBarIconState.swift */; };
 		ADEEAB024BB9B2C40CD6313D /* DebugLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71582A64B51A62129A2409B7 /* DebugLogger.swift */; };
 		AFF14827AB249970A3471374 /* NextUpSuggestionServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5AB41B49361F9C4F2416C80 /* NextUpSuggestionServiceTests.swift */; };
@@ -132,6 +135,7 @@
 		'ATTV0001BUILD000001' = {isa = PBXBuildFile; fileRef = ATTV0001FILEREF00001; };
 		B18EE1353A17B948EB328686 /* SuccessStoryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1F900DD6600DBC1E2C448F6 /* SuccessStoryService.swift */; };
 		B2607FE51C4B30E5069AA807 /* EventKitRepositoryEnvironment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F276F67582A827E523D8ED6 /* EventKitRepositoryEnvironment.swift */; };
+		B2E248ECAFEE84FFE41D44FC /* MacParkdeckStackingUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF4941399F2D3933217C8324 /* MacParkdeckStackingUITests.swift */; };
 		B46449CB5D5E8C093E07C2D9 /* DurationPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = F91103B45CFB1388E6B12F3C /* DurationPicker.swift */; };
 		B5253CB93F49550930B0AF7C /* FocusBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0B1EE7295AF0AD91CA0027A /* FocusBlock.swift */; };
 		B59D2883B998A9D4A297ED2C /* LocalTaskSourceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64C281ADBE9DA2AC381CB747 /* LocalTaskSourceTests.swift */; };
@@ -242,6 +246,7 @@
 		'DYNISLD01BUILD0001' = {isa = PBXBuildFile; fileRef = DYNISLD01FILE00001; };
 		E338397EBDBBEEA357D5A910 /* BlockerPickerSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8323E8E3E49804475266E66A /* BlockerPickerSheet.swift */; };
 		E388ADA5C322C89B3687240F /* FocusBlockTaskCountTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EABF765F6113A4B974211ACE /* FocusBlockTaskCountTests.swift */; };
+		E5CC4D539B7E126ED5394887 /* MacBacklogHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29C44E2AB09C4FA9C1FE7F5A /* MacBacklogHelpers.swift */; };
 		E6DF69A28B0DB868B330DADD /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5F22CE94E29A523114817BF /* ContentView.swift */; };
 		E907CB03C20C1B55A48C4B1B /* BacklogRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92133F2683BB9B90566D7646 /* BacklogRow.swift */; };
 		E98A667A603886CE7A68D968 /* EventBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B77251F3B87AF26FD6473763 /* EventBlock.swift */; };
@@ -642,6 +647,7 @@
 		04068491AA7CD2368A273C00 /* CreateTaskView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateTaskView.swift; sourceTree = "<group>"; };
 		0461CA6D7F62F83512E8AD05 /* TaskAssignmentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskAssignmentView.swift; sourceTree = "<group>"; };
 		0577AA0F051FD6C2DECA3B77 /* DisciplineTrendChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisciplineTrendChart.swift; sourceTree = "<group>"; };
+		0A57496C9D79BFC5EEBB9403 /* AITitleQualityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AITitleQualityTests.swift; path = FocusBloxTests/AITitleQualityTests.swift; sourceTree = SOURCE_ROOT; };
 		0A9FDDCD2C501D3A6679FA58 /* FocusBlox.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FocusBlox.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0B783A31231C9313A86914B9 /* BadgeOverdueNotificationTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BadgeOverdueNotificationTests.swift; sourceTree = "<group>"; };
 		0CB1D1EF0A6758E6B9B2921F /* BadgeOverdueUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BadgeOverdueUITests.swift; sourceTree = "<group>"; };
@@ -662,6 +668,7 @@
 		234340A8B266225A03BE4C8A /* MorningCoachingSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MorningCoachingSection.swift; path = Sources/Views/MorningCoachingSection.swift; sourceTree = SOURCE_ROOT; };
 		23C64BFA8782C6A106D23BE6 /* MorningCoachingSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MorningCoachingSection.swift; path = Sources/Views/MorningCoachingSection.swift; sourceTree = SOURCE_ROOT; };
 		26CD9467C8156E2C66B2DC9C /* SettingsToolbarModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsToolbarModifier.swift; sourceTree = "<group>"; };
+		29C44E2AB09C4FA9C1FE7F5A /* MacBacklogHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MacBacklogHelpers.swift; path = FocusBloxMac/MacBacklogHelpers.swift; sourceTree = SOURCE_ROOT; };
 		2CB34BE9ACA2FA753F4F5EC7 /* BehavioralProfileService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = BehavioralProfileService.swift; path = Sources/Services/BehavioralProfileService.swift; sourceTree = SOURCE_ROOT; };
 		2D314D238A7A0F2C4BEE1AAB /* FailureProtocolService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FailureProtocolService.swift; path = Sources/Services/FailureProtocolService.swift; sourceTree = SOURCE_ROOT; };
 		301796C3380CA4E06D1EF41B /* TaskCompletionUndoServiceTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TaskCompletionUndoServiceTests.swift; sourceTree = "<group>"; };
@@ -695,6 +702,7 @@
 		515D3A83205F8E00941BD4D0 /* EditFocusBlockSheet.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = EditFocusBlockSheet.swift; sourceTree = "<group>"; };
 		548F5CBBB14618043F38ACE6 /* PlanItemTransfer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanItemTransfer.swift; sourceTree = "<group>"; };
 		54C8A326C1D84FA7A3BD27A8 /* BacklogRowRedesignUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BacklogRowRedesignUITests.swift; sourceTree = "<group>"; };
+		577D4F2A95D6C50E813C12A8 /* MacBacklogParkdeckStackingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MacBacklogParkdeckStackingTests.swift; path = FocusBloxMacTests/MacBacklogParkdeckStackingTests.swift; sourceTree = SOURCE_ROOT; };
 		5850078865CF21FABB28AD9F /* SuccessStoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SuccessStoryView.swift; path = Sources/Views/SuccessStoryView.swift; sourceTree = SOURCE_ROOT; };
 		5D1F03B35977548B59D7269F /* CalendarEventTransfer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarEventTransfer.swift; sourceTree = "<group>"; };
 		5FEFD473342A7BED5A2A93AF /* SpotlightIndexingService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SpotlightIndexingService.swift; sourceTree = "<group>"; };
@@ -838,6 +846,7 @@
 		'DEFCMP01FILE00001' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeferredCompletionUITests.swift; sourceTree = "<group>"; };
 		'DEFSORT01FILE00001' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeferredSortUITests.swift; sourceTree = "<group>"; };
 		DF402517A33C6BA497EFE1AC /* DurationEditingUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DurationEditingUITests.swift; sourceTree = "<group>"; };
+		DF4941399F2D3933217C8324 /* MacParkdeckStackingUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MacParkdeckStackingUITests.swift; path = FocusBloxMacUITests/MacParkdeckStackingUITests.swift; sourceTree = SOURCE_ROOT; };
 		'DFCMP01FILEREF001' = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DeferredCompletionControllerTests.swift; sourceTree = "<group>"; };
 		'DFCMP02FILEREF001' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeferredCompletionController.swift; sourceTree = "<group>"; };
 		DFD460F955B924EB6F6C5B94 /* TaskFormTbdUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TaskFormTbdUITests.swift; sourceTree = "<group>"; };
@@ -859,6 +868,7 @@
 		E6D939B402B46840351D9475 /* EventKitRepositoryProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventKitRepositoryProtocol.swift; sourceTree = "<group>"; };
 		EABF765F6113A4B974211ACE /* FocusBlockTaskCountTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = FocusBlockTaskCountTests.swift; sourceTree = "<group>"; };
 		EAED8A7A7959F354879F7615 /* SiriTipPersistenceUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SiriTipPersistenceUITests.swift; sourceTree = "<group>"; };
+		ED064620BC7E5A21F85DBCCF /* CCQuickAddIntents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CCQuickAddIntents.swift; path = Sources/Intents/CCQuickAddIntents.swift; sourceTree = SOURCE_ROOT; };
 		EDB06B85B45AB03356A14914 /* TaskFormGlassCardUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TaskFormGlassCardUITests.swift; sourceTree = "<group>"; };
 		'EDITTSK01FILE0001' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditTaskSheetUITests.swift; sourceTree = "<group>"; };
 		'EFBUI001FILEREF00001' = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = EditFocusBlockUITests.swift; sourceTree = "<group>"; };
@@ -1682,6 +1692,11 @@
 				ACAD471A879DD844257AC3A7 /* BacklogParkdeckUITests.swift */,
 				B7767F4C2F77AEAD00D03E79 /* Recovered References */,
 				8F5648DF989F427EA8334814 /* MacFocusSprintParityUITests.swift */,
+				0A57496C9D79BFC5EEBB9403 /* AITitleQualityTests.swift */,
+				ED064620BC7E5A21F85DBCCF /* CCQuickAddIntents.swift */,
+				577D4F2A95D6C50E813C12A8 /* MacBacklogParkdeckStackingTests.swift */,
+				DF4941399F2D3933217C8324 /* MacParkdeckStackingUITests.swift */,
+				29C44E2AB09C4FA9C1FE7F5A /* MacBacklogHelpers.swift */,
 			);
 			sourceTree = "<group>";
 		};
@@ -2640,6 +2655,7 @@
 				AFF14827AB249970A3471374 /* NextUpSuggestionServiceTests.swift in Sources */,
 				ED4640E8A6E17770EF3FA7F2 /* LimitationGuardServiceTests.swift in Sources */,
 				5FFF4C86932815D0343ADAB7 /* ParkdeckClassificationTests.swift in Sources */,
+				1A6E494C905259CEFD4B91E7 /* AITitleQualityTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2658,6 +2674,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BUG36CC01BUILD00002,
+				AC904BA8A2B760F39957B04D /* CCQuickAddIntents.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2774,6 +2791,7 @@
 				7C2B47479B1125727570DF8D /* BehavioralProfileService.swift in Sources */,
 				AA11BB22CC33DD44EE550099 /* BehavioralProfile.swift in Sources */,
 				AA11BB22CC33DD44EE550100 /* EveningResetService.swift in Sources */,
+				E5CC4D539B7E126ED5394887 /* MacBacklogHelpers.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2781,6 +2799,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1CEC4456AD6C94BC7DB4977B /* MacBacklogParkdeckStackingTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2789,6 +2808,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				76A84BDB9F25A5B323DF9160 /* MacFocusSprintParityUITests.swift in Sources */,
+				B2E248ECAFEE84FFE41D44FC /* MacParkdeckStackingUITests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

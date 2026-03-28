@@ -12,6 +12,7 @@ import SwiftData
 /// Aligned with iOS BacklogRow styling and functionality
 struct MacBacklogRow: View {
     let task: LocalTask
+    var stackedCount: Int = 0  // MAC_028: Extra instances (0 = no badge, 1 = x2, 2+ = x3+)
     var onToggleComplete: (() -> Void)?
     var onImportanceCycle: ((Int) -> Void)?
     var onUrgencyToggle: ((String?) -> Void)?
@@ -111,6 +112,7 @@ struct MacBacklogRow: View {
                 pendingPulse = false
             }
         }
+        .background(stackedCount >= 2 ? Color.orange.opacity(0.06) : Color.clear)
         .opacity(isBlocked ? 0.5 : 1.0)
         .padding(.leading, isBlocked ? 20 : 0)
         .userActivity("com.henning.focusblox.viewTask", isActive: !task.isCompleted) { activity in
@@ -141,6 +143,21 @@ struct MacBacklogRow: View {
             // 4. Recurrence Badge
             if task.recurrencePattern != "none" {
                 RecurrenceBadge(pattern: task.recurrencePattern, taskId: task.id)
+            }
+
+            // 4b. MAC_028: Stacking Badge
+            if stackedCount >= 1 {
+                Text("x\(stackedCount + 1)")
+                    .font(.caption2.weight(stackedCount >= 2 ? .bold : .regular))
+                    .foregroundStyle(stackedCount >= 2 ? .orange : .secondary)
+                    .padding(.horizontal, 5)
+                    .padding(.vertical, 2)
+                    .background(
+                        Capsule()
+                            .fill(stackedCount >= 2 ? Color.orange.opacity(0.12) : Color.secondary.opacity(0.15))
+                    )
+                    .accessibilityIdentifier("stackingBadge_\(task.uuid.uuidString)")
+                    .accessibilityLabel("\(stackedCount + 1) aufgelaufene Instanzen")
             }
 
             // 5. Tags (Bug 78: guard against detached SwiftData objects)

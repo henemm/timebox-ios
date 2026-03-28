@@ -43,6 +43,7 @@
 | ~~RW_4.2~~ | ~~4 Reflexion~~ | ~~Success Story Generator~~ | ~~Low~~ | ~~L~~ | ~~Shared~~ | ~~[Spec](specs/rework/4.2-success-story-generator-impl.md)~~ ERLEDIGT |
 | ~~RW_4.3~~ | ~~4 Reflexion~~ | ~~Failure Protocol~~ | ~~Low~~ | ~~M~~ | ~~Shared~~ | ~~[Spec](specs/rework/4.3-failure-protocol-impl.md)~~ ERLEDIGT |
 | ~~RW_4.4~~ | ~~4 Reflexion~~ | ~~Morning Widget~~ | ~~Low~~ | ~~M~~ | ~~iOS-only~~ | ~~[Spec](specs/rework/4.4-morning-widget-impl.md)~~ ERLEDIGT |
+| RW_1.4 | 1 Erfassung | AI Enrichment Rework (Kategorie + Zeitschaetzung statt Titel-AI) | High | S | Shared | [Spec](specs/rework/1.4-ai-enrichment-rework-impl.md) OFFEN |
 
 ### macOS-Spalte Legende
 
@@ -63,7 +64,7 @@
 |----|-------|------|---------|-------------|
 | ~~MAC_025b~~ | ~~Reminders Sync auf macOS~~ | ~~High~~ | ~~S~~ | ~~`migrateRemindersToLocal()` Aufruf in `FocusBloxMacApp.swift` fehlt (~3 LoC). [Spec](specs/macos/MAC-025-reminders-sync.md)~~ ERLEDIGT |
 | ~~MAC_027~~ | ~~Focus Sprint Workflow Paritaet~~ | ~~Medium~~ | ~~S~~ | ~~Sidebar-Switch + Follow-up + Nudge Dialog~~ ERLEDIGT |
-| MAC_028 | Backlog Paritaet (Parkdeck + Stacking) | Medium | S | **Buendelt:** Parkdeck-Metapher (~70 LoC, ex MAC_RW_2.4) + Recurring Stacking (~40 LoC, ex MAC_RW_3.5). Dateien: `ContentView.swift`, `MacBacklogRow.swift`. ~110 LoC gesamt. |
+| ~~MAC_028~~ | ~~Backlog Paritaet (Parkdeck + Stacking)~~ | ~~Medium~~ | ~~S~~ | ~~Parkdeck-Metapher + Recurring Stacking. [Spec](specs/macos/MAC_028-backlog-parity.md)~~ ERLEDIGT |
 | MAC_026 | Enhanced Quick Capture (Metadaten) | Medium | M | macOS Quick Capture hat nur Titel, iOS hat volle Metadaten (Importance, Urgency, Category, Duration). [Spec](specs/macos/MAC-026-quick-capture-enhanced.md) |
 | MAC_RW_2.1_TL | DayView Daytime Timeline auf macOS | Medium | M | Platzhalter "Timeline kommt bald" ersetzen. Entweder shared `TimelineView` macOS-kompatibel machen oder macOS-Aequivalent bauen. |
 

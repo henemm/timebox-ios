@@ -75,6 +75,9 @@ struct ContentView: View {
 
     @State private var searchText = ""
 
+    // MAC_028: Parkdeck section state
+    @State private var isParkdeckExpanded: Bool = false
+
     // Recurring dialogs
     @State private var taskToDeleteRecurring: LocalTask?
     @State private var taskToEditRecurring: LocalTask?
@@ -455,18 +458,19 @@ struct ContentView: View {
                         }
                     }
 
-                    // Priority tier sections
-                    ForEach(TaskPriorityScoringService.PriorityTier.allCases, id: \.self) { tier in
+                    // MAC_028: Active tier sections (doNow, planSoon only — not parked)
+                    ForEach([TaskPriorityScoringService.PriorityTier.doNow, .planSoon], id: \.self) { tier in
                         let tierTasks = regularFilteredTasks.filter { task in
-                            let taskTier = TaskPriorityScoringService.PriorityTier.from(score: scoreFor(task))
+                            let score = scoreFor(task)
+                            let taskTier = TaskPriorityScoringService.PriorityTier.from(score: score)
                             let isOverdue = overdueTasks.contains(where: { $0.uuid == task.uuid })
-                            return taskTier == tier && !isOverdue
+                            return taskTier == tier && !isOverdue && !MacBacklogFilterHelper.isInParkdeck(task: task, score: score)
                         }.sorted { scoreFor($0) > scoreFor($1) }
 
                         if !tierTasks.isEmpty {
                             Section {
-                                ForEach(tierTasks, id: \.uuid) { task in
-                                    taskRowWithSwipe(task: task)
+                                ForEach(MacBacklogStackingHelper.applyStacking(tierTasks), id: \.task.uuid) { item in
+                                    taskRowWithSwipe(task: item.task, stackedCount: item.stackedCount)
                                 }
                             } header: {
                                 HStack {
@@ -483,6 +487,47 @@ struct ContentView: View {
                                         .clipShape(Capsule())
                                 }
                             }
+                        }
+                    }
+
+                    // MAC_028: Parkdeck section (collapsed by default)
+                    let pdTasks = regularFilteredTasks.filter { task in
+                        let score = scoreFor(task)
+                        let isOverdue = overdueTasks.contains(where: { $0.uuid == task.uuid })
+                        return !isOverdue && MacBacklogFilterHelper.isInParkdeck(task: task, score: score)
+                    }.sorted { scoreFor($0) > scoreFor($1) }
+
+                    if !pdTasks.isEmpty {
+                        Section {
+                            if isParkdeckExpanded || !searchText.isEmpty {
+                                ForEach(MacBacklogStackingHelper.applyStacking(pdTasks), id: \.task.uuid) { item in
+                                    taskRowWithSwipe(task: item.task, stackedCount: item.stackedCount)
+                                        .accessibilityIdentifier("parkdeckRow_\(item.task.uuid.uuidString)")
+                                }
+                            }
+                        } header: {
+                            Button {
+                                withAnimation(.smooth) { isParkdeckExpanded.toggle() }
+                            } label: {
+                                HStack {
+                                    Image(systemName: isParkdeckExpanded || !searchText.isEmpty ? "chevron.down" : "chevron.right")
+                                        .font(.caption)
+                                    Text("Parkdeck")
+                                        .font(.headline)
+                                        .foregroundStyle(.secondary)
+                                    Spacer()
+                                    Text("\(pdTasks.count)")
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                        .padding(.horizontal, 6)
+                                        .padding(.vertical, 2)
+                                        .background(Color.secondary.opacity(0.15))
+                                        .clipShape(Capsule())
+                                        .accessibilityIdentifier("parkdeckBadgeCount")
+                                }
+                            }
+                            .buttonStyle(.plain)
+                            .accessibilityIdentifier("parkdeckSectionHeader")
                         }
                     }
                 } else {
@@ -867,12 +912,39 @@ struct ContentView: View {
 
             singleTaskContextMenuItems(for: selection)
 
+            // MAC_028: Park / Activate
+            if selection.count == 1, let uuid = selection.first,
+               let task = tasks.first(where: { $0.uuid == uuid }) {
+                Divider()
+                if task.isParked || MacBacklogFilterHelper.isInParkdeck(task: task, score: scoreFor(task)) {
+                    Button("Aktivieren") { activateTask(task) }
+                } else {
+                    Button("In Parkdeck legen") { parkTask(task) }
+                }
+            }
+
             Divider()
 
             Button("Löschen", role: .destructive) {
                 deleteTasksByIds(selection)
             }
         }
+    }
+
+    // MARK: - Park / Activate (MAC_028)
+
+    private func parkTask(_ task: LocalTask) {
+        task.isParked = true
+        task.modifiedAt = Date()
+        try? modelContext.save()
+        refreshTasks()
+    }
+
+    private func activateTask(_ task: LocalTask) {
+        task.isParked = false
+        task.modifiedAt = Date()
+        try? modelContext.save()
+        refreshTasks()
     }
 
     @ViewBuilder
@@ -1117,8 +1189,8 @@ struct ContentView: View {
     // MARK: - Task Row with Swipe Actions (shared by all sections)
 
     @ViewBuilder
-    private func taskRowWithSwipe(task: LocalTask) -> some View {
-        makeBacklogRow(task: task)
+    private func taskRowWithSwipe(task: LocalTask, stackedCount: Int = 0) -> some View {
+        makeBacklogRow(task: task, stackedCount: stackedCount)
             .id(task.uuid)  // Bug 94: View identity for ScrollViewReader.scrollTo()
             .tag(task.uuid)
             .swipeActions(edge: .leading, allowsFullSwipe: true) {
@@ -1167,9 +1239,10 @@ struct ContentView: View {
     // MARK: - Row Builder
 
     @ViewBuilder
-    private func makeBacklogRow(task: LocalTask, isBlocked: Bool = false) -> some View {
+    private func makeBacklogRow(task: LocalTask, isBlocked: Bool = false, stackedCount: Int = 0) -> some View {
         MacBacklogRow(
             task: task,
+            stackedCount: stackedCount,
             onToggleComplete: {
                 // Templates can't be completed — checkbox means "end series"
                 if task.isTemplate {
