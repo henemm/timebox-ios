@@ -1422,6 +1422,10 @@ if __name__ == "__main__":
             "result_inspection_notes",      # Managed by fresh-eyes-inspector
             "docs_updated",                 # Managed by mark_docs_updated()
             "docs_updated_details",         # Managed by mark_docs_updated()
+            "regression_check_done",        # Managed by mark-regression-done
+            "regression_check_result",      # Managed by mark-regression-done
+            "validation_phase_done",        # Managed by mark-validation-done
+            "validation_phase_result",      # Managed by mark-validation-done
         }
         if field_name in BLOCKED_SET_FIELDS:
             print(f"BLOCKED: '{field_name}' cannot be set via set-field.")
@@ -1445,6 +1449,49 @@ if __name__ == "__main__":
             print(f"Docs marked as updated: {details or '(no details)'}")
         else:
             print("Failed to mark docs as updated")
+    elif cmd == "mark-regression-done":
+        result = sys.argv[2] if len(sys.argv) > 2 else None
+        with _state_lock():
+            state = load_state()
+            active = session_active_name(state)
+            if active and active in state.get("workflows", {}):
+                wf = state["workflows"][active]
+                phase = wf.get("current_phase", "")
+                if phase not in ("phase6_implement", "phase6b_adversary", "phase7_validate", "phase8_complete"):
+                    print(f"BLOCKED: mark-regression-done only allowed in implementation/validation phases (current: {phase})")
+                    sys.exit(1)
+                wf["regression_check_done"] = True
+                wf["regression_check_result"] = result or "(no result)"
+                wf["last_updated"] = datetime.now().isoformat()
+                _save_state_unlocked(state)
+                print(f"Regression check marked done: {result or '(no result)'}")
+            else:
+                print("No active workflow")
+                sys.exit(1)
+    elif cmd == "mark-validation-done":
+        result = sys.argv[2] if len(sys.argv) > 2 else None
+        with _state_lock():
+            state = load_state()
+            active = session_active_name(state)
+            if active and active in state.get("workflows", {}):
+                wf = state["workflows"][active]
+                phase = wf.get("current_phase", "")
+                if phase not in ("phase7_validate", "phase8_complete"):
+                    print(f"BLOCKED: mark-validation-done only allowed in validation/complete phases (current: {phase})")
+                    sys.exit(1)
+                # Pre-check: regression_check_done must be true
+                if not wf.get("regression_check_done", False):
+                    print("BLOCKED: regression_check_done must be true before marking validation done")
+                    print("Run the full test suite first: mark-regression-done \"result\"")
+                    sys.exit(1)
+                wf["validation_phase_done"] = True
+                wf["validation_phase_result"] = result or "(no result)"
+                wf["last_updated"] = datetime.now().isoformat()
+                _save_state_unlocked(state)
+                print(f"Validation phase marked done: {result or '(no result)'}")
+            else:
+                print("No active workflow")
+                sys.exit(1)
     elif cmd == "snapshot-tests":
         import glob as _glob
         import re as _re

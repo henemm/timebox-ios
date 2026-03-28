@@ -225,6 +225,85 @@ def check_todos_staged() -> tuple[bool, str]:
         return True, f"Could not check staged files: {e}"
 
 
+def check_todos_workflow_marked() -> tuple[bool, str]:
+    """Check that the active workflow's ID is marked ERLEDIGT in ACTIVE-todos.md.
+
+    This catches the case where Claude forgets to update ACTIVE-todos.md entirely.
+    The file would be 'clean' (no changes) and pass check_todos_staged(),
+    but the workflow ID would still be unmarked.
+
+    Only runs when a workflow is active and in phase7_validate or phase8_complete.
+    """
+    try:
+        state = load_workflow_state()
+        if not state:
+            return True, ""
+
+        workflows = state.get("workflows", {})
+        active_name = session_active_name(state)
+        if not active_name or active_name not in workflows:
+            return True, ""
+
+        workflow = workflows[active_name]
+        phase = workflow.get("current_phase", "phase0_idle")
+
+        # Only enforce for late phases (about to commit)
+        if phase not in ("phase6_implement", "phase7_validate", "phase8_complete"):
+            return True, ""
+
+        # Respect user_override
+        if workflow.get("user_override", False):
+            return True, ""
+        try:
+            from override_token import has_valid_token
+            if has_valid_token(active_name):
+                return True, ""
+        except ImportError:
+            pass
+
+        # Extract workflow ID (e.g. "RW_2.1d" from workflow name)
+        wf_id = active_name.upper().replace("-", "_")
+
+        # Read ACTIVE-todos.md and check if the ID is struck through
+        todos_file = get_project_root() / "docs" / "ACTIVE-todos.md"
+        if not todos_file.exists():
+            return True, ""
+
+        content = todos_file.read_text()
+
+        import re
+        # Match: ~~RW_2.1d~~ ... ERLEDIGT  (strikethrough + ERLEDIGT)
+        pattern_done = re.compile(
+            rf"~~{re.escape(wf_id)}~~.*ERLEDIGT", re.IGNORECASE
+        )
+        # Match: | RW_2.1d | ... (still open, not struck through)
+        pattern_open = re.compile(
+            rf"\|\s*{re.escape(wf_id)}\s*\|", re.IGNORECASE
+        )
+
+        if pattern_done.search(content):
+            return True, f"{wf_id} is marked ERLEDIGT"
+
+        if pattern_open.search(content):
+            return False, f"""{wf_id} ist in ACTIVE-todos.md noch NICHT als ERLEDIGT markiert!
+
+Du bist in Phase {phase} — kurz vor dem Commit.
+Aber das Backlog zeigt {wf_id} noch als offen.
+
+PFLICHT: Erst docs/ACTIVE-todos.md aktualisieren:
+  - Zeile mit {wf_id} durchstreichen (~~...~~)
+  - 'ERLEDIGT' anhaengen
+  - Datei stagen (git add docs/ACTIVE-todos.md)
+
+Dann committen."""
+
+        # ID not found in file at all — might be a sub-task or custom name, allow
+        return True, f"{wf_id} not found in ACTIVE-todos.md — skipping check"
+
+    except Exception as e:
+        return True, f"Workflow-todos check error: {e}"
+
+
 def check_adversary_verdict() -> tuple[bool, str]:
     """
     Check if the implementation-validator (adversary) has verified the fix.
@@ -301,6 +380,34 @@ def check_adversary_verdict() -> tuple[bool, str]:
   Address the issues before committing.
 ======================================================================"""
 
+        # Check for conditional verdicts — "VERIFIED" with caveats
+        # These slip through when adversary says "VERIFIED but X is missing"
+        verdict_lower = verdict.lower()
+        condition_markers = [
+            "aber", "but", "missing", "fehlt", "fehlen",
+            "einschraenkung", "caveat", "however", "except",
+            "todo", "noch nicht", "not yet", "should also",
+            "sollte auch", "incomplete", "unvollstaendig",
+        ]
+        for marker in condition_markers:
+            if marker in verdict_lower:
+                return False, f"""
+======================================================================
+  BLOCKED — Adversary Verdict hat Einschraenkungen
+======================================================================
+
+  Verdict: {verdict}
+
+  Das Verdict beginnt mit VERIFIED, enthaelt aber Einschraenkungen
+  (gefunden: '{marker}').
+
+  Ein sauberes Verdict sieht so aus:
+    VERIFIED:Tests PASSED: N tests across M runs, 0 failures
+
+  Adressiere die Einschraenkungen, fuehre den Adversary erneut aus,
+  und bekomme ein sauberes VERIFIED ohne Bedingungen.
+======================================================================"""
+
         return True, f"Adversary verdict: {verdict}"
 
     except Exception as e:
@@ -340,6 +447,17 @@ def main():
         print("aktualisieren (Status, Beschreibung, Commit-Hash).", file=sys.stderr)
         print(file=sys.stderr)
         print("Erst updaten, dann committen.", file=sys.stderr)
+        print("=" * 70, file=sys.stderr)
+        sys.exit(2)
+
+    # CHECK: Workflow ID must be marked ERLEDIGT in ACTIVE-todos.md
+    wf_ok, wf_msg = check_todos_workflow_marked()
+    if not wf_ok:
+        print("=" * 70, file=sys.stderr)
+        print("BLOCKED - Workflow nicht als ERLEDIGT markiert", file=sys.stderr)
+        print("=" * 70, file=sys.stderr)
+        print(file=sys.stderr)
+        print(wf_msg, file=sys.stderr)
         print("=" * 70, file=sys.stderr)
         sys.exit(2)
 

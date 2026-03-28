@@ -102,6 +102,10 @@ python3 .claude/hooks/workflow_state_multi.py add-artifact ui_test_output "docs/
 python3 .claude/hooks/workflow_state_multi.py mark-green "All [N] unit tests passed"
 python3 .claude/hooks/workflow_state_multi.py mark-ui-green "All [M] UI tests passed"
 
+# Mark REGRESSION CHECK done (PFLICHT — Gate-enforced!)
+# Nur setzen wenn Task 3 (Regression Check) tatsaechlich die VOLLE Test-Suite ausfuehrte
+python3 .claude/hooks/workflow_state_multi.py mark-regression-done "Full suite: [N] unit + [M] UI tests, 0 regressions"
+
 # Advance to validation phase
 python3 .claude/hooks/workflow_state_multi.py phase phase7_validate
 ```
@@ -164,6 +168,10 @@ python3 .claude/hooks/workflow_state_multi.py mark-docs-updated "ACTIVE-todos.md
 > "Validation successful. All checks passed. Ready for commit."
 
 ```bash
+# Mark validation as fully complete (PFLICHT — Gate-enforced!)
+# Blockiert Commit wenn nicht gesetzt. Setzt regression_check_done voraus.
+python3 .claude/hooks/workflow_state_multi.py mark-validation-done "All 4 checks passed: tests, spec, regression, scope"
+
 python3 .claude/hooks/workflow_state_multi.py phase phase8_complete
 ```
 

@@ -140,6 +140,16 @@
           },
           {
             "type": "command",
+            "command": "python3 .claude/hooks/validate_completeness_gate.py",
+            "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/artifact_existence_guard.py",
+            "timeout": 5
+          },
+          {
+            "type": "command",
             "command": "python3 .claude/hooks/pre_commit_gate.py",
             "timeout": 5
           },
