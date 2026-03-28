@@ -5,7 +5,7 @@ import SwiftData
 /// Works WITHOUT opening the app thanks to App Group shared container.
 struct GetNextUpIntent: AppIntent {
     static let title: LocalizedStringResource = "Next Up anzeigen"
-    static let description = IntentDescription("Gibt die aktuelle Next-Up-Liste zurueck.")
+    static let description = IntentDescription("Gibt die aktuelle Next-Up-Liste zurück.")
     static let openAppWhenRun: Bool = false
 
     func perform() async throws -> some IntentResult & ReturnsValue<[TaskEntity]> & ProvidesDialog {

@@ -1113,8 +1113,13 @@ struct BacklogView: View {
     private func blockedRow(_ item: PlanItem) -> some View {
         BacklogRow(
             item: item,
+            onDurationTap: { selectedItemForDuration = item },
+            onImportanceCycle: { newImportance in updateImportance(for: item, importance: newImportance) },
+            onUrgencyToggle: { newUrgency in updateUrgency(for: item, urgency: newUrgency) },
+            onCategoryTap: { selectedItemForCategory = item },
             onEditTap: { handleEditTap(item) },
             onTitleSave: { newTitle in saveTitleEdit(for: item, title: newTitle) },
+            isPendingResort: deferredSort.isPending(item.id),
             isBlocked: true
         )
         .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))

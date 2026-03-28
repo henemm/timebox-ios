@@ -20,7 +20,7 @@ enum BehavioralProfileService {
 
     // MARK: - Public API
 
-    /// Gibt das gecachte Profil zurueck oder berechnet es neu.
+    /// Gibt das gecachte Profil zurück oder berechnet es neu.
     /// Cache wird invalidiert wenn computedAt von einem anderen Kalendertag ist.
     static func profile(
         tasks: [LocalTask],
@@ -41,7 +41,7 @@ enum BehavioralProfileService {
         return computed
     }
 
-    /// Berechnet ein frisches Profil ohne Cache (fuer Tests und erzwungene Neuberechnung).
+    /// Berechnet ein frisches Profil ohne Cache (für Tests und erzwungene Neuberechnung).
     static func compute(
         tasks: [LocalTask],
         focusBlocks: [FocusBlock],
@@ -76,7 +76,7 @@ enum BehavioralProfileService {
 
     // MARK: - Komponente 1: Tageszeit-Affinitaet
 
-    /// Berechnet fuer jede Kategorie den Anteil pro Tageszeit-Fenster.
+    /// Berechnet für jede Kategorie den Anteil pro Tageszeit-Fenster.
     /// Nur Tasks mit gesetzter Kategorie werden gezaehlt.
     static func computeTimeAffinity(
         from tasks: [LocalTask]

@@ -83,7 +83,7 @@ struct CategoryTrendChart: View {
     // MARK: - Empty State
 
     private var emptyState: some View {
-        Text("Noch keine Daten fuer den Trend")
+        Text("Noch keine Daten für den Trend")
             .font(.subheadline)
             .foregroundStyle(.secondary)
             .accessibilityIdentifier("categoryTrendEmptyState")

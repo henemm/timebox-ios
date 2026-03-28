@@ -1,7 +1,7 @@
 import Foundation
 
-/// Tageszeit-Fenster fuer Affinitaets-Berechnung.
-/// morning: 06-12, afternoon: 12-18, evening: 18-06 (uebernaechtigend)
+/// Tageszeit-Fenster für Affinitäts-Berechnung.
+/// morning: 06-12, afternoon: 12-18, evening: 18-06 (übernächtigend)
 enum DayPeriod: String, CaseIterable, Hashable {
     case morning   = "morning"    // 06:00–11:59
     case afternoon = "afternoon"  // 12:00–17:59
@@ -30,9 +30,9 @@ struct ProcrastinationPattern: Equatable {
 
 /// Berechnetes Verhaltensprofil aus den letzten 28 Tagen.
 /// Wird von BehavioralProfileService erzeugt und in-memory gecacht.
-/// Alle Felder koennen nil sein wenn nicht genuegend Daten vorliegen.
+/// Alle Felder können nil sein wenn nicht genügend Daten vorliegen.
 struct BehavioralProfile {
-    /// Zeitpunkt der Berechnung (fuer Cache-Validierung)
+    /// Zeitpunkt der Berechnung (für Cache-Validierung)
     let computedAt: Date
 
     /// Tageszeit-Affinitaet pro Kategorie.

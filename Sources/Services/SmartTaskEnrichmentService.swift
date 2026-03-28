@@ -125,8 +125,8 @@ final class SmartTaskEnrichmentService {
                 "Kategorie: income (Geld verdienen), maintenance (Pflege/Haushalt), recharge (Erholung), learning (Lernen), giving_back (Helfen)"
                 "Energie: high = tiefe Fokus-Arbeit (Programmieren, Schreiben, Analyse), low = Routine (Einkaufen, Putzen)"
                 ""
-                "Orientiere dich an den Attributen aehnlicher bestehender Tasks wenn vorhanden."
-                "Beispiel: Wenn mehrere Tasks zum Thema Steuern importance=3 und category=income haben, uebernimm das fuer neue Steuer-Tasks."
+                "Orientiere dich an den Attributen ähnlicher bestehender Tasks wenn vorhanden."
+                "Beispiel: Wenn mehrere Tasks zum Thema Steuern importance=3 und category=income haben, übernimm das für neue Steuer-Tasks."
             }
 
             let response = try await session.respond(to: prompt, generating: TaskEnrichment.self)
@@ -206,7 +206,7 @@ final class SmartTaskEnrichmentService {
         let context = fetchRecentTaskContext()
         if !context.isEmpty {
             parts.append("")
-            parts.append("Bestehende Tasks des Nutzers (orientiere dich an deren Attributen fuer aehnliche Tasks):")
+            parts.append("Bestehende Tasks des Nutzers (orientiere dich an deren Attributen für ähnliche Tasks):")
             parts.append(context)
         }
 

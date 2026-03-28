@@ -2,7 +2,7 @@ import Foundation
 import SwiftData
 
 /// Grund warum ein Task nicht erledigt wurde.
-/// Als String gespeichert fuer CloudKit-Kompatibilitaet.
+/// Als String gespeichert für CloudKit-Kompatibilität.
 enum FailureReason: String, Codable, CaseIterable {
     case noTime
     case tooTired

@@ -64,7 +64,7 @@ struct ImportancePicker: View {
                 }
             }
 
-            Button("Zuruecksetzen") {
+            Button("Zurücksetzen") {
                 onSelect(nil)
             }
             .foregroundStyle(.secondary)

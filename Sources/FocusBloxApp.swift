@@ -26,7 +26,7 @@ struct FocusBloxApp: App {
 
     private static let appGroupID = "group.com.henning.focusblox"
 
-    /// SyncedSettings fuer iCloud KV Store Sync zwischen Geraeten
+    /// SyncedSettings für iCloud KV Store Sync zwischen Geräten
     private let syncedSettings = SyncedSettings()
 
     init() {
@@ -68,14 +68,14 @@ struct FocusBloxApp: App {
                 cloudKitDatabase: .none
             )
         } else if FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: appGroupID) != nil {
-            print("[CloudKit] iOS: App Group verfuegbar, CloudKit .private(iCloud.com.henning.focusblox)")
+            print("[CloudKit] iOS: App Group verfügbar, CloudKit .private(iCloud.com.henning.focusblox)")
             modelConfiguration = ModelConfiguration(
                 schema: schema,
                 groupContainer: .identifier(appGroupID),
                 cloudKitDatabase: .private("iCloud.com.henning.focusblox")
             )
         } else {
-            print("[CloudKit] iOS: App Group NICHT verfuegbar, CloudKit .private(iCloud.com.henning.focusblox) ohne Group Container")
+            print("[CloudKit] iOS: App Group NICHT verfügbar, CloudKit .private(iCloud.com.henning.focusblox) ohne Group Container")
             modelConfiguration = ModelConfiguration(
                 schema: schema,
                 isStoredInMemoryOnly: false,
@@ -222,7 +222,7 @@ struct FocusBloxApp: App {
                 notes: nil
             )
 
-            // --empty-morning: Leere Events/FocusBlocks fuer Empty-State-Test
+            // --empty-morning: Leere Events/FocusBlocks für Empty-State-Test
             if ProcessInfo.processInfo.arguments.contains("--empty-morning") {
                 mock.mockEvents = []
                 mock.mockFocusBlocks = []

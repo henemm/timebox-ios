@@ -3,8 +3,8 @@ import SwiftData
 
 enum FailureProtocolService {
 
-    /// Speichert einen Failure-Record. Append-only, nie loeschen.
-    /// Prueft Duplikate: gleicher taskID + gleiches Datum = kein Insert.
+    /// Speichert einen Failure-Record. Append-only, nie löschen.
+    /// Prüft Duplikate: gleicher taskID + gleiches Datum = kein Insert.
     static func save(
         taskID: String,
         reason: FailureReason,
@@ -29,7 +29,7 @@ enum FailureProtocolService {
         try? context.save()
     }
 
-    /// Holt alle Failure-Records fuer ein bestimmtes Datum.
+    /// Holt alle Failure-Records für ein bestimmtes Datum.
     static func fetchForDate(
         _ date: Date,
         context: ModelContext

@@ -440,7 +440,7 @@ struct MacFocusView: View {
             }
 
             let blocks = try eventKitRepo.fetchFocusBlocks(for: Date())
-            // Aktiven Block bevorzugen, sonst letzten abgelaufenen fuer Review
+            // Aktiven Block bevorzugen, sonst letzten abgelaufenen für Review
             activeBlock = blocks.first { $0.isActive }
                 ?? blocks.filter { $0.isPast }.last
             if activeBlock?.isPast == true && !reviewDismissed {
@@ -613,7 +613,7 @@ struct MacFocusView: View {
         Task { await loadData() }
     }
 
-    /// Unerledigte Tasks nach Sprint Review zurueck in Next Up
+    /// Unerledigte Tasks nach Sprint Review zurück in Next Up
     private func returnIncompleteTasksToNextUp(block: FocusBlock) {
         let incompleteTasks = block.taskIDs.filter { !block.completedTaskIDs.contains($0) }
         guard !incompleteTasks.isEmpty else { return }

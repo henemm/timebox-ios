@@ -204,10 +204,10 @@ struct FocusBloxMacApp: App {
     @State private var selectedSection: MainSection = .backlog
     @AppStorage("intentionJustSet") private var intentionJustSet: Bool = false
 
-    /// SyncedSettings fuer iCloud KV Store Sync zwischen Geraeten
+    /// SyncedSettings für iCloud KV Store Sync zwischen Geräten
     private let syncedSettings = SyncedSettings()
 
-    /// Shared EventKitRepository fuer alle Views (BACKLOG-002)
+    /// Shared EventKitRepository für alle Views (BACKLOG-002)
     private let eventKitRepository: any EventKitRepositoryProtocol = EventKitRepository()
 
     init() {
@@ -513,14 +513,14 @@ enum MacModelContainer {
                 cloudKitDatabase: .none
             )
         } else if appGroupURL != nil {
-            print("[CloudKit] macOS: App Group verfuegbar, CloudKit .private(iCloud.com.henning.focusblox)")
+            print("[CloudKit] macOS: App Group verfügbar, CloudKit .private(iCloud.com.henning.focusblox)")
             config = ModelConfiguration(
                 schema: schema,
                 groupContainer: .identifier(appGroupID),
                 cloudKitDatabase: .private("iCloud.com.henning.focusblox")
             )
         } else {
-            print("[CloudKit] macOS: App Group NICHT verfuegbar, CloudKit .private(iCloud.com.henning.focusblox) ohne Group Container")
+            print("[CloudKit] macOS: App Group NICHT verfügbar, CloudKit .private(iCloud.com.henning.focusblox) ohne Group Container")
             config = ModelConfiguration(
                 schema: schema,
                 isStoredInMemoryOnly: false,

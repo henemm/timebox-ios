@@ -1,7 +1,7 @@
 import Foundation
 
-/// Stateless service fuer Emotional Nudge (Micro-Tasks).
-/// Prueft Daily-Limits, generiert rotierende Motivationstexte,
+/// Stateless service für Emotional Nudge (Micro-Tasks).
+/// Prüft Daily-Limits, generiert rotierende Motivationstexte,
 /// trackt welche Tasks heute schon genudget wurden.
 struct EmotionalNudgeService {
 
@@ -23,7 +23,7 @@ struct EmotionalNudgeService {
 
     // MARK: - Public API
 
-    /// Prueft ob fuer diesen Task heute ein Nudge angezeigt werden darf.
+    /// Prüft ob für diesen Task heute ein Nudge angezeigt werden darf.
     /// Max 1 Nudge/Task/Tag, max 3 Nudges/Tag gesamt.
     @MainActor
     static func canShowNudge(for taskID: String) -> Bool {
@@ -39,7 +39,7 @@ struct EmotionalNudgeService {
         return !alreadyNudged
     }
 
-    /// Gibt einen rotierenden Nudge-Text zurueck.
+    /// Gibt einen rotierenden Nudge-Text zurück.
     @MainActor
     static func nudgeText() -> String {
         let settings = AppSettings.shared
@@ -47,7 +47,7 @@ struct EmotionalNudgeService {
         return nudgeTexts[index]
     }
 
-    /// Zaehlt den Nudge fuer diesen Task hoch.
+    /// Zählt den Nudge für diesen Task hoch.
     @MainActor
     static func recordNudge(for taskID: String) {
         let settings = AppSettings.shared

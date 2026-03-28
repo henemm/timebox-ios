@@ -97,8 +97,8 @@ final class TaskTitleEngine {
     static func titleContainsDateKeyword(_ title: String) -> Bool {
         let lower = title.lowercased()
         let keywords = [
-            "heute", "today", "morgen", "tomorrow", "uebermorgen", "übermorgen",
-            "naechste woche", "nächste woche", "next week",
+            "heute", "today", "morgen", "tomorrow", "übermorgen",
+            "nächste woche", "next week",
             "montag", "monday", "dienstag", "tuesday", "mittwoch", "wednesday",
             "donnerstag", "thursday", "freitag", "friday", "samstag", "saturday",
             "sonntag", "sunday"
@@ -115,8 +115,8 @@ final class TaskTitleEngine {
         let lower = title.lowercased()
         // Order: longer/more specific keywords first to avoid partial matches
         let mappings: [(keyword: String, relative: String)] = [
-            ("uebermorgen", "uebermorgen"), ("übermorgen", "übermorgen"),
-            ("naechste woche", "naechste woche"), ("nächste woche", "nächste woche"),
+            ("übermorgen", "übermorgen"),
+            ("nächste woche", "nächste woche"),
             ("next week", "next week"),
             ("heute", "heute"), ("today", "heute"),
             ("morgen", "morgen"), ("tomorrow", "morgen"),
@@ -149,9 +149,9 @@ final class TaskTitleEngine {
             return today
         case "tomorrow", "morgen":
             return cal.date(byAdding: .day, value: 1, to: today)
-        case "uebermorgen", "übermorgen":
+        case "übermorgen":
             return cal.date(byAdding: .day, value: 2, to: today)
-        case "naechste woche", "nächste woche", "next week":
+        case "nächste woche", "next week":
             return nextWeekday(2, after: today) // Monday
         case "montag", "monday":
             return nextWeekday(2, after: today)

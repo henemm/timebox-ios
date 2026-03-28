@@ -1,7 +1,7 @@
 import Foundation
 import EventKit
 
-/// Synchronisiert App-Einstellungen zwischen Geraeten via iCloud KV Store.
+/// Synchronisiert App-Einstellungen zwischen Geräten via iCloud KV Store.
 /// Kalender-IDs sind geraete-spezifisch, daher wird nach NAME gematchted.
 @MainActor
 final class SyncedSettings {
@@ -43,7 +43,7 @@ final class SyncedSettings {
         // Sync starten
         cloud.synchronize()
 
-        // Auf Aenderungen von anderen Geraeten lauschen
+        // Auf Aenderungen von anderen Geräten lauschen
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(cloudDidChange(_:)),
@@ -85,7 +85,7 @@ final class SyncedSettings {
         cloud.set(defaults.integer(forKey: LocalKey.warningTimingRaw), forKey: CloudKey.warningTimingRaw)
         cloud.set(defaults.integer(forKey: LocalKey.defaultTaskDuration), forKey: CloudKey.defaultTaskDuration)
 
-        // Event-Kategorien: Dictionary direkt kopieren (calendarItemIdentifier ist geraetuebergreifend stabil)
+        // Event-Kategorien: Dictionary direkt kopieren (calendarItemIdentifier ist geräteübergreifend stabil)
         if let catDict = defaults.dictionary(forKey: LocalKey.eventCategories) as? [String: String] {
             cloud.set(catDict, forKey: CloudKey.eventCategories)
         }
@@ -95,7 +95,7 @@ final class SyncedSettings {
 
     // MARK: - Pull: iCloud → Lokale Settings
 
-    /// Einstellungen von iCloud in lokale UserDefaults uebernehmen
+    /// Einstellungen von iCloud in lokale UserDefaults übernehmen
     @objc nonisolated private func cloudDidChange(_ notification: Notification) {
         Task { @MainActor in
             pullFromCloud()
@@ -126,7 +126,7 @@ final class SyncedSettings {
             }
         }
 
-        // Einfache Bool/Int-Werte direkt uebernehmen
+        // Einfache Bool/Int-Werte direkt übernehmen
         defaults.set(cloud.bool(forKey: CloudKey.remindersSyncEnabled), forKey: LocalKey.remindersSyncEnabled)
         defaults.set(cloud.bool(forKey: CloudKey.soundEnabled), forKey: LocalKey.soundEnabled)
         defaults.set(cloud.bool(forKey: CloudKey.warningEnabled), forKey: LocalKey.warningEnabled)

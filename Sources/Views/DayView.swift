@@ -296,7 +296,7 @@ struct DayView: View {
     @ViewBuilder
     private var eveningContent: some View {
         if isLoading {
-            ProgressView("Lade Tagesrueckblick...")
+            ProgressView("Lade Tagesrückblick...")
         } else if isPermissionDenied {
             permissionDeniedContent
         } else {
@@ -545,7 +545,7 @@ struct DayView: View {
         switch phase {
         case .morning: return "Guten Morgen"
         case .daytime: return "Dein Tag"
-        case .evening: return "Tagesrueckblick"
+        case .evening: return "Tagesrückblick"
         }
     }
 }

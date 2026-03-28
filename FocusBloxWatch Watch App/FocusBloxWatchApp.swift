@@ -18,7 +18,7 @@ struct FocusBloxWatch_Watch_AppApp: App {
         if let containerURL = FileManager.default.containerURL(
             forSecurityApplicationGroupIdentifier: appGroupID
         ) {
-            print("[CloudKit] Watch: App Group verfuegbar (\(containerURL.path))")
+            print("[CloudKit] Watch: App Group verfügbar (\(containerURL.path))")
             let cloudConfig = ModelConfiguration(
                 schema: schema,
                 groupContainer: .identifier(appGroupID),
@@ -32,7 +32,7 @@ struct FocusBloxWatch_Watch_AppApp: App {
                 print("[CloudKit] Watch: ModelContainer mit CloudKit FEHLGESCHLAGEN: \(error)")
             }
         } else {
-            print("[CloudKit] Watch: App Group NICHT verfuegbar — kein CloudKit moeglich")
+            print("[CloudKit] Watch: App Group NICHT verfügbar — kein CloudKit möglich")
         }
 
         // Fallback: local-only (NO CloudKit sync!)

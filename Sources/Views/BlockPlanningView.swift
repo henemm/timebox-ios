@@ -1110,7 +1110,7 @@ struct TimelineFocusBlockRow: View {
                                 isResizing = false
                             }
                     )
-                    .accessibilityLabel("Block-Dauer aendern")
+                    .accessibilityLabel("Block-Dauer ändern")
                     .accessibilityIdentifier("focusBlockResizeHandle_\(block.id)")
             }
         }

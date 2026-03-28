@@ -14,7 +14,7 @@ struct LimitationWarning: Equatable {
 
 enum LimitationGuardService {
 
-    /// Prueft ob die uebergebene Task-Liste den historischen Schnitt ueberschreitet.
+    /// Prüft ob die übergebene Task-Liste den historischen Schnitt überschreitet.
     /// - Returns: `LimitationWarning` wenn Ueberschreitung vorliegt, sonst nil.
     static func evaluate(
         tasks: [PlanItem],
@@ -55,7 +55,7 @@ enum LimitationGuardService {
 
 // MARK: - Banner View
 
-/// Nicht-modaler Inline-Banner fuer die Limitation-Warnung.
+/// Nicht-modaler Inline-Banner für die Limitation-Warnung.
 struct LimitationWarningBanner: View {
     let warning: LimitationWarning
     let onDismiss: () -> Void

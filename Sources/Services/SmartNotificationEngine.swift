@@ -189,7 +189,7 @@ enum SmartNotificationEngine {
         return Array(requests.prefix(budgetTasks))
     }
 
-    // MARK: - Reconcile (ModelContext Overload — fuer Views ohne ModelContainer-Zugriff)
+    // MARK: - Reconcile (ModelContext Overload — für Views ohne ModelContainer-Zugriff)
 
     static func reconcile(
         reason: ReconciliationReason,
@@ -318,7 +318,7 @@ enum SmartNotificationEngine {
            eveningDate > now {
             let content = UNMutableNotificationContent()
             content.title = "Tagesreview"
-            content.body = "Zeit fuer dein Tagesreview — was hast du heute geschafft?"
+            content.body = "Zeit für dein Tagesreview — was hast du heute geschafft?"
             content.sound = .default
 
             let interval = eveningDate.timeIntervalSince(now)
@@ -363,11 +363,11 @@ enum SmartNotificationEngine {
         let nudgeHours = [9, 11, 13, 15, 17, 19]
 
         let nudgeTexts: [(title: String, body: String)] = [
-            ("Wie laeuft dein Tag?", "Schau mal in dein Backlog — vielleicht ist ein Quick Win dabei."),
-            ("Zeit fuer den naechsten Sprint?", "Ein kurzer Focus Block kann viel bewegen."),
-            ("Dein Backlog wartet", "Welchen Task koenntest du jetzt angehen?"),
-            ("Kurze Pause vorbei?", "Der naechste kleine Schritt wartet auf dich."),
-            ("Halbzeit!", "Guter Zeitpunkt fuer einen Focus Sprint."),
+            ("Wie läuft dein Tag?", "Schau mal in dein Backlog — vielleicht ist ein Quick Win dabei."),
+            ("Zeit für den nächsten Sprint?", "Ein kurzer Focus Block kann viel bewegen."),
+            ("Dein Backlog wartet", "Welchen Task könntest du jetzt angehen?"),
+            ("Kurze Pause vorbei?", "Der nächste kleine Schritt wartet auf dich."),
+            ("Halbzeit!", "Guter Zeitpunkt für einen Focus Sprint."),
             ("Endspurt!", "Noch ein Task vor Feierabend?"),
         ]
 

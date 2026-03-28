@@ -8,21 +8,21 @@ Apple Versionsnummern seit WWDC 2025: Version = Folgejahr (2025 → 26.x, 2026 �
 
 ## Design-Leitbild
 
-Minimalistisch, wenige Farben, iOS-nativ ohne Custom-Widgets. Moeglichst nah am aktuellen Design-Paradigma von Apple (Liquid Glass).
+Minimalistisch, wenige Farben, iOS-nativ ohne Custom-Widgets. Möglichst nah am aktuellen Design-Paradigma von Apple (Liquid Glass).
 
 ## Cross-Platform Code-Sharing (iOS + macOS)
 
 **Prinzip: Maximales Code-Sharing, minimale Plattform-Duplikation.**
 
-Alles was sinnvoll fuer beide Plattformen funktioniert, wird EINMAL in `Sources/` entwickelt — nicht separat pro Plattform kopiert.
+Alles was sinnvoll für beide Plattformen funktioniert, wird EINMAL in `Sources/` entwickelt — nicht separat pro Plattform kopiert.
 
-- `Sources/` = Shared Code (Models, Services, Business-Logik, **und plattformuebergreifende Views**) → beide Plattformen
-- `FocusBloxMac/` = **NUR** was auf macOS tatsaechlich anders aussehen/funktionieren MUSS (Sidebar-Navigation, Window-Management, macOS-spezifische UI-Patterns)
+- `Sources/` = Shared Code (Models, Services, Business-Logik, **und plattformübergreifende Views**) → beide Plattformen
+- `FocusBloxMac/` = **NUR** was auf macOS tatsächlich anders aussehen/funktionieren MUSS (Sidebar-Navigation, Window-Management, macOS-spezifische UI-Patterns)
 - Neue Business-Logik **immer** in `Sources/` — keine Duplikation in `FocusBloxMac/`
 
 **Entscheidungsregel bei jedem Feature/Bug:**
 
-1. **Kann die View shared werden?** → `Sources/Views/` mit `#if os()` nur wo noetig
+1. **Kann die View shared werden?** → `Sources/Views/` mit `#if os()` nur wo nötig
 2. **Braucht macOS ein anderes Layout?** → Shared ViewModel in `Sources/`, nur View in `FocusBloxMac/`
 3. **Ist es rein plattformspezifisch?** (z.B. Sidebar, NSWindow) → `FocusBloxMac/`
 
@@ -63,22 +63,22 @@ For bug fixes: `/10-bug <description>` triggers Analysis-First → Spec → TDD 
 
 ```bash
 ./scripts/sim.sh build              # App bauen
-./scripts/sim.sh test TestClass     # UI Test ausfuehren
-./scripts/sim.sh unit TestClass     # Unit Test ausfuehren
+./scripts/sim.sh test TestClass     # UI Test ausführen
+./scripts/sim.sh unit TestClass     # Unit Test ausführen
 ./scripts/sim.sh screenshot [pfad]  # Screenshot vom Simulator
 ./scripts/sim.sh mac-build          # macOS App bauen
 ./scripts/sim.sh mac-unit TestClass # macOS Unit Test
 ```
 
-Bei Shared-Code-Aenderungen (`Sources/`): AUCH `mac-build` ausfuehren!
+Bei Shared-Code-Änderungen (`Sources/`): AUCH `mac-build` ausführen!
 
 ## UI Test Konventionen
 
 **Pre-Flight (PFLICHT vor JEDEM UI Test):**
 1. View-Datei lesen → alle `.accessibilityIdentifier()` notieren
-2. `/inspect-ui` ausfuehren fuer den Ziel-Screen
+2. `/inspect-ui` ausführen für den Ziel-Screen
 3. Identifier-Mapping erstellen: Element → Actual ID → Type
-4. Erst DANN Test schreiben — NIEMALS IDs raten oder aus Gedaechtnis
+4. Erst DANN Test schreiben — NIEMALS IDs raten oder aus Gedächtnis
 
 **AccessibilityIdentifier-Muster:**
 - Buttons: `camelCase` + `Button` (z.B. `addTaskButton`, `saveButton`)
@@ -91,11 +91,11 @@ Bei Shared-Code-Aenderungen (`Sources/`): AUCH `mac-build` ausfuehren!
 
 **Verboten:** `sleep(N)` — stattdessen `waitForExistence(timeout:)`
 
-## Xcode-Projekt: Dateien hinzufuegen
+## Xcode-Projekt: Dateien hinzufügen
 
 **NIEMALS `project.pbxproj` direkt editieren** — das Dateiformat ist fragil und manuelle Edits korrumpieren das Projekt.
 
-**Neue `.swift`-Dateien zum Projekt hinzufuegen:**
+**Neue `.swift`-Dateien zum Projekt hinzufügen:**
 ```python
 python3 -c "
 from pbxproj import XcodeProject

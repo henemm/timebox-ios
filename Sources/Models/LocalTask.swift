@@ -267,7 +267,7 @@ final class LocalTask {
 
 extension LocalTask {
     /// Verschiebt das Faelligkeitsdatum um N Tage und speichert.
-    /// Caller muss Notifications reschedeln (NotificationService ist nicht in allen Targets verfuegbar).
+    /// Caller muss Notifications reschedeln (NotificationService ist nicht in allen Targets verfügbar).
     /// No-op wenn dueDate nil ist.
     @discardableResult
     static func postpone(_ task: LocalTask, byDays days: Int, context: ModelContext) -> Date? {

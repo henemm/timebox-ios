@@ -4,7 +4,7 @@ import SwiftData
 // MARK: - Cycle Importance (nil → 1 → 2 → 3 → nil)
 
 struct CycleImportanceIntent: AppIntent {
-    static let title: LocalizedStringResource = "Wichtigkeit aendern"
+    static let title: LocalizedStringResource = "Wichtigkeit ändern"
     static let isDiscoverable: Bool = false
 
     @Dependency var captureState: QuickCaptureState
@@ -26,7 +26,7 @@ struct CycleImportanceIntent: AppIntent {
 // MARK: - Cycle Urgency (nil → not_urgent → urgent → nil)
 
 struct CycleUrgencyIntent: AppIntent {
-    static let title: LocalizedStringResource = "Dringlichkeit aendern"
+    static let title: LocalizedStringResource = "Dringlichkeit ändern"
     static let isDiscoverable: Bool = false
 
     @Dependency var captureState: QuickCaptureState
@@ -47,7 +47,7 @@ struct CycleUrgencyIntent: AppIntent {
 // MARK: - Cycle Category (maintenance → income → recharge → learning → giving_back → maintenance)
 
 struct CycleCategoryIntent: AppIntent {
-    static let title: LocalizedStringResource = "Kategorie aendern"
+    static let title: LocalizedStringResource = "Kategorie ändern"
     static let isDiscoverable: Bool = false
 
     @Dependency var captureState: QuickCaptureState
@@ -71,7 +71,7 @@ struct CycleCategoryIntent: AppIntent {
 // MARK: - Cycle Duration (nil → 15 → 25 → 45 → 60 → nil)
 
 struct CycleDurationIntent: AppIntent {
-    static let title: LocalizedStringResource = "Dauer aendern"
+    static let title: LocalizedStringResource = "Dauer ändern"
     static let isDiscoverable: Bool = false
 
     @Dependency var captureState: QuickCaptureState

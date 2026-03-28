@@ -259,7 +259,7 @@ enum NotificationService {
 
         let content = UNMutableNotificationContent()
         content.title = "FocusBlox beendet"
-        content.body = "\(blockTitle) - \(completedCount)/\(totalCount) Tasks erledigt. Zeit fuer dein Sprint Review!"
+        content.body = "\(blockTitle) - \(completedCount)/\(totalCount) Tasks erledigt. Zeit für dein Sprint Review!"
         content.sound = .default
 
         let trigger = UNTimeIntervalNotificationTrigger(

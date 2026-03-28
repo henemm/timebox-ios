@@ -154,7 +154,7 @@ struct FocusLiveView: View {
                             isAbortingBlock = false
                             reviewDismissed = true
                             Task {
-                                // Unerledigte Tasks zurueck nach Next Up
+                                // Unerledigte Tasks zurück nach Next Up
                                 if block.isPast {
                                     returnIncompleteTasksToNextUp(block: block)
                                 }
@@ -573,7 +573,7 @@ struct FocusLiveView: View {
             for block in blocks {
                 print("📥 [FocusLiveView] block: \(block.title), isActive=\(block.isActive)")
             }
-            // Aktiven Block bevorzugen, sonst letzten abgelaufenen fuer Review
+            // Aktiven Block bevorzugen, sonst letzten abgelaufenen für Review
             activeBlock = blocks.first { $0.isActive }
                 ?? blocks.filter { $0.isPast }.last
             if activeBlock?.isPast == true && !reviewDismissed {
@@ -855,7 +855,7 @@ struct FocusLiveView: View {
         return remainingSec / 60
     }
 
-    /// Unerledigte Tasks nach Sprint Review zurueck in Next Up
+    /// Unerledigte Tasks nach Sprint Review zurück in Next Up
     private func returnIncompleteTasksToNextUp(block: FocusBlock) {
         let incompleteTasks = block.taskIDs.filter { !block.completedTaskIDs.contains($0) }
         guard !incompleteTasks.isEmpty else { return }

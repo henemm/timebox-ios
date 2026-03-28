@@ -334,7 +334,7 @@ final class EventKitRepository: EventKitRepositoryProtocol, @unchecked Sendable 
         }
 
         // FocusBlocks aus ALLEN Kalendern laden (nil = kein Filter)
-        // damit Bloecke von anderen Geraeten sichtbar sind
+        // damit Bloecke von anderen Geräten sichtbar sind
         let predicate = eventStore.predicateForEvents(
             withStart: startOfDay,
             end: endOfDay,
@@ -421,7 +421,7 @@ enum EventKitError: Error, LocalizedError {
         case .saveFailed:
             return "Kalendereintrag konnte nicht gespeichert werden."
         case .eventReadOnly:
-            return "Termine mit Gaesten koennen nicht verschoben werden."
+            return "Termine mit Gästen können nicht verschoben werden."
         case .reminderNotFound:
             return "Erinnerung nicht gefunden."
         }

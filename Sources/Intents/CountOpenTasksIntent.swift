@@ -5,7 +5,7 @@ import SwiftData
 /// Works WITHOUT opening the app thanks to App Group shared container.
 struct CountOpenTasksIntent: AppIntent {
     static let title: LocalizedStringResource = "Offene Tasks zaehlen"
-    static let description = IntentDescription("Gibt die Anzahl offener Tasks zurueck.")
+    static let description = IntentDescription("Gibt die Anzahl offener Tasks zurück.")
     static let openAppWhenRun: Bool = false
 
     func perform() async throws -> some IntentResult & ReturnsValue<Int> & ProvidesDialog {
