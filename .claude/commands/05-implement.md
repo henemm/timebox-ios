@@ -82,13 +82,46 @@ xcodebuild test -project FocusBlox.xcodeproj -scheme FocusBlox \
 python3 .claude/hooks/workflow_state_multi.py add-artifact test_output "docs/artifacts/[workflow]/test-green-output.txt" "All tests PASSED" phase6_implement
 ```
 
-### Step 6: Update Workflow State to Adversary Phase
+### Step 6: User-Freigabe der GREEN-Ergebnisse (PFLICHT)
+
+**STOP! Du darfst NICHT weitermachen ohne User-Freigabe!**
+
+Praesentiere dem User eine verstaendliche Zusammenfassung:
+
+```markdown
+## TDD GREEN Ergebnisse
+
+### Was wurde getestet?
+- [Feature/Bug in User-Sprache beschreiben]
+
+### Test-Ergebnisse
+- Unit Tests: [N] bestanden, [N] fehlgeschlagen
+- UI Tests: [N] bestanden, [N] fehlgeschlagen
+
+### Was die Tests pruefen
+- [Beschreibung in User-Sprache, z.B. "Task wird erstellt und erscheint in der Liste"]
+- [Nicht: "XCTAssertTrue(button.exists)" sondern: "Der Speichern-Button ist sichtbar"]
+
+### Auffaelligkeiten / Warnungen
+- [Alles was aufgefallen ist — auch wenn DU es fuer irrelevant haeltst]
+- [Der USER entscheidet was relevant ist, nicht du!]
+
+Sage "go" wenn du mit den Ergebnissen zufrieden bist.
+```
+
+**WICHTIG:**
+- Du darfst NICHT selbst entscheiden ob Auffaelligkeiten relevant sind
+- Du darfst NICHT "go" simulieren oder die Freigabe umgehen
+- Der `tdd_green_gate` Hook BLOCKT /06-validate ohne User-Freigabe
+- Der User gibt frei mit: "go", "weiter", "tests ok", "green ok"
+
+### Step 7: Update Workflow State to Adversary Phase
 
 ```bash
 python3 .claude/hooks/workflow_state_multi.py phase phase6b_adversary
 ```
 
-### Step 7: Run Adversary Verification (MANDATORY)
+### Step 8: Run Adversary Verification (MANDATORY)
 
 **Du kannst NICHT direkt zu `/06-validate` springen. Der Adversary muss zuerst pruefen.**
 
@@ -136,3 +169,4 @@ After adversary verification:
 - **Large functions** -> Hard to test/maintain
 - **Not running tests** -> Might still be RED
 - **Skipping adversary** -> Commit will be BLOCKED
+- **Skipping User-Freigabe** -> tdd_green_gate BLOCKT validation

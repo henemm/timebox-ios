@@ -521,6 +521,9 @@ def create_workflow(name: str) -> dict:
         "ui_test_red_result": None,  # Description of failing UI test
         "ui_test_green_done": False,
         "ui_test_green_result": None,  # Description of passing UI tests
+        # TDD GREEN user approval (v2.7) - User must approve GREEN results
+        "tdd_green_approved": False,
+        "tdd_green_approved_at": None,
         # Analysis findings
         "analysis_findings": None,
         # Phases completed history
@@ -851,6 +854,7 @@ def get_workflow_status(name: str = None) -> str:
         f"Backlog Status: {backlog_name}",
         f"Spec: {workflow.get('spec_file') or 'Not created'}",
         f"Approved: {'Yes' if workflow.get('spec_approved') else 'No'}",
+        f"GREEN Approved: {'Yes' if workflow.get('tdd_green_approved') else 'No'}",
         f"Test Artifacts: {len(workflow.get('test_artifacts', []))}",
     ]
 
@@ -1494,6 +1498,8 @@ if __name__ == "__main__":
             "regression_check_result",      # Managed by mark-regression-done
             "validation_phase_done",        # Managed by mark-validation-done
             "validation_phase_result",      # Managed by mark-validation-done
+            "tdd_green_approved",           # Managed by tdd_green_listener.py (user says "go")
+            "tdd_green_approved_at",        # Managed by tdd_green_listener.py
         }
         if field_name in BLOCKED_SET_FIELDS:
             print(f"BLOCKED: '{field_name}' cannot be set via set-field.")

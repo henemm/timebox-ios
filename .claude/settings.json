@@ -172,6 +172,11 @@
             "type": "command",
             "command": "python3 .claude/hooks/no_workaround_guard.py",
             "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/tdd_green_gate.py",
+            "timeout": 5
           }
         ]
       },
@@ -224,6 +229,11 @@
           {
             "type": "command",
             "command": "python3 .claude/hooks/workflow_cleanup.py",
+            "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/tdd_green_listener.py",
             "timeout": 5
           },
           {
