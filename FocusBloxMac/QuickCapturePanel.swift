@@ -86,10 +86,11 @@ final class QuickCaptureController {
         .modelContainer(container)
 
         let hostingView = NSHostingView(rootView: contentView)
-        hostingView.frame = NSRect(x: 0, y: 0, width: 500, height: 120)
+        let fittingSize = hostingView.fittingSize
+        hostingView.frame = NSRect(x: 0, y: 0, width: 500, height: fittingSize.height)
 
         let panel = NSPanel(
-            contentRect: NSRect(x: 0, y: 0, width: 500, height: 120),
+            contentRect: NSRect(x: 0, y: 0, width: 500, height: fittingSize.height),
             styleMask: [.borderless, .nonactivatingPanel],
             backing: .buffered,
             defer: false
