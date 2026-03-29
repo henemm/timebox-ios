@@ -21,16 +21,14 @@ from pathlib import Path
 
 # Import session helpers
 try:
-    from workflow_state_multi import session_active_name, _tty_id
+    from workflow_state_multi import session_active_name
 except ImportError:
     sys.path.insert(0, str(Path(__file__).parent))
     try:
-        from workflow_state_multi import session_active_name, _tty_id
+        from workflow_state_multi import session_active_name
     except ImportError:
-        def session_active_name(state):
+        def session_active_name(state, **kw):
             return state.get("active_workflow")
-        def _tty_id():
-            return "unknown"
 
 STALE_DAYS = 7
 CLEANUP_INTERVAL_HOURS = 1
@@ -101,12 +99,11 @@ def main():
         if wf_name:
             session_active.add(wf_name)
 
-    # Clean stale session entries (TTY no longer exists)
+    # Clean session entries pointing to workflows that no longer exist
     sessions = state.get("session_workflows", {})
     stale_sessions = [
         sid for sid, entry in sessions.items()
-        if not Path(entry.get("tty", "")).exists()
-        and entry.get("tty", "") != "unknown"
+        if entry.get("workflow") not in workflows
     ]
     for sid in stale_sessions:
         del sessions[sid]
@@ -142,6 +139,19 @@ def main():
 
     if removed:
         state["workflows"] = kept
+
+        # Fix dangling active_workflow pointer: if the active workflow was removed,
+        # reassign to another remaining workflow (or clear it).
+        if state.get("active_workflow") not in kept:
+            remaining = [n for n in kept if kept[n].get("current_phase", "") != "phase0_idle"]
+            state["active_workflow"] = remaining[0] if remaining else ""
+
+        # Clean session entries that now point to removed workflows
+        sessions = state.get("session_workflows", {})
+        stale_sids = [sid for sid, e in sessions.items() if e.get("workflow") not in kept]
+        for sid in stale_sids:
+            del sessions[sid]
+
         with open(state_file, "w") as f:
             json.dump(state, f, indent=2)
         print(f"Workflow cleanup: {len(removed)} stale entries entfernt: {', '.join(removed[:5])}")
