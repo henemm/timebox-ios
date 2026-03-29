@@ -149,14 +149,14 @@ def _get_conflicting_tdd_workflows(requesting_workflow: str) -> list[dict]:
     state = load_state()
     conflicts = []
 
-    # Build reverse map: workflow_name -> session_tty
+    # Build reverse map: workflow_name -> session_id
     session_map = {}
-    for _sid, entry in state.get("session_workflows", {}).items():
+    for sid, entry in state.get("session_workflows", {}).items():
         wf_name = entry.get("workflow")
         if wf_name:
-            session_map[wf_name] = entry.get("tty", "unknown")
+            session_map[wf_name] = sid
 
-    my_tty = _tty_path()
+    my_sid = _session_id()
 
     for name, wf in state.get("workflows", {}).items():
         if name == requesting_workflow:
@@ -167,8 +167,8 @@ def _get_conflicting_tdd_workflows(requesting_workflow: str) -> list[dict]:
             continue
 
         # Session-aware: skip workflows owned by OTHER sessions
-        other_tty = session_map.get(name)
-        if other_tty and other_tty != my_tty:
+        other_sid = session_map.get(name)
+        if other_sid and my_sid and other_sid != my_sid:
             continue  # Different session — not our conflict
 
         # Check staleness
@@ -247,66 +247,121 @@ PHASE_SHORT = {
 }
 
 
-def _tty_path() -> str:
-    """Return the TTY device path for the current session."""
-    try:
-        return os.ttyname(sys.stdout.fileno())
-    except Exception:
+def _tty_key() -> Optional[str]:
+    """Return a short hash unique to the current terminal session.
+
+    Tries stdin/stdout/stderr file descriptors to find the TTY name,
+    then hashes it for a safe filename component.
+    Returns None if no TTY is attached (e.g. background process).
+    """
+    for fd in (0, 1, 2):
         try:
-            return os.ttyname(sys.stdin.fileno())
-        except Exception:
-            return os.environ.get("SSH_TTY", "unknown")
+            tty = os.ttyname(fd)
+            return hashlib.md5(tty.encode()).hexdigest()[:8]
+        except (OSError, AttributeError):
+            continue
+    return None
 
 
-def _tty_id() -> str:
-    """Eindeutige ID fuer das aktuelle TTY (per-Session)."""
-    return hashlib.md5(_tty_path().encode()).hexdigest()[:8]
+def _session_id_file() -> Path:
+    """Return the per-TTY session ID file path.
+
+    Each terminal gets its own file so parallel sessions don't
+    overwrite each other's session IDs.
+    Falls back to a global file if no TTY is detected.
+    """
+    tty = _tty_key()
+    if tty:
+        return Path(f"/tmp/claude_session_{tty}")
+    return Path("/tmp/claude_last_session_id")
 
 
-def session_active_name(state: dict = None) -> Optional[str]:
+def _session_id() -> Optional[str]:
+    """Return the Claude Code session_id if available.
+
+    Sources (in order):
+    1. CLAUDE_SESSION_ID env var (if set)
+    2. Per-TTY session ID file (written by UserPromptSubmit hook)
+    3. None (caller should fall back to global active_workflow)
+    """
+    sid = os.environ.get("CLAUDE_SESSION_ID")
+    if sid:
+        return sid
+    try:
+        sid = _session_id_file().read_text().strip()
+        if sid:
+            return sid
+    except (OSError, FileNotFoundError):
+        pass
+    return None
+
+
+def publish_session_id(session_id: str) -> None:
+    """Write session_id to per-TTY temp file for Bash commands to read.
+
+    Called by UserPromptSubmit hooks that have session_id from stdin JSON.
+    Each TTY gets its own file so parallel sessions don't collide.
+    """
+    try:
+        _session_id_file().write_text(session_id)
+    except OSError:
+        pass
+
+
+def session_active_name(state: dict = None, session_id: str = None) -> Optional[str]:
     """Return the active workflow name for the current session.
 
     Lookup order:
-    1. session_workflows[_tty_id()] → session-specific
-    2. active_workflow → global fallback (backward compat)
+    1. session_workflows[session_id] → session-specific (if session_id provided)
+    2. session_workflows[CLAUDE_SESSION_ID env] → session-specific (if env set)
+    3. active_workflow → global fallback
 
     Pure lookup — no side effects, no file I/O if state is provided.
     """
     if state is None:
         state = load_state()
-    tty = _tty_id()
-    entry = state.get("session_workflows", {}).get(tty)
-    if entry:
-        name = entry.get("workflow")
-        if name and name in state.get("workflows", {}):
-            return name
+
+    sid = session_id or _session_id()
+    if sid:
+        entry = state.get("session_workflows", {}).get(sid)
+        if entry:
+            name = entry.get("workflow")
+            if name and name in state.get("workflows", {}):
+                return name
+
     return state.get("active_workflow")
 
 
-def _set_session_entry(state: dict, name: Optional[str]) -> None:
+def _set_session_entry(state: dict, name: Optional[str], session_id: str = None) -> None:
     """Write or clear the session→workflow mapping.
 
     Must be called inside _state_lock(). Modifies state in-place.
+    Uses session_id (Claude Code UUID) as key.
     """
     if "session_workflows" not in state:
         state["session_workflows"] = {}
-    tty = _tty_id()
+
+    sid = session_id or _session_id()
+    if not sid:
+        # No session_id available (e.g. CLI call without env var).
+        # Store under global key; the SessionStart hook will fix it.
+        return
+
     if name is None:
-        state["session_workflows"].pop(tty, None)
+        state["session_workflows"].pop(sid, None)
     else:
-        state["session_workflows"][tty] = {
+        state["session_workflows"][sid] = {
             "workflow": name,
-            "tty": _tty_path(),
         }
 
 
 def _cleanup_stale_sessions(state: dict) -> None:
-    """Remove session entries whose TTY no longer exists. In-place."""
+    """Remove session entries for workflows that no longer exist. In-place."""
     sessions = state.get("session_workflows", {})
+    workflows = state.get("workflows", {})
     stale = [
         sid for sid, entry in sessions.items()
-        if not Path(entry.get("tty", "")).exists()
-        and entry.get("tty", "") != "unknown"
+        if entry.get("workflow") not in workflows
     ]
     for sid in stale:
         del sessions[sid]
@@ -332,7 +387,8 @@ def _update_iterm_title(workflow_name: str = None, phase: str = None):
 
     # Per-TTY temp file fuer PostToolUse-Hook refresh
     try:
-        Path(f"/tmp/claude_tab_title_{_tty_id()}").write_text(title)
+        sid = _session_id() or "global"
+        Path(f"/tmp/claude_tab_title_{sid}").write_text(title)
     except Exception:
         pass
 
@@ -512,15 +568,27 @@ def get_active_workflow() -> Optional[dict]:
 
 
 def set_active_workflow(name: str) -> bool:
-    """Switch to a different workflow (session-aware)."""
+    """Switch to a different workflow (session-aware).
+
+    Session-aware: If a session ID exists, only updates the session→workflow
+    mapping. The global active_workflow is only updated when no session ID
+    is available (single-session / non-TTY fallback).
+    This prevents parallel sessions from overwriting each other's global pointer.
+    """
     with _state_lock():
         state = load_state()
 
         if name not in state["workflows"]:
             return False
 
-        state["active_workflow"] = name
-        _set_session_entry(state, name)
+        sid = _session_id()
+        if sid:
+            # Session-specific: only update session mapping, not global
+            _set_session_entry(state, name)
+        else:
+            # No session ID: update global fallback
+            state["active_workflow"] = name
+
         _save_state_unlocked(state)
 
     phase = state["workflows"][name].get("current_phase", "phase0_idle")
