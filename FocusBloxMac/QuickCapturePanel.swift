@@ -148,7 +148,7 @@ struct QuickCaptureView: View {
     var body: some View {
         VStack(spacing: 8) {
             HStack(spacing: 12) {
-                Image(nsImage: MenuBarController.makeMenuBarIcon(from: NSApp.applicationIconImage!, size: NSSize(width: 24, height: 24)))
+                Image(nsImage: NSApp.applicationIconImage ?? NSImage())
                     .resizable()
                     .frame(width: 24, height: 24)
 
@@ -325,8 +325,7 @@ struct QuickCaptureView: View {
                 importance: capturedImportance,
                 estimatedDuration: capturedDuration,
                 urgency: capturedUrgency,
-                taskType: capturedTaskType,
-                lifecycleStatus: TaskLifecycleStatus.raw.rawValue
+                taskType: capturedTaskType
             )
             if shouldMarkNextUp, let task {
                 task.isNextUp = true

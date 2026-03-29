@@ -47,6 +47,7 @@ MAX_AGE_MINUTES = 15
 MIN_SIZE_BYTES = 10_000
 VALID_EXTENSIONS = {'.png', '.jpg', '.jpeg', '.tiff'}
 MIN_OVERRIDE_REASON_LENGTH = 10
+MAX_OVERRIDES_PER_SESSION = 2  # After this, user must type "override" to unlock
 
 
 def get_state_file() -> Path:
@@ -159,13 +160,50 @@ def main():
             print("ERROR: No active workflow found.")
             sys.exit(1)
 
+        # Override abuse detection: count overrides per workflow
+        workflow = state["workflows"][active]
+        override_count = workflow.get("inspection_override_count", 0)
+
+        if override_count >= MAX_OVERRIDES_PER_SESSION:
+            # Check for fresh user override token
+            token_file = Path(__file__).parent.parent / "user_override_token.json"
+            token_valid = False
+            if token_file.exists():
+                try:
+                    token_data = json.loads(token_file.read_text())
+                    created = datetime.fromisoformat(token_data.get("created", ""))
+                    age_min = (datetime.now() - created).total_seconds() / 60
+                    if age_min < 5:  # Token must be < 5 min old
+                        token_valid = True
+                        token_file.unlink()  # Single-use: delete after consumption
+                except (json.JSONDecodeError, ValueError, OSError):
+                    pass
+
+            if not token_valid:
+                print(f"BLOCKED: Override-Limit erreicht ({override_count}/{MAX_OVERRIDES_PER_SESSION}).")
+                print()
+                print("Du hast zu viele Inspection-Overrides benutzt.")
+                print("Das ist ein Signal fuer Abkuerzungen statt echter Arbeit.")
+                print()
+                print("LOESUNG: Henning muss 'override' im Chat tippen um freizugeben.")
+                print("         Oder: Mach einen echten Screenshot statt Override.")
+                sys.exit(1)
+
+        # Increment override counter
+        workflow["inspection_override_count"] = override_count + 1
+
         field_label = set_inspection_fields(gate_type, state, active,
                                             override_reason=override_reason.strip())
 
+        remaining = MAX_OVERRIDES_PER_SESSION - (override_count + 1)
         print(f"{field_label} OVERRIDE — Begruendung akzeptiert.")
         print(f"Workflow: {active}")
         print(f"Reason: {override_reason.strip()}")
         print(f"Fields updated. Gate is now open.")
+        if remaining <= 0:
+            print(f"WARNUNG: Override-Limit erreicht. Naechster Override braucht User-Freigabe.")
+        else:
+            print(f"Verbleibende Overrides: {remaining}/{MAX_OVERRIDES_PER_SESSION}")
         sys.exit(0)
 
     # Normal mode: inspection_gate.py <before|after> <screenshot-path>

@@ -237,7 +237,7 @@ struct MenuBarView: View {
 
     private var header: some View {
         HStack {
-            Image(nsImage: MenuBarController.makeMenuBarIcon(from: NSApp.applicationIconImage!, size: NSSize(width: 20, height: 20)))
+            Image(nsImage: NSApp.applicationIconImage ?? NSImage())
                 .resizable()
                 .frame(width: 20, height: 20)
             Text("FocusBlox")

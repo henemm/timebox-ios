@@ -35,40 +35,47 @@ final class MenuBarController: NSObject {
 
     private var idleImage: NSImage?
 
-    /// Extracts the center of the app icon (the concentric circles),
-    /// crops away the rounded-rect background, and renders as grayscale.
-    static func makeMenuBarIcon(from source: NSImage, size: NSSize) -> NSImage {
-        // Step 1: Crop inner 60% to remove rounded-rect background
-        let sourceSize = source.size
-        let inset = sourceSize.width * 0.2
-        let cropRect = NSRect(
-            x: inset, y: inset,
-            width: sourceSize.width - inset * 2,
-            height: sourceSize.height - inset * 2
-        )
+    /// Draws concentric rings with dark gaps as a template image.
+    /// Matches the app icon style: distinct rings separated by visible gaps.
+    /// Template images adapt automatically to Dark/Light Mode.
+    static func makeMenuBarIcon(size: NSSize) -> NSImage {
+        let image = NSImage(size: size, flipped: false) { rect in
+            let center = NSPoint(x: rect.midX, y: rect.midY)
+            let maxRadius = min(rect.width, rect.height) / 2
+            let ringWidth = maxRadius * 0.18
 
-        // Step 2: Draw cropped + circular mask at target size
-        let result = NSImage(size: size, flipped: false) { rect in
-            // Circular clip to remove any remaining background corners
-            NSBezierPath(ovalIn: rect).addClip()
-            source.draw(in: rect, from: cropRect, operation: .sourceOver, fraction: 1.0)
+            // Outer ring (stroked, not filled)
+            NSColor.black.withAlphaComponent(0.55).setStroke()
+            let outerPath = NSBezierPath()
+            outerPath.appendOval(in: rect.insetBy(dx: ringWidth / 2, dy: ringWidth / 2))
+            outerPath.lineWidth = ringWidth
+            outerPath.stroke()
+
+            // Middle ring
+            NSColor.black.withAlphaComponent(0.75).setStroke()
+            let midRadius = maxRadius * 0.58
+            let midRect = NSRect(
+                x: center.x - midRadius, y: center.y - midRadius,
+                width: midRadius * 2, height: midRadius * 2
+            )
+            let midPath = NSBezierPath()
+            midPath.appendOval(in: midRect.insetBy(dx: ringWidth / 2, dy: ringWidth / 2))
+            midPath.lineWidth = ringWidth
+            midPath.stroke()
+
+            // Inner core (filled circle)
+            NSColor.black.setFill()
+            let coreRadius = maxRadius * 0.22
+            let coreRect = NSRect(
+                x: center.x - coreRadius, y: center.y - coreRadius,
+                width: coreRadius * 2, height: coreRadius * 2
+            )
+            NSBezierPath(ovalIn: coreRect).fill()
+
             return true
         }
-
-        // Step 3: Convert to grayscale
-        guard let tiff = result.tiffRepresentation,
-              let ciImage = CIImage(data: tiff),
-              let filter = CIFilter(name: "CIColorMonochrome") else {
-            return result
-        }
-        filter.setValue(ciImage, forKey: kCIInputImageKey)
-        filter.setValue(CIColor(color: .gray)!, forKey: "inputColor")
-        filter.setValue(1.0, forKey: "inputIntensity")
-        guard let output = filter.outputImage else { return result }
-        let rep = NSCIImageRep(ciImage: output)
-        let grayscale = NSImage(size: size)
-        grayscale.addRepresentation(rep)
-        return grayscale
+        image.isTemplate = true
+        return image
     }
     private static let allDoneImage = NSImage(
         systemSymbolName: "checkmark.circle.fill",
@@ -79,10 +86,8 @@ final class MenuBarController: NSObject {
         self.eventKitRepo = eventKitRepository
         self.container = container
 
-        // Use app icon in grayscale for menu bar
-        if let appIcon = NSApp.applicationIconImage {
-            idleImage = Self.makeMenuBarIcon(from: appIcon, size: NSSize(width: 18, height: 18))
-        }
+        // Programmatic concentric circles as template image
+        idleImage = Self.makeMenuBarIcon(size: NSSize(width: 18, height: 18))
 
         // Pre-set visible position on first launch so menu bar managers
         // (e.g. Hidden Bar) don't hide the icon in an unreachable tier.
@@ -297,6 +302,16 @@ struct FocusBloxMacApp: App {
                         let mainContext = container.mainContext
                         let titleEngine = TaskTitleEngine(modelContext: mainContext)
                         Task { await titleEngine.improveAllPendingTitles() }
+                        // RW 1.5: Migrate any leftover "raw" tasks to "active" (Refiner removed)
+                        let rawPredicate = #Predicate<LocalTask> { $0.lifecycleStatus == "raw" }
+                        if let rawTasks = try? mainContext.fetch(
+                            FetchDescriptor<LocalTask>(predicate: rawPredicate)
+                        ), !rawTasks.isEmpty {
+                            for task in rawTasks {
+                                task.confirmSuggestions()
+                            }
+                            try? mainContext.save()
+                        }
                         let enrichment = SmartTaskEnrichmentService(modelContext: mainContext)
                         Task { await enrichment.enrichAllTbdTasks() }
                         // Spotlight: reindex all active tasks so they appear in system search
