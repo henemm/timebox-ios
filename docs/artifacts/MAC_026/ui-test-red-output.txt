@@ -1,0 +1,23 @@
+MAC_026: UI Test RED Evidence
+=============================
+
+macOS UI Tests sind durch BUG_111 blockiert (TCC-Dialog blockiert Test-Ausfuehrung via SSH).
+Siehe: docs/ACTIVE-todos.md, BUG_111
+
+RED-Evidenz (Code-basiert):
+- FocusBloxMac/QuickCapturePanel.swift Zeile 128-199: QuickCaptureView hat NUR:
+  - @State private var taskTitle = ""
+  - @State private var isNextUp = false
+  - KEINE importance, urgency, taskType, estimatedDuration States
+  - KEINE Metadaten-Buttons in der UI
+  - addTask() ruft createTask(title:taskType:lifecycleStatus:) OHNE Metadaten auf
+
+- iOS QuickCaptureView (Sources/Views/QuickCaptureView.swift) hat im Vergleich:
+  - @State private var importance: Int? = nil
+  - @State private var urgency: String? = nil
+  - @State private var taskType: String = "maintenance"
+  - @State private var estimatedDuration: Int? = nil
+  - Volle Metadaten-Row mit 5 Buttons
+  - createTask() mit allen Metadaten
+
+Fazit: macOS Quick Capture Panel hat KEINE Metadaten-Eingabe. Feature existiert nicht.
