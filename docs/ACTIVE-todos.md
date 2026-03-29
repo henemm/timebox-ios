@@ -66,7 +66,7 @@
 | ~~MAC_027~~ | ~~Focus Sprint Workflow Paritaet~~ | ~~Medium~~ | ~~S~~ | ~~Sidebar-Switch + Follow-up + Nudge Dialog~~ ERLEDIGT |
 | ~~MAC_028~~ | ~~Backlog Paritaet (Parkdeck + Stacking)~~ | ~~Medium~~ | ~~S~~ | ~~Parkdeck-Metapher + Recurring Stacking. [Spec](specs/macos/MAC_028-backlog-parity.md)~~ ERLEDIGT |
 | ~~MAC_026~~ | ~~Enhanced Quick Capture (Metadaten)~~ | ~~Medium~~ | ~~M~~ | ~~macOS Quick Capture hat nur Titel, iOS hat volle Metadaten. Teilbereich A (Metadaten-Buttons) implementiert. [Spec](specs/macos/MAC_026-quick-capture-metadata-impl.md)~~ ERLEDIGT |
-| MAC_029 | Menüzeilen-Icon optimieren | Low | S | Aktuelles Icon (Grayscale-Filter auf App-Icon) sieht matschig aus. Stattdessen konzentrische Kreise programmatisch als Template-Image zeichnen mit Alpha-Abstufungen wie iOS-Monochrome-Rendering. Datei: `FocusBloxMacApp.swift` (`makeMenuBarIcon`). |
+| ~~MAC_029~~ | ~~Menüzeilen-Icon optimieren~~ | ~~Low~~ | ~~S~~ | ~~Konzentrische Kreise programmatisch als Template-Image. [Spec](specs/macos/MAC_029-menubar-icon.md)~~ ERLEDIGT |
 | MAC_RW_2.1_TL | DayView Daytime Timeline auf macOS | Medium | M | Platzhalter "Timeline kommt bald" ersetzen. Entweder shared `TimelineView` macOS-kompatibel machen oder macOS-Aequivalent bauen. |
 
 ### Erledigte macOS-Items
