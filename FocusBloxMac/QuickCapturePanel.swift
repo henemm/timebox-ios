@@ -10,6 +10,15 @@ import SwiftData
 import Carbon.HIToolbox
 import Observation
 
+// MARK: - Content Height PreferenceKey
+
+private struct ContentHeightKey: PreferenceKey {
+    static var defaultValue: CGFloat = 0
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = max(value, nextValue())
+    }
+}
+
 /// Global Quick Capture floating panel (Spotlight-style)
 @Observable
 @MainActor
@@ -31,43 +40,27 @@ final class QuickCaptureController {
     // MARK: - Global Hotkey (⌘⇧Space)
 
     private func setupGlobalHotkey() {
-        // Monitor for ⌘⇧Space globally
         eventMonitor = NSEvent.addGlobalMonitorForEvents(matching: .keyDown) { [weak self] event in
-            // Check for ⌘⇧Space
-            if event.modifierFlags.contains([.command, .shift]) && event.keyCode == 49 { // 49 = Space
-                Task { @MainActor in
-                    self?.togglePanel()
-                }
+            if event.modifierFlags.contains([.command, .shift]) && event.keyCode == 49 {
+                Task { @MainActor in self?.togglePanel() }
             }
         }
-
-        // Also monitor local events (when app is active)
         NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
             if event.modifierFlags.contains([.command, .shift]) && event.keyCode == 49 {
-                Task { @MainActor in
-                    self?.togglePanel()
-                }
-                return nil // Consume the event
+                Task { @MainActor in self?.togglePanel() }
+                return nil
             }
             return event
         }
     }
 
     func togglePanel() {
-        if isVisible {
-            hidePanel()
-        } else {
-            showPanel()
-        }
+        if isVisible { hidePanel() } else { showPanel() }
     }
 
     func showPanel() {
         guard let container = modelContainer else { return }
-
-        if panel == nil {
-            createPanel(with: container)
-        }
-
+        if panel == nil { createPanel(with: container) }
         panel?.center()
         panel?.makeKeyAndOrderFront(nil)
         NSApplication.shared.activate(ignoringOtherApps: true)
@@ -79,10 +72,24 @@ final class QuickCaptureController {
         isVisible = false
     }
 
+    /// Animates the panel to a new height, keeping top edge stable.
+    func resizePanel(to newHeight: CGFloat) {
+        guard let panel, newHeight > 0 else { return }
+        let oldFrame = panel.frame
+        let newY = oldFrame.maxY - newHeight
+        let newFrame = NSRect(x: oldFrame.origin.x, y: newY, width: oldFrame.width, height: newHeight)
+        NSAnimationContext.runAnimationGroup { context in
+            context.duration = 0.2
+            context.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
+            panel.animator().setFrame(newFrame, display: true)
+        }
+    }
+
     private func createPanel(with container: ModelContainer) {
-        let contentView = QuickCaptureView(onDismiss: { [weak self] in
-            self?.hidePanel()
-        })
+        let contentView = QuickCaptureView(
+            onDismiss: { [weak self] in self?.hidePanel() },
+            onHeightChange: { [weak self] height in self?.resizePanel(to: height) }
+        )
         .modelContainer(container)
 
         let hostingView = NSHostingView(rootView: contentView)
@@ -104,12 +111,10 @@ final class QuickCaptureController {
         panel.hasShadow = true
         panel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
 
-        // Position at top center of screen
         if let screen = NSScreen.main {
             let screenFrame = screen.visibleFrame
-            let panelFrame = panel.frame
-            let x = screenFrame.midX - panelFrame.width / 2
-            let y = screenFrame.maxY - panelFrame.height - 100
+            let x = screenFrame.midX - panel.frame.width / 2
+            let y = screenFrame.maxY - panel.frame.height - 100
             panel.setFrameOrigin(NSPoint(x: x, y: y))
         }
 
@@ -138,6 +143,7 @@ struct QuickCaptureView: View {
     @State private var showDurationPicker = false
     @FocusState private var isFocused: Bool
     let onDismiss: () -> Void
+    var onHeightChange: ((CGFloat) -> Void)? = nil
 
     var body: some View {
         VStack(spacing: 8) {
@@ -184,6 +190,14 @@ struct QuickCaptureView: View {
                 .shadow(color: .black.opacity(0.2), radius: 20, y: 10)
         }
         .animation(.spring(duration: 0.25), value: taskTitle.isEmpty)
+        .background(
+            GeometryReader { geo in
+                Color.clear.preference(key: ContentHeightKey.self, value: geo.size.height)
+            }
+        )
+        .onPreferenceChange(ContentHeightKey.self) { height in
+            onHeightChange?(height)
+        }
         .onAppear { isFocused = true }
     }
 
@@ -340,7 +354,7 @@ struct QuickCaptureView: View {
 }
 
 #Preview {
-    QuickCaptureView(onDismiss: {})
+    QuickCaptureView(onDismiss: {}, onHeightChange: { _ in })
         .frame(width: 500)
         .padding()
 }
