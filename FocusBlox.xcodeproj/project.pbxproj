@@ -163,6 +163,7 @@
 		B9D12D9BF22325ADDE757862 /* CalendarEventTransfer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D1F03B35977548B59D7269F /* CalendarEventTransfer.swift */; };
 		BB98D59A1AE55221C769098C /* UnifiedCalendarViewUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA3FAC0479FF87E70224A37A /* UnifiedCalendarViewUITests.swift */; };
 		BC2B829A833F87522CFFB6BC /* MockEventKitRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 993E45CA1F0174CC0345C92C /* MockEventKitRepository.swift */; };
+		6810564754B61EBF42248CF2 /* MockEventKitRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 993E45CA1F0174CC0345C92C /* MockEventKitRepository.swift */; };
 		BDEDB5DE393186FC2D0BFF58 /* DurationEditingUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF402517A33C6BA497EFE1AC /* DurationEditingUITests.swift */; };
 		BF7EA53A03F4E19B23B48ADD /* WidgetRelevanceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 781B8F9B8D98DCC35B898300 /* WidgetRelevanceTests.swift */; };
 		BFEDE0F6D0C383A49101B8D2 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F364C9B1BB1D787792360427 /* SettingsView.swift */; };
@@ -411,6 +412,7 @@
 		'SMTNOTENG01BLD001' = {isa = PBXBuildFile; fileRef = SMTNOTENG01FREF01; };
 		'SMTNOTENG01BLD002' = {isa = PBXBuildFile; fileRef = SMTNOTENG01FREF01; };
 		'SMTSK01BUILD00001' = {isa = PBXBuildFile; fileRef = SMTSK01FILE000001; };
+		'BUG124BUILD000001' = {isa = PBXBuildFile; fileRef = BUG124FILE0000001; };
 		'SNDSVC01BUILDFILE0001' = {isa = PBXBuildFile; fileRef = SNDSVC01FILEREF00001; };
 		'SNDSVC02BUILDFILE0001' = {isa = PBXBuildFile; fileRef = SNDSVC02FILEREF00001; };
 		'SNDUI001BUILDFILE0001' = {isa = PBXBuildFile; fileRef = SNDUI001FILEREF00001; };
@@ -992,6 +994,7 @@
 		'SMTNOTD2FILE00001' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartNotificationPhaseDUITests.swift; sourceTree = "<group>"; };
 		'SMTNOTENG01FREF01' = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SmartNotificationEngine.swift; sourceTree = "<group>"; };
 		'SMTSK01FILE000001' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartTaskInterpretationUITests.swift; sourceTree = "<group>"; };
+		BUG124FILE0000001 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateKeywordStrippingUITests.swift; sourceTree = "<group>"; };
 		'SNDSVC01FILEREF00001' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundServiceTests.swift; sourceTree = "<group>"; };
 		'SNDSVC02FILEREF00001' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundService.swift; sourceTree = "<group>"; };
 		'SNDUI001FILEREF00001' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundSettingsUITests.swift; sourceTree = "<group>"; };
@@ -1207,6 +1210,7 @@
 				FBREORD01FILE00001,
 				CBPASTE01FILE00001,
 				SMTSK01FILE000001,
+				BUG124FILE0000001,
 				REFNRUI01FILE00001,
 				QCAP001FILEREF000001,
 				QCNEXTUP01FILE000001,
@@ -2451,6 +2455,7 @@
 				FBREORD01BUILD0001,
 				CBPASTE01BUILD0001,
 				SMTSK01BUILD00001,
+				BUG124BUILD000001,
 				REFNRUI01BUILD001,
 				QCAP001BUILDFILE00001,
 				QCNEXTUP01BUILD00001,
@@ -2727,6 +2732,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6810564754B61EBF42248CF2 /* MockEventKitRepository.swift in Sources */,
 				LIMGRD01MACBLD001,
 				B7DFC0952F2E9646009C2881 /* LocalTask.swift in Sources */,
 				TLI01MACBLD00001,

@@ -513,7 +513,7 @@ struct TaskFormSheet: View {
             let monthDayValue: Int? = recurrencePattern.requiresCustomConfig ? customBasePatternCode : (recurrencePattern.requiresMonthDay ? monthDay : nil)
             let intervalValue: Int? = recurrencePattern.requiresCustomConfig ? customInterval : nil
 
-            // Capture values before dismiss invalidates the view
+            // Capture values, dismiss synchronously (iOS 26 requirement), create in background
             let trimmedTitle = title.trimmingCharacters(in: .whitespaces)
             let capturedTags = tags
             let capturedPriority = priority
@@ -525,14 +525,13 @@ struct TaskFormSheet: View {
             let capturedContext = modelContext
 
             // Dismiss synchronously FIRST — async dismiss inside Task{} breaks on iOS 26
-            onCreateComplete?()
             dismiss()
 
-            // Create task in background after sheet is dismissed
+            // Create task in background, then trigger BacklogView refresh
             Task {
                 do {
                     let taskSource = LocalTaskSource(modelContext: capturedContext)
-                    let newTask = try await taskSource.createTask(
+                    _ = try await taskSource.createTask(
                         title: trimmedTitle,
                         tags: capturedTags,
                         dueDate: finalDueDate,
@@ -548,22 +547,25 @@ struct TaskFormSheet: View {
                         blockerTaskID: capturedBlockerTaskID
                     )
 
-                    // Reconcile notifications (replaces direct schedule calls)
+                    // Reconcile notifications
                     await SmartNotificationEngine.reconcile(
                         reason: .taskChanged,
-                        context: modelContext,
+                        context: capturedContext,
                         eventKitRepo: eventKitRepo
                     )
 
                     // ITB-G1: Donate intent so Siri learns task creation patterns
                     #if !os(macOS)
                     let donationIntent = CreateTaskIntent()
-                    donationIntent.taskTitle = newTask.title
+                    donationIntent.taskTitle = trimmedTitle
                     try? await IntentDonationManager.shared.donate(intent: donationIntent)
                     #endif
                 } catch {
                     print("[TaskFormSheet] Create task failed: \(error)")
                 }
+
+                // Trigger BacklogView refresh AFTER task creation
+                onCreateComplete?()
             }
 
         case .edit(let editTask):

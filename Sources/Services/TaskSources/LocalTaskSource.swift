@@ -6,6 +6,8 @@ import SwiftData
 /// Supports CloudKit sync when enabled on the ModelContainer.
 @MainActor
 final class LocalTaskSource: @preconcurrency TaskSource, @preconcurrency TaskSourceWritable {
+    /// Posted after a task is created and saved locally. BacklogView listens to refresh its list.
+    nonisolated static let taskCreatedNotification = Notification.Name("LocalTaskSource.taskCreated")
     typealias TaskData = LocalTask
 
     // MARK: - Static Properties
@@ -139,6 +141,9 @@ final class LocalTaskSource: @preconcurrency TaskSource, @preconcurrency TaskSou
            let item = try? SpotlightIndexingService.shared.buildSearchableItem(for: task) {
             CSSearchableIndex.default().indexSearchableItems([item]) { _ in }
         }
+
+        // Notify observers (e.g. BacklogView) that a task was created
+        NotificationCenter.default.post(name: Self.taskCreatedNotification, object: nil)
 
         return task
     }

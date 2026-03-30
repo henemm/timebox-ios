@@ -362,6 +362,9 @@ struct BacklogView: View {
         .refreshable {
             await loadTasks()
         }
+        .onReceive(NotificationCenter.default.publisher(for: LocalTaskSource.taskCreatedNotification)) { _ in
+            Task { await loadTasks() }
+        }
     }
 
     private func undoLastCompletion() {
