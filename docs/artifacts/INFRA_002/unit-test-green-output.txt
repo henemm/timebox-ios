@@ -1,0 +1,65 @@
+test_allows_git_operations (__main__.TestBashGate.test_allows_git_operations)
+Git commands pass through (staging/committing is safe). ... ok
+test_allows_sim_sh (__main__.TestBashGate.test_allows_sim_sh)
+Allows sim.sh wrapper calls. ... ok
+test_bash_gate_exists (__main__.TestBashGate.test_bash_gate_exists)
+bash_gate.py must exist as the consolidated Bash guard. ... ok
+test_blocks_direct_xcodebuild (__main__.TestBashGate.test_blocks_direct_xcodebuild)
+Blocks direct xcodebuild calls (must use sim.sh). ... ok
+test_blocks_secrets_exposure (__main__.TestBashGate.test_blocks_secrets_exposure)
+Blocks cat .env and similar sensitive file reads. ... ok
+test_blocks_state_file_manipulation (__main__.TestBashGate.test_blocks_state_file_manipulation)
+Blocks direct writes to protected workflow files. ... ok
+test_allows_docs_files (__main__.TestEditGate.test_allows_docs_files)
+Docs files are always allowed without workflow. ... ok
+test_allows_test_files (__main__.TestEditGate.test_allows_test_files)
+Test files are always allowed (we want to write tests freely). ... ok
+test_blocks_code_without_workflow (__main__.TestEditGate.test_blocks_code_without_workflow)
+Code files are blocked when no active workflow exists. ... ok
+test_blocks_protected_state_files (__main__.TestEditGate.test_blocks_protected_state_files)
+Protected state files (.claude/workflow_state.json etc.) always blocked. ... ok
+test_edit_gate_exists (__main__.TestEditGate.test_edit_gate_exists)
+edit_gate.py must exist as the consolidated Edit/Write guard. ... ok
+test_migrate_script_exists (__main__.TestMigrateState.test_migrate_script_exists)
+migrate_state.py must exist for v2→v3 state migration. ... ok
+test_old_hooks_removed (__main__.TestOldHooksRemoved.test_old_hooks_removed)
+All 50 old hook files must be deleted after migration. ... FAIL
+test_phase_listener_exists (__main__.TestPhaseListener.test_phase_listener_exists)
+phase_listener.py must exist as the consolidated UserPromptSubmit hook. ... ok
+test_complete_moves_to_archive (__main__.TestWorkflowStateCLI.test_complete_moves_to_archive)
+'complete' moves workflow file to _archive/ directory. ... ok
+test_phase_transition_validates_prerequisites (__main__.TestWorkflowStateCLI.test_phase_transition_validates_prerequisites)
+Phase transition validates prerequisites before allowing advance. ... ok
+test_start_creates_active_symlink (__main__.TestWorkflowStateCLI.test_start_creates_active_symlink)
+'start' command creates .active symlink pointing to new workflow. ... ok
+test_start_creates_workflow_file (__main__.TestWorkflowStateCLI.test_start_creates_workflow_file)
+'start' command creates .claude/workflows/<name>.json ... ok
+test_status_reads_active_workflow (__main__.TestWorkflowStateCLI.test_status_reads_active_workflow)
+'status' outputs current phase of active workflow. ... ok
+test_switch_changes_active_symlink (__main__.TestWorkflowStateCLI.test_switch_changes_active_symlink)
+'switch' changes .active symlink to target workflow. ... ok
+test_workflow_file_format_minimal (__main__.TestWorkflowStateCLI.test_workflow_file_format_minimal)
+Workflow JSON has minimal fields (no session_workflows, no phases_completed). ... ok
+test_workflow_py_exists (__main__.TestWorkflowStateCLI.test_workflow_py_exists)
+workflow.py must exist as the new CLI entry point. ... ok
+
+======================================================================
+FAIL: test_old_hooks_removed (__main__.TestOldHooksRemoved.test_old_hooks_removed)
+All 50 old hook files must be deleted after migration.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/hem/Developer/my-daily-sprints/docs/artifacts/INFRA_002/test_workflow_v3.py", line 414, in test_old_hooks_removed
+    self.assertEqual(
+    ~~~~~~~~~~~~~~~~^
+        len(remaining), 0,
+        ^^^^^^^^^^^^^^^^^^
+        f"{len(remaining)} old hooks still exist: {remaining[:5]}..."
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+AssertionError: 50 != 0 : 50 old hooks still exist: ['adversary_gate.py', 'adversary_verdict_guard.py', 'artifact_existence_guard.py', 'build_lock_guard.py', 'build_lock_release.py']...
+
+----------------------------------------------------------------------
+Ran 22 tests in 0.537s
+
+FAILED (failures=1)

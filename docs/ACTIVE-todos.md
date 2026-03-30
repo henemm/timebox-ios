@@ -120,6 +120,75 @@
 
 ---
 
+## Workflow-Architektur Rework
+
+| ID | Titel | Prio | Aufwand | Beschreibung |
+|----|-------|------|---------|-------------|
+| ~~INFRA_002~~ | ~~Workflow v3: Von 51 Hooks auf Phasenwechsel-Architektur~~ | ~~High~~ | ~~XL~~ | ~~P1+P2 erledigt: 6 neue Hooks (1.291 LoC) erstellt. Cutover (settings.json + alte Hooks löschen + State-Migration) als separater Schritt. [Spec](specs/infra/INFRA_002-workflow-v3.md)~~ ERLEDIGT |
+
+### INFRA_002 — Migrationsplan
+
+**Problem:** 51 Python-Hooks, 227KB shared State, instabiles Session-Tracking. Jeder Edit durchlaeuft 17 Hooks (bis 85s Timeout), jeder Bash-Befehl 15 Hooks (bis 365s). Bugs durch Race Conditions, Zombie-Workflows, Phase-Korruption.
+
+**Ziel:** Gleiche Qualitaetssicherung, 90% weniger Komplexitaet.
+
+**Architektur-Prinzipien:**
+1. **Phasen bleiben** — der Workflow /01 bis /06 aendert sich nicht
+2. **Hooks = Gesetz, CLAUDE.md = Guidance** — aber weniger Gesetze, bessere Gesetze
+3. **QA ist unabhaengig** — separater Agent prueft, nicht derselbe Claude der implementiert
+4. **Optimistische Validierung** — frei arbeiten innerhalb einer Phase, pruefen beim Phasenwechsel
+5. **1 State-File pro Workflow** — kein shared mutable State
+
+**Phase 1: State-Isolation (Eliminiert Session-Tracking-Bugs)**
+- `workflow_state.json` → `.claude/workflows/<name>.json` (1 File pro Workflow)
+- Jedes File enthaelt nur SEINEN State (Phase, Artifacts, affected_files)
+- Aktiver Workflow wird per `.claude/workflows/.active` Symlink bestimmt
+- Git Worktrees fuer echte Parallelitaet (statt Session-ID-Hacks)
+- **Eliminiert:** session_env.py, TERM_SESSION_ID-Tracking, Race Conditions, Zombie-Workflows
+
+**Phase 2: Hook-Konsolidierung (51 → 5 Hooks)**
+
+| Hook | Event | Aufgabe |
+|------|-------|---------|
+| `phase_listener.py` | UserPromptSubmit | Approval, Override, Stop-Lock, Phase-Erkennung |
+| `edit_gate.py` | PreToolUse (Edit/Write) | 1. Gehoert Datei zum aktiven Workflow? 2. Ist Phase >= phase6_implement? |
+| `bash_gate.py` | PreToolUse (Bash) | 1. Build-Lock (parallele Builds). 2. Pre-Commit-Gate (alle Checks). 3. sim.sh Enforcement |
+| `post_bash.py` | PostToolUse (Bash) | Build-Lock Release |
+| `phase_transition.py` | PreToolUse (Bash) | Beim Phasenwechsel-Befehl: Validiert ALLE Voraussetzungen der naechsten Phase |
+
+**Was `phase_transition.py` beim Phasenwechsel prueft (statt bei jedem Edit):**
+
+| Uebergang | Validierung |
+|-----------|-------------|
+| → phase3_spec | Context-File existiert, Analyse-Findings vorhanden |
+| → phase4_approved | Spec-File existiert, User hat "approved" gesagt |
+| → phase5_tdd_red | Spec approved |
+| → phase6_implement | RED Test-Artifacts existieren mit FAIL-Ergebnis |
+| → phase7_validate | GREEN Test-Artifacts existieren mit PASS-Ergebnis |
+| → phase8_complete | QA-Agent Verdict "VERIFIED", Docs aktualisiert |
+
+**Phase 3: QA als separater Agent**
+- Nach phase6_implement → QA-Agent wird automatisch gestartet (nicht derselbe Claude)
+- QA-Agent hat NUR Lese-Rechte + Test-Ausfuehrung
+- QA-Agent gibt Verdict: "VERIFIED" oder "NEEDS WORK: [Liste]"
+- Nur bei "VERIFIED" ist Commit moeglich
+- Adversary-Agent und Implementation-Validator werden zum Standard-QA-Flow
+
+**Phase 4: Cleanup**
+- 46 Hook-Dateien loeschen
+- `workflow_state_multi.py` (1700 Zeilen) → `workflow.py` (~300 Zeilen)
+- settings.json: 50 Hook-Eintraege → 5
+- CLAUDE.md aktualisieren
+
+**Risiken:**
+- Waehrend Migration koennten bestehende Workflows inkonsistent werden → Freeze + Clean Cutover
+- QA-Agent muss genauso streng sein wie die bisherigen Hooks → gruendlich testen
+- Einige Hooks enthalten nuetzliche Logik die nicht verloren gehen darf (z.B. secrets_guard, scope_guard) → in phase_transition.py integrieren
+
+**Reihenfolge:** Phase 1 → 2 → 3 → 4 (jeweils mit eigener Spec + Validation)
+
+---
+
 ## Prioritaets-Legende
 
 | Prio | Bedeutung |

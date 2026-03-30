@@ -1,0 +1,255 @@
+test_allows_git_operations (__main__.TestBashGate.test_allows_git_operations)
+Git commands pass through (staging/committing is safe). ... FAIL
+test_allows_sim_sh (__main__.TestBashGate.test_allows_sim_sh)
+Allows sim.sh wrapper calls. ... FAIL
+test_bash_gate_exists (__main__.TestBashGate.test_bash_gate_exists)
+bash_gate.py must exist as the consolidated Bash guard. ... FAIL
+test_blocks_direct_xcodebuild (__main__.TestBashGate.test_blocks_direct_xcodebuild)
+Blocks direct xcodebuild calls (must use sim.sh). ... ok
+test_blocks_secrets_exposure (__main__.TestBashGate.test_blocks_secrets_exposure)
+Blocks cat .env and similar sensitive file reads. ... ok
+test_blocks_state_file_manipulation (__main__.TestBashGate.test_blocks_state_file_manipulation)
+Blocks direct writes to protected workflow files. ... ok
+test_allows_docs_files (__main__.TestEditGate.test_allows_docs_files)
+Docs files are always allowed without workflow. ... FAIL
+test_allows_test_files (__main__.TestEditGate.test_allows_test_files)
+Test files are always allowed (we want to write tests freely). ... FAIL
+test_blocks_code_without_workflow (__main__.TestEditGate.test_blocks_code_without_workflow)
+Code files are blocked when no active workflow exists. ... ok
+test_blocks_protected_state_files (__main__.TestEditGate.test_blocks_protected_state_files)
+Protected state files (.claude/workflow_state.json etc.) always blocked. ... ok
+test_edit_gate_exists (__main__.TestEditGate.test_edit_gate_exists)
+edit_gate.py must exist as the consolidated Edit/Write guard. ... FAIL
+test_migrate_script_exists (__main__.TestMigrateState.test_migrate_script_exists)
+migrate_state.py must exist for v2→v3 state migration. ... FAIL
+test_old_hooks_removed (__main__.TestOldHooksRemoved.test_old_hooks_removed)
+All 50 old hook files must be deleted after migration. ... FAIL
+test_phase_listener_exists (__main__.TestPhaseListener.test_phase_listener_exists)
+phase_listener.py must exist as the consolidated UserPromptSubmit hook. ... FAIL
+test_complete_moves_to_archive (__main__.TestWorkflowStateCLI.test_complete_moves_to_archive)
+'complete' moves workflow file to _archive/ directory. ... FAIL
+test_phase_transition_validates_prerequisites (__main__.TestWorkflowStateCLI.test_phase_transition_validates_prerequisites)
+Phase transition validates prerequisites before allowing advance. ... ok
+test_start_creates_active_symlink (__main__.TestWorkflowStateCLI.test_start_creates_active_symlink)
+'start' command creates .active symlink pointing to new workflow. ... FAIL
+test_start_creates_workflow_file (__main__.TestWorkflowStateCLI.test_start_creates_workflow_file)
+'start' command creates .claude/workflows/<name>.json ... FAIL
+test_status_reads_active_workflow (__main__.TestWorkflowStateCLI.test_status_reads_active_workflow)
+'status' outputs current phase of active workflow. ... FAIL
+test_switch_changes_active_symlink (__main__.TestWorkflowStateCLI.test_switch_changes_active_symlink)
+'switch' changes .active symlink to target workflow. ... ERROR
+test_workflow_file_format_minimal (__main__.TestWorkflowStateCLI.test_workflow_file_format_minimal)
+Workflow JSON has minimal fields (no session_workflows, no phases_completed). ... ok
+test_workflow_py_exists (__main__.TestWorkflowStateCLI.test_workflow_py_exists)
+workflow.py must exist as the new CLI entry point. ... FAIL
+
+======================================================================
+ERROR: test_switch_changes_active_symlink (__main__.TestWorkflowStateCLI.test_switch_changes_active_symlink)
+'switch' changes .active symlink to target workflow.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/hem/Developer/my-daily-sprints/docs/artifacts/INFRA_002/test_workflow_v3.py", line 108, in test_switch_changes_active_symlink
+    target = os.readlink(str(active_link))
+FileNotFoundError: [Errno 2] No such file or directory: '/var/folders/dk/p4qd3_xx6ls6_xybmqzfgs1h0000gn/T/tmpr7dwj06_/.claude/workflows/.active'
+
+======================================================================
+FAIL: test_allows_git_operations (__main__.TestBashGate.test_allows_git_operations)
+Git commands pass through (staging/committing is safe).
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/hem/Developer/my-daily-sprints/docs/artifacts/INFRA_002/test_workflow_v3.py", line 323, in test_allows_git_operations
+    self.assertEqual(result.returncode, 0, f"git should be allowed. stderr: {result.stderr}")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : git should be allowed. stderr: /opt/homebrew/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python: can't open file '/Users/hem/Developer/my-daily-sprints/.claude/hooks/bash_gate.py': [Errno 2] No such file or directory
+
+
+======================================================================
+FAIL: test_allows_sim_sh (__main__.TestBashGate.test_allows_sim_sh)
+Allows sim.sh wrapper calls.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/hem/Developer/my-daily-sprints/docs/artifacts/INFRA_002/test_workflow_v3.py", line 307, in test_allows_sim_sh
+    self.assertEqual(result.returncode, 0, f"sim.sh should be allowed. stderr: {result.stderr}")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : sim.sh should be allowed. stderr: /opt/homebrew/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python: can't open file '/Users/hem/Developer/my-daily-sprints/.claude/hooks/bash_gate.py': [Errno 2] No such file or directory
+
+
+======================================================================
+FAIL: test_bash_gate_exists (__main__.TestBashGate.test_bash_gate_exists)
+bash_gate.py must exist as the consolidated Bash guard.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/hem/Developer/my-daily-sprints/docs/artifacts/INFRA_002/test_workflow_v3.py", line 268, in test_bash_gate_exists
+    self.assertTrue(
+    ~~~~~~~~~~~~~~~^
+        self.bash_gate.exists(),
+        ^^^^^^^^^^^^^^^^^^^^^^^^
+        f"bash_gate.py does not exist at {self.bash_gate}"
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+AssertionError: False is not true : bash_gate.py does not exist at /Users/hem/Developer/my-daily-sprints/.claude/hooks/bash_gate.py
+
+======================================================================
+FAIL: test_allows_docs_files (__main__.TestEditGate.test_allows_docs_files)
+Docs files are always allowed without workflow.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/hem/Developer/my-daily-sprints/docs/artifacts/INFRA_002/test_workflow_v3.py", line 223, in test_allows_docs_files
+    self.assertEqual(result.returncode, 0, f"docs/ should be allowed. stderr: {result.stderr}")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : docs/ should be allowed. stderr: /opt/homebrew/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python: can't open file '/Users/hem/Developer/my-daily-sprints/.claude/hooks/edit_gate.py': [Errno 2] No such file or directory
+
+
+======================================================================
+FAIL: test_allows_test_files (__main__.TestEditGate.test_allows_test_files)
+Test files are always allowed (we want to write tests freely).
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/hem/Developer/my-daily-sprints/docs/artifacts/INFRA_002/test_workflow_v3.py", line 231, in test_allows_test_files
+    self.assertEqual(result.returncode, 0, f"Test files should be allowed. stderr: {result.stderr}")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : Test files should be allowed. stderr: /opt/homebrew/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python: can't open file '/Users/hem/Developer/my-daily-sprints/.claude/hooks/edit_gate.py': [Errno 2] No such file or directory
+
+
+======================================================================
+FAIL: test_edit_gate_exists (__main__.TestEditGate.test_edit_gate_exists)
+edit_gate.py must exist as the consolidated Edit/Write guard.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/hem/Developer/my-daily-sprints/docs/artifacts/INFRA_002/test_workflow_v3.py", line 204, in test_edit_gate_exists
+    self.assertTrue(
+    ~~~~~~~~~~~~~~~^
+        self.edit_gate.exists(),
+        ^^^^^^^^^^^^^^^^^^^^^^^^
+        f"edit_gate.py does not exist at {self.edit_gate}"
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+AssertionError: False is not true : edit_gate.py does not exist at /Users/hem/Developer/my-daily-sprints/.claude/hooks/edit_gate.py
+
+======================================================================
+FAIL: test_migrate_script_exists (__main__.TestMigrateState.test_migrate_script_exists)
+migrate_state.py must exist for v2→v3 state migration.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/hem/Developer/my-daily-sprints/docs/artifacts/INFRA_002/test_workflow_v3.py", line 368, in test_migrate_script_exists
+    self.assertTrue(
+    ~~~~~~~~~~~~~~~^
+        self.migrate.exists(),
+        ^^^^^^^^^^^^^^^^^^^^^^
+        f"migrate_state.py does not exist at {self.migrate}"
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+AssertionError: False is not true : migrate_state.py does not exist at /Users/hem/Developer/my-daily-sprints/.claude/hooks/migrate_state.py
+
+======================================================================
+FAIL: test_old_hooks_removed (__main__.TestOldHooksRemoved.test_old_hooks_removed)
+All 50 old hook files must be deleted after migration.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/hem/Developer/my-daily-sprints/docs/artifacts/INFRA_002/test_workflow_v3.py", line 414, in test_old_hooks_removed
+    self.assertEqual(
+    ~~~~~~~~~~~~~~~~^
+        len(remaining), 0,
+        ^^^^^^^^^^^^^^^^^^
+        f"{len(remaining)} old hooks still exist: {remaining[:5]}..."
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+AssertionError: 50 != 0 : 50 old hooks still exist: ['adversary_gate.py', 'adversary_verdict_guard.py', 'artifact_existence_guard.py', 'build_lock_guard.py', 'build_lock_release.py']...
+
+======================================================================
+FAIL: test_phase_listener_exists (__main__.TestPhaseListener.test_phase_listener_exists)
+phase_listener.py must exist as the consolidated UserPromptSubmit hook.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/hem/Developer/my-daily-sprints/docs/artifacts/INFRA_002/test_workflow_v3.py", line 344, in test_phase_listener_exists
+    self.assertTrue(
+    ~~~~~~~~~~~~~~~^
+        self.listener.exists(),
+        ^^^^^^^^^^^^^^^^^^^^^^^
+        f"phase_listener.py does not exist at {self.listener}"
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+AssertionError: False is not true : phase_listener.py does not exist at /Users/hem/Developer/my-daily-sprints/.claude/hooks/phase_listener.py
+
+======================================================================
+FAIL: test_complete_moves_to_archive (__main__.TestWorkflowStateCLI.test_complete_moves_to_archive)
+'complete' moves workflow file to _archive/ directory.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/hem/Developer/my-daily-sprints/docs/artifacts/INFRA_002/test_workflow_v3.py", line 164, in test_complete_moves_to_archive
+    self.assertTrue(archive_file.exists(), f"Completed workflow should be in {archive_file}")
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : Completed workflow should be in /var/folders/dk/p4qd3_xx6ls6_xybmqzfgs1h0000gn/T/tmpucyulpnh/.claude/workflows/_archive/TEST_001.json
+
+======================================================================
+FAIL: test_start_creates_active_symlink (__main__.TestWorkflowStateCLI.test_start_creates_active_symlink)
+'start' command creates .active symlink pointing to new workflow.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/hem/Developer/my-daily-sprints/docs/artifacts/INFRA_002/test_workflow_v3.py", line 84, in test_start_creates_active_symlink
+    self.assertTrue(
+    ~~~~~~~~~~~~~~~^
+        active_link.is_symlink(),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^
+        f".active symlink not created at {active_link}"
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+AssertionError: False is not true : .active symlink not created at /var/folders/dk/p4qd3_xx6ls6_xybmqzfgs1h0000gn/T/tmpkffbmo84/.claude/workflows/.active
+
+======================================================================
+FAIL: test_start_creates_workflow_file (__main__.TestWorkflowStateCLI.test_start_creates_workflow_file)
+'start' command creates .claude/workflows/<name>.json
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/hem/Developer/my-daily-sprints/docs/artifacts/INFRA_002/test_workflow_v3.py", line 67, in test_start_creates_workflow_file
+    self.assertTrue(
+    ~~~~~~~~~~~~~~~^
+        workflow_file.exists(),
+        ^^^^^^^^^^^^^^^^^^^^^^^
+        f"Expected {workflow_file} to be created by 'start' command. "
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        f"stdout: {result.stdout}, stderr: {result.stderr}"
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+AssertionError: False is not true : Expected /var/folders/dk/p4qd3_xx6ls6_xybmqzfgs1h0000gn/T/tmp08zb2jcx/.claude/workflows/TEST_001.json to be created by 'start' command. stdout: , stderr: /opt/homebrew/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python: can't open file '/Users/hem/Developer/my-daily-sprints/.claude/hooks/workflow.py': [Errno 2] No such file or directory
+
+
+======================================================================
+FAIL: test_status_reads_active_workflow (__main__.TestWorkflowStateCLI.test_status_reads_active_workflow)
+'status' outputs current phase of active workflow.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/hem/Developer/my-daily-sprints/docs/artifacts/INFRA_002/test_workflow_v3.py", line 126, in test_status_reads_active_workflow
+    self.assertIn("TEST_001", result.stdout, f"Status should show workflow name. Got: {result.stdout}")
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'TEST_001' not found in '' : Status should show workflow name. Got: 
+
+======================================================================
+FAIL: test_workflow_py_exists (__main__.TestWorkflowStateCLI.test_workflow_py_exists)
+workflow.py must exist as the new CLI entry point.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/hem/Developer/my-daily-sprints/docs/artifacts/INFRA_002/test_workflow_v3.py", line 50, in test_workflow_py_exists
+    self.assertTrue(
+    ~~~~~~~~~~~~~~~^
+        self.workflow_py.exists(),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+        f"workflow.py does not exist at {self.workflow_py}. "
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "This is the new state manager replacing workflow_state_multi.py."
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+AssertionError: False is not true : workflow.py does not exist at /Users/hem/Developer/my-daily-sprints/.claude/hooks/workflow.py. This is the new state manager replacing workflow_state_multi.py.
+
+----------------------------------------------------------------------
+Ran 22 tests in 0.443s
+
+FAILED (failures=14, errors=1)
