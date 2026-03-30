@@ -9,7 +9,7 @@ You are in **Phase 2 - Analysis** of the workflow.
 
 Check current workflow:
 ```bash
-python3 .claude/hooks/workflow_state_multi.py status
+python3 .claude/hooks/workflow.py status
 ```
 
 ## Your Tasks
@@ -99,7 +99,7 @@ Register ALL affected files from the analysis in the workflow state. This is **M
 
 ```bash
 # Register all files that will be modified/created
-python3 .claude/hooks/workflow_state_multi.py set-affected-files \
+python3 .claude/hooks/workflow.py set-affected-files \
   "Sources/Models/Auth.swift" \
   "Sources/Config.swift" \
   "Tests/AuthTests.swift"
@@ -110,7 +110,7 @@ Use `--replace` to overwrite previous entries, or omit it to merge with existing
 ### Step 6: Update Workflow State
 
 ```bash
-python3 .claude/hooks/workflow_state_multi.py phase phase3_spec
+python3 .claude/hooks/workflow.py phase phase3_spec
 ```
 
 ## Next Step

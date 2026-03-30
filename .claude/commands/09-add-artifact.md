@@ -18,12 +18,12 @@ When you have captured a test artifact:
 
 2. **Register it** via CLI:
 ```bash
-python3 .claude/hooks/workflow_state_multi.py add-artifact <type> <path> <description> [phase]
+python3 .claude/hooks/workflow.py add-artifact <type> <path> <description> [phase]
 ```
 
 Example:
 ```bash
-python3 .claude/hooks/workflow_state_multi.py add-artifact screenshot \
+python3 .claude/hooks/workflow.py add-artifact screenshot \
   "docs/artifacts/my-feature/test-failure.png" \
   "Screenshot showing test failure: expected X but got Y" \
   phase5_tdd_red
@@ -65,7 +65,7 @@ For validation (`phase7_validate`), artifacts show **test success**:
 ./run-tests.sh > docs/artifacts/feature-login/test-output-red.txt 2>&1
 
 # Register it via CLI
-python3 .claude/hooks/workflow_state_multi.py add-artifact test_output \
+python3 .claude/hooks/workflow.py add-artifact test_output \
   "docs/artifacts/feature-login/test-output-red.txt" \
   "Test failed: LoginService.authenticate() not implemented - assertion error on line 42" \
   phase5_tdd_red

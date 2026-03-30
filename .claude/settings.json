@@ -15,87 +15,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 .claude/hooks/stop_lock_guard.py",
-            "timeout": 5
-          },
-          {
-            "type": "command",
-            "command": "python3 .claude/hooks/override_token_guard.py",
-            "timeout": 5
-          },
-          {
-            "type": "command",
-            "command": "python3 .claude/hooks/docs_location_guard.py",
-            "timeout": 5
-          },
-          {
-            "type": "command",
-            "command": "python3 .claude/hooks/strict_code_gate.py",
-            "timeout": 5
-          },
-          {
-            "type": "command",
-            "command": "python3 .claude/hooks/claude_md_protection.py",
-            "timeout": 5
-          },
-          {
-            "type": "command",
-            "command": "python3 .claude/hooks/domain_pattern_guard.py",
-            "timeout": 5
-          },
-          {
-            "type": "command",
-            "command": "python3 .claude/hooks/plan_validator.py",
-            "timeout": 5
-          },
-          {
-            "type": "command",
-            "command": "python3 .claude/hooks/post_implementation_gate.py",
-            "timeout": 5
-          },
-          {
-            "type": "command",
-            "command": "python3 .claude/hooks/red_test_gate.py",
-            "timeout": 5
-          },
-          {
-            "type": "command",
-            "command": "python3 .claude/hooks/scope_guard.py",
-            "timeout": 5
-          },
-          {
-            "type": "command",
-            "command": "python3 .claude/hooks/spec_enforcement.py",
-            "timeout": 5
-          },
-          {
-            "type": "command",
-            "command": "python3 .claude/hooks/tdd_enforcement.py",
-            "timeout": 5
-          },
-          {
-            "type": "command",
-            "command": "python3 .claude/hooks/track_changes.py",
-            "timeout": 5
-          },
-          {
-            "type": "command",
-            "command": "python3 .claude/hooks/ui_screenshot_gate.py",
-            "timeout": 5
-          },
-          {
-            "type": "command",
-            "command": "python3 .claude/hooks/workflow_gate.py",
-            "timeout": 5
-          },
-          {
-            "type": "command",
-            "command": "python3 .claude/hooks/ui_test_preflight.py",
-            "timeout": 5
-          },
-          {
-            "type": "command",
-            "command": "python3 .claude/hooks/test_regression_guard.py",
+            "command": "python3 .claude/hooks/edit_gate.py",
             "timeout": 5
           }
         ]
@@ -105,93 +25,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 .claude/hooks/state_integrity_guard.py",
-            "timeout": 5
-          },
-          {
-            "type": "command",
-            "command": "python3 .claude/hooks/sim_enforcer.py",
-            "timeout": 5
-          },
-          {
-            "type": "command",
-            "command": "python3 .claude/hooks/build_lock_guard.py",
+            "command": "python3 .claude/hooks/bash_gate.py",
             "timeout": 300
-          },
-          {
-            "type": "command",
-            "command": "python3 .claude/hooks/stop_lock_guard.py",
-            "timeout": 5
-          },
-          {
-            "type": "command",
-            "command": "python3 .claude/hooks/override_token_bash_guard.py",
-            "timeout": 5
-          },
-          {
-            "type": "command",
-            "command": "python3 .claude/hooks/adversary_verdict_guard.py",
-            "timeout": 5
-          },
-          {
-            "type": "command",
-            "command": "python3 .claude/hooks/result_inspection_gate.py",
-            "timeout": 5
-          },
-          {
-            "type": "command",
-            "command": "python3 .claude/hooks/validate_completeness_gate.py",
-            "timeout": 5
-          },
-          {
-            "type": "command",
-            "command": "python3 .claude/hooks/artifact_existence_guard.py",
-            "timeout": 5
-          },
-          {
-            "type": "command",
-            "command": "python3 .claude/hooks/pre_commit_gate.py",
-            "timeout": 5
-          },
-          {
-            "type": "command",
-            "command": "python3 .claude/hooks/secrets_guard.py",
-            "timeout": 5
-          },
-          {
-            "type": "command",
-            "command": "python3 .claude/hooks/test_lock_guard.py",
-            "timeout": 5
-          },
-          {
-            "type": "command",
-            "command": "python3 .claude/hooks/parallel_test_guard.py",
-            "timeout": 5
-          },
-          {
-            "type": "command",
-            "command": "python3 .claude/hooks/no_workaround_guard.py",
-            "timeout": 5
-          },
-          {
-            "type": "command",
-            "command": "python3 .claude/hooks/tdd_green_gate.py",
-            "timeout": 5
-          }
-        ]
-      },
-      {
-        "matcher": "Task",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 .claude/hooks/visual_inspection_gate.py",
-            "timeout": 5
-          },
-          {
-            "type": "command",
-            "command": "python3 .claude/hooks/feature_understanding_gate.py",
-            "timeout": 5
           }
         ]
       }
@@ -202,7 +37,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 .claude/hooks/build_lock_release.py",
+            "command": "python3 .claude/hooks/post_bash.py",
             "timeout": 5
           }
         ]
@@ -213,32 +48,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 .claude/hooks/stop_lock_listener.py",
-            "timeout": 5
-          },
-          {
-            "type": "command",
-            "command": "python3 .claude/hooks/workflow_state_updater.py",
-            "timeout": 5
-          },
-          {
-            "type": "command",
-            "command": "python3 .claude/hooks/override_token_listener.py",
-            "timeout": 5
-          },
-          {
-            "type": "command",
-            "command": "python3 .claude/hooks/workflow_cleanup.py",
-            "timeout": 5
-          },
-          {
-            "type": "command",
-            "command": "python3 .claude/hooks/tdd_green_listener.py",
-            "timeout": 5
-          },
-          {
-            "type": "command",
-            "command": "python3 .claude/hooks/new_ui_listener.py",
+            "command": "python3 .claude/hooks/phase_listener.py",
             "timeout": 5
           }
         ]

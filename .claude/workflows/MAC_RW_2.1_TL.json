@@ -1,0 +1,76 @@
+{
+  "name": "MAC_RW_2.1_TL",
+  "current_phase": "phase8_complete",
+  "created": "2026-03-29T12:00:17.859276",
+  "last_updated": "2026-03-30T11:42:20.335939",
+  "spec_file": "docs/specs/macos/MAC_RW_2.1_TL-dayview-timeline.md",
+  "spec_approved": true,
+  "context_file": "docs/context/MAC_029-menubar-icon.md",
+  "affected_files": [
+    "FocusBlox.xcodeproj/project.pbxproj",
+    "FocusBloxMac/FocusBloxMacApp.swift",
+    "FocusBloxMacTests/DayViewTimelineTests.swift",
+    "FocusBloxMacUITests/MacDayViewTimelineUITests.swift",
+    "Sources/Views/DayView.swift"
+  ],
+  "test_artifacts": [
+    {
+      "type": "test_output",
+      "path": "docs/artifacts/MAC_029/unit-test-red-output.txt",
+      "description": "Unit Test FAILED: makeMenuBarIcon(size:) Signatur existiert nicht in alter Implementation (Missing argument for parameter from)",
+      "phase": "phase5_tdd_red",
+      "created": "2026-03-29T12:07:33.846145"
+    },
+    {
+      "type": "test_output",
+      "path": "docs/artifacts/MAC_029/unit-test-green-output.txt",
+      "description": "All 4 tests PASSED: size, isTemplate, alphaGradient, transparentOutside",
+      "phase": "phase6_implement",
+      "created": "2026-03-29T15:26:40.439148"
+    },
+    {
+      "type": "test_output",
+      "path": "docs/artifacts/MAC_029/unit-test-red-output.txt",
+      "description": "Unit Test RED: gefuellte Scheiben ohne Luecken erzeugen falsche Optik",
+      "phase": "phase5_tdd_red",
+      "created": "2026-03-29T17:42:39.179784"
+    },
+    {
+      "type": "ui_test_output",
+      "path": "docs/artifacts/MAC_RW_2.1_TL/ui-test-red-output.txt",
+      "description": "UI Test FAILED: test_dayView_daytime_showsHourLabels \u2014 hour labels not found because MacTimelineView not integrated",
+      "phase": "phase5_tdd_red",
+      "created": "2026-03-29T21:14:24.570984"
+    },
+    {
+      "type": "test_output",
+      "path": "docs/artifacts/bug-124-keyword-strip/unit-test-red-output.txt",
+      "description": "10 unit tests failed: XCTAssertEqual failures for stripKeywords date keywords (heute/morgen/\u00fcbermorgen/freitag/n\u00e4chste woche/tomorrow)",
+      "phase": "phase5_tdd_red",
+      "created": "2026-03-30T07:35:26.533050"
+    },
+    {
+      "type": "ui_test_output",
+      "path": "docs/artifacts/MAC_RW_2.1_TL/ui-test-red-output.txt",
+      "description": "UI Test FAILED: test_dayView_daytime_showsHourLabels failed \u2014 MacTimelineView not in DayView",
+      "phase": "phase5_tdd_red",
+      "created": "2026-03-30T08:21:39.777700"
+    },
+    {
+      "type": "ui_test_output",
+      "path": "docs/artifacts/MAC_RW_2.1_TL/validation-test-output.txt",
+      "description": "ALL TESTS PASSED: 1 unit test, 3 UI tests green",
+      "phase": "phase7_validate",
+      "created": "2026-03-30T11:41:50.688788"
+    }
+  ],
+  "is_new_ui": false,
+  "red_test_done": true,
+  "ui_test_red_done": true,
+  "green_approved": true,
+  "adversary_verdict": "VERIFIED: 4 tests green, spec compliance 8/8, 0 regressions",
+  "analysis_findings": "Platzhalter in DayView.swift:162-166 ersetzen durch MacTimelineView read-only. Alle Daten bereits vorhanden. 1 Datei + 1 Test. Risk LOW.",
+  "docs_updated": true,
+  "regression_check_done": true,
+  "validation_done": true
+}

@@ -1,0 +1,40 @@
+{
+  "name": "bug-124-keyword-strip-v2",
+  "current_phase": "phase0_idle",
+  "created": "2026-03-30T07:56:32.749346",
+  "last_updated": "2026-03-30T11:17:56.662405",
+  "spec_file": "docs/artifacts/bug-124-keyword-strip/analysis.md",
+  "spec_approved": true,
+  "context_file": "docs/artifacts/bug-124-keyword-strip/analysis.md",
+  "affected_files": [
+    "FocusBlox.xcodeproj/project.pbxproj",
+    "FocusBloxTests/TaskTitleEngineTests.swift",
+    "FocusBloxUITests/DateKeywordStrippingUITests.swift",
+    "Sources/Services/TaskSources/LocalTaskSource.swift",
+    "Sources/Services/TaskTitleEngine.swift",
+    "Sources/Views/BacklogView.swift",
+    "Sources/Views/TaskFormSheet.swift"
+  ],
+  "test_artifacts": [
+    {
+      "type": "test_output",
+      "path": "docs/artifacts/bug-124-keyword-strip/unit-test-red-output.txt",
+      "description": "Unit tests: 19/19 stripKeywords PASSED but UI test failed \u2014 BacklogView does not refresh after async task creation",
+      "phase": "phase5_tdd_red",
+      "created": "2026-03-30T08:03:06.473259"
+    },
+    {
+      "type": "ui_test_output",
+      "path": "docs/artifacts/bug-124-keyword-strip/ui-test-red-output.txt",
+      "description": "UI test failed: XCTAssertTrue Task containing Klingel should appear \u2014 BacklogView never refreshes after async createTask",
+      "phase": "phase5_tdd_red",
+      "created": "2026-03-30T08:03:11.622454"
+    }
+  ],
+  "is_new_ui": false,
+  "red_test_done": true,
+  "ui_test_red_done": true,
+  "green_approved": false,
+  "adversary_verdict": null,
+  "analysis_findings": "1) stripKeywords fehlt Datums-Regex 2) BacklogView refreshed nicht nach async Task-Erstellung \u2014 Notification n\u00f6tig"
+}

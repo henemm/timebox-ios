@@ -31,7 +31,7 @@ Wenn du Frage 3 nicht beantworten kannst → der Test ist wertlos. Schreib ihn n
 
 Check status:
 ```bash
-python3 .claude/hooks/workflow_state_multi.py status
+python3 .claude/hooks/workflow.py status
 ```
 
 ## Your Tasks
@@ -39,7 +39,7 @@ python3 .claude/hooks/workflow_state_multi.py status
 ### 1. Enter TDD RED Phase
 
 ```bash
-python3 .claude/hooks/workflow_state_multi.py phase phase5_tdd_red
+python3 .claude/hooks/workflow.py phase phase5_tdd_red
 ```
 
 ### 2. Unit Tests schreiben — PFLICHT fuer Business-Logik
@@ -118,12 +118,12 @@ grep -E "(passed|failed|error:)" docs/artifacts/[workflow]/ui-test-red-output.tx
 
 ```bash
 # Register artifacts
-python3 .claude/hooks/workflow_state_multi.py add-artifact test_output "docs/artifacts/[workflow]/unit-test-red-output.txt" "Unit Test FAILED: [describe what failed]" phase5_tdd_red
-python3 .claude/hooks/workflow_state_multi.py add-artifact ui_test_output "docs/artifacts/[workflow]/ui-test-red-output.txt" "UI Test FAILED: [describe what failed]" phase5_tdd_red
+python3 .claude/hooks/workflow.py add-artifact test_output "docs/artifacts/[workflow]/unit-test-red-output.txt" "Unit Test FAILED: [describe what failed]" phase5_tdd_red
+python3 .claude/hooks/workflow.py add-artifact ui_test_output "docs/artifacts/[workflow]/ui-test-red-output.txt" "UI Test FAILED: [describe what failed]" phase5_tdd_red
 
 # Set mandatory RED flags
-python3 .claude/hooks/workflow_state_multi.py mark-red "failed: [describe what failed]"
-python3 .claude/hooks/workflow_state_multi.py mark-ui-red "failed: [describe what failed]"
+python3 .claude/hooks/workflow.py mark-red "failed: [describe what failed]"
+python3 .claude/hooks/workflow.py mark-ui-red "failed: [describe what failed]"
 ```
 
 ### 6. Test-Snapshot erstellen (Regressions-Schutz)
@@ -132,7 +132,7 @@ python3 .claude/hooks/workflow_state_multi.py mark-ui-red "failed: [describe wha
 blockt spaeter jedes Entfernen von Tests ohne PO-Genehmigung.
 
 ```bash
-python3 .claude/hooks/workflow_state_multi.py snapshot-tests
+python3 .claude/hooks/workflow.py snapshot-tests
 ```
 
 ## RED Phase Checklist
@@ -149,7 +149,7 @@ python3 .claude/hooks/workflow_state_multi.py snapshot-tests
 ## Next Step
 
 ```bash
-python3 .claude/hooks/workflow_state_multi.py phase phase6_implement
+python3 .claude/hooks/workflow.py phase phase6_implement
 ```
 
 ## Common Mistakes

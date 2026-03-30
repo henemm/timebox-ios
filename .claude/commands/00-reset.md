@@ -21,8 +21,8 @@ Resets workflow state to idle:
 ## Execute Reset
 
 ```bash
-# If using workflow_state_multi.py
-python3 .claude/hooks/workflow_state_multi.py reset
+# If using workflow.py
+python3 .claude/hooks/workflow.py reset
 
 # Or manually clear state
 echo '{"current_phase": "idle", "workflows": {}}' > .claude/workflow_state.json

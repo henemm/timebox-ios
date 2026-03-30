@@ -6,7 +6,7 @@ Manage multiple parallel workflows in your project.
 
 ### List All Workflows
 ```bash
-python3 .claude/hooks/workflow_state_multi.py list
+python3 .claude/hooks/workflow.py list
 ```
 
 Output:
@@ -18,7 +18,7 @@ Output:
 
 ### Check Current Status
 ```bash
-python3 .claude/hooks/workflow_state_multi.py status
+python3 .claude/hooks/workflow.py status
 ```
 
 Output:
@@ -32,22 +32,22 @@ Test Artifacts: 2
 
 ### Start New Workflow
 ```bash
-python3 .claude/hooks/workflow_state_multi.py start "feature-name"
+python3 .claude/hooks/workflow.py start "feature-name"
 ```
 
 ### Switch Active Workflow
 ```bash
-python3 .claude/hooks/workflow_state_multi.py switch "other-feature"
+python3 .claude/hooks/workflow.py switch "other-feature"
 ```
 
 ### Advance to Next Phase
 ```bash
-python3 .claude/hooks/workflow_state_multi.py advance
+python3 .claude/hooks/workflow.py advance
 ```
 
 ### Set Specific Phase
 ```bash
-python3 .claude/hooks/workflow_state_multi.py phase phase4_approved
+python3 .claude/hooks/workflow.py phase phase4_approved
 ```
 
 ## Workflow Phases
@@ -80,13 +80,13 @@ Separate from workflow phase - tracks the overall feature status for project pla
 
 ```bash
 # Check current backlog status
-python3 .claude/hooks/workflow_state_multi.py status
+python3 .claude/hooks/workflow.py status
 
 # Set backlog status explicitly
-python3 .claude/hooks/workflow_state_multi.py backlog spec_ready
+python3 .claude/hooks/workflow.py backlog spec_ready
 
 # Pause workflow (sets appropriate status)
-python3 .claude/hooks/workflow_state_multi.py pause
+python3 .claude/hooks/workflow.py pause
 ```
 
 ### Phase vs. Backlog Status

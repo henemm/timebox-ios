@@ -74,8 +74,8 @@ Moegliche Ergebnisse:
 
 **4. Ergebnis festhalten:**
 ```bash
-python3 .claude/hooks/workflow_state_multi.py set-field visual_inspection_notes "Agent-Beobachtung: [Was der Agent sah]. Abgleich mit Bug: [Wie es zum Report passt]"
-python3 .claude/hooks/workflow_state_multi.py set-field visual_inspection_done true
+python3 .claude/hooks/workflow.py set-field visual_inspection_notes "Agent-Beobachtung: [Was der Agent sah]. Abgleich mit Bug: [Wie es zum Report passt]"
+python3 .claude/hooks/workflow.py set-field visual_inspection_done true
 ```
 
 ### Kein Screenshot sinnvoll?
@@ -118,8 +118,8 @@ Wenn nie implementiert → **kein Bug**. Henning informieren, `/05-implement` vo
 ## Schritt 1: Workflow starten
 
 ```bash
-python3 .claude/hooks/workflow_state_multi.py start "bug-[kurzer-name]"
-python3 .claude/hooks/workflow_state_multi.py phase phase1_context
+python3 .claude/hooks/workflow.py start "bug-[kurzer-name]"
+python3 .claude/hooks/workflow.py phase phase1_context
 ```
 
 ## Schritt 2: Investigate-Tasks erstellen
@@ -249,7 +249,7 @@ Erst nach OK:
 Registriere ALLE Dateien die vom Fix betroffen sind — ohne das blockiert der Code Gate spaeter.
 
 ```bash
-python3 .claude/hooks/workflow_state_multi.py set-affected-files --replace \
+python3 .claude/hooks/workflow.py set-affected-files --replace \
   "Sources/path/to/affected1.swift" \
   "Sources/path/to/affected2.swift" \
   "Tests/path/to/TestFile.swift"
@@ -259,7 +259,7 @@ python3 .claude/hooks/workflow_state_multi.py set-affected-files --replace \
 
 Nach Freigabe — normaler TDD-Zyklus:
 ```bash
-python3 .claude/hooks/workflow_state_multi.py phase phase5_tdd_red
+python3 .claude/hooks/workflow.py phase phase5_tdd_red
 ```
 
 Nutze `/04-tdd-red` — leite Tests aus der Analyse ab:

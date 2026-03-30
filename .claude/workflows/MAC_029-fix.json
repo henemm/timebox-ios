@@ -1,0 +1,57 @@
+{
+  "name": "MAC_029-fix",
+  "current_phase": "phase0_idle",
+  "created": "2026-03-30T07:59:21.709396",
+  "last_updated": "2026-03-30T11:17:38.652529",
+  "spec_file": "docs/specs/macos/MAC_029-menubar-icon.md",
+  "spec_approved": true,
+  "context_file": "docs/context/MAC_029-menubar-icon.md",
+  "affected_files": [
+    "FocusBloxMac/FocusBloxMacApp.swift",
+    "FocusBloxMacTests/MenuBarIdleIconTests.swift",
+    "docs/specs/macos/MAC_029-menubar-icon.md"
+  ],
+  "test_artifacts": [
+    {
+      "type": "test_output",
+      "path": "docs/artifacts/bug-124-keyword-strip/unit-test-red-output.txt",
+      "description": "Unit tests: 19/19 stripKeywords PASSED, 3 pre-existing failures. stripKeywords fix confirmed.",
+      "phase": "phase5_tdd_red",
+      "created": "2026-03-30T08:02:55.924628"
+    },
+    {
+      "type": "test_output",
+      "path": "docs/artifacts/MAC_029-fix/unit-test-red-output.txt",
+      "description": "Unit Tests FAILED: 3/5 \u2014 alphaGradient umgekehrt, gap falsch, Proportionen alt",
+      "phase": "phase5_tdd_red",
+      "created": "2026-03-30T08:12:00.240016"
+    },
+    {
+      "type": "ui_test_output",
+      "path": "docs/artifacts/MAC_029-fix/ui-test-red-output.txt",
+      "description": "UI Test N/A: macOS MenuBar nicht per XCUITest testbar, visuelle Inspektion stattdessen",
+      "phase": "phase5_tdd_red",
+      "created": "2026-03-30T09:13:46.962917"
+    },
+    {
+      "type": "test_output",
+      "path": "docs/artifacts/MAC_029-fix/validation-test-output.txt",
+      "description": "ALL TESTS PASSED: 5 unit tests green, spec 8/8",
+      "phase": "phase7_validate",
+      "created": "2026-03-30T09:18:40.232067"
+    },
+    {
+      "type": "ui_test_output",
+      "path": "docs/artifacts/MAC_029-fix/validation-test-output.txt",
+      "description": "ALL TESTS PASSED: 5 unit tests green",
+      "phase": "phase7_validate",
+      "created": "2026-03-30T10:30:02.632832"
+    }
+  ],
+  "is_new_ui": false,
+  "red_test_done": true,
+  "ui_test_red_done": true,
+  "green_approved": false,
+  "adversary_verdict": "VERIFIED:Tests PASSED: 15 tests across 3 runs (unit + UI), 0 failures",
+  "analysis_findings": "Proportions-Fix: Ring-Breiten, Positionen und Alpha-Gradient aus Pixel-Analyse des App-Icons. 3 Dateien, ~15 LoC, LOW risk."
+}

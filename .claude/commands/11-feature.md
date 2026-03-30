@@ -62,8 +62,8 @@ Der Agent denkt ausschliesslich aus User-Perspektive:
 
 **2. User-Erwartung als Massstab festhalten:**
 ```bash
-python3 .claude/hooks/workflow_state_multi.py set-field user_expectation_notes "Zusammenfassung der User-Erwartung"
-python3 .claude/hooks/workflow_state_multi.py set-field user_expectation_done true
+python3 .claude/hooks/workflow.py set-field user_expectation_notes "Zusammenfassung der User-Erwartung"
+python3 .claude/hooks/workflow.py set-field user_expectation_done true
 ```
 
 **OHNE `user_expectation_done=true` werden alle technischen Agents BLOCKIERT!**
@@ -87,7 +87,7 @@ python3 .claude/hooks/workflow_state_multi.py set-field user_expectation_done tr
 5. Scoping (Max 4-5 Dateien, +/-250 LoC)
 6. ⛔ **Affected Files registrieren** (PFLICHT — Code Gate blockiert sonst!):
    ```bash
-   python3 .claude/hooks/workflow_state_multi.py set-affected-files --replace \
+   python3 .claude/hooks/workflow.py set-affected-files --replace \
      "Sources/path/to/file.swift" "Tests/path/to/Test.swift"
    ```
 7. ⛔ **ERST Tests definieren** in `openspec/changes/[feature-name]/tests.md`
@@ -126,8 +126,8 @@ KEIN Feature-Name! KEINE Spec! NICHT was gebaut werden sollte!
 | Fresh-Eyes findet UX-Probleme | STOP — nachbessern |
 
 ```bash
-python3 .claude/hooks/workflow_state_multi.py set-field result_inspection_notes "Fresh-Eyes: [Was gesehen]. Abgleich mit Erwartung: [Vergleich]"
-python3 .claude/hooks/workflow_state_multi.py set-field result_inspection_done true
+python3 .claude/hooks/workflow.py set-field result_inspection_notes "Fresh-Eyes: [Was gesehen]. Abgleich mit Erwartung: [Vergleich]"
+python3 .claude/hooks/workflow.py set-field result_inspection_done true
 ```
 
 ---
@@ -137,7 +137,7 @@ python3 .claude/hooks/workflow_state_multi.py set-field result_inspection_done t
 **PFLICHT! Gilt fuer Features genauso wie fuer Bugs.**
 
 ```bash
-python3 .claude/hooks/workflow_state_multi.py phase phase6b_adversary
+python3 .claude/hooks/workflow.py phase phase6b_adversary
 ```
 
 **1. Implementation-Validator Agent starten:**
@@ -175,7 +175,7 @@ Ohne `VERIFIED` Verdict blockiert `workflow_gate.py` die Validation-Phase.
 13. ⛔ **Alle Tests gruen** (Unit + UI)
 
 ```bash
-python3 .claude/hooks/workflow_state_multi.py phase phase7_validate
+python3 .claude/hooks/workflow.py phase phase7_validate
 ```
 
 **KEINE direkte Implementierung ohne User-Erwartung!**

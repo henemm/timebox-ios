@@ -13,7 +13,7 @@ You are starting the **Validation Phase**.
 
 Check workflow state:
 ```bash
-python3 .claude/hooks/workflow_state_multi.py status
+python3 .claude/hooks/workflow.py status
 ```
 
 Required:
@@ -96,18 +96,18 @@ Task (general-purpose/sonnet): "Du bist der docs-updater Agent.
 
 ```bash
 # Register GREEN test artifact
-python3 .claude/hooks/workflow_state_multi.py add-artifact ui_test_output "docs/artifacts/[workflow]/validation-test-output.txt" "ALL TESTS PASSED: [N] unit tests, [M] UI tests green" phase7_validate
+python3 .claude/hooks/workflow.py add-artifact ui_test_output "docs/artifacts/[workflow]/validation-test-output.txt" "ALL TESTS PASSED: [N] unit tests, [M] UI tests green" phase7_validate
 
 # Mark GREEN flags
-python3 .claude/hooks/workflow_state_multi.py mark-green "All [N] unit tests passed"
-python3 .claude/hooks/workflow_state_multi.py mark-ui-green "All [M] UI tests passed"
+python3 .claude/hooks/workflow.py mark-green "All [N] unit tests passed"
+python3 .claude/hooks/workflow.py mark-ui-green "All [M] UI tests passed"
 
 # Mark REGRESSION CHECK done (PFLICHT — Gate-enforced!)
 # Nur setzen wenn Task 3 (Regression Check) tatsaechlich die VOLLE Test-Suite ausfuehrte
-python3 .claude/hooks/workflow_state_multi.py mark-regression-done "Full suite: [N] unit + [M] UI tests, 0 regressions"
+python3 .claude/hooks/workflow.py mark-regression-done "Full suite: [N] unit + [M] UI tests, 0 regressions"
 
 # Advance to validation phase
-python3 .claude/hooks/workflow_state_multi.py phase phase7_validate
+python3 .claude/hooks/workflow.py phase phase7_validate
 ```
 
 ## Validation Report
@@ -158,7 +158,7 @@ Erstelle eine Zusammenfassung:
 
 3. **Flag setzen** (blockiert sonst phase8_complete):
 ```bash
-python3 .claude/hooks/workflow_state_multi.py mark-docs-updated "ACTIVE-todos.md: [ticket] → done"
+python3 .claude/hooks/workflow.py mark-docs-updated "ACTIVE-todos.md: [ticket] → done"
 ```
 
 ## Next Step
@@ -170,9 +170,9 @@ python3 .claude/hooks/workflow_state_multi.py mark-docs-updated "ACTIVE-todos.md
 ```bash
 # Mark validation as fully complete (PFLICHT — Gate-enforced!)
 # Blockiert Commit wenn nicht gesetzt. Setzt regression_check_done voraus.
-python3 .claude/hooks/workflow_state_multi.py mark-validation-done "All 4 checks passed: tests, spec, regression, scope"
+python3 .claude/hooks/workflow.py mark-validation-done "All 4 checks passed: tests, spec, regression, scope"
 
-python3 .claude/hooks/workflow_state_multi.py phase phase8_complete
+python3 .claude/hooks/workflow.py phase phase8_complete
 ```
 
 ## FORBIDDEN

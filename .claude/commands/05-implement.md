@@ -14,7 +14,7 @@ Write the **minimal code** to make failing tests pass. No more, no less.
 
 Check status:
 ```bash
-python3 .claude/hooks/workflow_state_multi.py status
+python3 .claude/hooks/workflow.py status
 ```
 
 **If TDD RED artifacts are missing, the `tdd_enforcement` hook will BLOCK your edits!**
@@ -24,7 +24,7 @@ python3 .claude/hooks/workflow_state_multi.py status
 ### Step 1: Verify RED Phase Complete
 
 ```bash
-python3 .claude/hooks/workflow_state_multi.py status
+python3 .claude/hooks/workflow.py status
 ```
 
 ### Step 2: Kontext laden (Explore/Haiku)
@@ -79,7 +79,7 @@ xcodebuild test -project FocusBlox.xcodeproj -scheme FocusBlox \
   -destination 'id=548B4A2F-FDFF-4F9E-8335-1A7A7B98E492' \
   2>&1 > docs/artifacts/[workflow]/test-green-output.txt
 
-python3 .claude/hooks/workflow_state_multi.py add-artifact test_output "docs/artifacts/[workflow]/test-green-output.txt" "All tests PASSED" phase6_implement
+python3 .claude/hooks/workflow.py add-artifact test_output "docs/artifacts/[workflow]/test-green-output.txt" "All tests PASSED" phase6_implement
 ```
 
 ### Step 6: User-Freigabe der GREEN-Ergebnisse (PFLICHT)
@@ -118,7 +118,7 @@ Sage "go" wenn du mit den Ergebnissen zufrieden bist.
 ### Step 7: Update Workflow State to Adversary Phase
 
 ```bash
-python3 .claude/hooks/workflow_state_multi.py phase phase6b_adversary
+python3 .claude/hooks/workflow.py phase phase6b_adversary
 ```
 
 ### Step 8: Run Adversary Verification (MANDATORY)
@@ -146,7 +146,7 @@ Der Adversary-Agent:
 **Wenn Adversary VERIFIED meldet:**
 - Weiter zu Phase 7:
 ```bash
-python3 .claude/hooks/workflow_state_multi.py phase phase7_validate
+python3 .claude/hooks/workflow.py phase phase7_validate
 ```
 
 ## Implementation Constraints
