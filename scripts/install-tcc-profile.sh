@@ -1,12 +1,9 @@
 #!/bin/bash
-# install-tcc-profile.sh — Installiert/deinstalliert das PPPC-Profil fuer macOS UI Test Automation
+# install-tcc-profile.sh — Aktiviert Automation Mode fuer macOS UI Tests
 # Loest BUG_111: TCC-Dialog "Enable UI Automation" blockiert Tests via SSH
+# macOS 26: automationmodetool ist die einzige SSH-taugliche Methode
 
 set -euo pipefail
-
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-PROFILE_PATH="$SCRIPT_DIR/focusblox-uitest-tcc.mobileconfig"
-PROFILE_IDENTIFIER="com.henning.focusblox.uitest-tcc"
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -20,27 +17,24 @@ error()   { echo -e "${RED}[ERROR]${NC} $1"; }
 usage() {
     echo "Usage: $0 [--install | --uninstall | --status]"
     echo ""
-    echo "  --install     Installiert das PPPC-Profil (benoetigt sudo)"
-    echo "  --uninstall   Entfernt das PPPC-Profil (benoetigt sudo)"
-    echo "  --status      Prueft ob das Profil installiert ist"
+    echo "  --install     Aktiviert Automation Mode ohne Auth-Dialog (benoetigt sudo)"
+    echo "  --uninstall   Deaktiviert Automation Mode ohne Auth (benoetigt sudo)"
+    echo "  --status      Prueft ob Automation Mode aktiv ist"
     echo ""
     echo "Ohne Argumente: --status"
 }
 
-check_profile_installed() {
-    if profiles -P 2>/dev/null | grep -q "$PROFILE_IDENTIFIER"; then
-        return 0
-    fi
-    return 1
+check_automation_mode() {
+    automationmodetool 2>&1 | grep -qi "does not require"
 }
 
 cmd_status() {
-    if check_profile_installed; then
-        info "PPPC-Profil ist installiert ($PROFILE_IDENTIFIER)"
+    if check_automation_mode; then
+        info "Automation Mode aktiv (ohne Auth-Dialog)"
         return 0
     else
-        warn "PPPC-Profil ist NICHT installiert"
-        echo "  Installieren mit: sudo $0 --install"
+        warn "Automation Mode NICHT aktiv — TCC-Dialog koennte Tests blockieren"
+        echo "  Aktivieren mit: sudo $0 --install"
         return 1
     fi
 }
@@ -52,47 +46,42 @@ cmd_install() {
         return 1
     fi
 
-    if [ ! -f "$PROFILE_PATH" ]; then
-        error "Profil nicht gefunden: $PROFILE_PATH"
-        return 1
-    fi
-
-    if check_profile_installed; then
-        info "Profil ist bereits installiert"
+    if check_automation_mode; then
+        info "Automation Mode ist bereits aktiv"
         return 0
     fi
 
-    info "Installiere PPPC-Profil..."
-    profiles install -type configuration -path "$PROFILE_PATH"
+    info "Aktiviere Automation Mode ohne Auth-Dialog..."
+    automationmodetool enable-automationmode-without-authentication
 
-    if check_profile_installed; then
-        info "Profil erfolgreich installiert!"
+    if check_automation_mode; then
+        info "Automation Mode erfolgreich aktiviert!"
         info "macOS UI Tests koennen jetzt ohne TCC-Dialog ausgefuehrt werden."
     else
-        error "Installation fehlgeschlagen — Profil nicht in 'profiles -P' gefunden"
+        error "Aktivierung fehlgeschlagen"
         return 1
     fi
 }
 
 cmd_uninstall() {
     if [ "$(id -u)" -ne 0 ]; then
-        error "Deinstallation benoetigt sudo"
+        error "Deaktivierung benoetigt sudo"
         echo "  Ausfuehren mit: sudo $0 --uninstall"
         return 1
     fi
 
-    if ! check_profile_installed; then
-        info "Profil ist nicht installiert — nichts zu tun"
+    if ! check_automation_mode; then
+        info "Automation Mode ist bereits deaktiviert — nichts zu tun"
         return 0
     fi
 
-    info "Entferne PPPC-Profil..."
-    profiles remove -identifier "$PROFILE_IDENTIFIER"
+    info "Deaktiviere Automation Mode ohne Auth..."
+    automationmodetool disable-automationmode-without-authentication
 
-    if ! check_profile_installed; then
-        info "Profil erfolgreich entfernt"
+    if ! check_automation_mode; then
+        info "Automation Mode deaktiviert"
     else
-        error "Deinstallation fehlgeschlagen"
+        error "Deaktivierung fehlgeschlagen"
         return 1
     fi
 }

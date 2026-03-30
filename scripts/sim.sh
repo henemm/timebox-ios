@@ -372,10 +372,10 @@ cmd_mac_test() {
         return 1
     fi
 
-    # BUG_111: Pruefen ob PPPC-Profil fuer TCC-Autorisierung installiert ist
-    if ! profiles -P 2>/dev/null | grep -q "com.henning.focusblox.uitest-tcc"; then
-        warn "PPPC-Profil nicht installiert — TCC-Dialog koennte Tests blockieren!"
-        warn "Installieren mit: sudo ./scripts/install-tcc-profile.sh --install"
+    # BUG_111: Pruefen ob Automation Mode ohne Auth-Dialog aktiv ist
+    if ! automationmodetool 2>&1 | grep -qi "does not require"; then
+        warn "Automation Mode nicht aktiv — TCC-Dialog koennte Tests blockieren!"
+        warn "Aktivieren mit: sudo ./scripts/install-tcc-profile.sh --install"
     fi
 
     info "Fuehre macOS UI Test aus: $TEST_TARGET"
