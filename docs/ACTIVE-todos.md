@@ -92,6 +92,7 @@
 
 | ID | Titel | Prio | Aufwand | Plattform | Beschreibung |
 |----|-------|------|---------|-----------|-------------|
+| ~~FEATURE_031~~ | ~~iOS App Icon Quick Actions (Long Press Menu)~~ | ~~Medium~~ | ~~S~~ | ~~iOS~~ | ~~3 Quick Actions: Task notieren, Sprint starten (SprintPickerSheet), Heute. Info.plist + AppDelegate + SprintPickerSheet.swift. [Spec](specs/features/FEATURE_031-quick-actions.md)~~ ERLEDIGT |
 | FEATURE_010 | macOS Backlog: Keyboard Shortcuts | Low | S | macOS | Cmd+N (neuer Task), Cmd+Delete (loeschen), etc. |
 | FEATURE_011 | macOS Backlog: Undo (Cmd+Z) | Low | S | macOS | iOS hat Shake-to-Undo. macOS Backlog hat kein Cmd+Z-Undo. |
 | ~~FEATURE_018~~ | ~~macOS Enhanced Quick Capture~~ | — | — | ~~macOS~~ | Ersetzt durch MAC_026 (siehe macOS Infrastruktur) |
@@ -109,7 +110,7 @@
 | ~~BUG_123~~ | ~~Recurring Child-Duplikate: 3x gleicher Task mit gleichem Datum im Backlog~~ | ~~High~~ | ~~S~~ | ~~Beide~~ | ~~Historische GroupID-Fragmentierung fuehrte zu mehreren offenen Instanzen derselben Serie mit identischem Datum. `deduplicateTemplates()` reassigned Kinder, aber deduplizierte nicht nach Datum. Fix: `deduplicateChildInstances()` in Startup-Sequenz nach Template-Dedup. Analyse: `docs/artifacts/bug-recurring-stacking/analysis.md`~~ ERLEDIGT |
 | ~~BUG_122~~ | ~~Sort-Lock: Nicht alle Task-Attribute editierbar waehrend Sortier-Sperre~~ | ~~High~~ | ~~S~~ | ~~iOS~~ | ~~`blockedRow()` in BacklogView.swift übergab keine Inline-Badge-Callbacks. Fix: 5 Callbacks (Importance, Urgency, Category, Duration, isPendingResort) ergänzt. macOS war nicht betroffen.~~ ERLEDIGT |
 | ~~BUG_115~~ | ~~Unit Test: BadgeOverdueNotificationTests erwartet 3 Actions, bekommt 4~~ | ~~Medium~~ | ~~S~~ | ~~iOS~~ | ~~Test erwartete alte 3-Action-Struktur (ACTION_POSTPONE), Code hat 4 Actions (POSTPONE_TOMORROW + POSTPONE_NEXT_WEEK). Test angepasst.~~ ERLEDIGT |
-| BUG_116 | Unit Test: LocalTaskSourceTests + SyncEngineTests Sortierung falsch | Medium | S | iOS | `test_fetchIncompleteTasks_sortsBySortOrder` und `test_sync_sortsByRank`: Tasks sind in falscher Reihenfolge. Sort-Logik in LocalTaskSource/SyncEngine stimmt nicht mit Test-Erwartungen ueberein. |
+| ~~BUG_116~~ | ~~Unit Test: LocalTaskSourceTests + SyncEngineTests Sortierung falsch~~ | ~~Medium~~ | ~~S~~ | ~~iOS~~ | ~~Tests erwarteten alte Sortierung (Bug 51 Fix). Irrelevanten Test geloescht (fetchIncompleteTasks-Sort hat keine User-Relevanz), sortsByRank an rank-desc angepasst.~~ ERLEDIGT |
 | BUG_117 | Unit Test: LocalTaskTests Default-Werte phase/category fehlen | Medium | S | iOS | `test_localTask_defaultValues_phase1`: Erwartet `phase="not_urgent"` und `category="maintenance"`, bekommt `nil`/`""`. Defaultwerte fehlen oder wurden geaendert. |
 | BUG_118 | Unit Test: NotificationSnoozeTests Postpone Next Week kaputt | Medium | S | iOS | `test_postponeNextWeek_advancesDueDateBySevenDays`: Datum wird nicht korrekt um 7 Tage vorgerueckt. Differenz zwischen erwartet/erhalten ist viel zu gross. |
 | BUG_119 | Unit Test: ReviewEventIntegrationTests Calendar-Events nicht kategorisiert | Medium | S | iOS | `testCategoryStatsIncludesCalendarEvents`: Erwartet 60/30 Min, erhaelt nil. Calendar-Events werden nicht in Category-Statistiken eingerechnet. |

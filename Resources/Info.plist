@@ -57,6 +57,33 @@
             <string>com.henning.timebox</string>
         </dict>
     </array>
+    <key>UIApplicationShortcutItems</key>
+    <array>
+        <dict>
+            <key>UIApplicationShortcutItemType</key>
+            <string>com.henning.focusblox.create-task</string>
+            <key>UIApplicationShortcutItemTitle</key>
+            <string>Task notieren</string>
+            <key>UIApplicationShortcutItemIconSymbolName</key>
+            <string>plus.circle</string>
+        </dict>
+        <dict>
+            <key>UIApplicationShortcutItemType</key>
+            <string>com.henning.focusblox.sprint-picker</string>
+            <key>UIApplicationShortcutItemTitle</key>
+            <string>Sprint starten</string>
+            <key>UIApplicationShortcutItemIconSymbolName</key>
+            <string>bolt.fill</string>
+        </dict>
+        <dict>
+            <key>UIApplicationShortcutItemType</key>
+            <string>com.henning.focusblox.day-view</string>
+            <key>UIApplicationShortcutItemTitle</key>
+            <string>Heute</string>
+            <key>UIApplicationShortcutItemIconSymbolName</key>
+            <string>calendar</string>
+        </dict>
+    </array>
     <key>UTExportedTypeDeclarations</key>
     <array>
         <dict>

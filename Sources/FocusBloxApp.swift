@@ -13,9 +13,11 @@ extension Notification.Name {
 
 @main
 struct FocusBloxApp: App {
+    @UIApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @Environment(\.scenePhase) private var scenePhase
     @State private var showQuickCapture = false
     @State private var quickCaptureTitle = ""
+    @State private var showSprintPicker = false
     @State private var selectedTab: AppTab = .backlog
     @State private var permissionRequested = false
     private let settings = AppSettings.shared
@@ -294,6 +296,10 @@ struct FocusBloxApp: App {
             .onAppear {
                 syncMonitor.startRemoteChangeMonitoring(container: sharedModelContainer)
                 resetUserDefaultsIfNeeded()
+                // Quick Action UI Test: open sprint picker on launch
+                if ProcessInfo.processInfo.arguments.contains("--show-sprint-picker") {
+                    showSprintPicker = true
+                }
                 // Migrate reminders-sourced tasks to local (one-time, idempotent)
                 // Then run existing dedup cleanup
                 if !ProcessInfo.processInfo.arguments.contains("-UITesting") {
@@ -404,6 +410,8 @@ struct FocusBloxApp: App {
                 } else if url.host == "create-task" {
                     quickCaptureTitle = ""
                     showQuickCapture = true
+                } else if url.host == "sprint-picker" {
+                    showSprintPicker = true
                 } else if FocusBlock.eventID(from: url) != nil {
                     selectedTab = .blox
                 }
@@ -419,6 +427,9 @@ struct FocusBloxApp: App {
             }
             .sheet(isPresented: $showQuickCapture) {
                 QuickCaptureView(initialTitle: quickCaptureTitle)
+            }
+            .sheet(isPresented: $showSprintPicker) {
+                SprintPickerSheet()
             }
         }
         .modelContainer(sharedModelContainer)
