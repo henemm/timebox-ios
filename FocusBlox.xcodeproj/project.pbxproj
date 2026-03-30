@@ -401,6 +401,7 @@
 		'SMARTENR00BUILD002' = {isa = PBXBuildFile; fileRef = SMARTENR00FILE0001; };
 		'SMARTGAPS001BUILDFILE00001' = {isa = PBXBuildFile; fileRef = SMARTGAPS001FILEREF000001; };
 		'SMTENR01BUILD0001' = {isa = PBXBuildFile; fileRef = SMTENR01FILE00001; };
+		REANALYZ01BUILD001 = {isa = PBXBuildFile; fileRef = REANALYZ01FILE0001; };
 		'SMTNOT01BUILD00001' = {isa = PBXBuildFile; fileRef = SMTNOT01FILE000001; };
 		'SMTNOT02BUILD00001' = {isa = PBXBuildFile; fileRef = SMTNOT02FILE000001; };
 		'SMTNOTB1BUILD0001' = {isa = PBXBuildFile; fileRef = SMTNOTB1FILE00001; };
@@ -984,6 +985,7 @@
 		'SMARTENR00FILE0001' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartTaskEnrichmentService.swift; sourceTree = "<group>"; };
 		'SMARTGAPS001FILEREF000001' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartGapsTests.swift; sourceTree = "<group>"; };
 		'SMTENR01FILE00001' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartTaskEnrichmentServiceTests.swift; sourceTree = "<group>"; };
+		REANALYZ01FILE0001 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReanalyzeTasksTests.swift; sourceTree = "<group>"; };
 		'SMTNOT01FILE000001' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartNotificationEngineTests.swift; sourceTree = "<group>"; };
 		'SMTNOT02FILE000001' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartNotificationEngineUITests.swift; sourceTree = "<group>"; };
 		'SMTNOTB1FILE00001' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartNotificationEnginePhaseBTests.swift; sourceTree = "<group>"; };
@@ -1548,6 +1550,7 @@
 				CTC2TEST0FILE00001,
 				95142243688D96B229D2FA41 /* MenuBarIconStateTests.swift */,
 				SMTENR01FILE00001,
+				REANALYZ01FILE0001,
 				REFNR01FILE000001,
 				0B783A31231C9313A86914B9 /* BadgeOverdueNotificationTests.swift */,
 				4B5428BC6A5B3155204FD1DF /* BadgeCountFilterTests.swift */,
@@ -2637,6 +2640,7 @@
 				CTC2TEST0BUILD0001,
 				F4222F8AEAECD043130A4C6B /* MenuBarIconStateTests.swift in Sources */,
 				SMTENR01BUILD0001,
+				REANALYZ01BUILD001,
 				REFNR01BUILD00001,
 				6AADB391CAF1B7B43535687E /* BadgeOverdueNotificationTests.swift in Sources */,
 				B8C8B1F5742E29A4FDF6BD53 /* BadgeCountFilterTests.swift in Sources */,

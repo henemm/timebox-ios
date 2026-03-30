@@ -81,6 +81,84 @@ final class SmartTaskEnrichmentService {
         return 0
     }
 
+    /// Re-analyze all incomplete tasks: title cleanup, date extraction, and AI enrichment.
+    /// Applies the full rule set (TaskTitleEngine + SmartTaskEnrichmentService) to every task.
+    /// Deterministic steps (title cleanup, date extraction) always run.
+    /// AI steps only run when Apple Intelligence is available.
+    /// Returns the number of tasks updated.
+    func reanalyzeAllTasks() async -> Int {
+        let predicate = #Predicate<LocalTask> { !$0.isCompleted }
+        let descriptor = FetchDescriptor<LocalTask>(predicate: predicate)
+
+        do {
+            let allTasks = try modelContext.fetch(descriptor)
+            let tasks = allTasks.filter { task in
+                task.lifecycleStatus != TaskLifecycleStatus.raw.rawValue
+            }
+            var updatedCount = 0
+
+            for task in tasks {
+                let changed = await reanalyzeTask(task)
+                if changed {
+                    updatedCount += 1
+                    try? await Task.sleep(for: .milliseconds(100))
+                }
+            }
+
+            try? modelContext.save()
+            return updatedCount
+        } catch {
+            print("[SmartEnrichment] Full reanalysis failed: \(error)")
+            return 0
+        }
+    }
+
+    /// Re-analyze a single task. Returns true if any field was changed.
+    /// Steps 1-2 are deterministic (always run), Steps 3-4 need AI.
+    func reanalyzeTask(_ task: LocalTask) async -> Bool {
+        var changed = false
+
+        // Capture original title BEFORE cleanup for date extraction
+        let originalTitle = task.taskDescription ?? task.title
+
+        // Step 1: Title cleanup (date keywords, urgency keywords, intro phrases)
+        let cleanedTitle = TaskTitleEngine.cleanTitle(task.title)
+        if cleanedTitle != task.title {
+            task.title = cleanedTitle
+            changed = true
+        }
+
+        // Step 2: Date extraction from original title (pre-cleanup)
+        if task.dueDate == nil,
+           TaskTitleEngine.titleContainsDateKeyword(originalTitle),
+           let date = TaskTitleEngine.extractDeterministicDueDate(from: originalTitle) {
+            task.dueDate = date
+            changed = true
+        }
+
+        // Steps 3-4: AI enrichment (only when available)
+        #if canImport(FoundationModels)
+        if #available(iOS 26.0, macOS 26.0, *), Self.isAvailable {
+            // Step 3: AI enrichment for missing attributes
+            let needsEnrichment = task.importance == nil || task.urgency == nil ||
+                task.taskType.isEmpty || task.aiEnergyLevel == nil
+            if needsEnrichment {
+                await performEnrichment(task)
+                changed = true
+            }
+
+            // Step 4: AI category + duration estimation
+            let needsCategoryOrDuration = task.taskType.isEmpty || task.estimatedDuration == nil
+            if needsCategoryOrDuration {
+                await enrichCategoryAndDuration(task)
+                changed = true
+            }
+        }
+        #endif
+
+        return changed
+    }
+
     #if canImport(FoundationModels)
     @available(iOS 26.0, macOS 26.0, *)
     private func performBatchEnrichment() async -> Int {
@@ -105,6 +183,33 @@ final class SmartTaskEnrichmentService {
         } catch {
             print("[SmartEnrichment] Batch fetch failed: \(error)")
             return 0
+        }
+    }
+
+    @available(iOS 26.0, macOS 26.0, *)
+    private func enrichCategoryAndDuration(_ task: LocalTask) async {
+        do {
+            let session = LanguageModelSession {
+                "Categorize tasks and estimate duration."
+                "Categories: income (work/career/money), maintenance (household/errands/health), recharge (exercise/hobbies/rest), learning (study/reading/courses), giving_back (family/friends/social)"
+                "Duration: 5 (quick call/message), 15 (short errand), 30 (medium task), 60 (long/deep work)"
+            }
+
+            let prompt = "Task: \(task.title)"
+            let response = try await session.respond(to: prompt, generating: TaskTitleEngine.TaskSuggestion.self)
+            let result = response.content
+
+            let validCategories = ["income", "maintenance", "recharge", "learning", "giving_back"]
+            if task.taskType.isEmpty, validCategories.contains(result.category) {
+                task.taskType = result.category
+            }
+
+            if task.estimatedDuration == nil, let minutes = Int(result.estimatedMinutes),
+               [5, 15, 30, 60].contains(minutes) {
+                task.estimatedDuration = minutes
+            }
+        } catch {
+            print("[SmartEnrichment] Category/duration enrichment failed for '\(task.title)': \(error)")
         }
     }
     #endif

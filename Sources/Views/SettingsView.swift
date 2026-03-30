@@ -129,7 +129,7 @@ struct SettingsView: View {
                     Text("Tasks")
                 }
 
-                // Section: Apple Intelligence (only visible when available)
+                // Section: Automatic Task Analysis (only visible when available)
                 if SmartTaskEnrichmentService.isAvailable {
                     Section {
                         Toggle("KI Task-Enrichment", isOn: $aiScoringEnabled)
@@ -141,7 +141,7 @@ struct SettingsView: View {
                                     isEnriching = true
                                     enrichResult = nil
                                     let service = SmartTaskEnrichmentService(modelContext: modelContext)
-                                    let count = await service.enrichAllTbdTasks()
+                                    let count = await service.reanalyzeAllTasks()
                                     enrichResult = count
                                     isEnriching = false
                                 }
@@ -161,9 +161,9 @@ struct SettingsView: View {
                             .accessibilityIdentifier("batchEnrichButton")
                         }
                     } header: {
-                        Text("Apple Intelligence")
+                        Text("Automatische Task-Analyse")
                     } footer: {
-                        Text("Ergänzt fehlende Task-Attribute (Wichtigkeit, Dringlichkeit, Kategorie) automatisch aus dem Titel.")
+                        Text("Bereinigt Titel, extrahiert Datumsangaben und ergänzt fehlende Attribute (Wichtigkeit, Dringlichkeit, Kategorie, Dauer) automatisch.")
                     }
                 }
 

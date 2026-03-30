@@ -106,7 +106,7 @@ struct MacSettingsView: View {
                                 isEnriching = true
                                 enrichResult = nil
                                 let service = SmartTaskEnrichmentService(modelContext: modelContext)
-                                let count = await service.enrichAllTbdTasks()
+                                let count = await service.reanalyzeAllTasks()
                                 enrichResult = count
                                 isEnriching = false
                             }
@@ -127,9 +127,9 @@ struct MacSettingsView: View {
                         .accessibilityIdentifier("batchEnrichButton")
                     }
                 } header: {
-                    Text("Apple Intelligence")
+                    Text("Automatische Task-Analyse")
                 } footer: {
-                    Text("Ergänzt fehlende Task-Attribute (Wichtigkeit, Dringlichkeit, Kategorie) automatisch aus dem Titel.")
+                    Text("Bereinigt Titel, extrahiert Datumsangaben und ergänzt fehlende Attribute (Wichtigkeit, Dringlichkeit, Kategorie, Dauer) automatisch.")
                 }
             }
 
