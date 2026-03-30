@@ -1,0 +1,27 @@
+test_fallback_checks_affected_files (__main__.TestActiveWorkflowFallback.test_fallback_checks_affected_files)
+When file is not in any workflow's affected_files, ... ok
+test_token_for_other_workflow_does_not_bypass (__main__.TestOverrideTokenLeak.test_token_for_other_workflow_does_not_bypass)
+Token for 'INFRA_002' must NOT allow edits for 'bug-reanalyze-tasks'. ... FAIL
+
+======================================================================
+FAIL: test_token_for_other_workflow_does_not_bypass (__main__.TestOverrideTokenLeak.test_token_for_other_workflow_does_not_bypass)
+Token for 'INFRA_002' must NOT allow edits for 'bug-reanalyze-tasks'.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/hem/Developer/my-daily-sprints/docs/artifacts/INFRA_002-P3-fix/test_edit_gate_bugs.py", line 74, in test_token_for_other_workflow_does_not_bypass
+    self.assertNotEqual(
+    ~~~~~~~~~~~~~~~~~~~^
+        result.returncode, 0,
+        ^^^^^^^^^^^^^^^^^^^^^
+        "Token for INFRA_002-P3 should NOT bypass edit gate for a different workflow in phase1. "
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        f"stderr: {result.stderr}"
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ) if result.returncode == 0 and "override" not in result.stderr.lower() else None
+    ^
+AssertionError: 0 == 0 : Token for INFRA_002-P3 should NOT bypass edit gate for a different workflow in phase1. stderr: 
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.025s
+
+FAILED (failures=1)

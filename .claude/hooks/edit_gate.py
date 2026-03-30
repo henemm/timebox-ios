@@ -104,7 +104,15 @@ def _find_workflow_for_file(file_path: str) -> dict | None:
 
 
 def _has_override_token(workflow_name: str = None) -> bool:
-    """Check override token."""
+    """Check override token for a SPECIFIC workflow. No fallback to 'any token'.
+
+    Args:
+        workflow_name: Required. Only returns True if a token exists for THIS workflow.
+                       Special values: "__infra__" for infrastructure files.
+                       None always returns False (no anonymous overrides).
+    """
+    if not workflow_name:
+        return False
     token_file = _project_root() / ".claude" / "user_override_token.json"
     if not token_file.exists():
         return False
@@ -113,9 +121,7 @@ def _has_override_token(workflow_name: str = None) -> bool:
         tokens = data.get("tokens", {}) if data.get("version") == 2 else (
             {data["workflow"]: data} if "workflow" in data else {}
         )
-        if workflow_name and workflow_name in tokens:
-            return True
-        return bool(tokens)  # Any valid token
+        return workflow_name in tokens
     except (json.JSONDecodeError, OSError):
         return False
 
@@ -183,10 +189,15 @@ def main():
         print("BLOCKED: Stop-lock active.", file=sys.stderr)
         sys.exit(2)
 
-    # 6. Find workflow for file
+    # 6. Find workflow for file (by affected_files match)
     workflow = _find_workflow_for_file(file_path)
     if not workflow:
-        workflow = _read_active_workflow()
+        # Fallback: active workflow ONLY if it has no affected_files yet
+        # (early phase, files not scoped yet). If it HAS affected_files
+        # but this file isn't in them → out of scope, don't fallback.
+        active = _read_active_workflow()
+        if active and not active.get("affected_files"):
+            workflow = active
 
     # 7. No workflow
     if not workflow:

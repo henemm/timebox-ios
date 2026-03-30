@@ -1,0 +1,9 @@
+test_fallback_checks_affected_files (__main__.TestActiveWorkflowFallback.test_fallback_checks_affected_files)
+When file is not in any workflow's affected_files, ... ok
+test_token_for_other_workflow_does_not_bypass (__main__.TestOverrideTokenLeak.test_token_for_other_workflow_does_not_bypass)
+Token for 'INFRA_002' must NOT allow edits for 'bug-reanalyze-tasks'. ... ok
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.097s
+
+OK
