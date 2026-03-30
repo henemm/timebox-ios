@@ -372,6 +372,12 @@ cmd_mac_test() {
         return 1
     fi
 
+    # BUG_111: Pruefen ob PPPC-Profil fuer TCC-Autorisierung installiert ist
+    if ! profiles -P 2>/dev/null | grep -q "com.henning.focusblox.uitest-tcc"; then
+        warn "PPPC-Profil nicht installiert — TCC-Dialog koennte Tests blockieren!"
+        warn "Installieren mit: sudo ./scripts/install-tcc-profile.sh --install"
+    fi
+
     info "Fuehre macOS UI Test aus: $TEST_TARGET"
     cd "$PROJECT_DIR"
 

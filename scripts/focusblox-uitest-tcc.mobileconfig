@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>PayloadDescription</key>
+    <string>Grants UI Automation (Accessibility) permission to the FocusBlox macOS UI Test runner, preventing the TCC dialog that blocks automated test execution via SSH.</string>
+    <key>PayloadDisplayName</key>
+    <string>FocusBlox macOS UI Test Automation</string>
+    <key>PayloadIdentifier</key>
+    <string>com.henning.focusblox.uitest-tcc</string>
+    <key>PayloadOrganization</key>
+    <string>Henning Meyerhenke</string>
+    <key>PayloadType</key>
+    <string>Configuration</string>
+    <key>PayloadUUID</key>
+    <string>A1B2C3D4-E5F6-7890-ABCD-EF1234567890</string>
+    <key>PayloadVersion</key>
+    <integer>1</integer>
+    <key>PayloadContent</key>
+    <array>
+        <dict>
+            <key>PayloadType</key>
+            <string>com.apple.TCC.configuration-profile-policy</string>
+            <key>PayloadUUID</key>
+            <string>B2C3D4E5-F6A7-8901-BCDE-F12345678901</string>
+            <key>PayloadIdentifier</key>
+            <string>com.henning.focusblox.uitest-tcc.tcc</string>
+            <key>PayloadVersion</key>
+            <integer>1</integer>
+            <key>Services</key>
+            <dict>
+                <key>Accessibility</key>
+                <array>
+                    <dict>
+                        <key>Identifier</key>
+                        <string>henemm.FocusBloxMacUITests.xctrunner</string>
+                        <key>IdentifierType</key>
+                        <string>bundleID</string>
+                        <key>CodeRequirement</key>
+                        <string>identifier "henemm.FocusBloxMacUITests.xctrunner" and anchor apple generic and certificate leaf[subject.OU] = "XK87E2B3VR"</string>
+                        <key>StaticCode</key>
+                        <false/>
+                        <key>Allowed</key>
+                        <true/>
+                    </dict>
+                </array>
+            </dict>
+        </dict>
+    </array>
+</dict>
+</plist>
