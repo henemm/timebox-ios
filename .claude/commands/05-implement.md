@@ -130,7 +130,7 @@ Starte den `implementation-validator` Agent:
 ```
 Task (implementation-validator): "Pruefe den aktuellen Workflow.
   Lies die Spec, fuehre Tests aus, mach Screenshots, pruefe Edge Cases.
-  Ruf am Ende adversary_gate.py auf."
+  Ruf am Ende qa_gate.py auf."
 ```
 
 Der Adversary-Agent:
@@ -138,7 +138,7 @@ Der Adversary-Agent:
 2. Fuehrt Tests aus → `/tmp/adversary_test_output.txt`
 3. Macht Screenshots → `/tmp/adversary_screenshot.png`
 4. Prueft Edge Cases
-5. Ruft `adversary_gate.py` auf → setzt Verdict
+5. Ruft `qa_gate.py` auf → setzt Verdict
 
 **Wenn Adversary BROKEN meldet:**
 - Fixen und Step 7 wiederholen

@@ -1,0 +1,18 @@
+test_implement_command_no_old_refs (__main__.TestBrokenReferencesFixed.test_implement_command_no_old_refs)
+05-implement.md must not reference adversary_gate.py. ... ok
+test_implementation_validator_no_old_refs (__main__.TestBrokenReferencesFixed.test_implementation_validator_no_old_refs)
+implementation-validator.md must not reference workflow_state_multi. ... ok
+test_qa_gate_exists (__main__.TestQaGateExists.test_qa_gate_exists) ... ok
+test_accepts_valid_output (__main__.TestQaGateValidation.test_accepts_valid_output)
+Accepts valid test output with both test targets. ... ok
+test_infra_flag_skips_target_check (__main__.TestQaGateValidation.test_infra_flag_skips_target_check)
+--infra flag accepts Python test output without FocusBlox targets. ... ok
+test_rejects_empty_file (__main__.TestQaGateValidation.test_rejects_empty_file)
+Rejects empty/tiny test output. ... ok
+test_rejects_no_test_patterns (__main__.TestQaGateValidation.test_rejects_no_test_patterns)
+Rejects file without test suite patterns. ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.307s
+
+OK

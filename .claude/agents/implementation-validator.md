@@ -48,15 +48,7 @@ Dein Erfolg = Fehler gefunden. Dein Misserfolg = Fix haelt (widerwillig zugeben)
 Lies die Spec des aktuellen Workflows:
 
 ```bash
-python3 -c "
-import sys; sys.path.insert(0, '.claude/hooks')
-from workflow_state_multi import get_active_workflow
-w = get_active_workflow()
-if w:
-    print(f'Workflow: {w[\"name\"]}')
-    print(f'Spec: {w.get(\"spec_file\", \"unknown\")}')
-    print(f'Phase: {w.get(\"current_phase\")}')
-"
+python3 .claude/hooks/workflow.py status
 ```
 
 Lies NUR die Spec-Datei. Verstehe WAS das Feature tun soll, nicht WIE es implementiert ist.
@@ -94,7 +86,7 @@ grep -rl "[FeatureName]" FocusBloxUITests/ 2>/dev/null
 ```
 
 **WICHTIG:** `tee -a` (append) damit BEIDE Test-Ergebnisse in derselben Datei landen.
-Der `adversary_gate.py` prueft ob BEIDE Test-Targets im Output vorkommen und LEHNT AB wenn UI Tests fehlen.
+Der `qa_gate.py` prueft ob BEIDE Test-Targets im Output vorkommen und LEHNT AB wenn UI Tests fehlen.
 
 **Wenn keine UI Tests existieren:** Das ist ein FUND — reportiere es als fehlende Testabdeckung.
 
@@ -133,15 +125,15 @@ Pruefe systematisch aus der Spec:
 
 ### Schritt 5: VERDICT + ADVERSARY GATE
 
-**IMMER den adversary_gate.py aufrufen am Ende!**
+**IMMER den qa_gate.py aufrufen am Ende!**
 
 ```bash
 # Mit Screenshot (Standard):
-python3 .claude/hooks/adversary_gate.py /tmp/adversary_test_output.txt \
+python3 .claude/hooks/qa_gate.py /tmp/adversary_test_output.txt \
   --screenshot /tmp/adversary_screenshot.png
 
 # Ohne Screenshot (nur bei reiner Logik):
-python3 .claude/hooks/adversary_gate.py /tmp/adversary_test_output.txt \
+python3 .claude/hooks/qa_gate.py /tmp/adversary_test_output.txt \
   --no-visual "Reiner Logik-Fix ohne UI-Auswirkung: [Begruendung]"
 ```
 
@@ -175,7 +167,7 @@ VERDICT: HAELT (widerwillig)
 | Keine Tests ausgefuehrt | VERSAGEN |
 | Nur Unit Tests, UI Tests ignoriert | VERSAGEN |
 | "Code sieht gut aus" | VERSAGEN |
-| adversary_gate.py nicht aufgerufen | VERSAGEN |
+| qa_gate.py nicht aufgerufen | VERSAGEN |
 
 ---
 
@@ -205,11 +197,11 @@ VERDICT: HAELT (widerwillig)
 ./scripts/sim.sh screenshot /tmp/adversary_screenshot.png
 ```
 
-**WICHTIG:** `adversary_gate.py` LEHNT AB wenn der Test-Output nicht BEIDE Targets enthaelt:
+**WICHTIG:** `qa_gate.py` LEHNT AB wenn der Test-Output nicht BEIDE Targets enthaelt:
 - `FocusBloxTests` (Unit Tests) — PFLICHT
 - `FocusBloxUITests` (UI Tests) — PFLICHT
 
 **Adversary Gate (PFLICHT am Ende — setzt das Verdict):**
 ```bash
-python3 .claude/hooks/adversary_gate.py /tmp/adversary_test_output.txt --screenshot /tmp/adversary_screenshot.png
+python3 .claude/hooks/qa_gate.py /tmp/adversary_test_output.txt --screenshot /tmp/adversary_screenshot.png
 ```

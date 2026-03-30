@@ -56,7 +56,7 @@ WRITE_INDICATORS = [
 ]
 
 WHITELIST_COMMANDS = [
-    "workflow.py", "adversary_gate.py", "inspection_gate.py", "preflight_gate.py",
+    "workflow.py", "qa_gate.py",
     "git add", "git commit", "git diff", "git status", "git log", "git push",
 ]
 
