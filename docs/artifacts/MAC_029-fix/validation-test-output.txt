@@ -1,0 +1,29 @@
+== MAC_029-fix Validation Test Output ==
+Date: 2026-03-30
+
+== Unit Tests: MenuBarIdleIconTests (macOS) ==
+Test Case 'test_makeMenuBarIcon_hasAlphaGradient' passed (0.344 seconds).
+Test Case 'test_makeMenuBarIcon_hasGapBetweenRings' passed (0.003 seconds).
+Test Case 'test_makeMenuBarIcon_isTemplate' passed (0.001 seconds).
+Test Case 'test_makeMenuBarIcon_resizesToTargetSize' passed (0.000 seconds).
+Test Case 'test_makeMenuBarIcon_transparentOutsideCircle' passed (0.002 seconds).
+
+Executed 5 tests, with 0 failures (0 unexpected) in 0.354 seconds
+
+** TEST SUCCEEDED **
+
+== UI Tests ==
+N/A: macOS MenuBar ist nicht per XCUITest testbar.
+Visuelle Inspektion per A/B-Vergleich in der Menüleiste bestätigt korrekte Proportionen.
+User hat Variante C (final) bestätigt.
+
+== Regression Check ==
+Full macOS test suite: all tests passed, 0 regressions.
+
+== Spec Compliance ==
+5/5 criteria met: makeMenuBarIcon(size:) signature, isTemplate=true,
+three concentric circles (stroke), transparent gaps, alpha gradient (1.0 > 0.75 > 0.60).
+
+== Final Parameters ==
+outerRingWidth: 0.28, midRingWidth: 0.22, midRadius: 0.54, coreRadius: 0.13
+midAlpha: 0.75, coreAlpha: 0.60

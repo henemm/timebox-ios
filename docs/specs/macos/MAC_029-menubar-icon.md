@@ -2,9 +2,9 @@
 entity_id: mac_029_menubar_icon
 type: module
 created: 2026-03-29
-updated: 2026-03-29
+updated: 2026-03-30
 status: draft
-version: "1.0"
+version: "1.1"
 tags: [macos, menubar, icon]
 ---
 
@@ -53,30 +53,31 @@ static func makeMenuBarIcon(size: NSSize) -> NSImage {
     let image = NSImage(size: size, flipped: false) { rect in
         let center = NSPoint(x: rect.midX, y: rect.midY)
         let maxRadius = min(rect.width, rect.height) / 2
-        let ringWidth = maxRadius * 0.18
+        let outerRingWidth = maxRadius * 0.28
+        let midRingWidth = maxRadius * 0.22
 
-        // Äußerer Ring (gestrokt, nicht gefüllt)
-        NSColor.black.withAlphaComponent(0.55).setStroke()
+        // Äußerer Ring (gestrokt, hellster Ring — wie im App-Icon)
+        NSColor.black.withAlphaComponent(1.0).setStroke()
         let outerPath = NSBezierPath()
-        outerPath.appendOval(in: rect.insetBy(dx: ringWidth / 2, dy: ringWidth / 2))
-        outerPath.lineWidth = ringWidth
+        outerPath.appendOval(in: rect.insetBy(dx: outerRingWidth / 2, dy: outerRingWidth / 2))
+        outerPath.lineWidth = outerRingWidth
         outerPath.stroke()
 
-        // Mittlerer Ring
+        // Mittlerer Ring (dunkler als äußerer)
         NSColor.black.withAlphaComponent(0.75).setStroke()
-        let midRadius = maxRadius * 0.58
+        let midRadius = maxRadius * 0.54
         let midRect = NSRect(
             x: center.x - midRadius, y: center.y - midRadius,
             width: midRadius * 2, height: midRadius * 2
         )
         let midPath = NSBezierPath()
-        midPath.appendOval(in: midRect.insetBy(dx: ringWidth / 2, dy: ringWidth / 2))
-        midPath.lineWidth = ringWidth
+        midPath.appendOval(in: midRect.insetBy(dx: midRingWidth / 2, dy: midRingWidth / 2))
+        midPath.lineWidth = midRingWidth
         midPath.stroke()
 
-        // Innerer Kern (gefüllt)
-        NSColor.black.setFill()
-        let coreRadius = maxRadius * 0.22
+        // Innerer Kern (gefüllt, dunkelster — wie im App-Icon)
+        NSColor.black.withAlphaComponent(0.60).setFill()
+        let coreRadius = maxRadius * 0.13
         let coreRect = NSRect(
             x: center.x - coreRadius, y: center.y - coreRadius,
             width: coreRadius * 2, height: coreRadius * 2
@@ -117,8 +118,10 @@ Bei 18x18pt @2x (36px) sind die Kreise scharf und als konzentrische Ringe erkenn
 ## Known Limitations
 
 - Template-Images können nur einfarbig sein (keine Farbverläufe) — bewusste Design-Entscheidung, da macOS Template-Images für Menüzeilen-Icons erwartet.
-- Die Alpha-Werte (0.15 / 0.4 / 1.0) und Radien-Faktoren (0.35 / 0.25) sind kalibrierte Startwerte. Falls das Ergebnis visuell nicht passt, werden die Werte in derselben Iteration angepasst — kein separates Backlog-Item nötig.
+- Die Proportionen (0.28 / 0.22 / 0.54 / 0.13) und Alpha-Werte (1.0 / 0.75 / 0.60) wurden durch iterativen visuellen Vergleich mit dem App-Icon optimiert. Alpha-Gradient: außen hell → innen dunkel (wie im App-Icon).
 
 ## Changelog
 
 - 2026-03-29: Initial spec created
+- 2026-03-30: v1.1 — Proportionen und Alpha-Gradient aus Pixel-Analyse des App-Icons korrigiert
+- 2026-03-30: v1.2 — Proportionen durch iterativen A/B-Vergleich in der Menüleiste finalisiert (outer 0.28, mid 0.22@0.54r, core 0.13, alpha 1.0/0.75/0.60)

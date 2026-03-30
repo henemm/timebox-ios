@@ -42,30 +42,31 @@ final class MenuBarController: NSObject {
         let image = NSImage(size: size, flipped: false) { rect in
             let center = NSPoint(x: rect.midX, y: rect.midY)
             let maxRadius = min(rect.width, rect.height) / 2
-            let ringWidth = maxRadius * 0.18
+            let outerRingWidth = maxRadius * 0.28
+            let midRingWidth = maxRadius * 0.22
 
-            // Outer ring (stroked, not filled)
-            NSColor.black.withAlphaComponent(0.55).setStroke()
+            // Outer ring (stroked, brightest)
+            NSColor.black.withAlphaComponent(1.0).setStroke()
             let outerPath = NSBezierPath()
-            outerPath.appendOval(in: rect.insetBy(dx: ringWidth / 2, dy: ringWidth / 2))
-            outerPath.lineWidth = ringWidth
+            outerPath.appendOval(in: rect.insetBy(dx: outerRingWidth / 2, dy: outerRingWidth / 2))
+            outerPath.lineWidth = outerRingWidth
             outerPath.stroke()
 
             // Middle ring
             NSColor.black.withAlphaComponent(0.75).setStroke()
-            let midRadius = maxRadius * 0.58
+            let midRadius = maxRadius * 0.54
             let midRect = NSRect(
                 x: center.x - midRadius, y: center.y - midRadius,
                 width: midRadius * 2, height: midRadius * 2
             )
             let midPath = NSBezierPath()
-            midPath.appendOval(in: midRect.insetBy(dx: ringWidth / 2, dy: ringWidth / 2))
-            midPath.lineWidth = ringWidth
+            midPath.appendOval(in: midRect.insetBy(dx: midRingWidth / 2, dy: midRingWidth / 2))
+            midPath.lineWidth = midRingWidth
             midPath.stroke()
 
-            // Inner core (filled circle)
-            NSColor.black.setFill()
-            let coreRadius = maxRadius * 0.22
+            // Inner core
+            NSColor.black.withAlphaComponent(0.60).setFill()
+            let coreRadius = maxRadius * 0.13
             let coreRect = NSRect(
                 x: center.x - coreRadius, y: center.y - coreRadius,
                 width: coreRadius * 2, height: coreRadius * 2
@@ -77,6 +78,7 @@ final class MenuBarController: NSObject {
         image.isTemplate = true
         return image
     }
+
     private static let allDoneImage = NSImage(
         systemSymbolName: "checkmark.circle.fill",
         accessibilityDescription: "FocusBlox — alle Tasks erledigt"

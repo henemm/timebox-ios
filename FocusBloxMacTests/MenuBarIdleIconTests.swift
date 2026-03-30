@@ -29,8 +29,8 @@ final class MenuBarIdleIconTests: XCTestCase {
 
     // MARK: - Alpha-Gradient (konzentrische Kreise)
 
-    /// Verhalten: Aeusserer Rand hat niedrigere Alpha als innerer Kern (Tiefeneffekt)
-    /// Bricht wenn: Alle Kreise mit gleicher Alpha gezeichnet werden oder Zeichenlogik fehlt
+    /// Verhalten: Aeusserer Ring hat hoehere Alpha als innerer Kern (wie im App-Icon: aussen hell, innen dunkler)
+    /// Bricht wenn: Alle Kreise mit gleicher Alpha gezeichnet werden oder Gradient umgekehrt
     func test_makeMenuBarIcon_hasAlphaGradient() {
         // Groesseres Image fuer zuverlaessigere Pixel-Analyse
         let size = NSSize(width: 100, height: 100)
@@ -42,22 +42,22 @@ final class MenuBarIdleIconTests: XCTestCase {
             return
         }
 
-        // Mittelpunkt: hohe Alpha (innerer Kern)
+        // Mittelpunkt: niedrigere Alpha (innerer Kern, dunkler)
         let centerX = bitmap.pixelsWide / 2
         let centerY = bitmap.pixelsHigh / 2
         let centerColor = bitmap.colorAt(x: centerX, y: centerY)
         let centerAlpha = centerColor?.alphaComponent ?? 0
 
-        // Rand: niedrige Alpha (aeusserer Ring)
-        // Punkt bei ~90% des Radius (nah am Rand, aber innerhalb des aeusseren Kreises)
+        // Rand: hohe Alpha (aeusserer Ring, hellster)
+        // Punkt bei ~92% des Radius (innerhalb des aeusseren Rings)
         let edgeX = Int(Double(bitmap.pixelsWide) * 0.92)
         let edgeY = bitmap.pixelsHigh / 2
         let edgeColor = bitmap.colorAt(x: edgeX, y: edgeY)
         let edgeAlpha = edgeColor?.alphaComponent ?? 0
 
-        XCTAssertGreaterThan(centerAlpha, 0.8, "Kern muss hohe Alpha haben (erwartet >0.8, bekommen \(centerAlpha))")
-        XCTAssertLessThan(edgeAlpha, 0.6, "Rand muss niedrigere Alpha als Kern haben (erwartet <0.6, bekommen \(edgeAlpha))")
-        XCTAssertGreaterThan(centerAlpha, edgeAlpha, "Kern-Alpha (\(centerAlpha)) muss groesser sein als Rand-Alpha (\(edgeAlpha))")
+        XCTAssertGreaterThan(edgeAlpha, 0.8, "Aeusserer Ring muss hohe Alpha haben (erwartet >0.8, bekommen \(edgeAlpha))")
+        XCTAssertLessThan(centerAlpha, 0.65, "Kern muss niedrigere Alpha als Rand haben (erwartet <0.65, bekommen \(centerAlpha))")
+        XCTAssertGreaterThan(edgeAlpha, centerAlpha, "Rand-Alpha (\(edgeAlpha)) muss groesser sein als Kern-Alpha (\(centerAlpha))")
     }
 
     /// Verhalten: Zwischen den Ringen muss eine transparente Luecke sein (nicht gefuellt)
@@ -72,8 +72,9 @@ final class MenuBarIdleIconTests: XCTestCase {
             return
         }
 
-        // Punkt bei ~65% des Radius: Luecke zwischen aeusserem Ring (endet bei ~82%) und mittlerem Ring (endet bei ~58%+9%)
-        let gapX = Int(Double(bitmap.pixelsWide) * 0.65)
+        // Punkt bei ~85% des Bitmap-Breite: Luecke zwischen aeusserem und mittlerem Ring
+        // (bei @2x Retina: Luecke in Points bei ~70% des Radius, in Pixel bei ~85%)
+        let gapX = Int(Double(bitmap.pixelsWide) * 0.85)
         let gapY = bitmap.pixelsHigh / 2
         let gapColor = bitmap.colorAt(x: gapX, y: gapY)
         let gapAlpha = gapColor?.alphaComponent ?? 1.0
