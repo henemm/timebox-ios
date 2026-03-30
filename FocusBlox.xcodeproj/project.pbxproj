@@ -127,6 +127,7 @@
 		AFF14827AB249970A3471374 /* NextUpSuggestionServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5AB41B49361F9C4F2416C80 /* NextUpSuggestionServiceTests.swift */; };
 		'AISCORE01BUILD0001' = {isa = PBXBuildFile; fileRef = AISCORE01FILE00001; };
 		'AISCORE01UIBLD0001' = {isa = PBXBuildFile; fileRef = AISCORE01UIFILE001; };
+		REANALYZUI01BLD001 = {isa = PBXBuildFile; fileRef = REANALYZUI01FILE01; };
 		'AITASKSCOR0BUILD001' = {isa = PBXBuildFile; fileRef = AITASKSCOR0FILE0001; };
 		'AITASKSCOR0BUILD002' = {isa = PBXBuildFile; fileRef = AITASKSCOR0FILE0001; };
 		'APPGRP02BUILD0001' = {isa = PBXBuildFile; fileRef = APPGRP02FILE00001; };
@@ -770,6 +771,7 @@
 		ACAD471A879DD844257AC3A7 /* BacklogParkdeckUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = BacklogParkdeckUITests.swift; path = FocusBloxUITests/BacklogParkdeckUITests.swift; sourceTree = SOURCE_ROOT; };
 		'AISCORE01FILE00001' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AITaskScoringServiceTests.swift; sourceTree = "<group>"; };
 		'AISCORE01UIFILE001' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AITaskScoringUITests.swift; sourceTree = "<group>"; };
+		REANALYZUI01FILE01 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReanalyzeButtonUITests.swift; sourceTree = "<group>"; };
 		'AITASKSCOR0FILE0001' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AITaskScoringService.swift; sourceTree = "<group>"; };
 		'APPGRP02FILE00001' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppGroupSwiftDataTests.swift; sourceTree = "<group>"; };
 		'APPSET01FILEREF00001' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
@@ -1260,6 +1262,7 @@
 				NXSWIPE01UIREF01,
 				NXLP01UIREF0001,
 				AISCORE01UIFILE001,
+				REANALYZUI01FILE01,
 				DUEDN02FILE0000001,
 				SMTNOT02FILE000001,
 				SMTNOTB2FILE00001,
@@ -2472,6 +2475,7 @@
 				DAILYR01BUILDFILE0001,
 				TSKDTUI1BUILDFILE001,
 				AISCORE01UIBLD0001,
+				REANALYZUI01BLD001,
 				REMSYNC1BUILDFILE001,
 				REMSYNC4BUILDFILE001,
 				REMLIST1BUILDFILE001,

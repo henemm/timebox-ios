@@ -129,42 +129,41 @@ struct SettingsView: View {
                     Text("Tasks")
                 }
 
-                // Section: Automatic Task Analysis (only visible when available)
-                if SmartTaskEnrichmentService.isAvailable {
-                    Section {
+                // Section: Automatic Task Analysis (always visible — deterministic steps work without AI)
+                Section {
+                    if SmartTaskEnrichmentService.isAvailable {
                         Toggle("KI Task-Enrichment", isOn: $aiScoringEnabled)
                             .accessibilityIdentifier("aiScoringToggle")
-
-                        if aiScoringEnabled {
-                            Button {
-                                Task {
-                                    isEnriching = true
-                                    enrichResult = nil
-                                    let service = SmartTaskEnrichmentService(modelContext: modelContext)
-                                    let count = await service.reanalyzeAllTasks()
-                                    enrichResult = count
-                                    isEnriching = false
-                                }
-                            } label: {
-                                HStack {
-                                    Text("Bestehende Tasks analysieren")
-                                    Spacer()
-                                    if isEnriching {
-                                        ProgressView()
-                                    } else if let result = enrichResult {
-                                        Text("\(result) aktualisiert")
-                                            .foregroundStyle(.secondary)
-                                    }
-                                }
-                            }
-                            .disabled(isEnriching)
-                            .accessibilityIdentifier("batchEnrichButton")
-                        }
-                    } header: {
-                        Text("Automatische Task-Analyse")
-                    } footer: {
-                        Text("Bereinigt Titel, extrahiert Datumsangaben und ergänzt fehlende Attribute (Wichtigkeit, Dringlichkeit, Kategorie, Dauer) automatisch.")
                     }
+
+                    Button {
+                        Task {
+                            isEnriching = true
+                            enrichResult = nil
+                            let service = SmartTaskEnrichmentService(modelContext: modelContext)
+                            let count = await service.reanalyzeAllTasks()
+                            enrichResult = count
+                            isEnriching = false
+                        }
+                    } label: {
+                        HStack {
+                            Text("Bestehende Tasks analysieren")
+                            Spacer()
+                            if isEnriching {
+                                ProgressView()
+                            } else if let result = enrichResult {
+                                Text("\(result) aktualisiert")
+                                    .foregroundStyle(.secondary)
+                                    .accessibilityIdentifier("enrichResultLabel")
+                            }
+                        }
+                    }
+                    .disabled(isEnriching)
+                    .accessibilityIdentifier("batchEnrichButton")
+                } header: {
+                    Text("Automatische Task-Analyse")
+                } footer: {
+                    Text("Bereinigt Titel, extrahiert Datumsangaben und ergänzt fehlende Attribute (Wichtigkeit, Dringlichkeit, Kategorie, Dauer) automatisch.")
                 }
 
                 // Section 1: Target Calendar
