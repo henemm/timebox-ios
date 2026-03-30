@@ -67,7 +67,7 @@ final class BadgeOverdueNotificationTests: XCTestCase {
 
     // MARK: - Category Registration
 
-    /// Verhalten: Nach App-Start muss DUE_DATE_INTERACTIVE Category mit 3 Actions registriert sein
+    /// Verhalten: Nach App-Start muss DUE_DATE_INTERACTIVE Category mit 4 Actions registriert sein
     /// Bricht wenn: registerDueDateActions() nicht existiert oder nicht aufgerufen wird
     func test_dueDateCategory_isRegistered() async {
         let categories = await UNUserNotificationCenter.current().notificationCategories()
@@ -77,8 +77,9 @@ final class BadgeOverdueNotificationTests: XCTestCase {
 
         let actionIDs = dueDateCategory?.actions.map(\.identifier) ?? []
         XCTAssertTrue(actionIDs.contains("ACTION_NEXT_UP"), "Must have NextUp action")
-        XCTAssertTrue(actionIDs.contains("ACTION_POSTPONE"), "Must have Postpone action")
+        XCTAssertTrue(actionIDs.contains("ACTION_POSTPONE_TOMORROW"), "Must have Postpone Tomorrow action")
+        XCTAssertTrue(actionIDs.contains("ACTION_POSTPONE_NEXT_WEEK"), "Must have Postpone Next Week action")
         XCTAssertTrue(actionIDs.contains("ACTION_COMPLETE"), "Must have Complete action")
-        XCTAssertEqual(dueDateCategory?.actions.count, 3, "Must have exactly 3 actions")
+        XCTAssertEqual(dueDateCategory?.actions.count, 4, "Must have exactly 4 actions")
     }
 }
