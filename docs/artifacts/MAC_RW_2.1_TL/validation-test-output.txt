@@ -1,0 +1,18 @@
+VALIDATION: MAC_RW_2.1_TL — DayView Daytime Timeline auf macOS
+Date: 2026-03-30
+
+== Mac Build ==
+Result: SUCCESS
+
+== Mac UI Tests (MacDayViewTimelineUITests) ==
+Executed 3 tests, with 0 failures (0 unexpected) in 64.151 seconds
+- test_dayView_daytime_noPlaceholder: PASSED
+- test_dayView_daytime_showsTimelineHourLabels: PASSED
+- test_dayView_daytime_showsMockCalendarEvent: PASSED
+
+== Mac Unit Tests (FocusBloxMacTests) ==
+Executed 1 test, with 0 failures in 0.001 seconds
+- example(): PASSED
+
+== Summary ==
+Total: 4 tests, 0 failures, 0 regressions

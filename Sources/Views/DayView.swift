@@ -159,10 +159,11 @@ struct DayView: View {
                 onRefresh: { await loadDaytimeData() }
             )
             #else
-            ContentUnavailableView(
-                "Dein Tag",
-                systemImage: "sun.max",
-                description: Text("Timeline kommt bald")
+            MacTimelineView(
+                date: Date(),
+                events: calendarEvents,
+                focusBlocks: focusBlocks,
+                scheduledTasks: scheduledTasks
             )
             #endif
         }

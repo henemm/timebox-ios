@@ -11,6 +11,7 @@ import CoreSpotlight
 import AppKit
 import UserNotifications
 import Security
+import EventKit
 
 // MARK: - Menu Bar Controller
 
@@ -215,7 +216,75 @@ struct FocusBloxMacApp: App {
     private let syncedSettings = SyncedSettings()
 
     /// Shared EventKitRepository für alle Views (BACKLOG-002)
-    private let eventKitRepository: any EventKitRepositoryProtocol = EventKitRepository()
+    /// Uses MockEventKitRepository with pre-seeded data during UI testing
+    private let eventKitRepository: any EventKitRepositoryProtocol = {
+        if ProcessInfo.processInfo.arguments.contains("-UITesting") {
+            let mock = MockEventKitRepository()
+            mock.mockCalendarAuthStatus = .fullAccess
+            mock.mockReminderAuthStatus = .fullAccess
+
+            let calendar = Calendar.current
+            let now = Date()
+            let startOfDay = calendar.startOfDay(for: now)
+
+            // Mock Calendar Events for timeline testing
+            let meeting1Start = calendar.date(byAdding: .hour, value: 8, to: startOfDay)!
+            let meeting1End = calendar.date(byAdding: .minute, value: 30, to: meeting1Start)!
+            let meeting1 = CalendarEvent(
+                id: "mock-event-1",
+                title: "Team Meeting",
+                startDate: meeting1Start,
+                endDate: meeting1End,
+                isAllDay: false,
+                calendarColor: nil,
+                notes: nil
+            )
+
+            let meeting2Start = calendar.date(byAdding: .hour, value: 12, to: startOfDay)!
+            let meeting2End = calendar.date(byAdding: .minute, value: 60, to: meeting2Start)!
+            let meeting2 = CalendarEvent(
+                id: "mock-event-2",
+                title: "Lunch Meeting",
+                startDate: meeting2Start,
+                endDate: meeting2End,
+                isAllDay: false,
+                calendarColor: nil,
+                notes: nil
+            )
+
+            mock.mockEvents = [meeting1, meeting2]
+
+            // Mock Focus Blocks for timeline testing
+            let block1Start = calendar.date(byAdding: .hour, value: 9, to: startOfDay)!
+            let block1End = calendar.date(byAdding: .hour, value: 11, to: startOfDay)!
+            let focusBlock1 = FocusBlock(
+                id: "mock-block-1",
+                title: "Focus Block 09:00",
+                startDate: block1Start,
+                endDate: block1End,
+                taskIDs: [],
+                completedTaskIDs: []
+            )
+
+            let block2Start = calendar.date(byAdding: .hour, value: 14, to: startOfDay)!
+            let block2End = calendar.date(byAdding: .hour, value: 16, to: startOfDay)!
+            let focusBlock2 = FocusBlock(
+                id: "mock-block-2",
+                title: "Deep Work 14:00",
+                startDate: block2Start,
+                endDate: block2End,
+                taskIDs: [],
+                completedTaskIDs: []
+            )
+
+            if !ProcessInfo.processInfo.arguments.contains("--empty-morning") {
+                mock.mockFocusBlocks = [focusBlock1, focusBlock2]
+            }
+
+            return mock
+        }
+        return EventKitRepository()
+    }()
 
     init() {
         // CRITICAL: Required for the app to receive keyboard and mouse events
