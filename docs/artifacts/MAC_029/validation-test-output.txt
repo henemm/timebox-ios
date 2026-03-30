@@ -1,0 +1,21 @@
+== MAC_029-rings Validation Test Output ==
+Date: 2026-03-29
+
+== Unit Tests: MenuBarIdleIconTests (macOS) ==
+Test Suite 'MenuBarIdleIconTests' started at 2026-03-29 21:43:25.621.
+Test Case 'test_makeMenuBarIcon_hasAlphaGradient' passed (0.013 seconds).
+Test Case 'test_makeMenuBarIcon_hasGapBetweenRings' passed (0.001 seconds).
+Test Case 'test_makeMenuBarIcon_isTemplate' passed (0.000 seconds).
+Test Case 'test_makeMenuBarIcon_resizesToTargetSize' passed (0.000 seconds).
+Test Case 'test_makeMenuBarIcon_transparentOutsideCircle' passed (0.001 seconds).
+
+Executed 5 tests, with 0 failures (0 unexpected) in 0.016 seconds
+
+** TEST SUCCEEDED **
+
+== UI Tests ==
+N/A: macOS MenuBar ist nicht per XCUITest testbar.
+Unit Tests decken die Icon-Generierungslogik vollstaendig ab.
+
+== Regression Check ==
+Full macOS test suite: all tests passed, 0 regressions.

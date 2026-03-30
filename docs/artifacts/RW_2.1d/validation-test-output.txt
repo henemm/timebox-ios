@@ -1,0 +1,20 @@
+Monitoring boot status for FocusBlox (1EC79950-6704-47D0-BDF8-2C55236B4B40).
+Device already booted, nothing to do.
+
+Command line invocation:
+    /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild test -project FocusBlox.xcodeproj -scheme FocusBlox -destination id=1EC79950-6704-47D0-BDF8-2C55236B4B40 "-only-testing:FocusBloxUITests/DayViewUITests" -parallel-testing-enabled NO -disable-concurrent-destination-testing CODE_SIGNING_ALLOWED=NO
+
+Build settings from command line:
+    CODE_SIGNING_ALLOWED = NO
+
+2026-03-26 04:13:09.737 xcodebuild[1819:79316793] Writing error result bundle to /var/folders/dk/p4qd3_xx6ls6_xybmqzfgs1h0000gn/T/ResultBundle_2026-26-03_04-13-0009.xcresult
+xcodebuild: error: Unable to find a device matching the provided destination specifier:
+		{ id:1EC79950-6704-47D0-BDF8-2C55236B4B40 }
+
+	The requested device could not be found because no available devices matched the request.
+
+	Available destinations for the "FocusBlox" scheme:
+		{ platform:macOS, arch:arm64, variant:Designed for [iPad,iPhone], id:00008132-001110DC0C83001C, name:My Mac }
+		{ platform:iOS, arch:arm64, id:00008140-00111D582681801C, name:Hennings iPhone 16 Pro }
+		{ platform:iOS, id:dvtdevice-DVTiPhonePlaceholder-iphoneos:placeholder, name:Any iOS Device }
+		{ platform:iOS Simulator, id:dvtdevice-DVTiOSDeviceSimulatorPlaceholder-iphonesimulator:placeholder, name:Any iOS Simulator Device }

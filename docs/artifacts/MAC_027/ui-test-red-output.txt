@@ -1,0 +1,30 @@
+MAC_027 TDD RED — macOS UI Tests
+
+Build: SUCCEEDED (test file compiles)
+Test Execution: HUNG (test runner could not establish connection — known macOS CLI UI test limitation)
+
+Tests written (ALL expected to FAIL because functionality not yet implemented):
+
+1. testSidebarSwitchesToFocusAfterSprintStart
+   → WILL FAIL: ContentView.startFocusSprint() has `break` instead of `selectedSection = .focus`
+
+2. testNudgeContinueDialogAppearsFor2MinBlock
+   → WILL FAIL: checkBlockEnd() goes directly to showSprintReview, no 2-min check exists
+
+3. testNudgeDialogHasExtendButton
+   → WILL FAIL: "Ja, weitermachen" button doesn't exist (no nudge dialog)
+
+4. testNudgeDialogHasEndButton
+   → WILL FAIL: "Nein, beenden" button doesn't exist (no nudge dialog)
+
+5. testFollowUpButtonExistsForIncompleteTasks
+   → WILL FAIL: No "followUpButton" accessibility ID in MacSprintReviewSheet
+
+6. testProgressNoteFieldExistsForIncompleteTasks
+   → WILL FAIL: No "progressNoteField" accessibility ID in MacSprintReviewSheet
+
+7. testFollowUpConfirmationAppearsAfterCreation
+   → WILL FAIL: No createFollowUp() function, no "Follow-up erstellt" confirmation text
+
+Infrastructure Note: macOS UI tests hang when run from CLI with CODE_SIGNING_ALLOWED=NO.
+Existing MacSprintReviewUITests also hang — this is a pre-existing infrastructure limitation.

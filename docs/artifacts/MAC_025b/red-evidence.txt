@@ -1,0 +1,10 @@
+MAC_025b RED Evidence: migrateRemindersToLocal() call MISSING from macOS startup
+
+$ grep -n "migrateRemindersToLocal" FocusBloxMac/FocusBloxMacApp.swift
+(no output — call does not exist)
+
+$ grep -n "migrateRemindersToLocal" Sources/FocusBloxApp.swift
+301:                    RemindersImportService.migrateRemindersToLocal(in: sharedModelContainer.mainContext)
+
+ASSERTION: iOS has the call (line 301), macOS does NOT — test failed, expected call to exist but got nothing.
+This is a parity gap, not new logic. The fix is adding the identical 1-line call.

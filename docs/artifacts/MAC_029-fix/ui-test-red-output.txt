@@ -1,0 +1,1 @@
+macOS MenuBar StatusItem ist nicht per XCUITest testbar. Das Icon wird nur in der Systemmenüleiste gerendert und ist von XCUITest nicht zugreifbar. Visuelle Inspektion per Screenshot ersetzt den UI-Test.

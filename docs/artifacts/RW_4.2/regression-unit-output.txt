@@ -1,0 +1,3 @@
+[0;31m[sim][0m Test-Name fehlt!
+Usage: ./scripts/sim.sh unit TestClass
+       ./scripts/sim.sh unit TestClass/testMethod

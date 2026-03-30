@@ -1,0 +1,15 @@
+MAC_027 Unit Test Assessment
+
+NO UNIT TESTS NEEDED — Pure UI Wiring Feature
+
+Justification:
+- Sub-Feature 1 (Sidebar-Switch): Setting a @Binding value after existing service call. No business logic.
+- Sub-Feature 2 (Nudge Dialog): Calling existing EmotionalNudgeService + existing eventKitRepo methods. No new logic.
+- Sub-Feature 3 (Follow-up): Calling existing FocusBlockActionService.abortWithFollowUp(). No new logic.
+
+All business logic is already tested:
+- FocusBlockActionService: 33 unit tests (FocusBlockActionServiceTests.swift)
+- EmotionalNudgeService: 7 unit tests (EmotionalNudgeServiceTests.swift)
+- FocusBlock model: 17 unit tests (FocusBlockTests.swift)
+
+This feature only wires existing tested services to macOS UI — no new functions, no new data transformations.
