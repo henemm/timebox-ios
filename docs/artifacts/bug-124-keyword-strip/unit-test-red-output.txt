@@ -1,0 +1,26 @@
+Test Case '-[FocusBloxTests.TaskTitleEngineTests test_stripKeywords_preservesCategoryColonPrefix]' passed (0.017 seconds).
+Test Case '-[FocusBloxTests.TaskTitleEngineTests test_stripKeywords_preservesMorgenAsPartOfWord]' passed (0.017 seconds).
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/TaskTitleEngineTests.swift:450: error: -[FocusBloxTests.TaskTitleEngineTests test_stripKeywords_removesBothDateAndUrgency] : XCTAssertEqual failed: ("Heute Klingel demontieren") is not equal to ("Klingel demontieren")
+Test Case '-[FocusBloxTests.TaskTitleEngineTests test_stripKeywords_removesBothDateAndUrgency]' failed (0.018 seconds).
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/TaskTitleEngineTests.swift:457: error: -[FocusBloxTests.TaskTitleEngineTests test_stripKeywords_removesDateKeywordCaseInsensitive] : XCTAssertEqual failed: ("HEUTE Einkaufen gehen") is not equal to ("Einkaufen gehen")
+Test Case '-[FocusBloxTests.TaskTitleEngineTests test_stripKeywords_removesDateKeywordCaseInsensitive]' failed (0.017 seconds).
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/TaskTitleEngineTests.swift:443: error: -[FocusBloxTests.TaskTitleEngineTests test_stripKeywords_removesDateKeywordInMiddle] : XCTAssertEqual failed: ("Termin morgen absagen") is not equal to ("Termin absagen")
+Test Case '-[FocusBloxTests.TaskTitleEngineTests test_stripKeywords_removesDateKeywordInMiddle]' failed (0.018 seconds).
+Test Case '-[FocusBloxTests.TaskTitleEngineTests test_stripKeywords_removesDringendPrefix]' passed (0.018 seconds).
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/TaskTitleEngineTests.swift:472: error: -[FocusBloxTests.TaskTitleEngineTests test_stripKeywords_removesEnglishDateKeyword] : XCTAssertEqual failed: ("Tomorrow fix the build") is not equal to ("fix the build")
+Test Case '-[FocusBloxTests.TaskTitleEngineTests test_stripKeywords_removesEnglishDateKeyword]' failed (0.018 seconds).
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/TaskTitleEngineTests.swift:407: error: -[FocusBloxTests.TaskTitleEngineTests test_stripKeywords_removesHeuteAtStart] : XCTAssertEqual failed: ("Heute Klingel demontieren") is not equal to ("Klingel demontieren") - User sieht 'Heute' im Titel — muss entfernt werden weil Datum als Badge angezeigt wird
+Test Case '-[FocusBloxTests.TaskTitleEngineTests test_stripKeywords_removesHeuteAtStart]' failed (0.017 seconds).
+Test Case '-[FocusBloxTests.TaskTitleEngineTests test_stripKeywords_removesKeywordInMiddle]' passed (0.017 seconds).
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/TaskTitleEngineTests.swift:415: error: -[FocusBloxTests.TaskTitleEngineTests test_stripKeywords_removesMorgenAtStart] : XCTAssertEqual failed: ("Morgen Termin für Reifenwechsel machen") is not equal to ("Termin für Reifenwechsel machen")
+Test Case '-[FocusBloxTests.TaskTitleEngineTests test_stripKeywords_removesMorgenAtStart]' failed (0.017 seconds).
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/TaskTitleEngineTests.swift:436: error: -[FocusBloxTests.TaskTitleEngineTests test_stripKeywords_removesNaechsteWoche] : XCTAssertEqual failed: ("Nächste Woche Bericht abgeben") is not equal to ("Bericht abgeben")
+Test Case '-[FocusBloxTests.TaskTitleEngineTests test_stripKeywords_removesNaechsteWoche]' failed (0.017 seconds).
+Test Case '-[FocusBloxTests.TaskTitleEngineTests test_stripKeywords_removesParenthesizedASAP]' passed (0.017 seconds).
+Test Case '-[FocusBloxTests.TaskTitleEngineTests test_stripKeywords_removesParenthesizedDringend]' passed (0.017 seconds).
+Test Case '-[FocusBloxTests.TaskTitleEngineTests test_stripKeywords_removesParenthesizedSofort]' passed (0.018 seconds).
+Test Case '-[FocusBloxTests.TaskTitleEngineTests test_stripKeywords_removesParenthesizedUrgent]' passed (0.017 seconds).
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/TaskTitleEngineTests.swift:422: error: -[FocusBloxTests.TaskTitleEngineTests test_stripKeywords_removesUebermorgen] : XCTAssertEqual failed: ("Übermorgen Zahnarzt anrufen") is not equal to ("Zahnarzt anrufen")
+Test Case '-[FocusBloxTests.TaskTitleEngineTests test_stripKeywords_removesUebermorgen]' failed (0.017 seconds).
+/Users/hem/Developer/my-daily-sprints/FocusBloxTests/TaskTitleEngineTests.swift:429: error: -[FocusBloxTests.TaskTitleEngineTests test_stripKeywords_removesWochentag] : XCTAssertEqual failed: ("Freitag Meeting vorbereiten") is not equal to ("Meeting vorbereiten")
+Test Case '-[FocusBloxTests.TaskTitleEngineTests test_stripKeywords_removesWochentag]' failed (0.017 seconds).

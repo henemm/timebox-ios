@@ -25,23 +25,49 @@ final class TaskTitleEngine {
 
     // MARK: - Deterministic Keyword Stripping
 
-    /// Removes known urgency/deadline keywords from task titles.
-    /// Runs synchronously — no AI needed. Handles parenthesized and prefix formats.
+    /// Removes known urgency and date keywords from task titles.
+    /// Runs synchronously — no AI needed. Handles parenthesized, prefix, and standalone formats.
+    /// Word-boundary aware: "Morgengymnastik" is preserved, "Morgen" standalone is removed.
     static func stripKeywords(_ title: String) -> String {
         var cleaned = title
 
-        // Parenthesized keywords: "(dringend)", "(urgent)", "(ASAP)", "(sofort)"
+        // Parenthesized urgency keywords: "(dringend)", "(urgent)", "(ASAP)", "(sofort)"
         cleaned = cleaned.replacingOccurrences(
             of: #"\s*\(\s*(?:dringend|urgent|asap|sofort|eilig)\s*\)"#,
             with: "",
             options: [.regularExpression, .caseInsensitive]
         )
 
-        // Prefix keywords: "dringend:", "urgent:", "ASAP:"
+        // Prefix urgency keywords: "dringend:", "urgent:", "ASAP:"
         cleaned = cleaned.replacingOccurrences(
             of: #"^(?:dringend|urgent|asap|sofort|eilig)\s*:\s*"#,
             with: "",
             options: [.regularExpression, .caseInsensitive]
+        )
+
+        // Date keywords (standalone, word-boundary safe): "heute", "morgen", weekdays, etc.
+        // Uses \b word boundaries to avoid matching substrings like "Morgengymnastik"
+        let dateKeywords = [
+            "übermorgen",  // longer first to avoid partial match with "morgen"
+            "nächste woche", "next week",
+            "heute", "today", "morgen", "tomorrow",
+            "montag", "monday", "dienstag", "tuesday",
+            "mittwoch", "wednesday", "donnerstag", "thursday",
+            "freitag", "friday", "samstag", "saturday",
+            "sonntag", "sunday",
+        ]
+        let datePattern = dateKeywords.joined(separator: "|")
+        cleaned = cleaned.replacingOccurrences(
+            of: "\\b(?:\(datePattern))\\b",
+            with: "",
+            options: [.regularExpression, .caseInsensitive]
+        )
+
+        // Collapse multiple spaces into one and trim
+        cleaned = cleaned.replacingOccurrences(
+            of: #"\s{2,}"#,
+            with: " ",
+            options: .regularExpression
         )
 
         return cleaned.trimmingCharacters(in: .whitespaces)

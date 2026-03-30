@@ -194,23 +194,23 @@ final class TaskTitleEngineTests: XCTestCase {
 
     // MARK: - Erweiterte relative Datumsangaben
 
-    /// Verhalten: "uebermorgen" wird zu +2 Tage gemappt
-    /// Bricht wenn: TaskTitleEngine.relativeDateFrom() den case "uebermorgen" entfernt
+    /// Verhalten: "übermorgen" wird zu +2 Tage gemappt
+    /// Bricht wenn: TaskTitleEngine.relativeDateFrom() den case "übermorgen" entfernt
     func test_relativeDateFrom_uebermorgen() {
-        let result = TaskTitleEngine.relativeDateFrom("uebermorgen")
+        let result = TaskTitleEngine.relativeDateFrom("übermorgen")
         let expected = Calendar.current.date(byAdding: .day, value: 2, to: Calendar.current.startOfDay(for: Date()))
-        XCTAssertEqual(result, expected, "uebermorgen should map to start of day +2")
+        XCTAssertEqual(result, expected, "übermorgen should map to start of day +2")
     }
 
-    /// Verhalten: "naechste woche" wird zum naechsten Montag gemappt
-    /// Bricht wenn: TaskTitleEngine.relativeDateFrom() den case "naechste woche" entfernt
+    /// Verhalten: "nächste woche" wird zum nächsten Montag gemappt
+    /// Bricht wenn: TaskTitleEngine.relativeDateFrom() den case "nächste woche" entfernt
     func test_relativeDateFrom_naechsteWoche() {
-        let result = TaskTitleEngine.relativeDateFrom("naechste woche")
-        XCTAssertNotNil(result, "naechste woche should return a date")
+        let result = TaskTitleEngine.relativeDateFrom("nächste woche")
+        XCTAssertNotNil(result, "nächste woche should return a date")
         if let date = result {
             let weekday = Calendar.current.component(.weekday, from: date)
-            XCTAssertEqual(weekday, 2, "naechste woche should be a Monday (weekday 2)")
-            XCTAssertTrue(date > Date(), "naechste woche should be in the future")
+            XCTAssertEqual(weekday, 2, "nächste woche should be a Monday (weekday 2)")
+            XCTAssertTrue(date > Date(), "nächste woche should be in the future")
         }
     }
 
@@ -398,6 +398,80 @@ final class TaskTitleEngineTests: XCTestCase {
                        "Category-style colon prefixes must NOT be stripped")
     }
 
+    // MARK: - BUG_124: stripKeywords() — Datums-Keywords entfernen
+
+    /// Verhalten: "Heute" am Anfang wird aus dem Titel entfernt
+    /// Bricht wenn: stripKeywords() keine Datums-Keyword-Regex hat
+    func test_stripKeywords_removesHeuteAtStart() {
+        let result = TaskTitleEngine.stripKeywords("Heute Klingel demontieren")
+        XCTAssertEqual(result, "Klingel demontieren",
+                       "User sieht 'Heute' im Titel — muss entfernt werden weil Datum als Badge angezeigt wird")
+    }
+
+    /// Verhalten: "Morgen" am Anfang wird aus dem Titel entfernt
+    /// Bricht wenn: stripKeywords() "morgen" nicht in der Datums-Keyword-Liste hat
+    func test_stripKeywords_removesMorgenAtStart() {
+        let result = TaskTitleEngine.stripKeywords("Morgen Termin für Reifenwechsel machen")
+        XCTAssertEqual(result, "Termin für Reifenwechsel machen")
+    }
+
+    /// Verhalten: "Übermorgen" wird entfernt (Umlaut korrekt)
+    /// Bricht wenn: stripKeywords() Umlaute nicht korrekt handled
+    func test_stripKeywords_removesUebermorgen() {
+        let result = TaskTitleEngine.stripKeywords("Übermorgen Zahnarzt anrufen")
+        XCTAssertEqual(result, "Zahnarzt anrufen")
+    }
+
+    /// Verhalten: Wochentag am Anfang wird entfernt
+    /// Bricht wenn: stripKeywords() keine Wochentag-Keywords hat
+    func test_stripKeywords_removesWochentag() {
+        let result = TaskTitleEngine.stripKeywords("Freitag Meeting vorbereiten")
+        XCTAssertEqual(result, "Meeting vorbereiten")
+    }
+
+    /// Verhalten: "Nächste Woche" (zwei Wörter) wird entfernt
+    /// Bricht wenn: stripKeywords() Multi-Wort-Keywords nicht handled
+    func test_stripKeywords_removesNaechsteWoche() {
+        let result = TaskTitleEngine.stripKeywords("Nächste Woche Bericht abgeben")
+        XCTAssertEqual(result, "Bericht abgeben")
+    }
+
+    /// Verhalten: Datums-Keyword in der Mitte wird entfernt
+    /// Bricht wenn: stripKeywords() nur am Anfang matcht
+    func test_stripKeywords_removesDateKeywordInMiddle() {
+        let result = TaskTitleEngine.stripKeywords("Termin morgen absagen")
+        XCTAssertEqual(result, "Termin absagen")
+    }
+
+    /// Verhalten: Kombinierte Keywords (Datum + Urgency) werden BEIDE entfernt
+    /// Bricht wenn: stripKeywords() nur eine Keyword-Kategorie entfernt
+    func test_stripKeywords_removesBothDateAndUrgency() {
+        let result = TaskTitleEngine.stripKeywords("Heute (dringend) Klingel demontieren")
+        XCTAssertEqual(result, "Klingel demontieren")
+    }
+
+    /// Verhalten: Case-insensitive Erkennung von Datums-Keywords
+    /// Bricht wenn: stripKeywords() Grossschreibung nicht handled
+    func test_stripKeywords_removesDateKeywordCaseInsensitive() {
+        let result = TaskTitleEngine.stripKeywords("HEUTE Einkaufen gehen")
+        XCTAssertEqual(result, "Einkaufen gehen")
+    }
+
+    /// Verhalten: "Morgen" als Teil eines Wortes wird NICHT entfernt
+    /// Bricht wenn: stripKeywords() kein Word-Boundary nutzt und Wortteile entfernt
+    func test_stripKeywords_preservesMorgenAsPartOfWord() {
+        let result = TaskTitleEngine.stripKeywords("Morgengymnastik machen")
+        XCTAssertEqual(result, "Morgengymnastik machen",
+                       "Keyword 'morgen' als Wortteil darf NICHT entfernt werden")
+    }
+
+    /// Verhalten: Englische Datums-Keywords werden entfernt
+    /// Bricht wenn: stripKeywords() nur deutsche Keywords kennt
+    func test_stripKeywords_removesEnglishDateKeyword() {
+        let result = TaskTitleEngine.stripKeywords("Tomorrow fix the build")
+        XCTAssertEqual(result, "fix the build")
+    }
+
     // MARK: - RW_1.4: cleanTitle() — Deterministische Titel-Bereinigung
 
     /// Verhalten: E-Mail-Prefixe (Re:, Fwd:, AW:, WG:, FW:) werden entfernt
@@ -560,11 +634,11 @@ final class TaskTitleEngineTests: XCTestCase {
                       "Title containing weekday should return true")
     }
 
-    /// Verhalten: Titel mit "naechste Woche" gibt true zurueck
+    /// Verhalten: Titel mit "Nächste Woche" gibt true zurück
     /// Bricht wenn: titleContainsDateKeyword() zusammengesetzte Phrasen nicht erkennt
     func test_titleContainsDateKeyword_returnsTrue_forNaechsteWocheTitle() {
-        XCTAssertTrue(TaskTitleEngine.titleContainsDateKeyword("Naechste Woche Meeting planen"),
-                      "Title containing 'naechste woche' should return true")
+        XCTAssertTrue(TaskTitleEngine.titleContainsDateKeyword("Nächste Woche Meeting planen"),
+                      "Title containing 'nächste woche' should return true")
     }
 
     /// Verhalten: Titel mit "today" (englisch) gibt true zurueck

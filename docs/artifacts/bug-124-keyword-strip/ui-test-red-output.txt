@@ -1,0 +1,1 @@
+/Users/hem/Developer/my-daily-sprints/FocusBloxUITests/DateKeywordStrippingUITests.swift:57: error: -[FocusBloxUITests.DateKeywordStrippingUITests testTaskForm_heuteKeyword_strippedFromTitle] : XCTAssertTrue failed - Task containing 'Klingel' should appear in backlog after save
