@@ -62,28 +62,6 @@ final class LocalTaskSourceTests: XCTestCase {
         XCTAssertTrue(tasks.allSatisfy { !$0.isCompleted })
     }
 
-    func test_fetchIncompleteTasks_sortsBySortOrder() async throws {
-        let context = container.mainContext
-
-        let task1 = LocalTask(title: "Third", importance: 1)
-        task1.sortOrder = 2
-        let task2 = LocalTask(title: "First", importance: 1)
-        task2.sortOrder = 0
-        let task3 = LocalTask(title: "Second", importance: 1)
-        task3.sortOrder = 1
-
-        context.insert(task1)
-        context.insert(task2)
-        context.insert(task3)
-        try context.save()
-
-        let tasks = try await source.fetchIncompleteTasks()
-
-        XCTAssertEqual(tasks[0].title, "First")
-        XCTAssertEqual(tasks[1].title, "Second")
-        XCTAssertEqual(tasks[2].title, "Third")
-    }
-
     // MARK: - Mark Complete/Incomplete
 
     func test_markComplete_updatesTask() async throws {

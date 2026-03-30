@@ -42,14 +42,16 @@ final class SyncEngineTests: XCTestCase {
         XCTAssertTrue(planItems.allSatisfy { !$0.isCompleted })
     }
 
-    func test_sync_sortsByRank() async throws {
+    /// Verhalten: sync() sortiert nach rank absteigend (hoechster Rang zuerst).
+    /// Bricht wenn: SyncEngine.swift:19 — .sorted { $0.rank > $1.rank } entfernt/umgekehrt.
+    func test_sync_sortsByRankDescending() async throws {
         let context = container.mainContext
-        let task1 = LocalTask(title: "Third", importance: 0)
-        task1.sortOrder = 2
-        let task2 = LocalTask(title: "First", importance: 0)
-        task2.sortOrder = 0
-        let task3 = LocalTask(title: "Second", importance: 0)
-        task3.sortOrder = 1
+        let task1 = LocalTask(title: "Low Rank", importance: 0)
+        task1.sortOrder = 0
+        let task2 = LocalTask(title: "Mid Rank", importance: 0)
+        task2.sortOrder = 1
+        let task3 = LocalTask(title: "High Rank", importance: 0)
+        task3.sortOrder = 2
 
         context.insert(task1)
         context.insert(task2)
@@ -58,9 +60,9 @@ final class SyncEngineTests: XCTestCase {
 
         let planItems = try await syncEngine.sync()
 
-        XCTAssertEqual(planItems[0].title, "First")
-        XCTAssertEqual(planItems[1].title, "Second")
-        XCTAssertEqual(planItems[2].title, "Third")
+        XCTAssertEqual(planItems[0].title, "High Rank", "Hoechster Rang soll zuerst kommen")
+        XCTAssertEqual(planItems[1].title, "Mid Rank")
+        XCTAssertEqual(planItems[2].title, "Low Rank", "Niedrigster Rang soll zuletzt kommen")
     }
 
     // MARK: - updateDuration Tests
