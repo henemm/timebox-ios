@@ -52,9 +52,7 @@ final class BacklogSectionsUITests: XCTestCase {
     func test_tierSections_existInPriorityView() {
         navigateToBacklogPriority()
 
-        let list = app.collectionViews.firstMatch.exists
-            ? app.collectionViews.firstMatch
-            : app.tables.firstMatch
+        let list = app.descendants(matching: .any).matching(identifier: "backlogTaskList").firstMatch
 
         // Scroll through to find tier sections
         var foundDringend = false
@@ -93,9 +91,11 @@ final class BacklogSectionsUITests: XCTestCase {
     func test_geparktSection_existsAndIsOpen() {
         navigateToBacklogPriority()
 
-        let list = app.collectionViews.firstMatch.exists
-            ? app.collectionViews.firstMatch
-            : app.tables.firstMatch
+        let backlogList = app.descendants(matching: .any).matching(identifier: "backlogTaskList").firstMatch
+        guard backlogList.waitForExistence(timeout: 5) else {
+            XCTFail("backlogTaskList nicht gefunden")
+            return
+        }
 
         // Scroll to find "Geparkt" section
         var geparktFound = false
@@ -104,7 +104,7 @@ final class BacklogSectionsUITests: XCTestCase {
                 geparktFound = true
                 break
             }
-            list.swipeUp()
+            backlogList.swipeUp()
         }
 
         // "Geparkt" muss existieren (Mock-Daten brauchen einen isParked=true Task)
@@ -123,9 +123,7 @@ final class BacklogSectionsUITests: XCTestCase {
     func test_swipeAction_showsHeuteNotNextUp() {
         navigateToBacklogPriority()
 
-        let list = app.collectionViews.firstMatch.exists
-            ? app.collectionViews.firstMatch
-            : app.tables.firstMatch
+        let list = app.descendants(matching: .any).matching(identifier: "backlogTaskList").firstMatch
 
         // Find any task in a tier section (not in Heute)
         let anyTask = app.staticTexts.matching(
@@ -155,9 +153,7 @@ final class BacklogSectionsUITests: XCTestCase {
     func test_tierTask_swipeLeft_showsParkenAction() {
         navigateToBacklogPriority()
 
-        let list = app.collectionViews.firstMatch.exists
-            ? app.collectionViews.firstMatch
-            : app.tables.firstMatch
+        let list = app.descendants(matching: .any).matching(identifier: "backlogTaskList").firstMatch
 
         let activeTask = app.staticTexts.matching(
             NSPredicate(format: "label CONTAINS '[MOCK] Blocker'")

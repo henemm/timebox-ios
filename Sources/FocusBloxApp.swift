@@ -699,6 +699,13 @@ struct FocusBloxApp: App {
         context.insert(tbdTask)
         context.insert(stuckTask)
 
+        // Geparkt Task (RW 2.4b) — manuell geparkt, erscheint in "Geparkt"-Sektion
+        let parkedTask = LocalTask(title: "[MOCK] Geparkte Idee - Spaeter", importance: 2, estimatedDuration: 30, urgency: "not_urgent")
+        parkedTask.isNextUp = false
+        parkedTask.isParked = true
+        parkedTask.taskType = "learning"
+        context.insert(parkedTask)
+
         // Create Focus Block mock tasks with known UUIDs
         // These match the taskIDs in FocusLiveView.createMockRepository()
         let fbTask1 = LocalTask(
