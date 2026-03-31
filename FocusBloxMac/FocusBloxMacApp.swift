@@ -210,6 +210,7 @@ struct FocusBloxMacApp: App {
     @State private var undoResultMessage = ""
     @State private var notificationDelegate: NotificationActionDelegate?
     @State private var selectedSection: MainSection = .backlog
+    @State private var dayViewForcedPhase: DayPhase?
     @AppStorage("intentionJustSet") private var intentionJustSet: Bool = false
 
     /// SyncedSettings für iCloud KV Store Sync zwischen Geräten
@@ -338,7 +339,7 @@ struct FocusBloxMacApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView(selectedSection: $selectedSection)
+            ContentView(selectedSection: $selectedSection, dayViewForcedPhase: dayViewForcedPhase)
                 .environment(\.eventKitRepository, eventKitRepository)
                 .environment(syncMonitor)
                 .environment(deferredSort)
@@ -449,9 +450,16 @@ struct FocusBloxMacApp: App {
                         intentionJustSet = false
                     }
                 }
-                .onReceive(NotificationCenter.default.publisher(for: NotificationActionDelegate.navigateToDayViewNotification)) { _ in
+                .onReceive(NotificationCenter.default.publisher(for: NotificationActionDelegate.navigateToDayViewNotification)) { notification in
                     selectedSection = .day
                     NSApplication.shared.activate(ignoringOtherApps: true)
+                    if let phaseStr = notification.userInfo?["phase"] as? String {
+                        switch phaseStr {
+                        case "morning": dayViewForcedPhase = .morning
+                        case "evening": dayViewForcedPhase = .evening
+                        default: dayViewForcedPhase = nil
+                        }
+                    }
                 }
         }
         .modelContainer(container)

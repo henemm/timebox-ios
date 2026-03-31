@@ -78,6 +78,9 @@ enum DayPhase: Equatable {
 // MARK: - Day View
 
 struct DayView: View {
+    /// External phase override from Notification Deep-Link. nil = time-based.
+    var forcedPhase: DayPhase?
+
     @AppStorage("morningEndHour") private var morningEndHour = 12
     @AppStorage("eveningStartHour") private var eveningStartHour = 18
     @Environment(\.eventKitRepository) private var eventKitRepo
@@ -103,6 +106,7 @@ struct DayView: View {
     }
 
     private var phase: DayPhase {
+        if let forced = forcedPhase { return forced }
         let hour = Calendar.current.component(.hour, from: Date())
         return DayPhase.from(hour: hour, morningEnd: morningEndHour, eveningStart: eveningStartHour)
     }

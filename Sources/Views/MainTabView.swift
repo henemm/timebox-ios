@@ -7,6 +7,7 @@ enum AppTab: Hashable {
 
 struct MainTabView: View {
     @Binding var selectedTab: AppTab
+    var dayViewForcedPhase: DayPhase?
 
     var body: some View {
         TabView(selection: $selectedTab) {
@@ -22,7 +23,7 @@ struct MainTabView: View {
                 }
                 .tag(AppTab.blox)
 
-            DayView()
+            DayView(forcedPhase: dayViewForcedPhase)
                 .tabItem {
                     Label("Tag", systemImage: "calendar.badge.clock")
                 }

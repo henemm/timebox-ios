@@ -19,6 +19,7 @@ struct FocusBloxApp: App {
     @State private var quickCaptureTitle = ""
     @State private var showSprintPicker = false
     @State private var selectedTab: AppTab = .backlog
+    @State private var dayViewForcedPhase: DayPhase?
     @State private var permissionRequested = false
     private let settings = AppSettings.shared
     @State private var syncMonitor = CloudKitSyncMonitor()
@@ -280,7 +281,7 @@ struct FocusBloxApp: App {
     var body: some Scene {
         WindowGroup {
             ZStack {
-                ContentView(selectedTab: $selectedTab)
+                ContentView(selectedTab: $selectedTab, dayViewForcedPhase: dayViewForcedPhase)
                     .environment(\.eventKitRepository, eventKitRepository)
                     .environment(syncMonitor)
                     .environment(deferredSort)
@@ -448,8 +449,15 @@ struct FocusBloxApp: App {
             .onReceive(NotificationCenter.default.publisher(for: .quickCaptureRequested)) { _ in
                 showQuickCapture = true
             }
-            .onReceive(NotificationCenter.default.publisher(for: NotificationActionDelegate.navigateToDayViewNotification)) { _ in
+            .onReceive(NotificationCenter.default.publisher(for: NotificationActionDelegate.navigateToDayViewNotification)) { notification in
                 selectedTab = .day
+                if let phaseStr = notification.userInfo?["phase"] as? String {
+                    switch phaseStr {
+                    case "morning": dayViewForcedPhase = .morning
+                    case "evening": dayViewForcedPhase = .evening
+                    default: dayViewForcedPhase = nil
+                    }
+                }
             }
             .onReceive(NotificationCenter.default.publisher(for: .focusSprintStarted)) { _ in
                 selectedTab = .focus

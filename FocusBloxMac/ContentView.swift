@@ -50,6 +50,7 @@ struct ContentView: View {
     // Navigation state
     @State private var columnVisibility: NavigationSplitViewVisibility = .all
     @Binding var selectedSection: MainSection
+    var dayViewForcedPhase: DayPhase?
     @State private var selectedFilter: SidebarFilter = .priority
     @State private var selectedTasks: Set<UUID> = []
     @State private var scrollToTaskID: UUID?  // Bug 94: Auto-scroll after task creation
@@ -264,7 +265,7 @@ struct ContentView: View {
                 selectedSection: $selectedSection
             )
         case .day:
-            DayView()
+            DayView(forcedPhase: dayViewForcedPhase)
         case .focus:
             MacFocusView()
         case .review:
