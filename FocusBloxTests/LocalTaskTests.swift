@@ -208,8 +208,8 @@ final class LocalTaskTests: XCTestCase {
         let task = LocalTask(title: "Test Task", importance: 1)
         context.insert(task)
 
-        XCTAssertEqual(task.urgency, "not_urgent")
-        XCTAssertEqual(task.taskType, "maintenance")
+        XCTAssertNil(task.urgency)
+        XCTAssertEqual(task.taskType, "")
         XCTAssertEqual(task.recurrencePattern, "none")
         XCTAssertNil(task.taskDescription)
         XCTAssertNil(task.externalID)
