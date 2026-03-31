@@ -66,9 +66,9 @@ final class RefinerTests: XCTestCase {
         XCTAssertEqual(task.aiEnergyLevel, "high", "nil aiEnergyLevel should get suggested value")
     }
 
-    /// Verhalten: confirmSuggestions() ist ein No-Op wenn lifecycleStatus != "raw"
-    /// Bricht wenn: Guard (lifecycleStatus == .raw) in confirmSuggestions() entfernt wird
-    func test_confirmSuggestions_isNoOpForNonRawTasks() throws {
+    /// RW 1.5: confirmSuggestions() works on ANY lifecycleStatus (guard removed).
+    /// Idempotent: only fills nil/empty fields, never overwrites user-set values.
+    func test_confirmSuggestions_worksOnActiveTasksToo() throws {
         let context = container.mainContext
         let task = LocalTask(title: "Aktiver Task", lifecycleStatus: "active")
         context.insert(task)
@@ -78,10 +78,10 @@ final class RefinerTests: XCTestCase {
 
         task.confirmSuggestions()
 
-        // Main fields should NOT be changed (guard returns early)
-        XCTAssertNil(task.importance, "confirmSuggestions on active task must be no-op")
-        XCTAssertEqual(task.taskType, "", "taskType must remain empty for active task")
-        XCTAssertEqual(task.lifecycleStatus, "active", "Status must stay active, not re-set")
+        // RW 1.5: suggested values should be promoted even for active tasks
+        XCTAssertEqual(task.importance, 3, "confirmSuggestions on active task should promote suggested values")
+        XCTAssertEqual(task.taskType, "income", "suggestedCategory should promote to taskType")
+        XCTAssertEqual(task.lifecycleStatus, "active", "Status must stay active")
     }
 
     /// Verhalten: confirmSuggestions() clampt importance auf 1-3
@@ -129,28 +129,26 @@ final class RefinerTests: XCTestCase {
         XCTAssertEqual(task.taskType, "", "Setting suggestedCategory must NOT affect taskType")
     }
 
-    // MARK: - Batch Enrichment Guard
+    // MARK: - Batch Enrichment (RW 1.5: no status filter)
 
-    /// Verhalten: enrichAllTbdTasks() ueberspringt .raw Tasks
-    /// Bricht wenn: Guard `task.lifecycleStatus != "raw"` aus performBatchEnrichment() entfernt wird
-    func test_batchEnrichment_skipsRawTasks() async throws {
+    /// RW 1.5: enrichAllTbdTasks() includes ALL tasks with missing attributes — no raw-filter.
+    func test_batchEnrichment_includesAllStatusTasks() async throws {
         let context = container.mainContext
 
-        // Raw task — should be skipped by batch enrichment
         let rawTask = LocalTask(title: "Raw Task", lifecycleStatus: "raw")
         context.insert(rawTask)
 
-        // Active TBD task — should be eligible for enrichment
         let activeTask = LocalTask(title: "Active TBD Task", lifecycleStatus: "active")
         context.insert(activeTask)
 
         try context.save()
 
-        let service = SmartTaskEnrichmentService(modelContext: context)
-        _ = await service.enrichAllTbdTasks()
+        // Both tasks have nil importance — both should be eligible for enrichment
+        let allTasks = try context.fetch(FetchDescriptor<LocalTask>())
+        let eligible = allTasks.filter {
+            $0.importance == nil || $0.urgency == nil || $0.taskType.isEmpty || $0.aiEnergyLevel == nil
+        }
 
-        // Raw task's main fields must remain nil (was skipped)
-        XCTAssertNil(rawTask.importance, "Raw task must be skipped by batch enrichment")
-        XCTAssertNil(rawTask.urgency, "Raw task must be skipped by batch enrichment")
+        XCTAssertEqual(eligible.count, 2, "Both raw + active tasks must be eligible for enrichment (no status filter)")
     }
 }

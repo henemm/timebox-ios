@@ -82,11 +82,11 @@ final class MonsterRemovalCleanupTests: XCTestCase {
     func test_appTab_hasExactlyFourCases() {
         // AppTab is not CaseIterable — the exhaustive switch is the actual regression guard.
         // Adding a 5th case to AppTab will cause a compile error here.
-        let allTabs: [AppTab] = [.backlog, .blox, .day, .focus, .review, .refiner]
+        let allTabs: [AppTab] = [.backlog, .blox, .day, .focus, .review]
 
         for tab in allTabs {
             switch tab {
-            case .backlog, .blox, .day, .focus, .review, .refiner:
+            case .backlog, .blox, .day, .focus, .review:
                 break // exhaustive — compiler enforces completeness
             }
         }

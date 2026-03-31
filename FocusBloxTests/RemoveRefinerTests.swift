@@ -35,16 +35,16 @@ final class RemoveRefinerTests: XCTestCase {
     }
 
     /// User tippt "Morgen Termin fuer Reifenwechsel machen" ein.
-    /// Erwartet: Titel ohne "Morgen", Faelligkeitsdatum = morgen.
-    /// Bricht wenn: extractDeterministicDueDate() das Datum erkennt aber nicht aus dem Titel entfernt
+    /// Erwartet: Titel ohne "Morgen", Task ist active.
+    /// Bricht wenn: stripKeywords() "Morgen" nicht entfernt oder Task als "raw" belassen wird
     func test_userCreatesTask_morgenKeywordRemovedFromTitle() async throws {
         let source = LocalTaskSource(modelContext: container.mainContext)
         let task = try await source.createTask(title: "Morgen Termin fuer Reifenwechsel machen")
 
         XCTAssertFalse(task.title.lowercased().contains("morgen"),
                        "User sieht 'Morgen' im Titel — muss entfernt werden")
-        XCTAssertNotNil(task.dueDate,
-                       "Faelligkeitsdatum muss aus 'Morgen' erkannt worden sein")
+        XCTAssertEqual(task.lifecycleStatus, "active",
+                       "Task muss sofort im Backlog sichtbar sein (active), nicht im Refiner")
     }
 
     /// User tippt "Rattenfalle neu mit Erdnussbutter bestuecken" ein (kein Keyword).

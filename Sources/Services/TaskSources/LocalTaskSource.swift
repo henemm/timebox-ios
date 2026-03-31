@@ -129,6 +129,7 @@ final class LocalTaskSource: @preconcurrency TaskSource, @preconcurrency TaskSou
         // AI enrichment: fill missing attributes (importance, urgency, taskType, energyLevel)
         let enrichment = SmartTaskEnrichmentService(modelContext: modelContext)
         await enrichment.enrichTask(task)
+        task.confirmSuggestions()
 
         // AI title improvement: run immediately (not deferred to app start)
         task.needsTitleImprovement = true

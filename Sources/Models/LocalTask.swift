@@ -294,7 +294,7 @@ extension LocalTask {
     /// Only overwrites main fields that are currently nil/empty (respects user edits).
     /// No-op if lifecycleStatus is not "raw".
     func confirmSuggestions() {
-        guard lifecycleStatus == TaskLifecycleStatus.raw.rawValue else { return }
+        // RW 1.5: Guard entfernt — if-let Prüfungen sind bereits idempotent
 
         if taskType.isEmpty, let cat = suggestedCategory {
             taskType = cat

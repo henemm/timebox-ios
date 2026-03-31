@@ -286,6 +286,7 @@
 		INTENT02BUILD00001 /* TaskEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = INTENT02FILEREF0001 /* TaskEntity.swift */; };
 		INTENT03BUILD00001 /* CreateTaskIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = INTENT03FILEREF0001 /* CreateTaskIntent.swift */; };
 		INTENT04BUILD00001 /* GetNextUpIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = INTENT04FILEREF0001 /* GetNextUpIntent.swift */; };
+		ORGDAY01BUILD0001 /* OrganizeMyDayIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = ORGDAY01FILE00001 /* OrganizeMyDayIntent.swift */; };
 		INTENT05BUILD00001 /* CompleteTaskIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = INTENT05FILEREF0001 /* CompleteTaskIntent.swift */; };
 		INTENT06BUILD00001 /* CountOpenTasksIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = INTENT06FILEREF0001 /* CountOpenTasksIntent.swift */; };
 		INTENT07BUILD00001 /* FocusBloxShortcuts.swift in Sources */ = {isa = PBXBuildFile; fileRef = INTENT07FILEREF0001 /* FocusBloxShortcuts.swift */; };
@@ -912,6 +913,7 @@
 		INTENT02FILEREF0001 /* TaskEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskEntity.swift; sourceTree = "<group>"; };
 		INTENT03FILEREF0001 /* CreateTaskIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateTaskIntent.swift; sourceTree = "<group>"; };
 		INTENT04FILEREF0001 /* GetNextUpIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetNextUpIntent.swift; sourceTree = "<group>"; };
+		ORGDAY01FILE00001 /* OrganizeMyDayIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrganizeMyDayIntent.swift; sourceTree = "<group>"; };
 		INTENT05FILEREF0001 /* CompleteTaskIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompleteTaskIntent.swift; sourceTree = "<group>"; };
 		INTENT06FILEREF0001 /* CountOpenTasksIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CountOpenTasksIntent.swift; sourceTree = "<group>"; };
 		INTENT07FILEREF0001 /* FocusBloxShortcuts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusBloxShortcuts.swift; sourceTree = "<group>"; };
@@ -1870,6 +1872,7 @@
 				INTENT02FILEREF0001 /* TaskEntity.swift */,
 				FBENTITY02FILE001 /* FocusBlockEntity.swift */,
 				INTENT03FILEREF0001 /* CreateTaskIntent.swift */,
+				ORGDAY01FILE00001 /* OrganizeMyDayIntent.swift */,
 				BUG35SNP01FILEREF01 /* CreateTaskSnippetIntent.swift */,
 				BUG35SNP02FILEREF01 /* QuickCaptureState.swift */,
 				BUG35SNP03FILEREF01 /* QuickCaptureSnippetView.swift */,
@@ -2548,6 +2551,7 @@
 				INTENT02BUILD00001 /* TaskEntity.swift in Sources */,
 				FBENTITY02BUILD01 /* FocusBlockEntity.swift in Sources */,
 				INTENT03BUILD00001 /* CreateTaskIntent.swift in Sources */,
+				ORGDAY01BUILD0001 /* OrganizeMyDayIntent.swift in Sources */,
 				BUG36CC01BUILD00001 /* CCQuickAddIntents.swift in Sources */,
 				BUG35SNP01BUILD0001 /* CreateTaskSnippetIntent.swift in Sources */,
 				BUG35SNP02BUILD0001 /* QuickCaptureState.swift in Sources */,

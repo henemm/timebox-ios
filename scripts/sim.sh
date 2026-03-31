@@ -30,7 +30,7 @@ set -eo pipefail
 # ============================================
 # KONFIGURATION — Einzige Quelle der Wahrheit
 # ============================================
-SIM_ID="DA9EB9EA-6E86-4510-B016-66B2278FF5D9"
+SIM_ID="C2B2472D-F80A-4AD4-A1D9-571948F0B106"
 SIM_NAME="FocusBlox"
 PROJECT="FocusBlox.xcodeproj"
 SCHEME="FocusBlox"

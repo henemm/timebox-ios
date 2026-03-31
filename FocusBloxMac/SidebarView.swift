@@ -14,7 +14,6 @@ enum MainSection: String, Hashable, CaseIterable {
     case day = "Tag"
     case focus = "Focus"
     case review = "Review"
-    case refiner = "Refiner"
 
     var icon: String {
         switch self {
@@ -23,7 +22,6 @@ enum MainSection: String, Hashable, CaseIterable {
         case .day: return "calendar.badge.clock"
         case .focus: return "target"
         case .review: return "chart.bar"
-        case .refiner: return "sparkles"
         }
     }
 }

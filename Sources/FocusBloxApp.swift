@@ -313,6 +313,8 @@ struct FocusBloxApp: App {
                     RecurrenceService.deduplicateTemplates(in: sharedModelContainer.mainContext)
                     RecurrenceService.deduplicateChildInstances(in: sharedModelContainer.mainContext)
                     RecurrenceService.repairOrphanedRecurringSeries(in: sharedModelContainer.mainContext)
+                    // RW 1.5: Migrate any leftover "raw" tasks to "active"
+                    Self.migrateRawTasksToActive(in: sharedModelContainer.mainContext)
                     // Background title improvement for tasks from Share Extension, Siri, Watch
                     let titleEngine = TaskTitleEngine(modelContext: sharedModelContainer.mainContext)
                     Task { await titleEngine.improveAllPendingTitles() }
@@ -369,7 +371,6 @@ struct FocusBloxApp: App {
                     case "day": selectedTab = .day
                     case "focus": selectedTab = .focus
                     case "review": selectedTab = .review
-                    case "refiner": selectedTab = .refiner
                     default: break
                     }
                 }
@@ -589,6 +590,18 @@ struct FocusBloxApp: App {
         UserDefaults.standard.set(false, forKey: "remindersSyncEnabled")
         UserDefaults.standard.removeObject(forKey: "visibleReminderListIDs")
         UserDefaults.standard.synchronize()
+    }
+
+    /// RW 1.5: One-time migration — promote leftover "raw" tasks to "active" and confirm suggestions.
+    private static func migrateRawTasksToActive(in context: ModelContext) {
+        let rawPredicate = #Predicate<LocalTask> { $0.lifecycleStatus == "raw" }
+        let descriptor = FetchDescriptor<LocalTask>(predicate: rawPredicate)
+        guard let rawTasks = try? context.fetch(descriptor), !rawTasks.isEmpty else { return }
+        for task in rawTasks {
+            task.confirmSuggestions()
+        }
+        try? context.save()
+        print("[RW 1.5] Migrated \(rawTasks.count) raw task(s) to active")
     }
 
     /// Continuous cleanup of test data that leaked into the persistent store.
@@ -871,25 +884,6 @@ struct FocusBloxApp: App {
         )
         recurringChild3.isNextUp = false
         context.insert(recurringChild3)
-
-        // MARK: - Raw Tasks for Refiner UI tests (RW 1.3)
-        if ProcessInfo.processInfo.arguments.contains("-InjectRawTasks") {
-            let rawTask1 = LocalTask(title: "[MOCK] Steuererklärung vorbereiten", importance: nil, estimatedDuration: nil, urgency: nil)
-            rawTask1.lifecycleStatus = TaskLifecycleStatus.raw.rawValue
-            rawTask1.suggestedCategory = "maintenance"
-            rawTask1.suggestedDuration = 60
-            rawTask1.suggestedImportance = 3
-            rawTask1.suggestedUrgency = "urgent"
-            rawTask1.suggestedEnergyLevel = "high"
-            context.insert(rawTask1)
-
-            let rawTask2 = LocalTask(title: "[MOCK] Buch weiterlesen", importance: nil, estimatedDuration: nil, urgency: nil)
-            rawTask2.lifecycleStatus = TaskLifecycleStatus.raw.rawValue
-            rawTask2.suggestedCategory = "recharge"
-            rawTask2.suggestedDuration = 30
-            rawTask2.suggestedImportance = 1
-            context.insert(rawTask2)
-        }
 
         // MARK: - Scheduled Task Mock Data (RW_3.1b)
         let scheduledTask = LocalTask(title: "[MOCK] Scheduled: Bericht schreiben", importance: 2, estimatedDuration: 45, urgency: "not_urgent")
