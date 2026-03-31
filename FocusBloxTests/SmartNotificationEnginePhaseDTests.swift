@@ -17,33 +17,34 @@ final class SmartNotificationEnginePhaseDTests: XCTestCase {
 
     // MARK: - buildReviewRequests Tests
 
-    /// Verhalten: Um 15:00 liefert buildReviewRequests genau 2 Requests (Evening 20:00 + Morning 08:00 morgen).
-    /// Bricht wenn: SmartNotificationEngine.buildReviewRequests(now:) weiterhin [] zurueckgibt (Stub Z312)
-    ///   oder die Methode private bleibt (Compile Error).
-    func test_buildReviewRequests_afternoon_returns2Requests() {
+    /// Verhalten: Um 15:00 liefert buildReviewRequests 13 Requests (7 Tage: heute Evening + 6× Morning+Evening).
+    /// Bricht wenn: Multi-Day-Loop in buildReviewRequests entfernt wird.
+    func test_buildReviewRequests_afternoon_returnsMultiDay() {
         let cal = Calendar.current
         let today = cal.startOfDay(for: Date())
-        // now = heute 15:00 → Evening 20:00 liegt in der Zukunft, Morning 08:00 morgen auch
+        // now = heute 15:00 → heute Morning vorbei, heute Evening + 6 weitere Tage komplett
         let now = cal.date(bySettingHour: 15, minute: 0, second: 0, of: today)!
 
         let requests = SmartNotificationEngine.buildReviewRequests(now: now)
 
-        XCTAssertEqual(requests.count, 2,
-                       "At 15:00, should return 2 requests: evening review + morning nudge")
+        // heute Evening (1) + 6 Tage Morning+Evening (12) = 13
+        XCTAssertEqual(requests.count, 13,
+                       "At 15:00, should return 7-day review requests (13 total)")
     }
 
-    /// Verhalten: Um 21:00 liefert buildReviewRequests genau 1 Request (nur Morning, Evening ist vorbei).
-    /// Bricht wenn: Vergangene Evening-Time (20:00) trotzdem eingeplant wird — Guard `eveningDate > now` fehlt.
-    func test_buildReviewRequests_afterEvening_returns1Request() {
+    /// Verhalten: Um 21:00 liefert buildReviewRequests 12 Requests (heute vorbei, 6 Tage komplett).
+    /// Bricht wenn: Vergangene Slots trotzdem eingeplant werden.
+    func test_buildReviewRequests_afterEvening_returnsMultiDay() {
         let cal = Calendar.current
         let today = cal.startOfDay(for: Date())
-        // now = heute 21:00 → Evening 20:00 ist vorbei, nur Morning 08:00 morgen
+        // now = heute 21:00 → heute Morning+Evening vorbei, 6 weitere Tage komplett
         let now = cal.date(bySettingHour: 21, minute: 0, second: 0, of: today)!
 
         let requests = SmartNotificationEngine.buildReviewRequests(now: now)
 
-        XCTAssertEqual(requests.count, 1,
-                       "At 21:00, evening is past — should return only morning request")
+        // 6 Tage Morning+Evening = 12
+        XCTAssertEqual(requests.count, 12,
+                       "At 21:00, today is past — should return 6 complete days (12)")
     }
 
     /// Verhalten: Review-IDs folgen Schema focusblox.review.{date} und focusblox.morning.{date}.
@@ -62,7 +63,7 @@ final class SmartNotificationEnginePhaseDTests: XCTestCase {
                       "Should contain morning nudge with prefix focusblox.morning.")
     }
 
-    /// Verhalten: Nie mehr als budgetReview (2) Requests.
+    /// Verhalten: Nie mehr als budgetReview (14) Requests.
     /// Bricht wenn: Budget-Cap `Array(requests.prefix(budgetReview))` entfernt wird.
     func test_buildReviewRequests_neverExceedsBudget() {
         let cal = Calendar.current

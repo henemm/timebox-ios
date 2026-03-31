@@ -40,7 +40,7 @@ enum SmartNotificationEngine {
 
     static let budgetTimers: Int = 4
     static let budgetTasks: Int  = 20
-    static let budgetReview: Int = 2
+    static let budgetReview: Int = 14
     static let budgetNudges: Int = 10
 
     // MARK: - BGAppRefreshTask
@@ -313,41 +313,43 @@ enum SmartNotificationEngine {
         let today = cal.startOfDay(for: now)
         var requests: [UNNotificationRequest] = []
 
-        // 1. Evening Review — 20:00 heute
-        if let eveningDate = cal.date(bySettingHour: 20, minute: 0, second: 0, of: today),
-           eveningDate > now {
-            let content = UNMutableNotificationContent()
-            content.title = "Tagesreview"
-            content.body = "Zeit für dein Tagesreview — was hast du heute geschafft?"
-            content.sound = .default
+        for dayOffset in 0..<7 {
+            guard let day = cal.date(byAdding: .day, value: dayOffset, to: today) else { continue }
+            let dateStr = dateString(from: day)
 
-            let interval = eveningDate.timeIntervalSince(now)
-            let trigger = UNTimeIntervalNotificationTrigger(timeInterval: interval, repeats: false)
-            let dateStr = dateString(from: today)
-            requests.append(UNNotificationRequest(
-                identifier: "focusblox.review.\(dateStr)",
-                content: content,
-                trigger: trigger
-            ))
-        }
+            // Evening Review — 20:00
+            if let eveningDate = cal.date(bySettingHour: 20, minute: 0, second: 0, of: day),
+               eveningDate > now {
+                let content = UNMutableNotificationContent()
+                content.title = "Tagesreview"
+                content.body = "Zeit für dein Tagesreview — was hast du heute geschafft?"
+                content.sound = .default
 
-        // 2. Morning Nudge — 08:00 morgen
-        if let tomorrow = cal.date(byAdding: .day, value: 1, to: today),
-           let morningDate = cal.date(bySettingHour: 8, minute: 0, second: 0, of: tomorrow),
-           morningDate > now {
-            let content = UNMutableNotificationContent()
-            content.title = "Guten Morgen"
-            content.body = "Dein Tag wartet — was packst du heute an?"
-            content.sound = .default
+                let interval = eveningDate.timeIntervalSince(now)
+                let trigger = UNTimeIntervalNotificationTrigger(timeInterval: interval, repeats: false)
+                requests.append(UNNotificationRequest(
+                    identifier: "focusblox.review.\(dateStr)",
+                    content: content,
+                    trigger: trigger
+                ))
+            }
 
-            let interval = morningDate.timeIntervalSince(now)
-            let trigger = UNTimeIntervalNotificationTrigger(timeInterval: interval, repeats: false)
-            let dateStr = dateString(from: tomorrow)
-            requests.append(UNNotificationRequest(
-                identifier: "focusblox.morning.\(dateStr)",
-                content: content,
-                trigger: trigger
-            ))
+            // Morning Nudge — 08:00
+            if let morningDate = cal.date(bySettingHour: 8, minute: 0, second: 0, of: day),
+               morningDate > now {
+                let content = UNMutableNotificationContent()
+                content.title = "Guten Morgen"
+                content.body = "Dein Tag wartet — was packst du heute an?"
+                content.sound = .default
+
+                let interval = morningDate.timeIntervalSince(now)
+                let trigger = UNTimeIntervalNotificationTrigger(timeInterval: interval, repeats: false)
+                requests.append(UNNotificationRequest(
+                    identifier: "focusblox.morning.\(dateStr)",
+                    content: content,
+                    trigger: trigger
+                ))
+            }
         }
 
         return Array(requests.prefix(budgetReview))
@@ -406,13 +408,26 @@ enum SmartNotificationEngine {
     // MARK: - BGAppRefreshTask Registration (iOS only)
 
     #if !os(macOS)
-    static func registerBackgroundTask() {
+    private static var bgContainer: ModelContainer?
+    private static var bgEventKitRepo: (any EventKitRepositoryProtocol)?
+
+    static func registerBackgroundTask(
+        container: ModelContainer,
+        eventKitRepo: any EventKitRepositoryProtocol
+    ) {
+        bgContainer = container
+        bgEventKitRepo = eventKitRepo
+
         BGTaskScheduler.shared.register(
             forTaskWithIdentifier: bgTaskIdentifier,
             using: nil
         ) { task in
             guard let refreshTask = task as? BGAppRefreshTask else { return }
             Task { @MainActor in
+                if let c = bgContainer, let r = bgEventKitRepo {
+                    await reconcile(reason: .appBackground, container: c, eventKitRepo: r)
+                }
+                scheduleBackgroundRefresh()
                 refreshTask.setTaskCompleted(success: true)
             }
         }

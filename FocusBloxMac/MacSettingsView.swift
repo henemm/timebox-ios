@@ -267,7 +267,7 @@ struct MacSettingsView: View {
             } header: {
                 Text("Profil")
             } footer: {
-                Text("Leise: nur Sprint-Timer. Ausgeglichen: Timer + Fristen + Tagesreview. Aktiv: alle inkl. Motivations-Nudges.")
+                Text("Leise — Nur Focus-Block-Timer (5 Min vorher + Ende).\nAusgeglichen — Timer + Frist-Erinnerungen + Morgengruß (08:00) + Abend-Review (20:00).\nAktiv — Alles + Motivations-Nachrichten alle 2 Stunden (9–19 Uhr).")
             }
 
             Section {

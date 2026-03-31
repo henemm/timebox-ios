@@ -44,6 +44,11 @@
     <key>UIBackgroundModes</key>
     <array>
         <string>remote-notification</string>
+        <string>fetch</string>
+    </array>
+    <key>BGTaskSchedulerPermittedIdentifiers</key>
+    <array>
+        <string>com.henning.focusblox.notification-refresh</string>
     </array>
     <key>CFBundleURLTypes</key>
     <array>

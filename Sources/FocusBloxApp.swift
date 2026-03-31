@@ -448,7 +448,10 @@ struct FocusBloxApp: App {
                 _ = await NotificationService.requestPermission()
             }
             #if !os(macOS)
-            SmartNotificationEngine.registerBackgroundTask()
+            SmartNotificationEngine.registerBackgroundTask(
+                container: sharedModelContainer,
+                eventKitRepo: eventKitRepository
+            )
             SmartNotificationEngine.scheduleBackgroundRefresh()
             #endif
             await MainActor.run {
