@@ -182,7 +182,12 @@ final class TaskTitleEngine {
     /// Word-boundary aware: "Dringlichkeit" does NOT match.
     nonisolated static func extractDeterministicUrgency(from title: String) -> String? {
         let lower = title.lowercased()
+        // Explicit urgency keywords
         if lower.range(of: #"\b(?:dringend|urgent|asap|sofort|eilig)\b"#, options: .regularExpression) != nil {
+            return "urgent"
+        }
+        // Deadline pattern: "bis [Wochentag/heute/morgen]" → urgent
+        if lower.range(of: #"\bbis\s+(?:morgen|heute|montag|dienstag|mittwoch|donnerstag|freitag|samstag|sonntag|ende\s+der\s+woche)\b"#, options: .regularExpression) != nil {
             return "urgent"
         }
         return nil

@@ -745,4 +745,64 @@ final class TaskTitleEngineTests: XCTestCase {
         XCTAssertNil(task.dueDate,
                      "Bug 95: Generic title must NOT get dueDate set by AI")
     }
+
+    // MARK: - AI_002: Deterministic "bis [Datum]" Urgency Extraction
+
+    /// Verhalten: "bis Freitag" im Titel → extractDeterministicUrgency() gibt "urgent" zurück
+    /// Bricht wenn: TaskTitleEngine.swift:185 — Regex in extractDeterministicUrgency enthält kein "bis [Wochentag]"-Pattern
+    func test_extractDeterministicUrgency_bisFreitag_returnsUrgent() {
+        let result = TaskTitleEngine.extractDeterministicUrgency(from: "Bewerbung bis Freitag fertig")
+        XCTAssertEqual(result, "urgent",
+                       "'bis Freitag' muss als urgent erkannt werden")
+    }
+
+    /// Verhalten: "bis morgen" im Titel → urgent
+    /// Bricht wenn: TaskTitleEngine.swift:185 — Regex enthält kein "bis morgen"-Pattern
+    func test_extractDeterministicUrgency_bisMorgen_returnsUrgent() {
+        let result = TaskTitleEngine.extractDeterministicUrgency(from: "Steuer bis morgen abgeben")
+        XCTAssertEqual(result, "urgent",
+                       "'bis morgen' muss als urgent erkannt werden")
+    }
+
+    /// Verhalten: "bis heute" im Titel → urgent
+    /// Bricht wenn: TaskTitleEngine.swift:185 — Regex enthält kein "bis heute"-Pattern
+    func test_extractDeterministicUrgency_bisHeute_returnsUrgent() {
+        let result = TaskTitleEngine.extractDeterministicUrgency(from: "Bericht bis heute einreichen")
+        XCTAssertEqual(result, "urgent",
+                       "'bis heute' muss als urgent erkannt werden")
+    }
+
+    /// Verhalten: "bis Montag" im Titel → urgent
+    /// Bricht wenn: TaskTitleEngine.swift:185 — Regex enthält kein "bis [Wochentag]"-Pattern
+    func test_extractDeterministicUrgency_bisMontag_returnsUrgent() {
+        let result = TaskTitleEngine.extractDeterministicUrgency(from: "Steuer bis Montag abgeben")
+        XCTAssertEqual(result, "urgent",
+                       "'bis Montag' muss als urgent erkannt werden")
+    }
+
+    // MARK: AI_002: False-Positive-Schutz
+
+    /// Verhalten: "von A bis Z" → nil (kein Wochentag nach "bis")
+    /// Bricht wenn: Regex zu breit matcht (jedes "bis" als urgent)
+    func test_extractDeterministicUrgency_vonAbisZ_returnsNil() {
+        let result = TaskTitleEngine.extractDeterministicUrgency(from: "Alphabetisch von A bis Z sortieren")
+        XCTAssertNil(result,
+                     "'von A bis Z' darf NICHT als urgent erkannt werden")
+    }
+
+    /// Verhalten: "bis auf weiteres" → nil
+    /// Bricht wenn: Regex zu breit matcht
+    func test_extractDeterministicUrgency_bisAufWeiteres_returnsNil() {
+        let result = TaskTitleEngine.extractDeterministicUrgency(from: "Pausiert bis auf weiteres")
+        XCTAssertNil(result,
+                     "'bis auf weiteres' darf NICHT als urgent erkannt werden")
+    }
+
+    /// Verhalten: "bis zu 3 Stunden" → nil
+    /// Bricht wenn: Regex zu breit matcht
+    func test_extractDeterministicUrgency_bisZu_returnsNil() {
+        let result = TaskTitleEngine.extractDeterministicUrgency(from: "Dauert bis zu 3 Stunden")
+        XCTAssertNil(result,
+                     "'bis zu 3 Stunden' darf NICHT als urgent erkannt werden")
+    }
 }

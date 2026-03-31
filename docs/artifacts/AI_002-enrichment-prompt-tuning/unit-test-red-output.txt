@@ -1,0 +1,19 @@
+TDD RED — AI_002 Unit Tests (2026-03-31)
+
+FAIL: test_extractDeterministicUrgency_bisFreitag_returnsUrgent()
+  XCTAssertEqual failed: ("nil") is not equal to ("Optional("urgent")") - 'bis Freitag' muss als urgent erkannt werden
+
+FAIL: test_extractDeterministicUrgency_bisMorgen_returnsUrgent()
+  XCTAssertEqual failed: ("nil") is not equal to ("Optional("urgent")") - 'bis morgen' muss als urgent erkannt werden
+
+FAIL: test_extractDeterministicUrgency_bisHeute_returnsUrgent()
+  XCTAssertEqual failed: ("nil") is not equal to ("Optional("urgent")") - 'bis heute' muss als urgent erkannt werden
+
+FAIL: test_extractDeterministicUrgency_bisMontag_returnsUrgent()
+  XCTAssertEqual failed: ("nil") is not equal to ("Optional("urgent")") - 'bis Montag' muss als urgent erkannt werden
+
+PASS: test_extractDeterministicUrgency_vonAbisZ_returnsNil()
+PASS: test_extractDeterministicUrgency_bisAufWeiteres_returnsNil()
+PASS: test_extractDeterministicUrgency_bisZu_returnsNil()
+
+4 failed, 3 passed (von neuen AI_002 Tests)

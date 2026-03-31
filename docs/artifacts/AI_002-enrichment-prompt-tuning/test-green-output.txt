@@ -1,0 +1,18 @@
+TDD GREEN — AI_002 Unit Tests (2026-03-31)
+
+TaskTitleEngineTests: ** TEST SUCCEEDED ** (69 tests)
+  - test_extractDeterministicUrgency_bisFreitag_returnsUrgent ✓
+  - test_extractDeterministicUrgency_bisMorgen_returnsUrgent ✓
+  - test_extractDeterministicUrgency_bisHeute_returnsUrgent ✓
+  - test_extractDeterministicUrgency_bisMontag_returnsUrgent ✓
+  - test_extractDeterministicUrgency_vonAbisZ_returnsNil ✓
+  - test_extractDeterministicUrgency_bisAufWeiteres_returnsNil ✓
+  - test_extractDeterministicUrgency_bisZu_returnsNil ✓
+
+SmartTaskEnrichmentServiceTests: 12/14 passed
+  - 2 vorbestehende Failures (nicht durch AI_002 verursacht):
+    - test_createTask_preservesUserAttributes_whileEnrichingOthers (AI nicht verfügbar in CI)
+    - test_enrichAllTbdTasks_returnsZeroWhenDisabled (bekannter Pre-existing Bug)
+
+KeywordSystemTests: ** TEST SUCCEEDED ** (79 tests)
+macOS Build: SUCCEEDED

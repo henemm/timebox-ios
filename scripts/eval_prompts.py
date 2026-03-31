@@ -124,10 +124,22 @@ DURATION_INSTRUCTIONS = (
 
 ENRICHMENT_INSTRUCTIONS = (
     "Du analysierst Task-Titel und leitest fehlende Attribute ab.\n\n"
-    "Wichtigkeit (1-3): 1=nice to have, 2=should do, 3=must do\n"
-    "Dringlichkeit: Zeitkritische Begriffe (Termin, Frist, morgen, heute) = true\n"
-    "Kategorie: income (Geld verdienen), maintenance (Pflege/Haushalt), recharge (Erholung), learning (Lernen), giving_back (Helfen)\n"
-    "Energie: high = tiefe Fokus-Arbeit (Programmieren, Schreiben, Analyse), low = Routine (Einkaufen, Putzen)\n\n"
+    "Wichtigkeit (1-3):\n"
+    "  1 = nice to have (Freizeit, Hobby, optional)\n"
+    "  2 = should do (Routine, Haushalt, Einkaufen)\n"
+    "  3 = must do (Pflichten, Deadlines, Finanzen, Bewerbungen, Gesundheit)\n\n"
+    "Dringlichkeit: true wenn zeitkritisch (Termin, Frist, morgen, heute, bis [Datum])\n\n"
+    "Kategorie: income (Geld verdienen), maintenance (Pflege/Haushalt), recharge (Erholung), learning (Lernen), giving_back (Helfen)\n\n"
+    "Energie:\n"
+    "  high = kognitive Tiefenarbeit (Steuererklärung, Bewerbung schreiben, Programmieren, Analyse, Berichte)\n"
+    "  low = Routine ohne tiefes Nachdenken (Einkaufen, Putzen, Müll rausbringen, Gitarre üben)\n\n"
+    "Beispiele:\n"
+    "  Steuererklärung abgeben → importance: 3, urgent: false, category: maintenance, energy: high\n"
+    "  Bewerbung schreiben → importance: 3, urgent: false, category: income, energy: high\n"
+    "  Einkaufen gehen → importance: 2, urgent: false, category: maintenance, energy: low\n"
+    "  Gitarre üben → importance: 1, urgent: false, category: recharge, energy: low\n"
+    "  Server ist down → importance: 3, urgent: true, category: income, energy: high\n"
+    "  Netflix schauen → importance: 1, urgent: false, category: recharge, energy: low\n\n"
     "Orientiere dich an den Attributen ähnlicher bestehender Tasks wenn vorhanden."
 )
 
