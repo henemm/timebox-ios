@@ -373,19 +373,24 @@ final class AITitleQualityTests: XCTestCase {
         var confidence: String
     }
 
+    /// System instructions fuer Kategorisierung — als Funktion damit jede Iteration
+    /// eine frische Session erstellen kann (verhindert Context-Window-Overflow nach ~29 Aufrufen).
     @available(iOS 26.0, macOS 26.0, *)
-    func test_categorization() async throws {
-        guard SystemLanguageModel.default.availability == .available else {
-            throw XCTSkip("Apple Intelligence nicht verfuegbar")
-        }
-
-        let session = LanguageModelSession {
+    private func makeCategorizeSession() -> LanguageModelSession {
+        LanguageModelSession {
             "Categorize tasks into exactly one category:"
             "- income: Work, earning money, career, freelance, invoices, clients"
             "- maintenance: Household, errands, repairs, cleaning, groceries, health appointments"
             "- recharge: Exercise, rest, hobbies, meditation, wellness, fun"
             "- learning: Study, reading, courses, skills, research, training"
             "- giving_back: Family, friends, volunteering, gifts, social events, helping others"
+        }
+    }
+
+    @available(iOS 26.0, macOS 26.0, *)
+    func test_categorization() async throws {
+        guard SystemLanguageModel.default.availability == .available else {
+            throw XCTSkip("Apple Intelligence nicht verfuegbar")
         }
 
         struct CatTest {
@@ -444,6 +449,8 @@ final class AITitleQualityTests: XCTestCase {
 
         for c in cases {
             do {
+                // Frische Session pro Task — verhindert Context-Window-Overflow (AI_001)
+                let session = makeCategorizeSession()
                 let response = try await session.respond(
                     to: "Categorize: \(c.input)",
                     generating: CategorizedTask.self
@@ -481,13 +488,11 @@ final class AITitleQualityTests: XCTestCase {
         var confidence: String
     }
 
+    /// System instructions fuer Zeitschaetzung — als Funktion damit jede Iteration
+    /// eine frische Session erstellen kann (verhindert Context-Window-Overflow nach ~29 Aufrufen).
     @available(iOS 26.0, macOS 26.0, *)
-    func test_durationEstimation() async throws {
-        guard SystemLanguageModel.default.availability == .available else {
-            throw XCTSkip("Apple Intelligence nicht verfuegbar")
-        }
-
-        let session = LanguageModelSession {
+    private func makeDurationSession() -> LanguageModelSession {
+        LanguageModelSession {
             "Estimate how long a task takes in minutes. Consider:"
             "- Quick calls/messages: 5-10 min"
             "- Simple errands (groceries, pickup): 15-30 min"
@@ -495,6 +500,13 @@ final class AITitleQualityTests: XCTestCase {
             "- Appointments (doctor, meeting): 30-60 min"
             "- Deep work (tax return, project): 60-120 min"
             "- Household chores: 15-45 min"
+        }
+    }
+
+    @available(iOS 26.0, macOS 26.0, *)
+    func test_durationEstimation() async throws {
+        guard SystemLanguageModel.default.availability == .available else {
+            throw XCTSkip("Apple Intelligence nicht verfuegbar")
         }
 
         struct DurTest {
@@ -544,6 +556,8 @@ final class AITitleQualityTests: XCTestCase {
 
         for c in cases {
             do {
+                // Frische Session pro Task — verhindert Context-Window-Overflow (AI_001)
+                let session = makeDurationSession()
                 let response = try await session.respond(
                     to: "Estimate duration: \(c.input)",
                     generating: EstimatedTask.self
