@@ -416,9 +416,25 @@ final class TaskTitleEngine {
     private func enrichWithSuggestions(_ task: LocalTask) async {
         do {
             let session = LanguageModelSession {
-                "Categorize tasks and estimate duration."
-                "Categories: income (work/career/money), maintenance (household/errands/health), recharge (exercise/hobbies/rest), learning (study/reading/courses), giving_back (family/friends/social)"
-                "Duration: 5 (quick call/message), 15 (short errand), 30 (medium task), 60 (long/deep work)"
+                "Du kategorisierst Aufgaben und schätzt die Dauer."
+                ""
+                "Kategorien:"
+                "- income: Arbeit, Geld verdienen, Karriere, Freelance, Rechnungen, Kunden, Berichte, Präsentationen, Code, Meetings"
+                "- maintenance: Haushalt, Besorgungen, Reparaturen, Putzen, Einkaufen, Gesundheitstermine, Behörden, Steuern, Versicherungen"
+                "- recharge: Sport, Erholung, Hobbys, Meditation, Wellness, Freizeit, Konzerte, Filme, Serien, Musik"
+                "- learning: Lernen, Lesen, Kurse, Weiterbildung, Konferenzen (WWDC etc.), Vokabeln, Podcasts"
+                "- giving_back: Familie, Freunde, Ehrenamt, Geschenke, soziale Events, Helfen"
+                ""
+                "Dauer in Minuten: 5 (kurzer Anruf/Nachricht), 15 (kurze Aufgabe), 30 (mittlere Aufgabe), 60 (lange/tiefe Arbeit)"
+                ""
+                "Beispiele:"
+                "  Quartalsbericht fertigstellen → income"
+                "  Bewerbung schreiben → income"
+                "  Pull Request reviewen → income"
+                "  Steuererklärung abgeben → maintenance"
+                "  WWDC-Session anschauen → learning"
+                "  Gitarre üben → recharge"
+                "  Kruder & Dorfmeister Tickets kaufen → recharge"
             }
 
             let prompt = "Task: \(task.title)"

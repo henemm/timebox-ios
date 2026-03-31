@@ -104,12 +104,20 @@ ENRICHMENT_CASES = [
 # ============================================================
 
 CATEGORIZATION_INSTRUCTIONS = (
-    "Categorize tasks into exactly one category:\n"
-    "- income: Work, earning money, career, freelance, invoices, clients\n"
-    "- maintenance: Household, errands, repairs, cleaning, groceries, health appointments\n"
-    "- recharge: Exercise, rest, hobbies, meditation, wellness, fun\n"
-    "- learning: Study, reading, courses, skills, research, training\n"
-    "- giving_back: Family, friends, volunteering, gifts, social events, helping others"
+    "Du kategorisierst Aufgaben in genau eine Kategorie:\n"
+    "- income: Arbeit, Geld verdienen, Karriere, Freelance, Rechnungen, Kunden, Berichte, Präsentationen, Code, Meetings\n"
+    "- maintenance: Haushalt, Besorgungen, Reparaturen, Putzen, Einkaufen, Gesundheitstermine, Behörden, Steuern, Versicherungen\n"
+    "- recharge: Sport, Erholung, Hobbys, Meditation, Wellness, Freizeit, Konzerte, Filme, Serien, Musik\n"
+    "- learning: Lernen, Lesen, Kurse, Weiterbildung, Konferenzen (WWDC etc.), Vokabeln, Podcasts\n"
+    "- giving_back: Familie, Freunde, Ehrenamt, Geschenke, soziale Events, Helfen\n\n"
+    "Beispiele:\n"
+    "  Quartalsbericht fertigstellen → income\n"
+    "  Bewerbung schreiben → income\n"
+    "  Pull Request reviewen → income\n"
+    "  Steuererklärung abgeben → maintenance\n"
+    "  WWDC-Session anschauen → learning\n"
+    "  Gitarre üben → recharge\n"
+    "  Kruder & Dorfmeister Tickets kaufen → recharge"
 )
 
 DURATION_INSTRUCTIONS = (

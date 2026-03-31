@@ -250,6 +250,42 @@ final class SmartTaskEnrichmentServiceTests: XCTestCase {
                       "Prompt muss Task-Titel 'Steuererklärung abgeben' enthalten")
     }
 
+    // MARK: - AI_003: Kategorisierungs-Prompt Qualität
+
+    /// Verhalten: Python-Eval CATEGORIZATION_INSTRUCTIONS enthält deutsche Few-Shot Beispiele
+    /// Bricht wenn: eval_prompts.py noch den alten englischen Prompt hat
+    /// Hinweis: Swift-Prompts werden in Implementation synchronisiert
+    func test_categorizationInstructions_evalScript_isGerman() throws {
+        let evalPath = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()  // FocusBloxTests/
+            .deletingLastPathComponent()  // project root
+            .appendingPathComponent("scripts/eval_prompts.py")
+        let content = try String(contentsOf: evalPath, encoding: .utf8)
+
+        // Der Kategorisierungs-Prompt muss auf Deutsch sein
+        XCTAssertTrue(content.contains("kategorisierst Aufgaben"),
+                      "CATEGORIZATION_INSTRUCTIONS muss deutsch sein ('kategorisierst Aufgaben')")
+    }
+
+    /// Verhalten: CATEGORIZATION_INSTRUCTIONS enthält Few-Shot Beispiele (→ Pfeil-Notation)
+    /// Bricht wenn: eval_prompts.py keine Few-Shot Beispiele im Prompt-String hat
+    func test_categorizationInstructions_evalScript_containsFewShot() throws {
+        let evalPath = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .appendingPathComponent("scripts/eval_prompts.py")
+        let content = try String(contentsOf: evalPath, encoding: .utf8)
+
+        // Few-Shot Beispiele im CATEGORIZATION_INSTRUCTIONS Block (nicht in CATEGORIZATION_CASES!)
+        // Suche nach dem Pfeil-Pattern "→ income/maintenance/recharge" im Instructions-String
+        XCTAssertTrue(content.contains("Bewerbung schreiben → income"),
+                      "Few-Shot: 'Bewerbung schreiben → income' fehlt in CATEGORIZATION_INSTRUCTIONS")
+        XCTAssertTrue(content.contains("Steuererklärung abgeben → maintenance"),
+                      "Few-Shot: 'Steuererklärung abgeben → maintenance' fehlt")
+        XCTAssertTrue(content.contains("Gitarre üben → recharge"),
+                      "Few-Shot: 'Gitarre üben → recharge' fehlt")
+    }
+
     /// GIVEN: A task created via createTask() with user-provided importance
     /// WHEN: Enrichment runs
     /// THEN: User-provided importance should be preserved, other fields enriched

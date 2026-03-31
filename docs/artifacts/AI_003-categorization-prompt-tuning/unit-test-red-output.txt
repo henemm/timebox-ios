@@ -1,0 +1,9 @@
+TDD RED — AI_003 Unit Tests (2026-03-31)
+
+FAIL: test_categorizationInstructions_evalScript_isGerman()
+  XCTAssertTrue failed - CATEGORIZATION_INSTRUCTIONS muss deutsch sein ('kategorisierst Aufgaben')
+
+FAIL: test_categorizationInstructions_evalScript_containsFewShot()
+  XCTAssertTrue failed - Few-Shot: 'Bewerbung schreiben → income' fehlt in CATEGORIZATION_INSTRUCTIONS
+
+2 neue AI_003 Tests FAILED (wie erwartet — Prompt noch auf Englisch, keine Few-Shot)
