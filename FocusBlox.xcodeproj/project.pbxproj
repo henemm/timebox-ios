@@ -535,6 +535,7 @@
 		'SMARTENR00BUILD001' = {isa = PBXBuildFile; fileRef = SMARTENR00FILE0001; };
 		'SMARTENR00BUILD002' = {isa = PBXBuildFile; fileRef = SMARTENR00FILE0001; };
 		'SMARTGAPS001BUILDFILE00001' = {isa = PBXBuildFile; fileRef = SMARTGAPS001FILEREF000001; };
+		'KWDSYS01BUILD0001' = {isa = PBXBuildFile; fileRef = KWDSYS01FILE00001; };
 		'SMTENR01BUILD0001' = {isa = PBXBuildFile; fileRef = SMTENR01FILE00001; };
 		'SMTNOT01BUILD00001' = {isa = PBXBuildFile; fileRef = SMTNOT01FILE000001; };
 		'SMTNOT02BUILD00001' = {isa = PBXBuildFile; fileRef = SMTNOT02FILE000001; };
@@ -1184,6 +1185,7 @@
 		'SKIPLOOP01FILE0001' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkipTaskLoopUITests.swift; sourceTree = "<group>"; };
 		'SMARTENR00FILE0001' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SmartTaskEnrichmentService.swift; path = Sources/Services/SmartTaskEnrichmentService.swift; sourceTree = SOURCE_ROOT; };
 		'SMARTGAPS001FILEREF000001' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartGapsTests.swift; sourceTree = "<group>"; };
+		'KWDSYS01FILE00001' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeywordSystemTests.swift; sourceTree = "<group>"; };
 		'SMTENR01FILE00001' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartTaskEnrichmentServiceTests.swift; sourceTree = "<group>"; };
 		'SMTNOT01FILE000001' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartNotificationEngineTests.swift; sourceTree = "<group>"; };
 		'SMTNOT02FILE000001' = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartNotificationEngineUITests.swift; sourceTree = "<group>"; };
@@ -1809,6 +1811,7 @@
 				CBHELP01FILE00001,
 				CTC2TEST0FILE00001,
 				95142243688D96B229D2FA41 /* MenuBarIconStateTests.swift */,
+				KWDSYS01FILE00001,
 				SMTENR01FILE00001,
 				REFNR01FILE000001,
 				RMREFNR01FILE00001,
@@ -3041,6 +3044,7 @@
 				CBHELP01BUILD0001,
 				CTC2TEST0BUILD0001,
 				F4222F8AEAECD043130A4C6B /* MenuBarIconStateTests.swift in Sources */,
+				KWDSYS01BUILD0001,
 				SMTENR01BUILD0001,
 				REFNR01BUILD00001,
 				RMREFNR01BUILD0001,
