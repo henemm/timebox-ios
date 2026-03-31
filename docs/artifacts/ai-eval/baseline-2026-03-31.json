@@ -1,0 +1,22 @@
+{
+  "timestamp": "2026-03-31T16:11:14",
+  "categorization": {
+    "correct": 29,
+    "total": 30,
+    "pct": 96,
+    "errors": 1
+  },
+  "duration": {
+    "correct": 10,
+    "total": 16,
+    "pct": 62,
+    "errors": 0
+  },
+  "enrichment": {
+    "correct": 23,
+    "total": 24,
+    "pct": 95,
+    "errors": 0
+  },
+  "elapsed_seconds": 22.7
+}

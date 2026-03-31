@@ -16,8 +16,11 @@ Voraussetzungen:
   python3 scripts/eval_prompts.py
 """
 
+import argparse
 import asyncio
+import importlib.util
 import json
+import sys
 import time
 import apple_fm_sdk as fm
 
@@ -378,48 +381,130 @@ async def check_token_usage():
         print(f"\n  Context Size Fehler: {e}")
 
 
+def load_compare_module(module_name):
+    """Lädt ein alternatives Prompt-Modul aus scripts/ für A/B-Vergleich."""
+    import os
+    path = os.path.join(os.path.dirname(__file__), f"{module_name}.py")
+    if not os.path.exists(path):
+        print(f"❌ Modul nicht gefunden: {path}")
+        sys.exit(1)
+    spec = importlib.util.spec_from_file_location(module_name, path)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+async def run_eval(instructions_cat, instructions_dur, instructions_enrich, only=None, quiet=False):
+    """Führt die Evaluierung durch und gibt Ergebnisse als Dict zurück."""
+    old_stdout = None
+    if quiet:
+        old_stdout = sys.stdout
+        sys.stdout = sys.stderr
+    results = {}
+    if only is None or only == "cat":
+        c, t, e = await eval_categorization(instructions_cat)
+        results["categorization"] = {"correct": c, "total": t, "pct": int(c / t * 100) if t else 0, "errors": e}
+    if only is None or only == "dur":
+        c, t, e = await eval_duration(instructions_dur)
+        results["duration"] = {"correct": c, "total": t, "pct": int(c / t * 100) if t else 0, "errors": e}
+    if only is None or only == "enrich":
+        c, t, e = await eval_enrichment(instructions_enrich)
+        results["enrichment"] = {"correct": c, "total": t, "pct": int(c / t * 100) if t else 0, "errors": e}
+    if old_stdout:
+        sys.stdout = old_stdout
+    return results
+
+
 async def main():
-    print("╔══════════════════════════════════════════════════════════╗")
-    print("║  FocusBlox AI Prompt Evaluation                        ║")
-    print("║  Apple Foundation Models Python SDK v0.1.1              ║")
-    print("║  macOS 26.4 — On-Device ~3B Parameter Model            ║")
-    print("╚══════════════════════════════════════════════════════════╝")
+    parser = argparse.ArgumentParser(description="FocusBlox AI Prompt Evaluation")
+    parser.add_argument("--json", action="store_true", help="Output als JSON")
+    parser.add_argument("--compare", metavar="MODULE", help="A/B-Vergleich: aktuell vs. MODULE (in scripts/)")
+    parser.add_argument("--only", choices=["cat", "dur", "enrich"], help="Nur eine Eval ausführen")
+    args = parser.parse_args()
+
+    if not args.json:
+        print("╔══════════════════════════════════════════════════════════╗")
+        print("║  FocusBlox AI Prompt Evaluation                        ║")
+        print("║  Apple Foundation Models Python SDK v0.1.1              ║")
+        print("║  macOS 26.4 — On-Device ~3B Parameter Model            ║")
+        print("╚══════════════════════════════════════════════════════════╝")
 
     model = fm.SystemLanguageModel()
     is_available, reason = model.is_available()
 
     if not is_available:
-        print(f"\n❌ Apple Intelligence nicht verfügbar: {reason}")
-        print("   Stelle sicher dass Apple Intelligence in Systemeinstellungen aktiviert ist.")
+        if args.json:
+            print(json.dumps({"error": f"Apple Intelligence nicht verfügbar: {reason}"}))
+        else:
+            print(f"\n❌ Apple Intelligence nicht verfügbar: {reason}")
         return
 
-    print(f"\n✓ Apple Intelligence verfügbar")
+    if not args.json:
+        print(f"\n✓ Apple Intelligence verfügbar")
 
     start = time.time()
 
-    # Token-Analyse
-    await check_token_usage()
+    if not args.json and args.only is None:
+        await check_token_usage()
 
-    # Kategorisierung (frische Session pro Task — wie Production-Code)
-    cat_correct, cat_total, cat_errors = await eval_categorization(CATEGORIZATION_INSTRUCTIONS)
+    # --- A/B Compare Mode ---
+    if args.compare:
+        mod = load_compare_module(args.compare)
+        cat_a = getattr(mod, "CATEGORIZATION_INSTRUCTIONS", CATEGORIZATION_INSTRUCTIONS)
+        dur_a = getattr(mod, "DURATION_INSTRUCTIONS", DURATION_INSTRUCTIONS)
+        enr_a = getattr(mod, "ENRICHMENT_INSTRUCTIONS", ENRICHMENT_INSTRUCTIONS)
 
-    # Zeitschätzung (frische Session pro Task)
-    dur_correct, dur_total, dur_errors = await eval_duration(DURATION_INSTRUCTIONS)
+        if not args.json:
+            print(f"\n{'='*60}")
+            print(f"A/B VERGLEICH: aktuell vs. {args.compare}")
+            print(f"{'='*60}")
+            print(f"\n--- Variante A (aktuell) ---")
+        results_a = await run_eval(CATEGORIZATION_INSTRUCTIONS, DURATION_INSTRUCTIONS, ENRICHMENT_INSTRUCTIONS, args.only, quiet=args.json)
 
-    # Enrichment (frische Session pro Task)
-    enr_correct, enr_total, enr_errors = await eval_enrichment(ENRICHMENT_INSTRUCTIONS)
+        if not args.json:
+            print(f"\n--- Variante B ({args.compare}) ---")
+        results_b = await run_eval(cat_a, dur_a, enr_a, args.only, quiet=args.json)
 
+        elapsed = time.time() - start
+
+        if args.json:
+            print(json.dumps({
+                "timestamp": time.strftime("%Y-%m-%dT%H:%M:%S"),
+                "variant_a": results_a,
+                "variant_b": results_b,
+                "compare_module": args.compare,
+                "elapsed_seconds": round(elapsed, 1),
+            }, indent=2))
+        else:
+            print(f"\n{'='*60}")
+            print(f"VERGLEICH")
+            print(f"{'='*60}")
+            for key in results_a:
+                a = results_a[key]
+                b = results_b[key]
+                delta = b["pct"] - a["pct"]
+                arrow = "↑" if delta > 0 else ("↓" if delta < 0 else "=")
+                print(f"  {key:20s}: A={a['pct']}%  B={b['pct']}%  {arrow}{abs(delta)}%")
+        return
+
+    # --- Normal Mode ---
+    results = await run_eval(CATEGORIZATION_INSTRUCTIONS, DURATION_INSTRUCTIONS, ENRICHMENT_INSTRUCTIONS, args.only, quiet=args.json)
     elapsed = time.time() - start
 
-    # Zusammenfassung
-    print("\n" + "=" * 60)
-    print("ZUSAMMENFASSUNG")
-    print("=" * 60)
-    print(f"\n  Kategorisierung: {cat_correct}/{cat_total} ({cat_correct/cat_total*100:.0f}%)")
-    print(f"  Zeitschätzung:   {dur_correct}/{dur_total} ({dur_correct/dur_total*100:.0f}%)")
-    print(f"  Enrichment:      {enr_correct}/{enr_total} ({enr_correct/enr_total*100:.0f}%)")
-    print(f"\n  Laufzeit: {elapsed:.1f}s (vs. ~{(cat_total+dur_total+len(ENRICHMENT_CASES))*0.5:.0f}s in XCTest)")
-    print(f"  Modell: macOS 26.4 On-Device (~3B Parameter)")
+    if args.json:
+        print(json.dumps({
+            "timestamp": time.strftime("%Y-%m-%dT%H:%M:%S"),
+            **results,
+            "elapsed_seconds": round(elapsed, 1),
+        }, indent=2))
+    else:
+        print("\n" + "=" * 60)
+        print("ZUSAMMENFASSUNG")
+        print("=" * 60)
+        for key, val in results.items():
+            print(f"  {key:20s}: {val['correct']}/{val['total']} ({val['pct']}%)")
+        print(f"\n  Laufzeit: {elapsed:.1f}s")
+        print(f"  Modell: macOS 26.4 On-Device (~3B Parameter)")
 
 
 if __name__ == "__main__":

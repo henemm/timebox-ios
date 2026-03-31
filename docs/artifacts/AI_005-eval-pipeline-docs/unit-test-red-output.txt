@@ -1,0 +1,18 @@
+TDD RED — AI_005 (2026-03-31)
+
+Manuelle Verifikation: CLI-Flags existieren noch nicht.
+
+$ python3 scripts/eval_prompts.py --json
+ERROR: unrecognized arguments: --json
+
+$ python3 scripts/eval_prompts.py --compare prompt_v2
+ERROR: unrecognized arguments: --compare
+
+$ python3 scripts/eval_prompts.py --only cat
+ERROR: unrecognized arguments: --only
+
+$ ls scripts/README.md
+No such file
+
+$ ls docs/artifacts/ai-eval/
+No such directory
