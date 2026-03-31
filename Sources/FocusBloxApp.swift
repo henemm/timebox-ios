@@ -459,6 +459,9 @@ struct FocusBloxApp: App {
                     }
                 }
             }
+            .onChange(of: selectedTab) { _, newTab in
+                if newTab != .day { dayViewForcedPhase = nil }
+            }
             .onReceive(NotificationCenter.default.publisher(for: .focusSprintStarted)) { _ in
                 selectedTab = .focus
             }

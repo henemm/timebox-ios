@@ -461,6 +461,9 @@ struct FocusBloxMacApp: App {
                         }
                     }
                 }
+                .onChange(of: selectedSection) { _, newSection in
+                    if newSection != .day { dayViewForcedPhase = nil }
+                }
         }
         .modelContainer(container)
         .defaultSize(width: 900, height: 600)
