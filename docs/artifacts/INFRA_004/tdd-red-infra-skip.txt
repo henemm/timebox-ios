@@ -1,0 +1,1 @@
+INFRA_004: Infrastructure-only change. No Swift code, no UI. Tests = validation scripts post-implementation.

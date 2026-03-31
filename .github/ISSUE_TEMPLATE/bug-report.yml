@@ -1,0 +1,72 @@
+name: Bug Report
+description: Etwas funktioniert nicht wie erwartet
+labels: ["type:bug"]
+body:
+  - type: input
+    id: title
+    attributes:
+      label: Zusammenfassung
+      description: Kurze Beschreibung des Problems
+      placeholder: "z.B. Task wird nach Completion nicht aus der Liste entfernt"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Plattform
+      options:
+        - iOS
+        - macOS
+        - Beide
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Prioritaet
+      options:
+        - Critical (Blocker)
+        - High (Kaputte UX)
+        - Medium (Stoerend)
+        - Low (Kosmetisch)
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Schritte zum Reproduzieren
+      description: Was muss man tun, um den Bug zu sehen?
+      placeholder: |
+        1. App oeffnen
+        2. Zum Backlog navigieren
+        3. Task antippen
+        4. ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Erwartetes Verhalten
+      description: Was sollte passieren?
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Tatsaechliches Verhalten
+      description: Was passiert stattdessen?
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Zusaetzlicher Kontext
+      description: Screenshots, Logs, oder andere relevante Informationen
+    validations:
+      required: false

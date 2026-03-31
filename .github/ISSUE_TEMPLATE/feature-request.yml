@@ -1,0 +1,76 @@
+name: Feature Request
+description: Neues Feature oder Aenderung an bestehendem Feature
+labels: ["type:feature"]
+body:
+  - type: input
+    id: title
+    attributes:
+      label: Feature-Titel
+      description: Kurze Beschreibung des Features
+      placeholder: "z.B. Drag & Drop fuer Tasks im Backlog"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Plattform
+      options:
+        - iOS
+        - macOS
+        - Beide
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Prioritaet
+      options:
+        - High (Wichtige UX-Verbesserung)
+        - Medium (Produktivitaetsverbesserung)
+        - Low (Nice-to-have)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: size
+    attributes:
+      label: Geschaetzter Aufwand
+      options:
+        - XS (< 30 min)
+        - S (< 2h)
+        - M (halber Tag)
+        - L (1-2 Tage)
+        - XL (> 2 Tage)
+    validations:
+      required: false
+
+  - type: textarea
+    id: user-story
+    attributes:
+      label: User Story
+      description: Als [Rolle] moechte ich [Aktion], damit [Nutzen]
+      placeholder: "Als Nutzer moechte ich Tasks per Drag & Drop sortieren, damit ich meine Prioritaeten schnell anpassen kann."
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: Acceptance Criteria
+      description: Wann ist das Feature fertig?
+      placeholder: |
+        - [ ] Tasks koennen per Long Press bewegt werden
+        - [ ] Neue Reihenfolge wird persistiert
+        - [ ] Animation beim Verschieben
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Zusaetzlicher Kontext
+      description: Mockups, Screenshots, oder andere relevante Informationen
+    validations:
+      required: false

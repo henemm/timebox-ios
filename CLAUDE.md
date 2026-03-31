@@ -112,5 +112,6 @@ Target-Namen: `FocusBlox` (iOS App), `FocusBloxTests` (Unit Tests), `FocusBloxUI
 - Specs: `docs/specs/[category]/[entity].md` (Template: `docs/specs/_template.md`)
 - Features: `docs/features/`
 - Reference: `docs/reference/` (inkl. `learnings.md`)
-- **Backlog & Roadmap:** `docs/ACTIVE-todos.md` ← **SINGLE SOURCE OF TRUTH**
+- **Backlog & Roadmap:** GitHub Issues (`gh issue list`) ← **SINGLE SOURCE OF TRUTH**
+- **Backlog-Archiv:** `docs/ACTIVE-todos.md` (read-only Referenz fuer erledigte Items)
 - User Story: `docs/project/stories/timebox-core.md`

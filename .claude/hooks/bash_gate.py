@@ -256,24 +256,15 @@ def main():
                 print(f"BLOCKED: Build-lock timeout after {MAX_WAIT}s.", file=sys.stderr)
                 sys.exit(2)
 
-    # 6. Git commit gates
+    # 6. Git commit gates — Issue-Link fuer fix:/feat: Commits
     if "git commit" in command and "--amend" not in command:
-        root = _project_root()
-        # Check ACTIVE-todos.md
-        import subprocess
-        result = subprocess.run(
-            ["git", "diff", "--name-only", "--", "docs/ACTIVE-todos.md"],
-            cwd=root, capture_output=True, text=True
-        )
-        if result.stdout.strip():
-            # Has unstaged changes
-            staged = subprocess.run(
-                ["git", "diff", "--cached", "--name-only"],
-                cwd=root, capture_output=True, text=True
-            )
-            if "docs/ACTIVE-todos.md" not in staged.stdout:
-                print("BLOCKED: docs/ACTIVE-todos.md has unstaged changes. Stage it first.", file=sys.stderr)
-                sys.exit(2)
+        # Search entire command for commit message content
+        # Works with both -m "msg" and HEREDOC styles
+        is_fix_or_feat = bool(re.search(r'(?:^|[\n"\'])(?:fix|feat)[:(]', command, re.MULTILINE))
+        has_issue_ref = bool(re.search(r'#\d+', command))
+        if is_fix_or_feat and not has_issue_ref:
+            print("BLOCKED: fix:/feat: commits must reference a GitHub Issue (e.g. 'fixes #42').", file=sys.stderr)
+            sys.exit(2)
 
     # 7. Allow
     sys.exit(0)

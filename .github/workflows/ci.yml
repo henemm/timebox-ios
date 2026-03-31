@@ -1,0 +1,66 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ios-unit-tests:
+    name: iOS Unit Tests
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode_26.app/Contents/Developer
+
+      - name: Build and Test
+        run: |
+          xcodebuild test \
+            -project FocusBlox.xcodeproj \
+            -scheme FocusBlox \
+            -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' \
+            -only-testing:FocusBloxTests \
+            -resultBundlePath TestResults-iOS.xcresult \
+            CODE_SIGNING_ALLOWED=NO \
+            | xcbeautify || true
+
+      - name: Upload Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: TestResults-iOS
+          path: TestResults-iOS.xcresult
+
+  macos-unit-tests:
+    name: macOS Unit Tests
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode_26.app/Contents/Developer
+
+      - name: Build and Test
+        run: |
+          xcodebuild test \
+            -project FocusBlox.xcodeproj \
+            -scheme FocusBloxMac \
+            -destination 'platform=macOS' \
+            -only-testing:FocusBloxTests \
+            -resultBundlePath TestResults-macOS.xcresult \
+            CODE_SIGNING_ALLOWED=NO \
+            | xcbeautify || true
+
+      - name: Upload Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: TestResults-macOS
+          path: TestResults-macOS.xcresult

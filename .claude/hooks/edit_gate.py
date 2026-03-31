@@ -5,6 +5,7 @@ Edit Gate v3 — Consolidated PreToolUse Hook for Edit|Write
 Replaces 17 separate hooks with 1. Sequential short-circuit logic:
 
 1. Protected State Files → BLOCK
+1b. Archived Backlog Files (ACTIVE-todos, ARCHIVE-todos, new todo/backlog/roadmap .md) → BLOCK
 2. Always-Allowed (docs, tests, scripts, .md, .json) → ALLOW
 3. Not code file → ALLOW
 4. Infrastructure (.claude/hooks/) → Override token check
@@ -43,7 +44,7 @@ ALWAYS_ALLOWED_PATTERNS = [
 ]
 
 PROTECTED_STATE_FILES = [
-    "workflows/", "workflow_state.json", "user_override_token.json",
+    ".claude/workflows/", "workflow_state.json", "user_override_token.json",
     "ui_test_preflight_state.json", "ui_screenshot_lock.json",
 ]
 
@@ -65,8 +66,31 @@ def _project_root() -> Path:
 
 
 def _read_active_workflow() -> dict | None:
-    """Read the active workflow from .claude/workflows/.active symlink."""
-    link = _project_root() / ".claude" / "workflows" / ".active"
+    """Read the active workflow for the current session.
+
+    Priority:
+    1. Session mapping (.sessions.json) if CLAUDE_SESSION_ID is set
+    2. Fallback to .active symlink
+    """
+    wf_dir = _project_root() / ".claude" / "workflows"
+
+    # Try session mapping first
+    session_id = os.environ.get("CLAUDE_SESSION_ID", "")
+    if session_id:
+        sessions_file = wf_dir / ".sessions.json"
+        if sessions_file.exists():
+            try:
+                sessions = json.loads(sessions_file.read_text())
+                wf_name = sessions.get(session_id)
+                if wf_name:
+                    wf_path = wf_dir / f"{wf_name}.json"
+                    if wf_path.exists():
+                        return json.loads(wf_path.read_text())
+            except (OSError, json.JSONDecodeError):
+                pass
+
+    # Fallback: .active symlink
+    link = wf_dir / ".active"
     if not link.exists():
         return None
     try:
@@ -159,6 +183,17 @@ def main():
     for pf in PROTECTED_STATE_FILES:
         if pf in file_path:
             print(f"BLOCKED: Protected state file: {pf}", file=sys.stderr)
+            sys.exit(2)
+
+    # 1b. Backlog-Dateien sind archiviert — GitHub Issues nutzen
+    fname = Path(file_path).name.lower()
+    if fname == "active-todos.md" or fname == "archive-todos.md":
+        print("BLOCKED: Backlog-Dateien sind archiviert. Nutze GitHub Issues: gh issue create / gh issue list", file=sys.stderr)
+        sys.exit(2)
+    if re.search(r'(todo|backlog|roadmap).*\.md$', fname, re.IGNORECASE) and "docs/" in file_path:
+        # Allow reading existing files, block creating new ones
+        if not Path(file_path).exists():
+            print("BLOCKED: Keine neuen Todo/Backlog/Roadmap-Dateien anlegen. Nutze GitHub Issues: gh issue create", file=sys.stderr)
             sys.exit(2)
 
     # 2. Always-allowed directories

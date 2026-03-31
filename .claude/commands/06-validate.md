@@ -150,15 +150,16 @@ Erstelle eine Zusammenfassung:
 
 **Nach erfolgreicher Validation, VOR phase8_complete:**
 
-1. **`docs/ACTIVE-todos.md`** aktualisieren:
-   - Bug/Feature Status auf `done` setzen
-   - Neue Erkenntnisse/Todos eintragen falls noetig
+1. **GitHub Issue schliessen:**
+   ```bash
+   gh issue close <number> --comment "Fixed in <commit-hash>"
+   ```
 
 2. **`CLAUDE.md`** aktualisieren (nur bei Architektur-Aenderungen)
 
 3. **Flag setzen** (blockiert sonst phase8_complete):
 ```bash
-python3 .claude/hooks/workflow.py mark-docs-updated "ACTIVE-todos.md: [ticket] → done"
+python3 .claude/hooks/workflow.py mark-docs-updated "GitHub Issue #<number> closed"
 ```
 
 ## Next Step

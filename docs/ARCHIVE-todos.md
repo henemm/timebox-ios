@@ -1,7 +1,8 @@
 # Archiv — Erledigte Todos
 
-> Hierher verschoben aus `ACTIVE-todos.md` am 2026-03-12.
-> Aktive Items: siehe `docs/ACTIVE-todos.md`
+> **Migriert nach GitHub Issues am 2026-03-31.** Alle Items existieren als geschlossene Issues.
+> Aktive Items: [GitHub Issues](https://github.com/henemm/timebox-ios/issues) (`gh issue list`)
+> Diese Datei dient als read-only Referenz fuer historische Details.
 
 ---
 

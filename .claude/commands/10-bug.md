@@ -99,7 +99,7 @@ Wenn der Bug reine Logik/Daten betrifft und ein Screenshot nichts zeigen wuerde:
 
 1. `git log --oneline | grep -i [feature]`
 2. `Grep` nach UI-Elementen (.searchable, Button-Identifier, etc.)
-3. ACTIVE-todos.md — steht es noch als OFFEN?
+3. GitHub Issues — steht es noch als OFFEN? (`gh issue list --search "[feature]"`)
 
 Wenn nie implementiert → **kein Bug**. Henning informieren, `/05-implement` vorschlagen.
 
@@ -128,7 +128,7 @@ Erstelle mit `TaskCreate` diese 5 Tasks (ALLE PFLICHT):
 
 | # | Task Subject | Description |
 |---|-------------|-------------|
-| 1 | **Wiederholungs-Check** | Git-History, ACTIVE-todos.md und Memory nach verwandten Bugs durchsuchen. ALLE bisherigen Fixes + warum sie nicht gehalten haben. |
+| 1 | **Wiederholungs-Check** | Git-History, GitHub Issues (`gh issue list`) und Memory nach verwandten Bugs durchsuchen. ALLE bisherigen Fixes + warum sie nicht gehalten haben. |
 | 2 | **Datenfluss-Trace** | KOMPLETTEN Datenfluss der betroffenen Daten tracen: Wo erstellt, wo transformiert, wo gespeichert, wo gelesen. JEDE Funktion die die Daten anfasst mit Datei+Zeile. |
 | 3 | **Alle Schreiber finden** | JEDE Stelle im Code finden die das betroffene Feld/Objekt SCHREIBT (direkt oder indirekt). Grep nach Feldnamen, Property-Zuweisungen, init-Aufrufen. |
 | 4 | **Alle Szenarien auflisten** | ALLE Szenarien in denen das Problem auftreten kann: User-Flows, Sync, Timer, Background, Edge Cases, Race Conditions, Geraete-Neustart, Offline. |
@@ -281,7 +281,8 @@ Nutze `/04-tdd-red` — leite Tests aus der Analyse ab:
 Wenn ein Check scheitert → Fix ueberarbeiten, NICHT committen.
 
 ## Schritt 9: Dokumentation
-- `docs/ACTIVE-todos.md` aktualisieren
+- GitHub Issue schliessen (`gh issue close <number> --comment "Fixed in <commit>"`)
+- Falls kein Issue existiert: `gh issue create` + sofort schliessen
 - Memory-Files aktualisieren falls neues Pattern entdeckt
 
 ---

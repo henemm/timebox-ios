@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Specs & Documentation
+    url: https://github.com/henemm/timebox-ios/tree/main/docs/specs
+    about: Technische Specs und Dokumentation im Repository
