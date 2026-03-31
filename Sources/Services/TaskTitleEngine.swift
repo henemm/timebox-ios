@@ -438,6 +438,9 @@ final class TaskTitleEngine {
             }
 
             let prompt = "Task: \(task.title)"
+            if #available(iOS 26.4, macOS 26.4, *) {
+                await SmartTaskEnrichmentService.logTokenUsage(prompt: prompt, service: "TaskTitleEngine/Category")
+            }
             let response = try await session.respond(to: prompt, generating: TaskSuggestion.self)
             let result = response.content
 

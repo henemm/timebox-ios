@@ -1,0 +1,7 @@
+TDD RED — AI_004 Unit Tests (2026-03-31)
+
+COMPILE ERROR: Type 'SmartTaskEnrichmentService' has no member 'tokenBudgetPercentage'
+
+Tests:
+- test_tokenBudgetPercentage_calculatesCorrectly — FAIL (member missing)
+- test_tokenBudgetPercentage_returnsZeroForZeroContext — FAIL (member missing)

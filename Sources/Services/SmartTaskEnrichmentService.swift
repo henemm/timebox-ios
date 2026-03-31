@@ -11,6 +11,32 @@ import FoundationModels
 @MainActor
 final class SmartTaskEnrichmentService {
 
+    // MARK: - Token Budget (AI_004)
+
+    /// Calculates what percentage of the context window a prompt uses.
+    /// Returns 0 if contextSize is 0 (division-by-zero guard).
+    static func tokenBudgetPercentage(tokens: Int, contextSize: Int) -> Int {
+        guard contextSize > 0 else { return 0 }
+        return Int(Double(tokens) / Double(contextSize) * 100)
+    }
+
+    #if canImport(FoundationModels)
+    /// Logs token usage for a prompt in Debug builds.
+    @available(iOS 26.4, macOS 26.4, *)
+    static func logTokenUsage(prompt: String, service: String) async {
+        #if DEBUG
+        let model = SystemLanguageModel.default
+        let contextSize = model.contextSize
+        guard let tokens = try? await model.tokenCount(for: prompt) else { return }
+        let pct = tokenBudgetPercentage(tokens: tokens, contextSize: contextSize)
+        print("[\(service)] Prompt: \(tokens) tokens (\(pct)% of \(contextSize) context)")
+        if pct > 50 {
+            print("[\(service)] ⚠️ Prompt verbraucht \(pct)% des Context Windows!")
+        }
+        #endif
+    }
+    #endif
+
     // MARK: - Availability
 
     /// Whether Apple Intelligence enrichment is available on this device.
@@ -240,6 +266,9 @@ final class SmartTaskEnrichmentService {
             }
 
             let prompt = "Task: \(task.title)"
+            if #available(iOS 26.4, macOS 26.4, *) {
+                await Self.logTokenUsage(prompt: prompt, service: "SmartEnrichment/Category")
+            }
             let response = try await session.respond(to: prompt, generating: TaskTitleEngine.TaskSuggestion.self)
             let result = response.content
 
@@ -264,6 +293,9 @@ final class SmartTaskEnrichmentService {
     @available(iOS 26.0, macOS 26.0, *)
     private func performEnrichment(_ task: LocalTask) async {
         let prompt = buildPrompt(for: task)
+        if #available(iOS 26.4, macOS 26.4, *) {
+            await Self.logTokenUsage(prompt: prompt, service: "SmartEnrichment")
+        }
 
         do {
             let session = LanguageModelSession {

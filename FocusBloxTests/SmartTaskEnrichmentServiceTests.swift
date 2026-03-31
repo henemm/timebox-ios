@@ -286,6 +286,22 @@ final class SmartTaskEnrichmentServiceTests: XCTestCase {
                       "Few-Shot: 'Gitarre üben → recharge' fehlt")
     }
 
+    // MARK: - AI_004: Token Budget Berechnung
+
+    /// Verhalten: tokenBudgetPercentage berechnet korrekten Prozentwert
+    /// Bricht wenn: SmartTaskEnrichmentService.tokenBudgetPercentage() fehlt oder falsch rechnet
+    func test_tokenBudgetPercentage_calculatesCorrectly() {
+        XCTAssertEqual(SmartTaskEnrichmentService.tokenBudgetPercentage(tokens: 500, contextSize: 1000), 50)
+        XCTAssertEqual(SmartTaskEnrichmentService.tokenBudgetPercentage(tokens: 0, contextSize: 1000), 0)
+        XCTAssertEqual(SmartTaskEnrichmentService.tokenBudgetPercentage(tokens: 1000, contextSize: 1000), 100)
+    }
+
+    /// Verhalten: tokenBudgetPercentage gibt 0 bei contextSize=0 (Division by Zero Schutz)
+    /// Bricht wenn: Keine Guard-Condition für contextSize=0
+    func test_tokenBudgetPercentage_returnsZeroForZeroContext() {
+        XCTAssertEqual(SmartTaskEnrichmentService.tokenBudgetPercentage(tokens: 500, contextSize: 0), 0)
+    }
+
     /// GIVEN: A task created via createTask() with user-provided importance
     /// WHEN: Enrichment runs
     /// THEN: User-provided importance should be preserved, other fields enriched
