@@ -105,14 +105,20 @@ final class LocalTaskSource: @preconcurrency TaskSource, @preconcurrency TaskSou
         let nextSortOrder = try await getNextSortOrder()
         let cleanedTitle = TaskTitleEngine.stripKeywords(title)
 
+        // Deterministic keyword extraction BEFORE task creation (from original title)
+        let deterministicUrgency = urgency ?? TaskTitleEngine.extractDeterministicUrgency(from: title)
+        let deterministicImportance = importance ?? TaskTitleEngine.extractDeterministicImportance(from: title)
+        let deterministicDuration = estimatedDuration ?? TaskTitleEngine.extractDeterministicDuration(from: title)
+        let deterministicDueDate = dueDate ?? TaskTitleEngine.extractDeterministicDueDate(from: title)
+
         let task = LocalTask(
             title: cleanedTitle,
-            importance: importance,
+            importance: deterministicImportance,
             tags: tags,
-            dueDate: dueDate,
+            dueDate: deterministicDueDate,
             sortOrder: nextSortOrder,
-            estimatedDuration: estimatedDuration,
-            urgency: urgency,
+            estimatedDuration: deterministicDuration,
+            urgency: deterministicUrgency,
             taskType: taskType,
             recurrencePattern: recurrencePattern,
             recurrenceWeekdays: recurrenceWeekdays,
@@ -126,12 +132,13 @@ final class LocalTaskSource: @preconcurrency TaskSource, @preconcurrency TaskSou
         modelContext.insert(task)
         try modelContext.save()
 
-        // AI enrichment: fill missing attributes (importance, urgency, taskType, energyLevel)
+        // AI enrichment: fill REMAINING missing attributes (importance, urgency, taskType, energyLevel)
+        // Deterministic values from keywords take precedence — AI only fills nil/empty fields
         let enrichment = SmartTaskEnrichmentService(modelContext: modelContext)
         await enrichment.enrichTask(task)
         task.confirmSuggestions()
 
-        // AI title improvement: run immediately (not deferred to app start)
+        // Title improvement: deterministic cleanup + AI suggestions for category/duration
         task.needsTitleImprovement = true
         let titleEngine = TaskTitleEngine(modelContext: modelContext)
         await titleEngine.improveTitleIfNeeded(task)

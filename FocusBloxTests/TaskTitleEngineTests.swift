@@ -20,9 +20,10 @@ final class TaskTitleEngineTests: XCTestCase {
 
     // MARK: - Guard Conditions
 
-    /// Verhalten: Wenn aiScoringEnabled == false, wird der Titel NICHT veraendert
-    /// Bricht wenn: TaskTitleEngine.improveTitleIfNeeded() den Guard `AppSettings.shared.aiScoringEnabled` entfernt
-    func test_improveTitleIfNeeded_skipsWhenAiDisabled() async throws {
+    /// Verhalten: Wenn aiScoringEnabled == false, laeuft deterministische Bereinigung TROTZDEM
+    /// (Email-Prefixe, Keywords, Datum/Urgency-Extraktion), aber KEINE AI-Suggestions.
+    /// Bricht wenn: Deterministische Schritte faelschlich an aiScoringEnabled gekoppelt sind
+    func test_improveTitleIfNeeded_runsDeterministicEvenWhenAiDisabled() async throws {
         let context = container.mainContext
         let task = LocalTask(title: "Re: Fwd: Meeting")
         task.needsTitleImprovement = true
@@ -34,8 +35,10 @@ final class TaskTitleEngineTests: XCTestCase {
         let engine = TaskTitleEngine(modelContext: context)
         await engine.improveTitleIfNeeded(task)
 
-        XCTAssertEqual(task.title, "Re: Fwd: Meeting", "Title should remain unchanged when AI is disabled")
-        XCTAssertTrue(task.needsTitleImprovement, "Flag should remain true when skipped")
+        XCTAssertEqual(task.title, "Meeting",
+                       "Deterministische Bereinigung (Email-Prefixe) muss auch ohne AI laufen")
+        XCTAssertFalse(task.needsTitleImprovement,
+                       "Flag muss auf false gesetzt werden nach deterministischer Bereinigung")
     }
 
     /// Verhalten: Wenn needsTitleImprovement == false, wird die Task uebersprungen
@@ -132,9 +135,12 @@ final class TaskTitleEngineTests: XCTestCase {
 
     /// Verhalten: Batch gibt 0 zurueck wenn aiScoringEnabled == false
     /// Bricht wenn: improveAllPendingTitles() den Guard `AppSettings.shared.aiScoringEnabled` entfernt
-    func test_improveAllPendingTitles_returnsZeroWhenDisabled() async throws {
+    /// Auch bei aiScoringEnabled=false werden Tasks deterministisch verarbeitet
+    /// (Keywords entfernen, Datum/Urgency/Importance/Duration extrahieren).
+    /// Nur AI-Suggestions (Kategorie, Energielevel) entfallen.
+    func test_improveAllPendingTitles_runsDeterministicWhenAiDisabled() async throws {
         let context = container.mainContext
-        let task = LocalTask(title: "Some task")
+        let task = LocalTask(title: "Dringend Einkaufen")
         task.needsTitleImprovement = true
         context.insert(task)
         try context.save()
@@ -144,7 +150,12 @@ final class TaskTitleEngineTests: XCTestCase {
         let engine = TaskTitleEngine(modelContext: context)
         let count = await engine.improveAllPendingTitles()
 
-        XCTAssertEqual(count, 0, "Should return 0 when AI is disabled")
+        XCTAssertEqual(count, 1,
+                       "Deterministische Verarbeitung muss auch ohne AI laufen")
+        XCTAssertEqual(task.urgency, "urgent",
+                       "'Dringend' muss deterministisch erkannt werden")
+        XCTAssertFalse(task.title.lowercased().contains("dringend"),
+                       "'Dringend' muss aus dem Titel entfernt werden")
     }
 
     // MARK: - Model Property

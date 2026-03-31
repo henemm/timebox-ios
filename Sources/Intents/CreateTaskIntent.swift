@@ -15,14 +15,21 @@ struct CreateTaskIntent: AppIntent {
     func perform() async throws -> some IntentResult & ProvidesDialog {
         let container = try SharedModelContainer.create()
         let context = ModelContext(container)
-        let task = LocalTask(title: taskTitle)
-        // Bug 97: Deterministic date extraction from title keywords (no AI needed)
+
+        // Deterministic keyword extraction + title cleanup (no AI needed)
+        let cleanedTitle = TaskTitleEngine.stripKeywords(taskTitle)
+        let task = LocalTask(title: cleanedTitle)
         task.dueDate = TaskTitleEngine.extractDeterministicDueDate(from: taskTitle)
-        // Flag for deferred AI title cleanup on next app launch
+        task.urgency = TaskTitleEngine.extractDeterministicUrgency(from: taskTitle)
+        task.importance = TaskTitleEngine.extractDeterministicImportance(from: taskTitle)
+        task.estimatedDuration = TaskTitleEngine.extractDeterministicDuration(from: taskTitle)
+        // Preserve original title for reference
+        task.taskDescription = taskTitle
+        // Flag for deferred AI enrichment (category, energy level) on next app launch
         task.needsTitleImprovement = true
         context.insert(task)
         try context.save()
-        return .result(dialog: "Task '\(taskTitle)' erstellt.")
+        return .result(dialog: "Task '\(cleanedTitle)' erstellt.")
     }
 }
 
