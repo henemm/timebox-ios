@@ -44,7 +44,13 @@ def main():
     if lock_path.exists():
         try:
             lock = json.loads(lock_path.read_text())
-            if lock.get("ppid") == os.getppid():
+            # Match by session ID (preferred) or PPID (backward compat)
+            session_id = os.environ.get("CLAUDE_SESSION_ID", "")
+            my_id = f"session:{session_id}" if session_id else f"ppid:{os.getppid()}"
+            holder_id = lock.get("holder_id", "")
+            if not holder_id and "ppid" in lock:
+                holder_id = f"ppid:{lock['ppid']}"
+            if holder_id == my_id:
                 lock_path.unlink()
         except (json.JSONDecodeError, OSError):
             pass

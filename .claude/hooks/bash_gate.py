@@ -88,11 +88,22 @@ def _build_lock_path() -> Path:
 
 
 def _is_stop_locked() -> bool:
+    """Check if stop-lock is active for the current session."""
     lock = _project_root() / ".claude" / "stop_lock.json"
     if not lock.exists():
         return False
     try:
-        return json.loads(lock.read_text()).get("enabled", False)
+        data = json.loads(lock.read_text())
+        # v2: per-session stop locks
+        if data.get("version") == 2:
+            sessions = data.get("sessions", {})
+            if not sessions:
+                return False
+            sid = os.environ.get("CLAUDE_SESSION_ID", "")
+            # Locked if this session or __global__ is in the map
+            return sid in sessions or "__global__" in sessions
+        # v1 backward compat
+        return data.get("enabled", False)
     except (json.JSONDecodeError, OSError):
         return False
 
@@ -161,20 +172,50 @@ def _is_xcodebuild(command: str) -> bool:
     return "xcodebuild" in command
 
 
+def _get_session_id() -> str:
+    """Get session identifier. Prefers CLAUDE_SESSION_ID, falls back to PPID."""
+    sid = os.environ.get("CLAUDE_SESSION_ID", "")
+    if sid:
+        return f"session:{sid}"
+    return f"ppid:{os.getppid()}"
+
+
 def _try_acquire_build_lock(command: str) -> bool:
     lock_path = _build_lock_path()
-    my_ppid = os.getppid()
+    my_id = _get_session_id()
     if lock_path.exists():
         try:
             lock = json.loads(lock_path.read_text())
-            if lock.get("ppid") == my_ppid:
+            holder_id = lock.get("holder_id", "")
+            # Backward compat: old locks have "ppid" but no "holder_id"
+            if not holder_id and "ppid" in lock:
+                holder_id = f"ppid:{lock['ppid']}"
+            if holder_id == my_id:
                 return True
-            # Check if holder is alive
-            try:
-                os.kill(lock["ppid"], 0)
-            except (OSError, ProcessLookupError, KeyError):
-                lock_path.unlink(missing_ok=True)
-                # Fall through to acquire
+            # Check if holder process is still alive (only for ppid-based)
+            if holder_id.startswith("ppid:"):
+                try:
+                    os.kill(int(holder_id.split(":")[1]), 0)
+                except (OSError, ProcessLookupError, ValueError):
+                    lock_path.unlink(missing_ok=True)
+                    # Fall through to acquire
+                else:
+                    return False
+            elif holder_id.startswith("session:"):
+                # Session-based: check staleness by timestamp (max 10 min)
+                created = lock.get("created", "")
+                if created:
+                    try:
+                        age = (datetime.now() - datetime.fromisoformat(created)).total_seconds()
+                        if age > 600:  # 10 min stale threshold
+                            lock_path.unlink(missing_ok=True)
+                            # Fall through to acquire
+                        else:
+                            return False
+                    except (ValueError, TypeError):
+                        return False
+                else:
+                    return False
             else:
                 return False
         except (json.JSONDecodeError, OSError):
@@ -182,7 +223,8 @@ def _try_acquire_build_lock(command: str) -> bool:
     # Acquire
     lock_path.parent.mkdir(parents=True, exist_ok=True)
     lock_path.write_text(json.dumps({
-        "ppid": my_ppid,
+        "holder_id": my_id,
+        "ppid": os.getppid(),  # Keep for backward compat / debugging
         "created": datetime.now().isoformat(),
         "command": command[:200],
     }))

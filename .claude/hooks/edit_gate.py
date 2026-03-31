@@ -20,6 +20,7 @@ Replaces 17 separate hooks with 1. Sequential short-circuit logic:
 Exit Codes: 0 = allowed, 2 = blocked
 """
 
+import fcntl
 import json
 import os
 import re
@@ -65,6 +66,27 @@ def _project_root() -> Path:
     return cwd
 
 
+def _read_workflow_locked(path: Path) -> dict | None:
+    """Read a workflow JSON file with a shared (read) lock to prevent torn reads."""
+    try:
+        fd = os.open(str(path), os.O_RDONLY)
+        try:
+            fcntl.flock(fd, fcntl.LOCK_SH | fcntl.LOCK_NB)
+            content = path.read_text()
+            return json.loads(content) if content.strip() else None
+        except BlockingIOError:
+            # Lock held exclusively — read without lock (best effort)
+            return json.loads(path.read_text())
+        finally:
+            try:
+                fcntl.flock(fd, fcntl.LOCK_UN)
+            except OSError:
+                pass
+            os.close(fd)
+    except (OSError, json.JSONDecodeError):
+        return None
+
+
 def _read_active_workflow() -> dict | None:
     """Read the active workflow for the current session.
 
@@ -85,7 +107,7 @@ def _read_active_workflow() -> dict | None:
                 if wf_name:
                     wf_path = wf_dir / f"{wf_name}.json"
                     if wf_path.exists():
-                        return json.loads(wf_path.read_text())
+                        return _read_workflow_locked(wf_path)
             except (OSError, json.JSONDecodeError):
                 pass
 
@@ -98,7 +120,7 @@ def _read_active_workflow() -> dict | None:
         if not target.is_absolute():
             target = link.parent / target
         if target.exists():
-            return json.loads(target.read_text())
+            return _read_workflow_locked(target)
     except (OSError, json.JSONDecodeError):
         pass
     return None
@@ -114,9 +136,8 @@ def _find_workflow_for_file(file_path: str) -> dict | None:
     if rel.startswith(root):
         rel = rel[len(root):].lstrip("/")
     for f in wf_dir.glob("*.json"):
-        try:
-            data = json.loads(f.read_text())
-        except (json.JSONDecodeError, OSError):
+        data = _read_workflow_locked(f)
+        if data is None:
             continue
         phase = data.get("current_phase", "phase0_idle")
         if phase in ("phase8_complete", "phase0_idle"):
@@ -151,11 +172,21 @@ def _has_override_token(workflow_name: str = None) -> bool:
 
 
 def _is_stop_locked() -> bool:
+    """Check if stop-lock is active for the current session."""
     lock = _project_root() / ".claude" / "stop_lock.json"
     if not lock.exists():
         return False
     try:
-        return json.loads(lock.read_text()).get("enabled", False)
+        data = json.loads(lock.read_text())
+        # v2: per-session stop locks
+        if data.get("version") == 2:
+            sessions = data.get("sessions", {})
+            if not sessions:
+                return False
+            sid = os.environ.get("CLAUDE_SESSION_ID", "")
+            return sid in sessions or "__global__" in sessions
+        # v1 backward compat
+        return data.get("enabled", False)
     except (json.JSONDecodeError, OSError):
         return False
 

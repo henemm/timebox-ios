@@ -1,10 +1,14 @@
 #!/usr/bin/env python3
 """
-Workflow v3 — Isolated State Manager
+Workflow v4 — Session-Aware State Manager
 
-Replaces workflow_state_multi.py (1733 LoC) with ~300 LoC.
 Each workflow gets its own JSON file in .claude/workflows/.
-Active workflow tracked via .active symlink.
+Active workflow tracked per-session via .sessions.json mapping.
+Fallback to .active symlink for backward compatibility.
+
+Session identification:
+  - $CLAUDE_SESSION_ID env var (set by session_start.py hook via CLAUDE_ENV_FILE)
+  - Hooks receive session_id in stdin JSON
 
 Usage:
     python3 workflow.py start <name>
@@ -21,10 +25,12 @@ Usage:
     python3 workflow.py snapshot-tests
 """
 
+import fcntl
 import json
 import os
 import sys
 import tempfile
+from contextlib import contextmanager
 from datetime import datetime
 from pathlib import Path
 
@@ -104,8 +110,92 @@ def _read_workflow(path: Path) -> dict:
     return json.loads(path.read_text())
 
 
+def _sessions_file() -> Path:
+    return _workflows_dir() / ".sessions.json"
+
+
+def _get_session_id() -> str:
+    """Get current session ID from environment."""
+    return os.environ.get("CLAUDE_SESSION_ID", "")
+
+
+def _read_sessions() -> dict:
+    """Read session -> workflow mapping (unlocked, for read-only use)."""
+    sf = _sessions_file()
+    if sf.exists():
+        try:
+            return json.loads(sf.read_text())
+        except (json.JSONDecodeError, OSError):
+            pass
+    return {}
+
+
+@contextmanager
+def _locked_sessions(timeout: float = 5.0):
+    """Context manager for atomic Read-Modify-Write on .sessions.json.
+
+    Usage:
+        with _locked_sessions() as sessions:
+            sessions["my_id"] = "my_workflow"
+            # File is written and lock released on exit
+
+    Yields a mutable dict. Changes are written back atomically on __exit__.
+    """
+    sf = _sessions_file()
+    sf.parent.mkdir(parents=True, exist_ok=True)
+    # Create file if missing so we can flock it
+    if not sf.exists():
+        sf.write_text("{}")
+    lock_fd = os.open(str(sf), os.O_RDWR)
+    try:
+        # Blocking lock with timeout via alarm (POSIX)
+        import signal
+
+        def _timeout_handler(signum, frame):
+            raise TimeoutError(f"Could not acquire lock on {sf} within {timeout}s")
+
+        old_handler = signal.signal(signal.SIGALRM, _timeout_handler)
+        signal.setitimer(signal.ITIMER_REAL, timeout)
+        try:
+            fcntl.flock(lock_fd, fcntl.LOCK_EX)
+        finally:
+            signal.setitimer(signal.ITIMER_REAL, 0)
+            signal.signal(signal.SIGALRM, old_handler)
+
+        # Read current state
+        try:
+            content = sf.read_text()
+            sessions = json.loads(content) if content.strip() else {}
+        except (json.JSONDecodeError, OSError):
+            sessions = {}
+
+        yield sessions
+
+        # Write back atomically
+        _atomic_write(sf, sessions)
+    finally:
+        fcntl.flock(lock_fd, fcntl.LOCK_UN)
+        os.close(lock_fd)
+
+
 def _read_active() -> tuple[dict, str]:
-    """Read the active workflow. Returns (data, name)."""
+    """Read the active workflow for the current session. Returns (data, name).
+
+    Priority:
+    1. Session mapping (.sessions.json) if CLAUDE_SESSION_ID is set
+    2. Fallback to .active symlink
+    """
+    session_id = _get_session_id()
+    if session_id:
+        sessions = _read_sessions()
+        wf_name = sessions.get(session_id)
+        if wf_name:
+            wf_file = _workflow_file(wf_name)
+            if wf_file.exists():
+                data = _read_workflow(wf_file)
+                return data, data.get("name", wf_name)
+
+    # Fallback: .active symlink
     link = _active_link()
     if not link.exists():
         print("No active workflow.", file=sys.stderr)
@@ -121,7 +211,18 @@ def _read_active() -> tuple[dict, str]:
 
 
 def _set_active(name: str) -> None:
-    """Set .active symlink to point to workflow file."""
+    """Set active workflow for current session.
+
+    Updates .sessions.json if CLAUDE_SESSION_ID is set.
+    Always updates .active symlink for backward compatibility.
+    """
+    # Update session mapping (locked to prevent lost updates)
+    session_id = _get_session_id()
+    if session_id:
+        with _locked_sessions() as sessions:
+            sessions[session_id] = name
+
+    # Update .active symlink (backward compat)
     link = _active_link()
     target = f"{name}.json"
     link.parent.mkdir(parents=True, exist_ok=True)
@@ -281,6 +382,15 @@ def cmd_set_field(args: list[str]) -> None:
         value = True
     elif value.lower() in ("false", "no"):
         value = False
+    else:
+        # Try parsing as JSON (for lists, dicts, numbers)
+        import json as _json
+        try:
+            parsed = _json.loads(value)
+            if isinstance(parsed, (list, dict, int, float)):
+                value = parsed
+        except (ValueError, TypeError):
+            pass
     data, name = _read_active()
     data[key] = value
     _save_active(data)
@@ -347,10 +457,17 @@ def cmd_complete(args: list[str]) -> None:
     wf_file = _workflow_file(name)
     if wf_file.exists():
         wf_file.unlink()
-    # Remove symlink
+    # Remove own session from mapping (locked to prevent lost updates)
+    session_id = _get_session_id()
+    if session_id:
+        with _locked_sessions() as sessions:
+            sessions.pop(session_id, None)
+    # Remove .active symlink only if it points to this workflow
     link = _active_link()
     if link.is_symlink():
-        link.unlink()
+        target = os.readlink(str(link))
+        if Path(target).stem == name:
+            link.unlink()
     print(f"Workflow {name} completed and archived.")
 
 
@@ -359,17 +476,29 @@ def cmd_list(args: list[str]) -> None:
     if not wf_dir.exists():
         print("No workflows.")
         return
-    active_name = None
-    link = _active_link()
-    if link.is_symlink():
-        target = os.readlink(str(link))
-        active_name = Path(target).stem
+    # Get session-based active workflow
+    session_id = _get_session_id()
+    sessions = _read_sessions()
+    my_active = sessions.get(session_id) if session_id else None
+    # Fallback to .active symlink
+    if not my_active:
+        link = _active_link()
+        if link.is_symlink():
+            target = os.readlink(str(link))
+            my_active = Path(target).stem
+    # Build reverse map: workflow -> list of short session IDs
+    wf_sessions = {}
+    for sid, wname in sessions.items():
+        wf_sessions.setdefault(wname, []).append(sid[:8])
     for f in sorted(wf_dir.glob("*.json")):
+        if f.name == ".sessions.json":
+            continue
         data = _read_workflow(f)
         name = data.get("name", f.stem)
         phase = data.get("current_phase", "?")
-        marker = " *" if name == active_name else ""
-        print(f"  {name}: {PHASE_NAMES.get(phase, phase)}{marker}")
+        marker = " *" if name == my_active else ""
+        session_info = f" [{', '.join(wf_sessions[name])}]" if name in wf_sessions else ""
+        print(f"  {name}: {PHASE_NAMES.get(phase, phase)}{marker}{session_info}")
 
 
 def cmd_snapshot_tests(args: list[str]) -> None:

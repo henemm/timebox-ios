@@ -38,6 +38,13 @@ MAC_SCHEME="FocusBloxMac"
 PROJECT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 DERIVED_DATA="$HOME/Library/Developer/Xcode/DerivedData"
 
+# --- Session-Isolation ---
+# Per-Session DerivedData verhindert Build-Artefakt-Konflikte
+# Simulator-Lock serialisiert Simulator-Zugriff zwischen Sessions
+SESSION_ID="${CLAUDE_SESSION_ID:-default}"
+SESSION_DERIVED_DATA="$DERIVED_DATA/FocusBlox-session-${SESSION_ID}"
+SIM_LOCK_FILE="$PROJECT_DIR/.claude/sim_lock"
+
 # Farben
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -49,6 +56,54 @@ info()    { echo -e "${BLUE}[sim]${NC} $1" >&2; }
 success() { echo -e "${GREEN}[sim]${NC} $1" >&2; }
 warn()    { echo -e "${YELLOW}[sim]${NC} $1" >&2; }
 error()   { echo -e "${RED}[sim]${NC} $1" >&2; }
+
+# Simulator-Lock: serialisiert Simulator-Zugriff zwischen Sessions
+# Verwendet mkdir (atomar auf POSIX) als Lock-Mechanismus
+SIM_LOCK_DIR="$PROJECT_DIR/.claude/sim_lock.d"
+SIM_LOCK_ACQUIRED=""
+MAX_SIM_WAIT=300
+
+acquire_sim_lock() {
+    local WAITED=0
+    while ! mkdir "$SIM_LOCK_DIR" 2>/dev/null; do
+        # Check for stale lock (older than 10 min)
+        if [ -f "$SIM_LOCK_DIR/info" ]; then
+            local LOCK_TIME
+            LOCK_TIME=$(cat "$SIM_LOCK_DIR/info" 2>/dev/null | head -1)
+            local NOW
+            NOW=$(date +%s)
+            if [ -n "$LOCK_TIME" ] && [ $((NOW - LOCK_TIME)) -gt 600 ]; then
+                warn "Stale Simulator-Lock entfernt (>10min alt)"
+                rm -rf "$SIM_LOCK_DIR"
+                continue
+            fi
+        fi
+        if [ $WAITED -ge $MAX_SIM_WAIT ]; then
+            error "Simulator-Lock Timeout (${MAX_SIM_WAIT}s) — andere Session blockiert"
+            return 1
+        fi
+        if [ $((WAITED % 30)) -eq 0 ] && [ $WAITED -gt 0 ]; then
+            info "Warte auf Simulator-Lock... (${WAITED}s/${MAX_SIM_WAIT}s)"
+        fi
+        sleep 5
+        WAITED=$((WAITED + 5))
+    done
+    # Write lock info for stale detection
+    echo "$(date +%s)" > "$SIM_LOCK_DIR/info"
+    echo "${SESSION_ID}" >> "$SIM_LOCK_DIR/info"
+    SIM_LOCK_ACQUIRED=1
+    info "Simulator-Lock acquired (Session: ${SESSION_ID:0:8})"
+}
+
+release_sim_lock() {
+    if [ -n "$SIM_LOCK_ACQUIRED" ]; then
+        rm -rf "$SIM_LOCK_DIR" 2>/dev/null || true
+        SIM_LOCK_ACQUIRED=""
+    fi
+}
+
+# Cleanup bei Exit
+trap release_sim_lock EXIT
 
 # ============================================
 # SUBCOMMANDS
@@ -77,9 +132,12 @@ cmd_status() {
         warn "Simulator ist aus (Shutdown)"
     fi
 
-    # Gebaute App pruefen
+    # Gebaute App pruefen (Session-DerivedData zuerst, dann global)
     local APP_PATH
-    APP_PATH=$(find "$DERIVED_DATA"/FocusBlox-*/Build/Products/Debug-iphonesimulator -name "FocusBlox.app" -maxdepth 1 2>/dev/null | head -1)
+    APP_PATH=$(find "$SESSION_DERIVED_DATA"/Build/Products/Debug-iphonesimulator -name "FocusBlox.app" -maxdepth 1 2>/dev/null | head -1)
+    if [ -z "$APP_PATH" ]; then
+        APP_PATH=$(find "$DERIVED_DATA"/FocusBlox-*/Build/Products/Debug-iphonesimulator -name "FocusBlox.app" -maxdepth 1 2>/dev/null | head -1)
+    fi
     if [ -n "$APP_PATH" ]; then
         success "App gebaut: $APP_PATH"
     else
@@ -112,13 +170,14 @@ cmd_boot() {
 }
 
 cmd_build() {
-    info "Baue App fuer Simulator..."
+    info "Baue App fuer Simulator... (DerivedData: ${SESSION_ID:0:8})"
     cd "$PROJECT_DIR"
 
     xcodebuild build \
         -project "$PROJECT" \
         -scheme "$SCHEME" \
         -destination "id=$SIM_ID" \
+        -derivedDataPath "$SESSION_DERIVED_DATA" \
         CODE_SIGNING_ALLOWED=NO \
         -quiet \
         2>&1
@@ -162,12 +221,18 @@ cmd_launch() {
 
     info "Starte App..."
 
+    # Simulator-Lock fuer exklusiven Zugriff
+    acquire_sim_lock
+
     # Sicherstellen dass Simulator laeuft
     cmd_boot
 
-    # Gebaute App finden
+    # Gebaute App finden (Session-isoliertes DerivedData zuerst, Fallback auf global)
     local APP_PATH
-    APP_PATH=$(find "$DERIVED_DATA"/FocusBlox-*/Build/Products/Debug-iphonesimulator -name "FocusBlox.app" -maxdepth 1 2>/dev/null | head -1)
+    APP_PATH=$(find "$SESSION_DERIVED_DATA"/Build/Products/Debug-iphonesimulator -name "FocusBlox.app" -maxdepth 1 2>/dev/null | head -1)
+    if [ -z "$APP_PATH" ]; then
+        APP_PATH=$(find "$DERIVED_DATA"/FocusBlox-*/Build/Products/Debug-iphonesimulator -name "FocusBlox.app" -maxdepth 1 2>/dev/null | head -1)
+    fi
     if [ -z "$APP_PATH" ]; then
         error "Keine gebaute App gefunden! Erst: ./scripts/sim.sh build"
         return 1
@@ -182,6 +247,7 @@ cmd_launch() {
     xcrun simctl launch "$SIM_ID" "$BUNDLE_ID" "${EXTRA_ARGS[@]}"
 
     success "App gestartet ($BUNDLE_ID)"
+    release_sim_lock
 }
 
 cmd_navigate() {
@@ -243,8 +309,11 @@ cmd_test() {
         return 1
     fi
 
-    info "Fuehre UI Test aus: $TEST_TARGET"
+    info "Fuehre UI Test aus: $TEST_TARGET (Session: ${SESSION_ID:0:8})"
     cd "$PROJECT_DIR"
+
+    # Simulator-Lock fuer exklusiven Zugriff
+    acquire_sim_lock
 
     # Sicherstellen dass Simulator laeuft
     cmd_boot
@@ -253,6 +322,7 @@ cmd_test() {
         -project "$PROJECT" \
         -scheme "$SCHEME" \
         -destination "id=$SIM_ID" \
+        -derivedDataPath "$SESSION_DERIVED_DATA" \
         -only-testing:"FocusBloxUITests/$TEST_TARGET" \
         -parallel-testing-enabled NO \
         -disable-concurrent-destination-testing \
@@ -260,6 +330,7 @@ cmd_test() {
         2>&1
 
     local EXIT_CODE=$?
+    release_sim_lock
 
     if [ $EXIT_CODE -eq 0 ]; then
         success "Test bestanden!"
@@ -284,8 +355,11 @@ cmd_unit() {
         return 1
     fi
 
-    info "Fuehre Unit Test aus: $TEST_TARGET"
+    info "Fuehre Unit Test aus: $TEST_TARGET (Session: ${SESSION_ID:0:8})"
     cd "$PROJECT_DIR"
+
+    # Simulator-Lock fuer exklusiven Zugriff
+    acquire_sim_lock
 
     # Sicherstellen dass Simulator laeuft
     cmd_boot
@@ -294,11 +368,13 @@ cmd_unit() {
         -project "$PROJECT" \
         -scheme "$SCHEME" \
         -destination "id=$SIM_ID" \
+        -derivedDataPath "$SESSION_DERIVED_DATA" \
         -only-testing:"FocusBloxTests/$TEST_TARGET" \
         -parallel-testing-enabled NO \
         2>&1
 
     local EXIT_CODE=$?
+    release_sim_lock
 
     if [ $EXIT_CODE -eq 0 ]; then
         success "Test bestanden!"
@@ -310,13 +386,14 @@ cmd_unit() {
 }
 
 cmd_mac_build() {
-    info "Baue macOS App (nativ)..."
+    info "Baue macOS App (nativ, Session: ${SESSION_ID:0:8})..."
     cd "$PROJECT_DIR"
 
     xcodebuild build \
         -project "$PROJECT" \
         -scheme "$MAC_SCHEME" \
         -destination "platform=macOS" \
+        -derivedDataPath "$SESSION_DERIVED_DATA" \
         CODE_SIGNING_ALLOWED=NO \
         -quiet \
         2>&1
@@ -339,13 +416,14 @@ cmd_mac_unit() {
         return 1
     fi
 
-    info "Fuehre macOS Unit Test aus: $TEST_TARGET"
+    info "Fuehre macOS Unit Test aus: $TEST_TARGET (Session: ${SESSION_ID:0:8})"
     cd "$PROJECT_DIR"
 
     xcodebuild test \
         -project "$PROJECT" \
         -scheme "$MAC_SCHEME" \
         -destination "platform=macOS" \
+        -derivedDataPath "$SESSION_DERIVED_DATA" \
         -only-testing:"FocusBloxMacTests/$TEST_TARGET" \
         -parallel-testing-enabled NO \
         CODE_SIGNING_ALLOWED=NO \
@@ -378,13 +456,14 @@ cmd_mac_test() {
         warn "Aktivieren mit: sudo ./scripts/install-tcc-profile.sh --install"
     fi
 
-    info "Fuehre macOS UI Test aus: $TEST_TARGET"
+    info "Fuehre macOS UI Test aus: $TEST_TARGET (Session: ${SESSION_ID:0:8})"
     cd "$PROJECT_DIR"
 
     xcodebuild test \
         -project "$PROJECT" \
         -scheme "$MAC_SCHEME" \
         -destination "platform=macOS" \
+        -derivedDataPath "$SESSION_DERIVED_DATA" \
         -only-testing:"FocusBloxMacUITests/$TEST_TARGET" \
         -parallel-testing-enabled NO \
         2>&1

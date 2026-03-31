@@ -63,6 +63,9 @@ credentials.json
 .claude/ui_test_preflight_state.json
 .claude/test_execution_lock.json
 .claude/ai-scoring-unit-test-red.log
+.claude/build_lock.json
+.claude/stop_lock.json
+.claude/sim_lock.d/
 
 # Python cache
 __pycache__/
