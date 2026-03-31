@@ -1,0 +1,40 @@
+    t =     9.54s     Wait for com.henning.timebox to idle
+    t =    10.35s Waiting 5.0s for Button (First Match) to exist
+    t =    11.38s     Checking `Expect predicate `existsNoRetry == 1` for object Button (First Match)`
+    t =    11.38s         Checking existence of `Button (First Match)`
+    t =    11.54s Waiting 5.0s for Button (First Match) to exist
+    t =    12.57s     Checking `Expect predicate `existsNoRetry == 1` for object Button (First Match)`
+    t =    12.57s         Checking existence of `Button (First Match)`
+    t =    12.94s Find the Button (First Match)
+    t =    13.34s Tap "completeButton_315CBA66-ADC6-45D2-B1F5-15BE608C5A04" Button
+    t =    13.34s     Wait for com.henning.timebox to idle
+    t =    13.34s     Find the "completeButton_315CBA66-ADC6-45D2-B1F5-15BE608C5A04" Button
+    t =    13.73s     Check for interrupting elements affecting "completeButton_315CBA66-ADC6-45D2-B1F5-15BE608C5A04" Button
+    t =    13.83s     Synthesize event
+    t =    14.13s     Wait for com.henning.timebox to idle
+    t =    14.93s Tap "completeButton_315CBA66-ADC6-45D2-B1F5-15BE608C5A04" Button
+    t =    14.93s     Wait for com.henning.timebox to idle
+    t =    14.94s     Find the "completeButton_315CBA66-ADC6-45D2-B1F5-15BE608C5A04" Button
+    t =    15.08s     Check for interrupting elements affecting "completeButton_315CBA66-ADC6-45D2-B1F5-15BE608C5A04" Button
+    t =    15.17s     Synthesize event
+    t =    15.46s     Wait for com.henning.timebox to idle
+    t =    19.98s Checking existence of `"completeButton_315CBA66-ADC6-45D2-B1F5-15BE608C5A04" Button`
+/Users/hem/Developer/my-daily-sprints/FocusBloxUITests/CompletionToggleUITests.swift:107: error: -[FocusBloxUITests.CompletionToggleUITests test_completionUndo_taskStaysVisibleAfterUndo] : XCTAssertTrue failed - Task must NOT disappear after undo — cancelCompletion should have stopped the timer
+    t =    20.13s Tear Down
+Test Case '-[FocusBloxUITests.CompletionToggleUITests test_completionUndo_taskStaysVisibleAfterUndo]' failed (20.583 seconds).
+Test Suite 'CompletionToggleUITests' failed at 2026-03-31 08:19:02.161.
+	 Executed 3 tests, with 3 failures (0 unexpected) in 49.500 (49.507) seconds
+Test Suite 'FocusBloxUITests.xctest' failed at 2026-03-31 08:19:02.161.
+	 Executed 3 tests, with 3 failures (0 unexpected) in 49.500 (49.508) seconds
+Test Suite 'Selected tests' failed at 2026-03-31 08:19:02.162.
+	 Executed 3 tests, with 3 failures (0 unexpected) in 49.500 (49.511) seconds
+2026-03-31 08:19:22.627 xcodebuild[18290:121928] [MT] IDETestOperationsObserverDebug: 80.452 elapsed -- Testing started completed.
+2026-03-31 08:19:22.627 xcodebuild[18290:121928] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2026-03-31 08:19:22.627 xcodebuild[18290:121928] [MT] IDETestOperationsObserverDebug: 80.452 sec, +80.452 sec -- end
+
+Test session results, code coverage, and logs:
+	/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Logs/Test/Test-FocusBlox-2026.03.31_08-17-35-+0200.xcresult
+
+** TEST FAILED **
+
+Testing started

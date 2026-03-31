@@ -1,0 +1,30 @@
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-iphonesimulator/FocusBlox.app/Frameworks/FocusBloxCore.framework/_CodeSignature'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-iphonesimulator/FocusBloxWidgetsExtension.appex/_CodeSignature'
+
+note: Removed stale file '/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Build/Products/Debug-iphonesimulator/FocusBlox.app/_CodeSignature'
+
+warning: Skipping duplicate build file in Compile Sources build phase: /Users/hem/Developer/my-daily-sprints/Sources/Intents/CCQuickAddIntents.swift (in target 'FocusBloxWidgetsExtension' from project 'FocusBlox')
+2026-03-31 08:27:07.902971+0200 FocusBloxUITests-Runner[28380:188433] [Default] Running tests...
+objc[28380]: Class LACUISecureTextField is implemented in both /Library/Developer/CoreSimulator/Volumes/iOS_23C54/Library/Developer/CoreSimulator/Profiles/Runtimes/iOS 26.2.simruntime/Contents/Resources/RuntimeRoot/System/Library/PrivateFrameworks/LocalAuthenticationCoreUI.framework/LocalAuthenticationCoreUI (0x309ad84b0) and /Library/Developer/CoreSimulator/Volumes/iOS_23C54/Library/Developer/CoreSimulator/Profiles/Runtimes/iOS 26.2.simruntime/Contents/Resources/RuntimeRoot/System/Library/Frameworks/LocalAuthenticationEmbeddedUI.framework/LocalAuthenticationEmbeddedUI (0x30727d370). This may cause spurious casting failures and mysterious crashes. One of the duplicates must be removed or renamed.
+objc[28380]: Class AKAlertImageURLProvider is implemented in both /Library/Developer/CoreSimulator/Volumes/iOS_23C54/Library/Developer/CoreSimulator/Profiles/Runtimes/iOS 26.2.simruntime/Contents/Resources/RuntimeRoot/System/Library/PrivateFrameworks/AuthKit.framework/AuthKit (0x1268f1bd0) and /Library/Developer/CoreSimulator/Volumes/iOS_23C54/Library/Developer/CoreSimulator/Profiles/Runtimes/iOS 26.2.simruntime/Contents/Resources/RuntimeRoot/System/Library/PrivateFrameworks/AuthKitUI.framework/AuthKitUI (0x309995948). This may cause spurious casting failures and mysterious crashes. One of the duplicates must be removed or renamed.
+objc[28380]: Class AKBiometricRatchetUtility is implemented in both /Library/Developer/CoreSimulator/Volumes/iOS_23C54/Library/Developer/CoreSimulator/Profiles/Runtimes/iOS 26.2.simruntime/Contents/Resources/RuntimeRoot/System/Library/PrivateFrameworks/AuthKit.framework/AuthKit (0x1268f3a48) and /Library/Developer/CoreSimulator/Volumes/iOS_23C54/Library/Developer/CoreSimulator/Profiles/Runtimes/iOS 26.2.simruntime/Contents/Resources/RuntimeRoot/System/Library/PrivateFrameworks/AuthKitUI.framework/AuthKitUI (0x3099959c0). This may cause spurious casting failures and mysterious crashes. One of the duplicates must be removed or renamed.
+    t =      nans Interface orientation changed to Portrait
+Test Suite 'Selected tests' started at 2026-03-31 08:27:10.866.
+Test Suite 'FocusBloxUITests.xctest' started at 2026-03-31 08:27:10.868.
+Test Suite 'FocusBloxUITests.xctest' passed at 2026-03-31 08:27:10.868.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-03-31 08:27:10.869.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.003) seconds
+2026-03-31 08:27:11.193 xcodebuild[28270:187268] [MT] IDETestOperationsObserverDebug: 6.064 elapsed -- Testing started completed.
+2026-03-31 08:27:11.193 xcodebuild[28270:187268] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2026-03-31 08:27:11.193 xcodebuild[28270:187268] [MT] IDETestOperationsObserverDebug: 6.064 sec, +6.064 sec -- end
+
+Test session results, code coverage, and logs:
+	/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-fshkgwtdrowrvdgcqrhjhqvttdao/Logs/Test/Test-FocusBlox-2026.03.31_08-26-56-+0200.xcresult
+
+** TEST SUCCEEDED **
+
+Testing started
+[0;32m[sim][0m Test bestanden!

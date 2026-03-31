@@ -914,6 +914,14 @@ struct BacklogView: View {
         }
     }
 
+    // MARK: - Cancel Completion (BUG-126)
+
+    private func cancelCompletion(_ item: PlanItem) {
+        deferredCompletion.cancelCompletion(id: item.id)
+        freezeSortOrder()
+        scheduleDeferredResort(for: item.id)
+    }
+
     // MARK: - Recurring Stacking (RW_3.5)
 
     /// Groups recurring instances by recurrenceGroupID.
@@ -995,6 +1003,7 @@ struct BacklogView: View {
                     BacklogRow(
                         item: item,
                         onComplete: { completeTask(item) },
+                        onCancelCompletion: { cancelCompletion(item) },
                         onDurationTap: { selectedItemForDuration = item },
                         onAddToNextUp: { updateNextUp(for: item, isNextUp: false) },
                         onImportanceCycle: { newImportance in updateImportance(for: item, importance: newImportance) },
@@ -1063,6 +1072,7 @@ struct BacklogView: View {
         BacklogRow(
             item: item,
             onComplete: { completeTask(item) },
+            onCancelCompletion: { cancelCompletion(item) },
             onDurationTap: { selectedItemForDuration = item },
             onAddToNextUp: { updateNextUp(for: item, isNextUp: true) },
             onImportanceCycle: { newImportance in updateImportance(for: item, importance: newImportance) },
@@ -1341,6 +1351,7 @@ struct BacklogView: View {
                             completeTask(item)
                         }
                     },
+                    onCancelCompletion: { cancelCompletion(item) },
                     onDurationTap: { selectedItemForDuration = item },
                     onAddToNextUp: { updateNextUp(for: item, isNextUp: true) },
                     onImportanceCycle: { newImportance in updateImportance(for: item, importance: newImportance) },

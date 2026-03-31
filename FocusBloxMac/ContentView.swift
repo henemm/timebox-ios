@@ -270,8 +270,6 @@ struct ContentView: View {
             MacFocusView()
         case .review:
             MacReviewView()
-        case .refiner:
-            RefinerView()
         }
     }
 
@@ -1254,6 +1252,11 @@ struct ContentView: View {
                         try? syncEngine.completeTask(itemID: task.id)
                     }
                 }
+            },
+            onCancelCompletion: {
+                deferredCompletion.cancelCompletion(id: task.id)
+                freezeSortOrder()
+                deferredSort.scheduleDeferredResort(id: task.id)
             },
             onImportanceCycle: { newValue in
                 freezeSortOrder()

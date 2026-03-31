@@ -109,6 +109,7 @@
 | ~~TD_005~~ | ~~Monster-Removal: Validierungstests~~ | ~~High~~ | ~~S~~ | ~~Beide~~ | ERLEDIGT → [Archiv](ARCHIVE-todos.md) |
 | ~~BUG_123~~ | ~~Recurring Child-Duplikate: 3x gleicher Task mit gleichem Datum im Backlog~~ | ~~High~~ | ~~S~~ | ~~Beide~~ | ~~Historische GroupID-Fragmentierung fuehrte zu mehreren offenen Instanzen derselben Serie mit identischem Datum. `deduplicateTemplates()` reassigned Kinder, aber deduplizierte nicht nach Datum. Fix: `deduplicateChildInstances()` in Startup-Sequenz nach Template-Dedup. Analyse: `docs/artifacts/bug-recurring-stacking/analysis.md`~~ ERLEDIGT |
 | ~~BUG_122~~ | ~~Sort-Lock: Nicht alle Task-Attribute editierbar waehrend Sortier-Sperre~~ | ~~High~~ | ~~S~~ | ~~iOS~~ | ~~`blockedRow()` in BacklogView.swift übergab keine Inline-Badge-Callbacks. Fix: 5 Callbacks (Importance, Urgency, Category, Duration, isPendingResort) ergänzt. macOS war nicht betroffen.~~ ERLEDIGT |
+| ~~BUG_126~~ | ~~Completion-Toggle waehrend 3-Sekunden-Fenster nicht editierbar~~ | ~~High~~ | ~~S~~ | ~~Beide~~ | ~~Guard in BacklogRow/MacBacklogRow blockierte zweiten Tap auf Checkbox waehrend Completion pending. Fix: `onCancelCompletion` Callback + Guard-Logik erlaubt Undo-Tap. `cancelCompletion()` (existierte bereits) verdrahtet. [Spec](specs/bugs/BUG-126-completion-toggle-editable.md)~~ ERLEDIGT |
 | ~~BUG_115~~ | ~~Unit Test: BadgeOverdueNotificationTests erwartet 3 Actions, bekommt 4~~ | ~~Medium~~ | ~~S~~ | ~~iOS~~ | ~~Test erwartete alte 3-Action-Struktur (ACTION_POSTPONE), Code hat 4 Actions (POSTPONE_TOMORROW + POSTPONE_NEXT_WEEK). Test angepasst.~~ ERLEDIGT |
 | ~~BUG_116~~ | ~~Unit Test: LocalTaskSourceTests + SyncEngineTests Sortierung falsch~~ | ~~Medium~~ | ~~S~~ | ~~iOS~~ | ~~Tests erwarteten alte Sortierung (Bug 51 Fix). Irrelevanten Test geloescht (fetchIncompleteTasks-Sort hat keine User-Relevanz), sortsByRank an rank-desc angepasst.~~ ERLEDIGT |
 | ~~BUG_117~~ | ~~Unit Test: LocalTaskTests Default-Werte phase/category fehlen~~ | ~~Medium~~ | ~~S~~ | ~~iOS~~ | ~~Test erwartete alte Defaults (urgency="not_urgent", taskType="maintenance"), aber TBD-Konzept (c6171de) hat absichtlich nil/leer als Default gesetzt. Test an TBD-Konzept angepasst.~~ ERLEDIGT |
@@ -128,6 +129,7 @@
 | ID | Titel | Prio | Aufwand | Beschreibung |
 |----|-------|------|---------|-------------|
 | ~~INFRA_002~~ | ~~Workflow v3: Von 51 Hooks auf Phasenwechsel-Architektur~~ | ~~High~~ | ~~XL~~ | ~~P1+P2 erledigt: 6 neue Hooks (1.291 LoC) erstellt. Cutover (settings.json + alte Hooks löschen + State-Migration) als separater Schritt. [Spec](specs/infra/INFRA_002-workflow-v3.md)~~ ERLEDIGT |
+| INFRA_004 | GitHub-Standards Integration (3 Phasen) | Medium | L | Hybridansatz: ~40% Custom-Tooling durch GitHub-native Features ersetzen. Lokaler Workflow-Enforcement bleibt. Details siehe Migrationsplan unten. |
 
 ### INFRA_002 — Migrationsplan
 
@@ -189,6 +191,77 @@
 - Einige Hooks enthalten nuetzliche Logik die nicht verloren gehen darf (z.B. secrets_guard, scope_guard) → in phase_transition.py integrieren
 
 **Reihenfolge:** Phase 1 → 2 → 3 → 4 (jeweils mit eigener Spec + Validation)
+
+---
+
+## INFRA_004 — GitHub-Standards Migrationsplan
+
+**Problem:** Projekt nutzt ausschließlich Custom-Tooling für Backlog (`ACTIVE-todos.md`), Specs (`docs/specs/`), CI (nur lokal) und Releases (manuell). Das führt zu: Merge-Konflikten im Backlog, fehlender Verlinkung zwischen Issues und PRs, keiner serverseitigen Test-Absicherung, manueller Backlog-Pflege.
+
+**Ziel:** GitHub-native Features nutzen wo sie besser sind, Custom-Workflow behalten wo er unersetzbar ist.
+
+**Analyse:** Siehe [Memory: reference_github-standards-analyse.md]
+
+### Phase 1: GitHub Issues als Backlog (Prio: High, Aufwand: M)
+
+> Größter Quick-Win. Eliminiert Merge-Konflikte und manuelle Pflege.
+
+| Schritt | Was | Details |
+|---------|-----|---------|
+| 1a | Issue Templates erstellen | `.github/ISSUE_TEMPLATE/bug-report.yml` + `feature-request.yml` (YAML-Forms mit strukturierten Feldern) |
+| 1b | Label-System einrichten | `type:bug`, `type:feature`, `type:infra`, `type:rework`, `priority:critical/high/medium/low`, `size:XS/S/M/L/XL`, `platform:ios`, `platform:macos`, `platform:both` |
+| 1c | Offene Items migrieren | Alle nicht-erledigten Items aus `ACTIVE-todos.md` als GitHub Issues anlegen (via `gh issue create`) |
+| 1d | GitHub Projects V2 Board | Kanban-Board mit Spalten: Backlog → Spec Ready → In Arbeit → Validation → Erledigt |
+| 1e | Workflow-Hooks anpassen | `bash_gate.py` Pre-Commit: statt "ACTIVE-todos.md staged?" → "GitHub Issue verlinkt?" (`fixes #123` im Commit) |
+| 1f | CLAUDE.md aktualisieren | Single Source of Truth = GitHub Issues (nicht mehr ACTIVE-todos.md) |
+
+**Claude Code Integration:** `gh issue list/create/close/comment` — voll unterstützt.
+
+**Was bleibt:** `ACTIVE-todos.md` wird Archiv-Dokument (read-only Referenz für erledigte Items).
+
+### Phase 2: GitHub Actions für CI/CD (Prio: Medium, Aufwand: M)
+
+> Serverseitige Test-Absicherung als Ergänzung zum lokalen Hook-System.
+
+| Schritt | Was | Details |
+|---------|-----|---------|
+| 2a | CI Workflow | `.github/workflows/ci.yml`: Build + Unit Tests bei jedem Push/PR (iOS + macOS) |
+| 2b | Branch Protection | `main` schützen: Required Status Checks (CI muss grün), Required Reviews (1) |
+| 2c | PR Template | `.github/PULL_REQUEST_TEMPLATE.md`: Summary, Test Plan, Checklist |
+| 2d | Release-Automation | `release-please` Action: Conventional Commits → automatisches Versioning + Changelog |
+| 2e | CODEOWNERS | Automatische Reviewer-Zuweisung nach Dateipfad |
+
+**Vorteil:** Server-seitige Checks können nicht umgangen werden (lokale Hooks schon).
+
+### Phase 3: Workflow-Integration (Prio: Low, Aufwand: S)
+
+> Feinschliff: Claude Code Workflow mit GitHub Issues verzahnen.
+
+| Schritt | Was | Details |
+|---------|-----|---------|
+| 3a | `/10-bug` verlinkt Issue | Bug-Workflow liest/erstellt automatisch GitHub Issue |
+| 3b | `/06-validate` schließt Issue | Nach Validation: `gh issue close` mit Commit-Referenz |
+| 3c | Spec-Verlinkung | Specs in `docs/specs/` werden im GitHub Issue verlinkt (nicht ersetzt — kein CLI-Support für Discussions) |
+
+### Was Custom bleibt (NICHT migrieren)
+
+| Feature | Grund |
+|---------|-------|
+| Hook-System (edit_gate, bash_gate, phase_listener) | Synchrone Pre-Command-Blockierung — GitHub ist async |
+| TDD-Phasen-Enforcement | Session-basiert, kein GitHub-Äquivalent |
+| Agent-System (12 Agenten) | Claude-Code-spezifisch |
+| Override-Token (1h TTL) | Zu granular für GitHub Environments |
+| `/inspect-ui` | Braucht lokalen Xcode-Simulator |
+| `sim.sh` Build-Wrapper | Lokales Build-Tool |
+| `docs/specs/` | Kein CLI-Support für GitHub Discussions |
+
+### Reihenfolge & Abhängigkeiten
+
+```
+Phase 1 (Issues) → unabhängig, sofort startbar
+Phase 2 (CI/CD) → unabhängig, parallel zu Phase 1 möglich
+Phase 3 (Integration) → nach Phase 1, braucht Issue-System
+```
 
 ---
 

@@ -14,6 +14,7 @@ struct MacBacklogRow: View {
     let task: LocalTask
     var stackedCount: Int = 0  // MAC_028: Extra instances (0 = no badge, 1 = x2, 2+ = x3+)
     var onToggleComplete: (() -> Void)?
+    var onCancelCompletion: (() -> Void)?  // Undo completion during pending phase (BUG-126)
     var onImportanceCycle: ((Int) -> Void)?
     var onUrgencyToggle: ((String?) -> Void)?
     var onCategorySelect: ((String) -> Void)?  // Direct category selection (macOS Menu)
@@ -34,7 +35,10 @@ struct MacBacklogRow: View {
         HStack(spacing: 10) {
             // Completion Toggle
             Button {
-                if !isCompletionPending && !isBlocked {
+                if isBlocked { return }
+                if isCompletionPending {
+                    onCancelCompletion?()
+                } else {
                     onToggleComplete?()
                 }
             } label: {

@@ -3,6 +3,7 @@ import SwiftUI
 struct BacklogRow: View {
     let item: PlanItem
     var onComplete: (() -> Void)?  // Mark task as completed
+    var onCancelCompletion: (() -> Void)?  // Undo completion during pending phase (BUG-126)
     var onDurationTap: (() -> Void)?
     var onAddToNextUp: (() -> Void)?
     var onTap: (() -> Void)?
@@ -32,7 +33,10 @@ struct BacklogRow: View {
         HStack(spacing: 12) {
             // Completion Checkbox
             Button {
-                if !isCompletionPending && !isBlocked {
+                if isBlocked { return }
+                if isCompletionPending {
+                    onCancelCompletion?()
+                } else {
                     onComplete?()
                 }
             } label: {

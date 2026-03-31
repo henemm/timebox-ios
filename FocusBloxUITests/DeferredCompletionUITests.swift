@@ -180,14 +180,14 @@ final class DeferredCompletionUITests: XCTestCase {
             "Second task should show 'Erledigt' label")
     }
 
-    // MARK: - Test 5: Double-tap doesn't trigger completion twice
+    // MARK: - Test 5: Double-tap UNDOES completion (BUG-126)
 
-    /// Verhalten: Tapping the checkbox while already in pending state should
-    /// be ignored (button is disabled during pending).
+    /// Verhalten: Tapping the checkbox while in pending state should CANCEL
+    /// the completion — checkbox returns to open state.
     ///
-    /// Bricht wenn: BacklogRow doesn't guard against isCompletionPending
-    /// in the button action (line 30).
-    func testDoubleTapIsIgnored() throws {
+    /// Bricht wenn: BacklogRow.swift guard still blocks the second tap
+    /// instead of calling onCancelCompletion.
+    func testDoubleTapUndoesCompletion() throws {
         navigateToBacklog()
 
         let button = findFirstCompleteButton()
@@ -197,19 +197,20 @@ final class DeferredCompletionUITests: XCTestCase {
 
         let buttonID = button.identifier
 
-        // First tap
+        // First tap — mark as done
         button.tap()
-        usleep(300_000)
 
-        // Second tap (should be ignored)
+        // Wait for pending state + hittable
+        let pendingPred = NSPredicate(format: "label == 'Erledigt' AND isHittable == true")
+        _ = XCTWaiter.wait(for: [XCTNSPredicateExpectation(predicate: pendingPred, object: app.buttons[buttonID])], timeout: 3)
+
+        // Second tap — UNDO completion
         app.buttons[buttonID].tap()
-        usleep(300_000)
 
-        // Task should still be visible and in pending state
-        let sameButton = app.buttons[buttonID]
-        XCTAssertTrue(sameButton.exists,
-            "Task should still be visible after double-tap")
-        XCTAssertEqual(sameButton.label, "Erledigt",
-            "Task should still show pending state after double-tap")
+        // Should return to open state
+        let openPred = NSPredicate(format: "label == 'Als erledigt markieren'")
+        let result = XCTWaiter.wait(for: [XCTNSPredicateExpectation(predicate: openPred, object: app.buttons[buttonID])], timeout: 3)
+        XCTAssertEqual(result, .completed,
+            "After second tap, should return to 'Als erledigt markieren' (undo)")
     }
 }
