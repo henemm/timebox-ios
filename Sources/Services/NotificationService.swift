@@ -21,7 +21,12 @@ enum NotificationService {
     static let actionPostponeNextWeek = "ACTION_POSTPONE_NEXT_WEEK"
     static let actionComplete = "ACTION_COMPLETE"
 
-    /// Register notification category with 3 interactive actions for due date notifications.
+    // MARK: - Daily Companion Actions
+    static let actionAcceptSuggestion = "ACTION_ACCEPT_SUGGESTION"
+    static let actionPlanDay = "ACTION_PLAN_DAY"
+    static let actionStartFocusBlock = "ACTION_START_FOCUS_BLOCK"
+
+    /// Register all notification categories (due date + daily companion).
     static func registerDueDateActions() {
         let nextUp = UNNotificationAction(
             identifier: actionNextUp, title: "Heute", options: []
@@ -36,14 +41,52 @@ enum NotificationService {
             identifier: actionComplete, title: "Erledigt", options: .destructive
         )
 
-        let category = UNNotificationCategory(
+        let dueDateCategory = UNNotificationCategory(
             identifier: dueDateInteractiveCategory,
             actions: [nextUp, postponeTomorrow, postponeNextWeek, complete],
             intentIdentifiers: [],
             options: []
         )
 
-        UNUserNotificationCenter.current().setNotificationCategories([category])
+        // Daily Companion: Morning
+        let acceptSuggestion = UNNotificationAction(
+            identifier: actionAcceptSuggestion, title: "Übernehmen", options: []
+        )
+        let planDay = UNNotificationAction(
+            identifier: actionPlanDay, title: "Tag planen", options: .foreground
+        )
+        let morningCategory = UNNotificationCategory(
+            identifier: NotificationContentService.dailyCompanionCategoryID + "_MORNING",
+            actions: [acceptSuggestion, planDay],
+            intentIdentifiers: [],
+            options: []
+        )
+
+        // Daily Companion: Nudge
+        let startBlock = UNNotificationAction(
+            identifier: actionStartFocusBlock, title: "Focus Block", options: .foreground
+        )
+        let nudgeCategory = UNNotificationCategory(
+            identifier: NotificationContentService.dailyCompanionCategoryID + "_NUDGE",
+            actions: [startBlock],
+            intentIdentifiers: [],
+            options: []
+        )
+
+        // Daily Companion: Evening
+        let eveningReview = UNNotificationAction(
+            identifier: actionPlanDay, title: "Tagesreview", options: .foreground
+        )
+        let eveningCategory = UNNotificationCategory(
+            identifier: NotificationContentService.dailyCompanionCategoryID + "_EVENING",
+            actions: [eveningReview],
+            intentIdentifiers: [],
+            options: []
+        )
+
+        UNUserNotificationCenter.current().setNotificationCategories([
+            dueDateCategory, morningCategory, nudgeCategory, eveningCategory
+        ])
     }
 
     // MARK: - Badge

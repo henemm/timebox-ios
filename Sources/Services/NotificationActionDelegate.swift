@@ -29,12 +29,24 @@ final class NotificationActionDelegate: NSObject, @preconcurrency UNUserNotifica
         // Deep-Link: Review/Nudge notifications with target="day"
         if let target = userInfo["target"] as? String, target == "day" {
             let phase = userInfo["phase"] as? String ?? "daytime"
+            let actionID = response.actionIdentifier
+            let suggestedTaskID = userInfo["suggestedTaskID"] as? String
+
             Task { @MainActor in
-                NotificationCenter.default.post(
-                    name: Self.navigateToDayViewNotification,
-                    object: nil,
-                    userInfo: ["phase": phase]
-                )
+                // Handle action buttons before navigating
+                if actionID == NotificationService.actionAcceptSuggestion,
+                   let taskID = suggestedTaskID {
+                    self.acceptSuggestedTask(taskID: taskID)
+                }
+
+                // Navigate to DayView (default tap + all foreground actions)
+                if actionID != UNNotificationDismissActionIdentifier {
+                    NotificationCenter.default.post(
+                        name: Self.navigateToDayViewNotification,
+                        object: nil,
+                        userInfo: ["phase": phase]
+                    )
+                }
                 completionHandler()
             }
             return
@@ -110,6 +122,37 @@ final class NotificationActionDelegate: NSObject, @preconcurrency UNUserNotifica
         #if !os(macOS)
         NotificationService.updateOverdueBadge(container: container)
         #endif
+    }
+
+    // MARK: - Daily Companion Actions
+
+    /// Sets a suggested task as NextUp (from Morning notification "Übernehmen" button).
+    private func acceptSuggestedTask(taskID: String) {
+        let context = container.mainContext
+        guard let uuid = UUID(uuidString: taskID) else { return }
+        let descriptor = FetchDescriptor<LocalTask>(
+            predicate: #Predicate { $0.uuid == uuid }
+        )
+        guard let task = try? context.fetch(descriptor).first else { return }
+
+        task.isNextUp = true
+        let maxOrder = (try? context.fetch(
+            FetchDescriptor<LocalTask>(
+                predicate: #Predicate { $0.isNextUp && !$0.isCompleted },
+                sortBy: [SortDescriptor(\.nextUpSortOrder, order: .reverse)]
+            )
+        ).first?.nextUpSortOrder) ?? 0
+        task.nextUpSortOrder = maxOrder + 1
+        task.modifiedAt = Date()
+        try? context.save()
+
+        Task {
+            await SmartNotificationEngine.reconcile(
+                reason: .taskChanged,
+                container: container,
+                eventKitRepo: eventKitRepository
+            )
+        }
     }
 
     // MARK: - Testing Support

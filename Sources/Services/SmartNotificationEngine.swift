@@ -43,6 +43,11 @@ enum SmartNotificationEngine {
     static let budgetReview: Int = 14
     static let budgetNudges: Int = 10
 
+    // MARK: - Cached AI Content (set during reconcile, used by buildReviewRequests)
+
+    static var cachedMorningContent: NotificationContentService.Content?
+    static var cachedEveningContent: NotificationContentService.Content?
+
     // MARK: - BGAppRefreshTask
 
     static let bgTaskIdentifier = "com.henning.focusblox.notification-refresh"
@@ -90,6 +95,7 @@ enum SmartNotificationEngine {
         }
 
         if profile == .balanced || profile == .active {
+            await precomputeNotificationContent(container: container)
             requests += buildReviewRequests(now: Date())
         }
 
@@ -230,6 +236,7 @@ enum SmartNotificationEngine {
         }
 
         if profile == .balanced || profile == .active {
+            await precomputeNotificationContent(context: context)
             requests += buildReviewRequests(now: Date())
         }
 
@@ -320,11 +327,13 @@ enum SmartNotificationEngine {
             // Evening Review — 20:00
             if let eveningDate = cal.date(bySettingHour: 20, minute: 0, second: 0, of: day),
                eveningDate > now {
+                let ec = cachedEveningContent
                 let content = UNMutableNotificationContent()
-                content.title = "Tagesreview"
-                content.body = "Zeit für dein Tagesreview — was hast du heute geschafft?"
+                content.title = ec?.title ?? "Tagesrückblick"
+                content.body = ec?.body ?? "Zeit für deinen Tagesrückblick."
                 content.sound = .default
                 content.userInfo = ["target": "day", "phase": "evening"]
+                content.categoryIdentifier = NotificationContentService.dailyCompanionCategoryID + "_EVENING"
 
                 let interval = eveningDate.timeIntervalSince(now)
                 let trigger = UNTimeIntervalNotificationTrigger(timeInterval: interval, repeats: false)
@@ -335,14 +344,18 @@ enum SmartNotificationEngine {
                 ))
             }
 
-            // Morning Nudge — 08:00
+            // Morning — 08:00
             if let morningDate = cal.date(bySettingHour: 8, minute: 0, second: 0, of: day),
                morningDate > now {
+                let mc = cachedMorningContent
                 let content = UNMutableNotificationContent()
-                content.title = "Guten Morgen"
-                content.body = "Dein Tag wartet — was packst du heute an?"
+                content.title = mc?.title ?? "Dein Tag"
+                content.body = mc?.body ?? "Was packst du heute an?"
                 content.sound = .default
-                content.userInfo = ["target": "day", "phase": "morning"]
+                var info: [String: Any] = ["target": "day", "phase": "morning"]
+                if let taskID = mc?.suggestedTaskID { info["suggestedTaskID"] = taskID }
+                content.userInfo = info
+                content.categoryIdentifier = NotificationContentService.dailyCompanionCategoryID + "_MORNING"
 
                 let interval = morningDate.timeIntervalSince(now)
                 let trigger = UNTimeIntervalNotificationTrigger(timeInterval: interval, repeats: false)
@@ -387,6 +400,7 @@ enum SmartNotificationEngine {
             content.body = text.body
             content.sound = .default
             content.userInfo = ["target": "day", "phase": "daytime"]
+            content.categoryIdentifier = NotificationContentService.dailyCompanionCategoryID + "_NUDGE"
 
             let interval = fireDate.timeIntervalSince(now)
             let trigger = UNTimeIntervalNotificationTrigger(timeInterval: interval, repeats: false)
@@ -398,6 +412,54 @@ enum SmartNotificationEngine {
         }
 
         return Array(requests.prefix(budgetNudges))
+    }
+
+    // MARK: - Precompute AI Content
+
+    private static func precomputeNotificationContent(container: ModelContainer) async {
+        let context = ModelContext(container)
+        await precomputeNotificationContent(context: context)
+    }
+
+    private static func precomputeNotificationContent(context: ModelContext) async {
+        // Morning: Find the most overdue task + free time estimate
+        let descriptor = FetchDescriptor<LocalTask>(
+            predicate: #Predicate<LocalTask> { !$0.isCompleted && !$0.isTemplate },
+            sortBy: [SortDescriptor(\.createdAt)]
+        )
+        let tasks = (try? context.fetch(descriptor)) ?? []
+
+        if let oldestTask = tasks.first {
+            let daysSince = Calendar.current.dateComponents([.day], from: oldestTask.createdAt, to: Date()).day ?? 0
+            cachedMorningContent = await NotificationContentService.generateMorningContent(
+                topTaskTitle: oldestTask.title,
+                daysSinceCreated: daysSince,
+                freeMinutes: 120,
+                meetingCount: 0,
+                suggestedTaskID: oldestTask.id
+            )
+        }
+
+        // Evening: Find completed tasks today
+        let startOfToday = Calendar.current.startOfDay(for: Date())
+        let completedDescriptor = FetchDescriptor<LocalTask>(
+            predicate: #Predicate<LocalTask> { $0.isCompleted && $0.completedAt != nil }
+        )
+        let allCompleted = (try? context.fetch(completedDescriptor)) ?? []
+        let todayCompleted = allCompleted.filter { ($0.completedAt ?? .distantPast) >= startOfToday }
+
+        if !todayCompleted.isEmpty {
+            let titles = todayCompleted.map(\.title)
+            let hardest = todayCompleted.max(by: { $0.rescheduleCount < $1.rescheduleCount })
+            let hardestDays = hardest.map { Calendar.current.dateComponents([.day], from: $0.createdAt, to: Date()).day ?? 0 } ?? 0
+
+            cachedEveningContent = await NotificationContentService.generateEveningContent(
+                completedTaskTitles: titles,
+                focusMinutes: 0,
+                hardestTaskTitle: hardest?.title,
+                hardestTaskDaysOpen: hardestDays
+            )
+        }
     }
 
     // MARK: - Helpers
