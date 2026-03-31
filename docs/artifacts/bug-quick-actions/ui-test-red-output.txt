@@ -1,0 +1,16 @@
+TDD RED — Quick Action UI Tests (2026-03-31 16:51-16:58)
+Original-Code: UIApplication.shared.open("focusblox://...") in AppDelegate.handleShortcut()
+
+test_longPress_showsQuickActionMenu: PASSED (71s)
+  → Quick Actions erscheinen korrekt auf Home Screen
+
+test_quickAction_taskNotieren_opensQuickCapture: FAILED (141s)
+  → XCTAssertTrue failed - Quick-Capture TextField muss nach 'Task notieren' Quick Action erscheinen
+
+test_quickAction_sprintStarten_opensSprintPicker: FAILED (136s)
+  → XCTAssertTrue failed - SprintPickerSheet muss nach 'Sprint starten' Quick Action erscheinen
+
+test_quickAction_heute_navigatesToDayTab: FAILED (134s)
+  → XCTAssertTrue failed - Tag-Tab muss nach 'Heute' Quick Action ausgewählt sein
+
+Root Cause: UIApplication.shared.open() für eigenes URL-Schema routet nicht zurück an .onOpenURL

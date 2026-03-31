@@ -1,0 +1,9 @@
+TDD GREEN — Quick Action UI Tests (2026-03-31 17:52)
+Fix: pendingQuickAction static var + scenePhase == .active Observer
+
+test_quickAction_taskNotieren_opensQuickCapture: PASSED (6.2s)
+test_quickAction_sprintStarten_opensSprintPicker: PASSED (5.7s)
+test_quickAction_heute_navigatesToDayTab: PASSED (5.0s)
+test_longPress_showsQuickActionMenu: PASSED (69.0s)
+
+Alle 4 Tests GRÜN.

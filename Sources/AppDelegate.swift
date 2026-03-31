@@ -1,15 +1,19 @@
 import UIKit
 
+/// Quick Action types for type-safe handling
+enum QuickActionType: String {
+    case createTask = "com.henning.focusblox.create-task"
+    case sprintPicker = "com.henning.focusblox.sprint-picker"
+    case dayView = "com.henning.focusblox.day-view"
+}
+
 /// Minimaler AppDelegate für Quick Action Handling (Long-Press auf App-Icon).
-/// Mapped UIApplicationShortcutItem Types auf focusblox:// URLs → onOpenURL in FocusBloxApp.
+/// Speichert die anstehende Action in einer statischen Property.
+/// FocusBloxApp.swift liest sie bei scenePhase == .active aus.
 final class AppDelegate: NSObject, UIApplicationDelegate {
 
-    /// Quick Action URLs keyed by shortcut item type
-    private static let quickActionURLs: [String: URL] = [
-        "com.henning.focusblox.create-task": URL(string: "focusblox://create-task")!,
-        "com.henning.focusblox.sprint-picker": URL(string: "focusblox://sprint-picker")!,
-        "com.henning.focusblox.day-view": URL(string: "focusblox://day-view")!,
-    ]
+    /// Pending Quick Action — consumed by FocusBloxApp on foreground
+    static var pendingQuickAction: QuickActionType?
 
     /// Called when app is already running and user taps a Quick Action
     func application(
@@ -28,9 +32,7 @@ final class AppDelegate: NSObject, UIApplicationDelegate {
         options: UIScene.ConnectionOptions
     ) -> UISceneConfiguration {
         if let shortcutItem = options.shortcutItem {
-            DispatchQueue.main.async {
-                Self.handleShortcut(shortcutItem)
-            }
+            Self.handleShortcut(shortcutItem)
         }
         let config = UISceneConfiguration(name: nil, sessionRole: connectingSceneSession.role)
         return config
@@ -38,8 +40,8 @@ final class AppDelegate: NSObject, UIApplicationDelegate {
 
     @discardableResult
     private static func handleShortcut(_ item: UIApplicationShortcutItem) -> Bool {
-        guard let url = quickActionURLs[item.type] else { return false }
-        UIApplication.shared.open(url)
+        guard let action = QuickActionType(rawValue: item.type) else { return false }
+        pendingQuickAction = action
         return true
     }
 }

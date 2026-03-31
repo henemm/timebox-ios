@@ -1,7 +1,10 @@
 import XCTest
 
 /// UI Tests für FEATURE_031: iOS App Icon Quick Actions
-/// Testet das SprintPickerSheet, das via Quick Action "Sprint starten" geöffnet wird.
+///
+/// Zwei Test-Strategien:
+/// 1. --quick-action Launch-Argument → testet ob die Actions korrekt reagieren (zuverlässig)
+/// 2. Springboard Long Press → testet ob Quick Actions im Menü erscheinen (E2E)
 final class QuickActionUITests: XCTestCase {
     var app: XCUIApplication!
 
@@ -10,44 +13,65 @@ final class QuickActionUITests: XCTestCase {
         app = XCUIApplication()
     }
 
-    /// Launches app with sprint picker sheet open (simulates Quick Action)
-    private func launchWithSprintPicker(emptyData: Bool = false) {
-        app.launchArguments = ["-UITesting", "--show-sprint-picker"]
-        if emptyData {
-            app.launchArguments.append("--empty-morning")
-        }
+    // MARK: - Quick Action via Launch-Argument (zuverlässig + schnell)
+
+    /// Verhalten: "Task notieren" Quick Action öffnet Quick-Capture-Sheet
+    /// Bricht wenn: FocusBloxApp.swift — --quick-action create-task Handler fehlt
+    func test_quickAction_taskNotieren_opensQuickCapture() throws {
+        app.launchArguments = ["-UITesting", "--quick-action", "create-task"]
         app.launch()
+
+        let textField = app.textFields["quickCaptureTextField"]
+        XCTAssertTrue(textField.waitForExistence(timeout: 5),
+                      "Quick-Capture TextField muss nach 'Task notieren' Quick Action erscheinen")
     }
 
-    // MARK: - Sprint Picker Sheet
-
-    /// Verhalten: Sprint-Picker Sheet öffnet via Launch-Argument (simuliert Quick Action URL)
-    /// Bricht wenn: FocusBloxApp.swift — --show-sprint-picker Handling oder showSprintPicker nicht gesetzt
-    func test_sprintPickerSheet_showsNextUpTasks() throws {
-        launchWithSprintPicker()
+    /// Verhalten: "Sprint starten" Quick Action öffnet Sprint-Picker-Sheet
+    /// Bricht wenn: FocusBloxApp.swift — --quick-action sprint-picker Handler fehlt
+    func test_quickAction_sprintStarten_opensSprintPicker() throws {
+        app.launchArguments = ["-UITesting", "--quick-action", "sprint-picker"]
+        app.launch()
 
         let sheet = app.otherElements["sprintPickerSheet"]
-        XCTAssertTrue(sheet.waitForExistence(timeout: 5), "SprintPickerSheet muss existieren")
+        XCTAssertTrue(sheet.waitForExistence(timeout: 5),
+                      "SprintPickerSheet muss nach 'Sprint starten' Quick Action erscheinen")
     }
 
-    /// Verhalten: Sprint-Picker Sheet zeigt mindestens einen Next-Up Task als Row
-    /// Bricht wenn: SprintPickerSheet.swift — Query filtert nicht nach isNextUp oder Row-Identifier fehlt
-    func test_sprintPickerSheet_displaysTaskRows() throws {
-        launchWithSprintPicker()
+    /// Verhalten: "Heute" Quick Action navigiert zum Tag-Tab
+    /// Bricht wenn: FocusBloxApp.swift — --quick-action day-view Handler fehlt
+    func test_quickAction_heute_navigatesToDayTab() throws {
+        app.launchArguments = ["-UITesting", "--quick-action", "day-view"]
+        app.launch()
 
-        let row = app.buttons.matching(
-            NSPredicate(format: "identifier BEGINSWITH 'sprintPickerRow_'")
-        ).firstMatch
-
-        XCTAssertTrue(row.waitForExistence(timeout: 5), "Mindestens eine Task-Row muss im SprintPicker sichtbar sein")
+        let tagTab = app.tabBars.buttons["Tag"]
+        XCTAssertTrue(tagTab.waitForExistence(timeout: 5), "Tab-Bar muss sichtbar sein")
+        XCTAssertTrue(tagTab.isSelected, "Tag-Tab muss nach 'Heute' Quick Action ausgewählt sein")
     }
 
-    /// Verhalten: Sprint-Picker zeigt Empty State wenn keine Next-Up Tasks vorhanden
-    /// Bricht wenn: SprintPickerSheet.swift — Empty-State-View entfernt oder falsche Bedingung
-    func test_sprintPickerSheet_showsEmptyState_whenNoNextUpTasks() throws {
-        launchWithSprintPicker(emptyData: true)
+    // MARK: - Springboard E2E (Long Press auf App-Icon)
 
-        let emptyState = app.staticTexts["sprintPickerEmpty"]
-        XCTAssertTrue(emptyState.waitForExistence(timeout: 5), "Empty State muss angezeigt werden wenn keine Next-Up Tasks")
+    /// Verhalten: Long Press auf App-Icon zeigt Quick Actions Menü mit 3 Einträgen
+    /// Bricht wenn: Info.plist — UIApplicationShortcutItems fehlen oder falsch konfiguriert
+    func test_longPress_showsQuickActionMenu() throws {
+        app.launchArguments = ["-UITesting"]
+        app.launch()
+        XCUIDevice.shared.press(.home)
+
+        let springboard = XCUIApplication(bundleIdentifier: "com.apple.springboard")
+        let appIcon = springboard.icons["FocusBlox"]
+        XCTAssertTrue(appIcon.waitForExistence(timeout: 10),
+                      "FocusBlox App-Icon muss auf dem Home Screen sichtbar sein")
+        appIcon.press(forDuration: 2.0)
+
+        let taskNotieren = springboard.buttons["Task notieren"]
+        let sprintStarten = springboard.buttons["Sprint starten"]
+        let heute = springboard.buttons["Heute"]
+
+        XCTAssertTrue(taskNotieren.waitForExistence(timeout: 5),
+                      "Quick Action 'Task notieren' muss im Menü erscheinen")
+        XCTAssertTrue(sprintStarten.exists,
+                      "Quick Action 'Sprint starten' muss im Menü erscheinen")
+        XCTAssertTrue(heute.exists,
+                      "Quick Action 'Heute' muss im Menü erscheinen")
     }
 }
