@@ -221,17 +221,7 @@ struct BacklogRow: View {
 
             // 3c. Stacking Badge (only if 2+ recurring instances stacked)
             if item.stackedInstanceCount >= 2 {
-                Text("x\(item.stackedInstanceCount)")
-                    .font(.caption2.weight(.bold))
-                    .foregroundStyle(item.stackedInstanceCount >= 3 ? .orange : .secondary)
-                    .padding(.horizontal, 6)
-                    .padding(.vertical, 3)
-                    .background(
-                        Capsule()
-                            .fill(item.stackedInstanceCount >= 3 ? Color.orange.opacity(0.2) : Color.secondary.opacity(0.15))
-                    )
-                    .accessibilityIdentifier("stackingBadge_\(item.id)")
-                    .accessibilityLabel("\(item.stackedInstanceCount) aufgelaufene Instanzen")
+                StackingBadge(count: item.stackedInstanceCount, taskId: item.id)
             }
 
             // 4. Tags
@@ -248,13 +238,7 @@ struct BacklogRow: View {
 
             // 7. Due Date Badge
             if let dueDate = item.dueDate {
-                HStack(spacing: 2) {
-                    Image(systemName: "calendar")
-                    Text(dueDate.dueDateText())
-                }
-                .font(.caption2)
-                .foregroundStyle((dueDate.isDueToday || dueDate.isOverdue) ? .red : .secondary)
-                .lineLimit(1)
+                DueDateBadge(date: dueDate, taskId: item.id)
             }
         }
     }
@@ -265,76 +249,25 @@ struct BacklogRow: View {
         Button {
             onCategoryTap?()
         } label: {
-            HStack(spacing: 4) {
-                Image(systemName: categoryIcon)
-                Text(categoryLabel)
-                    .lineLimit(1)
-            }
-            .font(.caption2)
-            .foregroundStyle(categoryColor)
-            .padding(.horizontal, 6)
-            .padding(.vertical, 4)
-            .background(
-                RoundedRectangle(cornerRadius: 6)
-                    .fill(categoryColor.opacity(0.2))
-            )
+            CategoryDisplayLabel(taskType: item.taskType)
         }
         .buttonStyle(.plain)
         .accessibilityIdentifier("categoryBadge_\(item.id)")
-        .accessibilityLabel("Kategorie: \(categoryLabel)")
-    }
-
-    private var categoryColor: Color {
-        TaskCategory(rawValue: item.taskType)?.color ?? .gray
-    }
-
-    private var categoryIcon: String {
-        TaskCategory(rawValue: item.taskType)?.icon ?? "questionmark.circle"
-    }
-
-    private var categoryLabel: String {
-        TaskCategory(rawValue: item.taskType)?.displayName ?? item.taskType.capitalized
+        .accessibilityLabel("Kategorie: \(TaskCategory(rawValue: item.taskType)?.displayName ?? item.taskType.capitalized)")
     }
 
     // MARK: - Duration Badge (platform-specific: iOS uses Button+Callback)
-    // Gray "?" = duration NOT set (TBD), Blue = duration IS set
-
-    private var isDurationSet: Bool {
-        item.estimatedDuration != nil
-    }
-
-    private var durationBadgeColor: Color {
-        isDurationSet ? .blue : .gray
-    }
-
-    private var durationBadgeBackground: Color {
-        isDurationSet ? .blue.opacity(0.2) : .gray.opacity(0.2)
-    }
 
     private var durationBadge: some View {
         Button {
             onDurationTap?()
         } label: {
-            HStack(spacing: 4) {
-                Image(systemName: isDurationSet ? "timer" : "questionmark")
-                if isDurationSet {
-                    Text("\(item.effectiveDuration)m")
-                        .lineLimit(1)
-                }
-            }
-            .font(.caption2)
-            .foregroundStyle(durationBadgeColor)
-            .padding(.horizontal, 6)
-            .padding(.vertical, 3)
-            .background(
-                Capsule()
-                    .fill(durationBadgeBackground)
-            )
+            DurationDisplayLabel(duration: item.estimatedDuration)
         }
         .buttonStyle(.plain)
         .fixedSize()
         .accessibilityIdentifier("durationBadge_\(item.id)")
-        .accessibilityLabel(isDurationSet ? "Dauer: \(item.effectiveDuration) Minuten" : "Dauer nicht gesetzt")
+        .accessibilityLabel(item.estimatedDuration != nil ? "Dauer: \(item.effectiveDuration) Minuten" : "Dauer nicht gesetzt")
     }
 
 }

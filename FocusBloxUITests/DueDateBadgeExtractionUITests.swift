@@ -19,34 +19,17 @@ final class DueDateBadgeExtractionUITests: XCTestCase {
         app.launch()
     }
 
-    /// Navigate to Backlog tab and switch to Liste view
-    private func navigateToBacklogList() {
+    /// Navigate to Backlog tab
+    private func navigateToBacklog() {
         let backlogTab = app.tabBars.buttons["Backlog"]
         XCTAssertTrue(backlogTab.waitForExistence(timeout: 10), "Backlog tab should exist")
         backlogTab.tap()
 
-        let viewModeSwitcher = app.buttons["viewModeSwitcher"]
-        guard viewModeSwitcher.waitForExistence(timeout: 5) else {
-            XCTFail("viewModeSwitcher should exist")
-            return
-        }
-        viewModeSwitcher.tap()
-
-        let listeOption = app.buttons.matching(
-            NSPredicate(format: "label CONTAINS 'Liste'")
-        ).firstMatch
-
-        guard listeOption.waitForExistence(timeout: 3) else {
-            XCTFail("Liste option should exist in view mode picker")
-            return
-        }
-        listeOption.tap()
-
         // Wait for data to load
-        let taskTitle = app.staticTexts.matching(
-            NSPredicate(format: "identifier BEGINSWITH 'taskTitle_'")
+        let badge = app.buttons.matching(
+            NSPredicate(format: "identifier BEGINSWITH 'importanceBadge_'")
         ).firstMatch
-        XCTAssertTrue(taskTitle.waitForExistence(timeout: 8), "Task titles should load")
+        XCTAssertTrue(badge.waitForExistence(timeout: 8), "Backlog tasks should load")
     }
 
     // MARK: - Test 1: DueDateBadge has accessibility identifier
@@ -54,7 +37,7 @@ final class DueDateBadgeExtractionUITests: XCTestCase {
     /// TDD RED: BacklogRow's due date display has NO accessibilityIdentifier yet.
     /// After extraction to DueDateBadge, it will have "dueDateBadge_<taskId>".
     func testDueDateBadgeHasAccessibilityIdentifier() throws {
-        navigateToBacklogList()
+        navigateToBacklog()
 
         // backlogTask1 has dueDate = Date() (today)
         let dueDateBadge = app.staticTexts.matching(
@@ -71,7 +54,7 @@ final class DueDateBadgeExtractionUITests: XCTestCase {
 
     /// TDD RED: After extraction, DueDateBadge should show "Heute" text.
     func testDueDateBadgeShowsHeuteForToday() throws {
-        navigateToBacklogList()
+        navigateToBacklog()
 
         let dueDateBadge = app.staticTexts.matching(
             NSPredicate(format: "identifier BEGINSWITH 'dueDateBadge_'")

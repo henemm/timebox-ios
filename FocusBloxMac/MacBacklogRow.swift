@@ -151,17 +151,7 @@ struct MacBacklogRow: View {
 
             // 4b. MAC_028: Stacking Badge
             if stackedCount >= 1 {
-                Text("x\(stackedCount + 1)")
-                    .font(.caption2.weight(stackedCount >= 2 ? .bold : .regular))
-                    .foregroundStyle(stackedCount >= 2 ? .orange : .secondary)
-                    .padding(.horizontal, 5)
-                    .padding(.vertical, 2)
-                    .background(
-                        Capsule()
-                            .fill(stackedCount >= 2 ? Color.orange.opacity(0.12) : Color.secondary.opacity(0.15))
-                    )
-                    .accessibilityIdentifier("stackingBadge_\(task.uuid.uuidString)")
-                    .accessibilityLabel("\(stackedCount + 1) aufgelaufene Instanzen")
+                StackingBadge(count: stackedCount + 1, taskId: task.uuid.uuidString)
             }
 
             // 5. Tags (Bug 78: guard against detached SwiftData objects)
@@ -188,7 +178,7 @@ struct MacBacklogRow: View {
 
             // 7. Due Date Badge
             if let dueDate = task.dueDate {
-                dueDateBadge(dueDate)
+                DueDateBadge(date: dueDate, taskId: task.uuid.uuidString)
             }
         }
     }
@@ -211,42 +201,14 @@ struct MacBacklogRow: View {
                 Label("Nicht gesetzt", systemImage: "questionmark.circle")
             }
         } label: {
-            HStack(spacing: 3) {
-                Image(systemName: categoryIcon)
-                Text(categoryLabel)
-                    .lineLimit(1)
-            }
-            .font(.caption2)
-            .foregroundStyle(categoryColor)
-            .padding(.horizontal, 6)
-            .padding(.vertical, 3)
-            .background(
-                RoundedRectangle(cornerRadius: 5)
-                    .fill(categoryColor.opacity(0.2))
-            )
+            CategoryDisplayLabel(taskType: task.taskType)
         }
         .menuStyle(.borderlessButton)
         .fixedSize()
         .accessibilityIdentifier("categoryBadge_\(task.id)")
     }
 
-    private var categoryColor: Color {
-        TaskCategory(rawValue: task.taskType)?.color ?? .gray
-    }
-
-    private var categoryIcon: String {
-        TaskCategory(rawValue: task.taskType)?.icon ?? "questionmark.circle"
-    }
-
-    private var categoryLabel: String {
-        TaskCategory(rawValue: task.taskType)?.displayName ?? "Typ"
-    }
-
     // MARK: - Duration Badge (macOS Menu Picker — platform-specific)
-
-    private var isDurationSet: Bool {
-        task.estimatedDuration != nil
-    }
 
     private var durationBadge: some View {
         Menu {
@@ -264,38 +226,11 @@ struct MacBacklogRow: View {
                 Label("Nicht gesetzt", systemImage: "questionmark")
             }
         } label: {
-            HStack(spacing: 3) {
-                Image(systemName: isDurationSet ? "timer" : "questionmark")
-                if let duration = task.estimatedDuration {
-                    Text("\(duration)m")
-                        .lineLimit(1)
-                }
-            }
-            .font(.caption2)
-            .foregroundStyle(isDurationSet ? .blue : .gray)
-            .padding(.horizontal, 6)
-            .padding(.vertical, 3)
-            .background(
-                Capsule()
-                    .fill((isDurationSet ? Color.blue : Color.gray).opacity(0.2))
-            )
+            DurationDisplayLabel(duration: task.estimatedDuration)
         }
         .menuStyle(.borderlessButton)
         .fixedSize()
         .accessibilityIdentifier("durationBadge_\(task.id)")
-    }
-
-    // MARK: - Due Date Badge
-
-    private func dueDateBadge(_ date: Date) -> some View {
-        HStack(spacing: 3) {
-            Image(systemName: "calendar")
-            Text(date.dueDateText())
-                .lineLimit(1)
-        }
-        .font(.caption2)
-        .foregroundStyle((date.isDueToday || date.isOverdue) ? .red : .secondary)
-        .fixedSize()
     }
 
 }

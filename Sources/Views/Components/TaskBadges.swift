@@ -163,6 +163,106 @@ struct TagsBadge: View {
     }
 }
 
+// MARK: - DueDateBadge
+
+struct DueDateBadge: View {
+    let date: Date
+    let taskId: String
+
+    var body: some View {
+        HStack(spacing: badgeSpacing) {
+            Image(systemName: "calendar")
+            Text(date.dueDateText())
+                .lineLimit(1)
+        }
+        .font(.caption2)
+        .foregroundStyle((date.isDueToday || date.isOverdue) ? .red : .secondary)
+        .fixedSize()
+        .accessibilityIdentifier("dueDateBadge_\(taskId)")
+    }
+}
+
+// MARK: - StackingBadge
+
+struct StackingBadge: View {
+    let count: Int
+    let taskId: String
+
+    var body: some View {
+        Text("x\(count)")
+            .font(.caption2.weight(count >= 3 ? .bold : .regular))
+            .foregroundStyle(count >= 3 ? .orange : .secondary)
+            .padding(.horizontal, badgePaddingH)
+            .padding(.vertical, badgePaddingV)
+            .background(
+                Capsule()
+                    .fill(count >= 3 ? Color.orange.opacity(0.2) : Color.secondary.opacity(0.15))
+            )
+            .accessibilityIdentifier("stackingBadge_\(taskId)")
+            .accessibilityLabel("\(count) aufgelaufene Instanzen")
+    }
+}
+
+// MARK: - CategoryDisplayLabel
+
+struct CategoryDisplayLabel: View {
+    let taskType: String
+
+    var body: some View {
+        HStack(spacing: badgeSpacing) {
+            Image(systemName: icon)
+            Text(label)
+                .lineLimit(1)
+        }
+        .font(.caption2)
+        .foregroundStyle(color)
+        .padding(.horizontal, badgePaddingH)
+        .padding(.vertical, badgePaddingV)
+        .background(
+            RoundedRectangle(cornerRadius: badgeCornerRadius)
+                .fill(color.opacity(0.2))
+        )
+    }
+
+    private var color: Color {
+        TaskCategory(rawValue: taskType)?.color ?? .gray
+    }
+
+    private var icon: String {
+        TaskCategory(rawValue: taskType)?.icon ?? "questionmark.circle"
+    }
+
+    private var label: String {
+        TaskCategory(rawValue: taskType)?.displayName ?? taskType.capitalized
+    }
+}
+
+// MARK: - DurationDisplayLabel
+
+struct DurationDisplayLabel: View {
+    let duration: Int?
+
+    private var isDurationSet: Bool { duration != nil }
+
+    var body: some View {
+        HStack(spacing: badgeSpacing) {
+            Image(systemName: isDurationSet ? "timer" : "questionmark")
+            if let duration {
+                Text("\(duration)m")
+                    .lineLimit(1)
+            }
+        }
+        .font(.caption2)
+        .foregroundStyle(isDurationSet ? .blue : .gray)
+        .padding(.horizontal, badgePaddingH)
+        .padding(.vertical, badgePaddingV)
+        .background(
+            Capsule()
+                .fill((isDurationSet ? Color.blue : Color.gray).opacity(0.2))
+        )
+    }
+}
+
 // MARK: - PriorityScoreBadge
 
 struct PriorityScoreBadge: View {
