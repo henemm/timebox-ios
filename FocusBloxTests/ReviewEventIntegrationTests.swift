@@ -2,11 +2,19 @@ import XCTest
 @testable import FocusBlox
 
 /// Unit Tests for Review Integration with Calendar Events
-/// TDD RED: These tests MUST FAIL because ReviewStatsCalculator doesn't exist yet
+/// Validates that ReviewStatsCalculator correctly includes/excludes calendar events in category stats.
 final class ReviewEventIntegrationTests: XCTestCase {
+
+    private let categoryMappingKey = "calendarEventCategories"
+
+    override func tearDown() {
+        super.tearDown()
+        UserDefaults.standard.removeObject(forKey: categoryMappingKey)
+    }
 
     // MARK: - Helper: Create CalendarEvent with category
 
+    /// Creates a CalendarEvent and writes the category to UserDefaults (matching production behavior since BUG_63).
     private func makeEvent(
         id: String = UUID().uuidString,
         title: String,
@@ -15,19 +23,19 @@ final class ReviewEventIntegrationTests: XCTestCase {
     ) -> CalendarEvent {
         let start = Date()
         let end = start.addingTimeInterval(TimeInterval(durationMinutes * 60))
-        var notes: String? = nil
-        if let category {
-            notes = "category:\(category)"
-        }
-        return CalendarEvent(
+        let event = CalendarEvent(
             id: id,
             title: title,
             startDate: start,
             endDate: end,
             isAllDay: false,
             calendarColor: nil,
-            notes: notes
+            notes: nil
         )
+        if let category {
+            setCategoryInUserDefaults(calendarItemID: event.calendarItemIdentifier, category: category)
+        }
+        return event
     }
 
     private func makeFocusBlockEvent(
@@ -38,19 +46,25 @@ final class ReviewEventIntegrationTests: XCTestCase {
     ) -> CalendarEvent {
         let start = Date()
         let end = start.addingTimeInterval(TimeInterval(durationMinutes * 60))
-        var notesLines = ["focusBlock:true", "tasks:task-1"]
-        if let category {
-            notesLines.append("category:\(category)")
-        }
-        return CalendarEvent(
+        let event = CalendarEvent(
             id: id,
             title: title,
             startDate: start,
             endDate: end,
             isAllDay: false,
             calendarColor: nil,
-            notes: notesLines.joined(separator: "\n")
+            notes: "focusBlock:true\ntasks:task-1"
         )
+        if let category {
+            setCategoryInUserDefaults(calendarItemID: event.calendarItemIdentifier, category: category)
+        }
+        return event
+    }
+
+    private func setCategoryInUserDefaults(calendarItemID: String, category: String) {
+        var dict = UserDefaults.standard.dictionary(forKey: categoryMappingKey) as? [String: String] ?? [:]
+        dict[calendarItemID] = category
+        UserDefaults.standard.set(dict, forKey: categoryMappingKey)
     }
 
     // MARK: - Test: ReviewStatsCalculator exists

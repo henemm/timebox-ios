@@ -1,8 +1,9 @@
-# Active Todos
+# Active Todos (ARCHIVIERT)
 
-> Zentraler Einstiegspunkt fuer alle aktiven Bugs und Tasks.
+> **ARCHIVIERT seit 2026-03-31.** Aktives Tracking via [GitHub Issues](https://github.com/henemm/timebox-ios/issues).
 >
-> **Regel:** Nach JEDEM Fix hier aktualisieren!
+> Diese Datei dient als **read-only Referenz** fuer erledigte Items.
+> Neue Bugs/Features werden als GitHub Issues angelegt (`gh issue create`).
 > **Archiv:** Erledigte Items → `docs/ARCHIVE-todos.md`
 > **IDs:** `BUG_XXX` = Bugs, `FEATURE_XXX` = Features, `TD_XXX` = Tech Debt
 
@@ -114,7 +115,7 @@
 | ~~BUG_116~~ | ~~Unit Test: LocalTaskSourceTests + SyncEngineTests Sortierung falsch~~ | ~~Medium~~ | ~~S~~ | ~~iOS~~ | ~~Tests erwarteten alte Sortierung (Bug 51 Fix). Irrelevanten Test geloescht (fetchIncompleteTasks-Sort hat keine User-Relevanz), sortsByRank an rank-desc angepasst.~~ ERLEDIGT |
 | ~~BUG_117~~ | ~~Unit Test: LocalTaskTests Default-Werte phase/category fehlen~~ | ~~Medium~~ | ~~S~~ | ~~iOS~~ | ~~Test erwartete alte Defaults (urgency="not_urgent", taskType="maintenance"), aber TBD-Konzept (c6171de) hat absichtlich nil/leer als Default gesetzt. Test an TBD-Konzept angepasst.~~ ERLEDIGT |
 | ~~BUG_118~~ | ~~Unit Test: NotificationSnoozeTests Postpone Next Week kaputt~~ | ~~Medium~~ | ~~S~~ | ~~iOS~~ | ~~Tests erwarteten altes Verhalten (dueDate + N Tage), aber Bug-85-C-Fix berechnet korrekt heute + N Tage. Test-Erwartungen angepasst.~~ ERLEDIGT |
-| BUG_119 | Unit Test: ReviewEventIntegrationTests Calendar-Events nicht kategorisiert | Medium | S | iOS | `testCategoryStatsIncludesCalendarEvents`: Erwartet 60/30 Min, erhaelt nil. Calendar-Events werden nicht in Category-Statistiken eingerechnet. |
+| ~~BUG_119~~ | ~~Unit Test: ReviewEventIntegrationTests Calendar-Events nicht kategorisiert~~ | ~~Medium~~ | ~~S~~ | ~~iOS~~ | ~~Tests nutzten veralteten Notes-basierten Category-Mechanismus (vor BUG_63). Fix: Test-Helper schreiben Categories in UserDefaults + tearDown-Cleanup. 5/5 Tests gruen.~~ ERLEDIGT |
 | BUG_120 | Unit Test: SmartTaskEnrichmentServiceTests CloudKit Error 134407 | Low | S | iOS | `test_createTask_enrichesAttributes_whenAvailable` schlaegt mit CloudKit/Store-Removal-Fehler (Error 134407) fehl. Vermutlich Test-Setup-Problem. |
 | ~~BUG_121~~ | ~~App crasht beim Start ohne iCloud-Account (CloudKit SIGTRAP)~~ | ~~Critical~~ | ~~S~~ | ~~Beide~~ | ~~App crashte bei normalem Start auf Geraeten/Simulatoren ohne iCloud-Account. `cloudKitDatabase: .private()` loeste SIGTRAP in `PFCloudKitContainerProvider` aus. Fix: `ubiquityIdentityToken`-Pruefung vor CloudKit-Init, Fallback auf lokalen Speicher. Eingefuehrt in Commit 5946410, gefixt in bug-cloudkit-crash Workflow.~~ ERLEDIGT |
 | ~~INFRA_001~~ | ~~TDD GREEN Gate: User muss Test-Ergebnisse freigeben~~ | ~~High~~ | ~~S~~ | ~~Beide~~ | ~~Nach TDD GREEN muss User "go" sagen bevor Validation. Verhindert dass Claude Test-Befunde ignoriert. Hooks: tdd_green_gate.py, tdd_green_listener.py~~ ERLEDIGT |
@@ -286,5 +287,5 @@ Phase 3 (Integration) → nach Phase 1, braucht Issue-System
 
 ---
 
-> **Dies ist das EINZIGE Backlog.** Kein zweites Backlog.
+> **Aktives Backlog: [GitHub Issues](https://github.com/henemm/timebox-ios/issues)**
 > **Archiv:** Alle erledigten Items → `docs/ARCHIVE-todos.md`

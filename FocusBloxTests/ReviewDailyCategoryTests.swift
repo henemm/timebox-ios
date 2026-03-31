@@ -17,8 +17,11 @@ final class ReviewDailyCategoryTests: XCTestCase {
         container = try ModelContainer(for: LocalTask.self, configurations: config)
     }
 
+    private let categoryMappingKey = "calendarEventCategories"
+
     override func tearDownWithError() throws {
         container = nil
+        UserDefaults.standard.removeObject(forKey: categoryMappingKey)
     }
 
     // MARK: - Bug 1: iOS loadData uses sync() which filters completed tasks
@@ -114,17 +117,22 @@ final class ReviewDailyCategoryTests: XCTestCase {
             "recharge": 15
         ]
 
-        // Calendar events for today
+        // Calendar events for today (category via UserDefaults, not notes — BUG_63)
         let now = Date()
+        let eventID = "evt1"
+        var dict = UserDefaults.standard.dictionary(forKey: categoryMappingKey) as? [String: String] ?? [:]
+        dict[eventID] = "income"
+        UserDefaults.standard.set(dict, forKey: categoryMappingKey)
+
         let events = [
             CalendarEvent(
-                id: "evt1",
+                id: eventID,
                 title: "Client Call",
                 startDate: now,
                 endDate: now.addingTimeInterval(60 * 60),
                 isAllDay: false,
                 calendarColor: nil,
-                notes: "category:income"
+                notes: nil
             )
         ]
 
@@ -148,6 +156,12 @@ final class ReviewDailyCategoryTests: XCTestCase {
         let today = Date()
         let yesterday = calendar.date(byAdding: .day, value: -1, to: today)!
 
+        // Set categories in UserDefaults (BUG_63: no longer stored in notes)
+        var dict = UserDefaults.standard.dictionary(forKey: categoryMappingKey) as? [String: String] ?? [:]
+        dict["today"] = "income"
+        dict["yesterday"] = "income"
+        UserDefaults.standard.set(dict, forKey: categoryMappingKey)
+
         let todayEvent = CalendarEvent(
             id: "today",
             title: "Today Meeting",
@@ -155,7 +169,7 @@ final class ReviewDailyCategoryTests: XCTestCase {
             endDate: today.addingTimeInterval(30 * 60),
             isAllDay: false,
             calendarColor: nil,
-            notes: "category:income"
+            notes: nil
         )
 
         let yesterdayEvent = CalendarEvent(
@@ -165,7 +179,7 @@ final class ReviewDailyCategoryTests: XCTestCase {
             endDate: yesterday.addingTimeInterval(60 * 60),
             isAllDay: false,
             calendarColor: nil,
-            notes: "category:income"
+            notes: nil
         )
 
         let allEvents = [todayEvent, yesterdayEvent]
