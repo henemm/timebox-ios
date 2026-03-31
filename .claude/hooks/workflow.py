@@ -276,10 +276,35 @@ def _new_workflow(name: str) -> dict:
         "ui_test_red_done": False,
         "green_approved": False,
         "adversary_verdict": None,
+        # Analysis quality gates (bugs)
+        "visual_inspection_done": False,
+        "analysis_file": None,
+        "analysis_findings": None,
+        "challenge_verdict": None,
+        # Fix proposal gate (bugs)
+        "fix_proposal_approved": False,
+        # Feature gates
+        "user_expectation_done": False,
+        "result_inspection_done": False,
+        # Workflow type: "bug" or "feature" (set by /10-bug or /11-feature)
+        "workflow_type": None,
     }
 
 
 # --- Phase Transition Validation ---
+
+def _has_override_token(workflow_name: str) -> bool:
+    """Check if user has granted an override token for this workflow."""
+    token_file = _project_root() / ".claude" / "user_override_token.json"
+    if not token_file.exists():
+        return False
+    try:
+        raw = json.loads(token_file.read_text())
+        tokens = raw.get("tokens", {}) if raw.get("version") == 2 else {}
+        return workflow_name in tokens or "__global__" in tokens
+    except (json.JSONDecodeError, OSError):
+        return False
+
 
 def _validate_transition(data: dict, target: str) -> str | None:
     """Validate phase transition prerequisites. Returns error message or None."""
@@ -294,36 +319,79 @@ def _validate_transition(data: dict, target: str) -> str | None:
     if tgt_idx <= cur_idx:
         return None
 
+    # User override token bypasses ALL gates
+    wf_name = data.get("name", "")
+    if wf_name and _has_override_token(wf_name):
+        return None
+
     # Forward transitions: validate prerequisites for each step
+
+    # --- Gate: Context must exist before analysis ---
     if tgt_idx >= PHASES.index("phase2_analyse"):
         if not data.get("context_file"):
             return "context_file not set — run /01-context first"
 
+    # --- Gate: Analysis Quality (before spec writing) ---
     if tgt_idx >= PHASES.index("phase3_spec"):
-        if not data.get("analysis_findings"):
-            # Allow if context_file exists (analysis may be inline)
-            pass
+        wf_type = data.get("workflow_type")
 
+        if wf_type == "feature":
+            # Feature path: user expectation must be captured first
+            if not data.get("user_expectation_done"):
+                return ("user_expectation_done not set — run User-Advocate Agent "
+                        "(Schritt 0 in /11-feature) and get user confirmation")
+        else:
+            # Bug path (default): full analysis quality gates
+            if not data.get("visual_inspection_done"):
+                return ("visual_inspection_done not set — run Fresh-Eyes-Inspector "
+                        "(Schritt 0.2 in /10-bug) or get user override")
+            if not data.get("analysis_file"):
+                return ("analysis_file not set — create docs/artifacts/[name]/analysis.md "
+                        "(Schritt 5 in /10-bug)")
+            if not data.get("analysis_findings"):
+                return ("analysis_findings not set — document findings from "
+                        "5 parallel investigate tasks (Schritt 2-4 in /10-bug)")
+            challenge = data.get("challenge_verdict")
+            if not challenge or not str(challenge).upper().startswith("SOLIDE"):
+                return (f"challenge_verdict is '{challenge}' — must be 'SOLIDE'. "
+                        "Run analysis-challenger agent (Schritt 5.5 in /10-bug)")
+
+    # --- Gate: Spec approval ---
     if tgt_idx >= PHASES.index("phase4_approved"):
         if not data.get("spec_file"):
             return "spec_file not set — run /03-write-spec first"
         if not data.get("spec_approved"):
             return "Spec not approved — user must say 'approved'"
 
+    # --- Gate: Fix proposal must be approved before TDD RED ---
+    if tgt_idx >= PHASES.index("phase5_tdd_red"):
+        if not data.get("fix_proposal_approved"):
+            return ("fix_proposal_approved not set — present fix proposal to user "
+                    "and wait for approval (Schritt 7 in /10-bug)")
+
+    # --- Gate: RED test artifacts before implementation ---
     if tgt_idx >= PHASES.index("phase6_implement"):
-        # Need RED test artifacts
         red_artifacts = [a for a in data.get("test_artifacts", [])
                         if a.get("phase") == "phase5_tdd_red"]
         if not red_artifacts:
             return "No RED test artifacts — run /04-tdd-red first"
 
+    # --- Gate: Result inspection before adversary (features) ---
+    if tgt_idx >= PHASES.index("phase6b_adversary"):
+        if data.get("workflow_type") == "feature":
+            if not data.get("result_inspection_done"):
+                return ("result_inspection_done not set — run Fresh-Eyes-Inspector "
+                        "on implementation result (Nach Implementation in /11-feature)")
+
+    # --- Gate: GREEN test artifacts before validation ---
     if tgt_idx >= PHASES.index("phase7_validate"):
-        # Need GREEN test artifacts
         green_artifacts = [a for a in data.get("test_artifacts", [])
                           if a.get("phase") == "phase6_implement"]
         if not green_artifacts and not data.get("green_approved"):
-            pass  # Allow — validation might be the step that creates them
+            return ("No GREEN test artifacts — tests must pass after implementation. "
+                    "Run tests and add artifacts, or get green_approved from user")
 
+    # --- Gate: Adversary verdict before completion ---
     if tgt_idx >= PHASES.index("phase8_complete"):
         verdict = data.get("adversary_verdict", "")
         if not verdict or not str(verdict).startswith("VERIFIED"):

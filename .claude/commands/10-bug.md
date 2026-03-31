@@ -119,6 +119,7 @@ Wenn nie implementiert → **kein Bug**. Henning informieren, `/05-implement` vo
 
 ```bash
 python3 .claude/hooks/workflow.py start "bug-[kurzer-name]"
+python3 .claude/hooks/workflow.py set-field workflow_type bug
 python3 .claude/hooks/workflow.py phase phase1_context
 ```
 

@@ -298,15 +298,66 @@ def main():
                 print(f"BLOCKED: Build-lock timeout after {MAX_WAIT}s.", file=sys.stderr)
                 sys.exit(2)
 
-    # 6. Git commit gates — Issue-Link fuer fix:/feat: Commits
+    # 6. Git commit gates
     if "git commit" in command and "--amend" not in command:
-        # Search entire command for commit message content
-        # Works with both -m "msg" and HEREDOC styles
+        # 6a. Issue-Link fuer fix:/feat: Commits
         is_fix_or_feat = bool(re.search(r'(?:^|[\n"\'])(?:fix|feat)[:(]', command, re.MULTILINE))
         has_issue_ref = bool(re.search(r'#\d+', command))
         if is_fix_or_feat and not has_issue_ref:
             print("BLOCKED: fix:/feat: commits must reference a GitHub Issue (e.g. 'fixes #42').", file=sys.stderr)
             sys.exit(2)
+
+        # 6b. Adversary-Verdict Gate — kein Commit ohne bestandene Prüfung
+        if is_fix_or_feat:
+            wf_dir = _project_root() / ".claude" / "workflows"
+            active_wf = None
+            # Try session mapping
+            session_id = os.environ.get("CLAUDE_SESSION_ID", "")
+            if session_id:
+                sessions_file = wf_dir / ".sessions.json"
+                if sessions_file.exists():
+                    try:
+                        sessions = json.loads(sessions_file.read_text())
+                        wf_name = sessions.get(session_id)
+                        if wf_name:
+                            wf_path = wf_dir / f"{wf_name}.json"
+                            if wf_path.exists():
+                                active_wf = json.loads(wf_path.read_text())
+                    except (json.JSONDecodeError, OSError):
+                        pass
+            # Fallback: .active symlink
+            if not active_wf:
+                link = wf_dir / ".active"
+                if link.is_symlink():
+                    try:
+                        target = Path(os.readlink(str(link)))
+                        if not target.is_absolute():
+                            target = link.parent / target
+                        if target.exists():
+                            active_wf = json.loads(target.read_text())
+                    except (json.JSONDecodeError, OSError):
+                        pass
+            if active_wf:
+                # Override-Token prüfen — User kann Gate umgehen
+                wf_name = active_wf.get("name", "")
+                has_override = False
+                if wf_name:
+                    token_file = _project_root() / ".claude" / "user_override_token.json"
+                    if token_file.exists():
+                        try:
+                            token_data = json.loads(token_file.read_text())
+                            tokens = token_data.get("tokens", {}) if token_data.get("version") == 2 else {}
+                            has_override = wf_name in tokens or "__global__" in tokens
+                        except (json.JSONDecodeError, OSError):
+                            pass
+
+                if not has_override:
+                    verdict = active_wf.get("adversary_verdict", "")
+                    if not verdict or not str(verdict).startswith("VERIFIED"):
+                        print(f"BLOCKED: Kein Commit ohne bestandene Adversary-Prüfung! "
+                              f"Aktuelles Verdict: '{verdict}'. "
+                              f"Führe /06-validate aus oder tippe 'override'.", file=sys.stderr)
+                        sys.exit(2)
 
     # 7. Allow
     sys.exit(0)

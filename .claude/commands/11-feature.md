@@ -31,15 +31,21 @@ Der Feature-Workflow hat **BLOCKING Checkpoints**. Diese MUESSEN erfuellt sein:
 
 | Checkpoint | Wann | Hook/Gate | Blockiert |
 |------------|------|-----------|-----------|
-| ⛔ User-Erwartung | VOR technischer Analyse | `feature_understanding_gate.py` | Alle Task-Agents |
-| ⛔ Tests definieren | VOR Implementierung | `tdd_enforcement.py` | Code-Edits |
-| ⛔ Fresh-Eyes Inspektion | NACH Implementierung | `result_inspection_done` | Adversary |
-| ⛔ Adversary | NACH Fresh-Eyes | `adversary_gate.py` | Validate-Phase |
-| ⛔ Unit + UI Tests | NACH Adversary | `workflow_gate.py` | Commit |
+| ⛔ User-Erwartung | VOR technischer Analyse | `workflow.py` → `user_expectation_done` | phase3_spec |
+| ⛔ Tests definieren | VOR Implementierung | `edit_gate.py` → RED test artifacts | Code-Edits |
+| ⛔ Fresh-Eyes Inspektion | NACH Implementierung | `workflow.py` → `result_inspection_done` | phase6b_adversary |
+| ⛔ Adversary | NACH Fresh-Eyes | `qa_gate.py` → `adversary_verdict` | phase8_complete |
+| ⛔ Unit + UI Tests | NACH Adversary | `bash_gate.py` → Commit-Gate | git commit |
 
 ---
 
 ## Anweisung
+
+### Schritt -1: Workflow-Typ registrieren
+
+```bash
+python3 .claude/hooks/workflow.py set-field workflow_type feature
+```
 
 ### Schritt 0: User-Perspektive ZUERST — Was soll der User erleben?
 

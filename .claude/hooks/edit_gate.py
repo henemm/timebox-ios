@@ -35,7 +35,6 @@ CODE_EXTENSIONS = {
 }
 
 ALWAYS_ALLOWED_DIRS = [
-    "Tests/", "UITests/", "Test/", "test/", "__tests__/", "tests/",
     "docs/", ".claude/commands/", "scripts/", "tools/",
 ]
 
@@ -54,6 +53,23 @@ INFRASTRUCTURE_DIRS = [".claude/hooks/", ".claude/agents/"]
 IMPL_PHASES = {
     "phase6_implement", "phase6b_adversary", "phase7_validate", "phase8_complete",
 }
+
+TEST_DIRS = [
+    "Tests/", "UITests/", "Test/", "test/", "__tests__/", "tests/",
+    "FocusBloxTests/", "FocusBloxUITests/",
+    "FocusBloxMacTests/", "FocusBloxMacUITests/",
+]
+
+SOURCE_DIRS = ["Sources/", "FocusBloxMac/"]
+
+# Phase5: nur Test-Dateien editierbar (TDD RED — Tests schreiben)
+TEST_ONLY_PHASES = {"phase5_tdd_red"}
+
+# Phase6: nur Source-Dateien editierbar (Tests dürfen NICHT angepasst werden!)
+SOURCE_ONLY_PHASES = {"phase6_implement"}
+
+# Phase6b/7: keine Code-Edits (nur lesen und testen)
+NO_EDIT_PHASES = {"phase6b_adversary", "phase7_validate"}
 
 
 # --- Helpers ---
@@ -191,6 +207,16 @@ def _is_stop_locked() -> bool:
         return False
 
 
+def _is_test_file(file_path: str) -> bool:
+    """Check if file is in a test directory."""
+    return any(d in file_path for d in TEST_DIRS)
+
+
+def _is_source_file(file_path: str) -> bool:
+    """Check if file is in a source directory."""
+    return any(d in file_path for d in SOURCE_DIRS)
+
+
 # --- Main ---
 
 def main():
@@ -273,10 +299,35 @@ def main():
     phase = workflow.get("current_phase", "phase0_idle")
     wf_name = workflow.get("name", "unknown")
 
-    # 8. Phase check
-    if phase not in IMPL_PHASES:
+    # 8. Phase-spezifische Edit-Einschränkungen
+    is_test = _is_test_file(file_path)
+
+    if phase in NO_EDIT_PHASES:
+        # phase6b_adversary / phase7_validate: keine Code-Edits
         if not _has_override_token(wf_name):
-            print(f"BLOCKED: Phase {phase} does not allow code edits. Need phase6_implement+.", file=sys.stderr)
+            print(f"BLOCKED: Phase {phase} erlaubt keine Code-Edits.", file=sys.stderr)
+            sys.exit(2)
+
+    elif phase in TEST_ONLY_PHASES:
+        # phase5_tdd_red: nur Test-Dateien erlaubt
+        if is_test:
+            sys.exit(0)  # Test-Dateien direkt erlaubt in TDD RED
+        if not _has_override_token(wf_name):
+            print(f"BLOCKED: Phase {phase} erlaubt nur Test-Dateien. Sources sind gesperrt.", file=sys.stderr)
+            sys.exit(2)
+
+    elif phase in SOURCE_ONLY_PHASES:
+        # phase6_implement: keine Test-Änderungen (Tests dürfen nicht angepasst werden!)
+        if is_test and not _has_override_token(wf_name):
+            print(f"BLOCKED: Phase {phase} erlaubt keine Test-Änderungen. "
+                  f"Tests dürfen nicht an Implementation angepasst werden!", file=sys.stderr)
+            sys.exit(2)
+        # Source files: fall through to TDD artifact check (Schritt 10)
+
+    elif phase not in IMPL_PHASES:
+        # Alle anderen Phasen vor Implementation: keine Code-Edits
+        if not _has_override_token(wf_name):
+            print(f"BLOCKED: Phase {phase} erlaubt keine Code-Edits. Starte mit /01-context.", file=sys.stderr)
             sys.exit(2)
 
     # 9. Override token skips TDD check

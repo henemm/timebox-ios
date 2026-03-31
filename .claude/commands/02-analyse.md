@@ -35,15 +35,26 @@ Task 3 (Explore/haiku): "Identifiziere Dependencies und Imports fuer
   [Feature-Bereich]. Welche Module haengen davon ab? Welche werden importiert?"
 ```
 
-### Step 2b: Bug-Analyse (bug-intake/Haiku)
+### Step 2b: Bug-Analyse → DELEGIERE AN `/10-bug`
 
-Bei Bugs dispatche den **bug-intake Agent**:
+**⛔ KEIN vereinfachter Bug-Pfad hier!**
 
-```
-Task (general-purpose/haiku): Verwende die bug-intake Instruktionen.
-  Input: symptom=[Fehlerbeschreibung], context=[Wo/Wann]
-  Fuehre parallele Investigation durch und erstelle Bug Report.
-```
+Bei Bugs MUSS der vollständige `/10-bug` Prozess durchlaufen werden:
+- Schritt 0.2: Fresh-Eyes-Inspector (Screenshot + unabhängiger Agent)
+- Schritt 2-4: 5 parallele Investigate-Tasks (ALLE PFLICHT)
+- Schritt 5: Analyse-Dokument (`docs/artifacts/bug-[name]/analysis.md`)
+- Schritt 5.5: Devil's Advocate (`analysis-challenger` Agent)
+- Schritt 6: Analyse Henning präsentieren + Freigabe
+- Schritt 7: Fix VORSCHLAGEN (nicht implementieren!) + Freigabe
+
+**Workflow-Gates erzwingen dies technisch:**
+- `visual_inspection_done` muss gesetzt sein
+- `analysis_file` muss auf das Analyse-Dokument zeigen
+- `analysis_findings` muss gesetzt sein
+- `challenge_verdict` muss "SOLIDE" sein
+- `fix_proposal_approved` muss true sein
+
+→ Führe `/10-bug` aus. Dieser Skill setzt alle nötigen Workflow-Felder.
 
 ### Step 3: Strategische Bewertung (Plan/Sonnet)
 
