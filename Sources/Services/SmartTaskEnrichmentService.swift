@@ -40,6 +40,9 @@ final class SmartTaskEnrichmentService {
 
         @Guide(description: "Cognitive energy: high for deep focus, low for routine")
         let suggestedEnergyLevel: String
+
+        @Guide(description: "Estimated duration in minutes: 5, 15, 30, or 60")
+        let suggestedDurationMinutes: Int
     }
     #endif
 
@@ -114,14 +117,16 @@ final class SmartTaskEnrichmentService {
     }
 
     /// Re-analyze a single task. Returns true if any field was changed.
-    /// Steps 1-2 are deterministic (always run), Steps 3-4 need AI.
+    /// Steps 1-5 are deterministic (always run), Steps 6-7 need AI.
     func reanalyzeTask(_ task: LocalTask) async -> Bool {
         var changed = false
 
-        // Capture original title BEFORE cleanup for date extraction
+        // Capture original title BEFORE cleanup for keyword extraction
         let originalTitle = task.taskDescription ?? task.title
 
-        // Step 1: Title cleanup (date keywords, urgency keywords, intro phrases)
+        // --- Deterministic steps (always run, no AI needed) ---
+
+        // Step 1: Title cleanup (all keywords, email prefixes, intro phrases)
         let cleanedTitle = TaskTitleEngine.cleanTitle(task.title)
         if cleanedTitle != task.title {
             task.title = cleanedTitle
@@ -136,10 +141,34 @@ final class SmartTaskEnrichmentService {
             changed = true
         }
 
-        // Steps 3-4: AI enrichment (only when available)
+        // Step 3: Urgency extraction — explicit keyword OVERRIDES any AI value
+        if let urgency = TaskTitleEngine.extractDeterministicUrgency(from: originalTitle) {
+            if task.urgency != urgency {
+                task.urgency = urgency
+                changed = true
+            }
+        }
+
+        // Step 4: Importance extraction — explicit keyword OVERRIDES any AI value
+        if let importance = TaskTitleEngine.extractDeterministicImportance(from: originalTitle) {
+            if task.importance != importance {
+                task.importance = importance
+                changed = true
+            }
+        }
+
+        // Step 5: Duration extraction (only if not already set by user)
+        if task.estimatedDuration == nil,
+           let duration = TaskTitleEngine.extractDeterministicDuration(from: originalTitle) {
+            task.estimatedDuration = duration
+            changed = true
+        }
+
+        // --- AI steps (only when available) ---
+
         #if canImport(FoundationModels)
         if #available(iOS 26.0, macOS 26.0, *), Self.isAvailable {
-            // Step 3: AI enrichment for missing attributes
+            // Step 6: AI enrichment for missing attributes
             let needsEnrichment = task.importance == nil || task.urgency == nil ||
                 task.taskType.isEmpty || task.aiEnergyLevel == nil
             if needsEnrichment {
@@ -147,7 +176,7 @@ final class SmartTaskEnrichmentService {
                 changed = true
             }
 
-            // Step 4: AI category + duration estimation
+            // Step 7: AI category + duration estimation
             let needsCategoryOrDuration = task.taskType.isEmpty || task.estimatedDuration == nil
             if needsCategoryOrDuration {
                 await enrichCategoryAndDuration(task)
@@ -228,6 +257,7 @@ final class SmartTaskEnrichmentService {
                 "Dringlichkeit: Zeitkritische Begriffe (Termin, Frist, morgen, heute) = true"
                 "Kategorie: income (Geld verdienen), maintenance (Pflege/Haushalt), recharge (Erholung), learning (Lernen), giving_back (Helfen)"
                 "Energie: high = tiefe Fokus-Arbeit (Programmieren, Schreiben, Analyse), low = Routine (Einkaufen, Putzen)"
+                "Dauer in Minuten: 5 (kurzer Anruf/Nachricht), 15 (kurze Aufgabe), 30 (mittlere Aufgabe), 60 (lange/tiefe Arbeit)"
                 ""
                 "Orientiere dich an den Attributen ähnlicher bestehender Tasks wenn vorhanden."
                 "Beispiel: Wenn mehrere Tasks zum Thema Steuern importance=3 und category=income haben, übernimm das für neue Steuer-Tasks."
@@ -253,6 +283,13 @@ final class SmartTaskEnrichmentService {
             if task.aiEnergyLevel == nil {
                 let validEnergy = result.suggestedEnergyLevel.lowercased()
                 task.aiEnergyLevel = (validEnergy == "high" || validEnergy == "low") ? validEnergy : "low"
+            }
+            // Duration estimation (was missing — only reanalyzeTask had it)
+            if task.suggestedDuration == nil {
+                let minutes = result.suggestedDurationMinutes
+                if [5, 15, 30, 60].contains(minutes) {
+                    task.suggestedDuration = minutes
+                }
             }
 
             try modelContext.save()
