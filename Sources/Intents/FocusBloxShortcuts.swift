@@ -46,6 +46,17 @@ struct FocusBloxShortcuts: AppShortcutsProvider {
             systemImageName: "number"
         )
 
+        AppShortcut(
+            intent: OrganizeMyDayIntent(),
+            phrases: [
+                "Plane meinen Tag in \(.applicationName)",
+                "Organisiere meinen Tag in \(.applicationName)",
+                "Tagesvorschläge in \(.applicationName)"
+            ],
+            shortTitle: "Tag organisieren",
+            systemImageName: "calendar.badge.clock"
+        )
+
     }
 
     static let shortcutTileColor: ShortcutTileColor = .blue

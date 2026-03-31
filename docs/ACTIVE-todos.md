@@ -98,7 +98,7 @@
 | ~~FEATURE_018~~ | ~~macOS Enhanced Quick Capture~~ | — | — | ~~macOS~~ | Ersetzt durch MAC_026 (siehe macOS Infrastruktur) |
 | FEATURE_019 | macOS Shortcuts.app Integration | Low | L | macOS | macOS Automatisierung. P3. |
 | FEATURE_020 | macOS Focus Mode Integration | Low | M | macOS | macOS System-Integration. P3. |
-| FEATURE_021 | OrganizeMyDay Intent | Low | XL | iOS | Komplexer Intent. Kann warten. |
+| ~~FEATURE_021~~ | ~~OrganizeMyDay Intent~~ | ~~Low~~ | ~~M~~ | ~~iOS~~ | ~~Siri/Shortcuts Intent: Findet freie Kalender-Luecken, schlaegt passende Tasks vor. Read-only. 5. Shortcut in FocusBloxShortcuts. [Spec](specs/ios/feature-021-organize-my-day-intent.md)~~ ERLEDIGT |
 | FEATURE_022 | CaptureContextIntent | Low | M | iOS | WARTEND auf Apple APIs (iOS 26.5/27). |
 | FEATURE_028 | Focus Sprint: Inline-Duration-Picker | Low | S | iOS | Vor Sprint-Start Dauer anpassen (Inline-Picker, kein Sheet). Follow-up aus RW_3.2 — bewusst ausgescoped um LoC-Limit einzuhalten. Default-Dauer (estimatedDuration oder 60 Min) reicht vorerst. |
 | FEATURE_030 | Task Lifecycle Debug Mode | Low | M | Beide | In Settings aktivierbarer Debug-Modus, der sichtbar macht wie ein Task entstanden (manuell, Reminders Import, Recurring Repair, CloudKit Sync), manipuliert (Template-Migration, Dedup-Reassignment, Priority-Recalc) oder geloescht wurde. Ziel: Transparenz bei Daten-Bugs wie Recurring-Duplikaten. Idee aus bug-recurring-stacking Analyse. |
