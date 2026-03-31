@@ -15,12 +15,31 @@ final class NotificationActionDelegate: NSObject, @preconcurrency UNUserNotifica
         self.eventKitRepository = eventKitRepository
     }
 
+    /// Notification name posted when user taps a Review/Nudge notification.
+    /// userInfo contains "phase" key with value "morning", "evening", or "daytime".
+    static let navigateToDayViewNotification = Notification.Name("NavigateToDayView")
+
     nonisolated func userNotificationCenter(
         _ center: UNUserNotificationCenter,
         didReceive response: UNNotificationResponse,
         withCompletionHandler completionHandler: @escaping @Sendable () -> Void
     ) {
         let userInfo = response.notification.request.content.userInfo
+
+        // Deep-Link: Review/Nudge notifications with target="day"
+        if let target = userInfo["target"] as? String, target == "day" {
+            let phase = userInfo["phase"] as? String ?? "daytime"
+            Task { @MainActor in
+                NotificationCenter.default.post(
+                    name: Self.navigateToDayViewNotification,
+                    object: nil,
+                    userInfo: ["phase": phase]
+                )
+                completionHandler()
+            }
+            return
+        }
+
         guard let taskID = userInfo["taskID"] as? String else {
             completionHandler()
             return

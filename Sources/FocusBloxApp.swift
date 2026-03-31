@@ -300,6 +300,21 @@ struct FocusBloxApp: App {
                 if ProcessInfo.processInfo.arguments.contains("--show-sprint-picker") {
                     showSprintPicker = true
                 }
+                // Quick Action UI Test: simulate Quick Action via launch argument
+                if let qaIndex = ProcessInfo.processInfo.arguments.firstIndex(of: "--quick-action"),
+                   qaIndex + 1 < ProcessInfo.processInfo.arguments.count {
+                    let action = ProcessInfo.processInfo.arguments[qaIndex + 1]
+                    switch action {
+                    case "create-task":
+                        quickCaptureTitle = ""
+                        showQuickCapture = true
+                    case "sprint-picker":
+                        showSprintPicker = true
+                    case "day-view":
+                        selectedTab = .day
+                    default: break
+                    }
+                }
                 // Migrate reminders-sourced tasks to local (one-time, idempotent)
                 // Then run existing dedup cleanup
                 if !ProcessInfo.processInfo.arguments.contains("-UITesting") {
@@ -377,6 +392,19 @@ struct FocusBloxApp: App {
             }
             .onChange(of: scenePhase) { _, newPhase in
                 if newPhase == .active {
+                    // Process pending Quick Action (Long-Press App-Icon → AppDelegate)
+                    if let action = AppDelegate.pendingQuickAction {
+                        AppDelegate.pendingQuickAction = nil
+                        switch action {
+                        case .createTask:
+                            quickCaptureTitle = ""
+                            showQuickCapture = true
+                        case .sprintPicker:
+                            showSprintPicker = true
+                        case .dayView:
+                            selectedTab = .day
+                        }
+                    }
                     syncMonitor.triggerSync()
                     checkCCQuickCaptureTrigger()
                     syncedSettings.pullFromCloud()  // Bug 102: Pull BEFORE push
@@ -419,6 +447,9 @@ struct FocusBloxApp: App {
             }
             .onReceive(NotificationCenter.default.publisher(for: .quickCaptureRequested)) { _ in
                 showQuickCapture = true
+            }
+            .onReceive(NotificationCenter.default.publisher(for: NotificationActionDelegate.navigateToDayViewNotification)) { _ in
+                selectedTab = .day
             }
             .onReceive(NotificationCenter.default.publisher(for: .focusSprintStarted)) { _ in
                 selectedTab = .focus

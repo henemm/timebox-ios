@@ -324,6 +324,7 @@ enum SmartNotificationEngine {
                 content.title = "Tagesreview"
                 content.body = "Zeit für dein Tagesreview — was hast du heute geschafft?"
                 content.sound = .default
+                content.userInfo = ["target": "day", "phase": "evening"]
 
                 let interval = eveningDate.timeIntervalSince(now)
                 let trigger = UNTimeIntervalNotificationTrigger(timeInterval: interval, repeats: false)
@@ -341,6 +342,7 @@ enum SmartNotificationEngine {
                 content.title = "Guten Morgen"
                 content.body = "Dein Tag wartet — was packst du heute an?"
                 content.sound = .default
+                content.userInfo = ["target": "day", "phase": "morning"]
 
                 let interval = morningDate.timeIntervalSince(now)
                 let trigger = UNTimeIntervalNotificationTrigger(timeInterval: interval, repeats: false)
@@ -384,6 +386,7 @@ enum SmartNotificationEngine {
             content.title = text.title
             content.body = text.body
             content.sound = .default
+            content.userInfo = ["target": "day", "phase": "daytime"]
 
             let interval = fireDate.timeIntervalSince(now)
             let trigger = UNTimeIntervalNotificationTrigger(timeInterval: interval, repeats: false)

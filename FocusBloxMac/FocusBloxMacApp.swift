@@ -449,6 +449,10 @@ struct FocusBloxMacApp: App {
                         intentionJustSet = false
                     }
                 }
+                .onReceive(NotificationCenter.default.publisher(for: NotificationActionDelegate.navigateToDayViewNotification)) { _ in
+                    selectedSection = .day
+                    NSApplication.shared.activate(ignoringOtherApps: true)
+                }
         }
         .modelContainer(container)
         .defaultSize(width: 900, height: 600)
