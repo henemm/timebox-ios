@@ -34,14 +34,20 @@ struct NotificationSnoozeTests {
         context.insert(task)
         try context.save()
 
-        // ACTION_POSTPONE_NEXT_WEEK hits default case currently → dueDate unchanged
         let delegate = NotificationActionDelegate(container: container, eventKitRepository: MockEventKitRepository())
         delegate.handleActionForTesting("ACTION_POSTPONE_NEXT_WEEK", taskID: task.id)
 
+        // postpone() calculates from today (not from dueDate) — Bug 85-C fix
         let fetched = try context.fetch(FetchDescriptor<LocalTask>()).first
-        let expected = Calendar.current.date(byAdding: .day, value: 7, to: tomorrow)!
+        let today = Calendar.current.startOfDay(for: Date())
+        let targetDay = Calendar.current.date(byAdding: .day, value: 7, to: today)!
+        let time = Calendar.current.dateComponents([.hour, .minute, .second], from: tomorrow)
+        let expected = Calendar.current.date(bySettingHour: time.hour ?? 0,
+                                             minute: time.minute ?? 0,
+                                             second: time.second ?? 0,
+                                             of: targetDay)!
         let diff = abs(fetched!.dueDate!.timeIntervalSince(expected))
-        #expect(diff < 1.0, "Bug 85-B: ACTION_POSTPONE_NEXT_WEEK must advance dueDate by 7 days")
+        #expect(diff < 1.0, "Bug 85-B: ACTION_POSTPONE_NEXT_WEEK must set dueDate to today+7 days")
     }
 
     @Test func postponeNextWeek_withoutDueDate_doesNotCrash() throws {
@@ -64,14 +70,20 @@ struct NotificationSnoozeTests {
         context.insert(task)
         try context.save()
 
-        // ACTION_POSTPONE_TOMORROW currently hits default case → dueDate unchanged
         let delegate = NotificationActionDelegate(container: container, eventKitRepository: MockEventKitRepository())
         delegate.handleActionForTesting("ACTION_POSTPONE_TOMORROW", taskID: task.id)
 
+        // postpone() calculates from today (not from dueDate) — Bug 85-C fix
         let fetched = try context.fetch(FetchDescriptor<LocalTask>()).first
-        let expected = Calendar.current.date(byAdding: .day, value: 1, to: tomorrow)!
+        let today = Calendar.current.startOfDay(for: Date())
+        let targetDay = Calendar.current.date(byAdding: .day, value: 1, to: today)!
+        let time = Calendar.current.dateComponents([.hour, .minute, .second], from: tomorrow)
+        let expected = Calendar.current.date(bySettingHour: time.hour ?? 0,
+                                             minute: time.minute ?? 0,
+                                             second: time.second ?? 0,
+                                             of: targetDay)!
         let diff = abs(fetched!.dueDate!.timeIntervalSince(expected))
-        #expect(diff < 1.0, "Bug 85-B: ACTION_POSTPONE_TOMORROW must advance dueDate by 1 day")
+        #expect(diff < 1.0, "Bug 85-B: ACTION_POSTPONE_TOMORROW must set dueDate to today+1 day")
     }
 
     // MARK: - Helper
