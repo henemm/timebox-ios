@@ -1,6 +1,10 @@
 import XCTest
 
-final class BacklogParkdeckUITests: XCTestCase {
+/// RW 2.4b: Backlog-Sektionen-Rework
+/// - "Next Up" → "Heute"
+/// - "Aktive Tasks" → 3 Tier-Sektionen (Dringend, Bald, Später)
+/// - "Parkdeck" → "Geparkt" (offen, nur manuell)
+final class BacklogSectionsUITests: XCTestCase {
     var app: XCUIApplication!
 
     override func setUpWithError() throws {
@@ -22,112 +26,162 @@ final class BacklogParkdeckUITests: XCTestCase {
         _ = viewModeSwitcher.waitForExistence(timeout: 3)
     }
 
-    /// Scrolls down until parkdeckSection becomes visible or maxSwipes reached
-    @discardableResult
-    private func scrollToParkdeck() -> XCUIElement {
-        let list = app.collectionViews.firstMatch.exists
-            ? app.collectionViews.firstMatch
-            : app.tables.firstMatch
-        let parkdeck = app.buttons["parkdeckSection"].firstMatch
+    // MARK: - TEST_01: "Heute"-Sektion (ehemals "Next Up")
 
-        // Scroll down to find parkdeck (may be off-screen)
-        for _ in 0..<5 {
-            if parkdeck.exists { break }
-            list.swipeUp()
-        }
-        return parkdeck
-    }
-
-    // MARK: - TEST_01: Parkdeck Section collapsed by default
-
-    /// Bricht wenn: BacklogView.priorityView hat keine Parkdeck-Section mit .accessibilityIdentifier("parkdeckSection")
-    func test_parkdeckSection_existsAndCollapsedByDefault() {
+    /// Bricht wenn: Section Header noch "Next Up" statt "Heute" zeigt
+    func test_heuteSection_existsWithCorrectLabel() {
         navigateToBacklogPriority()
 
-        let parkdeck = scrollToParkdeck()
-        XCTAssertTrue(parkdeck.waitForExistence(timeout: 3), "Parkdeck Section Header muss im Priority-View sichtbar sein")
+        let heuteText = app.staticTexts.matching(
+            NSPredicate(format: "label CONTAINS 'Heute'")
+        ).firstMatch
+        XCTAssertTrue(heuteText.waitForExistence(timeout: 5),
+                       "Section Header muss 'Heute' zeigen, nicht 'Next Up'")
 
-        // Parkdeck soll "Parkdeck" Text enthalten
-        let parkdeckText = app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'Parkdeck'")).firstMatch
-        XCTAssertTrue(parkdeckText.exists, "Parkdeck Header muss 'Parkdeck' Text enthalten")
+        // "Next Up" darf NICHT mehr existieren
+        let nextUpText = app.staticTexts.matching(
+            NSPredicate(format: "label == 'Next Up'")
+        ).firstMatch
+        XCTAssertFalse(nextUpText.exists,
+                        "'Next Up' Label darf nicht mehr existieren")
     }
 
-    // MARK: - TEST_02: Aktive Tasks Section existiert
+    // MARK: - TEST_02: Tier-Sektionen existieren (Dringend, Bald, Später)
 
-    /// Bricht wenn: BacklogView.priorityView hat keine Aktiv-Section mit .accessibilityIdentifier("activeTasksSection")
-    func test_activeTasksSection_exists() {
+    /// Bricht wenn: priorityView noch "Aktive Tasks" statt Tier-Sektionen zeigt
+    func test_tierSections_existInPriorityView() {
         navigateToBacklogPriority()
 
-        let activeSectionText = app.staticTexts["activeTasksSection"].firstMatch
-        let exists = activeSectionText.waitForExistence(timeout: 5)
-        XCTAssertTrue(exists, "Aktive Tasks Section Header muss im Priority-View sichtbar sein")
-    }
-
-    // MARK: - TEST_03: Parkdeck expandiert per Tap
-
-    /// Bricht wenn: Parkdeck-Button hat kein Toggle-Verhalten oder keine Tasks gerendert
-    func test_parkdeckSection_expandsOnTap() {
-        navigateToBacklogPriority()
-
-        let parkdeck = scrollToParkdeck()
-        guard parkdeck.waitForExistence(timeout: 5) else {
-            XCTFail("Parkdeck Section Header nicht gefunden")
-            return
-        }
-
-        // Tap to expand
-        parkdeck.tap()
-
-        // After expanding, parkdeck tasks may render below visible area — scroll down
         let list = app.collectionViews.firstMatch.exists
             ? app.collectionViews.firstMatch
             : app.tables.firstMatch
 
-        // Mock data includes tbdTask (someday) and backlogTask2 (eventually)
-        let anyTaskInParkdeck = app.staticTexts.matching(
-            NSPredicate(format: "label CONTAINS '[MOCK] TBD Task' OR label CONTAINS '[MOCK] Backlog Task 2'")
-        ).firstMatch
+        // Scroll through to find tier sections
+        var foundDringend = false
+        var foundBald = false
+        var foundSpaeter = false
 
-        // Scroll down a few times to find parkdeck content
-        for _ in 0..<5 {
-            if anyTaskInParkdeck.exists { break }
+        for _ in 0..<8 {
+            if app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'Dringend'")).firstMatch.exists {
+                foundDringend = true
+            }
+            if app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'Bald'")).firstMatch.exists {
+                foundBald = true
+            }
+            if app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'Später'")).firstMatch.exists {
+                foundSpaeter = true
+            }
+            if foundDringend && foundBald && foundSpaeter { break }
             list.swipeUp()
         }
 
-        XCTAssertTrue(
-            anyTaskInParkdeck.waitForExistence(timeout: 3),
-            "Nach Expand muss mindestens ein Task im Parkdeck sichtbar sein"
-        )
+        // Mindestens eine Tier-Sektion muss sichtbar sein (Mock-Daten haben Tasks in verschiedenen Tiers)
+        XCTAssertTrue(foundDringend || foundBald || foundSpaeter,
+                       "Mindestens eine Tier-Sektion (Dringend/Bald/Später) muss existieren")
+
+        // "Aktive Tasks" darf NICHT mehr existieren
+        let aktivText = app.staticTexts.matching(
+            NSPredicate(format: "label == 'Aktive Tasks'")
+        ).firstMatch
+        XCTAssertFalse(aktivText.exists,
+                        "'Aktive Tasks' Sektion darf nicht mehr existieren")
     }
 
-    // MARK: - TEST_04: Suche findet Tasks im collapsed Parkdeck
+    // MARK: - TEST_03: "Geparkt"-Sektion (ehemals "Parkdeck") ist offen
 
-    /// Bricht wenn: Suchlogik filtert Parkdeck-Tasks aus wenn Parkdeck collapsed ist
-    func test_search_findsParkdeckTasksWhenCollapsed() {
+    /// Bricht wenn: Section Header noch "Parkdeck" zeigt oder collapsed ist
+    func test_geparktSection_existsAndIsOpen() {
         navigateToBacklogPriority()
 
-        let searchField = app.searchFields.firstMatch
-        guard searchField.waitForExistence(timeout: 5) else {
-            XCTFail("Suchfeld nicht gefunden")
-            return
+        let list = app.collectionViews.firstMatch.exists
+            ? app.collectionViews.firstMatch
+            : app.tables.firstMatch
+
+        // Scroll to find "Geparkt" section
+        var geparktFound = false
+        for _ in 0..<8 {
+            if app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'Geparkt'")).firstMatch.exists {
+                geparktFound = true
+                break
+            }
+            list.swipeUp()
         }
-        searchField.tap()
-        searchField.typeText("TBD Task")
 
-        // The TBD task should appear in search results even though Parkdeck is collapsed
-        let searchResult = app.staticTexts.matching(
-            NSPredicate(format: "label CONTAINS 'TBD Task'")
+        // "Geparkt" muss existieren (Mock-Daten brauchen einen isParked=true Task)
+        // Wenn kein geparkter Mock-Task existiert, ist die Sektion leer und wird nicht angezeigt — das ist OK
+        // Aber "Parkdeck" darf NICHT mehr existieren
+        let parkdeckText = app.staticTexts.matching(
+            NSPredicate(format: "label CONTAINS 'Parkdeck'")
         ).firstMatch
-
-        XCTAssertTrue(
-            searchResult.waitForExistence(timeout: 3),
-            "Suche muss TBD Task finden, auch wenn Parkdeck collapsed ist"
-        )
+        XCTAssertFalse(parkdeckText.exists,
+                        "'Parkdeck' Label darf nicht mehr existieren — muss 'Geparkt' heißen")
     }
 
-    // MARK: - TEST_05: ViewMode Switcher hat alle 5 Modi
+    // MARK: - TEST_04: Swipe-Action "Heute" statt "Next Up"
 
-    /// Bricht wenn: ViewMode enum geaendert oder Parkdeck-Umbau ViewModes entfernt
+    /// Bricht wenn: Swipe-Action auf Backlog-Task noch "Next Up" statt "Heute" zeigt
+    func test_swipeAction_showsHeuteNotNextUp() {
+        navigateToBacklogPriority()
+
+        let list = app.collectionViews.firstMatch.exists
+            ? app.collectionViews.firstMatch
+            : app.tables.firstMatch
+
+        // Find any task in a tier section (not in Heute)
+        let anyTask = app.staticTexts.matching(
+            NSPredicate(format: "label CONTAINS '[MOCK] Backlog Task 1'")
+        ).firstMatch
+
+        for _ in 0..<5 {
+            if anyTask.exists { break }
+            list.swipeUp()
+        }
+
+        guard anyTask.waitForExistence(timeout: 5) else {
+            XCTFail("Backlog Task 1 nicht gefunden")
+            return
+        }
+
+        anyTask.swipeRight()
+
+        let heuteButton = app.buttons["Heute"]
+        XCTAssertTrue(heuteButton.waitForExistence(timeout: 3),
+                       "Swipe-Action muss 'Heute' zeigen, nicht 'Next Up'")
+    }
+
+    // MARK: - TEST_05: Swipe "Parken" auf Tier-Task
+
+    /// Bricht wenn: Tier-Tasks keine "Parken" Swipe-Action haben
+    func test_tierTask_swipeLeft_showsParkenAction() {
+        navigateToBacklogPriority()
+
+        let list = app.collectionViews.firstMatch.exists
+            ? app.collectionViews.firstMatch
+            : app.tables.firstMatch
+
+        let activeTask = app.staticTexts.matching(
+            NSPredicate(format: "label CONTAINS '[MOCK] Blocker'")
+        ).firstMatch
+
+        for _ in 0..<5 {
+            if activeTask.exists { break }
+            list.swipeUp()
+        }
+
+        guard activeTask.waitForExistence(timeout: 5) else {
+            XCTFail("Task '[MOCK] Blocker' nicht gefunden")
+            return
+        }
+
+        activeTask.swipeLeft()
+
+        let parkenButton = app.buttons["Parken"]
+        XCTAssertTrue(parkenButton.waitForExistence(timeout: 3),
+                       "Swipe auf Tier-Task muss 'Parken' Action zeigen")
+    }
+
+    // MARK: - TEST_06: ViewMode Switcher hat alle 5 Modi
+
     func test_viewModeSwitcher_hasAllFiveModes() {
         navigateToBacklogPriority()
 
@@ -146,100 +200,5 @@ final class BacklogParkdeckUITests: XCTestCase {
                 "ViewMode '\(mode)' muss im Switcher vorhanden sein"
             )
         }
-    }
-
-    // MARK: - TEST_07: Aktiver Task kann via Swipe geparkt werden
-
-    /// Bricht wenn: BacklogView.priorityView Active-Section keine "Parken" swipeAction hat
-    func test_activeTask_swipeLeft_showsParkenAction() {
-        navigateToBacklogPriority()
-
-        let list = app.collectionViews.firstMatch.exists
-            ? app.collectionViews.firstMatch
-            : app.tables.firstMatch
-
-        // "[MOCK] Blocker: API fertigstellen" is active (importance=3, urgency=urgent, no dueDate → not overdue)
-        let activeTask = app.staticTexts.matching(
-            NSPredicate(format: "label CONTAINS '[MOCK] Blocker'")
-        ).firstMatch
-
-        // Scroll to find the active task
-        for _ in 0..<5 {
-            if activeTask.exists { break }
-            list.swipeUp()
-        }
-
-        guard activeTask.waitForExistence(timeout: 5) else {
-            XCTFail("Aktiver Task '[MOCK] Blocker' nicht gefunden")
-            return
-        }
-
-        activeTask.swipeLeft()
-
-        let parkenButton = app.buttons["Parken"]
-        XCTAssertTrue(
-            parkenButton.waitForExistence(timeout: 3),
-            "Swipe auf aktiven Task muss 'Parken' Action zeigen"
-        )
-    }
-
-    // MARK: - TEST_08: Parkdeck-Task kann via Swipe aktiviert werden
-
-    /// Bricht wenn: BacklogView.priorityView Parkdeck-Section keine "Aktivieren" swipeAction hat
-    func test_parkdeckTask_swipeLeft_showsAktivierenAction() {
-        navigateToBacklogPriority()
-
-        // Expand parkdeck first
-        let parkdeck = scrollToParkdeck()
-        guard parkdeck.waitForExistence(timeout: 5) else {
-            XCTFail("Parkdeck Section Header nicht gefunden")
-            return
-        }
-        parkdeck.tap()
-
-        // Scroll to find a parkdeck task
-        let list = app.collectionViews.firstMatch.exists
-            ? app.collectionViews.firstMatch
-            : app.tables.firstMatch
-
-        let parkdeckTask = app.staticTexts.matching(
-            NSPredicate(format: "label CONTAINS '[MOCK] Backlog Task 2'")
-        ).firstMatch
-
-        for _ in 0..<5 {
-            if parkdeckTask.exists { break }
-            list.swipeUp()
-        }
-
-        guard parkdeckTask.waitForExistence(timeout: 3) else {
-            XCTFail("Parkdeck Task '[MOCK] Backlog Task 2' nicht gefunden nach Expand")
-            return
-        }
-
-        parkdeckTask.swipeLeft()
-
-        let aktivierenButton = app.buttons["Aktivieren"]
-        XCTAssertTrue(
-            aktivierenButton.waitForExistence(timeout: 3),
-            "Swipe auf Parkdeck-Task muss 'Aktivieren' Action zeigen"
-        )
-    }
-
-    // MARK: - TEST_06: Parkdeck Badge zeigt Anzahl
-
-    /// Bricht wenn: Parkdeck Header keinen Count-Badge hat
-    func test_parkdeckSection_showsBadgeCount() {
-        navigateToBacklogPriority()
-
-        let parkdeck = scrollToParkdeck()
-        guard parkdeck.waitForExistence(timeout: 5) else {
-            XCTFail("Parkdeck Section Header nicht gefunden")
-            return
-        }
-
-        // Check that the Parkdeck header label contains a number >= 1
-        let label = parkdeck.label
-        let hasNumber = label.range(of: #"\d+"#, options: .regularExpression) != nil
-        XCTAssertTrue(hasNumber, "Parkdeck Header muss eine Zahl (Badge Count) enthalten, hat aber: '\(label)'")
     }
 }

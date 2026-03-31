@@ -266,7 +266,7 @@ struct MenuBarView: View {
                             .foregroundStyle(isNextUp ? .blue : .secondary)
                     }
                     .buttonStyle(.borderless)
-                    .help("Next Up")
+                    .help("Heute")
                     .accessibilityIdentifier("qc_nextUpButton")
 
                     Button(action: addTask) {
@@ -293,7 +293,7 @@ struct MenuBarView: View {
 
     private var nextUpSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Next Up")
+            Text("Heute")
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .textCase(.uppercase)

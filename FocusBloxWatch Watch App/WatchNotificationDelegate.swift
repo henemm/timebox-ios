@@ -25,7 +25,7 @@ final class WatchNotificationDelegate: NSObject, @preconcurrency UNUserNotificat
 
     /// Register notification categories so watchOS can display interactive actions.
     static func registerActions() {
-        let nextUp = UNNotificationAction(identifier: actionNextUp, title: "Next Up", options: [])
+        let nextUp = UNNotificationAction(identifier: actionNextUp, title: "Heute", options: [])
         let postponeTomorrow = UNNotificationAction(identifier: actionPostponeTomorrow, title: "Morgen", options: [])
         let postponeNextWeek = UNNotificationAction(identifier: actionPostponeNextWeek, title: "Nächste Woche", options: [])
         let complete = UNNotificationAction(identifier: actionComplete, title: "Erledigt", options: [.destructive])

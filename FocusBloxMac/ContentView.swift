@@ -75,8 +75,7 @@ struct ContentView: View {
 
     @State private var searchText = ""
 
-    // MAC_028: Parkdeck section state
-    @State private var isParkdeckExpanded: Bool = false
+    // RW 2.4b: isParkdeckExpanded entfernt — "Geparkt" ist immer offen
 
     // Recurring dialogs
     @State private var taskToDeleteRecurring: LocalTask?
@@ -358,6 +357,43 @@ struct ContentView: View {
         }
     }
 
+    // RW 2.4b: Tier Section Helper
+    @ViewBuilder
+    private func macTierSection(
+        title: String,
+        tiers: [TaskPriorityScoringService.PriorityTier],
+        color: Color
+    ) -> some View {
+        let tierTasks = regularFilteredTasks.filter { task in
+            let score = scoreFor(task)
+            let taskTier = TaskPriorityScoringService.PriorityTier.from(score: score)
+            let isOverdue = overdueTasks.contains(where: { $0.uuid == task.uuid })
+            return tiers.contains(taskTier) && !isOverdue && !task.isParked
+        }.sorted { scoreFor($0) > scoreFor($1) }
+
+        if !tierTasks.isEmpty {
+            Section {
+                ForEach(MacBacklogStackingHelper.applyStacking(tierTasks), id: \.task.uuid) { item in
+                    taskRowWithSwipe(task: item.task, stackedCount: item.stackedCount)
+                }
+            } header: {
+                HStack {
+                    Text(title)
+                        .font(.headline)
+                        .foregroundStyle(color)
+                    Spacer()
+                    Text("\(tierTasks.count)")
+                        .font(.caption)
+                        .foregroundStyle(color)
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 2)
+                        .background(color.opacity(0.2))
+                        .clipShape(Capsule())
+                }
+            }
+        }
+    }
+
     private var backlogView: some View {
         VStack(spacing: 0) {
             // MARK: - Inline Search (FEATURE_023_v2)
@@ -417,7 +453,7 @@ struct ContentView: View {
                         }
                     } header: {
                         HStack {
-                            Label("Next Up", systemImage: "arrow.up.circle.fill")
+                            Label("Heute", systemImage: "calendar.circle.fill")
                                 .foregroundStyle(.blue)
                             Spacer()
                             Text("\(nextUpTasks.count)")
@@ -456,76 +492,39 @@ struct ContentView: View {
                         }
                     }
 
-                    // MAC_028: Active tier sections (doNow, planSoon only — not parked)
-                    ForEach([TaskPriorityScoringService.PriorityTier.doNow, .planSoon], id: \.self) { tier in
-                        let tierTasks = regularFilteredTasks.filter { task in
-                            let score = scoreFor(task)
-                            let taskTier = TaskPriorityScoringService.PriorityTier.from(score: score)
-                            let isOverdue = overdueTasks.contains(where: { $0.uuid == task.uuid })
-                            return taskTier == tier && !isOverdue && !MacBacklogFilterHelper.isInParkdeck(task: task, score: score)
-                        }.sorted { scoreFor($0) > scoreFor($1) }
+                    // RW 2.4b: 3 Tier-Sektionen (Dringend, Bald, Später)
+                    macTierSection(title: "Dringend", tiers: [.doNow], color: .red)
+                    macTierSection(title: "Bald", tiers: [.planSoon], color: .orange)
+                    macTierSection(title: "Später", tiers: [.eventually, .someday], color: .yellow)
 
-                        if !tierTasks.isEmpty {
-                            Section {
-                                ForEach(MacBacklogStackingHelper.applyStacking(tierTasks), id: \.task.uuid) { item in
-                                    taskRowWithSwipe(task: item.task, stackedCount: item.stackedCount)
-                                }
-                            } header: {
-                                HStack {
-                                    Text(tier.label)
-                                        .font(.headline)
-                                        .foregroundStyle(tierColor(tier))
-                                    Spacer()
-                                    Text("\(tierTasks.count)")
-                                        .font(.caption)
-                                        .foregroundStyle(tierColor(tier))
-                                        .padding(.horizontal, 6)
-                                        .padding(.vertical, 2)
-                                        .background(tierColor(tier).opacity(0.2))
-                                        .clipShape(Capsule())
-                                }
-                            }
-                        }
-                    }
-
-                    // MAC_028: Parkdeck section (collapsed by default)
-                    let pdTasks = regularFilteredTasks.filter { task in
-                        let score = scoreFor(task)
+                    // RW 2.4b: Geparkt (manuell, immer offen)
+                    let geparktTasks = regularFilteredTasks.filter { task in
                         let isOverdue = overdueTasks.contains(where: { $0.uuid == task.uuid })
-                        return !isOverdue && MacBacklogFilterHelper.isInParkdeck(task: task, score: score)
+                        return !isOverdue && task.isParked
                     }.sorted { scoreFor($0) > scoreFor($1) }
 
-                    if !pdTasks.isEmpty {
+                    if !geparktTasks.isEmpty {
                         Section {
-                            if isParkdeckExpanded || !searchText.isEmpty {
-                                ForEach(MacBacklogStackingHelper.applyStacking(pdTasks), id: \.task.uuid) { item in
-                                    taskRowWithSwipe(task: item.task, stackedCount: item.stackedCount)
-                                        .accessibilityIdentifier("parkdeckRow_\(item.task.uuid.uuidString)")
-                                }
+                            ForEach(MacBacklogStackingHelper.applyStacking(geparktTasks), id: \.task.uuid) { item in
+                                taskRowWithSwipe(task: item.task, stackedCount: item.stackedCount)
+                                    .accessibilityIdentifier("geparktRow_\(item.task.uuid.uuidString)")
                             }
                         } header: {
-                            Button {
-                                withAnimation(.smooth) { isParkdeckExpanded.toggle() }
-                            } label: {
-                                HStack {
-                                    Image(systemName: isParkdeckExpanded || !searchText.isEmpty ? "chevron.down" : "chevron.right")
-                                        .font(.caption)
-                                    Text("Parkdeck")
-                                        .font(.headline)
-                                        .foregroundStyle(.secondary)
-                                    Spacer()
-                                    Text("\(pdTasks.count)")
-                                        .font(.caption)
-                                        .foregroundStyle(.secondary)
-                                        .padding(.horizontal, 6)
-                                        .padding(.vertical, 2)
-                                        .background(Color.secondary.opacity(0.15))
-                                        .clipShape(Capsule())
-                                        .accessibilityIdentifier("parkdeckBadgeCount")
-                                }
+                            HStack {
+                                Text("Geparkt")
+                                    .font(.headline)
+                                    .foregroundStyle(.secondary)
+                                Spacer()
+                                Text("\(geparktTasks.count)")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                                    .padding(.horizontal, 6)
+                                    .padding(.vertical, 2)
+                                    .background(Color.secondary.opacity(0.15))
+                                    .clipShape(Capsule())
+                                    .accessibilityIdentifier("geparktBadgeCount")
                             }
-                            .buttonStyle(.plain)
-                            .accessibilityIdentifier("parkdeckSectionHeader")
+                            .accessibilityIdentifier("geparktSectionHeader")
                         }
                     }
                 } else {
@@ -883,11 +882,11 @@ struct ContentView: View {
                 Button("Weitergeben") { setCategory("giving_back", for: selection) }
             }
 
-            Button("Zu Next Up hinzufügen") {
+            Button("Zu Heute hinzufügen") {
                 addToNextUp(selection)
             }
 
-            Button("Aus Next Up entfernen") {
+            Button("Aus Heute entfernen") {
                 removeFromNextUp(selection)
             }
 
@@ -910,14 +909,14 @@ struct ContentView: View {
 
             singleTaskContextMenuItems(for: selection)
 
-            // MAC_028: Park / Activate
+            // RW 2.4b: Parken / Aktivieren
             if selection.count == 1, let uuid = selection.first,
                let task = tasks.first(where: { $0.uuid == uuid }) {
                 Divider()
-                if task.isParked || MacBacklogFilterHelper.isInParkdeck(task: task, score: scoreFor(task)) {
+                if task.isParked {
                     Button("Aktivieren") { activateTask(task) }
                 } else {
-                    Button("In Parkdeck legen") { parkTask(task) }
+                    Button("Parken") { parkTask(task) }
                 }
             }
 
@@ -1204,8 +1203,8 @@ struct ContentView: View {
                     }
                 } label: {
                     Label(
-                        task.isNextUp ? "Entfernen" : "Next Up",
-                        systemImage: task.isNextUp ? "arrow.down.circle.fill" : "arrow.up.circle.fill"
+                        task.isNextUp ? "Entfernen" : "Heute",
+                        systemImage: task.isNextUp ? "arrow.down.circle.fill" : "calendar.circle.fill"
                     )
                 }
                 .tint(task.isNextUp ? .orange : .green)

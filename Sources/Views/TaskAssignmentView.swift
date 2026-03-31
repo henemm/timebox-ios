@@ -135,9 +135,9 @@ struct TaskAssignmentView: View {
     private var taskBacklogSection: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
-                Image(systemName: "arrow.up.circle.fill")
+                Image(systemName: "calendar.circle.fill")
                     .foregroundStyle(.blue)
-                Text("Next Up")
+                Text("Heute")
                     .font(.headline)
                 Spacer()
                 Text("\(unscheduledTasks.count)")

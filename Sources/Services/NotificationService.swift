@@ -24,7 +24,7 @@ enum NotificationService {
     /// Register notification category with 3 interactive actions for due date notifications.
     static func registerDueDateActions() {
         let nextUp = UNNotificationAction(
-            identifier: actionNextUp, title: "Next Up", options: []
+            identifier: actionNextUp, title: "Heute", options: []
         )
         let postponeTomorrow = UNNotificationAction(
             identifier: actionPostponeTomorrow, title: "Morgen", options: []

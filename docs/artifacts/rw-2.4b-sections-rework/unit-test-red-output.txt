@@ -1,0 +1,9 @@
+TDD RED — ParkdeckClassificationTests (iOS)
+Executed 6 tests, with 3 failures:
+- test_lowScoreTask_notParked_isNotInParkdeck: FAILED — XCTAssertFalse: Eventually/someday-Task ohne isParked darf NICHT geparkt sein
+- test_noAttributeTask_somedayTier_isNotInParkdeck: FAILED — XCTAssertFalse: Someday-Task ohne isParked darf NICHT geparkt sein
+- test_lowScoreTask_explicitlyNotParked_isNotInParkdeck: FAILED — XCTAssertFalse: Task mit isParked=false darf NICHT geparkt sein, auch bei niedrigem Score
+
+TDD RED — MacBacklogParkdeckStackingTests (macOS)
+Executed 8 tests, with 1 failure:
+- test_lowTierTask_notParked_isNotClassifiedAsParkdeck: FAILED — XCTAssertFalse: Low-tier task without isParked must NOT be in parkdeck

@@ -164,7 +164,7 @@ struct QuickCaptureView: View {
                         .foregroundStyle(isNextUp ? .blue : .secondary)
                 }
                 .buttonStyle(.borderless)
-                .help("Next Up")
+                .help("Heute")
                 .accessibilityIdentifier("qc_nextUpButton")
 
                 if !taskTitle.isEmpty {

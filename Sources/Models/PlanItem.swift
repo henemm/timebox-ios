@@ -63,13 +63,13 @@ struct PlanItem: Identifiable, Sendable {
     /// Lifecycle status: raw/refined/active
     let lifecycleStatus: String
 
-    /// Manuell ins Parkdeck verschoben (RW 2.4)
+    /// Manuell geparkt (RW 2.4b: nur noch manuell, nicht mehr Score-basiert)
     let isParked: Bool
 
-    /// True wenn dieser Task im Parkdeck erscheinen soll.
-    /// Entweder manuell geparkt ODER Score-Tier ist eventually/someday.
+    /// True wenn dieser Task in der "Geparkt"-Sektion erscheinen soll.
+    /// RW 2.4b: NUR manuell geparkt. Score-Tiers bestimmen Dringend/Bald/Später.
     var isInParkdeck: Bool {
-        isParked || priorityTier == .eventually || priorityTier == .someday
+        isParked
     }
 
     // Direct Scheduling (RW 3.1)

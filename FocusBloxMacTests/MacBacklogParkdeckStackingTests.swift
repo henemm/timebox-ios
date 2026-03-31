@@ -30,12 +30,11 @@ final class MacBacklogParkdeckStackingTests: XCTestCase {
         XCTAssertTrue(result, "isParked task must be in parkdeck regardless of tier")
     }
 
-    /// Verhalten: eventually/someday tier tasks go to parkdeck even without isParked flag.
-    /// Bricht wenn: MacBacklogFilterHelper.isInParkdeck() ignores tier check.
-    func test_lowTierTask_isClassifiedAsParkdeck() {
+    /// RW 2.4b: Low-Tier-Task OHNE isParked ist NICHT geparkt — er landet in "Später"
+    /// Bricht wenn: MacBacklogFilterHelper.isInParkdeck() noch Tier-Check enthält (alte Logik)
+    func test_lowTierTask_notParked_isNotClassifiedAsParkdeck() {
         let task = LocalTask(title: "Low Priority", importance: 1)
         task.isParked = false
-        // importance=1, no urgency → low score → eventually/someday tier
 
         let score = TaskPriorityScoringService.calculateScore(
             importance: task.importance, urgency: task.urgency, dueDate: task.dueDate,
@@ -43,16 +42,10 @@ final class MacBacklogParkdeckStackingTests: XCTestCase {
             estimatedDuration: task.estimatedDuration, taskType: task.taskType,
             isNextUp: task.isNextUp, dependentTaskCount: 0
         )
-        let tier = TaskPriorityScoringService.PriorityTier.from(score: score)
-
-        // Only test if tier is actually eventually/someday (precondition)
-        guard tier == .eventually || tier == .someday else {
-            // If tier is higher, this test doesn't apply — skip
-            return
-        }
 
         let result = MacBacklogFilterHelper.isInParkdeck(task: task, score: score)
-        XCTAssertTrue(result, "Eventually/someday tier tasks must be in parkdeck")
+        // NEU: Low-Score allein macht NICHT geparkt
+        XCTAssertFalse(result, "Low-tier task without isParked must NOT be in parkdeck")
     }
 
     /// Verhalten: doNow/planSoon tasks that are NOT parked stay in active list.

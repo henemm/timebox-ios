@@ -10,15 +10,13 @@ import Foundation
 
 // MARK: - Parkdeck Filter Helper
 
-/// Determines if a task belongs in the Parkdeck section.
-/// Mirrors iOS PlanItem.isInParkdeck logic.
+/// Determines if a task belongs in the "Geparkt" section.
+/// RW 2.4b: NUR manuell geparkt, nicht mehr Score-basiert.
 enum MacBacklogFilterHelper {
 
-    /// A task is "in parkdeck" if manually parked OR in a low priority tier.
+    /// A task is "geparkt" only if manually parked (isParked == true).
     static func isInParkdeck(task: LocalTask, score: Int) -> Bool {
-        if task.isParked { return true }
-        let tier = TaskPriorityScoringService.PriorityTier.from(score: score)
-        return tier == .eventually || tier == .someday
+        task.isParked
     }
 }
 

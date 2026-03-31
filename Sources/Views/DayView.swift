@@ -270,7 +270,7 @@ struct DayView: View {
 
     private var morningNextUpSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Next Up")
+            Text("Heute")
                 .font(.headline)
 
             if let warning = activeLimitationWarning {

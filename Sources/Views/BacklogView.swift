@@ -52,7 +52,7 @@ struct BacklogView: View {
     @State private var errorMessage: String?
     @State private var isLoading = false
     @State private var importStatusMessage: String?
-    @State private var isParkdeckExpanded: Bool = false
+    // RW 2.4b: isParkdeckExpanded entfernt — "Geparkt" ist immer offen
     @State private var reorderTrigger = false
     @State private var selectedItemForDuration: PlanItem?
     @State private var selectedItemForImportance: PlanItem?
@@ -122,16 +122,22 @@ struct BacklogView: View {
         }.sorted { effectivePriorityScore(for: $0) > effectivePriorityScore(for: $1) }
     }
 
-    // MARK: - Active Tasks (doNow + planSoon, not manually parked, not overdue)
-    private var activeTasks: [PlanItem] {
+    // MARK: - Tier-basierte Sektionen (RW 2.4b)
+
+    /// Tasks für eine bestimmte Tier-Gruppe, exklusive Überfällige und Geparkte
+    private func tasksForTierGroup(_ tiers: [TaskPriorityScoringService.PriorityTier]) -> [PlanItem] {
         let overdueIDs = Set(overdueTasks.map(\.id))
         return backlogTasks
-            .filter { !$0.isInParkdeck && !overdueIDs.contains($0.id) }
+            .filter { !$0.isInParkdeck && !overdueIDs.contains($0.id) && tiers.contains($0.priorityTier) }
             .sorted { effectivePriorityScore(for: $0) > effectivePriorityScore(for: $1) }
     }
 
-    // MARK: - Parkdeck Tasks (eventually + someday + manually parked)
-    private var parkdeckTasks: [PlanItem] {
+    private var dringendTasks: [PlanItem] { tasksForTierGroup([.doNow]) }
+    private var baldTasks: [PlanItem] { tasksForTierGroup([.planSoon]) }
+    private var spaeterTasks: [PlanItem] { tasksForTierGroup([.eventually, .someday]) }
+
+    // MARK: - Geparkt (nur manuell, RW 2.4b)
+    private var geparktTasks: [PlanItem] {
         backlogTasks
             .filter { $0.isInParkdeck }
             .sorted { effectivePriorityScore(for: $0) > effectivePriorityScore(for: $1) }
@@ -590,7 +596,7 @@ struct BacklogView: View {
 
             Task { await refreshLocalTasks() }
         } catch {
-            errorMessage = "Next Up Status konnte nicht geändert werden."
+            errorMessage = "Heute-Status konnte nicht geändert werden."
         }
     }
 
@@ -930,13 +936,13 @@ struct BacklogView: View {
     /// Non-representative instances are removed from planItems.
     private func applyRecurringStacking() {
         // Group items by recurrenceGroupID + parked status (only non-nil, non-template, non-completed)
-        // Parked and active instances are grouped independently per spec
+        // RW 2.4b: Geparkte und ungeparkte Instanzen weiterhin getrennt gruppiert
         var groups: [String: [Int]] = [:]  // "groupID_parked/active" -> indices
         for (index, item) in planItems.enumerated() {
             guard let groupID = item.recurrenceGroupID,
                   !item.isTemplate,
                   !item.isCompleted else { continue }
-            let key = "\(groupID)_\(item.isInParkdeck ? "parked" : "active")"
+            let key = "\(groupID)_\(item.isParked ? "parked" : "active")"
             groups[key, default: []].append(index)
         }
 
@@ -1049,7 +1055,7 @@ struct BacklogView: View {
                 }
             } header: {
                 HStack {
-                    Label("Next Up", systemImage: "arrow.up.circle.fill")
+                    Label("Heute", systemImage: "calendar.circle.fill")
                         .font(.headline)
                         .foregroundStyle(.green)
                     Spacer()
@@ -1094,7 +1100,7 @@ struct BacklogView: View {
             Button {
                 updateNextUp(for: item, isNextUp: true)
             } label: {
-                Label("Next Up", systemImage: "arrow.up.circle.fill")
+                Label("Heute", systemImage: "calendar.circle.fill")
             }
             .tint(.green)
         }
@@ -1189,42 +1195,15 @@ struct BacklogView: View {
                 }
             }
 
-            // Active Tasks (doNow + planSoon, not manually parked)
-            if !activeTasks.isEmpty {
-                Section {
-                    ForEach(activeTasks) { item in
-                        backlogRowWithSwipe(item)
-                            .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                                Button {
-                                    parkTask(item)
-                                } label: {
-                                    Label("Parken", systemImage: "car.fill")
-                                }
-                                .tint(.gray)
-                            }
-                    }
-                } header: {
-                    HStack {
-                        Text("Aktive Tasks")
-                            .font(.headline)
-                            .foregroundStyle(.primary)
-                        Spacer()
-                        Text("\(activeTasks.count)")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                            .padding(.horizontal, 6)
-                            .padding(.vertical, 2)
-                            .background(Color.secondary.opacity(0.15))
-                            .clipShape(Capsule())
-                    }
-                    .accessibilityIdentifier("activeTasksSection")
-                }
-            }
+            // RW 2.4b: 3 Tier-Sektionen + Geparkt
+            tierSection(title: "Dringend", tasks: dringendTasks, color: .red)
+            tierSection(title: "Bald", tasks: baldTasks, color: .orange)
+            tierSection(title: "Später", tasks: spaeterTasks, color: .yellow)
 
-            // Parkdeck (collapsed by default, expanded during search)
-            Section {
-                if isParkdeckExpanded || !searchText.isEmpty {
-                    ForEach(parkdeckTasks) { item in
+            // Geparkt (manuell, immer offen)
+            if !geparktTasks.isEmpty {
+                Section {
+                    ForEach(geparktTasks) { item in
                         backlogRowWithSwipe(item)
                             .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                                 Button {
@@ -1235,20 +1214,13 @@ struct BacklogView: View {
                                 .tint(.blue)
                             }
                     }
-                }
-            } header: {
-                Button {
-                    withAnimation(.smooth) { isParkdeckExpanded.toggle() }
-                } label: {
+                } header: {
                     HStack {
-                        Image(systemName: (isParkdeckExpanded || !searchText.isEmpty) ? "chevron.down" : "chevron.right")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                        Text("Parkdeck")
+                        Text("Geparkt")
                             .font(.headline)
                             .foregroundStyle(.secondary)
                         Spacer()
-                        Text("\(parkdeckTasks.count)")
+                        Text("\(geparktTasks.count)")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                             .padding(.horizontal, 6)
@@ -1256,9 +1228,8 @@ struct BacklogView: View {
                             .background(Color.secondary.opacity(0.15))
                             .clipShape(Capsule())
                     }
+                    .accessibilityIdentifier("geparktSection")
                 }
-                .accessibilityIdentifier("parkdeckSection")
-                .buttonStyle(.plain)
             }
         }
         .listStyle(.plain)
@@ -1269,6 +1240,40 @@ struct BacklogView: View {
         }
         .refreshable {
             await loadTasks()
+        }
+    }
+
+    // MARK: - Tier Section Helper (RW 2.4b)
+    @ViewBuilder
+    private func tierSection(title: String, tasks: [PlanItem], color: Color) -> some View {
+        if !tasks.isEmpty {
+            Section {
+                ForEach(tasks) { item in
+                    backlogRowWithSwipe(item)
+                        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                            Button {
+                                parkTask(item)
+                            } label: {
+                                Label("Parken", systemImage: "car.fill")
+                            }
+                            .tint(.gray)
+                        }
+                }
+            } header: {
+                HStack {
+                    Text(title)
+                        .font(.headline)
+                        .foregroundStyle(color)
+                    Spacer()
+                    Text("\(tasks.count)")
+                        .font(.caption)
+                        .foregroundStyle(color)
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 2)
+                        .background(color.opacity(0.2))
+                        .clipShape(Capsule())
+                }
+            }
         }
     }
 
@@ -1386,7 +1391,7 @@ struct BacklogView: View {
                     Button {
                         updateNextUp(for: item, isNextUp: true)
                     } label: {
-                        Label("Next Up", systemImage: "arrow.up.circle.fill")
+                        Label("Heute", systemImage: "calendar.circle.fill")
                     }
                     .tint(.green)
                 }

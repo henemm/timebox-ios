@@ -76,9 +76,9 @@ struct MacBacklogRow: View {
                     .font(.system(size: 14))
             }
 
-            // Next Up Indicator
+            // Heute Indicator
             if task.isNextUp {
-                Image(systemName: "arrow.up.circle.fill")
+                Image(systemName: "calendar.circle.fill")
                     .foregroundStyle(.blue)
                     .font(.system(size: 14))
             }

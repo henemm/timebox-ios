@@ -214,7 +214,7 @@ struct MacPlanningView: View {
         VStack(alignment: .leading, spacing: 0) {
             // Header
             HStack {
-                Label("Next Up", systemImage: "arrow.up.circle.fill")
+                Label("Heute", systemImage: "calendar.circle.fill")
                     .font(.headline)
                 Spacer()
                 Text("\(nextUpTasks.count)")
@@ -233,7 +233,7 @@ struct MacPlanningView: View {
                 ContentUnavailableView(
                     "Keine Tasks",
                     systemImage: "tray",
-                    description: Text("Füge Tasks zu Next Up hinzu, um sie hier zu planen.")
+                    description: Text("Füge Tasks zu Heute hinzu, um sie hier zu planen.")
                 )
             } else {
                 List {

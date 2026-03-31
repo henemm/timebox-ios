@@ -230,7 +230,7 @@ struct TaskInspector: View {
                         }
                         .disabled(task.blockerTaskID != nil)
 
-                        statusChip("Next Up", "arrow.up.circle.fill", task.isNextUp, .blue) {
+                        statusChip("Heute", "calendar.circle.fill", task.isNextUp, .blue) {
                             task.isNextUp.toggle()
                             try? modelContext.save()
                         }
