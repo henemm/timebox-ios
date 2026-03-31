@@ -178,6 +178,27 @@ def _locked_sessions(timeout: float = 5.0):
         os.close(lock_fd)
 
 
+def _prune_orphaned_sessions() -> None:
+    """Remove session entries whose workflow JSON no longer exists.
+
+    A session is orphaned when its workflow was archived/deleted but
+    the session mapping remained (e.g. due to a crash).
+    """
+    sf = _sessions_file()
+    if not sf.exists():
+        return
+    sessions = _read_sessions()
+    if not sessions:
+        return
+    orphaned = [sid for sid, wname in sessions.items()
+                if not _workflow_file(wname).exists()]
+    if not orphaned:
+        return
+    with _locked_sessions() as live:
+        for sid in orphaned:
+            live.pop(sid, None)
+
+
 def _read_active() -> tuple[dict, str]:
     """Read the active workflow for the current session. Returns (data, name).
 
@@ -476,6 +497,8 @@ def cmd_list(args: list[str]) -> None:
     if not wf_dir.exists():
         print("No workflows.")
         return
+    # Prune orphaned sessions before listing
+    _prune_orphaned_sessions()
     # Get session-based active workflow
     session_id = _get_session_id()
     sessions = _read_sessions()

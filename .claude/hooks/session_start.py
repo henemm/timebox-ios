@@ -29,6 +29,13 @@ def main():
     with open(env_file, "a") as f:
         f.write(f'export CLAUDE_SESSION_ID="{session_id}"\n')
 
+    # Prune orphaned session entries (crash cleanup)
+    try:
+        from workflow import _prune_orphaned_sessions
+        _prune_orphaned_sessions()
+    except Exception:
+        pass  # Never block session start
+
 
 if __name__ == "__main__":
     main()
