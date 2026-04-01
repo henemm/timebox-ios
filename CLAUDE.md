@@ -105,6 +105,8 @@ proj.save()
 "
 ```
 
+**WARNUNG (Bug #182):** `python-pbxproj` erzeugt Quoted IDs (`"XXXX"`) statt Hex-IDs. Das kann zu Duplicate-Warnings führen wenn Xcode dieselben Dateien mit Hex-IDs referenziert. Nach jedem `add_file()`-Aufruf: `./scripts/sim.sh build` ausführen und auf "Skipping duplicate build file"-Warnings prüfen!
+
 Target-Namen: `FocusBlox` (iOS App), `FocusBloxTests` (Unit Tests), `FocusBloxUITests` (UI Tests), `FocusBloxMac` (macOS App)
 
 ## Specs & Documentation

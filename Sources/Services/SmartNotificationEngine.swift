@@ -41,7 +41,7 @@ enum SmartNotificationEngine {
     static let budgetTimers: Int = 4
     static let budgetTasks: Int  = 20
     static let budgetReview: Int = 14
-    static let budgetNudges: Int = 10
+    static var budgetNudges: Int { AppSettings.shared.nudgeDailyBudget * 7 }
 
     // MARK: - Cached AI Content (set during reconcile, used by buildReviewRequests)
 
@@ -316,6 +316,7 @@ enum SmartNotificationEngine {
     // MARK: - Prio 3: Review / Morning Requests
 
     static func buildReviewRequests(now: Date = Date()) -> [UNNotificationRequest] {
+        let settings = AppSettings.shared
         let cal = Calendar.current
         let today = cal.startOfDay(for: now)
         var requests: [UNNotificationRequest] = []
@@ -324,8 +325,7 @@ enum SmartNotificationEngine {
             guard let day = cal.date(byAdding: .day, value: dayOffset, to: today) else { continue }
             let dateStr = dateString(from: day)
 
-            // Evening Review — 20:00
-            if let eveningDate = cal.date(bySettingHour: 20, minute: 0, second: 0, of: day),
+            if let eveningDate = cal.date(bySettingHour: settings.eveningReflectionHour, minute: settings.eveningReflectionMinute, second: 0, of: day),
                eveningDate > now {
                 let ec = cachedEveningContent
                 let content = UNMutableNotificationContent()
@@ -344,8 +344,7 @@ enum SmartNotificationEngine {
                 ))
             }
 
-            // Morning — 08:00
-            if let morningDate = cal.date(bySettingHour: 8, minute: 0, second: 0, of: day),
+            if let morningDate = cal.date(bySettingHour: settings.morningReminderHour, minute: settings.morningReminderMinute, second: 0, of: day),
                morningDate > now {
                 let mc = cachedMorningContent
                 let content = UNMutableNotificationContent()
@@ -372,25 +371,29 @@ enum SmartNotificationEngine {
 
     // MARK: - Prio 4: Nudge Requests
 
-    static func buildNudgeRequests(now: Date = Date()) -> [UNNotificationRequest] {
-        let cal = Calendar.current
-        let today = cal.startOfDay(for: now)
+    static func buildNudgeRequests(now: Date = Date(), completedTodayCount: Int = 0) -> [UNNotificationRequest] {
+        let settings = AppSettings.shared
+        let budget = max(1, min(3, settings.nudgeDailyBudget))
+        let windowStart = settings.morningReminderHour + 1  // Nudges starten 1h nach Morgengruß
+        let windowEnd = settings.eveningReflectionHour      // Nudges enden bei Abend-Reflexion
 
-        // Feste Arbeitszeit-Slots: 9, 11, 13, 15, 17, 19 Uhr
-        let nudgeHours = [9, 11, 13, 15, 17, 19]
+        if settings.nudgeSilenceOnSuccess && completedTodayCount >= budget {
+            return []
+        }
+        guard windowStart < windowEnd else { return [] }
 
+        let slotHours = distributeSlots(count: budget, startHour: windowStart, endHour: windowEnd)
         let nudgeTexts: [(title: String, body: String)] = [
             ("Wie läuft dein Tag?", "Schau mal in dein Backlog — vielleicht ist ein Quick Win dabei."),
             ("Zeit für den nächsten Sprint?", "Ein kurzer Focus Block kann viel bewegen."),
             ("Dein Backlog wartet", "Welchen Task könntest du jetzt angehen?"),
-            ("Kurze Pause vorbei?", "Der nächste kleine Schritt wartet auf dich."),
-            ("Halbzeit!", "Guter Zeitpunkt für einen Focus Sprint."),
-            ("Endspurt!", "Noch ein Task vor Feierabend?"),
         ]
 
+        let cal = Calendar.current
+        let today = cal.startOfDay(for: now)
         var requests: [UNNotificationRequest] = []
 
-        for (index, hour) in nudgeHours.enumerated() {
+        for (index, hour) in slotHours.enumerated() {
             guard let fireDate = cal.date(bySettingHour: hour, minute: 0, second: 0, of: today),
                   fireDate > now else { continue }
 
@@ -410,8 +413,15 @@ enum SmartNotificationEngine {
                 trigger: trigger
             ))
         }
-
         return Array(requests.prefix(budgetNudges))
+    }
+
+    private static func distributeSlots(count: Int, startHour: Int, endHour: Int) -> [Int] {
+        guard count > 0, startHour < endHour else { return [] }
+        let span = endHour - startHour
+        if count == 1 { return [startHour + span / 2] }
+        let step = Double(span) / Double(count)
+        return (0..<count).map { i in startHour + Int(Double(i) * step + step / 2) }
     }
 
     // MARK: - Precompute AI Content

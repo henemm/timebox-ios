@@ -30,7 +30,7 @@ struct EmotionalNudgeService {
         let settings = AppSettings.shared
         resetIfNewDay()
 
-        guard settings.nudgeDailyCount < 3 else { return false }
+        guard settings.nudgeDailyCount < settings.nudgeDailyBudget else { return false }
 
         let alreadyNudged = settings.nudgeTaskIDs
             .split(separator: ",")

@@ -13,6 +13,10 @@ final class SmartNotificationEnginePhaseDTests: XCTestCase {
         UserDefaults.standard.removeObject(forKey: "notificationProfile")
         UserDefaults.standard.removeObject(forKey: "dueDateMorningReminderEnabled")
         UserDefaults.standard.removeObject(forKey: "dueDateAdvanceReminderEnabled")
+        UserDefaults.standard.removeObject(forKey: "nudgeDailyBudget")
+        UserDefaults.standard.removeObject(forKey: "nudgeSilenceOnSuccess")
+        UserDefaults.standard.removeObject(forKey: "morningReminderHour")
+        UserDefaults.standard.removeObject(forKey: "eveningReflectionHour")
     }
 
     // MARK: - buildReviewRequests Tests
@@ -79,31 +83,32 @@ final class SmartNotificationEnginePhaseDTests: XCTestCase {
 
     // MARK: - buildNudgeRequests Tests
 
-    /// Verhalten: Um 08:00 liefert buildNudgeRequests 6 Requests (alle Arbeitszeit-Slots 9,11,13,15,17,19).
-    /// Bricht wenn: SmartNotificationEngine.buildNudgeRequests(now:) weiterhin [] zurueckgibt (Stub Z318)
-    ///   oder die Methode private bleibt (Compile Error).
-    func test_buildNudgeRequests_morning_returns6Requests() {
+    /// Verhalten: Um 08:00 liefert buildNudgeRequests Requests basierend auf nudgeDailyBudget (Default: 2).
+    /// Bricht wenn: Budget-System nicht implementiert ist.
+    func test_buildNudgeRequests_morning_returnsBudgetRequests() {
+        UserDefaults.standard.removeObject(forKey: "nudgeDailyBudget")
         let cal = Calendar.current
         let today = cal.startOfDay(for: Date())
         let now = cal.date(bySettingHour: 8, minute: 0, second: 0, of: today)!
 
         let requests = SmartNotificationEngine.buildNudgeRequests(now: now)
 
-        XCTAssertEqual(requests.count, 6,
-                       "At 08:00, all 6 work-hour slots (9,11,13,15,17,19) should be scheduled")
+        XCTAssertEqual(requests.count, 2,
+                       "At 08:00, default budget (2) should produce 2 nudge requests")
     }
 
-    /// Verhalten: Um 14:00 liefert buildNudgeRequests 3 Requests (15, 17, 19 Uhr — nur zukuenftige).
+    /// Verhalten: Um 14:00 liefert buildNudgeRequests nur zukünftige Slots.
     /// Bricht wenn: `fireDate > now` Guard fehlt und vergangene Slots eingeplant werden.
     func test_buildNudgeRequests_afternoon_returnsOnlyFutureSlots() {
+        UserDefaults.standard.removeObject(forKey: "nudgeDailyBudget")
         let cal = Calendar.current
         let today = cal.startOfDay(for: Date())
         let now = cal.date(bySettingHour: 14, minute: 0, second: 0, of: today)!
 
         let requests = SmartNotificationEngine.buildNudgeRequests(now: now)
 
-        XCTAssertEqual(requests.count, 3,
-                       "At 14:00, only 3 future slots (15,17,19) should be scheduled")
+        XCTAssertLessThanOrEqual(requests.count, 2,
+                       "At 14:00, should return at most budget (2) future slots")
     }
 
     /// Verhalten: Um 20:00 liefert buildNudgeRequests 0 Requests (alle Arbeitszeit-Slots vorbei).

@@ -19,6 +19,12 @@ struct SettingsView: View {
     @AppStorage("dueDateAdvanceReminderEnabled") private var dueDateAdvanceReminderEnabled: Bool = false
     @AppStorage("dueDateAdvanceReminderMinutes") private var dueDateAdvanceReminderMinutes: Int = 60
     @AppStorage("notificationProfile") private var notificationProfileRaw: String = "balanced"
+    @AppStorage("nudgeDailyBudget") private var nudgeDailyBudget: Int = 2
+    @AppStorage("nudgeSilenceOnSuccess") private var nudgeSilenceOnSuccess: Bool = true
+    @AppStorage("morningReminderHour") private var morningReminderHour: Int = 8
+    @AppStorage("morningReminderMinute") private var morningReminderMinute: Int = 0
+    @AppStorage("eveningReflectionHour") private var eveningReflectionHour: Int = 20
+    @AppStorage("eveningReflectionMinute") private var eveningReflectionMinute: Int = 0
     @Environment(\.eventKitRepository) private var eventKitRepo
     @Environment(\.modelContext) private var modelContext
     @State private var isEnriching = false
@@ -47,7 +53,33 @@ struct SettingsView: View {
                 } header: {
                     Text("Profil")
                 } footer: {
-                    Text("Leise — Nur Focus-Block-Timer (5 Min vorher + Ende).\nAusgeglichen — Timer + Frist-Erinnerungen + Morgengruß (08:00) + Abend-Review (20:00).\nAktiv — Alles + Motivations-Nachrichten alle 2 Stunden (9–19 Uhr).")
+                    Text("Leise — Nur Focus-Block-Timer (5 Min vorher + Ende).\nAusgeglichen — Timer + Frist-Erinnerungen + Dein Tag + Abend-Reflexion.\nAktiv — Alles + konfigurierbare Tages-Nudges.")
+                }
+
+                if notificationProfileRaw == "active" {
+                    Section {
+                        Stepper("Max. Nudges: \(nudgeDailyBudget)", value: $nudgeDailyBudget, in: 1...3)
+                            .accessibilityIdentifier("nudgeBudgetStepper")
+                        Toggle("Stille bei Erfolg", isOn: $nudgeSilenceOnSuccess)
+                            .accessibilityIdentifier("silenceOnSuccessToggle")
+                    } header: {
+                        Text("Tages-Nudges")
+                    } footer: {
+                        Text("Motivations-Nachrichten im konfigurierten Zeitfenster. Bei 'Stille bei Erfolg' stoppen sie, sobald genug Tasks erledigt sind.")
+                    }
+                }
+
+                if notificationProfileRaw != "quiet" {
+                    Section {
+                        DatePicker("Dein Tag", selection: morningReminderTimeBinding, displayedComponents: .hourAndMinute)
+                            .accessibilityIdentifier("morningReminderTimePicker")
+                        DatePicker("Abend-Reflexion", selection: eveningReflectionTimeBinding, displayedComponents: .hourAndMinute)
+                            .accessibilityIdentifier("eveningReflectionTimePicker")
+                    } header: {
+                        Text("Erinnerungszeiten")
+                    } footer: {
+                        Text("Uhrzeiten für den täglichen Dein Tag und die Abend-Reflexion.")
+                    }
                 }
 
                 // Section 0: Sound Settings
@@ -330,6 +362,38 @@ struct SettingsView: View {
         }
     }
 
+
+    private var morningReminderTimeBinding: Binding<Date> {
+        Binding(
+            get: {
+                var comps = DateComponents()
+                comps.hour = morningReminderHour
+                comps.minute = morningReminderMinute
+                return Calendar.current.date(from: comps) ?? Date()
+            },
+            set: { newDate in
+                let comps = Calendar.current.dateComponents([.hour, .minute], from: newDate)
+                morningReminderHour = comps.hour ?? 8
+                morningReminderMinute = comps.minute ?? 0
+            }
+        )
+    }
+
+    private var eveningReflectionTimeBinding: Binding<Date> {
+        Binding(
+            get: {
+                var comps = DateComponents()
+                comps.hour = eveningReflectionHour
+                comps.minute = eveningReflectionMinute
+                return Calendar.current.date(from: comps) ?? Date()
+            },
+            set: { newDate in
+                let comps = Calendar.current.dateComponents([.hour, .minute], from: newDate)
+                eveningReflectionHour = comps.hour ?? 20
+                eveningReflectionMinute = comps.minute ?? 0
+            }
+        )
+    }
 
     private var morningTimeBinding: Binding<Date> {
         Binding(

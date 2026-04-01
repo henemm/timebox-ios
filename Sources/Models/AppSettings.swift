@@ -86,8 +86,6 @@ final class AppSettings: ObservableObject {
     // MARK: - Smart Nudge Settings
 
     @AppStorage("nudgeDailyBudget") var nudgeDailyBudget: Int = 2
-    @AppStorage("nudgeWindowStartHour") var nudgeWindowStartHour: Int = 10
-    @AppStorage("nudgeWindowEndHour") var nudgeWindowEndHour: Int = 18
     @AppStorage("morningReminderHour") var morningReminderHour: Int = 8
     @AppStorage("morningReminderMinute") var morningReminderMinute: Int = 0
     @AppStorage("eveningReflectionHour") var eveningReflectionHour: Int = 20
