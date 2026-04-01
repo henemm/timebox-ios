@@ -27,6 +27,9 @@ import re
 import sys
 from pathlib import Path
 
+# Session ID extracted from stdin JSON (set during main())
+_STDIN_SESSION_ID = ""
+
 # --- Configuration ---
 
 CODE_EXTENSIONS = {
@@ -113,7 +116,7 @@ def _read_active_workflow() -> dict | None:
     wf_dir = _project_root() / ".claude" / "workflows"
 
     # Try session mapping first
-    session_id = os.environ.get("CLAUDE_SESSION_ID", "")
+    session_id = os.environ.get("CLAUDE_SESSION_ID", "") or _STDIN_SESSION_ID
     if session_id:
         sessions_file = wf_dir / ".sessions.json"
         if sessions_file.exists():
@@ -220,11 +223,13 @@ def _is_source_file(file_path: str) -> bool:
 # --- Main ---
 
 def main():
+    global _STDIN_SESSION_ID
     tool_input = os.environ.get("CLAUDE_TOOL_INPUT", "")
     if not tool_input:
         try:
             data = json.load(sys.stdin)
             tool_input = json.dumps(data.get("tool_input", {}))
+            _STDIN_SESSION_ID = data.get("session_id", "")
         except (json.JSONDecodeError, Exception):
             sys.exit(0)
     try:

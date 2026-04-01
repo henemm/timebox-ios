@@ -17,6 +17,9 @@ import subprocess
 import sys
 from pathlib import Path
 
+# Session ID extracted from stdin JSON (set during main())
+_STDIN_SESSION_ID = ""
+
 
 def _project_root() -> Path:
     cwd = Path.cwd()
@@ -100,6 +103,7 @@ def _analyze_test_output(command: str, output: str) -> None:
 
 
 def main():
+    global _STDIN_SESSION_ID
     tool_input = os.environ.get("CLAUDE_TOOL_INPUT", "")
     tool_response = ""
 
@@ -107,6 +111,7 @@ def main():
         try:
             raw_input = json.load(sys.stdin)
             tool_input = json.dumps(raw_input.get("tool_input", {}))
+            _STDIN_SESSION_ID = raw_input.get("session_id", "")
             resp = raw_input.get("tool_response", "")
             tool_response = resp if isinstance(resp, str) else json.dumps(resp)
         except (json.JSONDecodeError, Exception):
@@ -127,7 +132,7 @@ def main():
         if lock_path.exists():
             try:
                 lock = json.loads(lock_path.read_text())
-                session_id = os.environ.get("CLAUDE_SESSION_ID", "")
+                session_id = os.environ.get("CLAUDE_SESSION_ID", "") or _STDIN_SESSION_ID
                 my_id = f"session:{session_id}" if session_id else f"ppid:{os.getppid()}"
                 holder_id = lock.get("holder_id", "")
                 if not holder_id and "ppid" in lock:

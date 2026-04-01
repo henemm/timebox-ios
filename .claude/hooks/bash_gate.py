@@ -24,6 +24,9 @@ import time
 from datetime import datetime
 from pathlib import Path
 
+# Session ID extracted from stdin JSON (set during _get_command())
+_STDIN_SESSION_ID = ""
+
 # --- Configuration ---
 
 SENSITIVE_PATTERNS = [
@@ -109,11 +112,13 @@ def _is_stop_locked() -> bool:
 
 
 def _get_command() -> str:
+    global _STDIN_SESSION_ID
     tool_input = os.environ.get("CLAUDE_TOOL_INPUT", "")
     if not tool_input:
         try:
             data = json.load(sys.stdin)
             tool_input = json.dumps(data.get("tool_input", {}))
+            _STDIN_SESSION_ID = data.get("session_id", "")
         except (json.JSONDecodeError, Exception):
             return ""
     try:
@@ -173,8 +178,8 @@ def _is_xcodebuild(command: str) -> bool:
 
 
 def _get_session_id() -> str:
-    """Get session identifier. Prefers CLAUDE_SESSION_ID, falls back to PPID."""
-    sid = os.environ.get("CLAUDE_SESSION_ID", "")
+    """Get session identifier. Prefers env var, then stdin, falls back to PPID."""
+    sid = os.environ.get("CLAUDE_SESSION_ID", "") or _STDIN_SESSION_ID
     if sid:
         return f"session:{sid}"
     return f"ppid:{os.getppid()}"

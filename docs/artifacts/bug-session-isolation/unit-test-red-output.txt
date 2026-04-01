@@ -1,0 +1,41 @@
+FFFFF..F
+======================================================================
+FAIL: test_get_session_id_uses_stdin_fallback (__main__.TestBashGateSessionId.test_get_session_id_uses_stdin_fallback)
+_get_session_id() should use stdin session_id when env var is empty.
+----------------------------------------------------------------------
+AssertionError: bash_gate._STDIN_SESSION_ID does not exist
+
+======================================================================
+FAIL: test_session_id_extracted_from_stdin (__main__.TestBashGateSessionId.test_session_id_extracted_from_stdin)
+session_id from stdin JSON should be available to _get_session_id().
+----------------------------------------------------------------------
+AssertionError: False is not true : bash_gate must have _STDIN_SESSION_ID module variable
+
+======================================================================
+FAIL: test_session_id_extracted_from_stdin (__main__.TestEditGateSessionId.test_session_id_extracted_from_stdin)
+session_id from stdin JSON should be available in edit_gate.
+----------------------------------------------------------------------
+AssertionError: False is not true : edit_gate must have _STDIN_SESSION_ID module variable
+
+======================================================================
+FAIL: test_session_id_extracted_from_stdin (__main__.TestPostBashSessionId.test_session_id_extracted_from_stdin)
+session_id from stdin JSON should be available in post_bash.
+----------------------------------------------------------------------
+AssertionError: False is not true : post_bash must have _STDIN_SESSION_ID module variable
+
+======================================================================
+FAIL: test_set_active_skips_symlink_when_session_id_present (__main__.TestSetActiveSymlinkBehavior.test_set_active_skips_symlink_when_session_id_present)
+_set_active() must NOT create .active symlink when session_id is set.
+----------------------------------------------------------------------
+AssertionError: True is not false : .active symlink must NOT be created when session_id is present
+
+======================================================================
+FAIL: test_session_start_hook_registered (__main__.TestSettingsJsonHasSessionStart.test_session_start_hook_registered)
+settings.json must include a SessionStart hook entry.
+----------------------------------------------------------------------
+AssertionError: 'SessionStart' not found in hooks : settings.json must have a SessionStart hook entry
+
+----------------------------------------------------------------------
+Ran 8 tests in 0.006s
+
+FAILED (failures=6)
