@@ -76,12 +76,14 @@ final class LocalTaskSource: @preconcurrency TaskSource, @preconcurrency TaskSou
         guard let task = try findTask(byID: taskID) else { return }
         task.isCompleted = true
         try modelContext.save()
+        TaskLifecycleLogger.shared.logCompleted(taskID: task.uuid, title: task.title)
     }
 
     func markIncomplete(taskID: String) async throws {
         guard let task = try findTask(byID: taskID) else { return }
         task.isCompleted = false
         try modelContext.save()
+        TaskLifecycleLogger.shared.logUncompleted(taskID: task.uuid, title: task.title)
     }
 
     // MARK: - TaskSourceWritable
@@ -135,8 +137,26 @@ final class LocalTaskSource: @preconcurrency TaskSource, @preconcurrency TaskSou
         // AI enrichment: fill REMAINING missing attributes (importance, urgency, taskType, energyLevel)
         // Deterministic values from keywords take precedence — AI only fills nil/empty fields
         let enrichment = SmartTaskEnrichmentService(modelContext: modelContext)
+        let preImportance = task.importance
+        let preUrgency = task.urgency
+        let preTaskType = task.taskType
         await enrichment.enrichTask(task)
         task.confirmSuggestions()
+
+        // Log enrichment changes
+        var enrichChanges: [FieldChange] = []
+        if task.importance != preImportance {
+            enrichChanges.append(FieldChange(field: "importance", oldValue: preImportance.map(String.init) ?? "nil", newValue: task.importance.map(String.init) ?? "nil"))
+        }
+        if task.urgency != preUrgency {
+            enrichChanges.append(FieldChange(field: "urgency", oldValue: preUrgency ?? "nil", newValue: task.urgency ?? "nil"))
+        }
+        if task.taskType != preTaskType {
+            enrichChanges.append(FieldChange(field: "taskType", oldValue: preTaskType, newValue: task.taskType))
+        }
+        if !enrichChanges.isEmpty {
+            TaskLifecycleLogger.shared.logEnriched(taskID: task.uuid, changes: enrichChanges)
+        }
 
         // Title improvement: deterministic cleanup + AI suggestions for category/duration
         task.needsTitleImprovement = true
@@ -152,6 +172,7 @@ final class LocalTaskSource: @preconcurrency TaskSource, @preconcurrency TaskSou
 
         // Notify observers (e.g. BacklogView) that a task was created
         NotificationCenter.default.post(name: Self.taskCreatedNotification, object: nil)
+        TaskLifecycleLogger.shared.logCreated(taskID: task.uuid, title: task.title)
 
         return task
     }
@@ -172,7 +193,9 @@ final class LocalTaskSource: @preconcurrency TaskSource, @preconcurrency TaskSou
     ) async throws {
         guard let task = try findTask(byID: taskID) else { return }
 
+        var changes: [FieldChange] = []
         if let title = title {
+            changes.append(FieldChange(field: "title", oldValue: task.title, newValue: title))
             task.title = title
         }
         if let tags = tags {
@@ -182,15 +205,21 @@ final class LocalTaskSource: @preconcurrency TaskSource, @preconcurrency TaskSou
             task.dueDate = dueDate
         }
         if let importance = importance {
+            let old = task.importance.map(String.init) ?? "nil"
+            changes.append(FieldChange(field: "importance", oldValue: old, newValue: String(importance)))
             task.importance = importance
         }
         if let estimatedDuration = estimatedDuration {
+            let old = task.estimatedDuration.map(String.init) ?? "nil"
+            changes.append(FieldChange(field: "estimatedDuration", oldValue: old, newValue: String(estimatedDuration)))
             task.estimatedDuration = estimatedDuration
         }
         if let urgency = urgency {
+            changes.append(FieldChange(field: "urgency", oldValue: task.urgency ?? "nil", newValue: urgency))
             task.urgency = urgency
         }
         if let taskType = taskType {
+            changes.append(FieldChange(field: "taskType", oldValue: task.taskType, newValue: taskType))
             task.taskType = taskType
         }
         if let recurrencePattern = recurrencePattern {
@@ -207,12 +236,16 @@ final class LocalTaskSource: @preconcurrency TaskSource, @preconcurrency TaskSou
         }
 
         try modelContext.save()
+        TaskLifecycleLogger.shared.logUpdated(taskID: task.uuid, changes: changes)
     }
 
     func deleteTask(taskID: String) async throws {
         guard let task = try findTask(byID: taskID) else { return }
+        let uuid = task.uuid
+        let title = task.title
         modelContext.delete(task)
         try modelContext.save()
+        TaskLifecycleLogger.shared.logDeleted(taskID: uuid, title: title)
     }
 
     // MARK: - Tag Suggestions

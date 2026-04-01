@@ -29,6 +29,9 @@ struct SettingsView: View {
     @State private var writableCalendars: [EKCalendar] = []
     @State private var allReminderLists: [ReminderListInfo] = []
     @AppStorage("siriTipCompleteTaskVisible") private var showCompleteTaskTip = true
+    @AppStorage("taskDebugModeEnabled") private var taskDebugModeEnabled: Bool = false
+    @State private var showLifecycleLogSheet = false
+    @State private var showClearLogConfirmation = false
 
     var body: some View {
         NavigationStack {
@@ -233,6 +236,37 @@ struct SettingsView: View {
                     Text("Info")
                 }
 
+                // Section: Developer Tools (below Info)
+                Section {
+                    Toggle("Task Debug Mode", isOn: $taskDebugModeEnabled)
+                        .accessibilityIdentifier("taskDebugModeToggle")
+
+                    if taskDebugModeEnabled {
+                        Button {
+                            showLifecycleLogSheet = true
+                        } label: {
+                            Text("Lifecycle Log anzeigen")
+                        }
+                        .accessibilityIdentifier("showLifecycleLogButton")
+
+                        Button(role: .destructive) {
+                            showClearLogConfirmation = true
+                        } label: {
+                            Text("Log löschen")
+                        }
+                        .accessibilityIdentifier("clearLifecycleLogButton")
+                        .confirmationDialog("Lifecycle Log löschen?", isPresented: $showClearLogConfirmation) {
+                            Button("Löschen", role: .destructive) {
+                                TaskLifecycleLogger.shared.clearLog()
+                            }
+                        }
+                    }
+                } header: {
+                    Text("Entwickler")
+                } footer: {
+                    Text("Zeichnet alle Task-Änderungen (Erstellen, Bearbeiten, Löschen) in eine Log-Datei auf.")
+                }
+
                 // Section 4: Visible Reminder Lists (only shown when sync enabled)
                 if remindersSyncEnabled && !allReminderLists.isEmpty {
                     Section {
@@ -269,6 +303,29 @@ struct SettingsView: View {
             }
             .onAppear {
                 loadCalendars()
+            }
+            .sheet(isPresented: $showLifecycleLogSheet) {
+                NavigationStack {
+                    ScrollView {
+                        let logContent = TaskLifecycleLogger.shared.getLog()
+                        Text(logContent.isEmpty ? "Noch keine Einträge." : logContent)
+                            .font(.system(.footnote, design: .monospaced))
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding()
+                            .accessibilityIdentifier("lifecycleLogContent")
+                    }
+                    .navigationTitle("Lifecycle Log")
+                    .toolbar {
+                        ToolbarItem(placement: .cancellationAction) {
+                            Button("Schließen") {
+                                showLifecycleLogSheet = false
+                            }
+                        }
+                        ToolbarItem(placement: .primaryAction) {
+                            ShareLink(item: TaskLifecycleLogger.shared.getLog())
+                        }
+                    }
+                }
             }
         }
     }

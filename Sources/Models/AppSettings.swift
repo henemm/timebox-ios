@@ -83,6 +83,17 @@ final class AppSettings: ObservableObject {
     /// ISO-8601 date of the cached story (e.g. "2026-03-26")
     @AppStorage("cachedSuccessStoryDate") var cachedSuccessStoryDate: String = ""
 
+    // MARK: - Smart Nudge Settings
+
+    @AppStorage("nudgeDailyBudget") var nudgeDailyBudget: Int = 2
+    @AppStorage("nudgeWindowStartHour") var nudgeWindowStartHour: Int = 10
+    @AppStorage("nudgeWindowEndHour") var nudgeWindowEndHour: Int = 18
+    @AppStorage("morningReminderHour") var morningReminderHour: Int = 8
+    @AppStorage("morningReminderMinute") var morningReminderMinute: Int = 0
+    @AppStorage("eveningReflectionHour") var eveningReflectionHour: Int = 20
+    @AppStorage("eveningReflectionMinute") var eveningReflectionMinute: Int = 0
+    @AppStorage("nudgeSilenceOnSuccess") var nudgeSilenceOnSuccess: Bool = true
+
     // MARK: - Notification Profile
 
     @AppStorage("notificationProfile") var notificationProfileRaw: String =
