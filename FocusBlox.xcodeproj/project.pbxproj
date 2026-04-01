@@ -555,6 +555,7 @@
 		B9D12D9BF22325ADDE757862 /* CalendarEventTransfer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D1F03B35977548B59D7269F /* CalendarEventTransfer.swift */; };
 		BB954BD08FCFE12011F840F7 /* SmartNudgeUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 794C4A58984978830678A1AD /* SmartNudgeUITests.swift */; };
 		BB98D59A1AE55221C769098C /* UnifiedCalendarViewUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA3FAC0479FF87E70224A37A /* UnifiedCalendarViewUITests.swift */; };
+		03B86DB53FA9687DF2B2A37A /* MockEventKitRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 993E45CA1F0174CC0345C92C /* MockEventKitRepository.swift */; };
 		BC2B829A833F87522CFFB6BC /* MockEventKitRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 993E45CA1F0174CC0345C92C /* MockEventKitRepository.swift */; };
 		BDEDB5DE393186FC2D0BFF58 /* DurationEditingUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF402517A33C6BA497EFE1AC /* DurationEditingUITests.swift */; };
 		BF7EA53A03F4E19B23B48ADD /* WidgetRelevanceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 781B8F9B8D98DCC35B898300 /* WidgetRelevanceTests.swift */; };
@@ -580,6 +581,7 @@
 		DE5811F4F48BE79B9EB7C818 /* PlanningViewUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C40AFBB545C0FA15517B9CE4 /* PlanningViewUITests.swift */; };
 		E338397EBDBBEEA357D5A910 /* BlockerPickerSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8323E8E3E49804475266E66A /* BlockerPickerSheet.swift */; };
 		E388ADA5C322C89B3687240F /* FocusBlockTaskCountTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EABF765F6113A4B974211ACE /* FocusBlockTaskCountTests.swift */; };
+		71CA9259759B325E45F167E7 /* NotificationContentService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FD5432FA6383EDB9F44E1EF /* NotificationContentService.swift */; };
 		E52E4F05BE968DC8677C62F0 /* NotificationContentService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FD5432FA6383EDB9F44E1EF /* NotificationContentService.swift */; };
 		E5CC4D539B7E126ED5394887 /* MacBacklogHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29C44E2AB09C4FA9C1FE7F5A /* MacBacklogHelpers.swift */; };
 		E6DF69A28B0DB868B330DADD /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5F22CE94E29A523114817BF /* ContentView.swift */; };
@@ -594,6 +596,7 @@
 		EE490C26458482C3B76400EE /* GapFinder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84C370C5BEDCC25CA912E79F /* GapFinder.swift */; };
 		F030A10100BF0100BF010001 /* TaskLifecycleLoggerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F030A10100FF0100FF010001 /* TaskLifecycleLoggerTests.swift */; };
 		F030A10200BF0200BF020001 /* TaskDebugModeUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F030A10200FF0200FF020001 /* TaskDebugModeUITests.swift */; };
+		706FADDB184CFD6215AA33B6 /* TaskLifecycleLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = F030A10300FF0300FF030001 /* TaskLifecycleLogger.swift */; };
 		F030A10300BF0300BF030001 /* TaskLifecycleLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = F030A10300FF0300FF030001 /* TaskLifecycleLogger.swift */; };
 		F16A4D838934D07E38895FEE /* BehavioralProfileServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EFF4FDF9298A227383D4DE9 /* BehavioralProfileServiceTests.swift */; };
 		F4222F8AEAECD043130A4C6B /* MenuBarIconStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95142243688D96B229D2FA41 /* MenuBarIconStateTests.swift */; };
@@ -3185,6 +3188,9 @@
 				AA11BB22CC33DD44EE550100 /* EveningResetService.swift in Sources */,
 				MAC026CATPK01MACBLD,
 				MAC026DURPK01MACBLD,
+				03B86DB53FA9687DF2B2A37A /* MockEventKitRepository.swift in Sources */,
+				71CA9259759B325E45F167E7 /* NotificationContentService.swift in Sources */,
+				706FADDB184CFD6215AA33B6 /* TaskLifecycleLogger.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
