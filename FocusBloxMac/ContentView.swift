@@ -67,6 +67,7 @@ struct ContentView: View {
     @AppStorage("remindersMarkCompleteOnImport") private var remindersMarkCompleteOnImport: Bool = true
 
     // CloudKit sync monitor
+    @Environment(\.scenePhase) private var scenePhase
     @Environment(CloudKitSyncMonitor.self) private var cloudKitMonitor
     @Environment(DeferredSortController.self) private var deferredSort
     @Environment(DeferredCompletionController.self) private var deferredCompletion
@@ -232,6 +233,14 @@ struct ContentView: View {
                 let enrichment = SmartTaskEnrichmentService(modelContext: modelContext)
                 let enriched = await enrichment.enrichAllTbdTasks()
                 if enriched > 0 { refreshTasks() }
+            }
+        }
+        .onChange(of: scenePhase) { _, newPhase in
+            if newPhase == .active {
+                // Cross-Platform Sync: Refresh task list when returning from background.
+                // CloudKit may have imported changes while the app was inactive,
+                // but remoteChangeCount onChange may not have triggered a UI update.
+                refreshTasks()
             }
         }
         .toolbar(id: "mainNavigation") {

@@ -64,6 +64,45 @@ final class CloudKitSyncTests: XCTestCase {
         }
     }
 
+    /// Bug: Cross-Platform Sync — Completed tasks must disappear from active list after refresh.
+    /// Simulates: iOS marks task complete (remote change arrives in store),
+    /// then macOS calls refreshTasks() pattern (save + fetch) → completed task filtered out.
+    @MainActor
+    func testCompletedTaskDisappearsAfterRefresh() throws {
+        let container = try MacModelContainer.create()
+        let context = container.mainContext
+
+        // Setup: Create an active task
+        let testTitle = "Sync Refresh Test \(UUID().uuidString)"
+        let task = LocalTask(title: testTitle)
+        task.lifecycleStatus = "active"
+        context.insert(task)
+        try context.save()
+
+        // Verify task appears in active list
+        let activeBefore = try context.fetch(FetchDescriptor<LocalTask>())
+            .filter { !$0.isCompleted && $0.title == testTitle }
+        XCTAssertEqual(activeBefore.count, 1, "Task should be in active list before completion")
+
+        // Simulate remote completion (iOS marks task complete → CloudKit imports to store)
+        task.isCompleted = true
+        task.completedAt = Date()
+        try context.save()
+
+        // Simulate macOS refreshTasks() pattern: save() + fetch()
+        try context.save()
+        let allTasks = try context.fetch(FetchDescriptor<LocalTask>(
+            sortBy: [SortDescriptor(\LocalTask.createdAt, order: .reverse)]
+        ))
+        let activeAfter = allTasks.filter { !$0.isCompleted && $0.title == testTitle }
+
+        XCTAssertEqual(activeAfter.count, 0, "Completed task must not appear in active list after refresh")
+
+        // Cleanup
+        context.delete(task)
+        try context.save()
+    }
+
     /// Test: iCloud container ID matches expected value
     func testICloudContainerID() throws {
         // Read entitlements to verify iCloud container is configured
