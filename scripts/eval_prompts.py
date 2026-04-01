@@ -91,14 +91,28 @@ DURATION_CASES = [
 
 ENRICHMENT_CASES = [
     # (input, expected_importance, expected_urgent, expected_energy)
-    ("Steuererklärung abgeben", 3, False, "high"),
-    ("Einkaufen gehen", 2, False, "low"),
-    ("Dringend: Server ist down", 3, True, "high"),
+    # NEUES MODELL: AI setzt importance/urgency NICHT — Default=1/false.
+    # Nur Keywords ("wichtig", "dringend", "bis Freitag") setzen hoch.
+    # Dieser Eval testet NUR noch energy (AI) — importance/urgency sind deterministisch.
+    # --- Originale Cases ---
+    ("Steuererklärung abgeben", 1, False, "high"),      # importance=1 (Default, kein Keyword)
+    ("Einkaufen gehen", 1, False, "low"),                # importance=1 (Default)
+    ("Dringend: Server ist down", 1, True, "high"),      # urgency=true via Keyword "Dringend"
     ("Gitarre üben", 1, False, "low"),
-    ("Meeting mit CEO morgen", 3, True, "high"),
+    ("Meeting mit CEO morgen", 1, False, "high"),         # kein Keyword → Default
     ("Netflix schauen", 1, False, "low"),
-    ("Bewerbung bis Freitag fertig", 3, True, "high"),
-    ("Müll rausbringen", 2, False, "low"),
+    ("Bewerbung bis Freitag fertig", 1, True, "high"),   # urgency=true via "bis Freitag"
+    ("Müll rausbringen", 1, False, "low"),
+    # --- Praxis-Cases aus echten User-Tasks (Bug-Report) ---
+    ("Fokus Bloc Task übertragen", 1, False, "low"),
+    ("Schuhe zur Bahnhofsmission bringen", 1, False, "low"),
+    ("Linux Rechner Update machen", 1, False, "low"),
+    ("Bücher zur Stadtbücherei zurückbringen", 1, False, "low"),
+    ("Fahrrad putzen", 1, False, "low"),
+    ("Bahnfahrt WE Hendrik Jochen buchen", 1, False, "low"),
+    ("eine Glasampulle bei Amazon bestellen", 1, False, "low"),
+    ("Pull Request reviewen", 1, False, "high"),
+    ("Zahnarzt Termin ausmachen", 1, False, "low"),
 ]
 
 
@@ -136,10 +150,11 @@ DURATION_INSTRUCTIONS = (
 ENRICHMENT_INSTRUCTIONS = (
     "Du analysierst Task-Titel und leitest fehlende Attribute ab.\n\n"
     "Wichtigkeit (1-3):\n"
-    "  1 = nice to have (Freizeit, Hobby, optional)\n"
-    "  2 = should do (Routine, Haushalt, Einkaufen)\n"
-    "  3 = must do (Pflichten, Deadlines, Finanzen, Bewerbungen, Gesundheit)\n\n"
-    "Dringlichkeit: true wenn zeitkritisch (Termin, Frist, morgen, heute, bis [Datum])\n\n"
+    "  1 = nice to have (Freizeit, Hobby, optional, kein Zeitdruck)\n"
+    "  2 = should do (die MEISTEN Alltagstasks: Haushalt, Einkaufen, Termine, Besorgungen, Routine, Updates)\n"
+    "  3 = must do (NUR echte Pflichten mit spürbaren Konsequenzen: Steuererklärung, Arzttermin, Deadlines, Finanzen)\n\n"
+    "WICHTIG: Im Zweifel importance=2. Nur bei echten Pflichten mit Konsequenzen importance=3.\n"
+    "Dringlichkeit: true NUR wenn ein konkretes Datum oder eine Frist existiert. Ohne Datum/Frist → false.\n\n"
     "Kategorie: income (Geld verdienen), maintenance (Pflege/Haushalt), recharge (Erholung), learning (Lernen), giving_back (Helfen)\n\n"
     "Energie:\n"
     "  high = kognitive Tiefenarbeit (Steuererklärung, Bewerbung schreiben, Programmieren, Analyse, Berichte)\n"

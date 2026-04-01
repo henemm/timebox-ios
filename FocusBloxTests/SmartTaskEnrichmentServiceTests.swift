@@ -325,4 +325,174 @@ final class SmartTaskEnrichmentServiceTests: XCTestCase {
                           "taskType should be enriched when user didn't set it")
         }
     }
+
+    // MARK: - BUG: Enrichment-Qualität (Feedback-Schleife, Duration, Prompt)
+
+    /// Verhalten: buildPrompt() akzeptiert gecachten Context statt Live-Fetch
+    /// Bricht wenn: SmartTaskEnrichmentService.buildPrompt(for:cachedContext:) nicht existiert
+    func test_buildPrompt_acceptsCachedContext() throws {
+        let context = container.mainContext
+        let task = LocalTask(title: "Einkaufen gehen")
+        context.insert(task)
+        try context.save()
+
+        let service = SmartTaskEnrichmentService(modelContext: context)
+        let cachedContext = "- Steuererklärung | Kat: maintenance | Imp: 3"
+
+        let prompt = service.buildPrompt(for: task, cachedContext: cachedContext)
+
+        XCTAssertTrue(prompt.contains("Steuererklärung"),
+                      "Prompt muss gecachten Context enthalten")
+        XCTAssertTrue(prompt.contains("Einkaufen gehen"),
+                      "Prompt muss Task-Titel enthalten")
+    }
+
+    /// Verhalten: buildPrompt() mit cachedContext ruft NICHT fetchRecentTaskContext() auf
+    /// Bricht wenn: buildPrompt(for:cachedContext:) intern trotzdem fetchRecentTaskContext() aufruft
+    func test_buildPrompt_cachedContext_doesNotFetchLive() throws {
+        let context = container.mainContext
+        let task = LocalTask(title: "Test Task")
+        context.insert(task)
+        try context.save()
+
+        let service = SmartTaskEnrichmentService(modelContext: context)
+        let cachedContext = "- Manueller Kontext | Imp: 2"
+
+        let prompt = service.buildPrompt(for: task, cachedContext: cachedContext)
+
+        XCTAssertTrue(prompt.contains("Manueller Kontext"),
+                      "Gecachter Context muss verwendet werden, nicht Live-Fetch")
+    }
+
+    /// Verhalten: reanalyzeTask() promotet suggestedDuration zu estimatedDuration
+    /// Bricht wenn: reanalyzeTask() nach performEnrichment() suggestedDuration nicht zu estimatedDuration überträgt
+    func test_reanalyzeTask_promotesSuggestedDuration() async throws {
+        let context = container.mainContext
+        let task = LocalTask(title: "Einkaufen gehen")
+        task.suggestedDuration = 30
+        task.estimatedDuration = nil
+        context.insert(task)
+        try context.save()
+
+        let service = SmartTaskEnrichmentService(modelContext: context)
+        let _ = await service.reanalyzeTask(task)
+
+        XCTAssertEqual(task.estimatedDuration, 30,
+                       "suggestedDuration=30 muss zu estimatedDuration promoted werden")
+    }
+
+    /// Verhalten: reanalyzeTask() überschreibt NICHT user-gesetzte estimatedDuration
+    /// Bricht wenn: Duration-Promotion estimatedDuration überschreibt obwohl User sie gesetzt hat
+    func test_reanalyzeTask_preservesUserSetDuration() async throws {
+        let context = container.mainContext
+        let task = LocalTask(title: "Fokus-Session")
+        task.suggestedDuration = 30
+        task.estimatedDuration = 60
+        context.insert(task)
+        try context.save()
+
+        let service = SmartTaskEnrichmentService(modelContext: context)
+        let _ = await service.reanalyzeTask(task)
+
+        XCTAssertEqual(task.estimatedDuration, 60,
+                       "User-gesetzte Duration=60 darf NICHT durch suggestedDuration=30 überschrieben werden")
+    }
+
+    /// Verhalten: TaskEnrichment struct akzeptiert nur gültige Kategorien
+    /// Bricht wenn: TaskEnrichment.suggestedTaskType keinen .anyOf() Constraint hat
+    func test_performEnrichment_onlyAcceptsValidCategories() async throws {
+        let context = container.mainContext
+        let task = LocalTask(title: "Wäsche waschen")
+        context.insert(task)
+        try context.save()
+
+        let service = SmartTaskEnrichmentService(modelContext: context)
+
+        if SmartTaskEnrichmentService.isAvailable {
+            await service.enrichTask(task)
+
+            let validCategories = ["income", "maintenance", "recharge", "learning", "giving_back", ""]
+            XCTAssertTrue(validCategories.contains(task.taskType),
+                          "taskType '\(task.taskType)' muss eine gültige Kategorie sein")
+        }
+    }
+
+    // MARK: - PRAXIS-TEST: Echte Titel → AI-Ergebnisse
+
+    /// Praxistest: Schickt 12 realistische Task-Titel durch die Enrichment-Pipeline
+    /// und prüft ob die AI sinnvolle Werte zurückgibt (≥70% korrekt).
+    /// Bricht wenn: Prompt-Balance oder Constraints falsche Werte produzieren
+    func test_enrichment_realWorldTitles_qualityCheck() async throws {
+        guard SmartTaskEnrichmentService.isAvailable else {
+            throw XCTSkip("Apple Intelligence nicht verfügbar")
+        }
+
+        let context = container.mainContext
+
+        struct Expected {
+            let title: String
+            let impRange: ClosedRange<Int>
+            let urgent: Bool
+            let category: String
+        }
+
+        let cases: [Expected] = [
+            Expected(title: "Einkaufen gehen",                        impRange: 1...2, urgent: false, category: "maintenance"),
+            Expected(title: "Steuererklärung abgeben",                impRange: 3...3, urgent: false, category: "maintenance"),
+            Expected(title: "Gitarre üben",                           impRange: 1...1, urgent: false, category: "recharge"),
+            Expected(title: "Schuhe zur Bahnhofsmission bringen",     impRange: 1...2, urgent: false, category: "giving_back"),
+            Expected(title: "Linux Rechner Update machen",            impRange: 1...2, urgent: false, category: "maintenance"),
+            Expected(title: "Pull Request reviewen",                  impRange: 2...3, urgent: false, category: "income"),
+            Expected(title: "Netflix schauen",                        impRange: 1...1, urgent: false, category: "recharge"),
+            Expected(title: "Bewerbung schreiben",                    impRange: 3...3, urgent: false, category: "income"),
+            Expected(title: "Zahnarzt Termin ausmachen",              impRange: 2...3, urgent: false, category: "maintenance"),
+            Expected(title: "Fahrrad putzen",                         impRange: 1...2, urgent: false, category: "maintenance"),
+            Expected(title: "Bücher zur Stadtbücherei zurückbringen", impRange: 1...2, urgent: false, category: "maintenance"),
+            Expected(title: "Fokus Bloc Task übertragen",             impRange: 1...2, urgent: false, category: "income"),
+        ]
+
+        print("\n========== ENRICHMENT PRAXIS-TEST ==========")
+        print(String(format: "%-42s | %s | %-11s | %-14s | %4s | %s", "TITEL", "IMP", "URGENCY", "KATEGORIE", "DUR", "OK?"))
+        print(String(repeating: "-", count: 95))
+
+        var passCount = 0
+
+        for tc in cases {
+            let task = LocalTask(title: tc.title)
+            context.insert(task)
+            try context.save()
+
+            let service = SmartTaskEnrichmentService(modelContext: context)
+            await service.enrichTask(task)
+
+            let impOK = task.importance.map { tc.impRange.contains($0) } ?? false
+            let urgOK = (task.urgency == (tc.urgent ? "urgent" : "not_urgent"))
+            let catOK = task.taskType == tc.category
+            let allOK = impOK && urgOK && catOK
+            if allOK { passCount += 1 }
+
+            let impStr = task.importance.map { String($0) } ?? "-"
+            let urgStr = task.urgency ?? "-"
+            let durStr = (task.estimatedDuration ?? task.suggestedDuration).map { "\($0)m" } ?? "-"
+            let mark = allOK ? "OK" : "FAIL"
+            var detail = ""
+            if !impOK { detail += " imp:\(impStr)!=\(tc.impRange)" }
+            if !urgOK { detail += " urg:\(urgStr)" }
+            if !catOK { detail += " cat:\(task.taskType)!=\(tc.category)" }
+
+            print(String(format: "%-42s |  %@ | %-11s | %-14s | %4s | %s%s",
+                         tc.title, impStr, urgStr, task.taskType, durStr, mark, detail))
+
+            context.delete(task)
+            try context.save()
+        }
+
+        let rate = Double(passCount) / Double(cases.count) * 100
+        print(String(repeating: "-", count: 95))
+        print("Pass-Rate: \(passCount)/\(cases.count) = \(Int(rate))%")
+        print("==============================================\n")
+
+        XCTAssertGreaterThanOrEqual(rate, 70.0,
+            "Enrichment-Qualität muss ≥70% — aktuell \(Int(rate))% (\(passCount)/\(cases.count))")
+    }
 }

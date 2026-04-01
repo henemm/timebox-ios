@@ -55,16 +55,16 @@ final class SmartTaskEnrichmentService {
     @available(iOS 26.0, macOS 26.0, *)
     @Generable
     struct TaskEnrichment {
-        @Guide(description: "Importance 1-3: 1=nice to have, 2=should do, 3=must do")
+        @Guide(description: "Importance: 1=nice to have, 2=should do (DEFAULT for most tasks), 3=must do (only real obligations with consequences)")
         let suggestedImportance: Int
 
-        @Guide(description: "Is this time-critical? true=urgent, false=not urgent")
+        @Guide(description: "Is this time-critical? true ONLY if concrete deadline/date exists, false otherwise")
         let suggestedUrgent: Bool
 
-        @Guide(description: "Category: income, maintenance, recharge, learning, giving_back")
+        @Guide(description: "Task category", .anyOf(["income", "maintenance", "recharge", "learning", "giving_back"]))
         let suggestedTaskType: String
 
-        @Guide(description: "Cognitive energy: high for deep focus, low for routine")
+        @Guide(description: "Cognitive energy required", .anyOf(["high", "low"]))
         let suggestedEnergyLevel: String
 
         @Guide(description: "Estimated duration in minutes: 5, 15, 30, or 60")
@@ -126,8 +126,12 @@ final class SmartTaskEnrichmentService {
             }
             var updatedCount = 0
 
+            // Cache context ONCE before batch — prevents snowball effect where
+            // early (possibly wrong) enrichments poison later tasks' prompts
+            let cachedContext = fetchRecentTaskContext()
+
             for task in tasks {
-                let changed = await reanalyzeTask(task)
+                let changed = await reanalyzeTask(task, cachedContext: cachedContext)
                 if changed {
                     updatedCount += 1
                     try? await Task.sleep(for: .milliseconds(100))
@@ -144,7 +148,7 @@ final class SmartTaskEnrichmentService {
 
     /// Re-analyze a single task. Returns true if any field was changed.
     /// Steps 1-5 are deterministic (always run), Steps 6-7 need AI.
-    func reanalyzeTask(_ task: LocalTask) async -> Bool {
+    func reanalyzeTask(_ task: LocalTask, cachedContext: String? = nil) async -> Bool {
         var changed = false
 
         // Capture original title BEFORE cleanup for keyword extraction
@@ -198,7 +202,13 @@ final class SmartTaskEnrichmentService {
             let needsEnrichment = task.importance == nil || task.urgency == nil ||
                 task.taskType.isEmpty || task.aiEnergyLevel == nil
             if needsEnrichment {
-                await performEnrichment(task)
+                await performEnrichment(task, cachedContext: cachedContext)
+                changed = true
+            }
+
+            // Step 6b: Promote suggestedDuration → estimatedDuration (confirmSuggestions() is not called in reanalyze)
+            if task.estimatedDuration == nil, let dur = task.suggestedDuration {
+                task.estimatedDuration = dur
                 changed = true
             }
 
@@ -291,8 +301,8 @@ final class SmartTaskEnrichmentService {
 
     #if canImport(FoundationModels)
     @available(iOS 26.0, macOS 26.0, *)
-    private func performEnrichment(_ task: LocalTask) async {
-        let prompt = buildPrompt(for: task)
+    private func performEnrichment(_ task: LocalTask, cachedContext: String? = nil) async {
+        let prompt = buildPrompt(for: task, cachedContext: cachedContext)
         if #available(iOS 26.4, macOS 26.4, *) {
             await Self.logTokenUsage(prompt: prompt, service: "SmartEnrichment")
         }
@@ -302,11 +312,12 @@ final class SmartTaskEnrichmentService {
                 "Du analysierst Task-Titel und leitest fehlende Attribute ab."
                 ""
                 "Wichtigkeit (1-3):"
-                "  1 = nice to have (Freizeit, Hobby, optional)"
-                "  2 = should do (Routine, Haushalt, Einkaufen)"
-                "  3 = must do (Pflichten, Deadlines, Finanzen, Bewerbungen, Gesundheit)"
+                "  1 = nice to have (Freizeit, Hobby, optional, kein Zeitdruck)"
+                "  2 = should do (die MEISTEN Alltagstasks: Haushalt, Einkaufen, Termine, Besorgungen, Routine, Updates)"
+                "  3 = must do (NUR echte Pflichten mit spürbaren Konsequenzen: Steuererklärung, Arzttermin, Deadlines, Finanzen)"
                 ""
-                "Dringlichkeit: true wenn zeitkritisch (Termin, Frist, morgen, heute, bis [Datum])"
+                "WICHTIG: Im Zweifel importance=2. Nur bei echten Pflichten mit Konsequenzen importance=3."
+                "Dringlichkeit: true NUR wenn ein konkretes Datum oder eine Frist existiert. Ohne Datum/Frist → false."
                 ""
                 "Kategorie: income (Geld verdienen), maintenance (Pflege/Haushalt), recharge (Erholung), learning (Lernen), giving_back (Helfen)"
                 ""
@@ -328,12 +339,13 @@ final class SmartTaskEnrichmentService {
             let response = try await session.respond(to: prompt, generating: TaskEnrichment.self)
             let result = response.content
 
-            // Only fill nil/empty fields — user values take precedence
+            // Importance/Urgency: AI darf diese NICHT setzen — nur Keywords dürfen hochsetzen.
+            // Default: importance=1, urgency=not_urgent (harmlose Baseline)
             if task.importance == nil {
-                task.importance = max(1, min(3, result.suggestedImportance))
+                task.importance = 1
             }
             if task.urgency == nil {
-                task.urgency = result.suggestedUrgent ? "urgent" : "not_urgent"
+                task.urgency = "not_urgent"
             }
             if task.taskType.isEmpty {
                 let validTypes = ["income", "maintenance", "recharge", "learning", "giving_back"]
@@ -389,7 +401,7 @@ final class SmartTaskEnrichmentService {
         }.joined(separator: "\n")
     }
 
-    func buildPrompt(for task: LocalTask) -> String {
+    func buildPrompt(for task: LocalTask, cachedContext: String? = nil) -> String {
         var parts: [String] = []
         parts.append("Task: \(task.title)")
 
@@ -406,7 +418,7 @@ final class SmartTaskEnrichmentService {
             parts.append("Beschreibung: \(description)")
         }
 
-        let context = fetchRecentTaskContext()
+        let context = cachedContext ?? fetchRecentTaskContext()
         if !context.isEmpty {
             parts.append("")
             parts.append("Bestehende Tasks des Nutzers (orientiere dich an deren Attributen für ähnliche Tasks):")

@@ -131,12 +131,13 @@ final class AITaskScoringService {
             let validEnergy = result.energyLevel.lowercased()
             task.aiEnergyLevel = (validEnergy == "high" || validEnergy == "low") ? validEnergy : "low"
 
-            // Apply suggestions ONLY for TBD tasks (manual values take precedence)
+            // Importance/Urgency: AI darf diese NICHT setzen — nur Keywords dürfen hochsetzen.
+            // Default: importance=1, urgency=not_urgent (harmlose Baseline)
             if task.importance == nil {
-                task.importance = max(1, min(3, result.suggestedImportance))
+                task.importance = 1
             }
             if task.urgency == nil {
-                task.urgency = result.suggestedUrgent ? "urgent" : "not_urgent"
+                task.urgency = "not_urgent"
             }
 
             try modelContext.save()
