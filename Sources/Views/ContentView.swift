@@ -5,6 +5,7 @@ struct ContentView: View {
     @AppStorage("siriTipGetNextUpVisible") private var showGetNextUpTip = true
     @Binding var selectedTab: AppTab
     var dayViewForcedPhase: DayPhase?
+    var useCoachLayout: Bool = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -12,7 +13,11 @@ struct ContentView: View {
             SiriTipView(intent: GetNextUpIntent(), isVisible: $showGetNextUpTip)
                 .padding(.horizontal)
 
-            MainTabView(selectedTab: $selectedTab, dayViewForcedPhase: dayViewForcedPhase)
+            MainTabView(
+                selectedTab: $selectedTab,
+                dayViewForcedPhase: dayViewForcedPhase,
+                useCoachLayout: useCoachLayout
+            )
         }
     }
 }

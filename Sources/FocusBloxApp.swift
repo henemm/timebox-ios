@@ -21,6 +21,7 @@ struct FocusBloxApp: App {
     @State private var selectedTab: AppTab = .backlog
     @State private var dayViewForcedPhase: DayPhase?
     @State private var permissionRequested = false
+    @AppStorage("useCoachTabLayout") private var useCoachTabLayoutSetting = false
     private let settings = AppSettings.shared
     @State private var syncMonitor = CloudKitSyncMonitor()
     @State private var deferredSort = DeferredSortController()
@@ -28,6 +29,15 @@ struct FocusBloxApp: App {
     @State private var notificationDelegate: NotificationActionDelegate?
 
     private static let appGroupID = "group.com.henning.focusblox"
+
+    /// Coach Tab Layout: aktiviert via Settings-Toggle oder Launch-Argument (UI Tests)
+    private var useCoachLayout: Bool {
+        useCoachTabLayoutSetting || ProcessInfo.processInfo.arguments.contains("--coach-tab-layout")
+    }
+
+    /// Maps classic tab to coach-layout equivalent
+    private var dayTab: AppTab { useCoachLayout ? .coach : .day }
+    private var bloxTab: AppTab { useCoachLayout ? .plan : .blox }
 
     /// SyncedSettings für iCloud KV Store Sync zwischen Geräten
     private let syncedSettings = SyncedSettings()
@@ -281,7 +291,11 @@ struct FocusBloxApp: App {
     var body: some Scene {
         WindowGroup {
             ZStack {
-                ContentView(selectedTab: $selectedTab, dayViewForcedPhase: dayViewForcedPhase)
+                ContentView(
+                    selectedTab: $selectedTab,
+                    dayViewForcedPhase: dayViewForcedPhase,
+                    useCoachLayout: useCoachLayout
+                )
                     .environment(\.eventKitRepository, eventKitRepository)
                     .environment(syncMonitor)
                     .environment(deferredSort)
@@ -312,7 +326,7 @@ struct FocusBloxApp: App {
                     case "sprint-picker":
                         showSprintPicker = true
                     case "day-view":
-                        selectedTab = .day
+                        selectedTab = dayTab
                     default: break
                     }
                 }
@@ -375,7 +389,7 @@ struct FocusBloxApp: App {
                 }
                 // RW_4.4: Simulate deep link for UI testing
                 if ProcessInfo.processInfo.arguments.contains("-DayViewDeepLink") {
-                    selectedTab = .day
+                    selectedTab = dayTab
                 }
                 // Generic --screen argument for sim.sh navigate
                 if let screenIndex = ProcessInfo.processInfo.arguments.firstIndex(of: "--screen"),
@@ -383,10 +397,10 @@ struct FocusBloxApp: App {
                     let screen = ProcessInfo.processInfo.arguments[screenIndex + 1]
                     switch screen {
                     case "backlog": selectedTab = .backlog
-                    case "blox": selectedTab = .blox
-                    case "day": selectedTab = .day
+                    case "blox": selectedTab = bloxTab
+                    case "day": selectedTab = dayTab
                     case "focus": selectedTab = .focus
-                    case "review": selectedTab = .review
+                    case "review": selectedTab = useCoachLayout ? .coach : .review
                     default: break
                     }
                 }
@@ -403,7 +417,7 @@ struct FocusBloxApp: App {
                         case .sprintPicker:
                             showSprintPicker = true
                         case .dayView:
-                            selectedTab = .day
+                            selectedTab = dayTab
                         }
                     }
                     syncMonitor.triggerSync()
@@ -436,21 +450,21 @@ struct FocusBloxApp: App {
             }
             .onOpenURL { url in
                 if url.host == "day-view" {
-                    selectedTab = .day
+                    selectedTab = dayTab
                 } else if url.host == "create-task" {
                     quickCaptureTitle = ""
                     showQuickCapture = true
                 } else if url.host == "sprint-picker" {
                     showSprintPicker = true
                 } else if FocusBlock.eventID(from: url) != nil {
-                    selectedTab = .blox
+                    selectedTab = bloxTab
                 }
             }
             .onReceive(NotificationCenter.default.publisher(for: .quickCaptureRequested)) { _ in
                 showQuickCapture = true
             }
             .onReceive(NotificationCenter.default.publisher(for: NotificationActionDelegate.navigateToDayViewNotification)) { notification in
-                selectedTab = .day
+                selectedTab = dayTab
                 if let phaseStr = notification.userInfo?["phase"] as? String {
                     switch phaseStr {
                     case "morning": dayViewForcedPhase = .morning
@@ -460,7 +474,7 @@ struct FocusBloxApp: App {
                 }
             }
             .onChange(of: selectedTab) { _, newTab in
-                if newTab != .day { dayViewForcedPhase = nil }
+                if newTab != .day && newTab != .coach { dayViewForcedPhase = nil }
             }
             .onReceive(NotificationCenter.default.publisher(for: .focusSprintStarted)) { _ in
                 selectedTab = .focus
@@ -692,14 +706,20 @@ struct FocusBloxApp: App {
         guard existingTasks.isEmpty else { return }
 
         // Create mock tasks with isNextUp = true (vollständig - nicht TBD)
-        let task1 = LocalTask(title: "[MOCK] Task 1 #30min", importance: 3, estimatedDuration: 30, urgency: "urgent")
+        let task1 = LocalTask(title: "[MOCK] Feature: Dark Mode fuer Settings #30min", importance: 3, estimatedDuration: 30, urgency: "urgent")
         task1.isNextUp = true
+        task1.taskType = "deep_work"
+        task1.tags = ["feature", "ui"]
 
-        let task2 = LocalTask(title: "[MOCK] Task 2 #15min", importance: 2, estimatedDuration: 15, urgency: "not_urgent")
+        let task2 = LocalTask(title: "[MOCK] Bug-Fix: Navigation Crash #15min", importance: 2, estimatedDuration: 15, urgency: "not_urgent")
         task2.isNextUp = true
+        task2.taskType = "deep_work"
+        task2.tags = ["bug", "critical"]
 
-        let task3 = LocalTask(title: "[MOCK] Task 3 #45min", importance: 1, estimatedDuration: 45, urgency: "not_urgent")
+        let task3 = LocalTask(title: "[MOCK] Dokumentation aktualisieren #45min", importance: 1, estimatedDuration: 45, urgency: "not_urgent")
         task3.isNextUp = true
+        task3.taskType = "shallow_work"
+        task3.tags = ["docs"]
 
         // Create a mock task that's already assigned to a Focus Block
         let assignedTask = LocalTask(uuid: UUID(uuidString: "00000000-0000-0000-0000-000000000001") ?? UUID(),
@@ -944,6 +964,8 @@ struct FocusBloxApp: App {
         scheduledTask.scheduledDuration = 45
         context.insert(scheduledTask)
 
+        // MARK: - Completed Tasks for Coach Tab Daytime Section
+
         // Completed task outside any FocusBlock (for Review tab testing)
         let completedOutsideBlock = LocalTask(title: "[MOCK] Erledigte Backlog-Aufgabe", importance: 2, estimatedDuration: 20, urgency: "not_urgent")
         completedOutsideBlock.isNextUp = false
@@ -951,6 +973,34 @@ struct FocusBloxApp: App {
         completedOutsideBlock.completedAt = Date()
         completedOutsideBlock.taskType = "shallow_work"
         context.insert(completedOutsideBlock)
+
+        // Completed task 1: E-Mail-Backlog abarbeiten (realistic for Coach view)
+        let coachCompletedTask1 = LocalTask(
+            title: "[MOCK] E-Mail-Backlog abarbeiten #25min",
+            importance: 2,
+            estimatedDuration: 25,
+            urgency: "not_urgent"
+        )
+        coachCompletedTask1.isNextUp = false
+        coachCompletedTask1.isCompleted = true
+        coachCompletedTask1.completedAt = Date()
+        coachCompletedTask1.taskType = "shallow_work"
+        coachCompletedTask1.tags = ["work", "admin"]
+        context.insert(coachCompletedTask1)
+
+        // Completed task 2: Code Review (higher importance)
+        let coachCompletedTask2 = LocalTask(
+            title: "[MOCK] Code Review fuer PR #1234 #35min",
+            importance: 3,
+            estimatedDuration: 35,
+            urgency: "urgent"
+        )
+        coachCompletedTask2.isNextUp = false
+        coachCompletedTask2.isCompleted = true
+        coachCompletedTask2.completedAt = Calendar.current.date(byAdding: .minute, value: -45, to: Date()) ?? Date()
+        coachCompletedTask2.taskType = "deep_work"
+        coachCompletedTask2.tags = ["code", "review"]
+        context.insert(coachCompletedTask2)
 
         try? context.save()
 

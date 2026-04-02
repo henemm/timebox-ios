@@ -36,6 +36,7 @@ struct SettingsView: View {
     @State private var allReminderLists: [ReminderListInfo] = []
     @AppStorage("siriTipCompleteTaskVisible") private var showCompleteTaskTip = true
     @AppStorage("taskDebugModeEnabled") private var taskDebugModeEnabled: Bool = false
+    @AppStorage("useCoachTabLayout") private var useCoachTabLayout: Bool = false
     @State private var showLifecycleLogSheet = false
     @State private var showClearLogConfirmation = false
 
@@ -270,6 +271,9 @@ struct SettingsView: View {
 
                 // Section: Developer Tools (below Info)
                 Section {
+                    Toggle("Coach-Tab Layout", isOn: $useCoachTabLayout)
+                        .accessibilityIdentifier("coachTabLayoutToggle")
+
                     Toggle("Task Debug Mode", isOn: $taskDebugModeEnabled)
                         .accessibilityIdentifier("taskDebugModeToggle")
 

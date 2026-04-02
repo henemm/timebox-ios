@@ -79,14 +79,15 @@ final class MonsterRemovalCleanupTests: XCTestCase {
     /// Bricht wenn: jemand `case meinTag` o.ae. zu AppTab in MainTabView.swift hinzufuegt.
     /// NOTE: The real guard here is the exhaustive switch below — it causes a COMPILER ERROR
     /// if a new case is added to AppTab without updating this test.
-    func test_appTab_hasExactlyFourCases() {
+    func test_appTab_hasAllCases() {
         // AppTab is not CaseIterable — the exhaustive switch is the actual regression guard.
-        // Adding a 5th case to AppTab will cause a compile error here.
-        let allTabs: [AppTab] = [.backlog, .blox, .day, .focus, .review]
+        // Adding a new case to AppTab will cause a compile error here.
+        // Classic: backlog, blox, day, focus, review | Coach layout: plan, coach
+        let allTabs: [AppTab] = [.backlog, .blox, .day, .focus, .review, .plan, .coach]
 
         for tab in allTabs {
             switch tab {
-            case .backlog, .blox, .day, .focus, .review:
+            case .backlog, .blox, .day, .focus, .review, .plan, .coach:
                 break // exhaustive — compiler enforces completeness
             }
         }

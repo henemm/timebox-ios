@@ -2,14 +2,28 @@ import SwiftUI
 import SwiftData
 
 enum AppTab: Hashable {
+    // Classic 5-tab layout
     case backlog, blox, day, focus, review
+    // Coach 4-tab layout
+    case plan, coach
 }
 
 struct MainTabView: View {
     @Binding var selectedTab: AppTab
     var dayViewForcedPhase: DayPhase?
+    var useCoachLayout: Bool = false
 
     var body: some View {
+        if useCoachLayout {
+            coachTabView
+        } else {
+            classicTabView
+        }
+    }
+
+    // MARK: - Classic 5-Tab Layout
+
+    private var classicTabView: some View {
         TabView(selection: $selectedTab) {
             BacklogView()
                 .tabItem {
@@ -40,6 +54,37 @@ struct MainTabView: View {
                     Label("Review", systemImage: "chart.bar")
                 }
                 .tag(AppTab.review)
+        }
+        .accessibilityIdentifier("mainTabView_unified")
+    }
+
+    // MARK: - Coach 4-Tab Layout
+
+    private var coachTabView: some View {
+        TabView(selection: $selectedTab) {
+            BacklogView()
+                .tabItem {
+                    Label("Backlog", systemImage: "list.bullet")
+                }
+                .tag(AppTab.backlog)
+
+            BlockPlanningView()
+                .tabItem {
+                    Label("Planen", systemImage: "calendar")
+                }
+                .tag(AppTab.plan)
+
+            FocusLiveView()
+                .tabItem {
+                    Label("Focus", systemImage: "target")
+                }
+                .tag(AppTab.focus)
+
+            CoachView()
+                .tabItem {
+                    Label("Coach", systemImage: "sparkles")
+                }
+                .tag(AppTab.coach)
         }
         .accessibilityIdentifier("mainTabView_unified")
     }

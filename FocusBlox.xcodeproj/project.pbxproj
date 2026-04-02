@@ -184,6 +184,8 @@
 		"FIX34E637A7AC7CFBFF9A316" = {isa = PBXBuildFile; fileRef = A7EA4709B8F23EC742F2087A /* CategoryIconBadge.swift */; };
 		"FIX34EFECF6F49B8D39E391A" = {isa = PBXBuildFile; fileRef = 2AE04DE0A5007669A021AD09 /* ImportancePicker.swift */; };
 		"FIX351514C631DD6C99214A3" = {isa = PBXBuildFile; fileRef = 3C8143598A2B36DD82E0C03D /* DayView.swift */; };
+		COACHTST01BFIL01 = {isa = PBXBuildFile; fileRef = COACHTST01FREF01 /* CoachTabLayoutUITests.swift */; };
+		COACH001BLDFILE01 = {isa = PBXBuildFile; fileRef = COACH001FILEREF01 /* CoachView.swift */; };
 		"FIX3532CBEA403AAB428A8F9" = {isa = PBXBuildFile; fileRef = 4F2D4BF997D496BE1963FBAC /* FocusBloxIconLayers.swift */; };
 		"FIX353BF306E6F082D692F38" = {isa = PBXBuildFile; fileRef = 68BE46E6AD61FBA6E8D4C08A /* CreateTaskIntent.swift */; };
 		"FIX35FD2CCB93BC10C05880A" = {isa = PBXBuildFile; fileRef = 04DD40ED9F110CCB57B42E1C /* ReminderListInfo.swift */; };
@@ -1042,6 +1044,7 @@
 		31904CA661DB113E1D4F523F /* FocusBloxUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FocusBloxUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		32E6EA75FACA340867827895 /* PlanItemTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanItemTests.swift; sourceTree = "<group>"; };
 		339BBA1A3799CB0C6CF5897A /* BacklogViewUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BacklogViewUITests.swift; sourceTree = "<group>"; };
+		COACHTST01FREF01 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoachTabLayoutUITests.swift; sourceTree = "<group>"; };
 		34504F11B10E2A41AFCA1AC9 /* TaskFailureRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TaskFailureRecord.swift; path = Sources/Models/TaskFailureRecord.swift; sourceTree = SOURCE_ROOT; };
 		34D186C26C7135F80A5E3B0B /* SyncEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncEngine.swift; sourceTree = "<group>"; };
 		350DD1256F45268992636DEA /* NotificationService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
@@ -1055,6 +1058,7 @@
 		3BE6C24124E626E4489ECDFA /* Bug81StaleBlockAssignmentUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Bug81StaleBlockAssignmentUITests.swift; sourceTree = "<group>"; };
 		3C256CDC6B3B5BA25279A4AA /* IOSTimelineCanvasUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = IOSTimelineCanvasUITests.swift; sourceTree = "<group>"; };
 		3C8143598A2B36DD82E0C03D /* DayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DayView.swift; path = Sources/Views/DayView.swift; sourceTree = SOURCE_ROOT; };
+		COACH001FILEREF01 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CoachView.swift; path = Sources/Views/CoachView.swift; sourceTree = SOURCE_ROOT; };
 		3D764B92919F2A7EEBF94450 /* SmartTaskEnrichmentService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SmartTaskEnrichmentService.swift; path = Sources/Services/SmartTaskEnrichmentService.swift; sourceTree = SOURCE_ROOT; };
 		3E284B3E881E745000F98D71 /* NextUpSuggestionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = NextUpSuggestionService.swift; path = Sources/Services/NextUpSuggestionService.swift; sourceTree = SOURCE_ROOT; };
 		3F276F67582A827E523D8ED6 /* EventKitRepositoryEnvironment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventKitRepositoryEnvironment.swift; sourceTree = "<group>"; };
@@ -1523,6 +1527,7 @@
 				RW33ABRT01FREF0001,
 				B7B87F212F1BCD9B0069B457 /* EisenhowerMatrixUITests.swift */,
 				339BBA1A3799CB0C6CF5897A /* BacklogViewUITests.swift */,
+				COACHTST01FREF01 /* CoachTabLayoutUITests.swift */,
 				9356580BE3C5699878A6B87D /* BeforeScreenshotTest.swift */,
 				BCFB47E31C1D91935DCB9374 /* DebugLogReaderTest.swift */,
 				DEFSORT01FILE00001,
@@ -2083,6 +2088,7 @@
 				EE0F454E8E09B7308709962B /* TaskBadges.swift */,
 				901B40D9B916DF564231BF4B /* WeekdayButton.swift */,
 				3C8143598A2B36DD82E0C03D /* DayView.swift */,
+				COACH001FILEREF01 /* CoachView.swift */,
 				EDEB4424960326E38F6C67BB /* DesignSystem.swift */,
 				2AE04DE0A5007669A021AD09 /* ImportancePicker.swift */,
 				666A4EA5B18307916DCE2DFD /* QuickCaptureView.swift */,
@@ -2672,6 +2678,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F030A10300BF0300BF030001 /* TaskLifecycleLogger.swift in Sources */,
+				COACH001BLDFILE01 /* CoachView.swift in Sources */,
 				E907CB03C20C1B55A48C4B1B /* BacklogRow.swift in Sources */,
 				254BA311864B4038A8BC9F46 /* NextUpSuggestionService.swift in Sources */,
 				A8A08C6878B74D789ECE9734 /* MorningCoachingSection.swift in Sources */,
@@ -2812,6 +2819,7 @@
 			files = (
 				F030A10200BF0200BF020001 /* TaskDebugModeUITests.swift in Sources */,
 				CF2E7692295B675D8541312A /* BacklogViewUITests.swift in Sources */,
+				COACHTST01BFIL01 /* CoachTabLayoutUITests.swift in Sources */,
 				RW33ABRT01BFIL0001,
 				4702F3D2CAF394E0AC9AAF96 /* BeforeScreenshotTest.swift in Sources */,
 				6C17452E66E837CD8225506C /* DebugLogReaderTest.swift in Sources */,
