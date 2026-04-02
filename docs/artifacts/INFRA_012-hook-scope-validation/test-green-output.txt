@@ -1,0 +1,24 @@
+=== INFRA_012 Scope-Validation Tests ===
+
+--- Test 1: set-affected-files BLOCKED in phase6_implement ---
+  ✅ phase6 → set-affected-files exit code (exit=1)
+  ✅ phase6 → BLOCKED message (contains 'BLOCKED')
+
+--- Test 2: set-affected-files ALLOWED in phase2_analyse ---
+  ✅ phase2 → set-affected-files exit code (exit=0)
+  ✅ phase2 → Set affected_files (contains 'Set affected_files')
+
+--- Test 3: set-affected-files ALLOWED in phase4_approved ---
+  ✅ phase4 → set-affected-files exit code (exit=0)
+  ✅ phase4 → Set affected_files (contains 'Set affected_files')
+
+--- Test 4: pbxproj Python-Einzeiler BLOCKED ---
+  ✅ pbxproj Python → bash_gate exit code (exit=2)
+  ✅ pbxproj Python → BLOCKED message (contains 'BLOCKED')
+
+--- Test 5: pbxproj whitegelistetes Script ALLOWED ---
+  ✅ pbxproj Script → bash_gate exit code (exit=0)
+
+=== SUMMARY ===
+Total: 9 | Passed: 9 | Failed: 0
+All tests passed (unexpected in RED phase!)

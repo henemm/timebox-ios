@@ -96,14 +96,12 @@ Bei Shared-Code-Änderungen (`Sources/`): AUCH `mac-build` ausführen!
 **NIEMALS `project.pbxproj` direkt editieren** — das Dateiformat ist fragil und manuelle Edits korrumpieren das Projekt.
 
 **Neue `.swift`-Dateien zum Projekt hinzufügen:**
-```python
-python3 -c "
-from pbxproj import XcodeProject
-proj = XcodeProject.load('FocusBlox.xcodeproj/project.pbxproj')
-proj.add_file('Sources/Pfad/NeueDatei.swift', target_name='FocusBlox')
-proj.save()
-"
+```bash
+python3 scripts/add_file_to_project.py Sources/Pfad/NeueDatei.swift
+python3 scripts/add_file_to_project.py Sources/A.swift Sources/B.swift --target FocusBloxTests
 ```
+
+**ACHTUNG:** Python-Einzeiler mit `project.pbxproj` werden vom Bash-Gate blockiert (#186). Immer das whitegelistete Script verwenden!
 
 **WARNUNG (Bug #182):** `python-pbxproj` erzeugt Quoted IDs (`"XXXX"`) statt Hex-IDs. Das kann zu Duplicate-Warnings führen wenn Xcode dieselben Dateien mit Hex-IDs referenziert. Nach jedem `add_file()`-Aufruf: `./scripts/sim.sh build` ausführen und auf "Skipping duplicate build file"-Warnings prüfen!
 

@@ -1,0 +1,34 @@
+=== INFRA_012 Scope-Validation Tests ===
+
+--- Test 1: set-affected-files BLOCKED in phase6_implement ---
+  ❌ phase6 → set-affected-files exit code (expected exit=1, got exit=0)
+     Output: Set affected_files on workflow INFRA_012-hook-scope-validation: 4 files
+  ❌ phase6 → BLOCKED message (missing 'BLOCKED')
+     Output: Set affected_files on workflow INFRA_012-hook-scope-validation: 4 files
+
+--- Test 2: set-affected-files ALLOWED in phase2_analyse ---
+  ✅ phase2 → set-affected-files exit code (exit=0)
+  ✅ phase2 → Set affected_files (contains 'Set affected_files')
+
+--- Test 3: set-affected-files ALLOWED in phase4_approved ---
+  ✅ phase4 → set-affected-files exit code (exit=0)
+  ✅ phase4 → Set affected_files (contains 'Set affected_files')
+
+--- Test 4: pbxproj Python-Einzeiler BLOCKED ---
+  ❌ pbxproj Python → bash_gate exit code (expected exit=2, got exit=0)
+     Output: 
+  ❌ pbxproj Python → BLOCKED message (missing 'BLOCKED')
+     Output: 
+
+--- Test 5: pbxproj whitegelistetes Script ALLOWED ---
+  ✅ pbxproj Script → bash_gate exit code (exit=0)
+
+=== SUMMARY ===
+Total: 9 | Passed: 5 | Failed: 4
+
+FAILED tests (expected in RED phase):
+
+  - phase6 → set-affected-files exit code
+  - phase6 → BLOCKED message
+  - pbxproj Python → bash_gate exit code
+  - pbxproj Python → BLOCKED message

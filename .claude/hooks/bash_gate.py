@@ -50,6 +50,7 @@ PROTECTED_FILE_PATTERNS = [
     r"user_override_token\.json",
     r"\.claude/hooks/[^\s]*\.py",
     r"\.claude/settings\.json",
+    r"project\.pbxproj",
 ]
 
 WRITE_INDICATORS = [
@@ -61,6 +62,7 @@ WRITE_INDICATORS = [
 WHITELIST_COMMANDS = [
     "workflow.py", "qa_gate.py",
     "git add", "git commit", "git diff", "git status", "git log", "git push",
+    "add_file_to_project.py",
 ]
 
 ALLOWED_SCRIPTS = ["sim.sh", "run_resilient_tests.sh", "adversary_screenshot.sh",

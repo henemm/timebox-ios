@@ -491,6 +491,22 @@ def cmd_set_affected_files(args: list[str]) -> None:
     replace = "--replace" in args
     files = [a for a in args if a != "--replace"]
     data, name = _read_active()
+
+    # Phase-Guard: affected_files nur in frühen Phasen änderbar (#186)
+    ALLOWED_PHASES_FOR_SCOPE = {
+        "phase0_idle",
+        "phase1_context",
+        "phase2_analyse",
+        "phase3_spec",
+        "phase4_approved",  # /10-bug Schritt 7.5 braucht das
+    }
+    phase = data.get("current_phase", "phase0_idle")
+    if phase not in ALLOWED_PHASES_FOR_SCOPE:
+        if not _has_override_token(name):
+            print(f"BLOCKED: set-affected-files nicht erlaubt in Phase {phase}. "
+                  f"Scope wird vor TDD RED definiert.", file=sys.stderr)
+            sys.exit(1)
+
     if replace:
         data["affected_files"] = files
     else:
