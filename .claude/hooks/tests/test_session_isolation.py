@@ -116,11 +116,11 @@ class TestSetActiveSymlinkBehavior(unittest.TestCase):
         import shutil
         shutil.rmtree(self.tmpdir, ignore_errors=True)
 
-    def test_set_active_skips_symlink_when_session_id_present(self):
-        """_set_active() must NOT create .active symlink when session_id is set.
+    def test_set_active_writes_symlink_always(self):
+        """_set_active() must ALWAYS create .active symlink (Bug #192 fix).
 
-        Bricht wenn: workflow.py:246-252 .active immer geschrieben wird.
-        EXPECTED TO FAIL: _set_active() writes .active unconditionally.
+        .active is always updated for backward compat + debugging.
+        .sessions.json remains source of truth for session-aware tools.
         """
         import workflow
 
@@ -131,10 +131,10 @@ class TestSetActiveSymlinkBehavior(unittest.TestCase):
         with patch.object(workflow, "_get_session_id", return_value="session-xyz"):
             workflow._set_active("test-workflow")
 
-        # .active symlink should NOT exist when session_id is present
-        self.assertFalse(
+        # .active symlink MUST exist even when session_id is present
+        self.assertTrue(
             self.active_link.is_symlink(),
-            ".active symlink must NOT be created when session_id is present"
+            ".active symlink must be created even when session_id is present (Bug #192)"
         )
 
     def test_set_active_writes_symlink_when_no_session_id(self):

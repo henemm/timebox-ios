@@ -243,14 +243,14 @@ def _set_active(name: str) -> None:
         with _locked_sessions() as sessions:
             sessions[session_id] = name
 
-    # Update .active symlink only when no session_id (backward compat)
-    if not session_id:
-        link = _active_link()
-        target = f"{name}.json"
-        link.parent.mkdir(parents=True, exist_ok=True)
-        if link.is_symlink() or link.exists():
-            link.unlink()
-        os.symlink(target, str(link))
+    # Always update .active symlink (backward compat + debugging)
+    # .sessions.json remains source of truth for session-aware tools
+    link = _active_link()
+    target = f"{name}.json"
+    link.parent.mkdir(parents=True, exist_ok=True)
+    if link.is_symlink() or link.exists():
+        link.unlink()
+    os.symlink(target, str(link))
 
 
 def _save_active(data: dict) -> None:
