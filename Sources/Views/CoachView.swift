@@ -10,6 +10,11 @@ struct CoachView: View {
     @Environment(\.eventKitRepository) private var eventKitRepo
     @Environment(\.modelContext) private var modelContext
 
+    // Intention data
+    @State private var todayIntention: DayIntention?
+    @State private var yesterdayIntention: DayIntention?
+    @State private var intentionSuggestions: [String] = []
+
     // Morning data
     @State private var calendarEvents: [CalendarEvent] = []
     @State private var focusBlocks: [FocusBlock] = []
@@ -93,71 +98,22 @@ struct CoachView: View {
 
             if isLoading {
                 ProgressView()
-            } else if isPermissionDenied {
-                Text("Kein Kalender-Zugriff")
-                    .foregroundStyle(.secondary)
             } else {
                 VStack(alignment: .leading, spacing: 12) {
-                    Text("Was soll heute zählen?")
-                        .font(.title3.weight(.semibold))
-                        .accessibilityIdentifier("coachMorningQuestion")
-
-                    if !morningSuggestions.isEmpty {
-                        MorningCoachingSection(
-                            suggestions: morningSuggestions,
-                            onConfirm: { suggestion in
-                                let taskSource = LocalTaskSource(modelContext: modelContext)
-                                let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
-                                try? syncEngine.updateNextUp(itemID: suggestion.id, isNextUp: true)
-                                NextUpSuggestionService.invalidateCache()
-                                morningSuggestions.removeAll { $0.id == suggestion.id }
-                            },
-                            onDismiss: { suggestion in
-                                morningSuggestions.removeAll { $0.id == suggestion.id }
-                            },
-                            limitationWarning: nil,
-                            onDismissWarning: {}
-                        )
+                    // Gestern-Echo
+                    if let yesterday = yesterdayIntention {
+                        Text("Gestern: \(yesterday.text)")
+                            .font(.subheadline)
+                            .foregroundStyle(.tertiary)
+                            .accessibilityIdentifier("yesterdayIntentionEcho")
                     }
 
-                    if !freeSlots.isEmpty {
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("Freie Lücken")
-                                .font(.subheadline.weight(.semibold))
-                                .foregroundStyle(.secondary)
-                            ForEach(freeSlots) { slot in
-                                HStack {
-                                    Text(slot.startDate, style: .time)
-                                        .font(.subheadline)
-                                        .foregroundStyle(.secondary)
-                                        .frame(width: 55, alignment: .leading)
-                                    Text("\(slot.durationMinutes) Min frei")
-                                        .font(.subheadline)
-                                }
-                                .padding(8)
-                                .background(.yellow.opacity(0.15), in: RoundedRectangle(cornerRadius: 8))
-                            }
-                        }
-                    }
-
-                    if !nextUpTasks.isEmpty {
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("Heute geplant")
-                                .font(.subheadline.weight(.semibold))
-                                .foregroundStyle(.secondary)
-                            ForEach(nextUpTasks) { task in
-                                HStack {
-                                    Text(task.title)
-                                        .font(.subheadline)
-                                    Spacer()
-                                    if let duration = task.estimatedDuration {
-                                        Text("\(duration) Min")
-                                            .font(.caption)
-                                            .foregroundStyle(.secondary)
-                                    }
-                                }
-                            }
-                        }
+                    if let intention = todayIntention {
+                        // Intention already set — show it + task suggestions
+                        intentionSetView(intention)
+                    } else {
+                        // No intention yet — show question + chips
+                        intentionPickerView
                     }
                 }
             }
@@ -173,6 +129,121 @@ struct CoachView: View {
         )
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("coachMorningSection")
+    }
+
+    // MARK: - Intention Picker (no intention set yet)
+
+    private var intentionPickerView: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Was soll heute zählen?")
+                .font(.title3.weight(.semibold))
+                .accessibilityIdentifier("coachMorningQuestion")
+
+            if intentionSuggestions.isEmpty {
+                ProgressView("Vorschläge werden generiert...")
+                    .font(.subheadline)
+            } else {
+                VStack(spacing: 10) {
+                    ForEach(Array(intentionSuggestions.enumerated()), id: \.offset) { index, suggestion in
+                        Button {
+                            selectIntention(suggestion)
+                        } label: {
+                            Text(suggestion)
+                                .font(.subheadline.weight(.medium))
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(.horizontal, 16)
+                                .padding(.vertical, 12)
+                                .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityIdentifier("intentionChip_\(index)")
+                    }
+                }
+            }
+        }
+    }
+
+    // MARK: - Intention Set View (intention already chosen)
+
+    private func intentionSetView(_ intention: DayIntention) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Text("Heute:")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                Text(intention.text)
+                    .font(.title3.weight(.semibold))
+            }
+            .accessibilityIdentifier("todayIntentionText")
+
+            // Show existing task suggestions + free slots below
+            if !morningSuggestions.isEmpty {
+                MorningCoachingSection(
+                    suggestions: morningSuggestions,
+                    onConfirm: { suggestion in
+                        let taskSource = LocalTaskSource(modelContext: modelContext)
+                        let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
+                        try? syncEngine.updateNextUp(itemID: suggestion.id, isNextUp: true)
+                        NextUpSuggestionService.invalidateCache()
+                        morningSuggestions.removeAll { $0.id == suggestion.id }
+                    },
+                    onDismiss: { suggestion in
+                        morningSuggestions.removeAll { $0.id == suggestion.id }
+                    },
+                    limitationWarning: nil,
+                    onDismissWarning: {}
+                )
+            }
+
+            if !freeSlots.isEmpty {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Freie Lücken")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.secondary)
+                    ForEach(freeSlots) { slot in
+                        HStack {
+                            Text(slot.startDate, style: .time)
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                                .frame(width: 55, alignment: .leading)
+                            Text("\(slot.durationMinutes) Min frei")
+                                .font(.subheadline)
+                        }
+                        .padding(8)
+                        .background(.yellow.opacity(0.15), in: RoundedRectangle(cornerRadius: 8))
+                    }
+                }
+            }
+
+            if !nextUpTasks.isEmpty {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Heute geplant")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.secondary)
+                    ForEach(nextUpTasks) { task in
+                        HStack {
+                            Text(task.title)
+                                .font(.subheadline)
+                            Spacer()
+                            if let duration = task.estimatedDuration {
+                                Text("\(duration) Min")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // MARK: - Intention Actions
+
+    private func selectIntention(_ text: String) {
+        let intention = DayIntention(date: Date(), text: text)
+        modelContext.insert(intention)
+        try? modelContext.save()
+        todayIntention = intention
     }
 
     // MARK: - Daytime Section
@@ -377,6 +448,22 @@ struct CoachView: View {
         let calendar = Calendar.current
         let today = calendar.startOfDay(for: Date())
 
+        // Intention laden
+        do {
+            let todayPredicate = #Predicate<DayIntention> { $0.date == today }
+            var todayDescriptor = FetchDescriptor(predicate: todayPredicate)
+            todayDescriptor.fetchLimit = 1
+            todayIntention = try modelContext.fetch(todayDescriptor).first
+
+            let yesterday = calendar.date(byAdding: .day, value: -1, to: today)!
+            let yesterdayPredicate = #Predicate<DayIntention> { $0.date == yesterday }
+            var yesterdayDescriptor = FetchDescriptor(predicate: yesterdayPredicate)
+            yesterdayDescriptor.fetchLimit = 1
+            yesterdayIntention = try modelContext.fetch(yesterdayDescriptor).first
+        } catch {
+            // Intention-Daten nicht verfügbar
+        }
+
         // Task-Daten laden (unabhängig von EventKit)
         do {
             let taskSource = LocalTaskSource(modelContext: modelContext)
@@ -440,6 +527,22 @@ struct CoachView: View {
             )
         } catch {
             // Silently fail — sections show empty state
+        }
+
+        // Intention-Vorschläge generieren (wenn noch keine Intention gesetzt)
+        if todayIntention == nil {
+            let topTasks = allTasks
+                .filter { !$0.isCompleted && $0.isActionable }
+                .sorted { ($0.aiScore ?? 0) > ($1.aiScore ?? 0) }
+            let totalFreeMinutes = freeSlots.reduce(0) { $0 + $1.durationMinutes }
+            let meetingCount = calendarEvents.filter { !$0.isAllDay && !$0.isFocusBlock }.count
+
+            intentionSuggestions = await IntentionSuggestionService.suggestions(
+                topTasks: Array(topTasks.prefix(5)),
+                freeMinutes: totalFreeMinutes,
+                meetingCount: meetingCount,
+                yesterdayIntention: yesterdayIntention?.text
+            )
         }
     }
 }

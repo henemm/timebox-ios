@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		FAFB51FCCCCFFDD85F0D265A /* CoachIntentionUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7167CA7141C3A57476891E0 /* CoachIntentionUITests.swift */; };
+		C65382110B596A49B275F394 /* IntentionSuggestionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 384B45ACD5EEEA70C9C02ACB /* IntentionSuggestionService.swift */; };
+		36185728D6656978AF4775BD /* DayIntention.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07990DEBAC65BB769E7F58FA /* DayIntention.swift */; };
 		"AISCORE01BUILD0001" = {isa = PBXBuildFile; fileRef = AISCORE01FILE00001; };
 		"AISCORE01UIBLD0001" = {isa = PBXBuildFile; fileRef = AISCORE01UIFILE001; };
 		"AITASKSCOR0BUILD001" = {isa = PBXBuildFile; fileRef = AITASKSCOR0FILE0001; };
@@ -794,6 +797,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		C7167CA7141C3A57476891E0 /* CoachIntentionUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CoachIntentionUITests.swift; path = FocusBloxUITests/CoachIntentionUITests.swift; sourceTree = SOURCE_ROOT; };
+		384B45ACD5EEEA70C9C02ACB /* IntentionSuggestionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = IntentionSuggestionService.swift; path = Sources/Services/IntentionSuggestionService.swift; sourceTree = SOURCE_ROOT; };
+		07990DEBAC65BB769E7F58FA /* DayIntention.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DayIntention.swift; path = Sources/Models/DayIntention.swift; sourceTree = SOURCE_ROOT; };
 		"AISCORE01FILE00001" = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AITaskScoringServiceTests.swift; sourceTree = "<group>"; };
 		"AISCORE01UIFILE001" = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AITaskScoringUITests.swift; sourceTree = "<group>"; };
 		"AITASKSCOR0FILE0001" = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AITaskScoringService.swift; path = Sources/Services/AITaskScoringService.swift; sourceTree = SOURCE_ROOT; };
@@ -1523,6 +1529,7 @@
 		05D90FB2A2CE48689EC309B4 /* FocusBloxUITests */ = {
 			isa = PBXGroup;
 			children = (
+				C7167CA7141C3A57476891E0 /* CoachIntentionUITests.swift */,
 				EFBUI001FILEREF00001,
 				RW33ABRT01FREF0001,
 				B7B87F212F1BCD9B0069B457 /* EisenhowerMatrixUITests.swift */,
@@ -1696,6 +1703,7 @@
 		73F58232703F62346B160001 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				07990DEBAC65BB769E7F58FA /* DayIntention.swift */,
 				APPSET01FILEREF00001,
 				SYNSET02FILE00001,
 				WARNTIM01FILEREF0001,
@@ -1947,6 +1955,7 @@
 		E8F581D4C161751425D7F776 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				384B45ACD5EEEA70C9C02ACB /* IntentionSuggestionService.swift */,
 				AITASKSCOR0FILE0001,
 				TPSCORING0FILE0001,
 				SMARTENR00FILE0001,
@@ -2677,6 +2686,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C65382110B596A49B275F394 /* IntentionSuggestionService.swift in Sources */,
+				36185728D6656978AF4775BD /* DayIntention.swift in Sources */,
 				F030A10300BF0300BF030001 /* TaskLifecycleLogger.swift in Sources */,
 				COACH001BLDFILE01 /* CoachView.swift in Sources */,
 				E907CB03C20C1B55A48C4B1B /* BacklogRow.swift in Sources */,
@@ -2817,6 +2828,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FAFB51FCCCCFFDD85F0D265A /* CoachIntentionUITests.swift in Sources */,
 				F030A10200BF0200BF020001 /* TaskDebugModeUITests.swift in Sources */,
 				CF2E7692295B675D8541312A /* BacklogViewUITests.swift in Sources */,
 				COACHTST01BFIL01 /* CoachTabLayoutUITests.swift in Sources */,

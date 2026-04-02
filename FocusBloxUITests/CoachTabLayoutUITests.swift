@@ -99,21 +99,26 @@ final class CoachTabLayoutUITests: XCTestCase {
 
     // MARK: - Content Behavior Tests (with Mock Data)
 
-    /// GIVEN: Coach layout with mock data (Next Up tasks exist)
-    /// WHEN: User opens Coach tab
-    /// THEN: Morning section shows planned tasks (not just the question)
-    func testMorningShowsPlannedTasks() throws {
+    /// GIVEN: Coach layout with mock data
+    /// WHEN: User opens Coach tab and sets an intention
+    /// THEN: Morning section shows "Heute geplant" after intention is set
+    func testMorningShowsPlannedTasksAfterIntention() throws {
         app.launchArguments.append("--coach-tab-layout")
         app.launch()
 
         app.tabBars.firstMatch.buttons["Coach"].tap()
 
-        let morningSection = app.otherElements["coachMorningSection"]
-        XCTAssertTrue(morningSection.waitForExistence(timeout: 5))
+        // Intention chips should appear first
+        let chip = app.buttons["intentionChip_0"]
+        XCTAssertTrue(chip.waitForExistence(timeout: 10), "Intention chips should appear")
 
+        // Set intention
+        chip.tap()
+
+        // After intention: "Heute geplant" should appear
         let heutePlanned = app.staticTexts["Heute geplant"]
         XCTAssertTrue(heutePlanned.waitForExistence(timeout: 5),
-                      "Morning section should show 'Heute geplant' with real tasks")
+                      "After setting intention, 'Heute geplant' tasks should appear")
     }
 
     /// GIVEN: Coach layout with mock data (completed tasks exist)

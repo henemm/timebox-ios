@@ -60,7 +60,8 @@ struct FocusBloxApp: App {
         let schema = Schema([
             LocalTask.self,
             TaskMetadata.self,
-            TaskFailureRecord.self
+            TaskFailureRecord.self,
+            DayIntention.self
         ])
 
         let isUITesting = ProcessInfo.processInfo.arguments.contains("-UITesting")
