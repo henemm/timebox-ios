@@ -30,6 +30,7 @@ struct CoachView: View {
 
     @State private var isLoading = false
     @State private var isPermissionDenied = false
+    @State private var refreshID = UUID()
     @State private var behavioralProfile: BehavioralProfile?
     @State private var limitationWarningDismissed = false
 
@@ -70,8 +71,11 @@ struct CoachView: View {
             .navigationTitle("Coach")
             .withSettingsToolbar()
         }
-        .task {
+        .task(id: refreshID) {
             await loadAllData()
+        }
+        .onAppear {
+            refreshID = UUID()
         }
         .accessibilityIdentifier("coachView")
     }

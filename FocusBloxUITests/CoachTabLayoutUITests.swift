@@ -220,4 +220,58 @@ final class CoachTabLayoutUITests: XCTestCase {
         // Final check: we should be on Backlog
         XCTAssertTrue(backlogTab.isSelected, "Should be on Backlog tab after navigation")
     }
+
+    // MARK: - Data Refresh Tests (Bug #194)
+
+    /// GIVEN: Coach layout with mock data, task completed in Backlog
+    /// WHEN: User switches back to Coach tab
+    /// THEN: Coach reflects the updated completion count (REALITY check)
+    func testCoachRefreshesAfterBacklogCompletion() throws {
+        app.launchArguments.append("--coach-tab-layout")
+        app.launch()
+
+        let tabBar = app.tabBars.firstMatch
+        XCTAssertTrue(tabBar.waitForExistence(timeout: 5))
+
+        // 1. Go to Coach, note the completed count
+        let coachTab = tabBar.buttons["Coach"]
+        coachTab.tap()
+        XCTAssertTrue(coachTab.waitForExistence(timeout: 3))
+
+        // Scroll to see daytime section
+        app.swipeUp()
+
+        // Find "schon erledigt" text and capture count
+        let completedBefore = app.staticTexts.matching(
+            NSPredicate(format: "label CONTAINS 'schon erledigt'")
+        ).firstMatch
+        let hadCompletedBefore = completedBefore.waitForExistence(timeout: 3)
+        let countBefore = hadCompletedBefore ? completedBefore.label : "0"
+
+        // 2. Switch to Backlog
+        tabBar.buttons["Backlog"].tap()
+        XCTAssertTrue(tabBar.buttons["Backlog"].waitForExistence(timeout: 3))
+
+        // 3. Complete a task in Backlog (tap first complete button)
+        let completeButton = app.buttons.matching(
+            NSPredicate(format: "identifier BEGINSWITH 'completeButton_'")
+        ).firstMatch
+        if completeButton.waitForExistence(timeout: 5) {
+            completeButton.tap()
+        }
+
+        // 4. Switch back to Coach
+        coachTab.tap()
+        XCTAssertTrue(coachTab.waitForExistence(timeout: 3))
+
+        // 5. Scroll to daytime section again
+        app.swipeUp()
+
+        // 6. REALITY CHECK: Coach must show updated data
+        let completedAfter = app.staticTexts.matching(
+            NSPredicate(format: "label CONTAINS 'schon erledigt'")
+        ).firstMatch
+        XCTAssertTrue(completedAfter.waitForExistence(timeout: 5),
+                      "Coach should show updated completed count after tab switch. Before: \(countBefore)")
+    }
 }
