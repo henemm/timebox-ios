@@ -482,6 +482,7 @@ struct MacFocusView: View {
                 )
                 taskStartTime = nil
                 await loadData()
+                NotificationCenter.default.post(name: .taskDataChanged, object: nil)
             } catch {
                 errorMessage = "Task konnte nicht als erledigt markiert werden."
             }
@@ -628,6 +629,7 @@ struct MacFocusView: View {
             }
         }
         try? modelContext.save()
+        NotificationCenter.default.post(name: .taskDataChanged, object: nil)
     }
 }
 

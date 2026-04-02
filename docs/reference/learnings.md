@@ -152,5 +152,39 @@ SyncEngine.deleteRecurringSeries(     // 3. Erst jetzt löschen — kein LocalTa
 
 ---
 
+## macOS Cross-View Refresh: `taskDataChanged` Notification Pattern
+
+**Problem (#189, #190, #191):** `ContentView` (Backlog) hält `@State tasks` und ruft `refreshTasks()` auf. Child-Views (`MacFocusView`, `TaskInspector`, `MacPlanningView`) ändern Task-Daten via `modelContext.save()`, aber `ContentView` bekommt davon nichts mit — das Backlog veraltet.
+
+**Pattern: Notification posten nach jeder Task-Mutation**
+
+Definition (in `ContentView.swift`):
+```swift
+extension Notification.Name {
+    static let taskDataChanged = Notification.Name("taskDataChanged")
+}
+```
+
+Observer in `ContentView`:
+```swift
+.onReceive(NotificationCenter.default.publisher(for: .taskDataChanged)) { _ in
+    refreshTasks()
+}
+```
+
+Sender in jeder mutierenden Child-View nach `modelContext.save()`:
+```swift
+NotificationCenter.default.post(name: .taskDataChanged, object: nil)
+```
+
+**Regel:** Jede macOS-View, die Task-Daten ändert und `modelContext.save()` aufruft, MUSS danach `.taskDataChanged` posten. Gilt für: Status-Toggles, Completion, isNextUp, Planning-Aktionen.
+
+**Betroffene Views (Stand 2026-04-02):**
+- `MacFocusView` — nach `markTaskComplete()` und `returnIncompleteTasksToNextUp()`
+- `TaskInspector` — via `saveAndNotify()` Helper (kapselt save + post)
+- `MacPlanningView` — nach assign/remove/create/addTask-Aktionen
+
+---
+
 Erstellt: 2026-01-23
-Aktualisiert: 2026-03-21 (SwiftUI List multi-button row, RW_3.2)
+Aktualisiert: 2026-04-02 (macOS taskDataChanged Notification Pattern, Bug #189-191)

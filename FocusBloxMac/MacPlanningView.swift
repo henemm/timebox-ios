@@ -348,6 +348,7 @@ struct MacPlanningView: View {
             Task {
                 await loadCalendarEvents(showSpinner: false)
                 await loadPlanItems()
+                NotificationCenter.default.post(name: .taskDataChanged, object: nil)
             }
         } catch {
             errorMessage = "Task konnte nicht entfernt werden."
@@ -375,6 +376,7 @@ struct MacPlanningView: View {
                 try syncEngine.updateAssignedFocusBlock(itemID: taskID, focusBlockID: block.id)
                 await loadCalendarEvents(showSpinner: false)
                 await loadPlanItems()
+                NotificationCenter.default.post(name: .taskDataChanged, object: nil)
                 // Bug 81 Fix: Update sheet binding so it re-renders with current block
                 if let refreshedBlock = focusBlocks.first(where: { $0.id == block.id }) {
                     blockForTasks = refreshedBlock
@@ -426,6 +428,8 @@ struct MacPlanningView: View {
 
             // Background sync to get accurate calendar colors etc.
             await loadCalendarEvents(showSpinner: false)
+            await loadPlanItems()
+            NotificationCenter.default.post(name: .taskDataChanged, object: nil)
         } catch {
             errorMessage = "Fehler beim Erstellen: \(error.localizedDescription)"
         }
@@ -473,6 +477,8 @@ struct MacPlanningView: View {
                 completedTaskIDs: event.focusBlockCompletedIDs,
                 taskTimes: [:]
             )
+            await loadPlanItems()
+            NotificationCenter.default.post(name: .taskDataChanged, object: nil)
         } catch {
             // Rollback on failure
             calendarEvents[eventIndex] = event

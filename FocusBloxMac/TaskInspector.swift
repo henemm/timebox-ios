@@ -112,7 +112,7 @@ struct TaskInspector: View {
 
                             Button {
                                 task.dueDate = nil
-                                try? modelContext.save()
+                                saveAndNotify()
                             } label: {
                                 Image(systemName: "xmark.circle.fill")
                                     .foregroundStyle(.secondary)
@@ -121,7 +121,7 @@ struct TaskInspector: View {
                         } else {
                             Button("+ Datum setzen") {
                                 task.dueDate = Date()
-                                try? modelContext.save()
+                                saveAndNotify()
                             }
                             .buttonStyle(.plain)
                             .foregroundStyle(.blue)
@@ -226,13 +226,13 @@ struct TaskInspector: View {
                             } else {
                                 task.completedAt = nil
                             }
-                            try? modelContext.save()
+                            saveAndNotify()
                         }
                         .disabled(task.blockerTaskID != nil)
 
                         statusChip("Heute", "calendar.circle.fill", task.isNextUp, .blue) {
                             task.isNextUp.toggle()
-                            try? modelContext.save()
+                            saveAndNotify()
                         }
                         .disabled(task.blockerTaskID != nil)
                     }
@@ -283,7 +283,7 @@ struct TaskInspector: View {
             get: { task.blockerTaskID },
             set: { newValue in
                 task.blockerTaskID = newValue
-                try? modelContext.save()
+                saveAndNotify()
             }
         )
     }
@@ -391,7 +391,7 @@ struct TaskInspector: View {
                 case "yearly": task.recurrenceMonthDay = 1004
                 default: task.recurrenceMonthDay = 1001
                 }
-                try? modelContext.save()
+                saveAndNotify()
             }
         )
     }
@@ -401,7 +401,7 @@ struct TaskInspector: View {
             get: { task.recurrenceInterval ?? 1 },
             set: { newVal in
                 task.recurrenceInterval = newVal
-                try? modelContext.save()
+                saveAndNotify()
             }
         )
     }
@@ -417,7 +417,7 @@ struct TaskInspector: View {
                 if !newPattern.requiresMonthDay {
                     task.recurrenceMonthDay = nil
                 }
-                try? modelContext.save()
+                saveAndNotify()
             }
         )
     }
@@ -427,7 +427,7 @@ struct TaskInspector: View {
             get: { Set(task.recurrenceWeekdays ?? []) },
             set: { newSet in
                 task.recurrenceWeekdays = Array(newSet).sorted()
-                try? modelContext.save()
+                saveAndNotify()
             }
         )
     }
@@ -437,7 +437,7 @@ struct TaskInspector: View {
             get: { task.recurrenceMonthDay ?? 1 },
             set: { newDay in
                 task.recurrenceMonthDay = newDay
-                try? modelContext.save()
+                saveAndNotify()
             }
         )
     }
@@ -452,7 +452,7 @@ struct TaskInspector: View {
 
         return Button {
             task.importance = level
-            try? modelContext.save()
+            saveAndNotify()
         } label: {
             HStack(spacing: 4) {
                 Image(systemName: icon)
@@ -478,7 +478,7 @@ struct TaskInspector: View {
 
         return Button {
             task.urgency = value
-            try? modelContext.save()
+            saveAndNotify()
         } label: {
             HStack(spacing: 4) {
                 Image(systemName: icon)
@@ -504,7 +504,7 @@ struct TaskInspector: View {
 
         return Button {
             task.estimatedDuration = minutes
-            try? modelContext.save()
+            saveAndNotify()
         } label: {
             Text("\(minutes)m")
                 .font(.caption)
@@ -527,7 +527,7 @@ struct TaskInspector: View {
 
         return Button {
             task.taskType = id
-            try? modelContext.save()
+            saveAndNotify()
         } label: {
             VStack(spacing: 4) {
                 Image(systemName: icon)
@@ -568,6 +568,12 @@ struct TaskInspector: View {
             .foregroundStyle(color)
         }
         .buttonStyle(.plain)
+    }
+
+    /// Save and notify ContentView to refresh backlog (Bug #189/#190/#191)
+    private func saveAndNotify() {
+        saveAndNotify()
+        NotificationCenter.default.post(name: .taskDataChanged, object: nil)
     }
 }
 

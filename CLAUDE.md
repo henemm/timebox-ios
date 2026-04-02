@@ -31,6 +31,12 @@ Alles was sinnvoll für beide Plattformen funktioniert, wird EINMAL in `Sources/
 - Kann bestehender plattformspezifischer Code nach `Sources/` verschoben werden?
 - Wenn ein iOS-Feature kein macOS-Pendant hat: Backlog-Eintrag erstellen
 
+**macOS Cross-View Refresh — `taskDataChanged` Notification:**
+Wenn eine macOS-View Task-Daten ändert (`modelContext.save()`), MUSS sie danach
+`NotificationCenter.default.post(name: .taskDataChanged, object: nil)` aufrufen,
+damit `ContentView.refreshTasks()` getriggert wird. Neue macOS-Views mit Mutations
+immer nach diesem Pattern implementieren. Details: `docs/reference/learnings.md`
+
 ## Workflow
 
 This project uses the **OpenSpec TDD Workflow**:

@@ -13,6 +13,11 @@ import os
 
 private let logger = Logger(subsystem: "com.henning.focusblox", category: "RemindersImport")
 
+// Bug #189/#190/#191: Notification for child-view task mutations → ContentView refresh
+extension Notification.Name {
+    static let taskDataChanged = Notification.Name("taskDataChanged")
+}
+
 // MARK: - Focused Values for Keyboard Commands
 
 struct TaskActionsKey: FocusedValueKey {
@@ -242,6 +247,10 @@ struct ContentView: View {
                 // but remoteChangeCount onChange may not have triggered a UI update.
                 refreshTasks()
             }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .taskDataChanged)) { _ in
+            // Bug #189/#190/#191: Refresh after child-view task mutations
+            refreshTasks()
         }
         .toolbar(id: "mainNavigation") {
             // Main navigation in toolbar
