@@ -102,4 +102,60 @@ final class CoachIntentionUITests: XCTestCase {
         XCTAssertTrue(plannedLabel.waitForExistence(timeout: 5),
                       "After setting intention, 'Heute geplant' tasks should appear")
     }
+
+    // MARK: - Evening Reflection Tests (Phase B)
+
+    /// GIVEN: Intention set + evening section visible
+    /// WHEN: User scrolls to evening
+    /// THEN: Evening shows intention echo
+    func testEveningShowsIntentionEcho() throws {
+        app.launch()
+        app.tabBars.firstMatch.buttons["Coach"].tap()
+
+        // Set intention first
+        let chip = app.buttons["intentionChip_0"]
+        XCTAssertTrue(chip.waitForExistence(timeout: 10))
+        chip.tap()
+
+        // Scroll to evening
+        app.swipeUp()
+        app.swipeUp()
+
+        let eveningSection = app.otherElements["coachEveningSection"]
+        XCTAssertTrue(eveningSection.waitForExistence(timeout: 5))
+
+        let intentionEcho = app.staticTexts["eveningIntentionEcho"]
+        XCTAssertTrue(intentionEcho.waitForExistence(timeout: 5),
+                      "Evening should show the morning intention as echo")
+    }
+
+    /// GIVEN: Evening section with completed tasks
+    /// WHEN: User scrolls to evening
+    /// THEN: Reflection text is shown (AI or fallback)
+    func testEveningShowsReflectionText() throws {
+        app.launch()
+        app.tabBars.firstMatch.buttons["Coach"].tap()
+
+        app.swipeUp()
+        app.swipeUp()
+
+        let reflectionText = app.staticTexts["eveningReflectionText"]
+        XCTAssertTrue(reflectionText.waitForExistence(timeout: 5),
+                      "Evening should show reflection text")
+    }
+
+    /// GIVEN: Evening section
+    /// WHEN: User looks for stats
+    /// THEN: Stats are behind a collapsed "Details" toggle
+    func testEveningStatsAreCollapsed() throws {
+        app.launch()
+        app.tabBars.firstMatch.buttons["Coach"].tap()
+
+        app.swipeUp()
+        app.swipeUp()
+
+        let detailsToggle = app.buttons["eveningDetailsToggle"]
+        XCTAssertTrue(detailsToggle.waitForExistence(timeout: 5),
+                      "Evening should have a collapsed 'Details' toggle")
+    }
 }

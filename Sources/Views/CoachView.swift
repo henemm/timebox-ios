@@ -38,6 +38,7 @@ struct CoachView: View {
     @State private var refreshID = UUID()
     @State private var behavioralProfile: BehavioralProfile?
     @State private var limitationWarningDismissed = false
+    @State private var eveningReflectionText: String = ""
 
     private var currentPhase: DayPhase {
         let hour = Calendar.current.component(.hour, from: Date())
@@ -335,55 +336,74 @@ struct CoachView: View {
                 ProgressView()
             } else {
                 VStack(alignment: .leading, spacing: 16) {
-                    if !timelineSegments.isEmpty {
-                        DayTimelineBar(segments: timelineSegments)
+                    // Intention echo (from morning)
+                    if let intention = todayIntention {
+                        Text("Dein Vorsatz: \(intention.text)")
+                            .font(.subheadline)
+                            .foregroundStyle(.tertiary)
+                            .accessibilityIdentifier("eveningIntentionEcho")
                     }
 
-                    if !completedTasks.isEmpty {
-                        VStack(alignment: .leading, spacing: 8) {
-                            Label("\(completedTasks.count) erledigt", systemImage: "checkmark.circle.fill")
-                                .foregroundStyle(.green)
-                                .font(.subheadline.weight(.semibold))
-                            ForEach(completedTasks) { task in
-                                Text(task.title)
-                                    .font(.subheadline)
-                                    .foregroundStyle(.secondary)
+                    // Reflection text (AI or fallback)
+                    Text(eveningReflectionText)
+                        .font(.body)
+                        .accessibilityIdentifier("eveningReflectionText")
+
+                    // Collapsed Details
+                    DisclosureGroup {
+                        VStack(alignment: .leading, spacing: 12) {
+                            if !timelineSegments.isEmpty {
+                                DayTimelineBar(segments: timelineSegments)
+                            }
+
+                            if !completedTasks.isEmpty {
+                                VStack(alignment: .leading, spacing: 8) {
+                                    Label("\(completedTasks.count) erledigt", systemImage: "checkmark.circle.fill")
+                                        .foregroundStyle(.green)
+                                        .font(.subheadline.weight(.semibold))
+                                    ForEach(completedTasks) { task in
+                                        Text(task.title)
+                                            .font(.subheadline)
+                                            .foregroundStyle(.secondary)
+                                    }
+                                }
+                            }
+
+                            if totalPlanned > 0 {
+                                HStack(spacing: 16) {
+                                    ZStack {
+                                        Circle()
+                                            .stroke(.secondary.opacity(0.2), lineWidth: 6)
+                                        Circle()
+                                            .trim(from: 0, to: CGFloat(completionPercentage) / 100)
+                                            .stroke(
+                                                completionPercentage == 100 ? .green : .blue,
+                                                style: StrokeStyle(lineWidth: 6, lineCap: .round)
+                                            )
+                                            .rotationEffect(.degrees(-90))
+                                            .animation(.spring(), value: completionPercentage)
+                                        Text("\(completionPercentage)%")
+                                            .font(.caption.weight(.bold))
+                                    }
+                                    .frame(width: 50, height: 50)
+
+                                    VStack(alignment: .leading) {
+                                        Text("\(totalCompleted) von \(totalPlanned) geplanten Tasks")
+                                            .font(.subheadline)
+                                        Text("\(todayBlocks.count) Focus Blocks")
+                                            .font(.caption)
+                                            .foregroundStyle(.secondary)
+                                    }
+                                }
+                                .accessibilityIdentifier("coachCompletionRing")
                             }
                         }
+                    } label: {
+                        Label("Details", systemImage: "chart.bar")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
                     }
-
-                    #if os(iOS)
-                    SuccessStoryView(completedTasks: completedTasks, focusBlocks: focusBlocks)
-                    #endif
-
-                    if totalPlanned > 0 {
-                        HStack(spacing: 16) {
-                            ZStack {
-                                Circle()
-                                    .stroke(.secondary.opacity(0.2), lineWidth: 6)
-                                Circle()
-                                    .trim(from: 0, to: CGFloat(completionPercentage) / 100)
-                                    .stroke(
-                                        completionPercentage == 100 ? .green : .blue,
-                                        style: StrokeStyle(lineWidth: 6, lineCap: .round)
-                                    )
-                                    .rotationEffect(.degrees(-90))
-                                    .animation(.spring(), value: completionPercentage)
-                                Text("\(completionPercentage)%")
-                                    .font(.caption.weight(.bold))
-                            }
-                            .frame(width: 50, height: 50)
-
-                            VStack(alignment: .leading) {
-                                Text("\(totalCompleted) von \(totalPlanned) geplanten Tasks")
-                                    .font(.subheadline)
-                                Text("\(todayBlocks.count) Focus Blocks")
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                            }
-                        }
-                        .accessibilityIdentifier("coachCompletionRing")
-                    }
+                    .accessibilityIdentifier("eveningDetailsToggle")
                 }
             }
         }
@@ -544,5 +564,12 @@ struct CoachView: View {
                 yesterdayIntention: yesterdayIntention?.text
             )
         }
+
+        // Evening reflection generieren
+        eveningReflectionText = await SuccessStoryService.generate(
+            completedTasks: completedTasks,
+            focusBlocks: focusBlocks,
+            intention: todayIntention?.text
+        )
     }
 }
