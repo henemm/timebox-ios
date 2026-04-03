@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C7326197F7E25BD25B904096 /* TaskSuggestionUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2429086F615EF5BE704920B /* TaskSuggestionUITests.swift */; };
+		6D9F3CC3F3C21C0143D86B9F /* TaskSuggestionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2B0C48BFC234966B9C9D02D /* TaskSuggestionService.swift */; };
+		46C355C4F155278568C094C2 /* TaskSuggestionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2B0C48BFC234966B9C9D02D /* TaskSuggestionService.swift */; };
+		8974CF6A442C7C55B715A19E /* TaskSuggestionServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F91DFB2F02485D6C629F324F /* TaskSuggestionServiceTests.swift */; };
 		CA1535634F6A1689F63F5D2C /* MacCoachVisibleSectionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BBB162F558A9FAB290FC296 /* MacCoachVisibleSectionsTests.swift */; };
 		03A94D15FBA2530D8C629546 /* BacklogRowRedesignUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54C8A326C1D84FA7A3BD27A8 /* BacklogRowRedesignUITests.swift */; };
 		03B86DB53FA9687DF2B2A37A /* MockEventKitRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 993E45CA1F0174CC0345C92C /* MockEventKitRepository.swift */; };
@@ -677,6 +681,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		B2429086F615EF5BE704920B /* TaskSuggestionUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TaskSuggestionUITests.swift; path = FocusBloxUITests/TaskSuggestionUITests.swift; sourceTree = SOURCE_ROOT; };
+		B2B0C48BFC234966B9C9D02D /* TaskSuggestionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TaskSuggestionService.swift; path = Sources/Services/TaskSuggestionService.swift; sourceTree = SOURCE_ROOT; };
+		F91DFB2F02485D6C629F324F /* TaskSuggestionServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TaskSuggestionServiceTests.swift; path = FocusBloxTests/TaskSuggestionServiceTests.swift; sourceTree = SOURCE_ROOT; };
 		1BBB162F558A9FAB290FC296 /* MacCoachVisibleSectionsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MacCoachVisibleSectionsTests.swift; path = FocusBloxMacTests/MacCoachVisibleSectionsTests.swift; sourceTree = SOURCE_ROOT; };
 		01344413B23EDC8D6C17192A /* CountOpenTasksIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CountOpenTasksIntent.swift; path = Sources/Intents/CountOpenTasksIntent.swift; sourceTree = SOURCE_ROOT; };
 		01F676CC7EA20C97ACDD9D18 /* LocalTaskTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalTaskTests.swift; sourceTree = "<group>"; };
@@ -1359,6 +1366,7 @@
 		05D90FB2A2CE48689EC309B4 /* FocusBloxUITests */ = {
 			isa = PBXGroup;
 			children = (
+				B2429086F615EF5BE704920B /* TaskSuggestionUITests.swift */,
 				1900BEB46279861840615C53 /* TaskJumpingBugProofTest.swift */,
 				C7167CA7141C3A57476891E0 /* CoachIntentionUITests.swift */,
 				EFBUI001FILEREF00001 /* EditFocusBlockUITests.swift */,
@@ -1638,6 +1646,7 @@
 		A6B3805EF19D1B131D346DDD /* FocusBloxTests */ = {
 			isa = PBXGroup;
 			children = (
+				F91DFB2F02485D6C629F324F /* TaskSuggestionServiceTests.swift */,
 				B7B87F1F2F1BCD900069B457 /* EisenhowerMatrixTests.swift */,
 				7D81A830A7874C023E289830 /* NextUpTests.swift */,
 				SMARTGAPS001FILEREF000001 /* SmartGapsTests.swift */,
@@ -1793,6 +1802,7 @@
 		E8F581D4C161751425D7F776 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				B2B0C48BFC234966B9C9D02D /* TaskSuggestionService.swift */,
 				384B45ACD5EEEA70C9C02ACB /* IntentionSuggestionService.swift */,
 				AITASKSCOR0FILE0001 /* AITaskScoringService.swift */,
 				TPSCORING0FILE0001 /* TaskPriorityScoringService.swift */,
@@ -2546,6 +2556,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				46C355C4F155278568C094C2 /* TaskSuggestionService.swift in Sources */,
 				C65382110B596A49B275F394 /* IntentionSuggestionService.swift in Sources */,
 				36185728D6656978AF4775BD /* DayIntention.swift in Sources */,
 				F030A10300BF0300BF030001 /* TaskLifecycleLogger.swift in Sources */,
@@ -2688,6 +2699,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C7326197F7E25BD25B904096 /* TaskSuggestionUITests.swift in Sources */,
 				0A590A59957304B81F3F1234 /* TaskJumpingBugProofTest.swift in Sources */,
 				FAFB51FCCCCFFDD85F0D265A /* CoachIntentionUITests.swift in Sources */,
 				F030A10200BF0200BF020001 /* TaskDebugModeUITests.swift in Sources */,
@@ -2813,6 +2825,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8974CF6A442C7C55B715A19E /* TaskSuggestionServiceTests.swift in Sources */,
 				F030A10100BF0100BF010001 /* TaskLifecycleLoggerTests.swift in Sources */,
 				EDE19804EA6D5CB9BCCB6981 /* CalendarSelectionTests.swift in Sources */,
 				968A3087301F055E331E560C /* EventKitRepositoryTests.swift in Sources */,
@@ -2995,6 +3008,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6D9F3CC3F3C21C0143D86B9F /* TaskSuggestionService.swift in Sources */,
 				SSV01MACBLD00001 /* SuccessStoryView.swift in Sources */,
 				SSS01MACBLD00001 /* SuccessStoryService.swift in Sources */,
 				ISS01MACBLD00001 /* IntentionSuggestionService.swift in Sources */,

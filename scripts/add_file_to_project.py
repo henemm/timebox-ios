@@ -64,6 +64,52 @@ def find_group_id(filepath):
     return None
 
 
+def add_existing_file_to_target(pbxproj_content, filepath, target_name):
+    """Add an existing file reference to an additional target. Returns modified content."""
+    filename = os.path.basename(filepath)
+
+    # Find existing file ref ID
+    file_ref_id = generate_id(filepath, "fileref")
+    if file_ref_id not in pbxproj_content:
+        print(f"  ERROR: {filepath} not found in project. Use add_file_to_project first.", file=sys.stderr)
+        sys.exit(1)
+
+    # Generate a unique build file ID for this target
+    mac_build_id = generate_id(filepath, f"buildfile:{target_name}")
+
+    # Check if already in this target
+    build_phase_id = TARGET_BUILD_PHASE_IDS.get(target_name)
+    if not build_phase_id:
+        print(f"  ERROR: Unknown target '{target_name}'", file=sys.stderr)
+        sys.exit(1)
+
+    if mac_build_id in pbxproj_content:
+        print(f"  SKIP: {filepath} already in target {target_name}")
+        return pbxproj_content
+
+    # 1. Add PBXBuildFile entry
+    build_file_line = f'\t\t{mac_build_id} /* {filename} in Sources */ = {{isa = PBXBuildFile; fileRef = {file_ref_id} /* {filename} */; }};\n'
+    pbxproj_content = pbxproj_content.replace(
+        "/* Begin PBXBuildFile section */\n",
+        f"/* Begin PBXBuildFile section */\n{build_file_line}",
+    )
+
+    # 2. Add to target's PBXSourcesBuildPhase
+    pattern = f"{build_phase_id} /\\* Sources \\*/ = {{\\s*\n\\s*isa = PBXSourcesBuildPhase;\\s*\n\\s*buildActionMask = \\d+;\\s*\n\\s*files = \\(\n"
+    match = re.search(pattern, pbxproj_content)
+    if match:
+        insert_pos = match.end()
+        build_ref_line = f"\t\t\t\t{mac_build_id} /* {filename} in Sources */,\n"
+        pbxproj_content = pbxproj_content[:insert_pos] + build_ref_line + pbxproj_content[insert_pos:]
+    else:
+        print(f"  ERROR: Could not find PBXSourcesBuildPhase for {target_name}", file=sys.stderr)
+        sys.exit(1)
+
+    print(f"  Added: {filepath} -> {target_name} (additional target)")
+    print(f"    BuildFile: {mac_build_id}")
+    return pbxproj_content
+
+
 def add_file_to_project(pbxproj_content, filepath, target_name):
     """Add a single file to the pbxproj content. Returns modified content."""
     filename = os.path.basename(filepath)
@@ -137,6 +183,8 @@ def main():
     parser.add_argument("--project", default="FocusBlox.xcodeproj/project.pbxproj",
                         help="Path to project.pbxproj")
     parser.add_argument("--dry-run", action="store_true", help="Show changes without writing")
+    parser.add_argument("--add-target", action="store_true",
+                        help="Add existing file to an additional target (file must already be in project)")
     args = parser.parse_args()
 
     if not os.path.exists(args.project):
@@ -150,7 +198,10 @@ def main():
     for filepath in args.files:
         if not os.path.exists(filepath):
             print(f"WARNING: {filepath} does not exist on disk (adding anyway)")
-        content = add_file_to_project(content, filepath, args.target)
+        if args.add_target:
+            content = add_existing_file_to_target(content, filepath, args.target)
+        else:
+            content = add_file_to_project(content, filepath, args.target)
 
     if content == original:
         print("\nNo changes needed.")

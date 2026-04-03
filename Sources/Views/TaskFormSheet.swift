@@ -42,6 +42,13 @@ struct TaskFormSheet: View {
     @State private var taskDescription: String = ""
     @State private var isSaving = false
 
+    // Task Suggestions
+    @State private var suggestions: [TaskSuggestion] = []
+    @State private var duplicateMatch: DuplicateMatch?
+    @State private var duplicateDismissed = false
+    @State private var suggestionTask: Task<Void, Never>?
+    @State private var skipNextSuggestionUpdate = false
+
     // Dependency State
     @State private var blockerTaskID: String? = nil
     @State private var showBlockerPicker = false
@@ -125,6 +132,68 @@ struct TaskFormSheet: View {
                         TextField("Task-Titel", text: $title)
                             .font(.title3.weight(.medium))
                             .accessibilityIdentifier("taskTitle")
+                            .onChange(of: title) { _, newValue in
+                                if case .create = mode, !skipNextSuggestionUpdate {
+                                    updateSuggestions(for: newValue)
+                                }
+                                if skipNextSuggestionUpdate {
+                                    skipNextSuggestionUpdate = false
+                                }
+                            }
+
+                        // Autocomplete suggestions (create mode only)
+                        if case .create = mode, !suggestions.isEmpty {
+                            ForEach(suggestions) { suggestion in
+                                Button {
+                                    skipNextSuggestionUpdate = true
+                                    title = suggestion.title
+                                    suggestions = []
+                                    duplicateDismissed = false
+                                    checkDuplicate(for: suggestion.title)
+                                } label: {
+                                    HStack {
+                                        Image(systemName: "magnifyingglass")
+                                            .foregroundStyle(.secondary)
+                                            .font(.caption)
+                                        Text(suggestion.title)
+                                            .foregroundStyle(.primary)
+                                        Spacer()
+                                        if suggestion.isCompleted {
+                                            Text("erledigt")
+                                                .font(.caption2)
+                                                .foregroundStyle(.secondary)
+                                        }
+                                    }
+                                    .padding(.vertical, 4)
+                                }
+                                .accessibilityIdentifier("suggestion_\(suggestion.id.uuidString)")
+                            }
+                        }
+
+                        // Duplicate warning
+                        if case .create = mode, let match = duplicateMatch, !duplicateDismissed {
+                            HStack(spacing: 4) {
+                                Image(systemName: "exclamationmark.triangle.fill")
+                                    .foregroundStyle(.orange)
+                                    .font(.caption)
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text("Ähnlich: \u{201E}\(match.task.title)\u{201C}")
+                                        .font(.caption)
+                                    if let completedAt = match.task.completedAt {
+                                        Text("Zuletzt erledigt: \(completedAt.formatted(.relative(presentation: .named)))")
+                                            .font(.caption2)
+                                            .foregroundStyle(.secondary)
+                                    }
+                                }
+                                Spacer()
+                                Button("OK") {
+                                    duplicateDismissed = true
+                                }
+                                .font(.caption)
+                                .accessibilityIdentifier("dismissDuplicateButton")
+                            }
+                            .accessibilityIdentifier("duplicateWarning")
+                        }
                     }
 
                     // MARK: - Duration (Quick Select) - all unselected by default
@@ -495,6 +564,29 @@ struct TaskFormSheet: View {
             )
         }
         .accessibilityIdentifier("taskFormSection_\(id)")
+    }
+
+    // MARK: - Task Suggestions
+
+    private func updateSuggestions(for input: String) {
+        duplicateDismissed = false
+        // Cancel previous task to avoid race conditions with rapid typing
+        suggestionTask?.cancel()
+        let service = TaskSuggestionService(modelContext: modelContext)
+        suggestionTask = Task {
+            // Small debounce to avoid unnecessary work during fast typing
+            try? await Task.sleep(for: .milliseconds(150))
+            guard !Task.isCancelled else { return }
+            suggestions = await service.suggestions(for: input)
+            duplicateMatch = await service.findDuplicate(for: input)
+        }
+    }
+
+    private func checkDuplicate(for input: String) {
+        let service = TaskSuggestionService(modelContext: modelContext)
+        Task {
+            duplicateMatch = await service.findDuplicate(for: input)
+        }
     }
 
     // MARK: - Save

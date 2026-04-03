@@ -13,6 +13,7 @@ struct SettingsView: View {
     @AppStorage("remindersMarkCompleteOnImport") private var remindersMarkCompleteOnImport: Bool = true
     @AppStorage("defaultTaskDuration") private var defaultTaskDuration: Int = 15
     @AppStorage("aiScoringEnabled") private var aiScoringEnabled: Bool = true
+    @AppStorage("taskSuggestionsEnabled") private var taskSuggestionsEnabled: Bool = true
     @AppStorage("dueDateMorningReminderEnabled") private var dueDateMorningReminderEnabled: Bool = true
     @AppStorage("dueDateMorningReminderHour") private var dueDateMorningReminderHour: Int = 9
     @AppStorage("dueDateMorningReminderMinute") private var dueDateMorningReminderMinute: Int = 0
@@ -167,6 +168,9 @@ struct SettingsView: View {
 
                 // Section: Automatic Task Analysis (always visible — deterministic steps work without AI)
                 Section {
+                    Toggle("Task-Vorschläge", isOn: $taskSuggestionsEnabled)
+                        .accessibilityIdentifier("taskSuggestionsToggle")
+
                     if SmartTaskEnrichmentService.isAvailable {
                         Toggle("KI Task-Enrichment", isOn: $aiScoringEnabled)
                             .accessibilityIdentifier("aiScoringToggle")

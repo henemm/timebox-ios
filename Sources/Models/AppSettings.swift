@@ -52,6 +52,11 @@ final class AppSettings: ObservableObject {
     /// Whether AI-powered task scoring is enabled
     @AppStorage("aiScoringEnabled") var aiScoringEnabled: Bool = true
 
+    // MARK: - Task Suggestions
+
+    /// Whether autocomplete and duplicate detection is enabled in CreateTaskView
+    @AppStorage("taskSuggestionsEnabled") var taskSuggestionsEnabled: Bool = true
+
     // MARK: - Emotional Nudge Tracking
 
     @AppStorage("nudgeDailyCount") var nudgeDailyCount: Int = 0

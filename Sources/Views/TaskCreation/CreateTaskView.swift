@@ -26,6 +26,11 @@ struct CreateTaskView: View {
     @State private var customInterval: Int = 1
     @State private var taskDescription: String = ""
 
+    // MARK: - Task Suggestions
+    @State private var suggestions: [TaskSuggestion] = []
+    @State private var duplicateMatch: DuplicateMatch?
+    @State private var duplicateDismissed = false
+
     var onSave: (() -> Void)?
 
     var body: some View {
@@ -35,6 +40,62 @@ struct CreateTaskView: View {
 
                 Section {
                     TextField("Task-Titel", text: $title)
+                        .accessibilityIdentifier("taskTitleField")
+                        .onChange(of: title) { _, newValue in
+                            updateSuggestions(for: newValue)
+                        }
+
+                    // Autocomplete suggestions
+                    if !suggestions.isEmpty {
+                        ForEach(suggestions) { suggestion in
+                            Button {
+                                title = suggestion.title
+                                suggestions = []
+                                duplicateDismissed = false
+                                checkDuplicate(for: suggestion.title)
+                            } label: {
+                                HStack {
+                                    Image(systemName: "magnifyingglass")
+                                        .foregroundStyle(.secondary)
+                                        .font(.caption)
+                                    Text(suggestion.title)
+                                        .foregroundStyle(.primary)
+                                    Spacer()
+                                    if suggestion.isCompleted {
+                                        Text("erledigt")
+                                            .font(.caption2)
+                                            .foregroundStyle(.secondary)
+                                    }
+                                }
+                            }
+                            .accessibilityIdentifier("suggestion_\(suggestion.id.uuidString)")
+                        }
+                    }
+                } footer: {
+                    // Duplicate warning
+                    if let match = duplicateMatch, !duplicateDismissed {
+                        HStack(spacing: 4) {
+                            Image(systemName: "exclamationmark.triangle.fill")
+                                .foregroundStyle(.orange)
+                                .font(.caption)
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text("Ähnlich: \u{201E}\(match.task.title)\u{201C}")
+                                    .font(.caption)
+                                if let completedAt = match.task.completedAt {
+                                    Text("Zuletzt erledigt: \(completedAt.formatted(.relative(presentation: .named)))")
+                                        .font(.caption2)
+                                        .foregroundStyle(.secondary)
+                                }
+                            }
+                            Spacer()
+                            Button("OK") {
+                                duplicateDismissed = true
+                            }
+                            .font(.caption)
+                            .accessibilityIdentifier("dismissDuplicateButton")
+                        }
+                        .accessibilityIdentifier("duplicateWarning")
+                    }
                 }
 
                 // MARK: - Duration (Quick Select) - all unselected by default
@@ -231,6 +292,24 @@ struct CreateTaskView: View {
                     .disabled(title.trimmingCharacters(in: .whitespaces).isEmpty || isSaving)
                 }
             }
+        }
+    }
+
+    // MARK: - Task Suggestions
+
+    private func updateSuggestions(for input: String) {
+        duplicateDismissed = false
+        let service = TaskSuggestionService(modelContext: modelContext)
+        Task {
+            suggestions = await service.suggestions(for: input)
+            duplicateMatch = await service.findDuplicate(for: input)
+        }
+    }
+
+    private func checkDuplicate(for input: String) {
+        let service = TaskSuggestionService(modelContext: modelContext)
+        Task {
+            duplicateMatch = await service.findDuplicate(for: input)
         }
     }
 
