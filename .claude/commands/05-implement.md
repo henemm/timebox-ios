@@ -121,29 +121,79 @@ Sage "go" wenn du mit den Ergebnissen zufrieden bist.
 python3 .claude/hooks/workflow.py phase phase6b_adversary
 ```
 
-### Step 8: Run Adversary Verification (MANDATORY)
+### Step 8: Run Adversary Dialog (MANDATORY)
 
-**Du kannst NICHT direkt zu `/06-validate` springen. Der Adversary muss zuerst pruefen.**
+**Du kannst NICHT direkt zu `/06-validate` springen. Der Adversary-Dialog muss zuerst stattfinden.**
 
-Starte den `implementation-validator` Agent:
+#### 8a. Spec parsen — Checkliste erstellen
 
-```
-Task (implementation-validator): "Pruefe den aktuellen Workflow.
-  Lies die Spec, fuehre Tests aus, mach Screenshots, pruefe Edge Cases.
-  Ruf am Ende qa_gate.py auf."
+```bash
+python3 .claude/hooks/adversary_dialog.py parse <spec-pfad>
 ```
 
-Der Adversary-Agent:
-1. Liest NUR die Spec (nicht den Code)
-2. Fuehrt Tests aus → `/tmp/adversary_test_output.txt`
-3. Macht Screenshots → `/tmp/adversary_screenshot.png`
-4. Prueft Edge Cases
-5. Ruft `qa_gate.py` auf → setzt Verdict
+Das zeigt dir die Expected-Behavior-Punkte die bewiesen werden muessen.
 
-**Wenn Adversary BROKEN meldet:**
-- Fixen und Step 7 wiederholen
+#### 8b. Adversary-Dialog fuehren
 
-**Wenn Adversary VERIFIED meldet:**
+Starte den `implementation-validator` Agent mit der Checkliste:
+
+```
+Task (implementation-validator): "Pruefe den aktuellen Workflow gegen die Spec.
+  Hier ist die Checkliste der zu beweisenden Punkte:
+  [Punkte aus 8a einfuegen]
+
+  REGELN:
+  - Lies NUR die Spec (nicht den Code!)
+  - Fordere fuer JEDEN Punkt einen Beweis (Screenshot, Test-Output, konkreter Code-Pfad)
+  - Akzeptiere NICHT die erste Antwort — bohre nach, frage nach Edge Cases
+  - Mindestens 2 Runden Dialog
+  - Fuehre Tests aus → /tmp/adversary_test_output.txt
+  - Mach Screenshots → /tmp/adversary_screenshot.png"
+```
+
+Der Dialog laeuft als Hin-und-Her zwischen dir (Implementierer) und dem Agent (Adversary):
+1. Agent nennt naechsten offenen Punkt + was er sehen will
+2. Du lieferst Beweis (Screenshot, Test-Output)
+3. Agent bewertet: AKZEPTIERT oder NACHFRAGE
+4. Wiederholen bis alle Punkte bewiesen ODER Defekt gefunden
+
+#### 8c. Dialog-Protokoll speichern
+
+Speichere das Protokoll als Artifact:
+```
+docs/artifacts/<workflow-name>/adversary-dialog.md
+```
+
+Format: Siehe `adversary_dialog.py render_dialog_artifact()` — mit Checkliste, Runden, Verdict.
+
+Registriere das Artifact im Workflow:
+```bash
+python3 .claude/hooks/workflow.py add-artifact adversary_dialog "docs/artifacts/<workflow-name>/adversary-dialog.md" "Adversary Dialog Protokoll" phase6b_adversary
+```
+
+#### 8d. QA-Gate mit Checklist-Validierung
+
+```bash
+# Fuer App-Features (mit XCTest-Output):
+python3 .claude/hooks/qa_gate.py /tmp/adversary_test_output.txt \
+  --checklist docs/artifacts/<workflow-name>/adversary-dialog.md \
+  --screenshot /tmp/adversary_screenshot.png
+
+# Fuer Infra-Tickets (mit Python-unittest-Output, ohne UI):
+python3 .claude/hooks/qa_gate.py /tmp/adversary_test_output.txt \
+  --checklist docs/artifacts/<workflow-name>/adversary-dialog.md \
+  --infra --no-visual "Infra-Ticket ohne UI"
+```
+
+Das Gate prueft zusaetzlich:
+- Alle Checklisten-Punkte bewiesen ([x])
+- Mindestens 2 Dialog-Runden dokumentiert
+- Artifact ist aktuell (< 60 Min)
+
+**Wenn BROKEN:**
+- Fixen und Step 7 wiederholen (neuer Dialog!)
+
+**Wenn VERIFIED:**
 - Weiter zu Phase 7:
 ```bash
 python3 .claude/hooks/workflow.py phase phase7_validate

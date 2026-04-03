@@ -21,6 +21,19 @@ Required:
 - `ui_test_red_done`: `true`
 - `ui_test_red_result`: contains "failed"
 
+### Adversary-Dialog Artifact (PFLICHT)
+
+Pruefe ob ein Dialog-Artifact existiert:
+```bash
+python3 .claude/hooks/adversary_dialog.py validate docs/artifacts/<workflow-name>/adversary-dialog.md
+```
+
+Ohne bestandenes Dialog-Artifact darf die Validation NICHT starten.
+Das Artifact muss:
+- Alle Checklisten-Punkte bewiesen haben ([x])
+- Mindestens 2 Dialog-Runden dokumentieren
+- Aktuell sein (< 60 Min)
+
 ## Your Tasks
 
 ### Step 1: Parallele Validierung (4x Haiku)

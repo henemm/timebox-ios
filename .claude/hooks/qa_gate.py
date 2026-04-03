@@ -59,11 +59,14 @@ def validate_test_output(filepath: str, infra: bool = False) -> tuple[bool, str]
 
     content = path.read_text(errors="replace")
 
-    # Must contain test patterns
-    patterns = [r"Test Suite", r"Test Case", r"Executed \d+ test", r"passed|failed"]
-    matches = sum(1 for p in patterns if re.search(p, content, re.IGNORECASE))
-    if matches < 2:
-        return False, f"Doesn't look like test output (matched {matches}/4 patterns)."
+    # Must contain test patterns (XCTest or Python unittest)
+    xctest_patterns = [r"Test Suite", r"Test Case", r"Executed \d+ test", r"passed|failed"]
+    py_patterns = [r"Ran \d+ tests?", r"\bOK\b|FAILED", r"unittest", r"\.\.\."]
+    xctest_matches = sum(1 for p in xctest_patterns if re.search(p, content, re.IGNORECASE))
+    py_matches = sum(1 for p in py_patterns if re.search(p, content, re.IGNORECASE))
+    best_matches = max(xctest_matches, py_matches)
+    if best_matches < 2:
+        return False, f"Doesn't look like test output (matched {best_matches}/4 patterns)."
 
     # Check test targets (skip for --infra)
     if not infra:
@@ -84,6 +87,17 @@ def validate_test_output(filepath: str, infra: bool = False) -> tuple[bool, str]
         if failures > 0:
             return False, f"Tests FAILED: {failures}/{total} failures"
         return True, f"Tests PASSED: {total} tests across {len(exec_matches)} runs, 0 failures"
+
+    # Python unittest: "Ran N tests in X.XXXs" + "OK" or "FAILED"
+    py_exec = re.search(r"Ran (\d+) tests? in", content)
+    if py_exec:
+        total = int(py_exec.group(1))
+        if re.search(r"^FAILED", content, re.MULTILINE):
+            py_failures = re.search(r"failures=(\d+)", content)
+            fail_count = int(py_failures.group(1)) if py_failures else 1
+            return False, f"Python tests FAILED: {fail_count}/{total} failures"
+        if re.search(r"^OK", content, re.MULTILINE):
+            return True, f"Python tests PASSED: {total} tests, 0 failures"
 
     if "TEST FAILED" in content:
         return False, "TEST FAILED marker found."
@@ -148,6 +162,22 @@ def main():
         if ss_path.stat().st_size < 1000:
             print(f"\nFAILED — Screenshot too small ({ss_path.stat().st_size} bytes)")
             sys.exit(1)
+
+    # Validate dialog artifact if --checklist provided
+    checklist_path = None
+    if "--checklist" in args:
+        idx = args.index("--checklist")
+        if idx + 1 < len(args):
+            checklist_path = args[idx + 1]
+
+    if checklist_path:
+        from adversary_dialog import validate_dialog_artifact
+        cl_valid, cl_message = validate_dialog_artifact(checklist_path)
+        if not cl_valid:
+            print(f"\nFAILED — Dialog: {cl_message}")
+            print(f"Workflow: {wf_name}")
+            sys.exit(1)
+        print(f"Dialog: {cl_message}")
 
     verdict = f"VERIFIED:{message}"
     _set_verdict(verdict)
