@@ -68,8 +68,7 @@ Der Agent denkt ausschliesslich aus User-Perspektive:
 
 **2. User-Erwartung als Massstab festhalten:**
 ```bash
-python3 .claude/hooks/workflow.py set-field user_expectation_notes "Zusammenfassung der User-Erwartung"
-python3 .claude/hooks/workflow.py set-field user_expectation_done true
+python3 .claude/hooks/workflow.py mark-user-expectation "Zusammenfassung der User-Erwartung"
 ```
 
 **OHNE `user_expectation_done=true` werden alle technischen Agents BLOCKIERT!**
@@ -132,8 +131,7 @@ KEIN Feature-Name! KEINE Spec! NICHT was gebaut werden sollte!
 | Fresh-Eyes findet UX-Probleme | STOP — nachbessern |
 
 ```bash
-python3 .claude/hooks/workflow.py set-field result_inspection_notes "Fresh-Eyes: [Was gesehen]. Abgleich mit Erwartung: [Vergleich]"
-python3 .claude/hooks/workflow.py set-field result_inspection_done true
+python3 .claude/hooks/workflow.py mark-result-inspection "Fresh-Eyes: [Was gesehen]. Abgleich mit Erwartung: [Vergleich]"
 ```
 
 ---

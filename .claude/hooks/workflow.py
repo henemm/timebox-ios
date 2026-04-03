@@ -489,6 +489,16 @@ PROTECTED_FIELDS = {
     "regression_check_done",
     "docs_updated",
     "validation_done",
+    # Gate flags — must use dedicated mark-* commands
+    "spec_approved",
+    "visual_inspection_done",
+    "fix_proposal_approved",
+    "user_expectation_done",
+    "result_inspection_done",
+    "red_test_done",
+    "analysis_findings",
+    "challenge_verdict",
+    "context_file",
 }
 
 
@@ -646,6 +656,101 @@ def cmd_mark_validation_done(args: list[str]) -> None:
     print(f"Validation marked done: {result}")
 
 
+MIN_NOTES_LEN = 30  # Minimum chars for evidence notes
+
+
+def cmd_mark_visual_inspection(args: list[str]) -> None:
+    notes = " ".join(args) if args else ""
+    if len(notes) < MIN_NOTES_LEN:
+        print(f"BLOCKED: Notes too short ({len(notes)}/{MIN_NOTES_LEN} chars). "
+              f"Provide real observations from the inspection.", file=sys.stderr)
+        sys.exit(1)
+    data, name = _read_active()
+    data["visual_inspection_notes"] = notes
+    data["visual_inspection_done"] = True
+    _save_active(data)
+    print(f"Visual inspection marked done.")
+
+
+def cmd_mark_user_expectation(args: list[str]) -> None:
+    notes = " ".join(args) if args else ""
+    if len(notes) < MIN_NOTES_LEN:
+        print(f"BLOCKED: Notes too short ({len(notes)}/{MIN_NOTES_LEN} chars). "
+              f"Provide real user-advocate findings.", file=sys.stderr)
+        sys.exit(1)
+    data, name = _read_active()
+    data["user_expectation_notes"] = notes
+    data["user_expectation_done"] = True
+    _save_active(data)
+    print(f"User expectation marked done.")
+
+
+def cmd_mark_result_inspection(args: list[str]) -> None:
+    notes = " ".join(args) if args else ""
+    if len(notes) < MIN_NOTES_LEN:
+        print(f"BLOCKED: Notes too short ({len(notes)}/{MIN_NOTES_LEN} chars). "
+              f"Provide real fresh-eyes findings.", file=sys.stderr)
+        sys.exit(1)
+    data, name = _read_active()
+    data["result_inspection_notes"] = notes
+    data["result_inspection_done"] = True
+    _save_active(data)
+    print(f"Result inspection marked done.")
+
+
+def cmd_mark_fix_proposal(args: list[str]) -> None:
+    notes = " ".join(args) if args else ""
+    if len(notes) < MIN_NOTES_LEN:
+        print(f"BLOCKED: Notes too short ({len(notes)}/{MIN_NOTES_LEN} chars). "
+              f"Provide the approved fix proposal summary.", file=sys.stderr)
+        sys.exit(1)
+    data, name = _read_active()
+    data["fix_proposal_approved"] = True
+    data["fix_proposal_notes"] = notes
+    _save_active(data)
+    print(f"Fix proposal marked approved.")
+
+
+def cmd_mark_analysis(args: list[str]) -> None:
+    notes = " ".join(args) if args else ""
+    if len(notes) < MIN_NOTES_LEN:
+        print(f"BLOCKED: Notes too short ({len(notes)}/{MIN_NOTES_LEN} chars). "
+              f"Provide real analysis findings.", file=sys.stderr)
+        sys.exit(1)
+    data, name = _read_active()
+    data["analysis_findings"] = notes
+    _save_active(data)
+    print(f"Analysis findings recorded.")
+
+
+def cmd_mark_challenge(args: list[str]) -> None:
+    verdict = " ".join(args) if args else ""
+    if len(verdict) < MIN_NOTES_LEN:
+        print(f"BLOCKED: Verdict too short ({len(verdict)}/{MIN_NOTES_LEN} chars). "
+              f"Provide the devil's advocate verdict.", file=sys.stderr)
+        sys.exit(1)
+    data, name = _read_active()
+    data["challenge_verdict"] = verdict
+    _save_active(data)
+    print(f"Challenge verdict recorded.")
+
+
+def cmd_mark_context(args: list[str]) -> None:
+    context_file = " ".join(args) if args else ""
+    if not context_file:
+        print("BLOCKED: Provide the context file path.", file=sys.stderr)
+        sys.exit(1)
+    # Verify file exists
+    ctx_path = _project_root() / context_file
+    if not ctx_path.exists():
+        print(f"BLOCKED: Context file not found: {context_file}", file=sys.stderr)
+        sys.exit(1)
+    data, name = _read_active()
+    data["context_file"] = context_file
+    _save_active(data)
+    print(f"Context file recorded: {context_file}")
+
+
 def cmd_complete(args: list[str]) -> None:
     data, name = _read_active()
     data["current_phase"] = "phase8_complete"
@@ -740,6 +845,13 @@ COMMANDS = {
     "mark-regression-done": cmd_mark_regression_done,
     "mark-docs-updated": cmd_mark_docs_updated,
     "mark-validation-done": cmd_mark_validation_done,
+    "mark-visual-inspection": cmd_mark_visual_inspection,
+    "mark-user-expectation": cmd_mark_user_expectation,
+    "mark-result-inspection": cmd_mark_result_inspection,
+    "mark-fix-proposal": cmd_mark_fix_proposal,
+    "mark-analysis": cmd_mark_analysis,
+    "mark-challenge": cmd_mark_challenge,
+    "mark-context": cmd_mark_context,
     "complete": cmd_complete,
     "list": cmd_list,
     "snapshot-tests": cmd_snapshot_tests,

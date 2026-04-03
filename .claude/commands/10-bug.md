@@ -74,8 +74,7 @@ Moegliche Ergebnisse:
 
 **4. Ergebnis festhalten:**
 ```bash
-python3 .claude/hooks/workflow.py set-field visual_inspection_notes "Agent-Beobachtung: [Was der Agent sah]. Abgleich mit Bug: [Wie es zum Report passt]"
-python3 .claude/hooks/workflow.py set-field visual_inspection_done true
+python3 .claude/hooks/workflow.py mark-visual-inspection "Agent-Beobachtung: [Was der Agent sah]. Abgleich mit Bug: [Wie es zum Report passt]"
 ```
 
 ### Kein Screenshot sinnvoll?
