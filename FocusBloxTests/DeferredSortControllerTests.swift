@@ -148,7 +148,33 @@ final class DeferredSortControllerTests: XCTestCase {
         await fulfillment(of: [expectation], timeout: 5.0)
     }
 
-    // MARK: - Test 7: Mehrere Pending IDs gleichzeitig
+    // MARK: - Test 7: Frozen Score bestimmt Tier-Zuweisung (Regression RW_2.4b)
+
+    /// GIVEN: Ein Task mit Score 45 (planSoon Tier, 35-59)
+    /// WHEN: Der Score live auf 75 steigt (doNow Tier, 60-100), aber frozen bei 45 bleibt
+    /// THEN: effectiveScore gibt 45 zurück → Tier bleibt planSoon (nicht doNow)
+    ///
+    /// Regression-Test für Bug: tasksForTierGroup nutzte $0.priorityTier (live)
+    /// statt effectivePriorityTier (frozen). Commit 5cd3357 (RW_2.4b).
+    func test_frozenScore_determinesTier_notLiveScore() {
+        let controller = DeferredSortController()
+
+        // Freeze bei Score 45 (planSoon Tier)
+        controller.freeze(scores: ["task-1": 45])
+
+        // Live-Score ist jetzt 75 (doNow Tier), aber frozen Score ist 45
+        let effectiveScore = controller.effectiveScore(id: "task-1", liveScore: 75)
+        XCTAssertEqual(effectiveScore, 45, "Frozen Score (45) muss zurückgegeben werden, nicht Live-Score (75)")
+
+        // Tier-Berechnung mit frozen Score muss planSoon ergeben, nicht doNow
+        let tier = TaskPriorityScoringService.PriorityTier.from(score: effectiveScore)
+        XCTAssertEqual(tier, .planSoon,
+                       "Tier muss aus frozen Score (45 → planSoon) berechnet werden, "
+                       + "nicht aus Live-Score (75 → doNow). "
+                       + "Bug: tasksForTierGroup nutzte $0.priorityTier (live) statt effectivePriorityTier (frozen)")
+    }
+
+    // MARK: - Test 8: Mehrere Pending IDs gleichzeitig
 
     /// GIVEN: Controller
     /// WHEN: Mehrere Tasks als pending markiert werden

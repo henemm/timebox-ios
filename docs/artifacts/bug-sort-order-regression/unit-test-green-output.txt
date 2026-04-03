@@ -1,0 +1,22 @@
+Test Case '-[FocusBloxTests.DeferredSortControllerTests test_freeze_capturesScores_effectiveScore_returnsFrozen]' started.
+Test Case '-[FocusBloxTests.DeferredSortControllerTests test_freeze_capturesScores_effectiveScore_returnsFrozen]' passed (0.002 seconds).
+Test Case '-[FocusBloxTests.DeferredSortControllerTests test_freeze_guard_doesNotOverwriteExistingSnapshot]' started.
+Test Case '-[FocusBloxTests.DeferredSortControllerTests test_freeze_guard_doesNotOverwriteExistingSnapshot]' passed (0.000 seconds).
+Test Case '-[FocusBloxTests.DeferredSortControllerTests test_frozenScore_determinesTier_notLiveScore]' started.
+Test Case '-[FocusBloxTests.DeferredSortControllerTests test_frozenScore_determinesTier_notLiveScore]' passed (0.000 seconds).
+Test Case '-[FocusBloxTests.DeferredSortControllerTests test_multiplePendingIDs]' started.
+Test Case '-[FocusBloxTests.DeferredSortControllerTests test_multiplePendingIDs]' passed (0.000 seconds).
+Test Case '-[FocusBloxTests.DeferredSortControllerTests test_onUnfreezeCallback_calledAfterTimeout]' started.
+Test Case '-[FocusBloxTests.DeferredSortControllerTests test_onUnfreezeCallback_calledAfterTimeout]' passed (3.272 seconds).
+Test Case '-[FocusBloxTests.DeferredSortControllerTests test_scheduleDeferredResort_setsPendingID]' started.
+Test Case '-[FocusBloxTests.DeferredSortControllerTests test_scheduleDeferredResort_setsPendingID]' passed (0.000 seconds).
+Test Case '-[FocusBloxTests.DeferredSortControllerTests test_timerClearsStateAfterTimeout]' started.
+Test Case '-[FocusBloxTests.DeferredSortControllerTests test_timerClearsStateAfterTimeout]' passed (4.612 seconds).
+Test Case '-[FocusBloxTests.DeferredSortControllerTests test_timerResets_onSubsequentSchedule]' started.
+Test Case '-[FocusBloxTests.DeferredSortControllerTests test_timerResets_onSubsequentSchedule]' passed (6.691 seconds).
+Test Suite 'DeferredSortControllerTests' passed at 2026-04-03 13:11:17.176.
+	 Executed 8 tests, with 0 failures (0 unexpected) in 14.578 (14.586) seconds
+Test Suite 'FocusBloxTests.xctest' passed at 2026-04-03 13:11:17.181.
+	 Executed 8 tests, with 0 failures (0 unexpected) in 14.578 (14.591) seconds
+Test Suite 'Selected tests' passed at 2026-04-03 13:11:17.183.
+	 Executed 8 tests, with 0 failures (0 unexpected) in 14.578 (14.593) seconds

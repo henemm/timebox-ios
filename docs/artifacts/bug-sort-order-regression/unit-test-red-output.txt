@@ -1,0 +1,12 @@
+Test Case '-[FocusBloxTests.DeferredSortControllerTests test_freeze_capturesScores_effectiveScore_returnsFrozen]' passed (0.002 seconds).
+Test Case '-[FocusBloxTests.DeferredSortControllerTests test_freeze_guard_doesNotOverwriteExistingSnapshot]' passed (0.000 seconds).
+Test Case '-[FocusBloxTests.DeferredSortControllerTests test_frozenScore_determinesTier_notLiveScore]' started.
+Test Case '-[FocusBloxTests.DeferredSortControllerTests test_frozenScore_determinesTier_notLiveScore]' passed (0.001 seconds).
+Test Case '-[FocusBloxTests.DeferredSortControllerTests test_multiplePendingIDs]' passed (0.001 seconds).
+Test Case '-[FocusBloxTests.DeferredSortControllerTests test_onUnfreezeCallback_calledAfterTimeout]' passed (3.281 seconds).
+Test Case '-[FocusBloxTests.DeferredSortControllerTests test_scheduleDeferredResort_setsPendingID]' passed (0.000 seconds).
+Test Case '-[FocusBloxTests.DeferredSortControllerTests test_timerClearsStateAfterTimeout]' passed (4.607 seconds).
+Test Case '-[FocusBloxTests.DeferredSortControllerTests test_timerResets_onSubsequentSchedule]' passed (6.686 seconds).
+Test Suite 'DeferredSortControllerTests' passed at 2026-04-03 13:08:17.298.
+Test Suite 'FocusBloxTests.xctest' passed at 2026-04-03 13:08:17.301.
+Test Suite 'Selected tests' passed at 2026-04-03 13:08:17.305.

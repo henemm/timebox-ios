@@ -90,7 +90,7 @@ struct BacklogView: View {
     // MARK: - Next Up Tasks
     private var nextUpTasks: [PlanItem] {
         planItems.filter { $0.isNextUp && !$0.isCompleted && !$0.isTemplate && !$0.isBlocked && matchesSearch($0) }
-            .sorted { $0.priorityScore > $1.priorityScore }
+            .sorted { effectivePriorityScore(for: $0) > effectivePriorityScore(for: $1) }
     }
 
     /// All non-completed backlog tasks (including blocked ones for grouping)
@@ -128,7 +128,7 @@ struct BacklogView: View {
     private func tasksForTierGroup(_ tiers: [TaskPriorityScoringService.PriorityTier]) -> [PlanItem] {
         let overdueIDs = Set(overdueTasks.map(\.id))
         return backlogTasks
-            .filter { !$0.isInParkdeck && !overdueIDs.contains($0.id) && tiers.contains($0.priorityTier) }
+            .filter { !$0.isInParkdeck && !overdueIDs.contains($0.id) && tiers.contains(effectivePriorityTier(for: $0)) }
             .sorted { effectivePriorityScore(for: $0) > effectivePriorityScore(for: $1) }
     }
 
@@ -698,7 +698,9 @@ struct BacklogView: View {
     }
 
     private func freezeSortOrder() {
-        deferredSort.freeze(scores: Dictionary(uniqueKeysWithValues: backlogTasks.map { ($0.id, effectivePriorityScore(for: $0)) }))
+        // Freeze ALL visible tasks (backlog + nextUp), not just backlog
+        let allVisible = backlogTasks + nextUpTasks
+        deferredSort.freeze(scores: Dictionary(uniqueKeysWithValues: allVisible.map { ($0.id, effectivePriorityScore(for: $0)) }))
     }
 
     private func scheduleDeferredResort(for itemID: String) {
