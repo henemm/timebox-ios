@@ -158,4 +158,63 @@ final class CoachIntentionUITests: XCTestCase {
         XCTAssertTrue(detailsToggle.waitForExistence(timeout: 5),
                       "Evening should have a collapsed 'Details' toggle")
     }
+
+    // MARK: - Daytime Silence Tests (Phase C)
+
+    /// GIVEN: Intention set, daytime section visible
+    /// WHEN: User looks at daytime section
+    /// THEN: Intention is shown prominently (large, centered)
+    func testDaytimeShowsIntentionProminently() throws {
+        app.launch()
+        app.tabBars.firstMatch.buttons["Coach"].tap()
+
+        // Set intention
+        let chip = app.buttons["intentionChip_0"]
+        XCTAssertTrue(chip.waitForExistence(timeout: 10))
+        chip.tap()
+
+        // Scroll to daytime
+        app.swipeUp()
+
+        let daytimeIntention = app.staticTexts["daytimeIntentionText"]
+        XCTAssertTrue(daytimeIntention.waitForExistence(timeout: 5),
+                      "Daytime should show intention text prominently")
+    }
+
+    /// GIVEN: Daytime section with completed tasks
+    /// WHEN: User looks at daytime
+    /// THEN: Only a compact count is shown (not a full task list)
+    func testDaytimeShowsCompactCount() throws {
+        app.launch()
+        app.tabBars.firstMatch.buttons["Coach"].tap()
+
+        app.swipeUp()
+
+        // Should show "X Dinge geschafft" as compact text, not a task list
+        let compactCount = app.staticTexts.matching(
+            NSPredicate(format: "label CONTAINS 'Dinge geschafft' OR label CONTAINS 'schon erledigt'")
+        ).firstMatch
+        XCTAssertTrue(compactCount.waitForExistence(timeout: 5),
+                      "Daytime should show compact completion count")
+    }
+
+    /// GIVEN: Daytime section
+    /// WHEN: User looks at daytime
+    /// THEN: No block counter ("X von Y Blöcken") is shown
+    func testDaytimeHidesBlockCounter() throws {
+        app.launch()
+        app.tabBars.firstMatch.buttons["Coach"].tap()
+
+        app.swipeUp()
+
+        let daytimeSection = app.otherElements["coachDaytimeSection"]
+        XCTAssertTrue(daytimeSection.waitForExistence(timeout: 5))
+
+        // Block counter should NOT be in daytime section
+        let blockCounter = app.staticTexts.matching(
+            NSPredicate(format: "label CONTAINS 'Blöcken erledigt'")
+        ).firstMatch
+        XCTAssertFalse(blockCounter.exists,
+                       "Daytime should NOT show block counter — silence, not status report")
+    }
 }

@@ -123,22 +123,19 @@ final class CoachTabLayoutUITests: XCTestCase {
 
     /// GIVEN: Coach layout with mock data (completed tasks exist)
     /// WHEN: User opens Coach tab and scrolls to Daytime section
-    /// THEN: Daytime section shows "schon erledigt" with actual tasks
-    func testDaytimeShowsCompletedTasks() throws {
+    /// THEN: Daytime shows compact completion count (silence, not report)
+    func testDaytimeShowsCompactCount() throws {
         app.launchArguments.append("--coach-tab-layout")
         app.launch()
 
         app.tabBars.firstMatch.buttons["Coach"].tap()
-
-        // Daytime section may be below the fold — scroll to it
         app.swipeUp()
 
-        // Search for the "schon erledigt" label which proves completed tasks are shown
         let completedLabel = app.staticTexts.matching(
-            NSPredicate(format: "label CONTAINS 'schon erledigt'")
+            NSPredicate(format: "label CONTAINS 'Dinge geschafft'")
         ).firstMatch
         XCTAssertTrue(completedLabel.waitForExistence(timeout: 5),
-                      "Daytime section should show 'X schon erledigt' with completed tasks")
+                      "Daytime should show compact 'X Dinge geschafft'")
     }
 
     /// GIVEN: Coach layout with mock data
@@ -170,29 +167,6 @@ final class CoachTabLayoutUITests: XCTestCase {
     /// GIVEN: Coach layout with mock data
     /// WHEN: User opens Coach tab
     /// THEN: Block status section exists and shows a count label
-    /// Note: FocusBlocks come from EventKit (no calendar access in UI tests),
-    /// so we verify the section renders, not the specific count.
-    /// GIVEN: Coach layout with mock data
-    /// WHEN: User opens Coach tab and scrolls to Daytime
-    /// THEN: Block status text is visible (contains "Blöcken")
-    func testBlockStatusSectionExists() throws {
-        app.launchArguments.append("--coach-tab-layout")
-        app.launch()
-
-        let coachTab = app.tabBars.firstMatch.buttons["Coach"]
-        XCTAssertTrue(coachTab.waitForExistence(timeout: 5), "Coach tab should exist")
-        coachTab.tap()
-
-        // Block status is in daytime section — scroll to it
-        app.swipeUp()
-
-        let blockText = app.staticTexts.matching(
-            NSPredicate(format: "label CONTAINS 'Blöcken'")
-        ).firstMatch
-        XCTAssertTrue(blockText.waitForExistence(timeout: 5),
-                      "Block status should show 'Blöcken' label in daytime section")
-    }
-
     // MARK: - Navigation Tests
 
     /// GIVEN: Coach layout is active
@@ -205,22 +179,22 @@ final class CoachTabLayoutUITests: XCTestCase {
         let tabBar = app.tabBars.firstMatch
         XCTAssertTrue(tabBar.waitForExistence(timeout: 5))
 
-        // Navigate to each tab with waitForExistence to handle timing
+        // Wait for Coach layout to be active before navigating
         let planenTab = tabBar.buttons["Planen"]
+        XCTAssertTrue(planenTab.waitForExistence(timeout: 5), "Planen tab must exist before tapping")
         planenTab.tap()
-        XCTAssertTrue(planenTab.waitForExistence(timeout: 3))
 
         let focusTab = tabBar.buttons["Focus"]
-        focusTab.tap()
         XCTAssertTrue(focusTab.waitForExistence(timeout: 3))
+        focusTab.tap()
 
         let coachTab = tabBar.buttons["Coach"]
-        coachTab.tap()
         XCTAssertTrue(coachTab.waitForExistence(timeout: 3))
+        coachTab.tap()
 
         let backlogTab = tabBar.buttons["Backlog"]
-        backlogTab.tap()
         XCTAssertTrue(backlogTab.waitForExistence(timeout: 3))
+        backlogTab.tap()
 
         // Final check: we should be on Backlog
         XCTAssertTrue(backlogTab.isSelected, "Should be on Backlog tab after navigation")
@@ -246,9 +220,9 @@ final class CoachTabLayoutUITests: XCTestCase {
         // Scroll to see daytime section
         app.swipeUp()
 
-        // Find "schon erledigt" text and capture count
+        // Find completion count text
         let completedBefore = app.staticTexts.matching(
-            NSPredicate(format: "label CONTAINS 'schon erledigt'")
+            NSPredicate(format: "label CONTAINS 'Dinge geschafft'")
         ).firstMatch
         let hadCompletedBefore = completedBefore.waitForExistence(timeout: 3)
         let countBefore = hadCompletedBefore ? completedBefore.label : "0"
@@ -274,7 +248,7 @@ final class CoachTabLayoutUITests: XCTestCase {
 
         // 6. REALITY CHECK: Coach must show updated data
         let completedAfter = app.staticTexts.matching(
-            NSPredicate(format: "label CONTAINS 'schon erledigt'")
+            NSPredicate(format: "label CONTAINS 'Dinge geschafft'")
         ).firstMatch
         XCTAssertTrue(completedAfter.waitForExistence(timeout: 5),
                       "Coach should show updated completed count after tab switch. Before: \(countBefore)")

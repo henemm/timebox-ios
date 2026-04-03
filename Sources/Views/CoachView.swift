@@ -261,49 +261,35 @@ struct CoachView: View {
             if isLoading {
                 ProgressView()
             } else {
-                VStack(alignment: .leading, spacing: 12) {
-                    let blocksCompleted = todayBlocks.filter { block in
-                        let tasksInBlock = block.taskIDs.count
-                        let completedInBlock = block.completedTaskIDs.count
-                        return tasksInBlock > 0 && completedInBlock == tasksInBlock
-                    }.count
-
-                    HStack {
-                        Image(systemName: "square.stack.3d.up.fill")
-                            .foregroundStyle(.blue)
-                        Text("\(blocksCompleted) von \(todayBlocks.count) Blöcken erledigt")
-                            .font(.subheadline)
-                    }
-                    .accessibilityIdentifier("coachBlockStatus")
-
-                    if let nextBlock = nextUpcomingBlock {
-                        HStack {
-                            Image(systemName: "clock")
+                VStack(alignment: .leading, spacing: 16) {
+                    // Intention prominent (the heart of daytime)
+                    if let intention = todayIntention {
+                        Text(intention.text)
+                            .font(.title2.weight(.semibold))
+                            .multilineTextAlignment(.center)
+                            .frame(maxWidth: .infinity, alignment: .center)
+                            .padding(.vertical, 8)
+                            .accessibilityIdentifier("daytimeIntentionText")
+                    } else {
+                        VStack(spacing: 8) {
+                            Image(systemName: "sparkles")
+                                .font(.title)
                                 .foregroundStyle(.secondary)
-                            Text("\(nextBlock.startDate, style: .time) — \(nextBlock.title)")
+                            Text("Setze oben deine Intention für heute")
                                 .font(.subheadline)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(.tertiary)
                         }
+                        .frame(maxWidth: .infinity, alignment: .center)
+                        .padding(.vertical, 12)
                     }
 
+                    // Compact completion count (no task list)
                     if !completedTasks.isEmpty {
-                        VStack(alignment: .leading, spacing: 8) {
-                            Label("\(completedTasks.count) schon erledigt", systemImage: "checkmark.circle.fill")
-                                .foregroundStyle(.green)
-                                .font(.subheadline.weight(.semibold))
-
-                            ForEach(completedTasks) { task in
-                                HStack(spacing: 8) {
-                                    Image(systemName: "checkmark")
-                                        .font(.caption2)
-                                        .foregroundStyle(.green)
-                                    Text(task.title)
-                                        .font(.subheadline)
-                                        .foregroundStyle(.secondary)
-                                }
-                            }
-                        }
-                        .accessibilityIdentifier("coachCompletedTasks")
+                        Label("\(completedTasks.count) Dinge geschafft", systemImage: "checkmark.circle.fill")
+                            .foregroundStyle(.green)
+                            .font(.subheadline)
+                            .frame(maxWidth: .infinity, alignment: .center)
+                            .accessibilityIdentifier("coachCompletedTasks")
                     }
                 }
             }
