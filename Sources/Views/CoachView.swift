@@ -5,7 +5,7 @@ import SwiftUI
 /// Zeigt alle 3 Tages-Phasen als scrollbaren Fluss:
 /// Morning (Intention) → Daytime (Status + erledigte Tasks) → Evening (Reflexion + Stats)
 struct CoachView: View {
-    @AppStorage("morningEndHour") private var morningEndHour = 12
+    @AppStorage("morningEndHour") private var morningEndHour = 10
     @AppStorage("eveningStartHour") private var eveningStartHour = 18
     @Environment(\.eventKitRepository) private var eventKitRepo
     @Environment(\.modelContext) private var modelContext
@@ -39,10 +39,16 @@ struct CoachView: View {
     @State private var behavioralProfile: BehavioralProfile?
     @State private var limitationWarningDismissed = false
     @State private var eveningReflectionText: String = ""
+    @State private var scrollProxy: ScrollViewProxy?
 
     private var currentPhase: DayPhase {
         let hour = Calendar.current.component(.hour, from: Date())
-        return DayPhase.from(hour: hour, morningEnd: morningEndHour, eveningStart: eveningStartHour)
+        return DayPhase.coachPhase(
+            hour: hour,
+            morningEnd: morningEndHour,
+            eveningStart: eveningStartHour,
+            hasIntention: todayIntention != nil
+        )
     }
 
     private var totalCompleted: Int { completedTasks.count }
@@ -60,17 +66,25 @@ struct CoachView: View {
         NavigationStack {
             ScrollViewReader { proxy in
                 ScrollView {
-                    VStack(alignment: .leading, spacing: 32) {
+                    VStack(alignment: .leading, spacing: 0) {
                         morningSection
                             .id("morning")
+                            .containerRelativeFrame(.vertical)
+                            .padding()
                         daytimeSection
                             .id("daytime")
+                            .containerRelativeFrame(.vertical)
+                            .padding()
                         eveningSection
                             .id("evening")
+                            .containerRelativeFrame(.vertical)
+                            .padding()
                     }
-                    .padding()
+                    .scrollTargetLayout()
                 }
+                .scrollTargetBehavior(.viewAligned)
                 .onAppear {
+                    scrollProxy = proxy
                     scrollToCurrentPhase(proxy: proxy)
                 }
             }
@@ -250,6 +264,15 @@ struct CoachView: View {
         NotificationCenter.default.post(name: .taskDataChanged, object: nil)
         #endif
         todayIntention = intention
+
+        // Nach Intention-Auswahl sanft zu "Dein Tag" scrollen
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+            if let proxy = scrollProxy {
+                withAnimation(.smooth) {
+                    proxy.scrollTo("daytime", anchor: .top)
+                }
+            }
+        }
     }
 
     // MARK: - Daytime Section
@@ -562,5 +585,17 @@ struct CoachView: View {
             focusBlocks: focusBlocks,
             intention: todayIntention?.text
         )
+    }
+}
+
+// MARK: - Coach Phase Logic
+
+extension DayPhase {
+    /// Coach-spezifische Phase: Morgen bleibt aktiv solange keine Intention gesetzt UND vor morningEnd.
+    /// Nach Intention-Auswahl oder ab morningEnd → daytime. Ab eveningStart → evening.
+    static func coachPhase(hour: Int, morningEnd: Int, eveningStart: Int, hasIntention: Bool) -> DayPhase {
+        if hour >= eveningStart { return .evening }
+        if hour < morningEnd && !hasIntention { return .morning }
+        return .daytime
     }
 }

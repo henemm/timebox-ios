@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		BBF756FA8545271427FCD542 /* CoachPhaseLogicTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47FF1D861D562EDB2931746 /* CoachPhaseLogicTests.swift */; };
 		FC52135EC9CEE9C9E18A041E /* SmartNotificationEngineIntentionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E08A522C2BA7BB34DB2470D8 /* SmartNotificationEngineIntentionTests.swift */; };
 		C7326197F7E25BD25B904096 /* TaskSuggestionUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2429086F615EF5BE704920B /* TaskSuggestionUITests.swift */; };
 		6D9F3CC3F3C21C0143D86B9F /* TaskSuggestionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2B0C48BFC234966B9C9D02D /* TaskSuggestionService.swift */; };
@@ -682,6 +683,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		D47FF1D861D562EDB2931746 /* CoachPhaseLogicTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CoachPhaseLogicTests.swift; path = FocusBloxTests/CoachPhaseLogicTests.swift; sourceTree = SOURCE_ROOT; };
 		E08A522C2BA7BB34DB2470D8 /* SmartNotificationEngineIntentionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SmartNotificationEngineIntentionTests.swift; path = FocusBloxTests/SmartNotificationEngineIntentionTests.swift; sourceTree = SOURCE_ROOT; };
 		B2429086F615EF5BE704920B /* TaskSuggestionUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TaskSuggestionUITests.swift; path = FocusBloxUITests/TaskSuggestionUITests.swift; sourceTree = SOURCE_ROOT; };
 		B2B0C48BFC234966B9C9D02D /* TaskSuggestionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TaskSuggestionService.swift; path = Sources/Services/TaskSuggestionService.swift; sourceTree = SOURCE_ROOT; };
@@ -1648,6 +1650,7 @@
 		A6B3805EF19D1B131D346DDD /* FocusBloxTests */ = {
 			isa = PBXGroup;
 			children = (
+				D47FF1D861D562EDB2931746 /* CoachPhaseLogicTests.swift */,
 				E08A522C2BA7BB34DB2470D8 /* SmartNotificationEngineIntentionTests.swift */,
 				F91DFB2F02485D6C629F324F /* TaskSuggestionServiceTests.swift */,
 				B7B87F1F2F1BCD900069B457 /* EisenhowerMatrixTests.swift */,
@@ -2828,6 +2831,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BBF756FA8545271427FCD542 /* CoachPhaseLogicTests.swift in Sources */,
 				FC52135EC9CEE9C9E18A041E /* SmartNotificationEngineIntentionTests.swift in Sources */,
 				8974CF6A442C7C55B715A19E /* TaskSuggestionServiceTests.swift in Sources */,
 				F030A10100BF0100BF010001 /* TaskLifecycleLoggerTests.swift in Sources */,
