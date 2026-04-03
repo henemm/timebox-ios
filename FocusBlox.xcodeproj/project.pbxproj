@@ -7,17 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		0A590A59957304B81F3F1234 /* TaskJumpingBugProofTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1900BEB46279861840615C53 /* TaskJumpingBugProofTest.swift */; };
-		SSV01MACBLD00001 /* SuccessStoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5850078865CF21FABB28AD9F /* SuccessStoryView.swift */; };
-		SSS01MACBLD00001 /* SuccessStoryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1F900DD6600DBC1E2C448F6 /* SuccessStoryService.swift */; };
-		ISS01MACBLD00001 /* IntentionSuggestionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 384B45ACD5EEEA70C9C02ACB /* IntentionSuggestionService.swift */; };
-		DI001MACBLD00001 /* DayIntention.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07990DEBAC65BB769E7F58FA /* DayIntention.swift */; };
-		COACH001MACBLD01 /* CoachView.swift in Sources */ = {isa = PBXBuildFile; fileRef = COACH001FILEREF01 /* CoachView.swift */; };
-		67DC0F36E46E54AEB92C74B5 /* MacCoachTabLayoutUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04C38AEEF7A74383E2D83F58 /* MacCoachTabLayoutUITests.swift */; };
+		CA1535634F6A1689F63F5D2C /* MacCoachVisibleSectionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BBB162F558A9FAB290FC296 /* MacCoachVisibleSectionsTests.swift */; };
 		03A94D15FBA2530D8C629546 /* BacklogRowRedesignUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54C8A326C1D84FA7A3BD27A8 /* BacklogRowRedesignUITests.swift */; };
 		03B86DB53FA9687DF2B2A37A /* MockEventKitRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 993E45CA1F0174CC0345C92C /* MockEventKitRepository.swift */; };
 		062C2C62A78FAAB837F02EA6 /* EventKitRepositoryEnvironment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F276F67582A827E523D8ED6 /* EventKitRepositoryEnvironment.swift */; };
 		083F4E94B7CAB57935831D64 /* SuccessStoryUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B334C3C80A1A6187A2DD945 /* SuccessStoryUITests.swift */; };
+		0A590A59957304B81F3F1234 /* TaskJumpingBugProofTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1900BEB46279861840615C53 /* TaskJumpingBugProofTest.swift */; };
 		0AD14E1CA3B1D61146618D3D /* LimitationGuardUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B64E4008A8607B3C5545F3CF /* LimitationGuardUITests.swift */; };
 		0B30790C22063E68AD1A34AE /* SpotlightIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E693153139C30E62D300D923 /* SpotlightIntegrationTests.swift */; };
 		0E82487280F787D98D8C8580 /* MorningCoachingSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8313480AA9BC90E4F214351E /* MorningCoachingSection.swift */; };
@@ -84,6 +79,7 @@
 		669DD290B3AF43A2A2F726A1 /* TbdTasksUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76E1CD1DD36A7476E82D9003 /* TbdTasksUITests.swift */; };
 		66C0D68335223400522071A4 /* CategoryTrendChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B00FF52557F6F42E8194A77 /* CategoryTrendChart.swift */; };
 		679DD8A94D88B08CBA097B91 /* TagRedesignUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC217D1BAA414B7974854ECE /* TagRedesignUITests.swift */; };
+		67DC0F36E46E54AEB92C74B5 /* MacCoachTabLayoutUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04C38AEEF7A74383E2D83F58 /* MacCoachTabLayoutUITests.swift */; };
 		69353F8733B7CE7A1198CE23 /* DisciplineStatsServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D75178618986DA8EB698748 /* DisciplineStatsServiceTests.swift */; };
 		6AADB391CAF1B7B43535687E /* BadgeOverdueNotificationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B783A31231C9313A86914B9 /* BadgeOverdueNotificationTests.swift */; };
 		6AE84B88BD9C4E3A5E89A645 /* BehavioralProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48934E578C766B083C669C9D /* BehavioralProfile.swift */; };
@@ -227,6 +223,7 @@
 		CLRHEX01BUILD00001 /* Color+Hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = CLRHEX01FILEREF001 /* Color+Hex.swift */; };
 		CLRHEX01BUILD00002 /* Color+Hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = CLRHEX01FILEREF001 /* Color+Hex.swift */; };
 		COACH001BLDFILE01 /* CoachView.swift in Sources */ = {isa = PBXBuildFile; fileRef = COACH001FILEREF01 /* CoachView.swift */; };
+		COACH001MACBLD01 /* CoachView.swift in Sources */ = {isa = PBXBuildFile; fileRef = COACH001FILEREF01 /* CoachView.swift */; };
 		COACHTST01BFIL01 /* CoachTabLayoutUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = COACHTST01FREF01 /* CoachTabLayoutUITests.swift */; };
 		CREATETV02BUILD0001 /* CreateTaskView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04068491AA7CD2368A273C00 /* CreateTaskView.swift */; };
 		CTC1SERV0BUILD0001 /* TaskTitleEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = CTC1SERV0FILE00001 /* TaskTitleEngine.swift */; };
@@ -251,6 +248,7 @@
 		DFSRT01BUILD00001 /* DeferredSortControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFSRT01FILEREF001 /* DeferredSortControllerTests.swift */; };
 		DFSRT02BUILD00001 /* DeferredSortController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFSRT02FILEREF001 /* DeferredSortController.swift */; };
 		DFSRT03BUILD00001 /* DeferredSortController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFSRT02FILEREF001 /* DeferredSortController.swift */; };
+		DI001MACBLD00001 /* DayIntention.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07990DEBAC65BB769E7F58FA /* DayIntention.swift */; };
 		DISC01BUILD0000001 /* Discipline.swift in Sources */ = {isa = PBXBuildFile; fileRef = DISC01FILEREF00001 /* Discipline.swift */; };
 		DISC02BUILD0000001 /* Discipline.swift in Sources */ = {isa = PBXBuildFile; fileRef = DISC01FILEREF00001 /* Discipline.swift */; };
 		DSCT01BUILD0000001 /* DisciplineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DSCT01FILEREF00001 /* DisciplineTests.swift */; };
@@ -313,6 +311,7 @@
 		INTENT05BUILD00001 /* CompleteTaskIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = INTENT05FILEREF0001 /* CompleteTaskIntent.swift */; };
 		INTENT06BUILD00001 /* CountOpenTasksIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = INTENT06FILEREF0001 /* CountOpenTasksIntent.swift */; };
 		INTENT07BUILD00001 /* FocusBloxShortcuts.swift in Sources */ = {isa = PBXBuildFile; fileRef = INTENT07FILEREF0001 /* FocusBloxShortcuts.swift */; };
+		ISS01MACBLD00001 /* IntentionSuggestionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 384B45ACD5EEEA70C9C02ACB /* IntentionSuggestionService.swift */; };
 		ITBFLITE01BUILD01 /* TaskEntityUserActivityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ITBFLITE01FILE001 /* TaskEntityUserActivityTests.swift */; };
 		JUMPBUG01BUILD0001 /* (null) in Sources */ = {isa = PBXBuildFile; };
 		KWDSYS01BUILD0001 /* KeywordSystemTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = KWDSYS01FILE00001 /* KeywordSystemTests.swift */; };
@@ -444,6 +443,8 @@
 		SNDSVC02BUILDFILE0001 /* SoundService.swift in Sources */ = {isa = PBXBuildFile; fileRef = SNDSVC02FILEREF00001 /* SoundService.swift */; };
 		SNDUI001BUILDFILE0001 /* SoundSettingsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = SNDUI001FILEREF00001 /* SoundSettingsUITests.swift */; };
 		SPRNTRV01BUILD0001 /* SprintReviewUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = SPRNTRV01FILE00001 /* SprintReviewUITests.swift */; };
+		SSS01MACBLD00001 /* SuccessStoryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1F900DD6600DBC1E2C448F6 /* SuccessStoryService.swift */; };
+		SSV01MACBLD00001 /* SuccessStoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5850078865CF21FABB28AD9F /* SuccessStoryView.swift */; };
 		SYNSET01BUILD0001 /* SyncedSettingsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = SYNSET01FILE00001 /* SyncedSettingsTests.swift */; };
 		SYNSET02BUILD0001 /* SyncedSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = SYNSET02FILE00001 /* SyncedSettings.swift */; };
 		SYNSET02BUILD0002 /* SyncedSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = SYNSET02FILE00001 /* SyncedSettings.swift */; };
@@ -676,13 +677,13 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		1900BEB46279861840615C53 /* TaskJumpingBugProofTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TaskJumpingBugProofTest.swift; path = FocusBloxUITests/TaskJumpingBugProofTest.swift; sourceTree = SOURCE_ROOT; };
-		04C38AEEF7A74383E2D83F58 /* MacCoachTabLayoutUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MacCoachTabLayoutUITests.swift; path = FocusBloxMacUITests/MacCoachTabLayoutUITests.swift; sourceTree = SOURCE_ROOT; };
+		1BBB162F558A9FAB290FC296 /* MacCoachVisibleSectionsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MacCoachVisibleSectionsTests.swift; path = FocusBloxMacTests/MacCoachVisibleSectionsTests.swift; sourceTree = SOURCE_ROOT; };
 		01344413B23EDC8D6C17192A /* CountOpenTasksIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CountOpenTasksIntent.swift; path = Sources/Intents/CountOpenTasksIntent.swift; sourceTree = SOURCE_ROOT; };
 		01F676CC7EA20C97ACDD9D18 /* LocalTaskTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalTaskTests.swift; sourceTree = "<group>"; };
 		040247E89B605A2D0AE1C285 /* QuickCaptureSubIntents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = QuickCaptureSubIntents.swift; path = Sources/Intents/QuickCaptureSubIntents.swift; sourceTree = SOURCE_ROOT; };
 		04068491AA7CD2368A273C00 /* CreateTaskView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateTaskView.swift; sourceTree = "<group>"; };
 		0461CA6D7F62F83512E8AD05 /* TaskAssignmentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskAssignmentView.swift; sourceTree = "<group>"; };
+		04C38AEEF7A74383E2D83F58 /* MacCoachTabLayoutUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MacCoachTabLayoutUITests.swift; path = FocusBloxMacUITests/MacCoachTabLayoutUITests.swift; sourceTree = SOURCE_ROOT; };
 		04DD40ED9F110CCB57B42E1C /* ReminderListInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ReminderListInfo.swift; path = Sources/Models/ReminderListInfo.swift; sourceTree = SOURCE_ROOT; };
 		0577AA0F051FD6C2DECA3B77 /* DisciplineTrendChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisciplineTrendChart.swift; sourceTree = "<group>"; };
 		07990DEBAC65BB769E7F58FA /* DayIntention.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DayIntention.swift; path = Sources/Models/DayIntention.swift; sourceTree = SOURCE_ROOT; };
@@ -702,6 +703,7 @@
 		14E16E8941781A7134CBEE3A /* SyncEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncEngineTests.swift; sourceTree = "<group>"; };
 		15724F09AFC73A3875135019 /* LimitationGuardServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = LimitationGuardServiceTests.swift; path = FocusBloxTests/LimitationGuardServiceTests.swift; sourceTree = SOURCE_ROOT; };
 		16DB1BDF5EBAC3B508866AAF /* EditRedesignUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = EditRedesignUITests.swift; sourceTree = "<group>"; };
+		1900BEB46279861840615C53 /* TaskJumpingBugProofTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TaskJumpingBugProofTest.swift; path = FocusBloxUITests/TaskJumpingBugProofTest.swift; sourceTree = SOURCE_ROOT; };
 		1950589463657F7EB526D130 /* FocusBloxTests/WatchEnrichmentGapTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = FocusBloxTests/WatchEnrichmentGapTests.swift; sourceTree = SOURCE_ROOT; };
 		1A27D4BE199FA040FC61FFD6 /* LocalTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalTask.swift; sourceTree = "<group>"; };
 		1B00FF52557F6F42E8194A77 /* CategoryTrendChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryTrendChart.swift; sourceTree = "<group>"; };
@@ -1757,6 +1759,7 @@
 				A243DD5301F14089BF9880CE /* MorningCoachingSection.swift */,
 				B1F900DD6600DBC1E2C448F6 /* SuccessStoryService.swift */,
 				5850078865CF21FABB28AD9F /* SuccessStoryView.swift */,
+				04C38AEEF7A74383E2D83F58 /* MacCoachTabLayoutUITests.swift */,
 			);
 			name = "Recovered References";
 			sourceTree = "<group>";
@@ -3081,6 +3084,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CA1535634F6A1689F63F5D2C /* MacCoachVisibleSectionsTests.swift in Sources */,
 				1CEC4456AD6C94BC7DB4977B /* MacBacklogParkdeckStackingTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

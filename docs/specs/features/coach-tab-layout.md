@@ -2,8 +2,8 @@
 entity_id: coach-tab-layout
 type: feature
 created: 2026-04-01
-updated: 2026-04-01
-status: draft
+updated: 2026-04-03
+status: implemented
 version: "1.0"
 tags: [ui, tabs, navigation, coach]
 ---
@@ -127,17 +127,31 @@ Alle bestehenden `selectedTab = .day` / `.blox` Referenzen werden über Helper-P
 ## Known Limitations
 
 - Coach-Tab ist ein **Prototyp** zum Testen — kein finales Feature
-- Keine macOS-spezifische Coach-View (nutzt shared CoachView)
 - Wochenübersicht nur als kompakter Ring, nicht als vollständiges Review-Dashboard
 - Bestehende UI Tests testen nur das klassische Layout (Coach-Tests sind neu)
+
+## macOS
+
+Der Coach-Tab ist auch auf macOS verfügbar:
+
+- `FocusBloxMac/SidebarView.swift`: `MainSection` enum hat `.coach` Case
+- `FocusBloxMac/ContentView.swift`: `useCoachTabLayout` Feature-Flag + `visibleSections` computed property
+- `FocusBloxMac/MacSettingsView.swift`: Toggle für Coach-Tab Layout in den Einstellungen
+- Shared Views (`DayIntention`, `IntentionSuggestionService`, `SuccessStoryService`, `SuccessStoryView`) wurden zum `FocusBloxMac` Target hinzugefügt
+- `Sources/Views/CoachView.swift`: `.withSettingsToolbar()` und `.taskDataChanged`-Notification sind mit `#if os(iOS)` guards versehen
+
+**macOS-Tests:**
+- `FocusBloxMacUITests/MacCoachTabLayoutUITests.swift` (5 UI Tests)
+- `FocusBloxMacTests/MacCoachVisibleSectionsTests.swift` (3 Unit Tests)
 
 ## Rückgängig machen
 
 1. Settings → Entwickler → "Coach-Tab Layout" Toggle auf **aus**
-2. App zeigt sofort wieder 5 Tabs
+2. App zeigt sofort wieder 5 Tabs (iOS) bzw. klassische Sidebar ohne Coach (macOS)
 3. Kein Code gelöscht, kein Datenverlust
 4. Alternativ: Feature Flag komplett entfernen → alles zurück wie vorher
 
 ## Changelog
 
 - 2026-04-01: Initial spec created (Prototyp Variante C)
+- 2026-04-03: macOS-Implementierung abgeschlossen (#197) — Coach-Tab in Sidebar, Feature-Flag-Toggle in MacSettingsView, shared Views zum Mac-Target hinzugefügt; Status auf `implemented` gesetzt

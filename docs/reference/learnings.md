@@ -179,12 +179,38 @@ NotificationCenter.default.post(name: .taskDataChanged, object: nil)
 
 **Regel:** Jede macOS-View, die Task-Daten ändert und `modelContext.save()` aufruft, MUSS danach `.taskDataChanged` posten. Gilt für: Status-Toggles, Completion, isNextUp, Planning-Aktionen.
 
-**Betroffene Views (Stand 2026-04-02):**
+**Betroffene Views (Stand 2026-04-03):**
 - `MacFocusView` — nach `markTaskComplete()` und `returnIncompleteTasksToNextUp()`
 - `TaskInspector` — via `saveAndNotify()` Helper (kapselt save + post)
 - `MacPlanningView` — nach assign/remove/create/addTask-Aktionen
+- `CoachView` (macOS) — nach Intention-Speicherung (`saveDayIntention()`)
+
+---
+
+---
+
+## macOS XCTest: Element-Abfrage in NavigationSplitView
+
+**Problem (#197):** `app.otherElements["identifier"]` findet keine Elemente im Content-Bereich einer `NavigationSplitView`. Der Content-Bereich wird von XCTest nicht als direkt abfragbares `otherElement` exponiert.
+
+**Falscher Ansatz:**
+```swift
+app.otherElements["coachContent"].waitForExistence(timeout: 5)  // ❌ findet nichts
+```
+
+**Korrekter Ansatz — `descendants(matching:)` verwenden:**
+```swift
+app.descendants(matching: .any)["coachContent"].waitForExistence(timeout: 5)  // ✅
+```
+
+**Grund:** `descendants(matching: .any)` durchsucht den gesamten Accessibility-Baum unabhängig von der Element-Hierarchie, während `otherElements` nur eine bestimmte Accessibility-Kategorie trifft, die in `NavigationSplitView`-Content-Areas nicht zuverlässig gesetzt ist.
+
+**Generelle Regel für macOS UI Tests mit `NavigationSplitView`:**
+- Sidebar-Elemente: `app.outlineRows` oder `app.buttons["Label"]`
+- Content-Bereich: `app.descendants(matching: .any)["identifier"]`
+- Toolbar-Buttons: `app.buttons["Label"]` (funktioniert weiterhin direkt)
 
 ---
 
 Erstellt: 2026-01-23
-Aktualisiert: 2026-04-02 (macOS taskDataChanged Notification Pattern, Bug #189-191)
+Aktualisiert: 2026-04-03 (CoachView zu taskDataChanged-Liste; macOS XCTest NavigationSplitView, #197)
