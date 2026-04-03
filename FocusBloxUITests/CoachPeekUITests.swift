@@ -19,6 +19,40 @@ final class CoachPeekUITests: XCTestCase {
         }
     }
 
+    /// Screenshot des Coach-Tabs für visuelle Inspektion — alle Phasen.
+    func test_screenshot_coachTab() {
+        let coach = app.otherElements["coachView"]
+        XCTAssertTrue(coach.waitForExistence(timeout: 5))
+
+        // Screenshot 1: Aktuelle Phase (Auto-Scroll-Ziel)
+        let s1 = app.screenshot()
+        try? s1.pngRepresentation.write(to: URL(fileURLWithPath: "/tmp/coach_phase_current.png"))
+
+        // Scroll ganz nach oben um Morning zu sehen
+        let scrollView = app.scrollViews.firstMatch
+        scrollView.swipeDown()
+        scrollView.swipeDown()
+        scrollView.swipeDown()
+        Thread.sleep(forTimeInterval: 0.5)
+
+        let s2 = app.screenshot()
+        try? s2.pngRepresentation.write(to: URL(fileURLWithPath: "/tmp/coach_phase_morning.png"))
+
+        // Scroll zu Daytime
+        scrollView.swipeUp()
+        Thread.sleep(forTimeInterval: 0.5)
+
+        let s3 = app.screenshot()
+        try? s3.pngRepresentation.write(to: URL(fileURLWithPath: "/tmp/coach_phase_daytime.png"))
+
+        // Scroll zu Evening
+        scrollView.swipeUp()
+        Thread.sleep(forTimeInterval: 0.5)
+
+        let s4 = app.screenshot()
+        try? s4.pngRepresentation.write(to: URL(fileURLWithPath: "/tmp/coach_phase_evening.png"))
+    }
+
     /// Verhalten: Wenn Morning-Section im Fokus ist, muss "Dein Tag" (Daytime)
     /// am unteren Bildschirmrand angedeutet sichtbar sein (Peek-Effekt).
     func test_morningFocus_daytimePeeksFromBelow() {

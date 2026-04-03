@@ -39,7 +39,7 @@ struct CoachView: View {
     @State private var behavioralProfile: BehavioralProfile?
     @State private var limitationWarningDismissed = false
     @State private var eveningReflectionText: String = ""
-    @State private var scrollProxy: ScrollViewProxy?
+    @State private var activeDrawer: DayPhase?
 
     private var currentPhase: DayPhase {
         let hour = Calendar.current.component(.hour, from: Date())
@@ -63,35 +63,16 @@ struct CoachView: View {
     }
 
     var body: some View {
-        NavigationStack {
-            ScrollViewReader { proxy in
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 0) {
-                        morningSection
-                            .id("morning")
-                            .containerRelativeFrame(.vertical)
-                            .padding()
-                        daytimeSection
-                            .id("daytime")
-                            .containerRelativeFrame(.vertical)
-                            .padding()
-                        eveningSection
-                            .id("evening")
-                            .containerRelativeFrame(.vertical)
-                            .padding()
-                    }
-                    .scrollTargetLayout()
-                }
-                .scrollTargetBehavior(.viewAligned)
-                .onAppear {
-                    scrollProxy = proxy
-                    scrollToCurrentPhase(proxy: proxy)
-                }
+        VStack(spacing: 0) {
+            drawer(phase: .morning, title: "Guten Morgen", icon: "sunrise.fill", color: .orange) {
+                morningContent
             }
-            .navigationTitle("Coach")
-            #if os(iOS)
-            .withSettingsToolbar()
-            #endif
+            drawer(phase: .daytime, title: "Dein Tag", icon: "sun.max.fill", color: .blue) {
+                daytimeContent
+            }
+            drawer(phase: .evening, title: "Tagesrückblick", icon: "moon.stars.fill", color: .purple) {
+                eveningContent
+            }
         }
         .accessibilityIdentifier("coachView")
         .task(id: refreshID) {
@@ -99,53 +80,98 @@ struct CoachView: View {
         }
         .onAppear {
             refreshID = UUID()
+            if activeDrawer == nil {
+                activeDrawer = currentPhase
+            }
         }
     }
 
-    // MARK: - Morning Section
+    // MARK: - Drawer Component
 
-    private var morningSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            sectionHeader(
-                title: "Guten Morgen",
-                icon: "sunrise.fill",
-                color: .orange,
-                isActive: currentPhase == .morning
-            )
+    @ViewBuilder
+    private func drawer<Content: View>(
+        phase: DayPhase,
+        title: String,
+        icon: String,
+        color: Color,
+        @ViewBuilder content: @escaping () -> Content
+    ) -> some View {
+        let isOpen = activeDrawer == phase
+        let isActive = currentPhase == phase
 
-            if isLoading {
-                ProgressView()
-            } else {
-                VStack(alignment: .leading, spacing: 12) {
-                    // Gestern-Echo
-                    if let yesterday = yesterdayIntention {
-                        Text("Gestern: \(yesterday.text)")
-                            .font(.subheadline)
-                            .foregroundStyle(.tertiary)
-                            .accessibilityIdentifier("yesterdayIntentionEcho")
-                    }
-
-                    if let intention = todayIntention {
-                        // Intention already set — show it + task suggestions
-                        intentionSetView(intention)
-                    } else {
-                        // No intention yet — show question + chips
-                        intentionPickerView
-                    }
+        VStack(spacing: 0) {
+            // Header — immer sichtbar, tappbar
+            Button {
+                withAnimation(.spring(duration: 0.4)) {
+                    activeDrawer = isOpen ? nil : phase
                 }
+            } label: {
+                HStack {
+                    Image(systemName: icon)
+                        .foregroundStyle(color)
+                        .font(.title3)
+                    Text(title)
+                        .font(.headline)
+                    if isActive {
+                        Text("Jetzt")
+                            .font(.caption)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 2)
+                            .background(color.opacity(0.2), in: Capsule())
+                            .foregroundStyle(color)
+                    }
+                    Spacer()
+                    Image(systemName: isOpen ? "chevron.up" : "chevron.down")
+                        .font(.caption)
+                        .foregroundStyle(.tertiary)
+                }
+                .padding(.horizontal, 20)
+                .padding(.vertical, 14)
+                .background(isActive ? color.opacity(0.06) : .clear)
+            }
+            .buttonStyle(.plain)
+            .accessibilityIdentifier("coachDrawer_\(title)")
+
+            Divider()
+
+            // Content — nur wenn offen
+            if isOpen {
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 12) {
+                        content()
+                    }
+                    .padding()
+                }
+                .transition(.opacity.combined(with: .move(edge: .top)))
             }
         }
-        .padding()
-        .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(currentPhase == .morning ? .orange.opacity(0.08) : .clear)
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: 16)
-                .strokeBorder(.secondary.opacity(0.15), lineWidth: 1)
-        )
+        .frame(maxHeight: isOpen ? .infinity : nil)
         .accessibilityElement(children: .contain)
-        .accessibilityIdentifier("coachMorningSection")
+        .accessibilityIdentifier(phase == .morning ? "coachMorningSection" :
+                                 phase == .daytime ? "coachDaytimeSection" : "coachEveningSection")
+    }
+
+    // MARK: - Morning Content
+
+    @ViewBuilder
+    private var morningContent: some View {
+        if isLoading {
+            ProgressView()
+        } else {
+            // Gestern-Echo
+            if let yesterday = yesterdayIntention {
+                Text("Gestern: \(yesterday.text)")
+                    .font(.subheadline)
+                    .foregroundStyle(.tertiary)
+                    .accessibilityIdentifier("yesterdayIntentionEcho")
+            }
+
+            if let intention = todayIntention {
+                intentionSetView(intention)
+            } else {
+                intentionPickerView
+            }
+        }
     }
 
     // MARK: - Intention Picker (no intention set yet)
@@ -265,191 +291,123 @@ struct CoachView: View {
         #endif
         todayIntention = intention
 
-        // Nach Intention-Auswahl sanft zu "Dein Tag" scrollen
+        // Nach Intention-Auswahl sanft zu "Dein Tag" wechseln
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-            if let proxy = scrollProxy {
-                withAnimation(.smooth) {
-                    proxy.scrollTo("daytime", anchor: .top)
-                }
+            withAnimation(.spring(duration: 0.4)) {
+                activeDrawer = .daytime
             }
         }
     }
 
-    // MARK: - Daytime Section
+    // MARK: - Daytime Content
 
-    private var daytimeSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            sectionHeader(
-                title: "Dein Tag",
-                icon: "sun.max.fill",
-                color: .blue,
-                isActive: currentPhase == .daytime
-            )
-
-            if isLoading {
-                ProgressView()
+    @ViewBuilder
+    private var daytimeContent: some View {
+        if isLoading {
+            ProgressView()
+        } else {
+            if let intention = todayIntention {
+                Text(intention.text)
+                    .font(.title2.weight(.semibold))
+                    .multilineTextAlignment(.center)
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    .padding(.vertical, 8)
+                    .accessibilityIdentifier("daytimeIntentionText")
             } else {
-                VStack(alignment: .leading, spacing: 16) {
-                    // Intention prominent (the heart of daytime)
-                    if let intention = todayIntention {
-                        Text(intention.text)
-                            .font(.title2.weight(.semibold))
-                            .multilineTextAlignment(.center)
-                            .frame(maxWidth: .infinity, alignment: .center)
-                            .padding(.vertical, 8)
-                            .accessibilityIdentifier("daytimeIntentionText")
-                    } else {
-                        VStack(spacing: 8) {
-                            Image(systemName: "sparkles")
-                                .font(.title)
-                                .foregroundStyle(.secondary)
-                            Text("Setze oben deine Intention für heute")
-                                .font(.subheadline)
-                                .foregroundStyle(.tertiary)
-                        }
-                        .frame(maxWidth: .infinity, alignment: .center)
-                        .padding(.vertical, 12)
+                VStack(spacing: 8) {
+                    Image(systemName: "sparkles")
+                        .font(.title)
+                        .foregroundStyle(.secondary)
+                    Text("Setze oben deine Intention für heute")
+                        .font(.subheadline)
+                        .foregroundStyle(.tertiary)
+                }
+                .frame(maxWidth: .infinity, alignment: .center)
+                .padding(.vertical, 12)
+            }
+
+            if !completedTasks.isEmpty {
+                Label("\(completedTasks.count) Dinge geschafft", systemImage: "checkmark.circle.fill")
+                    .foregroundStyle(.green)
+                    .font(.subheadline)
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    .accessibilityIdentifier("coachCompletedTasks")
+            }
+        }
+    }
+
+    // MARK: - Evening Content
+
+    @ViewBuilder
+    private var eveningContent: some View {
+        if isLoading {
+            ProgressView()
+        } else {
+            if let intention = todayIntention {
+                Text("Dein Vorsatz: \(intention.text)")
+                    .font(.subheadline)
+                    .foregroundStyle(.tertiary)
+                    .accessibilityIdentifier("eveningIntentionEcho")
+            }
+
+            Text(eveningReflectionText)
+                .font(.body)
+                .accessibilityIdentifier("eveningReflectionText")
+
+            DisclosureGroup {
+                VStack(alignment: .leading, spacing: 12) {
+                    if !timelineSegments.isEmpty {
+                        DayTimelineBar(segments: timelineSegments)
                     }
 
-                    // Compact completion count (no task list)
                     if !completedTasks.isEmpty {
-                        Label("\(completedTasks.count) Dinge geschafft", systemImage: "checkmark.circle.fill")
-                            .foregroundStyle(.green)
-                            .font(.subheadline)
-                            .frame(maxWidth: .infinity, alignment: .center)
-                            .accessibilityIdentifier("coachCompletedTasks")
-                    }
-                }
-            }
-        }
-        .padding()
-        .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(currentPhase == .daytime ? .blue.opacity(0.08) : .clear)
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: 16)
-                .strokeBorder(.secondary.opacity(0.15), lineWidth: 1)
-        )
-        .accessibilityElement(children: .contain)
-        .accessibilityIdentifier("coachDaytimeSection")
-    }
-
-    // MARK: - Evening Section
-
-    private var eveningSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            sectionHeader(
-                title: "Tagesrückblick",
-                icon: "moon.stars.fill",
-                color: .purple,
-                isActive: currentPhase == .evening
-            )
-
-            if isLoading {
-                ProgressView()
-            } else {
-                VStack(alignment: .leading, spacing: 16) {
-                    // Intention echo (from morning)
-                    if let intention = todayIntention {
-                        Text("Dein Vorsatz: \(intention.text)")
-                            .font(.subheadline)
-                            .foregroundStyle(.tertiary)
-                            .accessibilityIdentifier("eveningIntentionEcho")
-                    }
-
-                    // Reflection text (AI or fallback)
-                    Text(eveningReflectionText)
-                        .font(.body)
-                        .accessibilityIdentifier("eveningReflectionText")
-
-                    // Collapsed Details
-                    DisclosureGroup {
-                        VStack(alignment: .leading, spacing: 12) {
-                            if !timelineSegments.isEmpty {
-                                DayTimelineBar(segments: timelineSegments)
-                            }
-
-                            if !completedTasks.isEmpty {
-                                VStack(alignment: .leading, spacing: 8) {
-                                    Label("\(completedTasks.count) erledigt", systemImage: "checkmark.circle.fill")
-                                        .foregroundStyle(.green)
-                                        .font(.subheadline.weight(.semibold))
-                                    ForEach(completedTasks) { task in
-                                        Text(task.title)
-                                            .font(.subheadline)
-                                            .foregroundStyle(.secondary)
-                                    }
-                                }
-                            }
-
-                            if totalPlanned > 0 {
-                                HStack(spacing: 16) {
-                                    ZStack {
-                                        Circle()
-                                            .stroke(.secondary.opacity(0.2), lineWidth: 6)
-                                        Circle()
-                                            .trim(from: 0, to: CGFloat(completionPercentage) / 100)
-                                            .stroke(
-                                                completionPercentage == 100 ? .green : .blue,
-                                                style: StrokeStyle(lineWidth: 6, lineCap: .round)
-                                            )
-                                            .rotationEffect(.degrees(-90))
-                                            .animation(.spring(), value: completionPercentage)
-                                        Text("\(completionPercentage)%")
-                                            .font(.caption.weight(.bold))
-                                    }
-                                    .frame(width: 50, height: 50)
-
-                                    VStack(alignment: .leading) {
-                                        Text("\(totalCompleted) von \(totalPlanned) geplanten Tasks")
-                                            .font(.subheadline)
-                                        Text("\(todayBlocks.count) Focus Blocks")
-                                            .font(.caption)
-                                            .foregroundStyle(.secondary)
-                                    }
-                                }
-                                .accessibilityIdentifier("coachCompletionRing")
+                        VStack(alignment: .leading, spacing: 8) {
+                            Label("\(completedTasks.count) erledigt", systemImage: "checkmark.circle.fill")
+                                .foregroundStyle(.green)
+                                .font(.subheadline.weight(.semibold))
+                            ForEach(completedTasks) { task in
+                                Text(task.title)
+                                    .font(.subheadline)
+                                    .foregroundStyle(.secondary)
                             }
                         }
-                    } label: {
-                        Label("Details", systemImage: "chart.bar")
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
                     }
-                    .accessibilityIdentifier("eveningDetailsToggle")
+
+                    if totalPlanned > 0 {
+                        HStack(spacing: 16) {
+                            ZStack {
+                                Circle()
+                                    .stroke(.secondary.opacity(0.2), lineWidth: 6)
+                                Circle()
+                                    .trim(from: 0, to: CGFloat(completionPercentage) / 100)
+                                    .stroke(
+                                        completionPercentage == 100 ? .green : .blue,
+                                        style: StrokeStyle(lineWidth: 6, lineCap: .round)
+                                    )
+                                    .rotationEffect(.degrees(-90))
+                                    .animation(.spring(), value: completionPercentage)
+                                Text("\(completionPercentage)%")
+                                    .font(.caption.weight(.bold))
+                            }
+                            .frame(width: 50, height: 50)
+
+                            VStack(alignment: .leading) {
+                                Text("\(totalCompleted) von \(totalPlanned) geplanten Tasks")
+                                    .font(.subheadline)
+                                Text("\(todayBlocks.count) Focus Blocks")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                        .accessibilityIdentifier("coachCompletionRing")
+                    }
                 }
+            } label: {
+                Label("Details", systemImage: "chart.bar")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
             }
-        }
-        .padding()
-        .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(currentPhase == .evening ? .purple.opacity(0.08) : .clear)
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: 16)
-                .strokeBorder(.secondary.opacity(0.15), lineWidth: 1)
-        )
-        .accessibilityElement(children: .contain)
-        .accessibilityIdentifier("coachEveningSection")
-    }
-
-    // MARK: - Helpers
-
-    private func sectionHeader(title: String, icon: String, color: Color, isActive: Bool) -> some View {
-        HStack {
-            Image(systemName: icon)
-                .foregroundStyle(color)
-            Text(title)
-                .font(.headline)
-            if isActive {
-                Text("Jetzt")
-                    .font(.caption)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 2)
-                    .background(color.opacity(0.2), in: Capsule())
-                    .foregroundStyle(color)
-            }
+            .accessibilityIdentifier("eveningDetailsToggle")
         }
     }
 
@@ -459,18 +417,6 @@ struct CoachView: View {
             .filter { $0.startDate > now }
             .sorted { $0.startDate < $1.startDate }
             .first
-    }
-
-    private func scrollToCurrentPhase(proxy: ScrollViewProxy) {
-        let target: String
-        switch currentPhase {
-        case .morning: target = "morning"
-        case .daytime: target = "daytime"
-        case .evening: target = "evening"
-        }
-        withAnimation(.smooth) {
-            proxy.scrollTo(target, anchor: .top)
-        }
     }
 
     // MARK: - Data Loading
