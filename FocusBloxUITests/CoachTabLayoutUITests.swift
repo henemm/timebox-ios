@@ -143,8 +143,8 @@ final class CoachTabLayoutUITests: XCTestCase {
 
     /// GIVEN: Coach layout with mock data
     /// WHEN: User scrolls to evening section
-    /// THEN: Evening section shows Success Story with actual text
-    func testEveningShowsSuccessStory() throws {
+    /// THEN: Evening section shows reflection text (not empty)
+    func testEveningShowsReflection() throws {
         app.launchArguments.append("--coach-tab-layout")
         app.launch()
 
@@ -160,11 +160,11 @@ final class CoachTabLayoutUITests: XCTestCase {
         XCTAssertTrue(eveningSection.waitForExistence(timeout: 5),
                       "Evening section should be visible after scrolling")
 
-        let successStory = app.staticTexts.matching(
-            NSPredicate(format: "label CONTAINS 'Erfolgs-Story' OR label CONTAINS 'ruhiger Tag' OR label CONTAINS 'geschafft'")
-        ).firstMatch
-        XCTAssertTrue(successStory.waitForExistence(timeout: 5),
-                      "Evening section should show a Success Story with real text")
+        let reflectionText = app.staticTexts["eveningReflectionText"]
+        XCTAssertTrue(reflectionText.waitForExistence(timeout: 5),
+                      "Evening should show reflection text")
+        XCTAssertFalse(reflectionText.label.isEmpty,
+                       "Reflection text should not be empty")
     }
 
     /// GIVEN: Coach layout with mock data
