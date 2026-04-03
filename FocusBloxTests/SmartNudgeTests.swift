@@ -36,7 +36,7 @@ final class SmartNudgeTests: XCTestCase {
         UserDefaults.standard.set(1, forKey: "nudgeDailyBudget")
         let now = makeTime(hour: 8, minute: 0)
 
-        let requests = SmartNotificationEngine.buildNudgeRequests(now: now)
+        let requests = SmartNotificationEngine.buildNudgeRequests(now: now, intentionText: "Test-Intention")
 
         XCTAssertLessThanOrEqual(requests.count, 1,
             "Budget=1 should produce at most 1 nudge, got \(requests.count)")
@@ -50,7 +50,7 @@ final class SmartNudgeTests: XCTestCase {
         UserDefaults.standard.set(3, forKey: "nudgeDailyBudget")
         let now = makeTime(hour: 8, minute: 0)
 
-        let requests = SmartNotificationEngine.buildNudgeRequests(now: now)
+        let requests = SmartNotificationEngine.buildNudgeRequests(now: now, intentionText: "Test-Intention")
 
         XCTAssertLessThanOrEqual(requests.count, 3,
             "Budget=3 should produce at most 3 nudges, got \(requests.count)")
@@ -63,7 +63,7 @@ final class SmartNudgeTests: XCTestCase {
     func test_buildNudgeRequests_defaultBudget_returnsMax2() {
         let now = makeTime(hour: 8, minute: 0)
 
-        let requests = SmartNotificationEngine.buildNudgeRequests(now: now)
+        let requests = SmartNotificationEngine.buildNudgeRequests(now: now, intentionText: "Test-Intention")
 
         XCTAssertLessThanOrEqual(requests.count, 2,
             "Default budget (2) should produce at most 2 nudges, got \(requests.count)")
@@ -91,7 +91,7 @@ final class SmartNudgeTests: XCTestCase {
         UserDefaults.standard.set(false, forKey: "nudgeSilenceOnSuccess")
         let now = makeTime(hour: 10, minute: 0)
 
-        let requests = SmartNotificationEngine.buildNudgeRequests(now: now)
+        let requests = SmartNotificationEngine.buildNudgeRequests(now: now, intentionText: "Test-Intention")
 
         // With silence disabled, nudges should fire regardless.
         // This tests that budget is respected even with silence off.
@@ -112,7 +112,7 @@ final class SmartNudgeTests: XCTestCase {
         UserDefaults.standard.set(16, forKey: "eveningReflectionHour")
         let now = makeTime(hour: 8, minute: 0)
 
-        let requests = SmartNotificationEngine.buildNudgeRequests(now: now)
+        let requests = SmartNotificationEngine.buildNudgeRequests(now: now, intentionText: "Test-Intention")
 
         for request in requests {
             guard let trigger = request.trigger as? UNTimeIntervalNotificationTrigger else {
@@ -136,7 +136,7 @@ final class SmartNudgeTests: XCTestCase {
         UserDefaults.standard.set(10, forKey: "eveningReflectionHour")
         let now = makeTime(hour: 8, minute: 0)
 
-        let requests = SmartNotificationEngine.buildNudgeRequests(now: now)
+        let requests = SmartNotificationEngine.buildNudgeRequests(now: now, intentionText: "Test-Intention")
 
         XCTAssertEqual(requests.count, 0,
             "Invalid window (start >= end) should produce 0 nudges")

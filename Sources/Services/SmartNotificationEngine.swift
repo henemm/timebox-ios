@@ -100,7 +100,8 @@ enum SmartNotificationEngine {
         }
 
         if profile == .active {
-            requests += buildNudgeRequests(now: Date())
+            let intentionText = fetchTodayIntention(container: container)
+            requests += buildNudgeRequests(now: Date(), intentionText: intentionText)
         }
 
         return Array(requests.prefix(64))
@@ -241,7 +242,8 @@ enum SmartNotificationEngine {
         }
 
         if profile == .active {
-            requests += buildNudgeRequests(now: Date())
+            let intentionText = fetchTodayIntention(context: context)
+            requests += buildNudgeRequests(now: Date(), intentionText: intentionText)
         }
 
         return Array(requests.prefix(64))
@@ -371,11 +373,14 @@ enum SmartNotificationEngine {
 
     // MARK: - Prio 4: Nudge Requests
 
-    static func buildNudgeRequests(now: Date = Date(), completedTodayCount: Int = 0) -> [UNNotificationRequest] {
+    static func buildNudgeRequests(now: Date = Date(), completedTodayCount: Int = 0, intentionText: String? = nil) -> [UNNotificationRequest] {
         let settings = AppSettings.shared
         let budget = max(1, min(3, settings.nudgeDailyBudget))
         let windowStart = settings.morningReminderHour + 1  // Nudges starten 1h nach Morgengruß
         let windowEnd = settings.eveningReflectionHour      // Nudges enden bei Abend-Reflexion
+
+        // Ohne Intention: keine Nudges (User-Advocate: lieber Stille als generisch)
+        guard let intention = intentionText, !intention.isEmpty else { return [] }
 
         if settings.nudgeSilenceOnSuccess && completedTodayCount >= budget {
             return []
@@ -383,11 +388,6 @@ enum SmartNotificationEngine {
         guard windowStart < windowEnd else { return [] }
 
         let slotHours = distributeSlots(count: budget, startHour: windowStart, endHour: windowEnd)
-        let nudgeTexts: [(title: String, body: String)] = [
-            ("Wie läuft dein Tag?", "Schau mal in dein Backlog — vielleicht ist ein Quick Win dabei."),
-            ("Zeit für den nächsten Sprint?", "Ein kurzer Focus Block kann viel bewegen."),
-            ("Dein Backlog wartet", "Welchen Task könntest du jetzt angehen?"),
-        ]
 
         let cal = Calendar.current
         let today = cal.startOfDay(for: now)
@@ -397,10 +397,13 @@ enum SmartNotificationEngine {
             guard let fireDate = cal.date(bySettingHour: hour, minute: 0, second: 0, of: today),
                   fireDate > now else { continue }
 
-            let text = nudgeTexts[index % nudgeTexts.count]
+            let nudgeContent = NotificationContentService.generateNudgeContent(
+                intentionText: intention,
+                slotIndex: index
+            )
             let content = UNMutableNotificationContent()
-            content.title = text.title
-            content.body = text.body
+            content.title = nudgeContent.title
+            content.body = nudgeContent.body
             content.sound = .default
             content.userInfo = ["target": "day", "phase": "daytime"]
             content.categoryIdentifier = NotificationContentService.dailyCompanionCategoryID + "_NUDGE"
@@ -422,6 +425,23 @@ enum SmartNotificationEngine {
         if count == 1 { return [startHour + span / 2] }
         let step = Double(span) / Double(count)
         return (0..<count).map { i in startHour + Int(Double(i) * step + step / 2) }
+    }
+
+    // MARK: - Fetch Today's Intention
+
+    private static func fetchTodayIntention(container: ModelContainer) -> String? {
+        let context = ModelContext(container)
+        return fetchTodayIntention(context: context)
+    }
+
+    private static func fetchTodayIntention(context: ModelContext) -> String? {
+        let today = Calendar.current.startOfDay(for: Date())
+        let descriptor = FetchDescriptor<DayIntention>(
+            predicate: #Predicate { $0.date == today }
+        )
+        guard let intention = try? context.fetch(descriptor).first,
+              !intention.text.isEmpty else { return nil }
+        return intention.text
     }
 
     // MARK: - Precompute AI Content

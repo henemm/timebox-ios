@@ -146,6 +146,18 @@ enum NotificationContentService {
         )
     }
 
+    private static let nudgeTemplates: [(title: String, bodyTemplate: String)] = [
+        ("Kurzer Check-in", "Wie läuft's mit «%@»? Ein kleiner Schritt zählt."),
+        ("Dein Tagesziel", "«%@» — bist du schon einen Schritt nähergekommen?"),
+        ("Erinnerung", "Kurzer Check-in: Wie steht's um «%@»?"),
+    ]
+
+    static func generateNudgeContent(intentionText: String, slotIndex: Int = 0) -> Content {
+        let template = nudgeTemplates[slotIndex % nudgeTemplates.count]
+        let body = template.bodyTemplate.replacingOccurrences(of: "%@", with: intentionText)
+        return Content(title: template.title, body: body)
+    }
+
     // MARK: - Prompt Building
 
     static func buildMorningPrompt(
