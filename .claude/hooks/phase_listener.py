@@ -54,8 +54,8 @@ def _get_user_message(hook_input: dict) -> str:
 
 
 def _get_session_id(hook_input: dict) -> str:
-    """Extract session_id from hook input."""
-    return hook_input.get("session_id", "")
+    """Extract session_id from hook input or environment."""
+    return os.environ.get("CLAUDE_SESSION_ID", "") or hook_input.get("session_id", "")
 
 
 def _read_active_workflow(session_id: str = "") -> tuple[dict | None, Path | None]:
