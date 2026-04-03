@@ -71,6 +71,22 @@ struct ContentView: View {
     @AppStorage("remindersSyncEnabled") private var remindersSyncEnabled: Bool = true
     @AppStorage("remindersMarkCompleteOnImport") private var remindersMarkCompleteOnImport: Bool = true
 
+    // #197: Coach-Tab Layout feature flag (same key as iOS for iCloud sync)
+    @AppStorage("useCoachTabLayout") private var useCoachTabLayout: Bool = false
+
+    private var useCoachLayout: Bool {
+        useCoachTabLayout
+            || ProcessInfo.processInfo.arguments.contains("--coach-tab-layout")
+    }
+
+    private var visibleSections: [MainSection] {
+        if useCoachLayout {
+            return [.backlog, .planning, .focus, .coach]
+        } else {
+            return [.backlog, .planning, .day, .focus, .review]
+        }
+    }
+
     // CloudKit sync monitor
     @Environment(\.scenePhase) private var scenePhase
     @Environment(CloudKitSyncMonitor.self) private var cloudKitMonitor
@@ -256,7 +272,7 @@ struct ContentView: View {
             // Main navigation in toolbar
             ToolbarItem(id: "navigationPicker", placement: .principal) {
                 Picker("Bereich", selection: $selectedSection) {
-                    ForEach(MainSection.allCases, id: \.self) { section in
+                    ForEach(visibleSections, id: \.self) { section in
                         Label(
                             section.rawValue,
                             systemImage: section.icon
@@ -288,6 +304,8 @@ struct ContentView: View {
             MacFocusView()
         case .review:
             MacReviewView()
+        case .coach:
+            CoachView()
         }
     }
 

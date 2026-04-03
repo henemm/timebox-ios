@@ -8,12 +8,14 @@
 import SwiftUI
 
 /// Main navigation sections (Bug 101: 4 sections — Assign removed, matches iOS)
+/// #197: Added .coach for Coach-Tab macOS parity
 enum MainSection: String, Hashable, CaseIterable {
     case backlog = "Backlog"
     case planning = "Blox"
     case day = "Tag"
     case focus = "Focus"
     case review = "Review"
+    case coach = "Coach"
 
     var icon: String {
         switch self {
@@ -22,6 +24,7 @@ enum MainSection: String, Hashable, CaseIterable {
         case .day: return "calendar.badge.clock"
         case .focus: return "target"
         case .review: return "chart.bar"
+        case .coach: return "sparkles"
         }
     }
 }

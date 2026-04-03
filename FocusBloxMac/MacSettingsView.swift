@@ -26,6 +26,7 @@ struct MacSettingsView: View {
     @AppStorage("dueDateAdvanceReminderEnabled") private var dueDateAdvanceReminderEnabled: Bool = false
     @AppStorage("dueDateAdvanceReminderMinutes") private var dueDateAdvanceReminderMinutes: Int = 60
     @AppStorage("notificationProfile") private var notificationProfileRaw: String = "balanced"
+    @AppStorage("useCoachTabLayout") private var useCoachTabLayout: Bool = false
 
     // MARK: - State
 
@@ -129,6 +130,16 @@ struct MacSettingsView: View {
                 Text("Automatische Task-Analyse")
             } footer: {
                 Text("Bereinigt Titel, extrahiert Datumsangaben und ergänzt fehlende Attribute (Wichtigkeit, Dringlichkeit, Kategorie, Dauer) automatisch.")
+            }
+
+            // #197: Coach-Tab Layout toggle (same key as iOS for iCloud sync)
+            Section {
+                Toggle("Coach-Tab Layout", isOn: $useCoachTabLayout)
+                    .accessibilityIdentifier("coachTabLayoutToggle")
+            } header: {
+                Text("Navigation")
+            } footer: {
+                Text("Zeigt 4 Bereiche (Backlog, Planen, Focus, Coach) statt der klassischen 5.")
             }
 
             Section {

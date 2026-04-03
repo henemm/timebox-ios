@@ -75,15 +75,17 @@ struct CoachView: View {
                 }
             }
             .navigationTitle("Coach")
+            #if os(iOS)
             .withSettingsToolbar()
+            #endif
         }
+        .accessibilityIdentifier("coachView")
         .task(id: refreshID) {
             await loadAllData()
         }
         .onAppear {
             refreshID = UUID()
         }
-        .accessibilityIdentifier("coachView")
     }
 
     // MARK: - Morning Section
@@ -244,6 +246,9 @@ struct CoachView: View {
         let intention = DayIntention(date: Date(), text: text)
         modelContext.insert(intention)
         try? modelContext.save()
+        #if os(macOS)
+        NotificationCenter.default.post(name: .taskDataChanged, object: nil)
+        #endif
         todayIntention = intention
     }
 
