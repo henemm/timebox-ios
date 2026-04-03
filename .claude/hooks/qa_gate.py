@@ -34,9 +34,11 @@ def _project_root() -> Path:
 def _set_verdict(verdict: str) -> None:
     """Set adversary_verdict on active workflow via workflow.py CLI."""
     workflow_py = _project_root() / ".claude" / "hooks" / "workflow.py"
+    env = os.environ.copy()
+    env["WORKFLOW_CALLER"] = "qa_gate"
     subprocess.run(
         [sys.executable, str(workflow_py), "set-field", "adversary_verdict", verdict],
-        capture_output=True, text=True
+        capture_output=True, text=True, env=env,
     )
 
 

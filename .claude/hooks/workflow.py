@@ -384,6 +384,12 @@ def _validate_transition(data: dict, target: str) -> str | None:
                 return ("result_inspection_done not set — run Fresh-Eyes-Inspector "
                         "on implementation result (Nach Implementation in /11-feature)")
 
+    # --- Gate: Must pass through phase6b_adversary ---
+    if tgt_idx >= PHASES.index("phase7_validate"):
+        if not data.get("adversary_phase_visited"):
+            return ("Must pass through phase6b_adversary before validation — "
+                    "run adversary check first")
+
     # --- Gate: GREEN test artifacts before validation ---
     if tgt_idx >= PHASES.index("phase7_validate"):
         green_artifacts = [a for a in data.get("test_artifacts", [])
@@ -439,12 +445,21 @@ def cmd_status(args: list[str]) -> None:
     approved = "Yes" if data.get("spec_approved") else "No"
     green_ok = "Yes" if data.get("green_approved") else "No"
     artifacts = len(data.get("test_artifacts", []))
+    green_test = "Yes" if data.get("green_test_done") else "No"
+    regression = "Yes" if data.get("regression_check_done") else "No"
+    docs = "Yes" if data.get("docs_updated") else "No"
+    validation = "Yes" if data.get("validation_done") else "No"
     print(f"Workflow: {name}")
     print(f"Phase: {phase_name}")
     print(f"Spec: {spec}")
     print(f"Approved: {approved}")
     print(f"GREEN Approved: {green_ok}")
     print(f"Test Artifacts: {artifacts}")
+    print(f"green_test_done: {green_test}")
+    print(f"ui_test_green_done: {'Yes' if data.get('ui_test_green_done') else 'No'}")
+    print(f"regression_check_done: {regression}")
+    print(f"docs_updated: {docs}")
+    print(f"validation_done: {validation}")
 
 
 def cmd_phase(args: list[str]) -> None:
@@ -458,8 +473,23 @@ def cmd_phase(args: list[str]) -> None:
         print(f"BLOCKED: {error}", file=sys.stderr)
         sys.exit(1)
     data["current_phase"] = target
+    # Track phase6b visit for enforcement
+    if target == "phase6b_adversary":
+        data["adversary_phase_visited"] = True
     _save_active(data)
     print(f"Set phase to: {target}")
+
+
+# --- Protected Fields ---
+
+PROTECTED_FIELDS = {
+    "adversary_verdict",
+    "green_test_done",
+    "ui_test_green_done",
+    "regression_check_done",
+    "docs_updated",
+    "validation_done",
+}
 
 
 def cmd_set_field(args: list[str]) -> None:
@@ -467,6 +497,12 @@ def cmd_set_field(args: list[str]) -> None:
         print("Usage: workflow.py set-field <key> <value>", file=sys.stderr)
         sys.exit(1)
     key, value = args[0], " ".join(args[1:])
+    # Protected fields can only be set by dedicated commands (or qa_gate.py)
+    caller = os.environ.get("WORKFLOW_CALLER", "")
+    if key in PROTECTED_FIELDS and caller != "qa_gate":
+        print(f"BLOCKED: '{key}' is a protected field. "
+              f"Use the dedicated command instead.", file=sys.stderr)
+        sys.exit(1)
     # Parse booleans
     if value.lower() in ("true", "yes"):
         value = True
@@ -551,6 +587,63 @@ def cmd_mark_ui_red(args: list[str]) -> None:
     data["ui_test_red_result"] = result
     _save_active(data)
     print(f"RED UI test marked done: {result}")
+
+
+def cmd_mark_green(args: list[str]) -> None:
+    result = " ".join(args) if args else "passed"
+    data, name = _read_active()
+    data["green_test_done"] = True
+    data["green_test_result"] = result
+    _save_active(data)
+    print(f"GREEN unit test marked done: {result}")
+
+
+def cmd_mark_ui_green(args: list[str]) -> None:
+    result = " ".join(args) if args else "passed"
+    data, name = _read_active()
+    data["ui_test_green_done"] = True
+    data["ui_test_green_result"] = result
+    _save_active(data)
+    print(f"GREEN UI test marked done: {result}")
+
+
+def cmd_mark_regression_done(args: list[str]) -> None:
+    result = " ".join(args) if args else "no regressions"
+    data, name = _read_active()
+    data["regression_check_done"] = True
+    data["regression_check_result"] = result
+    _save_active(data)
+    print(f"Regression check marked done: {result}")
+
+
+def cmd_mark_docs_updated(args: list[str]) -> None:
+    result = " ".join(args) if args else "docs updated"
+    data, name = _read_active()
+    data["docs_updated"] = True
+    data["docs_updated_result"] = result
+    _save_active(data)
+    print(f"Docs update marked done: {result}")
+
+
+def cmd_mark_validation_done(args: list[str]) -> None:
+    result = " ".join(args) if args else "all checks passed"
+    data, name = _read_active()
+    # Prerequisite check: green + regression + docs must be done
+    missing = []
+    if not data.get("green_test_done"):
+        missing.append("green_test_done (run mark-green first)")
+    if not data.get("regression_check_done"):
+        missing.append("regression_check_done (run mark-regression-done first)")
+    if not data.get("docs_updated"):
+        missing.append("docs_updated (run mark-docs-updated first)")
+    if missing:
+        print(f"BLOCKED: Prerequisites missing: {', '.join(missing)}",
+              file=sys.stderr)
+        sys.exit(1)
+    data["validation_done"] = True
+    data["validation_done_result"] = result
+    _save_active(data)
+    print(f"Validation marked done: {result}")
 
 
 def cmd_complete(args: list[str]) -> None:
@@ -642,6 +735,11 @@ COMMANDS = {
     "add-artifact": cmd_add_artifact,
     "mark-red": cmd_mark_red,
     "mark-ui-red": cmd_mark_ui_red,
+    "mark-green": cmd_mark_green,
+    "mark-ui-green": cmd_mark_ui_green,
+    "mark-regression-done": cmd_mark_regression_done,
+    "mark-docs-updated": cmd_mark_docs_updated,
+    "mark-validation-done": cmd_mark_validation_done,
     "complete": cmd_complete,
     "list": cmd_list,
     "snapshot-tests": cmd_snapshot_tests,
