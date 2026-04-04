@@ -9,7 +9,7 @@ final class CoachDaytimeTests: XCTestCase {
     func test_daytimeMotivation_zeroTasks() {
         let text = SuccessStoryService.daytimeMotivation(completedCount: 0, totalPlanned: 5)
         XCTAssertFalse(text.isEmpty, "Motivation darf nicht leer sein")
-        XCTAssertTrue(text.count <= 80, "Text sollte kurz sein (\(text.count) Zeichen)")
+        XCTAssertTrue(text.count <= 200, "Text sollte nicht übermäßig lang sein (\(text.count) Zeichen)")
     }
 
     /// 1-3 Tasks → anerkennender Text

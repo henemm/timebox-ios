@@ -121,38 +121,121 @@ enum NextUpSuggestionService {
         }
     }
 
+    // MARK: - Reason Category (Gruppen-Key)
+
+    enum ReasonCategory: String {
+        case deadline, stuck, important, priority, category, backlog
+    }
+
+    static func reasonCategory(for item: PlanItem, now: Date = Date()) -> ReasonCategory {
+        if let due = item.dueDate {
+            let days = Calendar.current.dateComponents([.day], from: now, to: due).day ?? 99
+            if days <= 2 { return .deadline }
+        }
+        if item.rescheduleCount >= 3 { return .stuck }
+        if item.importance == 3 { return .important }
+        if let score = item.aiScore, score > 70 { return .priority }
+        if TaskCategory(rawValue: item.taskType) != nil { return .category }
+        return .backlog
+    }
+
+    static func groupReasonText(category: ReasonCategory, tasks: [PlanItem], now: Date = Date()) -> String {
+        let count = tasks.count
+        let totalMinutes = tasks.compactMap(\.estimatedDuration).reduce(0, +)
+        let minuteHint = totalMinutes > 0 ? " Insgesamt \(totalMinutes) Minuten." : ""
+
+        switch category {
+        case .deadline:
+            if count == 1, let due = tasks.first?.dueDate {
+                let days = Calendar.current.dateComponents([.day], from: now, to: due).day ?? 0
+                if days <= 0 { return "Deadline ist heute.\(minuteHint) Wenn du es jetzt erledigst, ist es vom Tisch — und du kannst morgen frei planen." }
+                if days == 1 { return "Deadline morgen.\(minuteHint) Heute anfangen heißt morgen entspannt sein." }
+                return "Deadline übermorgen.\(minuteHint) Wer vorarbeitet, hat den Kopf frei für Unerwartetes."
+            }
+            return "\(count) Aufgaben haben bald Deadline.\(minuteHint) Pack sie heute an — danach ist der Kopf frei."
+
+        case .stuck:
+            let maxCount = tasks.map(\.rescheduleCount).max() ?? 3
+            if count == 1 {
+                return "Diese Aufgabe schiebst du schon \(maxCount)x vor dir her.\(minuteHint) Heute durchziehen — danach ist sie Geschichte."
+            }
+            return "\(count) Aufgaben warten schon länger.\(minuteHint) Heute loszuwerden fühlt sich gut an."
+
+        case .important:
+            if count == 1 {
+                return "Sehr wichtig.\(minuteHint) Was wichtig ist, verdient den frischesten Moment des Tages — also jetzt."
+            }
+            return "\(count) wichtige Aufgaben.\(minuteHint) Je früher erledigt, desto besser der Tag."
+
+        case .priority:
+            return "Hohe Priorität laut deinem Backlog.\(minuteHint) Heute ist ein guter Zeitpunkt."
+
+        case .category:
+            if let cat = TaskCategory(rawValue: tasks.first?.taskType ?? "") {
+                return "\(cat.localizedName) — diese Kategorie kommt im Alltag oft zu kurz.\(minuteHint)"
+            }
+            return "Passt gut in deinen Tag.\(minuteHint)"
+
+        case .backlog:
+            let daysOld = tasks.compactMap { Calendar.current.dateComponents([.day], from: $0.createdAt, to: now).day }.max() ?? 0
+            if daysOld > 14 {
+                return "Seit über \(daysOld) Tagen im Backlog.\(minuteHint) Heute wäre der perfekte Tag, es anzupacken."
+            }
+            return "Offen im Backlog.\(minuteHint) Heute wäre ein guter Tag dafür."
+        }
+    }
+
     // MARK: - Reason Text
 
     static func reasonText(for item: PlanItem, now: Date = Date()) -> String {
-        // Deadline innerhalb 48h
+        let duration = item.estimatedDuration.map { "\($0) Min" } ?? ""
+        let catName = TaskCategory(rawValue: item.taskType)?.localizedName
+
+        // Deadline innerhalb 48h — höchste Priorität
         if let due = item.dueDate {
             let days = Calendar.current.dateComponents([.day], from: now, to: due).day ?? 99
-            if days <= 0 { return "Deadline heute" }
-            if days == 1 { return "Deadline morgen" }
-            if days == 2 { return "Deadline übermorgen" }
+            if days <= 0 {
+                return "Deadline ist heute\(duration.isEmpty ? "" : " (\(duration))"). Wenn du es heute erledigst, ist es vom Tisch — und du kannst morgen frei planen."
+            }
+            if days == 1 {
+                return "Deadline morgen\(duration.isEmpty ? "" : " — geschätzt \(duration)"). Heute anfangen heißt morgen entspannt sein."
+            }
+            if days == 2 {
+                return "Deadline in 2 Tagen. Wer vorarbeitet, hat den Kopf frei für Unerwartetes."
+            }
         }
 
-        // Oft verschoben
+        // Oft verschoben — mit konkreter Ermutigung
+        if item.rescheduleCount >= 5 {
+            return "Schon \(item.rescheduleCount)x verschoben\(duration.isEmpty ? "" : ", aber nur \(duration)"). Heute durchziehen — danach ist es Geschichte."
+        }
         if item.rescheduleCount >= 3 {
-            return "Schon \(item.rescheduleCount)x verschoben"
+            return "\(item.rescheduleCount)x verschoben\(duration.isEmpty ? "" : " (\(duration))"). Kleine Aufgaben wachsen im Kopf — heute abhaken und Ballast loswerden."
         }
 
         // Hohe Wichtigkeit
         if item.importance == 3 {
-            return "Sehr wichtig"
+            return "Sehr wichtig\(duration.isEmpty ? "" : " (\(duration))"). Was wichtig ist, verdient den frischesten Moment des Tages — also jetzt."
         }
 
         // Hoher AI-Score
         if let score = item.aiScore, score > 70 {
-            return "Hohe Priorität"
+            return "Priorität \(score)/100 in deinem Backlog\(catName.map { " (\($0))" } ?? ""). Heute ist ein guter Tag, das anzugehen."
         }
 
-        // Fallback: Kategorie
-        if let cat = TaskCategory(rawValue: item.taskType) {
-            return "Guter Zeitpunkt für \(cat.localizedName)"
+        // Kategorie-basiert mit Kontext
+        if let cat = catName {
+            let durationHint = duration.isEmpty ? "" : " \(duration) reichen."
+            return "\(cat) — diese Kategorie kommt in deinem Alltag oft zu kurz.\(durationHint)"
         }
 
-        return "Im Backlog bereit"
+        // Alter-basiert
+        let daysOld = Calendar.current.dateComponents([.day], from: item.createdAt, to: now).day ?? 0
+        if daysOld > 14 {
+            return "Seit \(daysOld) Tagen im Backlog. Heute wäre der perfekte Tag, es endlich anzupacken."
+        }
+
+        return "Offen im Backlog\(duration.isEmpty ? "" : " (\(duration))") — heute wäre ein guter Tag dafür."
     }
 
     // MARK: - Private Scoring

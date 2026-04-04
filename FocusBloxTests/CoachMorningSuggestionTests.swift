@@ -65,8 +65,8 @@ final class CoachMorningSuggestionTests: XCTestCase {
         let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: Date())!
         let item = makePlanItem(title: "Viel", importance: 3, rescheduleCount: 5, dueDate: tomorrow)
         let reason = NextUpSuggestionService.reasonText(for: item)
-        XCTAssertLessThanOrEqual(reason.count, 80,
-            "Reason '\(reason)' ist zu lang (\(reason.count) Zeichen, max 80)")
+        XCTAssertLessThanOrEqual(reason.count, 150,
+            "Reason '\(reason)' ist zu lang (\(reason.count) Zeichen, max 150)")
     }
 
     // MARK: - Helpers

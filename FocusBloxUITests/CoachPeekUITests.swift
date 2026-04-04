@@ -19,36 +19,39 @@ final class CoachPeekUITests: XCTestCase {
         }
     }
 
-    /// Screenshot des Coach-Tabs für visuelle Inspektion — alle Phasen.
+    /// Screenshot jedes Drawers einzeln aufgeklappt.
     func test_screenshot_coachTab() {
         let coach = app.otherElements["coachView"]
         XCTAssertTrue(coach.waitForExistence(timeout: 5))
 
-        // Screenshot 1: Aktuelle Phase (Auto-Scroll-Ziel)
+        // Screenshot 1: Aktuelle Phase (auto-open)
         let s1 = app.screenshot()
         try? s1.pngRepresentation.write(to: URL(fileURLWithPath: "/tmp/coach_phase_current.png"))
 
-        // Scroll ganz nach oben um Morning zu sehen
-        let scrollView = app.scrollViews.firstMatch
-        scrollView.swipeDown()
-        scrollView.swipeDown()
-        scrollView.swipeDown()
-        Thread.sleep(forTimeInterval: 0.5)
-
+        // Morning Drawer öffnen
+        let morningDrawer = app.buttons["coachDrawer_Guten Morgen"]
+        if morningDrawer.waitForExistence(timeout: 3) {
+            morningDrawer.tap()
+            Thread.sleep(forTimeInterval: 0.5)
+        }
         let s2 = app.screenshot()
         try? s2.pngRepresentation.write(to: URL(fileURLWithPath: "/tmp/coach_phase_morning.png"))
 
-        // Scroll zu Daytime
-        scrollView.swipeUp()
-        Thread.sleep(forTimeInterval: 0.5)
-
+        // Dein Tag Drawer öffnen
+        let dayDrawer = app.buttons["coachDrawer_Dein Tag"]
+        if dayDrawer.waitForExistence(timeout: 3) {
+            dayDrawer.tap()
+            Thread.sleep(forTimeInterval: 0.5)
+        }
         let s3 = app.screenshot()
         try? s3.pngRepresentation.write(to: URL(fileURLWithPath: "/tmp/coach_phase_daytime.png"))
 
-        // Scroll zu Evening
-        scrollView.swipeUp()
-        Thread.sleep(forTimeInterval: 0.5)
-
+        // Evening Drawer öffnen
+        let eveningDrawer = app.buttons["coachDrawer_Tagesrückblick"]
+        if eveningDrawer.waitForExistence(timeout: 3) {
+            eveningDrawer.tap()
+            Thread.sleep(forTimeInterval: 0.5)
+        }
         let s4 = app.screenshot()
         try? s4.pngRepresentation.write(to: URL(fileURLWithPath: "/tmp/coach_phase_evening.png"))
     }

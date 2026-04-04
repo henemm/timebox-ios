@@ -35,6 +35,7 @@ struct CoachView: View {
     @State private var limitationWarningDismissed = false
     @State private var eveningReflectionText: String = ""
     @State private var activeDrawer: DayPhase?
+    @State private var dismissedTaskIDs: Set<String> = []
 
     private var currentPhase: DayPhase {
         let hour = Calendar.current.component(.hour, from: Date())
@@ -63,6 +64,7 @@ struct CoachView: View {
             drawer(phase: .evening, title: "Tagesrückblick", icon: "moon.stars.fill", color: .purple) {
                 eveningContent
             }
+            Spacer()
         }
         .accessibilityIdentifier("coachView")
         .task(id: refreshID) {
@@ -70,7 +72,16 @@ struct CoachView: View {
         }
         .onAppear {
             refreshID = UUID()
-            if activeDrawer == nil {
+            // --open-drawer morning/daytime/evening: bestimmten Drawer öffnen (für Screenshots)
+            if let idx = ProcessInfo.processInfo.arguments.firstIndex(of: "--open-drawer"),
+               idx + 1 < ProcessInfo.processInfo.arguments.count {
+                switch ProcessInfo.processInfo.arguments[idx + 1] {
+                case "morning": activeDrawer = .morning
+                case "daytime": activeDrawer = .daytime
+                case "evening": activeDrawer = .evening
+                default: activeDrawer = currentPhase
+                }
+            } else if activeDrawer == nil {
                 activeDrawer = currentPhase
             }
         }
@@ -143,76 +154,141 @@ struct CoachView: View {
 
     // MARK: - Morning Content
 
+    private var morningTopTasks: [PlanItem] {
+        allTasks
+            .filter { !$0.isCompleted && $0.isActionable && !$0.isNextUp && !dismissedTaskIDs.contains($0.id) }
+            .sorted { $0.priorityScore > $1.priorityScore }
+            .prefix(5)
+            .map { $0 }
+    }
+
     @ViewBuilder
     private var morningContent: some View {
         if isLoading {
             ProgressView()
-        } else if morningSuggestions.isEmpty {
-            VStack(spacing: 8) {
-                Image(systemName: "checkmark.seal.fill")
-                    .font(.title)
-                    .foregroundStyle(.green)
-                Text("Alles geplant — guter Start!")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-            }
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 20)
+        } else if morningTopTasks.isEmpty {
+            coachText("Alles geplant — guter Start! Du weißt was heute zählt.")
         } else {
-            MorningCoachingSection(
-                suggestions: morningSuggestions,
-                onConfirm: { suggestion in
-                    let taskSource = LocalTaskSource(modelContext: modelContext)
-                    let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
-                    try? syncEngine.updateNextUp(itemID: suggestion.id, isNextUp: true)
-                    NextUpSuggestionService.invalidateCache()
-                    morningSuggestions.removeAll { $0.id == suggestion.id }
-                },
-                onDismiss: { suggestion in
-                    morningSuggestions.removeAll { $0.id == suggestion.id }
-                }
+            let groups = groupTasksByReason(morningTopTasks)
+
+            // Nur Zusammenfassung wenn mehrere Gruppen
+            if groups.count > 1 {
+                coachHeadline(morningCoachingText)
+            }
+
+            coachTaskSection(
+                title: "Vorschläge für heute",
+                titleIcon: "lightbulb.fill",
+                titleColor: .orange,
+                tasks: morningTopTasks,
+                showReason: true,
+                showActions: true
             )
         }
     }
 
+    private var morningCoachingText: String {
+        let groups = groupTasksByReason(morningTopTasks)
+        let count = morningTopTasks.count
+        let groupCount = groups.count
+
+        // Überblick über alle Gruppen — nicht den Inhalt einer Gruppe wiederholen
+        if groupCount == 1 {
+            return "" // Wird nicht angezeigt (groups.count <= 1)
+        }
+
+        let groupNames = groups.compactMap {
+            NextUpSuggestionService.ReasonCategory(rawValue: $0.category)
+        }.map { cat -> String in
+            switch cat {
+            case .deadline: return "Deadlines"
+            case .stuck: return "aufgeschobene Aufgaben"
+            case .important: return "Wichtiges"
+            case .priority: return "Prioritäten"
+            case .category, .backlog: return "offene Tasks"
+            }
+        }
+
+        let summary = groupNames.joined(separator: ", ")
+        return "\(count) Vorschläge für heute — \(summary). Schau dir an, was am besten in deinen Tag passt."
+    }
+
+    private func addToToday(_ task: PlanItem) {
+        let taskSource = LocalTaskSource(modelContext: modelContext)
+        let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
+        try? syncEngine.updateNextUp(itemID: task.id, isNextUp: true)
+        refreshID = UUID()
+    }
+
     // MARK: - Daytime Content
+
+    /// Tasks die heute geplant sind (NextUp)
+    private var todayPlannedTasks: [PlanItem] {
+        allTasks.filter { $0.isNextUp && !$0.isCompleted && $0.isActionable }
+    }
 
     @ViewBuilder
     private var daytimeContent: some View {
         if isLoading {
             ProgressView()
         } else {
-            // Dynamischer Motivationstext
-            Text(SuccessStoryService.daytimeMotivation(
+            // Coaching-Text — Hero
+            coachHeadline(SuccessStoryService.daytimeMotivation(
                 completedCount: completedTasks.count,
-                totalPlanned: totalPlanned
+                totalPlanned: todayPlannedTasks.count + completedTasks.count
             ))
-            .font(.subheadline.weight(.medium))
-            .foregroundStyle(.secondary)
-            .frame(maxWidth: .infinity, alignment: .center)
-            .padding(.vertical, 8)
             .accessibilityIdentifier("coachDaytimeMotivation")
 
-            if completedTasks.isEmpty {
-                // CTA wenn nichts erledigt
+            // Heute geplante Tasks
+            if !todayPlannedTasks.isEmpty {
+                coachTaskSection(
+                    title: "Heute geplant",
+                    titleIcon: "calendar",
+                    titleColor: .blue,
+                    tasks: todayPlannedTasks,
+                    showReason: true,
+                    showActions: false
+                )
+            }
+
+            // Erledigte Tasks
+            if !completedTasks.isEmpty {
+                coachTaskSection(
+                    title: "Erledigt",
+                    titleIcon: "checkmark.circle.fill",
+                    titleColor: .green,
+                    tasks: completedTasks,
+                    showReason: false,
+                    showActions: false,
+                    completed: true
+                )
+            }
+
+            // Vorschläge
+            if !morningTopTasks.isEmpty {
+                coachTaskSection(
+                    title: "Vorschläge",
+                    titleIcon: "lightbulb.fill",
+                    titleColor: .orange,
+                    tasks: Array(morningTopTasks.prefix(3)),
+                    showReason: true,
+                    showActions: true
+                )
+            }
+
+            // CTA wenn komplett leer
+            if todayPlannedTasks.isEmpty && completedTasks.isEmpty && morningTopTasks.isEmpty {
+                coachEmptyState(icon: "sparkles", color: .blue, text: "Noch nichts geplant — starte mit den Vorschlägen!")
                 Button {
                     activeDrawer = .morning
                 } label: {
                     Label("Vorschläge ansehen", systemImage: "lightbulb.fill")
                         .font(.subheadline.weight(.medium))
-                        .padding(.horizontal, 20)
-                        .padding(.vertical, 10)
-                        .background(.blue.opacity(0.1), in: Capsule())
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.borderedProminent)
+                .tint(.blue)
                 .frame(maxWidth: .infinity)
                 .accessibilityIdentifier("coachDaytimeCTA")
-            } else {
-                // Erledigte Tasks als Liste
-                ForEach(completedTasks) { task in
-                    taskRow(task, completed: true)
-                }
-                .accessibilityIdentifier("coachCompletedTasks")
             }
         }
     }
@@ -224,64 +300,69 @@ struct CoachView: View {
         if isLoading {
             ProgressView()
         } else {
-            Text(eveningReflectionText)
-                .font(.body)
+            // Reflexionstext — Hero
+            coachHeadline(eveningReflectionText)
                 .accessibilityIdentifier("eveningReflectionText")
 
-            DisclosureGroup {
-                VStack(alignment: .leading, spacing: 12) {
-                    if !timelineSegments.isEmpty {
-                        DayTimelineBar(segments: timelineSegments)
+            // Completion Ring
+            if totalPlanned > 0 {
+                HStack(spacing: 16) {
+                    ZStack {
+                        Circle()
+                            .stroke(.secondary.opacity(0.2), lineWidth: 8)
+                        Circle()
+                            .trim(from: 0, to: CGFloat(completionPercentage) / 100)
+                            .stroke(
+                                completionPercentage == 100 ? .green : .blue,
+                                style: StrokeStyle(lineWidth: 8, lineCap: .round)
+                            )
+                            .rotationEffect(.degrees(-90))
+                            .animation(.spring(), value: completionPercentage)
+                        Text("\(completionPercentage)%")
+                            .font(.headline.weight(.bold))
                     }
+                    .frame(width: 60, height: 60)
 
-                    if !completedTasks.isEmpty {
-                        VStack(alignment: .leading, spacing: 8) {
-                            Label("\(completedTasks.count) erledigt", systemImage: "checkmark.circle.fill")
-                                .foregroundStyle(.green)
-                                .font(.subheadline.weight(.semibold))
-                            ForEach(completedTasks) { task in
-                                Text(task.title)
-                                    .font(.subheadline)
-                                    .foregroundStyle(.secondary)
-                            }
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("\(totalCompleted) von \(totalPlanned) geplanten Tasks")
+                            .font(.subheadline.weight(.medium))
+                        if todayBlocks.count > 0 {
+                            Text("\(todayBlocks.count) Focus Blocks")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
                         }
-                    }
-
-                    if totalPlanned > 0 {
-                        HStack(spacing: 16) {
-                            ZStack {
-                                Circle()
-                                    .stroke(.secondary.opacity(0.2), lineWidth: 6)
-                                Circle()
-                                    .trim(from: 0, to: CGFloat(completionPercentage) / 100)
-                                    .stroke(
-                                        completionPercentage == 100 ? .green : .blue,
-                                        style: StrokeStyle(lineWidth: 6, lineCap: .round)
-                                    )
-                                    .rotationEffect(.degrees(-90))
-                                    .animation(.spring(), value: completionPercentage)
-                                Text("\(completionPercentage)%")
-                                    .font(.caption.weight(.bold))
-                            }
-                            .frame(width: 50, height: 50)
-
-                            VStack(alignment: .leading) {
-                                Text("\(totalCompleted) von \(totalPlanned) geplanten Tasks")
-                                    .font(.subheadline)
-                                Text("\(todayBlocks.count) Focus Blocks")
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                            }
-                        }
-                        .accessibilityIdentifier("coachCompletionRing")
                     }
                 }
-            } label: {
-                Label("Details", systemImage: "chart.bar")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                .padding()
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
+                .accessibilityIdentifier("coachCompletionRing")
             }
-            .accessibilityIdentifier("eveningDetailsToggle")
+
+            // Erledigte Tasks
+            if !completedTasks.isEmpty {
+                coachTaskSection(
+                    title: "Erledigt",
+                    titleIcon: "checkmark.circle.fill",
+                    titleColor: .green,
+                    tasks: completedTasks,
+                    showReason: false,
+                    showActions: false,
+                    completed: true
+                )
+            }
+
+            // Offen geblieben
+            if !unfinishedTasks.isEmpty {
+                coachTaskSection(
+                    title: "Offen geblieben",
+                    titleIcon: "arrow.uturn.right.circle",
+                    titleColor: .orange,
+                    tasks: unfinishedTasks,
+                    showReason: false,
+                    showActions: false
+                )
+            }
         }
     }
 
@@ -293,38 +374,142 @@ struct CoachView: View {
             .first
     }
 
-    // MARK: - Shared Task Row
+    // MARK: - Shared Section Components
 
-    private func taskRow(_ item: PlanItem, completed: Bool = false) -> some View {
-        HStack(spacing: 10) {
-            Image(systemName: completed ? "checkmark.circle.fill" : "circle")
-                .font(.system(size: 20))
-                .foregroundStyle(completed ? .green : .secondary)
+    /// Zusammenfassung — nur bei mehreren Gruppen, visuell dominant
+    private func coachHeadline(_ text: String) -> some View {
+        Text(text)
+            .font(.title3.weight(.semibold))
+            .foregroundStyle(.primary)
+            .padding()
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
+    }
 
-            VStack(alignment: .leading, spacing: 2) {
-                Text(item.title)
-                    .font(.subheadline)
-                    .lineLimit(2)
-                    .strikethrough(completed)
-                    .foregroundStyle(completed ? .secondary : .primary)
+    /// Gruppen-Coaching-Text — Detail pro Gruppe
+    private func coachText(_ text: String) -> some View {
+        Text(text)
+            .font(.subheadline)
+            .foregroundStyle(.primary)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .frame(maxWidth: .infinity, alignment: .leading)
+    }
 
-                HStack(spacing: 6) {
-                    if let cat = TaskCategory(rawValue: item.taskType) {
-                        Label(cat.localizedName, systemImage: cat.icon)
-                            .font(.caption2)
-                            .foregroundStyle(cat.color)
-                    }
-                    if let duration = item.estimatedDuration {
-                        Text("\(duration) Min")
-                            .font(.caption2)
-                            .foregroundStyle(.secondary)
-                    }
+    private func coachEmptyState(icon: String, color: Color, text: String) -> some View {
+        VStack(spacing: 8) {
+            Image(systemName: icon)
+                .font(.title2)
+                .foregroundStyle(color)
+            Text(text)
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 16)
+    }
+
+    @ViewBuilder
+    private func coachTaskSection(
+        title: String,
+        titleIcon: String,
+        titleColor: Color,
+        tasks: [PlanItem],
+        showReason: Bool,
+        showActions: Bool,
+        completed: Bool = false
+    ) -> some View {
+        // Section Header
+        HStack(spacing: 6) {
+            Image(systemName: titleIcon)
+                .foregroundStyle(titleColor)
+                .font(.subheadline)
+            Text(title)
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(.secondary)
+            Spacer()
+            Text("\(tasks.count)")
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 2)
+                .background(titleColor.opacity(0.15), in: Capsule())
+        }
+        .padding(.top, 8)
+
+        if showReason {
+            // Gruppiert: Coaching-Text als Card → Tasks darunter
+            let groups = groupTasksByReason(tasks)
+            ForEach(groups, id: \.category) { group in
+                // Coach redet
+                coachText(group.text)
+
+                // Tasks als Beleg
+                ForEach(group.tasks) { task in
+                    taskWithActions(task, showActions: showActions, completed: completed)
                 }
             }
-            Spacer()
+        } else {
+            // Ungegruppiert: nur Tasks
+            ForEach(tasks) { task in
+                taskWithActions(task, showActions: showActions, completed: completed)
+            }
         }
-        .padding(10)
-        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 10))
+    }
+
+    private struct ReasonGroup {
+        let category: String
+        let text: String
+        var tasks: [PlanItem]
+    }
+
+    private func groupTasksByReason(_ tasks: [PlanItem]) -> [ReasonGroup] {
+        var groups: [ReasonGroup] = []
+        for task in tasks {
+            let cat = NextUpSuggestionService.reasonCategory(for: task)
+            if let idx = groups.firstIndex(where: { $0.category == cat.rawValue }) {
+                groups[idx].tasks.append(task)
+            } else {
+                groups.append(ReasonGroup(category: cat.rawValue, text: "", tasks: [task]))
+            }
+        }
+        // Gruppen-Texte generieren mit allen Tasks der Gruppe
+        return groups.map { group in
+            let cat = NextUpSuggestionService.ReasonCategory(rawValue: group.category) ?? .backlog
+            let text = NextUpSuggestionService.groupReasonText(category: cat, tasks: group.tasks)
+            return ReasonGroup(category: group.category, text: text, tasks: group.tasks)
+        }
+    }
+
+    @ViewBuilder
+    private func taskWithActions(_ task: PlanItem, showActions: Bool, completed: Bool) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            BacklogRow(item: task, isCompletionPending: completed)
+
+            if showActions {
+                HStack(spacing: 12) {
+                    Button {
+                        addToToday(task)
+                    } label: {
+                        Label("Für heute einplanen", systemImage: "calendar.badge.plus")
+                            .font(.caption.weight(.medium))
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(.blue)
+
+                    Button {
+                        dismissedTaskIDs.insert(task.id)
+                    } label: {
+                        Label("Ausblenden", systemImage: "eye.slash")
+                            .font(.caption.weight(.medium))
+                    }
+                    .buttonStyle(.bordered)
+                    .tint(.secondary)
+                }
+                .padding(.leading, 34)
+            }
+        }
     }
 
     // MARK: - Data Loading
