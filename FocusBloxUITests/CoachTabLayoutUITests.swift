@@ -74,18 +74,16 @@ final class CoachTabLayoutUITests: XCTestCase {
         XCTAssertTrue(morningSection.waitForExistence(timeout: 5), "Morning section should exist")
 
         let daytimeSection = app.otherElements["coachDaytimeSection"]
-        XCTAssertTrue(daytimeSection.exists, "Daytime section should exist")
+        XCTAssertTrue(daytimeSection.waitForExistence(timeout: 3), "Daytime section should exist")
 
-        // Evening section may require scrolling
-        app.swipeUp()
         let eveningSection = app.otherElements["coachEveningSection"]
-        XCTAssertTrue(eveningSection.waitForExistence(timeout: 3), "Evening section should exist after scrolling")
+        XCTAssertTrue(eveningSection.waitForExistence(timeout: 3), "Evening section should exist")
     }
 
     /// GIVEN: Coach layout is active
     /// WHEN: User opens Coach tab
-    /// THEN: Morning intention question is visible
-    func testCoachTabShowsMorningQuestion() throws {
+    /// THEN: Morning drawer exists with header
+    func testCoachTabShowsMorningDrawer() throws {
         app.launchArguments.append("--coach-tab-layout")
         app.launch()
 
@@ -93,32 +91,8 @@ final class CoachTabLayoutUITests: XCTestCase {
         XCTAssertTrue(tabBar.waitForExistence(timeout: 5))
         tabBar.buttons["Coach"].tap()
 
-        let question = app.staticTexts["coachMorningQuestion"]
-        XCTAssertTrue(question.waitForExistence(timeout: 5), "Morning intention question should be visible")
-    }
-
-    // MARK: - Content Behavior Tests (with Mock Data)
-
-    /// GIVEN: Coach layout with mock data
-    /// WHEN: User opens Coach tab and sets an intention
-    /// THEN: Morning section shows "Heute geplant" after intention is set
-    func testMorningShowsPlannedTasksAfterIntention() throws {
-        app.launchArguments.append("--coach-tab-layout")
-        app.launch()
-
-        app.tabBars.firstMatch.buttons["Coach"].tap()
-
-        // Intention chips should appear first
-        let chip = app.buttons["intentionChip_0"]
-        XCTAssertTrue(chip.waitForExistence(timeout: 10), "Intention chips should appear")
-
-        // Set intention
-        chip.tap()
-
-        // After intention: "Heute geplant" should appear
-        let heutePlanned = app.staticTexts["Heute geplant"]
-        XCTAssertTrue(heutePlanned.waitForExistence(timeout: 5),
-                      "After setting intention, 'Heute geplant' tasks should appear")
+        let morningDrawer = app.buttons["coachDrawer_Guten Morgen"]
+        XCTAssertTrue(morningDrawer.waitForExistence(timeout: 5), "Morning drawer should exist")
     }
 
     /// GIVEN: Coach layout with mock data (completed tasks exist)
@@ -131,11 +105,9 @@ final class CoachTabLayoutUITests: XCTestCase {
         app.tabBars.firstMatch.buttons["Coach"].tap()
         app.swipeUp()
 
-        let completedLabel = app.staticTexts.matching(
-            NSPredicate(format: "label CONTAINS 'Dinge geschafft'")
-        ).firstMatch
-        XCTAssertTrue(completedLabel.waitForExistence(timeout: 5),
-                      "Daytime should show compact 'X Dinge geschafft'")
+        let motivationLabel = app.staticTexts["coachDaytimeMotivation"]
+        XCTAssertTrue(motivationLabel.waitForExistence(timeout: 5),
+                      "Daytime should show motivation text")
     }
 
     /// GIVEN: Coach layout with mock data
