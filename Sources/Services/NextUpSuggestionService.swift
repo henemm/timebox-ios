@@ -121,6 +121,40 @@ enum NextUpSuggestionService {
         }
     }
 
+    // MARK: - Reason Text
+
+    static func reasonText(for item: PlanItem, now: Date = Date()) -> String {
+        // Deadline innerhalb 48h
+        if let due = item.dueDate {
+            let days = Calendar.current.dateComponents([.day], from: now, to: due).day ?? 99
+            if days <= 0 { return "Deadline heute" }
+            if days == 1 { return "Deadline morgen" }
+            if days == 2 { return "Deadline übermorgen" }
+        }
+
+        // Oft verschoben
+        if item.rescheduleCount >= 3 {
+            return "Schon \(item.rescheduleCount)x verschoben"
+        }
+
+        // Hohe Wichtigkeit
+        if item.importance == 3 {
+            return "Sehr wichtig"
+        }
+
+        // Hoher AI-Score
+        if let score = item.aiScore, score > 70 {
+            return "Hohe Priorität"
+        }
+
+        // Fallback: Kategorie
+        if let cat = TaskCategory(rawValue: item.taskType) {
+            return "Guter Zeitpunkt für \(cat.localizedName)"
+        }
+
+        return "Im Backlog bereit"
+    }
+
     // MARK: - Private Scoring
 
     private static func timeAffinityBonus(

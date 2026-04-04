@@ -10,11 +10,6 @@ struct CoachView: View {
     @Environment(\.eventKitRepository) private var eventKitRepo
     @Environment(\.modelContext) private var modelContext
 
-    // Intention data
-    @State private var todayIntention: DayIntention?
-    @State private var yesterdayIntention: DayIntention?
-    @State private var intentionSuggestions: [String] = []
-
     // Morning data
     @State private var calendarEvents: [CalendarEvent] = []
     @State private var focusBlocks: [FocusBlock] = []
@@ -43,12 +38,7 @@ struct CoachView: View {
 
     private var currentPhase: DayPhase {
         let hour = Calendar.current.component(.hour, from: Date())
-        return DayPhase.coachPhase(
-            hour: hour,
-            morningEnd: morningEndHour,
-            eveningStart: eveningStartHour,
-            hasIntention: todayIntention != nil
-        )
+        return DayPhase.from(hour: hour, morningEnd: morningEndHour, eveningStart: eveningStartHour)
     }
 
     private var totalCompleted: Int { completedTasks.count }
@@ -157,145 +147,31 @@ struct CoachView: View {
     private var morningContent: some View {
         if isLoading {
             ProgressView()
-        } else {
-            // Gestern-Echo
-            if let yesterday = yesterdayIntention {
-                Text("Gestern: \(yesterday.text)")
-                    .font(.subheadline)
-                    .foregroundStyle(.tertiary)
-                    .accessibilityIdentifier("yesterdayIntentionEcho")
-            }
-
-            if let intention = todayIntention {
-                intentionSetView(intention)
-            } else {
-                intentionPickerView
-            }
-        }
-    }
-
-    // MARK: - Intention Picker (no intention set yet)
-
-    private var intentionPickerView: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("Was soll heute zählen?")
-                .font(.title3.weight(.semibold))
-                .accessibilityIdentifier("coachMorningQuestion")
-
-            if intentionSuggestions.isEmpty {
-                ProgressView("Vorschläge werden generiert...")
-                    .font(.subheadline)
-            } else {
-                VStack(spacing: 10) {
-                    ForEach(Array(intentionSuggestions.enumerated()), id: \.offset) { index, suggestion in
-                        Button {
-                            selectIntention(suggestion)
-                        } label: {
-                            Text(suggestion)
-                                .font(.subheadline.weight(.medium))
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .padding(.horizontal, 16)
-                                .padding(.vertical, 12)
-                                .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
-                        }
-                        .buttonStyle(.plain)
-                        .accessibilityIdentifier("intentionChip_\(index)")
-                    }
-                }
-            }
-        }
-    }
-
-    // MARK: - Intention Set View (intention already chosen)
-
-    private func intentionSetView(_ intention: DayIntention) -> some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                Text("Heute:")
+        } else if morningSuggestions.isEmpty {
+            VStack(spacing: 8) {
+                Image(systemName: "checkmark.seal.fill")
+                    .font(.title)
+                    .foregroundStyle(.green)
+                Text("Alles geplant — guter Start!")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
-                Text(intention.text)
-                    .font(.title3.weight(.semibold))
             }
-            .accessibilityIdentifier("todayIntentionText")
-
-            // Show existing task suggestions + free slots below
-            if !morningSuggestions.isEmpty {
-                MorningCoachingSection(
-                    suggestions: morningSuggestions,
-                    onConfirm: { suggestion in
-                        let taskSource = LocalTaskSource(modelContext: modelContext)
-                        let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
-                        try? syncEngine.updateNextUp(itemID: suggestion.id, isNextUp: true)
-                        NextUpSuggestionService.invalidateCache()
-                        morningSuggestions.removeAll { $0.id == suggestion.id }
-                    },
-                    onDismiss: { suggestion in
-                        morningSuggestions.removeAll { $0.id == suggestion.id }
-                    },
-                    limitationWarning: nil,
-                    onDismissWarning: {}
-                )
-            }
-
-            if !freeSlots.isEmpty {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Freie Lücken")
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(.secondary)
-                    ForEach(freeSlots) { slot in
-                        HStack {
-                            Text(slot.startDate, style: .time)
-                                .font(.subheadline)
-                                .foregroundStyle(.secondary)
-                                .frame(width: 55, alignment: .leading)
-                            Text("\(slot.durationMinutes) Min frei")
-                                .font(.subheadline)
-                        }
-                        .padding(8)
-                        .background(.yellow.opacity(0.15), in: RoundedRectangle(cornerRadius: 8))
-                    }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 20)
+        } else {
+            MorningCoachingSection(
+                suggestions: morningSuggestions,
+                onConfirm: { suggestion in
+                    let taskSource = LocalTaskSource(modelContext: modelContext)
+                    let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
+                    try? syncEngine.updateNextUp(itemID: suggestion.id, isNextUp: true)
+                    NextUpSuggestionService.invalidateCache()
+                    morningSuggestions.removeAll { $0.id == suggestion.id }
+                },
+                onDismiss: { suggestion in
+                    morningSuggestions.removeAll { $0.id == suggestion.id }
                 }
-            }
-
-            if !nextUpTasks.isEmpty {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Heute geplant")
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(.secondary)
-                    ForEach(nextUpTasks) { task in
-                        HStack {
-                            Text(task.title)
-                                .font(.subheadline)
-                            Spacer()
-                            if let duration = task.estimatedDuration {
-                                Text("\(duration) Min")
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    // MARK: - Intention Actions
-
-    private func selectIntention(_ text: String) {
-        let intention = DayIntention(date: Date(), text: text)
-        modelContext.insert(intention)
-        try? modelContext.save()
-        #if os(macOS)
-        NotificationCenter.default.post(name: .taskDataChanged, object: nil)
-        #endif
-        todayIntention = intention
-
-        // Nach Intention-Auswahl sanft zu "Dein Tag" wechseln
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-            withAnimation(.spring(duration: 0.4)) {
-                activeDrawer = .daytime
-            }
+            )
         }
     }
 
@@ -306,32 +182,23 @@ struct CoachView: View {
         if isLoading {
             ProgressView()
         } else {
-            if let intention = todayIntention {
-                Text(intention.text)
-                    .font(.title2.weight(.semibold))
-                    .multilineTextAlignment(.center)
-                    .frame(maxWidth: .infinity, alignment: .center)
-                    .padding(.vertical, 8)
-                    .accessibilityIdentifier("daytimeIntentionText")
-            } else {
-                VStack(spacing: 8) {
-                    Image(systemName: "sparkles")
-                        .font(.title)
-                        .foregroundStyle(.secondary)
-                    Text("Setze oben deine Intention für heute")
-                        .font(.subheadline)
-                        .foregroundStyle(.tertiary)
-                }
-                .frame(maxWidth: .infinity, alignment: .center)
-                .padding(.vertical, 12)
-            }
-
             if !completedTasks.isEmpty {
                 Label("\(completedTasks.count) Dinge geschafft", systemImage: "checkmark.circle.fill")
                     .foregroundStyle(.green)
                     .font(.subheadline)
                     .frame(maxWidth: .infinity, alignment: .center)
                     .accessibilityIdentifier("coachCompletedTasks")
+            } else {
+                VStack(spacing: 8) {
+                    Image(systemName: "sparkles")
+                        .font(.title)
+                        .foregroundStyle(.secondary)
+                    Text("Noch nichts erledigt — starte mit dem Wichtigsten!")
+                        .font(.subheadline)
+                        .foregroundStyle(.tertiary)
+                }
+                .frame(maxWidth: .infinity, alignment: .center)
+                .padding(.vertical, 12)
             }
         }
     }
@@ -343,13 +210,6 @@ struct CoachView: View {
         if isLoading {
             ProgressView()
         } else {
-            if let intention = todayIntention {
-                Text("Dein Vorsatz: \(intention.text)")
-                    .font(.subheadline)
-                    .foregroundStyle(.tertiary)
-                    .accessibilityIdentifier("eveningIntentionEcho")
-            }
-
             Text(eveningReflectionText)
                 .font(.body)
                 .accessibilityIdentifier("eveningReflectionText")
@@ -428,22 +288,6 @@ struct CoachView: View {
         let calendar = Calendar.current
         let today = calendar.startOfDay(for: Date())
 
-        // Intention laden
-        do {
-            let todayPredicate = #Predicate<DayIntention> { $0.date == today }
-            var todayDescriptor = FetchDescriptor(predicate: todayPredicate)
-            todayDescriptor.fetchLimit = 1
-            todayIntention = try modelContext.fetch(todayDescriptor).first
-
-            let yesterday = calendar.date(byAdding: .day, value: -1, to: today)!
-            let yesterdayPredicate = #Predicate<DayIntention> { $0.date == yesterday }
-            var yesterdayDescriptor = FetchDescriptor(predicate: yesterdayPredicate)
-            yesterdayDescriptor.fetchLimit = 1
-            yesterdayIntention = try modelContext.fetch(yesterdayDescriptor).first
-        } catch {
-            // Intention-Daten nicht verfügbar
-        }
-
         // Task-Daten laden (unabhängig von EventKit)
         do {
             let taskSource = LocalTaskSource(modelContext: modelContext)
@@ -509,39 +353,10 @@ struct CoachView: View {
             // Silently fail — sections show empty state
         }
 
-        // Intention-Vorschläge generieren (wenn noch keine Intention gesetzt)
-        if todayIntention == nil {
-            let topTasks = allTasks
-                .filter { !$0.isCompleted && $0.isActionable }
-                .sorted { ($0.aiScore ?? 0) > ($1.aiScore ?? 0) }
-            let totalFreeMinutes = freeSlots.reduce(0) { $0 + $1.durationMinutes }
-            let meetingCount = calendarEvents.filter { !$0.isAllDay && !$0.isFocusBlock }.count
-
-            intentionSuggestions = await IntentionSuggestionService.suggestions(
-                topTasks: Array(topTasks.prefix(5)),
-                freeMinutes: totalFreeMinutes,
-                meetingCount: meetingCount,
-                yesterdayIntention: yesterdayIntention?.text
-            )
-        }
-
         // Evening reflection generieren
         eveningReflectionText = await SuccessStoryService.generate(
             completedTasks: completedTasks,
-            focusBlocks: focusBlocks,
-            intention: todayIntention?.text
+            focusBlocks: focusBlocks
         )
-    }
-}
-
-// MARK: - Coach Phase Logic
-
-extension DayPhase {
-    /// Coach-spezifische Phase: Morgen bleibt aktiv solange keine Intention gesetzt UND vor morningEnd.
-    /// Nach Intention-Auswahl oder ab morningEnd → daytime. Ab eveningStart → evening.
-    static func coachPhase(hour: Int, morningEnd: Int, eveningStart: Int, hasIntention: Bool) -> DayPhase {
-        if hour >= eveningStart { return .evening }
-        if hour < morningEnd && !hasIntention { return .morning }
-        return .daytime
     }
 }

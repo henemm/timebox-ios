@@ -116,6 +116,7 @@ struct BacklogRow: View {
         }
         .opacity(isBlocked ? 0.5 : 1.0)
         .padding(.leading, isBlocked ? 24 : 0)
+        #if os(iOS)
         .userActivity(TaskEntity.activityType, isActive: !item.isCompleted) { activity in
             activity.title = item.title
             activity.isEligibleForSearch = true
@@ -123,6 +124,7 @@ struct BacklogRow: View {
             activity.targetContentIdentifier = "task://\(item.id)"
             activity.userInfo = ["entityID": item.id]
         }
+        #endif
         // NOTE: No accessibilityIdentifier on parent - children have their own identifiers
         // Parent identifier would override all child identifiers in SwiftUI
     }
