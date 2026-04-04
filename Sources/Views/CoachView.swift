@@ -182,23 +182,37 @@ struct CoachView: View {
         if isLoading {
             ProgressView()
         } else {
-            if !completedTasks.isEmpty {
-                Label("\(completedTasks.count) Dinge geschafft", systemImage: "checkmark.circle.fill")
-                    .foregroundStyle(.green)
-                    .font(.subheadline)
-                    .frame(maxWidth: .infinity, alignment: .center)
-                    .accessibilityIdentifier("coachCompletedTasks")
-            } else {
-                VStack(spacing: 8) {
-                    Image(systemName: "sparkles")
-                        .font(.title)
-                        .foregroundStyle(.secondary)
-                    Text("Noch nichts erledigt — starte mit dem Wichtigsten!")
-                        .font(.subheadline)
-                        .foregroundStyle(.tertiary)
+            // Dynamischer Motivationstext
+            Text(SuccessStoryService.daytimeMotivation(
+                completedCount: completedTasks.count,
+                totalPlanned: totalPlanned
+            ))
+            .font(.subheadline.weight(.medium))
+            .foregroundStyle(.secondary)
+            .frame(maxWidth: .infinity, alignment: .center)
+            .padding(.vertical, 8)
+            .accessibilityIdentifier("coachDaytimeMotivation")
+
+            if completedTasks.isEmpty {
+                // CTA wenn nichts erledigt
+                Button {
+                    activeDrawer = .morning
+                } label: {
+                    Label("Vorschläge ansehen", systemImage: "lightbulb.fill")
+                        .font(.subheadline.weight(.medium))
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 10)
+                        .background(.blue.opacity(0.1), in: Capsule())
                 }
-                .frame(maxWidth: .infinity, alignment: .center)
-                .padding(.vertical, 12)
+                .buttonStyle(.plain)
+                .frame(maxWidth: .infinity)
+                .accessibilityIdentifier("coachDaytimeCTA")
+            } else {
+                // Erledigte Tasks als Liste
+                ForEach(completedTasks) { task in
+                    taskRow(task, completed: true)
+                }
+                .accessibilityIdentifier("coachCompletedTasks")
             }
         }
     }
@@ -277,6 +291,40 @@ struct CoachView: View {
             .filter { $0.startDate > now }
             .sorted { $0.startDate < $1.startDate }
             .first
+    }
+
+    // MARK: - Shared Task Row
+
+    private func taskRow(_ item: PlanItem, completed: Bool = false) -> some View {
+        HStack(spacing: 10) {
+            Image(systemName: completed ? "checkmark.circle.fill" : "circle")
+                .font(.system(size: 20))
+                .foregroundStyle(completed ? .green : .secondary)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(item.title)
+                    .font(.subheadline)
+                    .lineLimit(2)
+                    .strikethrough(completed)
+                    .foregroundStyle(completed ? .secondary : .primary)
+
+                HStack(spacing: 6) {
+                    if let cat = TaskCategory(rawValue: item.taskType) {
+                        Label(cat.localizedName, systemImage: cat.icon)
+                            .font(.caption2)
+                            .foregroundStyle(cat.color)
+                    }
+                    if let duration = item.estimatedDuration {
+                        Text("\(duration) Min")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+            }
+            Spacer()
+        }
+        .padding(10)
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 10))
     }
 
     // MARK: - Data Loading

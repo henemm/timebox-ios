@@ -82,6 +82,24 @@ enum SuccessStoryService {
         #endif
     }
 
+    // MARK: - Daytime Motivation
+
+    static func daytimeMotivation(completedCount: Int, totalPlanned: Int) -> String {
+        switch completedCount {
+        case 0:
+            return "Noch nichts erledigt — der erste Schritt ist der schwerste."
+        case 1:
+            return "Ein guter Anfang! Der erste Task ist geschafft."
+        case 2...3:
+            return "Läuft! \(completedCount) Tasks erledigt — weiter so."
+        default:
+            if totalPlanned > 0 && completedCount >= totalPlanned {
+                return "Alles geschafft! \(completedCount) Tasks erledigt — starker Tag."
+            }
+            return "\(completedCount) Tasks erledigt — du bist richtig produktiv heute!"
+        }
+    }
+
     // MARK: - Fallback
 
     static func fallback(completedTasks: [PlanItem], focusBlocks: [FocusBlock], intention: String? = nil) -> String {
