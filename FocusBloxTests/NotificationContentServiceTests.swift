@@ -95,20 +95,6 @@ final class NotificationContentServiceTests: XCTestCase {
         }
     }
 
-    // MARK: - Nudge Content
-
-    /// Bricht wenn: Nudge-Fallback keinen konkreten Zeitslot nennt.
-    func test_nudgeFallback_suggestsConcreteTimeSlot() {
-        let result = NotificationContentService.nudgeFallback(
-            suggestedTaskTitle: "Projekt X",
-            slotStartTime: "14:00",
-            slotDurationMinutes: 60
-        )
-
-        XCTAssertTrue(result.body.contains("14:00") || result.body.contains("14 Uhr"),
-                       "Nudge must suggest concrete time. Got: \(result.body)")
-    }
-
     // MARK: - Notification Category
 
     /// Bricht wenn: Die DAILY_COMPANION Kategorie nicht registriert wird.

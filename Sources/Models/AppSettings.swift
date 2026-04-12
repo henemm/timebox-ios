@@ -57,12 +57,6 @@ final class AppSettings: ObservableObject {
     /// Whether autocomplete and duplicate detection is enabled in CreateTaskView
     @AppStorage("taskSuggestionsEnabled") var taskSuggestionsEnabled: Bool = true
 
-    // MARK: - Emotional Nudge Tracking
-
-    @AppStorage("nudgeDailyCount") var nudgeDailyCount: Int = 0
-    @AppStorage("nudgeLastDate") var nudgeLastDate: String = ""
-    @AppStorage("nudgeTaskIDs") var nudgeTaskIDs: String = ""
-
     // MARK: - Day View Settings
 
     /// Hour when morning phase ends (0-23, default 12)
@@ -74,7 +68,7 @@ final class AppSettings: ObservableObject {
     // MARK: - Evening Reset
 
     /// ISO-8601 date string of the last successful reset (e.g. "2026-03-25").
-    /// Empty string = never reset. Used for idempotency (same pattern as nudgeLastDate).
+    /// Empty string = never reset. Used for idempotency.
     @AppStorage("lastResetDate") var lastResetDate: String = ""
 
     /// Hour of day at which the reset threshold is crossed (0-23, default 0 = midnight).
@@ -88,14 +82,12 @@ final class AppSettings: ObservableObject {
     /// ISO-8601 date of the cached story (e.g. "2026-03-26")
     @AppStorage("cachedSuccessStoryDate") var cachedSuccessStoryDate: String = ""
 
-    // MARK: - Smart Nudge Settings
+    // MARK: - Notification Time Settings
 
-    @AppStorage("nudgeDailyBudget") var nudgeDailyBudget: Int = 2
     @AppStorage("morningReminderHour") var morningReminderHour: Int = 8
     @AppStorage("morningReminderMinute") var morningReminderMinute: Int = 0
     @AppStorage("eveningReflectionHour") var eveningReflectionHour: Int = 20
     @AppStorage("eveningReflectionMinute") var eveningReflectionMinute: Int = 0
-    @AppStorage("nudgeSilenceOnSuccess") var nudgeSilenceOnSuccess: Bool = true
 
     // MARK: - Notification Profile
 

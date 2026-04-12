@@ -14,7 +14,6 @@ struct BacklogRow: View {
     var onDeleteTap: (() -> Void)?
     var onStartFocusSprint: (() -> Void)?
     var onTitleSave: ((String) -> Void)?  // Inline title edit callback
-    var isStuck: Bool = false  // rescheduleCount >= 3: shows blockade marker
     var isPendingResort: Bool = false  // Deferred sort: shows border when item changed but not yet re-sorted
     var isCompletionPending: Bool = false  // Deferred completion: shows filled checkbox before task disappears
     var isBlocked: Bool = false  // Task is blocked by another task (dimmed + indented + checkbox disabled)
@@ -90,18 +89,6 @@ struct BacklogRow: View {
                     .opacity(pendingPulse ? 0.9 : 0.4)
                     .allowsHitTesting(false)
                     .accessibilityIdentifier("pendingResortBorder_\(item.id)")
-            }
-        }
-        .overlay(alignment: .topLeading) {
-            if isStuck {
-                Image(systemName: "exclamationmark.triangle.fill")
-                    .foregroundStyle(.orange)
-                    .font(.caption)
-                    .padding(4)
-                    .accessibilityElement(children: .ignore)
-                    .accessibilityLabel("Blockiert")
-                    .accessibilityAddTraits(.isImage)
-                    .accessibilityIdentifier("stuckMarker_\(item.id)")
             }
         }
         .animation(.easeOut(duration: 0.3), value: isPendingResort)

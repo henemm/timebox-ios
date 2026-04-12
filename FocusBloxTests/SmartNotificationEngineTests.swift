@@ -15,7 +15,7 @@ final class SmartNotificationEngineTests: XCTestCase {
 
     // MARK: - Budget Tests
 
-    /// Verhalten: Profil "leise" plant NUR Timer-Notifications, keine Task/Review/Nudge-Requests.
+    /// Verhalten: Profil "leise" plant NUR Timer-Notifications, keine Task/Review-Requests.
     /// Bricht wenn: SmartNotificationEngine.reconcile() die Profil-Prüfung `if profile == .balanced || ...`
     ///   für buildTaskRequests nicht korrekt ausschliesst (Zeile ~109 in Spec).
     func test_quietProfile_onlyTimerSlots() async throws {
@@ -29,18 +29,15 @@ final class SmartNotificationEngineTests: XCTestCase {
             eventKitRepo: makeMockRepo(blocks: [])
         )
 
-        // Assert: Keine Task-, Review- oder Nudge-Requests
+        // Assert: Keine Task- oder Review-Requests
         let taskRequests = requests.filter { $0.identifier.hasPrefix("due-date-") }
-        let nudgeRequests = requests.filter { $0.identifier.hasPrefix("focusblox.nudge.") }
         let reviewRequests = requests.filter { $0.identifier.hasPrefix("focusblox.review.") || $0.identifier.hasPrefix("focusblox.morning.") }
         XCTAssertEqual(taskRequests.count, 0, "Quiet profile should have 0 task requests")
-        XCTAssertEqual(nudgeRequests.count, 0, "Quiet profile should have 0 nudge requests")
         XCTAssertEqual(reviewRequests.count, 0, "Quiet profile should have 0 review requests")
     }
 
-    /// Verhalten: Profil "ausgeglichen" plant Tasks (max 20) und Review (max 2), aber keine Nudges.
-    /// Bricht wenn: Budget-Konstante budgetTasks (Zeile ~75) oder die Profil-Logik
-    ///   für Nudges (Zeile ~119) geändert wird.
+    /// Verhalten: Profil "ausgeglichen" plant Tasks (max 20) und Review (max 14).
+    /// Bricht wenn: Budget-Konstante budgetTasks (Zeile ~75) geändert wird.
     func test_balancedProfile_budgetLimits() async throws {
         // Arrange: 30 Tasks mit dueDate (mehr als Budget)
         let tasks = (0..<30).map { i in
@@ -56,17 +53,13 @@ final class SmartNotificationEngineTests: XCTestCase {
         )
 
         let taskRequests = requests.filter { $0.identifier.hasPrefix("due-date-") }
-        let nudgeRequests = requests.filter { $0.identifier.hasPrefix("focusblox.nudge.") }
-
         // Assert
         XCTAssertLessThanOrEqual(taskRequests.count, 20, "Balanced profile: max 20 task requests")
-        XCTAssertEqual(nudgeRequests.count, 0, "Balanced profile should have 0 nudge requests")
     }
 
-    /// Verhalten: Profil "aktiv" aktiviert Nudge-Slots (bis 10).
-    /// Bricht wenn: Die Profil-Prüfung `if profile == .active` (Zeile ~119) entfernt wird
-    ///   oder budgetNudges (Zeile ~77) geändert wird.
-    func test_activeProfile_nudgeSlotsEnabled() async throws {
+    /// Verhalten: Profil "aktiv" plant Tasks und Reviews.
+    /// Bricht wenn: Active-Profil bei buildAllRequests crasht.
+    func test_activeProfile_doesNotCrash() async throws {
         // Act: Active-Profil Requests berechnen
         let requests = try await SmartNotificationEngine.buildAllRequests(
             profile: .active,
@@ -74,12 +67,7 @@ final class SmartNotificationEngineTests: XCTestCase {
             eventKitRepo: makeMockRepo(blocks: [])
         )
 
-        // Assert: Nudge-Slots sind prinzipiell verfügbar (in Phase A noch 0 weil Platzhalter,
-        // aber der Profil-Check muss .active durchlassen)
-        // Dieser Test validiert, dass die Engine bei .active NICHT vor buildNudgeRequests() abbricht
-        let totalNonTimer = requests.filter { !$0.identifier.hasPrefix("focus-block-") }
-        // In Phase A: buildNudgeRequests() returns [], so wir prüfen nur dass kein Crash
-        XCTAssertTrue(true, "Active profile should not crash on nudge path")
+        XCTAssertNotNil(requests, "Active profile should not crash")
     }
 
     /// Verhalten: Gesamt-Requests dürfen nie 64 übersteigen.

@@ -401,6 +401,7 @@ struct FocusBloxApp: App {
                     case "blox": selectedTab = bloxTab
                     case "day": selectedTab = dayTab
                     case "focus": selectedTab = .focus
+                    case "coach": selectedTab = .coach
                     case "review": selectedTab = useCoachLayout ? .coach : .review
                     default: break
                     }
@@ -750,12 +751,6 @@ struct FocusBloxApp: App {
         tbdTask.taskType = "maintenance"
         tbdTask.sortOrder = -1  // Appear first in backlog
 
-        // Stuck Task (rescheduleCount >= 3) for Emotional Nudge (RW_3.4)
-        let stuckTask = LocalTask(title: "[MOCK] Stuck Task - 5x verschoben", importance: 2, estimatedDuration: 30, urgency: "not_urgent")
-        stuckTask.isNextUp = true
-        stuckTask.rescheduleCount = 5
-        stuckTask.taskType = "deep_work"
-
         context.insert(task1)
         context.insert(task2)
         context.insert(task3)
@@ -763,7 +758,6 @@ struct FocusBloxApp: App {
         context.insert(backlogTask1)
         context.insert(backlogTask2)
         context.insert(tbdTask)
-        context.insert(stuckTask)
 
         // Geparkt Task (RW 2.4b) — manuell geparkt, erscheint in "Geparkt"-Sektion
         let parkedTask = LocalTask(title: "[MOCK] Geparkte Idee - Spaeter", importance: 2, estimatedDuration: 30, urgency: "not_urgent")

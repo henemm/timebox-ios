@@ -935,13 +935,6 @@ struct ContentView: View {
                     Label("Focus Sprint starten", systemImage: "bolt.fill")
                 }
 
-                if task.rescheduleCount >= 3 {
-                    Button {
-                        startNudgeSprint(for: task)
-                    } label: {
-                        Label("Nur 2 Minuten anfangen", systemImage: "bolt.fill")
-                    }
-                }
             }
 
             singleTaskContextMenuItems(for: selection)
@@ -1170,23 +1163,6 @@ struct ContentView: View {
                 selectedSection = .focus
             case .blockedByActiveBlock:
                 break // macOS alert is out of scope for RW 3.2
-            }
-        } catch {
-            // Silent fail on macOS for now
-        }
-    }
-
-    private func startNudgeSprint(for task: LocalTask) {
-        do {
-            let result = try FocusBlockActionService.startImmediate(
-                taskID: task.id,
-                eventKitRepo: eventKitRepo,
-                modelContext: modelContext,
-                durationMinutes: 2
-            )
-            if case .started = result {
-                EmotionalNudgeService.recordNudge(for: task.id)
-                selectedSection = .focus
             }
         } catch {
             // Silent fail on macOS for now

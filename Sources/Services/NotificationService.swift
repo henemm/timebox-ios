@@ -62,17 +62,6 @@ enum NotificationService {
             options: []
         )
 
-        // Daily Companion: Nudge
-        let startBlock = UNNotificationAction(
-            identifier: actionStartFocusBlock, title: "Focus Block", options: .foreground
-        )
-        let nudgeCategory = UNNotificationCategory(
-            identifier: NotificationContentService.dailyCompanionCategoryID + "_NUDGE",
-            actions: [startBlock],
-            intentIdentifiers: [],
-            options: []
-        )
-
         // Daily Companion: Evening
         let eveningReview = UNNotificationAction(
             identifier: actionPlanDay, title: "Tagesreview", options: .foreground
@@ -85,7 +74,7 @@ enum NotificationService {
         )
 
         UNUserNotificationCenter.current().setNotificationCategories([
-            dueDateCategory, morningCategory, nudgeCategory, eveningCategory
+            dueDateCategory, morningCategory, eveningCategory
         ])
     }
 

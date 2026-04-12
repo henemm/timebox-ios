@@ -559,32 +559,8 @@ struct BacklogView: View {
             },
             onDelete: {
                 deleteTask(task)
-            },
-            onStartNudgeSprint: {
-                startNudgeSprint(for: task)
             }
         )
-    }
-
-    private func startNudgeSprint(for item: PlanItem) {
-        do {
-            let result = try FocusBlockActionService.startImmediate(
-                taskID: item.id,
-                eventKitRepo: eventKitRepo,
-                modelContext: modelContext,
-                durationMinutes: 2
-            )
-            switch result {
-            case .started:
-                EmotionalNudgeService.recordNudge(for: item.id)
-                focusSprintFeedback.toggle()
-                NotificationCenter.default.post(name: .focusSprintStarted, object: nil)
-            case .blockedByActiveBlock(let title):
-                focusSprintConflictTitle = title
-            }
-        } catch {
-            errorMessage = "Nudge Sprint konnte nicht gestartet werden: \(error.localizedDescription)"
-        }
     }
 
     private func updateNextUp(for item: PlanItem, isNextUp: Bool) {
@@ -1029,7 +1005,6 @@ struct BacklogView: View {
                         onDeleteTap: { deleteTask(item) },
                         onStartFocusSprint: { startFocusSprint(for: item) },
                         onTitleSave: { newTitle in saveTitleEdit(for: item, title: newTitle) },
-                        isStuck: item.rescheduleCount >= 3,
                         isPendingResort: deferredSort.isPending(item.id),
                         isCompletionPending: deferredCompletion.isPending(item.id)
                     )
@@ -1098,7 +1073,6 @@ struct BacklogView: View {
             onDeleteTap: { deleteTask(item) },
             onStartFocusSprint: { startFocusSprint(for: item) },
             onTitleSave: { newTitle in saveTitleEdit(for: item, title: newTitle) },
-            isStuck: item.rescheduleCount >= 3,
             isPendingResort: deferredSort.isPending(item.id),
             isCompletionPending: deferredCompletion.isPending(item.id),
             effectiveScore: effectivePriorityScore(for: item)

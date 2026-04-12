@@ -3,8 +3,8 @@ import SwiftData
 import UserNotifications
 @testable import FocusBlox
 
-/// Unit Tests for SmartNotificationEngine Phase D (Review/Nudge + Settings UI)
-/// TDD RED: Tests MUST FAIL — buildReviewRequests/buildNudgeRequests are private empty stubs
+/// Unit Tests for SmartNotificationEngine Phase D (Review + Settings UI)
+/// TDD RED: Tests MUST FAIL — buildReviewRequests is a private empty stub
 /// without `now:` parameter.
 @MainActor
 final class SmartNotificationEnginePhaseDTests: XCTestCase {
@@ -13,8 +13,6 @@ final class SmartNotificationEnginePhaseDTests: XCTestCase {
         UserDefaults.standard.removeObject(forKey: "notificationProfile")
         UserDefaults.standard.removeObject(forKey: "dueDateMorningReminderEnabled")
         UserDefaults.standard.removeObject(forKey: "dueDateAdvanceReminderEnabled")
-        UserDefaults.standard.removeObject(forKey: "nudgeDailyBudget")
-        UserDefaults.standard.removeObject(forKey: "nudgeSilenceOnSuccess")
         UserDefaults.standard.removeObject(forKey: "morningReminderHour")
         UserDefaults.standard.removeObject(forKey: "eveningReflectionHour")
     }
@@ -64,7 +62,7 @@ final class SmartNotificationEnginePhaseDTests: XCTestCase {
         XCTAssertTrue(ids.contains(where: { $0.hasPrefix("focusblox.review.") }),
                       "Should contain evening review with prefix focusblox.review.")
         XCTAssertTrue(ids.contains(where: { $0.hasPrefix("focusblox.morning.") }),
-                      "Should contain morning nudge with prefix focusblox.morning.")
+                      "Should contain morning review with prefix focusblox.morning.")
     }
 
     /// Verhalten: Nie mehr als budgetReview (14) Requests.
@@ -81,84 +79,13 @@ final class SmartNotificationEnginePhaseDTests: XCTestCase {
                                   "Review requests must not exceed budget of \(SmartNotificationEngine.budgetReview)")
     }
 
-    // MARK: - buildNudgeRequests Tests
-
-    /// Verhalten: Um 08:00 liefert buildNudgeRequests Requests basierend auf nudgeDailyBudget (Default: 2).
-    /// Bricht wenn: Budget-System nicht implementiert ist.
-    func test_buildNudgeRequests_morning_returnsBudgetRequests() {
-        UserDefaults.standard.removeObject(forKey: "nudgeDailyBudget")
-        let cal = Calendar.current
-        let today = cal.startOfDay(for: Date())
-        let now = cal.date(bySettingHour: 8, minute: 0, second: 0, of: today)!
-
-        let requests = SmartNotificationEngine.buildNudgeRequests(now: now)
-
-        XCTAssertEqual(requests.count, 2,
-                       "At 08:00, default budget (2) should produce 2 nudge requests")
-    }
-
-    /// Verhalten: Um 14:00 liefert buildNudgeRequests nur zukünftige Slots.
-    /// Bricht wenn: `fireDate > now` Guard fehlt und vergangene Slots eingeplant werden.
-    func test_buildNudgeRequests_afternoon_returnsOnlyFutureSlots() {
-        UserDefaults.standard.removeObject(forKey: "nudgeDailyBudget")
-        let cal = Calendar.current
-        let today = cal.startOfDay(for: Date())
-        let now = cal.date(bySettingHour: 14, minute: 0, second: 0, of: today)!
-
-        let requests = SmartNotificationEngine.buildNudgeRequests(now: now)
-
-        XCTAssertLessThanOrEqual(requests.count, 2,
-                       "At 14:00, should return at most budget (2) future slots")
-    }
-
-    /// Verhalten: Um 20:00 liefert buildNudgeRequests 0 Requests (alle Arbeitszeit-Slots vorbei).
-    /// Bricht wenn: Slots ausserhalb der Arbeitszeit generiert werden.
-    func test_buildNudgeRequests_evening_returns0() {
-        let cal = Calendar.current
-        let today = cal.startOfDay(for: Date())
-        let now = cal.date(bySettingHour: 20, minute: 0, second: 0, of: today)!
-
-        let requests = SmartNotificationEngine.buildNudgeRequests(now: now)
-
-        XCTAssertEqual(requests.count, 0,
-                       "At 20:00, all work-hour slots are past — should return 0")
-    }
-
-    /// Verhalten: Nudge-IDs folgen Schema focusblox.nudge.work.{HH}.
-    /// Bricht wenn: Identifier-Schema in buildNudgeRequests geaendert wird.
-    func test_buildNudgeRequests_identifierSchema() {
-        let cal = Calendar.current
-        let today = cal.startOfDay(for: Date())
-        let now = cal.date(bySettingHour: 8, minute: 0, second: 0, of: today)!
-
-        let requests = SmartNotificationEngine.buildNudgeRequests(now: now)
-
-        for request in requests {
-            XCTAssertTrue(request.identifier.hasPrefix("focusblox.nudge.work."),
-                          "Nudge ID '\(request.identifier)' should start with 'focusblox.nudge.work.'")
-        }
-    }
-
-    /// Verhalten: Nie mehr als budgetNudges (10) Requests.
-    /// Bricht wenn: Budget-Cap `Array(requests.prefix(budgetNudges))` entfernt wird.
-    func test_buildNudgeRequests_neverExceedsBudget() {
-        let cal = Calendar.current
-        let today = cal.startOfDay(for: Date())
-        let now = cal.date(bySettingHour: 0, minute: 1, second: 0, of: today)!
-
-        let requests = SmartNotificationEngine.buildNudgeRequests(now: now)
-
-        XCTAssertLessThanOrEqual(requests.count, SmartNotificationEngine.budgetNudges,
-                                  "Nudge requests must not exceed budget of \(SmartNotificationEngine.budgetNudges)")
-    }
-
     // MARK: - Budget Integration Tests (via buildAllRequests)
 
-    /// Verhalten: Bei Profil "balanced" enthaelt buildAllRequests Review-Requests aber keine Nudges.
-    /// Bricht wenn: Profil-Gating in buildAllRequests fuer Review (Z92-94) oder Nudge (Z96-98) falsch ist,
+    /// Verhalten: Bei Profil "balanced" enthaelt buildAllRequests Review-Requests.
+    /// Bricht wenn: Profil-Gating in buildAllRequests fuer Review falsch ist,
     ///   oder buildReviewRequests weiterhin [] zurueckgibt.
-    func test_buildAllRequests_balanced_includesReview_excludesNudges() async throws {
-        // Disable due date reminders to isolate review/nudge testing
+    func test_buildAllRequests_balanced_includesReview() async throws {
+        // Disable due date reminders to isolate review testing
         UserDefaults.standard.set(false, forKey: "dueDateMorningReminderEnabled")
         UserDefaults.standard.set(false, forKey: "dueDateAdvanceReminderEnabled")
 
@@ -170,29 +97,14 @@ final class SmartNotificationEnginePhaseDTests: XCTestCase {
         )
 
         let reviewIDs = requests.filter { $0.identifier.hasPrefix("focusblox.review.") || $0.identifier.hasPrefix("focusblox.morning.") }
-        let nudgeIDs = requests.filter { $0.identifier.hasPrefix("focusblox.nudge.") }
 
         XCTAssertGreaterThan(reviewIDs.count, 0,
                              "Balanced profile should include review requests")
-        XCTAssertEqual(nudgeIDs.count, 0,
-                       "Balanced profile should NOT include nudge requests")
     }
 
-    /// Verhalten: Bei Profil "active" schliesst buildAllRequests Nudge-Requests ein (wenn Slots verfuegbar).
-    /// Bricht wenn: Active-Profil Nudges nicht einschliesst (Gating Z96-98).
-    /// Hinweis: buildAllRequests nutzt Date() intern — Nudges koennen nachts leer sein.
-    /// Daher testen wir buildNudgeRequests direkt mit kontrollierter Zeit.
-    func test_buildAllRequests_active_includesReviewAndNudges() async throws {
-        // Direkt-Test: buildNudgeRequests mit kontrollierter Uhrzeit (10:00)
-        let cal = Calendar.current
-        let today = cal.startOfDay(for: Date())
-        let morning = cal.date(bySettingHour: 10, minute: 0, second: 0, of: today)!
-
-        let nudgeRequests = SmartNotificationEngine.buildNudgeRequests(now: morning)
-        XCTAssertGreaterThan(nudgeRequests.count, 0,
-                             "buildNudgeRequests should return nudges at 10:00")
-
-        // Integration-Test: buildAllRequests mit active Profil enthaelt Review
+    /// Verhalten: Bei Profil "active" schliesst buildAllRequests Review-Requests ein.
+    /// Bricht wenn: Active-Profil Reviews nicht einschliesst.
+    func test_buildAllRequests_active_includesReview() async throws {
         UserDefaults.standard.set(false, forKey: "dueDateMorningReminderEnabled")
         UserDefaults.standard.set(false, forKey: "dueDateAdvanceReminderEnabled")
 
@@ -209,9 +121,9 @@ final class SmartNotificationEnginePhaseDTests: XCTestCase {
                              "Active profile should include review requests")
     }
 
-    /// Verhalten: Bei Profil "quiet" enthaelt buildAllRequests weder Review noch Nudges.
-    /// Bricht wenn: Quiet-Profil ungewollt Review/Nudges einschliesst.
-    func test_buildAllRequests_quiet_excludesReviewAndNudges() async throws {
+    /// Verhalten: Bei Profil "quiet" enthaelt buildAllRequests keine Review-Requests.
+    /// Bricht wenn: Quiet-Profil ungewollt Reviews einschliesst.
+    func test_buildAllRequests_quiet_excludesReview() async throws {
         let container = try makeTestContainer()
         let repo = makeMockRepo(blocks: [])
 
@@ -220,15 +132,13 @@ final class SmartNotificationEnginePhaseDTests: XCTestCase {
         )
 
         let reviewIDs = requests.filter { $0.identifier.hasPrefix("focusblox.review.") || $0.identifier.hasPrefix("focusblox.morning.") }
-        let nudgeIDs = requests.filter { $0.identifier.hasPrefix("focusblox.nudge.") }
 
         XCTAssertEqual(reviewIDs.count, 0, "Quiet profile should NOT include review requests")
-        XCTAssertEqual(nudgeIDs.count, 0, "Quiet profile should NOT include nudge requests")
     }
 
-    /// Verhalten: Gesamt-Budget bleibt <= 64 auch mit Review + Nudge-Requests.
+    /// Verhalten: Gesamt-Budget bleibt <= 64 auch mit Review-Requests.
     /// Bricht wenn: Budget-Cap `Array(requests.prefix(64))` in buildAllRequests entfernt wird.
-    func test_totalBudget_withReviewAndNudges_neverExceeds64() async throws {
+    func test_totalBudget_withReview_neverExceeds64() async throws {
         let cal = Calendar.current
         // Viele Tasks mit dueDate → fuellt Task-Budget
         let tasks = (0..<50).map { i in
@@ -251,13 +161,13 @@ final class SmartNotificationEnginePhaseDTests: XCTestCase {
         )
 
         XCTAssertLessThanOrEqual(requests.count, 64,
-                                  "Total requests must never exceed 64 — even with review + nudges")
+                                  "Total requests must never exceed 64 — even with review requests")
     }
 
     // MARK: - Regression: Phase A/B/C Container Overload bleibt funktional
 
     /// Verhalten: Container-Overload funktioniert weiterhin nach Phase D Signatur-Aenderungen.
-    /// Bricht wenn: Signatur-Aenderungen an buildReviewRequests/buildNudgeRequests den Overload brechen.
+    /// Bricht wenn: Signatur-Aenderungen an buildReviewRequests den Overload brechen.
     func test_containerOverload_stillFunctional() async throws {
         let container = try makeTestContainer()
 

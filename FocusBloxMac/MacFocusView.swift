@@ -19,7 +19,6 @@ struct MacFocusView: View {
     @State private var isLoading = false
     @State private var errorMessage: String?
     @State private var showSprintReview = false
-    @State private var showNudgeContinueDialog = false
     @State private var reviewDismissed = false
     @State private var warningPlayed = false
 
@@ -82,20 +81,6 @@ struct MacFocusView: View {
                     }
                 )
             }
-        }
-        .confirmationDialog(
-            "Weitermachen?",
-            isPresented: $showNudgeContinueDialog,
-            titleVisibility: .visible
-        ) {
-            Button("Ja, weitermachen") {
-                extendNudgeBlock()
-            }
-            Button("Nein, beenden", role: .cancel) {
-                showSprintReview = true
-            }
-        } message: {
-            Text("Du hast 2 Minuten gemacht. Willst du weitermachen?")
         }
     }
 
@@ -565,7 +550,7 @@ struct MacFocusView: View {
             SoundService.playWarning()
             warningPlayed = true
         }
-        if block.isPast && !showSprintReview && !showNudgeContinueDialog && !reviewDismissed {
+        if block.isPast && !showSprintReview && !reviewDismissed {
             // Bug 55C: Save current task's time before showing sprint review
             if let startTime = taskStartTime {
                 let tasks = tasksForBlock(block)
@@ -584,34 +569,11 @@ struct MacFocusView: View {
                 taskStartTime = nil
             }
             SoundService.playEndGong()
-            // Nudge-Sprint erkennen (2-Min Block) → "Weitermachen?" statt SprintReview
-            let blockDurationMinutes = Int(block.endDate.timeIntervalSince(block.startDate) / 60)
-            if blockDurationMinutes <= 2 {
-                showNudgeContinueDialog = true
-            } else {
-                showSprintReview = true
-            }
+            showSprintReview = true
             warningPlayed = false
             // Reload to get fresh taskTimes for Sprint Review
             Task { await loadData() }
         }
-    }
-
-    /// Verlängert einen Nudge-Sprint um die geschätzte Task-Dauer.
-    private func extendNudgeBlock() {
-        guard let block = activeBlock else { return }
-        let tasks = tasksForBlock(block)
-        let remainingTasks = tasks.filter { !block.completedTaskIDs.contains($0.id) }
-        let extraMinutes = remainingTasks.first?.estimatedDuration ?? 25
-        let newEndDate = Date().addingTimeInterval(Double(extraMinutes) * 60)
-        try? eventKitRepo.updateFocusBlockTime(
-            eventID: block.id,
-            startDate: block.startDate,
-            endDate: newEndDate
-        )
-        reviewDismissed = false
-        warningPlayed = false
-        Task { await loadData() }
     }
 
     /// Unerledigte Tasks nach Sprint Review zurück in Next Up

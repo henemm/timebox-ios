@@ -15,7 +15,7 @@ final class NotificationActionDelegate: NSObject, @preconcurrency UNUserNotifica
         self.eventKitRepository = eventKitRepository
     }
 
-    /// Notification name posted when user taps a Review/Nudge notification.
+    /// Notification name posted when user taps a Review notification.
     /// userInfo contains "phase" key with value "morning", "evening", or "daytime".
     static let navigateToDayViewNotification = Notification.Name("NavigateToDayView")
 
@@ -26,7 +26,7 @@ final class NotificationActionDelegate: NSObject, @preconcurrency UNUserNotifica
     ) {
         let userInfo = response.notification.request.content.userInfo
 
-        // Deep-Link: Review/Nudge notifications with target="day"
+        // Deep-Link: Review notifications with target="day"
         if let target = userInfo["target"] as? String, target == "day" {
             let phase = userInfo["phase"] as? String ?? "daytime"
             let actionID = response.actionIdentifier

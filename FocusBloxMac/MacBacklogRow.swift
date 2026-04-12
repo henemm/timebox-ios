@@ -20,8 +20,6 @@ struct MacBacklogRow: View {
     var onCategorySelect: ((String) -> Void)?  // Direct category selection (macOS Menu)
     var onDurationSelect: ((Int?) -> Void)?    // Direct duration selection (macOS Menu)
     var onStartFocusSprint: (() -> Void)?
-    var onStartNudgeSprint: (() -> Void)?
-    var isStuck: Bool = false  // rescheduleCount >= 3: shows blockade marker
     var isPendingResort: Bool = false  // Deferred sort: shows border when item changed but not yet re-sorted
     var isCompletionPending: Bool = false  // Deferred completion: shows filled checkbox before task disappears
     var isBlocked: Bool = false  // Task is blocked by another task (dimmed + indented + checkbox disabled)
@@ -92,18 +90,6 @@ struct MacBacklogRow: View {
                     .opacity(pendingPulse ? 0.9 : 0.4)
                     .allowsHitTesting(false)
                     .accessibilityIdentifier("pendingResortBorder_\(task.uuid.uuidString)")
-            }
-        }
-        .overlay(alignment: .topLeading) {
-            if isStuck {
-                Image(systemName: "exclamationmark.triangle.fill")
-                    .foregroundStyle(.orange)
-                    .font(.caption2)
-                    .padding(4)
-                    .accessibilityElement(children: .ignore)
-                    .accessibilityLabel("Blockiert")
-                    .accessibilityAddTraits(.isImage)
-                    .accessibilityIdentifier("stuckMarker_\(task.uuid.uuidString)")
             }
         }
         .animation(.easeOut(duration: 0.3), value: isPendingResort)

@@ -7,7 +7,7 @@ import UserNotifications
 @MainActor
 final class NotificationDeepLinkTests: XCTestCase {
 
-    // MARK: - userInfo in Review/Nudge Requests
+    // MARK: - userInfo in Review Requests
 
     /// Bricht wenn: buildReviewRequests keine userInfo mit "target" setzt.
     /// Welche Zeile bricht diesen Test? SmartNotificationEngine.swift buildReviewRequests — kein userInfo
@@ -56,24 +56,6 @@ final class NotificationDeepLinkTests: XCTestCase {
         for request in eveningRequests {
             XCTAssertEqual(request.content.userInfo["phase"] as? String, "evening",
                            "Evening request must have phase='evening' in userInfo")
-        }
-    }
-
-    /// Bricht wenn: Nudge-Requests keine userInfo mit target "day" haben.
-    func test_nudgeRequests_containTargetUserInfo() {
-        let cal = Calendar.current
-        let today = cal.startOfDay(for: Date())
-        let now = cal.date(bySettingHour: 8, minute: 0, second: 0, of: today)!
-
-        let requests = SmartNotificationEngine.buildNudgeRequests(now: now)
-
-        XCTAssertGreaterThan(requests.count, 0, "Should have nudge requests at 08:00")
-        for request in requests {
-            let userInfo = request.content.userInfo
-            XCTAssertEqual(userInfo["target"] as? String, "day",
-                           "Nudge request must have target='day' in userInfo")
-            XCTAssertEqual(userInfo["phase"] as? String, "daytime",
-                           "Nudge request must have phase='daytime' in userInfo")
         }
     }
 

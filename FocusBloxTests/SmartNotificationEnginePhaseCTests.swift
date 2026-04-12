@@ -189,7 +189,7 @@ final class SmartNotificationEnginePhaseCTests: XCTestCase {
         let repo = MockEventKitRepository()
         repo.mockFocusBlocks = blocks
 
-        // Profil "active" nutzt alle Slots (Timer + Tasks + Review + Nudges)
+        // Profil "active" nutzt alle Slots (Timer + Tasks + Review)
         let requests = await SmartNotificationEngine.buildAllRequests(
             profile: .active,
             container: container,

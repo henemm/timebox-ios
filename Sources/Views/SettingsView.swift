@@ -20,8 +20,6 @@ struct SettingsView: View {
     @AppStorage("dueDateAdvanceReminderEnabled") private var dueDateAdvanceReminderEnabled: Bool = false
     @AppStorage("dueDateAdvanceReminderMinutes") private var dueDateAdvanceReminderMinutes: Int = 60
     @AppStorage("notificationProfile") private var notificationProfileRaw: String = "balanced"
-    @AppStorage("nudgeDailyBudget") private var nudgeDailyBudget: Int = 2
-    @AppStorage("nudgeSilenceOnSuccess") private var nudgeSilenceOnSuccess: Bool = true
     @AppStorage("morningReminderHour") private var morningReminderHour: Int = 8
     @AppStorage("morningReminderMinute") private var morningReminderMinute: Int = 0
     @AppStorage("eveningReflectionHour") private var eveningReflectionHour: Int = 20
@@ -55,20 +53,7 @@ struct SettingsView: View {
                 } header: {
                     Text("Profil")
                 } footer: {
-                    Text("Leise — Nur Focus-Block-Timer (5 Min vorher + Ende).\nAusgeglichen — Timer + Frist-Erinnerungen + Dein Tag + Abend-Reflexion.\nAktiv — Alles + konfigurierbare Tages-Nudges.")
-                }
-
-                if notificationProfileRaw == "active" {
-                    Section {
-                        Stepper("Max. Nudges: \(nudgeDailyBudget)", value: $nudgeDailyBudget, in: 1...3)
-                            .accessibilityIdentifier("nudgeBudgetStepper")
-                        Toggle("Stille bei Erfolg", isOn: $nudgeSilenceOnSuccess)
-                            .accessibilityIdentifier("silenceOnSuccessToggle")
-                    } header: {
-                        Text("Tages-Nudges")
-                    } footer: {
-                        Text("Motivations-Nachrichten im konfigurierten Zeitfenster. Bei 'Stille bei Erfolg' stoppen sie, sobald genug Tasks erledigt sind.")
-                    }
+                    Text("Leise — Nur Focus-Block-Timer (5 Min vorher + Ende).\nAusgeglichen — Timer + Frist-Erinnerungen + Dein Tag + Abend-Reflexion.\nAktiv — Alles oben.")
                 }
 
                 if notificationProfileRaw != "quiet" {

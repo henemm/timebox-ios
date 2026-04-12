@@ -115,13 +115,12 @@ final class Bug169_BGRefreshProfileTests: XCTestCase {
     // MARK: - Fix 3: Gesamt-Budget bleibt <= 64 auch mit 14 Review-Slots
 
     /// Bricht wenn: Nach budgetReview-Erhöhung auf 14 das Gesamt-Budget > 64 wird.
-    /// Budget: Timer(4) + Tasks(20) + Review(14) + Nudges(10) = 48 — passt.
+    /// Budget: Timer(4) + Tasks(20) + Review(14) = 38 — passt.
     /// Welche Zeile bricht diesen Test? SmartNotificationEngine.swift: Budget-Summe
     func test_totalBudgetSum_fitsIn64() {
         let total = SmartNotificationEngine.budgetTimers
             + SmartNotificationEngine.budgetTasks
             + SmartNotificationEngine.budgetReview
-            + SmartNotificationEngine.budgetNudges
 
         XCTAssertLessThanOrEqual(total, 64,
                                   "Sum of all budgets (\(total)) must fit within iOS 64-notification limit")

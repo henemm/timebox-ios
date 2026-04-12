@@ -41,7 +41,6 @@ enum SmartNotificationEngine {
     static let budgetTimers: Int = 4
     static let budgetTasks: Int  = 20
     static let budgetReview: Int = 14
-    static var budgetNudges: Int { AppSettings.shared.nudgeDailyBudget * 7 }
 
     // MARK: - Cached AI Content (set during reconcile, used by buildReviewRequests)
 
@@ -97,11 +96,6 @@ enum SmartNotificationEngine {
         if profile == .balanced || profile == .active {
             await precomputeNotificationContent(container: container, eventKitRepo: eventKitRepo)
             requests += buildReviewRequests(now: Date())
-        }
-
-        if profile == .active {
-            let intentionText = fetchTodayIntention(container: container)
-            requests += buildNudgeRequests(now: Date(), intentionText: intentionText)
         }
 
         return Array(requests.prefix(64))
@@ -241,11 +235,6 @@ enum SmartNotificationEngine {
             requests += buildReviewRequests(now: Date())
         }
 
-        if profile == .active {
-            let intentionText = fetchTodayIntention(context: context)
-            requests += buildNudgeRequests(now: Date(), intentionText: intentionText)
-        }
-
         return Array(requests.prefix(64))
     }
 
@@ -369,79 +358,6 @@ enum SmartNotificationEngine {
         }
 
         return Array(requests.prefix(budgetReview))
-    }
-
-    // MARK: - Prio 4: Nudge Requests
-
-    static func buildNudgeRequests(now: Date = Date(), completedTodayCount: Int = 0, intentionText: String? = nil) -> [UNNotificationRequest] {
-        let settings = AppSettings.shared
-        let budget = max(1, min(3, settings.nudgeDailyBudget))
-        let windowStart = settings.morningReminderHour + 1  // Nudges starten 1h nach Morgengruß
-        let windowEnd = settings.eveningReflectionHour      // Nudges enden bei Abend-Reflexion
-
-        // Ohne Intention: keine Nudges (User-Advocate: lieber Stille als generisch)
-        guard let intention = intentionText, !intention.isEmpty else { return [] }
-
-        if settings.nudgeSilenceOnSuccess && completedTodayCount >= budget {
-            return []
-        }
-        guard windowStart < windowEnd else { return [] }
-
-        let slotHours = distributeSlots(count: budget, startHour: windowStart, endHour: windowEnd)
-
-        let cal = Calendar.current
-        let today = cal.startOfDay(for: now)
-        var requests: [UNNotificationRequest] = []
-
-        for (index, hour) in slotHours.enumerated() {
-            guard let fireDate = cal.date(bySettingHour: hour, minute: 0, second: 0, of: today),
-                  fireDate > now else { continue }
-
-            let nudgeContent = NotificationContentService.generateNudgeContent(
-                intentionText: intention,
-                slotIndex: index
-            )
-            let content = UNMutableNotificationContent()
-            content.title = nudgeContent.title
-            content.body = nudgeContent.body
-            content.sound = .default
-            content.userInfo = ["target": "day", "phase": "daytime"]
-            content.categoryIdentifier = NotificationContentService.dailyCompanionCategoryID + "_NUDGE"
-
-            let interval = fireDate.timeIntervalSince(now)
-            let trigger = UNTimeIntervalNotificationTrigger(timeInterval: interval, repeats: false)
-            requests.append(UNNotificationRequest(
-                identifier: "focusblox.nudge.work.\(hour)",
-                content: content,
-                trigger: trigger
-            ))
-        }
-        return Array(requests.prefix(budgetNudges))
-    }
-
-    private static func distributeSlots(count: Int, startHour: Int, endHour: Int) -> [Int] {
-        guard count > 0, startHour < endHour else { return [] }
-        let span = endHour - startHour
-        if count == 1 { return [startHour + span / 2] }
-        let step = Double(span) / Double(count)
-        return (0..<count).map { i in startHour + Int(Double(i) * step + step / 2) }
-    }
-
-    // MARK: - Fetch Today's Intention
-
-    private static func fetchTodayIntention(container: ModelContainer) -> String? {
-        let context = ModelContext(container)
-        return fetchTodayIntention(context: context)
-    }
-
-    private static func fetchTodayIntention(context: ModelContext) -> String? {
-        let today = Calendar.current.startOfDay(for: Date())
-        let descriptor = FetchDescriptor<DayIntention>(
-            predicate: #Predicate { $0.date == today }
-        )
-        guard let intention = try? context.fetch(descriptor).first,
-              !intention.text.isEmpty else { return nil }
-        return intention.text
     }
 
     // MARK: - Precompute AI Content
