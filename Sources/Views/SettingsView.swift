@@ -35,6 +35,8 @@ struct SettingsView: View {
     @State private var allReminderLists: [ReminderListInfo] = []
     @AppStorage("siriTipCompleteTaskVisible") private var showCompleteTaskTip = true
     @AppStorage("taskDebugModeEnabled") private var taskDebugModeEnabled: Bool = false
+    @AppStorage("backlogStaleAgeDays") private var backlogStaleAgeDays: Int = 14
+    @AppStorage("backlogStaleRescheduleCount") private var backlogStaleRescheduleCount: Int = 3
     @AppStorage("useCoachTabLayout") private var useCoachTabLayout: Bool = false
     @State private var showLifecycleLogSheet = false
     @State private var showClearLogConfirmation = false
@@ -149,6 +151,18 @@ struct SettingsView: View {
                     .accessibilityIdentifier("defaultDurationPicker")
                 } header: {
                     Text("Tasks")
+                }
+
+                // Section: Backlog Hygiene
+                Section {
+                    Stepper("Nach \(AppSettings.shared.backlogStaleAgeDays) Tagen", value: $backlogStaleAgeDays, in: 7...90)
+                        .accessibilityIdentifier("staleAgeDaysStepper")
+                    Stepper("Nach \(AppSettings.shared.backlogStaleRescheduleCount)× verschieben", value: $backlogStaleRescheduleCount, in: 1...10)
+                        .accessibilityIdentifier("staleRescheduleCountStepper")
+                } header: {
+                    Text("Backlog-Hygiene")
+                } footer: {
+                    Text("Tasks werden zum Aufräumen vorgeschlagen wenn sie zu lange im Backlog liegen oder zu oft verschoben wurden.")
                 }
 
                 // Section: Automatic Task Analysis (always visible — deterministic steps work without AI)

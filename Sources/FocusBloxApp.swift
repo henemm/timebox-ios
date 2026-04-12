@@ -759,6 +759,30 @@ struct FocusBloxApp: App {
         context.insert(backlogTask2)
         context.insert(tbdTask)
 
+        // Stale Tasks (Backlog Hygiene) — alt genug für Aufräum-Vorschlag
+        let staleTask1 = LocalTask(
+            title: "[MOCK] Alte Idee: App-Icon redesignen",
+            importance: 1,
+            createdAt: Calendar.current.date(byAdding: .day, value: -20, to: Date()) ?? Date(),
+            estimatedDuration: 60,
+            urgency: "not_urgent"
+        )
+        staleTask1.isNextUp = false
+        staleTask1.taskType = "maintenance"
+        context.insert(staleTask1)
+
+        let staleTask2 = LocalTask(
+            title: "[MOCK] Oft verschoben: Steuererklaerung",
+            importance: 2,
+            createdAt: Calendar.current.date(byAdding: .day, value: -10, to: Date()) ?? Date(),
+            estimatedDuration: 120,
+            urgency: "not_urgent"
+        )
+        staleTask2.isNextUp = false
+        staleTask2.rescheduleCount = 4
+        staleTask2.taskType = "income"
+        context.insert(staleTask2)
+
         // Geparkt Task (RW 2.4b) — manuell geparkt, erscheint in "Geparkt"-Sektion
         let parkedTask = LocalTask(title: "[MOCK] Geparkte Idee - Spaeter", importance: 2, estimatedDuration: 30, urgency: "not_urgent")
         parkedTask.isNextUp = false

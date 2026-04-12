@@ -103,4 +103,12 @@ final class AppSettings: ObservableObject {
         }
     }
 
+    // MARK: - Backlog Hygiene
+
+    /// Days after which an untouched task is suggested for cleanup (7-90)
+    @AppStorage("backlogStaleAgeDays") var backlogStaleAgeDays: Int = 14
+
+    /// Reschedule count after which a task is suggested for cleanup (1-10)
+    @AppStorage("backlogStaleRescheduleCount") var backlogStaleRescheduleCount: Int = 3
+
 }

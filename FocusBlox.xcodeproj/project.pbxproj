@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		EDA969EAFEFA3828A96E74DE /* BacklogHygieneView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F06EE41E85B8D03CDD433CAB /* BacklogHygieneView.swift */; };
+		F7FC3318497D18071C96DBA6 /* BacklogHealthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D618F7073BA70D38D932075 /* BacklogHealthService.swift */; };
+		C5124F141765BA1BD5FCA850 /* BacklogHygieneUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F18474B615562084306A7610 /* BacklogHygieneUITests.swift */; };
+		A3807E05353BD27C00133695 /* BacklogHealthServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 819EE8E46855DD04709EF5B3 /* BacklogHealthServiceTests.swift */; };
 		7156677C1EC12AE558C55597 /* CoachMorningSlotUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 365E461EF1EDB22FEC78B7F4 /* CoachMorningSlotUITests.swift */; };
 		253139E2003B91137C87379B /* NotificationFreeTimeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 540FC8B31790262D5E96D546 /* NotificationFreeTimeTests.swift */; };
 		97F5C9AEC902D81D3A87F818 /* CoachEveningStatsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C928EE53E80BEDAF79DBA54 /* CoachEveningStatsUITests.swift */; };
@@ -685,6 +689,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		F06EE41E85B8D03CDD433CAB /* BacklogHygieneView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = BacklogHygieneView.swift; path = Sources/Views/BacklogHygieneView.swift; sourceTree = SOURCE_ROOT; };
+		5D618F7073BA70D38D932075 /* BacklogHealthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = BacklogHealthService.swift; path = Sources/Services/BacklogHealthService.swift; sourceTree = SOURCE_ROOT; };
+		F18474B615562084306A7610 /* BacklogHygieneUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = BacklogHygieneUITests.swift; path = FocusBloxUITests/BacklogHygieneUITests.swift; sourceTree = SOURCE_ROOT; };
+		819EE8E46855DD04709EF5B3 /* BacklogHealthServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = BacklogHealthServiceTests.swift; path = FocusBloxTests/BacklogHealthServiceTests.swift; sourceTree = SOURCE_ROOT; };
 		365E461EF1EDB22FEC78B7F4 /* CoachMorningSlotUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CoachMorningSlotUITests.swift; path = FocusBloxUITests/CoachMorningSlotUITests.swift; sourceTree = SOURCE_ROOT; };
 		540FC8B31790262D5E96D546 /* NotificationFreeTimeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = NotificationFreeTimeTests.swift; path = FocusBloxTests/NotificationFreeTimeTests.swift; sourceTree = SOURCE_ROOT; };
 		9C928EE53E80BEDAF79DBA54 /* CoachEveningStatsUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CoachEveningStatsUITests.swift; path = FocusBloxUITests/CoachEveningStatsUITests.swift; sourceTree = SOURCE_ROOT; };
@@ -1375,6 +1383,7 @@
 		05D90FB2A2CE48689EC309B4 /* FocusBloxUITests */ = {
 			isa = PBXGroup;
 			children = (
+				F18474B615562084306A7610 /* BacklogHygieneUITests.swift */,
 				365E461EF1EDB22FEC78B7F4 /* CoachMorningSlotUITests.swift */,
 				9C928EE53E80BEDAF79DBA54 /* CoachEveningStatsUITests.swift */,
 				63D7BD49F4ECABF8CF429841 /* FocusBlockAbortStateUITests.swift */,
@@ -1578,6 +1587,7 @@
 		7613DF2BEF00711C6BDA68E3 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				F06EE41E85B8D03CDD433CAB /* BacklogHygieneView.swift */,
 				217C7AD059FD114C1AD7845D /* BacklogRow.swift */,
 				92133F2683BB9B90566D7646 /* BacklogRow.swift */,
 				9B35F02DA57C64E51F6EC483 /* NextUpSection.swift */,
@@ -1659,6 +1669,7 @@
 		A6B3805EF19D1B131D346DDD /* FocusBloxTests */ = {
 			isa = PBXGroup;
 			children = (
+				819EE8E46855DD04709EF5B3 /* BacklogHealthServiceTests.swift */,
 				540FC8B31790262D5E96D546 /* NotificationFreeTimeTests.swift */,
 				6801821B121A482E278638FF /* FocusBlockAbortTests.swift */,
 				024008C3E31ED68D6BA6B748 /* CoachDaytimeTests.swift */,
@@ -1819,6 +1830,7 @@
 		E8F581D4C161751425D7F776 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				5D618F7073BA70D38D932075 /* BacklogHealthService.swift */,
 				B2B0C48BFC234966B9C9D02D /* TaskSuggestionService.swift */,
 				384B45ACD5EEEA70C9C02ACB /* IntentionSuggestionService.swift */,
 				AITASKSCOR0FILE0001 /* AITaskScoringService.swift */,
@@ -2570,6 +2582,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EDA969EAFEFA3828A96E74DE /* BacklogHygieneView.swift in Sources */,
+				F7FC3318497D18071C96DBA6 /* BacklogHealthService.swift in Sources */,
 				46C355C4F155278568C094C2 /* TaskSuggestionService.swift in Sources */,
 				C65382110B596A49B275F394 /* IntentionSuggestionService.swift in Sources */,
 				36185728D6656978AF4775BD /* DayIntention.swift in Sources */,
@@ -2712,6 +2726,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C5124F141765BA1BD5FCA850 /* BacklogHygieneUITests.swift in Sources */,
 				7156677C1EC12AE558C55597 /* CoachMorningSlotUITests.swift in Sources */,
 				97F5C9AEC902D81D3A87F818 /* CoachEveningStatsUITests.swift in Sources */,
 				71DC87EDF8FB32561F1B003D /* FocusBlockAbortStateUITests.swift in Sources */,
@@ -2840,6 +2855,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A3807E05353BD27C00133695 /* BacklogHealthServiceTests.swift in Sources */,
 				253139E2003B91137C87379B /* NotificationFreeTimeTests.swift in Sources */,
 				C4FD130621870A0DBFCD27F2 /* FocusBlockAbortTests.swift in Sources */,
 				89736F871F3E6F5BFB2F632C /* CoachDaytimeTests.swift in Sources */,

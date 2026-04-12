@@ -74,7 +74,16 @@ struct BacklogView: View {
     @State private var undoResultMessage = ""
     @State private var focusSprintConflictTitle: String?
     @State private var focusSprintFeedback = false
+    @State private var showHygieneSheet = false
 
+    // MARK: - Stale Tasks (Backlog Hygiene)
+    private var staleTasks: [PlanItem] {
+        BacklogHealthService.findStaleTasks(
+            in: backlogTasks,
+            staleAgeDays: AppSettings.shared.backlogStaleAgeDays,
+            staleRescheduleCount: AppSettings.shared.backlogStaleRescheduleCount
+        )
+    }
 
     // MARK: - Search Filter
     private func matchesSearch(_ item: PlanItem) -> Bool {
@@ -196,6 +205,13 @@ struct BacklogView: View {
                     }
                     .accessibilityIdentifier("addTaskButton")
 
+                    Button {
+                        showHygieneSheet = true
+                    } label: {
+                        Image(systemName: "sparkles")
+                    }
+                    .accessibilityIdentifier("hygieneToolbarButton")
+
                     viewModeSwitcher
 
                     Button {
@@ -257,6 +273,9 @@ struct BacklogView: View {
             }
             .sheet(isPresented: $showSettings) {
                 SettingsView()
+            }
+            .sheet(isPresented: $showHygieneSheet) {
+                BacklogHygieneView(staleTasks: staleTasks)
             }
             .sheet(item: $taskToEdit) { task in
                 TaskDetailSheet(
@@ -1155,6 +1174,27 @@ struct BacklogView: View {
     private var priorityView: some View {
         List {
             nextUpListSection
+
+            // Backlog Hygiene Banner
+            if !staleTasks.isEmpty {
+                Section {
+                    Button {
+                        showHygieneSheet = true
+                    } label: {
+                        HStack {
+                            Image(systemName: "sparkles")
+                                .foregroundStyle(.orange)
+                            Text("\(staleTasks.count) Tasks liegen seit Wochen rum. Aufräumen?")
+                                .font(.subheadline)
+                            Spacer()
+                            Image(systemName: "chevron.right")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                    .accessibilityIdentifier("hygieneCleanupBanner")
+                }
+            }
 
             // Overdue tasks at top
             if !overdueTasks.isEmpty {
