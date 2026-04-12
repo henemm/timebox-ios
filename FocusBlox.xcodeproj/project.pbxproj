@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		97F5C9AEC902D81D3A87F818 /* CoachEveningStatsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C928EE53E80BEDAF79DBA54 /* CoachEveningStatsUITests.swift */; };
 		71DC87EDF8FB32561F1B003D /* FocusBlockAbortStateUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63D7BD49F4ECABF8CF429841 /* FocusBlockAbortStateUITests.swift */; };
 		C4FD130621870A0DBFCD27F2 /* FocusBlockAbortTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6801821B121A482E278638FF /* FocusBlockAbortTests.swift */; };
 		89736F871F3E6F5BFB2F632C /* CoachDaytimeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 024008C3E31ED68D6BA6B748 /* CoachDaytimeTests.swift */; };
@@ -689,6 +690,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		9C928EE53E80BEDAF79DBA54 /* CoachEveningStatsUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CoachEveningStatsUITests.swift; path = FocusBloxUITests/CoachEveningStatsUITests.swift; sourceTree = SOURCE_ROOT; };
 		63D7BD49F4ECABF8CF429841 /* FocusBlockAbortStateUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FocusBlockAbortStateUITests.swift; path = FocusBloxUITests/FocusBlockAbortStateUITests.swift; sourceTree = SOURCE_ROOT; };
 		6801821B121A482E278638FF /* FocusBlockAbortTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FocusBlockAbortTests.swift; path = FocusBloxTests/FocusBlockAbortTests.swift; sourceTree = SOURCE_ROOT; };
 		024008C3E31ED68D6BA6B748 /* CoachDaytimeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CoachDaytimeTests.swift; path = FocusBloxTests/CoachDaytimeTests.swift; sourceTree = SOURCE_ROOT; };
@@ -1382,6 +1384,7 @@
 		05D90FB2A2CE48689EC309B4 /* FocusBloxUITests */ = {
 			isa = PBXGroup;
 			children = (
+				9C928EE53E80BEDAF79DBA54 /* CoachEveningStatsUITests.swift */,
 				63D7BD49F4ECABF8CF429841 /* FocusBlockAbortStateUITests.swift */,
 				18E048FAA63FC90A805A4B80 /* CoachPeekUITests.swift */,
 				B2429086F615EF5BE704920B /* TaskSuggestionUITests.swift */,
@@ -2723,6 +2726,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				97F5C9AEC902D81D3A87F818 /* CoachEveningStatsUITests.swift in Sources */,
 				71DC87EDF8FB32561F1B003D /* FocusBlockAbortStateUITests.swift in Sources */,
 				68F948A0584163F75A1756C5 /* CoachPeekUITests.swift in Sources */,
 				C7326197F7E25BD25B904096 /* TaskSuggestionUITests.swift in Sources */,

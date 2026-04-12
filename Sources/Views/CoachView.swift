@@ -28,6 +28,12 @@ struct CoachView: View {
     // Review data
     @State private var todayBlocks: [FocusBlock] = []
 
+    // Weekly stats data (letzte 7 Tage)
+    @State private var weekBlocks: [FocusBlock] = []
+    @State private var weekCalendarEvents: [CalendarEvent] = []
+    @State private var weekCompletedTasks: [PlanItem] = []
+    private let statsCalculator = ReviewStatsCalculator()
+
     @State private var isLoading = false
     @State private var isPermissionDenied = false
     @State private var refreshID = UUID()
@@ -51,6 +57,53 @@ struct CoachView: View {
     private var completionPercentage: Int {
         guard totalPlanned > 0 else { return 0 }
         return Int((Double(totalCompleted) / Double(totalPlanned)) * 100)
+    }
+
+    // MARK: - Category Stats (Computed)
+
+    private var todayCalendarEvents: [CalendarEvent] {
+        let calendar = Calendar.current
+        let startOfToday = calendar.startOfDay(for: Date())
+        let endOfToday = calendar.date(byAdding: .day, value: 1, to: startOfToday) ?? startOfToday
+        return calendarEvents.filter {
+            $0.startDate >= startOfToday && $0.startDate < endOfToday
+        }
+    }
+
+    private var dailyCategoryStats: [CategoryStat] {
+        var taskStats: [String: Int] = [:]
+        for task in completedTasks {
+            taskStats[task.taskType, default: 0] += task.effectiveDuration
+        }
+        let combined = statsCalculator.computeCategoryMinutes(
+            taskMinutesByCategory: taskStats, calendarEvents: todayCalendarEvents
+        )
+        return TaskCategory.allCases.compactMap { config in
+            guard let minutes = combined[config.rawValue], minutes > 0 else { return nil }
+            return CategoryStat(config: config, minutes: minutes)
+        }.sorted { $0.minutes > $1.minutes }
+    }
+
+    private var dailyTotalMinutes: Int {
+        dailyCategoryStats.reduce(0) { $0 + $1.minutes }
+    }
+
+    private var weeklyCategoryStats: [CategoryStat] {
+        var taskStats: [String: Int] = [:]
+        for task in weekCompletedTasks {
+            taskStats[task.taskType, default: 0] += task.effectiveDuration
+        }
+        let combined = statsCalculator.computeCategoryMinutes(
+            taskMinutesByCategory: taskStats, calendarEvents: weekCalendarEvents
+        )
+        return TaskCategory.allCases.compactMap { config in
+            guard let minutes = combined[config.rawValue], minutes > 0 else { return nil }
+            return CategoryStat(config: config, minutes: minutes)
+        }.sorted { $0.minutes > $1.minutes }
+    }
+
+    private var weeklyTotalMinutes: Int {
+        weeklyCategoryStats.reduce(0) { $0 + $1.minutes }
     }
 
     var body: some View {
@@ -363,7 +416,121 @@ struct CoachView: View {
                     showActions: false
                 )
             }
+
+            // Kategorie-Statistik heute
+            eveningDailyCategorySection
+
+            // Kategorie-Statistik letzte 7 Tage
+            eveningWeeklyCategorySection
+
+            // Planungsgenauigkeit
+            eveningPlanningAccuracySection
         }
+    }
+
+    // MARK: - Evening Stats Sections
+
+    @ViewBuilder
+    private var eveningDailyCategorySection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Zeit pro Kategorie — Heute")
+                .font(.headline)
+
+            if dailyCategoryStats.isEmpty {
+                Text("Keine Daten vorhanden")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .padding(.vertical, 8)
+            } else {
+                VStack(spacing: 12) {
+                    ForEach(dailyCategoryStats) { stat in
+                        CategoryBar(stat: stat, totalMinutes: dailyTotalMinutes)
+                    }
+                }
+            }
+        }
+        .padding()
+        .background(RoundedRectangle(cornerRadius: 16).fill(.ultraThinMaterial))
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("coachDailyCategoryStats")
+    }
+
+    @ViewBuilder
+    private var eveningWeeklyCategorySection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Zeit pro Kategorie — Letzte 7 Tage")
+                .font(.headline)
+
+            if weeklyCategoryStats.isEmpty {
+                Text("Keine Daten vorhanden")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .padding(.vertical, 8)
+            } else {
+                VStack(spacing: 12) {
+                    ForEach(weeklyCategoryStats) { stat in
+                        CategoryBar(stat: stat, totalMinutes: weeklyTotalMinutes)
+                    }
+                }
+            }
+        }
+        .padding()
+        .background(RoundedRectangle(cornerRadius: 16).fill(.ultraThinMaterial))
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("coachWeeklyCategoryStats")
+    }
+
+    @ViewBuilder
+    private var eveningPlanningAccuracySection: some View {
+        let stats = statsCalculator.computePlanningAccuracy(blocks: weekBlocks, allTasks: allTasks)
+
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Planungsgenauigkeit")
+                .font(.headline)
+
+            if stats.trackedTaskCount > 0 {
+                HStack {
+                    Image(systemName: stats.averageDeviation < -0.05 ? "hare" : stats.averageDeviation > 0.05 ? "tortoise" : "checkmark.seal")
+                        .foregroundStyle(stats.averageDeviation < -0.05 ? .green : stats.averageDeviation > 0.05 ? .orange : .blue)
+                    Text("Durchschnitt: \(stats.averageDeviationFormatted)")
+                        .font(.subheadline)
+                    Spacer()
+                    Text("\(stats.trackedTaskCount) Tasks")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+
+                HStack(spacing: 0) {
+                    AccuracyPill(count: stats.fasterCount, label: "Schneller", color: .green, icon: "arrow.up.circle.fill")
+                    AccuracyPill(count: stats.onTimeCount, label: "Im Plan", color: .blue, icon: "checkmark.circle.fill")
+                    AccuracyPill(count: stats.slowerCount, label: "Langsamer", color: .orange, icon: "arrow.down.circle.fill")
+                }
+            }
+
+            if stats.rescheduledTaskCount > 0 {
+                HStack {
+                    Image(systemName: "arrow.triangle.2.circlepath")
+                        .foregroundStyle(.purple)
+                    Text("\(stats.rescheduledTaskCount) Tasks umgeplant")
+                        .font(.subheadline)
+                    Spacer()
+                    Text("\(stats.totalReschedules)x total")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+
+            if !stats.hasData {
+                Text("Noch keine Focus Blocks mit Zeiterfassung")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .padding(.vertical, 8)
+            }
+        }
+        .padding()
+        .background(RoundedRectangle(cornerRadius: 16).fill(.ultraThinMaterial))
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("coachPlanningAccuracy")
     }
 
     private var nextUpcomingBlock: FocusBlock? {
@@ -526,13 +693,20 @@ struct CoachView: View {
             let taskSource = LocalTaskSource(modelContext: modelContext)
             let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
             allTasks = try await syncEngine.sync()
-            let recentlyCompleted = try await syncEngine.syncCompletedTasks(days: 1)
+            let recentlyCompleted = try await syncEngine.syncCompletedTasks(days: 7)
 
             nextUpTasks = allTasks.filter { $0.isNextUp && !$0.isCompleted && $0.isActionable }
+
+            let sevenDaysAgo = calendar.date(byAdding: .day, value: -7, to: today) ?? today
 
             completedTasks = recentlyCompleted.filter {
                 guard let completedAt = $0.completedAt else { return false }
                 return completedAt >= today
+            }
+
+            weekCompletedTasks = recentlyCompleted.filter {
+                guard let completedAt = $0.completedAt else { return false }
+                return completedAt >= sevenDaysAgo
             }
 
             unfinishedTasks = allTasks.filter {
@@ -554,6 +728,24 @@ struct CoachView: View {
             calendarEvents = try eventKitRepo.fetchCalendarEvents(for: Date())
             focusBlocks = try eventKitRepo.fetchFocusBlocks(for: Date())
             todayBlocks = focusBlocks.filter { calendar.isDate($0.startDate, inSameDayAs: today) }
+
+            // Wochen-Daten für Stats (letzte 7 Tage)
+            let sevenDaysAgo = calendar.date(byAdding: .day, value: -7, to: today) ?? today
+            var allWeekBlocks: [FocusBlock] = []
+            var allWeekEvents: [CalendarEvent] = []
+            var currentDate = sevenDaysAgo
+            while currentDate < today {
+                let dayBlocks = try eventKitRepo.fetchFocusBlocks(for: currentDate)
+                allWeekBlocks.append(contentsOf: dayBlocks)
+                let dayEvents = try eventKitRepo.fetchCalendarEvents(for: currentDate)
+                allWeekEvents.append(contentsOf: dayEvents)
+                currentDate = calendar.date(byAdding: .day, value: 1, to: currentDate) ?? today
+            }
+            // Heute dazurechnen (bereits geladen)
+            allWeekBlocks.append(contentsOf: todayBlocks)
+            allWeekEvents.append(contentsOf: calendarEvents)
+            weekBlocks = allWeekBlocks
+            weekCalendarEvents = allWeekEvents
 
             let scheduledPairs = allTasks
                 .filter { $0.isScheduled }
