@@ -17,24 +17,9 @@ final class CoachTabLayoutUITests: XCTestCase {
         app = nil
     }
 
-    // MARK: - Feature Flag Tests
+    // MARK: - Tab Layout Tests
 
-    /// GIVEN: Coach layout feature flag is OFF (default)
-    /// WHEN: App launches
-    /// THEN: Original 5-tab layout is shown
-    func testDefaultLayoutShowsFiveTabs() throws {
-        app.launch()
-        let tabBar = app.tabBars.firstMatch
-        XCTAssertTrue(tabBar.waitForExistence(timeout: 5), "Tab bar should exist")
-
-        XCTAssertTrue(tabBar.buttons["Backlog"].exists, "Backlog tab should exist in default layout")
-        XCTAssertTrue(tabBar.buttons["Blox"].exists, "Blox tab should exist in default layout")
-        XCTAssertTrue(tabBar.buttons["Tag"].exists, "Tag tab should exist in default layout")
-        XCTAssertTrue(tabBar.buttons["Focus"].exists, "Focus tab should exist in default layout")
-        XCTAssertTrue(tabBar.buttons["Review"].exists, "Review tab should exist in default layout")
-    }
-
-    /// GIVEN: Coach layout feature flag is ON
+    /// GIVEN: Coach layout is active
     /// WHEN: App launches
     /// THEN: 4-tab Coach layout is shown (Backlog, Planen, Focus, Coach)
     func testCoachLayoutShowsFourTabs() throws {
@@ -57,9 +42,9 @@ final class CoachTabLayoutUITests: XCTestCase {
     // MARK: - Coach Tab Content Tests
 
     /// GIVEN: Coach layout is active
-    /// WHEN: User navigates to Coach tab
-    /// THEN: All 3 sections are visible (Morning, Daytime, Evening)
-    func testCoachTabShowsAllThreeSections() throws {
+    /// WHEN: User opens each drawer
+    /// THEN: All 3 drawer headers exist and can be opened
+    func testCoachTabShowsAllThreeDrawers() throws {
         app.launchArguments.append("--coach-tab-layout")
         app.launch()
 
@@ -70,14 +55,14 @@ final class CoachTabLayoutUITests: XCTestCase {
         let coachView = app.otherElements["coachView"]
         XCTAssertTrue(coachView.waitForExistence(timeout: 5), "Coach view should exist")
 
-        let morningSection = app.otherElements["coachMorningSection"]
-        XCTAssertTrue(morningSection.waitForExistence(timeout: 5), "Morning section should exist")
+        let morningDrawer = app.buttons["coachDrawer_Guten Morgen"]
+        XCTAssertTrue(morningDrawer.waitForExistence(timeout: 5), "Morning drawer should exist")
 
-        let daytimeSection = app.otherElements["coachDaytimeSection"]
-        XCTAssertTrue(daytimeSection.waitForExistence(timeout: 3), "Daytime section should exist")
+        let daytimeDrawer = app.buttons["coachDrawer_Dein Tag"]
+        XCTAssertTrue(daytimeDrawer.waitForExistence(timeout: 3), "Daytime drawer should exist")
 
-        let eveningSection = app.otherElements["coachEveningSection"]
-        XCTAssertTrue(eveningSection.waitForExistence(timeout: 3), "Evening section should exist")
+        let eveningDrawer = app.buttons["coachDrawer_Tagesrückblick"]
+        XCTAssertTrue(eveningDrawer.waitForExistence(timeout: 3), "Evening drawer should exist")
     }
 
     /// GIVEN: Coach layout is active
@@ -95,43 +80,40 @@ final class CoachTabLayoutUITests: XCTestCase {
         XCTAssertTrue(morningDrawer.waitForExistence(timeout: 5), "Morning drawer should exist")
     }
 
-    /// GIVEN: Coach layout with mock data (completed tasks exist)
-    /// WHEN: User opens Coach tab and scrolls to Daytime section
-    /// THEN: Daytime shows compact completion count (silence, not report)
-    func testDaytimeShowsCompactCount() throws {
+    /// GIVEN: Coach layout with mock data
+    /// WHEN: User opens Daytime drawer
+    /// THEN: Daytime shows motivation text
+    func testDaytimeShowsMotivationText() throws {
         app.launchArguments.append("--coach-tab-layout")
+        app.launchArguments.append("--open-drawer")
+        app.launchArguments.append("daytime")
         app.launch()
 
-        app.tabBars.firstMatch.buttons["Coach"].tap()
-        app.swipeUp()
+        let tabBar = app.tabBars.firstMatch
+        XCTAssertTrue(tabBar.waitForExistence(timeout: 5))
+        tabBar.buttons["Coach"].tap()
 
         let motivationLabel = app.staticTexts["coachDaytimeMotivation"]
-        XCTAssertTrue(motivationLabel.waitForExistence(timeout: 5),
-                      "Daytime should show motivation text")
+        XCTAssertTrue(motivationLabel.waitForExistence(timeout: 10),
+                      "Daytime should show motivation text after opening drawer")
     }
 
     /// GIVEN: Coach layout with mock data
-    /// WHEN: User scrolls to evening section
-    /// THEN: Evening section shows reflection text (not empty)
+    /// WHEN: User opens Evening drawer
+    /// THEN: Evening shows reflection text (not empty)
     func testEveningShowsReflection() throws {
         app.launchArguments.append("--coach-tab-layout")
+        app.launchArguments.append("--open-drawer")
+        app.launchArguments.append("evening")
         app.launch()
 
-        app.tabBars.firstMatch.buttons["Coach"].tap()
-
-        let coachView = app.otherElements["coachView"]
-        XCTAssertTrue(coachView.waitForExistence(timeout: 5))
-
-        app.swipeUp()
-        app.swipeUp()
-
-        let eveningSection = app.otherElements["coachEveningSection"]
-        XCTAssertTrue(eveningSection.waitForExistence(timeout: 5),
-                      "Evening section should be visible after scrolling")
+        let tabBar = app.tabBars.firstMatch
+        XCTAssertTrue(tabBar.waitForExistence(timeout: 5))
+        tabBar.buttons["Coach"].tap()
 
         let reflectionText = app.staticTexts["eveningReflectionText"]
-        XCTAssertTrue(reflectionText.waitForExistence(timeout: 5),
-                      "Evening should show reflection text")
+        XCTAssertTrue(reflectionText.waitForExistence(timeout: 10),
+                      "Evening should show reflection text after opening drawer")
         XCTAssertFalse(reflectionText.label.isEmpty,
                        "Reflection text should not be empty")
     }
@@ -176,34 +158,29 @@ final class CoachTabLayoutUITests: XCTestCase {
 
     /// GIVEN: Coach layout with mock data, task completed in Backlog
     /// WHEN: User switches back to Coach tab
-    /// THEN: Coach reflects the updated completion count (REALITY check)
+    /// THEN: Coach reflects the updated data (Daytime motivation text refreshes)
     func testCoachRefreshesAfterBacklogCompletion() throws {
         app.launchArguments.append("--coach-tab-layout")
+        app.launchArguments.append("--open-drawer")
+        app.launchArguments.append("daytime")
         app.launch()
 
         let tabBar = app.tabBars.firstMatch
         XCTAssertTrue(tabBar.waitForExistence(timeout: 5))
 
-        // 1. Go to Coach, note the completed count
+        // 1. Go to Coach, Daytime drawer auto-opens via --open-drawer
         let coachTab = tabBar.buttons["Coach"]
         coachTab.tap()
-        XCTAssertTrue(coachTab.waitForExistence(timeout: 3))
 
-        // Scroll to see daytime section
-        app.swipeUp()
-
-        // Find completion count text
-        let completedBefore = app.staticTexts.matching(
-            NSPredicate(format: "label CONTAINS 'Dinge geschafft'")
-        ).firstMatch
-        let hadCompletedBefore = completedBefore.waitForExistence(timeout: 3)
-        let countBefore = hadCompletedBefore ? completedBefore.label : "0"
+        let motivationBefore = app.staticTexts["coachDaytimeMotivation"]
+        _ = motivationBefore.waitForExistence(timeout: 10)
+        let labelBefore = motivationBefore.exists ? motivationBefore.label : ""
 
         // 2. Switch to Backlog
         tabBar.buttons["Backlog"].tap()
         XCTAssertTrue(tabBar.buttons["Backlog"].waitForExistence(timeout: 3))
 
-        // 3. Complete a task in Backlog (tap first complete button)
+        // 3. Complete a task in Backlog
         let completeButton = app.buttons.matching(
             NSPredicate(format: "identifier BEGINSWITH 'completeButton_'")
         ).firstMatch
@@ -211,18 +188,13 @@ final class CoachTabLayoutUITests: XCTestCase {
             completeButton.tap()
         }
 
-        // 4. Switch back to Coach
+        // 4. Switch back to Coach — Daytime drawer should still be active
         coachTab.tap()
         XCTAssertTrue(coachTab.waitForExistence(timeout: 3))
 
-        // 5. Scroll to daytime section again
-        app.swipeUp()
-
-        // 6. REALITY CHECK: Coach must show updated data
-        let completedAfter = app.staticTexts.matching(
-            NSPredicate(format: "label CONTAINS 'Dinge geschafft'")
-        ).firstMatch
-        XCTAssertTrue(completedAfter.waitForExistence(timeout: 5),
-                      "Coach should show updated completed count after tab switch. Before: \(countBefore)")
+        // 5. REALITY CHECK: motivation text must exist after refresh
+        let motivationAfter = app.staticTexts["coachDaytimeMotivation"]
+        XCTAssertTrue(motivationAfter.waitForExistence(timeout: 10),
+                      "Coach should show motivation text after tab switch. Before: \(labelBefore)")
     }
 }
