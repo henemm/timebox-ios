@@ -300,6 +300,80 @@ final class NextUpSuggestionServiceTests: XCTestCase {
                           "Nach invalidateCache soll neu berechnet werden")
     }
 
+    // MARK: - candidatesPerSlot Tests (Feature #206)
+
+    /// Verhalten: candidatesPerSlot liefert bis zu 3 Tasks pro Slot, sortiert nach Score.
+    /// Bricht wenn: Methode nicht existiert oder weniger/mehr als maxPerSlot Kandidaten liefert.
+    func test_candidatesPerSlot_returnsUpToThreePerSlot() {
+        let slots = [makeSlot(startHour: 9, endHour: 10)]
+        let tasks = [
+            makePlanItem(title: "High", importance: 3, urgency: "urgent"),
+            makePlanItem(title: "Medium", importance: 2, urgency: "not_urgent"),
+            makePlanItem(title: "Low", importance: 1, urgency: "not_urgent"),
+            makePlanItem(title: "Lowest", importance: 1, urgency: "not_urgent"),
+        ]
+        let profile = makeProfile()
+
+        let result = NextUpSuggestionService.candidatesPerSlot(
+            items: tasks, slots: slots, profile: profile,
+            calendarEvents: [], now: tomorrowDate, maxPerSlot: 3
+        )
+
+        XCTAssertEqual(result.count, 1, "Ein Slot → ein Eintrag im Dictionary")
+        let candidates = result[slots[0].id] ?? []
+        XCTAssertEqual(candidates.count, 3, "Max 3 Kandidaten pro Slot")
+        XCTAssertEqual(candidates[0].planItem.title, "High",
+                       "Hoechster Score soll zuerst kommen")
+    }
+
+    /// Verhalten: candidatesPerSlot schliesst Tasks aus die nicht in den Slot passen (Dauer).
+    /// Bricht wenn: Duration-Filter nicht greift.
+    func test_candidatesPerSlot_respectsDurationFilter() {
+        let slots = [makeSlot(startHour: 9, endHour: 10)] // 60 Min
+        let tasks = [
+            makePlanItem(title: "Fits 30", estimatedDuration: 30),
+            makePlanItem(title: "Fits 60", estimatedDuration: 60),
+            makePlanItem(title: "Too Long 90", estimatedDuration: 90),
+        ]
+        let profile = makeProfile()
+
+        let result = NextUpSuggestionService.candidatesPerSlot(
+            items: tasks, slots: slots, profile: profile,
+            calendarEvents: [], now: tomorrowDate, maxPerSlot: 3
+        )
+
+        let candidates = result[slots[0].id] ?? []
+        XCTAssertEqual(candidates.count, 2, "Nur Tasks die in den Slot passen")
+        let titles = candidates.map(\.planItem.title)
+        XCTAssertFalse(titles.contains("Too Long 90"), "90-Min-Task darf nicht in 60-Min-Slot")
+    }
+
+    /// Verhalten: candidatesPerSlot liefert fuer mehrere Slots unabhaengige Kandidaten.
+    /// Ein Task kann in mehreren Slots vorgeschlagen werden (anders als compute()).
+    /// Bricht wenn: Dedup ueber Slots hinweg faelschlicherweise greift.
+    func test_candidatesPerSlot_allowsSameTaskInMultipleSlots() {
+        let slots = [
+            makeSlot(startHour: 9, endHour: 10),
+            makeSlot(startHour: 14, endHour: 15),
+        ]
+        let tasks = [
+            makePlanItem(title: "Versatile", importance: 3, estimatedDuration: 30),
+        ]
+        let profile = makeProfile()
+
+        let result = NextUpSuggestionService.candidatesPerSlot(
+            items: tasks, slots: slots, profile: profile,
+            calendarEvents: [], now: tomorrowDate, maxPerSlot: 3
+        )
+
+        let slot1Count = result[slots[0].id]?.count ?? 0
+        let slot2Count = result[slots[1].id]?.count ?? 0
+        XCTAssertEqual(slot1Count, 1, "Task soll im ersten Slot vorgeschlagen werden")
+        XCTAssertEqual(slot2Count, 1, "Gleicher Task soll auch im zweiten Slot vorgeschlagen werden")
+    }
+
+    // MARK: - Original Tests
+
     /// Verhalten: Leere Ergebnisse wenn alle Tasks blockiert, erledigt oder zu lang sind.
     /// Bricht wenn: compute() trotzdem Ergebnisse zurueckgibt ohne eligible Tasks.
     func test_suggestions_emptyWhenNoEligibleTasks() {

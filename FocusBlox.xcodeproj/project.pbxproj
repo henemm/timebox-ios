@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7156677C1EC12AE558C55597 /* CoachMorningSlotUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 365E461EF1EDB22FEC78B7F4 /* CoachMorningSlotUITests.swift */; };
 		253139E2003B91137C87379B /* NotificationFreeTimeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 540FC8B31790262D5E96D546 /* NotificationFreeTimeTests.swift */; };
 		97F5C9AEC902D81D3A87F818 /* CoachEveningStatsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C928EE53E80BEDAF79DBA54 /* CoachEveningStatsUITests.swift */; };
 		71DC87EDF8FB32561F1B003D /* FocusBlockAbortStateUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63D7BD49F4ECABF8CF429841 /* FocusBlockAbortStateUITests.swift */; };
@@ -684,6 +685,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		365E461EF1EDB22FEC78B7F4 /* CoachMorningSlotUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CoachMorningSlotUITests.swift; path = FocusBloxUITests/CoachMorningSlotUITests.swift; sourceTree = SOURCE_ROOT; };
 		540FC8B31790262D5E96D546 /* NotificationFreeTimeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = NotificationFreeTimeTests.swift; path = FocusBloxTests/NotificationFreeTimeTests.swift; sourceTree = SOURCE_ROOT; };
 		9C928EE53E80BEDAF79DBA54 /* CoachEveningStatsUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CoachEveningStatsUITests.swift; path = FocusBloxUITests/CoachEveningStatsUITests.swift; sourceTree = SOURCE_ROOT; };
 		63D7BD49F4ECABF8CF429841 /* FocusBlockAbortStateUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FocusBlockAbortStateUITests.swift; path = FocusBloxUITests/FocusBlockAbortStateUITests.swift; sourceTree = SOURCE_ROOT; };
@@ -1373,6 +1375,7 @@
 		05D90FB2A2CE48689EC309B4 /* FocusBloxUITests */ = {
 			isa = PBXGroup;
 			children = (
+				365E461EF1EDB22FEC78B7F4 /* CoachMorningSlotUITests.swift */,
 				9C928EE53E80BEDAF79DBA54 /* CoachEveningStatsUITests.swift */,
 				63D7BD49F4ECABF8CF429841 /* FocusBlockAbortStateUITests.swift */,
 				18E048FAA63FC90A805A4B80 /* CoachPeekUITests.swift */,
@@ -2709,6 +2712,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7156677C1EC12AE558C55597 /* CoachMorningSlotUITests.swift in Sources */,
 				97F5C9AEC902D81D3A87F818 /* CoachEveningStatsUITests.swift in Sources */,
 				71DC87EDF8FB32561F1B003D /* FocusBlockAbortStateUITests.swift in Sources */,
 				68F948A0584163F75A1756C5 /* CoachPeekUITests.swift in Sources */,

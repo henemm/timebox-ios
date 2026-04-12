@@ -91,6 +91,40 @@ enum NextUpSuggestionService {
         return suggestions
     }
 
+    /// Returns up to `maxPerSlot` candidates per slot, keyed by slot ID.
+    /// Unlike `compute()`, tasks can appear in multiple slots.
+    static func candidatesPerSlot(
+        items: [PlanItem],
+        slots: [TimeSlot],
+        profile: BehavioralProfile,
+        calendarEvents: [CalendarEvent],
+        now: Date,
+        maxPerSlot: Int = 3
+    ) -> [UUID: [NextUpSuggestion]] {
+        var result: [UUID: [NextUpSuggestion]] = [:]
+
+        for slot in slots.sorted(by: { $0.startDate < $1.startDate }) {
+            let candidates = items
+                .filter { item in
+                    !item.isCompleted &&
+                    item.isActionable &&
+                    !item.isNextUp &&
+                    item.estimatedDuration != nil &&
+                    item.estimatedDuration! <= slot.durationMinutes
+                }
+                .map { (item: $0, score: score(item: $0, slot: slot, profile: profile, now: now)) }
+                .sorted { $0.score > $1.score }
+                .prefix(maxPerSlot)
+                .map { NextUpSuggestion(id: $0.item.id, planItem: $0.item, slot: slot, score: $0.score) }
+
+            if !candidates.isEmpty {
+                result[slot.id] = Array(candidates)
+            }
+        }
+
+        return result
+    }
+
     static func score(
         item: PlanItem,
         slot: TimeSlot,
