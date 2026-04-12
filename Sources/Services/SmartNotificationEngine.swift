@@ -95,7 +95,7 @@ enum SmartNotificationEngine {
         }
 
         if profile == .balanced || profile == .active {
-            await precomputeNotificationContent(container: container)
+            await precomputeNotificationContent(container: container, eventKitRepo: eventKitRepo)
             requests += buildReviewRequests(now: Date())
         }
 
@@ -237,7 +237,7 @@ enum SmartNotificationEngine {
         }
 
         if profile == .balanced || profile == .active {
-            await precomputeNotificationContent(context: context)
+            await precomputeNotificationContent(context: context, eventKitRepo: eventKitRepo)
             requests += buildReviewRequests(now: Date())
         }
 
@@ -446,12 +446,30 @@ enum SmartNotificationEngine {
 
     // MARK: - Precompute AI Content
 
-    private static func precomputeNotificationContent(container: ModelContainer) async {
+    private static func precomputeNotificationContent(container: ModelContainer, eventKitRepo: any EventKitRepositoryProtocol) async {
         let context = ModelContext(container)
-        await precomputeNotificationContent(context: context)
+        await precomputeNotificationContent(context: context, eventKitRepo: eventKitRepo)
     }
 
-    private static func precomputeNotificationContent(context: ModelContext) async {
+    private static func precomputeNotificationContent(context: ModelContext, eventKitRepo: any EventKitRepositoryProtocol) async {
+        // Fetch calendar data (graceful degradation if not authorized)
+        let today = Date()
+        let calendarEvents = (try? eventKitRepo.fetchCalendarEvents(for: today)) ?? []
+        let focusBlocks = (try? eventKitRepo.fetchFocusBlocks(for: today)) ?? []
+
+        // Calculate real free minutes via GapFinder
+        let gapFinder = GapFinder(events: calendarEvents, focusBlocks: focusBlocks, scheduledTasks: [], date: today)
+        let freeSlots = gapFinder.findFreeSlots(minMinutes: 15, maxMinutes: 480)
+        let freeMinutes = freeSlots.reduce(0) { $0 + $1.durationMinutes }
+
+        // Count meetings from calendar events
+        let meetingCount = calendarEvents.filter { !$0.isAllDay }.count
+
+        // Calculate focus minutes from today's FocusBlocks
+        let focusMinutes = focusBlocks.reduce(0) { total, block in
+            total + Int(block.endDate.timeIntervalSince(block.startDate) / 60)
+        }
+
         // Morning: Find the most overdue task + free time estimate
         let descriptor = FetchDescriptor<LocalTask>(
             predicate: #Predicate<LocalTask> { !$0.isCompleted && !$0.isTemplate },
@@ -464,14 +482,14 @@ enum SmartNotificationEngine {
             cachedMorningContent = await NotificationContentService.generateMorningContent(
                 topTaskTitle: oldestTask.title,
                 daysSinceCreated: daysSince,
-                freeMinutes: 120,
-                meetingCount: 0,
+                freeMinutes: freeMinutes,
+                meetingCount: meetingCount,
                 suggestedTaskID: oldestTask.id
             )
         }
 
         // Evening: Find completed tasks today
-        let startOfToday = Calendar.current.startOfDay(for: Date())
+        let startOfToday = Calendar.current.startOfDay(for: today)
         let completedDescriptor = FetchDescriptor<LocalTask>(
             predicate: #Predicate<LocalTask> { $0.isCompleted && $0.completedAt != nil }
         )
@@ -485,7 +503,7 @@ enum SmartNotificationEngine {
 
             cachedEveningContent = await NotificationContentService.generateEveningContent(
                 completedTaskTitles: titles,
-                focusMinutes: 0,
+                focusMinutes: focusMinutes,
                 hardestTaskTitle: hardest?.title,
                 hardestTaskDaysOpen: hardestDays
             )
