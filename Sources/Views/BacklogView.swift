@@ -723,6 +723,14 @@ struct BacklogView: View {
 
     private func deleteSingleTask(_ task: PlanItem) {
         do {
+            // Bug #209: Mark template so repair won't resurrect this deleted instance
+            if let groupID = task.recurrenceGroupID,
+               let pattern = task.recurrencePattern,
+               pattern != "none",
+               let template = RecurrenceService.findTemplate(groupID: groupID, in: modelContext) {
+                template.lastSkippedDate = Date()
+            }
+
             let taskSource = LocalTaskSource(modelContext: modelContext)
             let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
             try syncEngine.deleteTask(itemID: task.id)

@@ -461,7 +461,15 @@ enum RecurrenceService {
 
             // Only repair series that still have a template.
             // If no template exists, user deliberately ended the series — don't resurrect.
-            guard findTemplate(groupID: groupID, in: modelContext) != nil else { continue }
+            guard let template = findTemplate(groupID: groupID, in: modelContext) else { continue }
+
+            // Bug #209: Don't repair if user manually deleted an instance after last completion.
+            // lastSkippedDate on template means "user deleted a single instance" — if it's newer
+            // than the most recent completion, the deletion was intentional.
+            if let skippedDate = template.lastSkippedDate,
+               skippedDate > (task.completedAt ?? .distantPast) {
+                continue
+            }
 
             if let _ = createNextInstance(from: task, in: modelContext) {
                 repaired += 1

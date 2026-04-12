@@ -183,6 +183,12 @@ final class SyncEngine {
         if task.recurrencePattern != "none" {
             let newInstance = RecurrenceService.createNextInstance(from: task, in: modelContext)
             newInstanceID = newInstance?.id
+
+            // Bug #209: Reset lastSkippedDate on template — series continues normally
+            if let groupID = task.recurrenceGroupID,
+               let template = RecurrenceService.findTemplate(groupID: groupID, in: modelContext) {
+                template.lastSkippedDate = nil
+            }
         }
         TaskCompletionUndoService.recordCreatedInstance(id: newInstanceID)
 

@@ -1079,6 +1079,13 @@ struct ContentView: View {
     }
 
     private func deleteSingleTask(_ task: LocalTask) {
+        // Bug #209: Mark template so repair won't resurrect this deleted instance
+        if let groupID = task.recurrenceGroupID,
+           task.recurrencePattern != "none",
+           let template = RecurrenceService.findTemplate(groupID: groupID, in: modelContext) {
+            template.lastSkippedDate = Date()
+        }
+
         modelContext.delete(task)
         try? modelContext.save()
         refreshTasks()

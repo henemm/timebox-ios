@@ -73,6 +73,12 @@ final class LocalTask {
     /// Child instances (isTemplate=false) appear in Backlog/Priority when due.
     var isTemplate: Bool = false
 
+    /// Bug #209: Date when a single instance was manually deleted from this series.
+    /// Set on the TEMPLATE when user deletes "only this task".
+    /// Prevents repairOrphanedRecurringSeries() from resurrecting the instance.
+    /// Reset to nil when a new instance is completed (normal series flow).
+    var lastSkippedDate: Date?
+
     /// Whether this task should be visible in the backlog.
     /// Hides future-dated recurring task instances (due tomorrow or later).
     /// Non-recurring tasks and recurring tasks without dueDate are always visible.

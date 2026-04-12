@@ -705,6 +705,162 @@ final class RecurrenceServiceTests: XCTestCase {
         XCTAssertEqual(repaired, 0, "Non-recurring tasks should not be repaired")
     }
 
+    // MARK: - Bug 209: Gelöschte Serienelemente erscheinen nach Neustart erneut
+
+    /// Bug 209 Kern-Test: Repair darf Serie NICHT reparieren wenn lastSkippedDate
+    /// neuer als completedAt ist (User hat bewusst gelöscht NACH letzter Completion).
+    /// Bricht wenn: repairOrphanedRecurringSeries() lastSkippedDate nicht prüft.
+    @MainActor
+    func test_repairSkipsSeriesWithLastSkippedDate() throws {
+        let container = try ModelContainer(for: LocalTask.self, configurations: .init(isStoredInMemoryOnly: true))
+        let context = container.mainContext
+        let groupID = "skipped-series-209"
+
+        // Template mit lastSkippedDate (User hat Instanz gelöscht)
+        let template = LocalTask(
+            title: "Wöchentliche Aufgabe",
+            recurrencePattern: "weekly",
+            recurrenceGroupID: groupID
+        )
+        template.isTemplate = true
+        template.lastSkippedDate = Date() // gerade eben gelöscht
+        context.insert(template)
+
+        // Completed Task (gestern erledigt) — Repair-Quelle
+        let completed = LocalTask(
+            title: "Wöchentliche Aufgabe",
+            dueDate: Calendar.current.date(byAdding: .day, value: -1, to: Date()),
+            recurrencePattern: "weekly",
+            recurrenceGroupID: groupID
+        )
+        completed.isCompleted = true
+        completed.completedAt = Calendar.current.date(byAdding: .day, value: -1, to: Date())
+        context.insert(completed)
+        try context.save()
+
+        // Repair sollte NICHT reparieren — lastSkippedDate > completedAt
+        let repaired = RecurrenceService.repairOrphanedRecurringSeries(in: context)
+        XCTAssertEqual(repaired, 0, "Bug 209: Should NOT repair series when lastSkippedDate > completedAt")
+
+        let openTasks = try context.fetch(FetchDescriptor<LocalTask>(
+            predicate: #Predicate { !$0.isCompleted && !$0.isTemplate }
+        ))
+        XCTAssertEqual(openTasks.count, 0, "Bug 209: No zombie task should be created after manual delete")
+    }
+
+    /// Repair muss weiterhin funktionieren wenn KEIN lastSkippedDate gesetzt ist.
+    /// Bricht wenn: lastSkippedDate-Guard fälschlicherweise alle Repairs blockiert.
+    @MainActor
+    func test_repairStillWorksWithoutLastSkippedDate() throws {
+        let container = try ModelContainer(for: LocalTask.self, configurations: .init(isStoredInMemoryOnly: true))
+        let context = container.mainContext
+        let groupID = "normal-repair-209"
+
+        // Template OHNE lastSkippedDate (normaler Zustand)
+        let template = LocalTask(
+            title: "Tägliche Aufgabe",
+            recurrencePattern: "daily",
+            recurrenceGroupID: groupID
+        )
+        template.isTemplate = true
+        // lastSkippedDate bleibt nil
+        context.insert(template)
+
+        // Completed Task — Repair-Quelle
+        let completed = LocalTask(
+            title: "Tägliche Aufgabe",
+            dueDate: Calendar.current.startOfDay(for: Date()),
+            recurrencePattern: "daily",
+            recurrenceGroupID: groupID
+        )
+        completed.isCompleted = true
+        completed.completedAt = Date()
+        context.insert(completed)
+        try context.save()
+
+        let repaired = RecurrenceService.repairOrphanedRecurringSeries(in: context)
+        XCTAssertEqual(repaired, 1, "Bug 209: Normal repair must still work when no lastSkippedDate")
+
+        let openTasks = try context.fetch(FetchDescriptor<LocalTask>(
+            predicate: #Predicate { !$0.isCompleted && !$0.isTemplate }
+        ))
+        XCTAssertEqual(openTasks.count, 1, "Bug 209: One successor should be created")
+    }
+
+    /// Nach Completion muss lastSkippedDate zurückgesetzt werden (Serie läuft normal weiter).
+    /// Bricht wenn: completeTask() lastSkippedDate nicht auf nil setzt.
+    @MainActor
+    func test_completionResetsLastSkippedDate() throws {
+        let container = try ModelContainer(for: LocalTask.self, configurations: .init(isStoredInMemoryOnly: true))
+        let context = container.mainContext
+        let groupID = "reset-skip-209"
+
+        // Template mit gesetztem lastSkippedDate
+        let template = LocalTask(
+            title: "Reset Test",
+            recurrencePattern: "daily",
+            recurrenceGroupID: groupID
+        )
+        template.isTemplate = true
+        template.lastSkippedDate = Calendar.current.date(byAdding: .day, value: -1, to: Date())
+        context.insert(template)
+
+        // Offene Instanz die erledigt wird
+        let task = LocalTask(
+            title: "Reset Test",
+            dueDate: Calendar.current.startOfDay(for: Date()),
+            recurrencePattern: "daily",
+            recurrenceGroupID: groupID
+        )
+        context.insert(task)
+        try context.save()
+
+        // Completion via SyncEngine
+        let taskSource = LocalTaskSource(modelContext: context)
+        let syncEngine = SyncEngine(taskSource: taskSource, modelContext: context)
+        try syncEngine.completeTask(itemID: task.id)
+
+        // lastSkippedDate muss nil sein
+        XCTAssertNil(template.lastSkippedDate,
+                     "Bug 209: completeTask() must reset lastSkippedDate on template")
+    }
+
+    /// Repair mit lastSkippedDate ÄLTER als completedAt → Repair soll greifen.
+    /// (User hat gelöscht, dann eine andere Instanz erledigt, Skip ist veraltet)
+    /// Bricht wenn: Guard zu aggressiv — blockiert auch veraltete Skips.
+    @MainActor
+    func test_repairWorksWhenLastSkippedDateIsOlderThanCompletion() throws {
+        let container = try ModelContainer(for: LocalTask.self, configurations: .init(isStoredInMemoryOnly: true))
+        let context = container.mainContext
+        let groupID = "stale-skip-209"
+
+        // Template mit ALTEM lastSkippedDate (vor 3 Tagen)
+        let template = LocalTask(
+            title: "Stale Skip",
+            recurrencePattern: "daily",
+            recurrenceGroupID: groupID
+        )
+        template.isTemplate = true
+        template.lastSkippedDate = Calendar.current.date(byAdding: .day, value: -3, to: Date())
+        context.insert(template)
+
+        // Completed Task NACH dem Skip (gestern)
+        let completed = LocalTask(
+            title: "Stale Skip",
+            dueDate: Calendar.current.date(byAdding: .day, value: -1, to: Date()),
+            recurrencePattern: "daily",
+            recurrenceGroupID: groupID
+        )
+        completed.isCompleted = true
+        completed.completedAt = Calendar.current.date(byAdding: .day, value: -1, to: Date())
+        context.insert(completed)
+        try context.save()
+
+        // Skip ist älter als Completion → Repair soll greifen
+        let repaired = RecurrenceService.repairOrphanedRecurringSeries(in: context)
+        XCTAssertEqual(repaired, 1, "Bug 209: Stale lastSkippedDate should NOT block repair")
+    }
+
     // MARK: - Bug 95: createNextInstance darf NICHT dueDate aus Date() fallback setzen
 
     /// Verhalten: Recurring Task ohne dueDate darf bei Completion KEINEN Date()-Fallback verwenden
