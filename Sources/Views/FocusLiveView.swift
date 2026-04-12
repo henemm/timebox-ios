@@ -62,6 +62,7 @@ struct FocusLiveView: View {
     @State private var followUpSaved = false
     @State private var followUpTaskID: String?
     @State private var isAbortingBlock = false
+    @State private var abortedBlockID: String?  // Bug #211: Block nach Abort ignorieren
     @State private var showNudgeContinueDialog = false
     private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     private let overdueReminderInterval: TimeInterval = 120 // 2 Minuten
@@ -143,7 +144,14 @@ struct FocusLiveView: View {
                     }
                 )
             }
-            .sheet(isPresented: $showSprintReview) {
+            .sheet(isPresented: $showSprintReview, onDismiss: {
+                // Bug #211: Cleanup bei Swipe-Down (wenn onDismiss-Callback nicht aufgerufen wurde)
+                if isAbortingBlock {
+                    isAbortingBlock = false
+                    reviewDismissed = true
+                    Task { await loadData() }
+                }
+            }) {
                 if let block = activeBlock {
                     SprintReviewSheet(
                         block: block,
@@ -151,11 +159,13 @@ struct FocusLiveView: View {
                         completedTaskIDs: block.completedTaskIDs,
                         isAborted: isAbortingBlock,
                         onDismiss: {
+                            // Bug #211: isAbortingBlock VOR dem Check lesen, dann erst zurücksetzen
+                            let wasAborted = isAbortingBlock
                             isAbortingBlock = false
                             reviewDismissed = true
                             Task {
-                                // Unerledigte Tasks zurück nach Next Up
-                                if block.isPast {
+                                // Bug #211: Tasks auch bei Abort zurücksetzen (Block noch aktiv)
+                                if wasAborted || block.isPast {
                                     returnIncompleteTasksToNextUp(block: block)
                                 }
                                 await loadData()
@@ -358,9 +368,14 @@ struct FocusLiveView: View {
                     .foregroundStyle(.secondary)
             }
 
-            // Abort button (RW 3.3)
+            // Abort button (RW 3.3) — Bug #211: State sofort zurücksetzen
             Button {
                 isAbortingBlock = true
+                abortedBlockID = block.id  // Bug #211: Block nach Abort ignorieren
+                // Bug #211: LiveActivity + Timer-State sofort beenden
+                liveActivityManager.endActivity()
+                liveActivityStarted = false
+                taskStartTime = nil
                 showSprintReview = true
             } label: {
                 Label("Abbrechen", systemImage: "xmark.circle")
@@ -574,8 +589,10 @@ struct FocusLiveView: View {
                 print("📥 [FocusLiveView] block: \(block.title), isActive=\(block.isActive)")
             }
             // Aktiven Block bevorzugen, sonst letzten abgelaufenen für Review
-            activeBlock = blocks.first { $0.isActive }
-                ?? blocks.filter { $0.isPast }.last
+            // Bug #211: Abgebrochenen Block ignorieren
+            let eligibleBlocks = blocks.filter { $0.id != abortedBlockID }
+            activeBlock = eligibleBlocks.first { $0.isActive }
+                ?? eligibleBlocks.filter { $0.isPast }.last
             if activeBlock?.isPast == true && !reviewDismissed {
                 showSprintReview = true
             }
