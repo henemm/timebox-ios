@@ -365,6 +365,12 @@ def main():
                               f"Aktuelles Verdict: '{verdict}'. "
                               f"Führe /06-validate aus oder tippe 'override'.", file=sys.stderr)
                         sys.exit(2)
+                    # 6c. validation_done Gate — /06-validate muss vollständig durchlaufen sein
+                    if not active_wf.get("validation_done"):
+                        print("BLOCKED: Kein Commit ohne validation_done! "
+                              "Führe /06-validate vollständig aus (mark-validation-done).",
+                              file=sys.stderr)
+                        sys.exit(2)
 
     # 7. Allow
     sys.exit(0)

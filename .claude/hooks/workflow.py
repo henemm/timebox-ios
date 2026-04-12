@@ -284,6 +284,8 @@ def _new_workflow(name: str) -> dict:
         "challenge_verdict": None,
         # Fix proposal gate (bugs)
         "fix_proposal_approved": False,
+        "existence_check_done": False,
+        "dead_code_check_done": False,
         # Feature gates
         "user_expectation_done": False,
         "result_inspection_done": False,
@@ -346,6 +348,9 @@ def _validate_transition(data: dict, target: str) -> str | None:
             if not data.get("visual_inspection_done"):
                 return ("visual_inspection_done not set — run Fresh-Eyes-Inspector "
                         "(Schritt 0.2 in /10-bug) or get user override")
+            if not data.get("existence_check_done"):
+                return ("existence_check_done not set — run Existenz-Check "
+                        "(Schritt 0.5 in /10-bug): git log grep, GitHub Issues search")
             if not data.get("analysis_file"):
                 return ("analysis_file not set — create docs/artifacts/[name]/analysis.md "
                         "(Schritt 5 in /10-bug)")
@@ -377,6 +382,12 @@ def _validate_transition(data: dict, target: str) -> str | None:
         if not red_artifacts:
             return "No RED test artifacts — run /04-tdd-red first"
 
+    # --- Gate: UI tests are MANDATORY (CLAUDE.md rule) ---
+    if tgt_idx >= PHASES.index("phase6_implement"):
+        if not data.get("ui_test_red_done"):
+            return ("ui_test_red_done not set — UI tests are MANDATORY for every "
+                    "feature/bug. Run UI tests in /04-tdd-red and mark-ui-red")
+
     # --- Gate: Result inspection before adversary (features) ---
     if tgt_idx >= PHASES.index("phase6b_adversary"):
         if data.get("workflow_type") == "feature":
@@ -389,6 +400,12 @@ def _validate_transition(data: dict, target: str) -> str | None:
         if not data.get("adversary_phase_visited"):
             return ("Must pass through phase6b_adversary before validation — "
                     "run adversary check first")
+
+    # --- Gate: Dead-code check before validation ---
+    if tgt_idx >= PHASES.index("phase7_validate"):
+        if not data.get("dead_code_check_done"):
+            return ("dead_code_check_done not set — grep for callers of new/changed "
+                    "functions to prove they are not dead code (Schritt 8.3 in /10-bug)")
 
     # --- Gate: GREEN test artifacts before validation ---
     if tgt_idx >= PHASES.index("phase7_validate"):
@@ -499,6 +516,8 @@ PROTECTED_FIELDS = {
     "analysis_findings",
     "challenge_verdict",
     "context_file",
+    "existence_check_done",
+    "dead_code_check_done",
 }
 
 
@@ -751,6 +770,34 @@ def cmd_mark_context(args: list[str]) -> None:
     print(f"Context file recorded: {context_file}")
 
 
+def cmd_mark_existence_check(args: list[str]) -> None:
+    notes = " ".join(args) if args else ""
+    if len(notes) < MIN_NOTES_LEN:
+        print(f"BLOCKED: Existence check notes must be >= {MIN_NOTES_LEN} chars. "
+              f"Describe: git log result, GitHub Issues search result, code grep result.",
+              file=sys.stderr)
+        sys.exit(1)
+    data, name = _read_active()
+    data["existence_check_done"] = True
+    data["existence_check_notes"] = notes
+    _save_active(data)
+    print(f"Existence check marked done: {notes}")
+
+
+def cmd_mark_dead_code_check(args: list[str]) -> None:
+    notes = " ".join(args) if args else ""
+    if len(notes) < MIN_NOTES_LEN:
+        print(f"BLOCKED: Dead-code check notes must be >= {MIN_NOTES_LEN} chars. "
+              f"Describe: grep for callers, which functions are called from where.",
+              file=sys.stderr)
+        sys.exit(1)
+    data, name = _read_active()
+    data["dead_code_check_done"] = True
+    data["dead_code_check_notes"] = notes
+    _save_active(data)
+    print(f"Dead-code check marked done: {notes}")
+
+
 def cmd_complete(args: list[str]) -> None:
     data, name = _read_active()
     data["current_phase"] = "phase8_complete"
@@ -852,6 +899,8 @@ COMMANDS = {
     "mark-analysis": cmd_mark_analysis,
     "mark-challenge": cmd_mark_challenge,
     "mark-context": cmd_mark_context,
+    "mark-existence-check": cmd_mark_existence_check,
+    "mark-dead-code-check": cmd_mark_dead_code_check,
     "complete": cmd_complete,
     "list": cmd_list,
     "snapshot-tests": cmd_snapshot_tests,

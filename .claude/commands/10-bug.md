@@ -102,6 +102,11 @@ Wenn der Bug reine Logik/Daten betrifft und ein Screenshot nichts zeigen wuerde:
 
 Wenn nie implementiert → **kein Bug**. Henning informieren, `/05-implement` vorschlagen.
 
+**Ergebnis festhalten (PFLICHT — Gate-enforced!):**
+```bash
+python3 .claude/hooks/workflow.py mark-existence-check "git log: [Ergebnis]. GitHub Issues: [Ergebnis]. Code grep: [Ergebnis]"
+```
+
 > Negativbeispiel: "Suche nicht sichtbar" — war nie gebaut worden, nur Spec existierte.
 
 ---
@@ -275,8 +280,13 @@ Nutze `/04-tdd-red` — leite Tests aus der Analyse ab:
 |---|-------|----------------------------------|
 | 1 | `xcodebuild build` (BEIDE Plattformen) | Code kompiliert nicht |
 | 2 | `xcodebuild test` ausfuehren | Tests laufen nicht durch |
-| 3 | `Grep` nach neuer Funktion → mind. 1 Aufrufer | Neuer Code ist Dead Code |
+| 3 | `Grep` nach neuer Funktion → mind. 1 Aufrufer + `mark-dead-code-check` | Neuer Code ist Dead Code |
 | 4 | Beide Plattformen (iOS + macOS Views) geaendert? | Fix nur auf einer Plattform |
+
+**Dead-Code-Check festhalten (PFLICHT — Gate-enforced!):**
+```bash
+python3 .claude/hooks/workflow.py mark-dead-code-check "grep: [Funktion] aufgerufen von [Datei:Zeile]. Keine Dead-Code-Stellen."
+```
 
 Wenn ein Check scheitert → Fix ueberarbeiten, NICHT committen.
 
