@@ -1,0 +1,16 @@
+TDD RED Results — FEATURE #217 v2.0 Aufteilen Dialog (BacklogRow-Redesign)
+==========================================================================
+
+Tests: 14 Tests geschrieben (neu), exemplarisch ausgeführt:
+
+1. test_splitView_showsBacklogRowCards: FAILED
+   → XCTAssertFalse failed - Old splitSuggestionTitle TextFields should be replaced by BacklogRow cards
+   → Alte TextField-basierte Darstellung ist noch aktiv
+
+2. test_splitView_durationBadgeTapOpensPicker: FAILED  
+   → Failed to not hittable: durationBadge_* (hinter Sheet, nicht in Split-View)
+   → DurationPicker-Integration in BacklogRow fehlt
+
+3. test_regenerateButton_labelIsNeuGenerieren: PASSED (bereits in v1 implementiert)
+
+Fazit: Kern-Tests für BacklogRow-Replacement bestätigt RED.

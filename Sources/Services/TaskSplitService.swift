@@ -116,6 +116,10 @@ enum TaskSplitService {
         originalTaskID: String,
         suggestions: [(title: String, minutes: Int)],
         taskType: String,
+        importance: Int?,
+        urgency: String?,
+        tags: [String],
+        dueDate: Date?,
         modelContext: ModelContext
     ) -> Int {
         let valid = suggestions.filter { !$0.title.isEmpty }
@@ -125,6 +129,10 @@ enum TaskSplitService {
             let newTask = LocalTask(title: suggestion.title)
             newTask.estimatedDuration = suggestion.minutes
             newTask.taskType = taskType
+            newTask.importance = importance
+            newTask.urgency = urgency
+            newTask.tags = tags.isEmpty ? nil : tags
+            newTask.dueDate = dueDate
             newTask.parentTaskID = originalTaskID
             modelContext.insert(newTask)
         }

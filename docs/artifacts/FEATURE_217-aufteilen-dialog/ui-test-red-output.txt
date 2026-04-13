@@ -1,0 +1,27 @@
+TDD RED Results — FEATURE #217 Aufteilen Dialog
+================================================
+
+11 neue Tests geschrieben, 3 exemplarisch ausgeführt — alle FAILED (RED):
+
+1. test_durationBadge_visible: FAILED
+   → XCTAssertTrue failed - Duration badge should be visible on first suggestion
+   → splitDurationBadge_0 existiert nicht (noch nicht implementiert)
+
+2. test_deleteButton_visible: FAILED
+   → XCTAssertTrue failed - Explicit delete button should be visible per suggestion
+   → splitDeleteButton_0 existiert nicht (noch nicht implementiert)
+
+3. test_regenerateButton_labelIsNeuGenerieren: FAILED
+   → XCTAssertTrue failed - Button label should be 'Neu generieren', not 'Nochmal'
+   → Button hat noch Label "Nochmal" statt "Neu generieren"
+
+Weitere Tests (nicht einzeln ausgeführt, gleiche Failure-Pattern):
+4. test_durationBadge_tapOpensPicker
+5. test_durationBadge_updatesAfterPick
+6. test_deleteButton_removesSuggestion
+7. test_deleteButton_disabledAtOneSuggestion
+8. test_regenerateWithoutChanges_noAlert
+9. test_regenerateWithChanges_showsAlert
+10. test_regenerateAlert_cancelKeepsChanges
+
+Alle Tests schlagen fehl weil die UI-Elemente noch nicht existieren — TDD RED bestätigt.

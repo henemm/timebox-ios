@@ -38,6 +38,10 @@ final class TaskSplitServiceTests: XCTestCase {
             originalTaskID: original.uuid.uuidString,
             suggestions: suggestions,
             taskType: "maintenance",
+            importance: nil,
+            urgency: nil,
+            tags: [],
+            dueDate: nil,
             modelContext: context
         )
 
@@ -70,6 +74,10 @@ final class TaskSplitServiceTests: XCTestCase {
             originalTaskID: original.uuid.uuidString,
             suggestions: [(title: "Sub 1", minutes: 15)],
             taskType: "",
+            importance: nil,
+            urgency: nil,
+            tags: [],
+            dueDate: nil,
             modelContext: context
         )
 
@@ -96,6 +104,10 @@ final class TaskSplitServiceTests: XCTestCase {
             originalTaskID: original.uuid.uuidString,
             suggestions: suggestions,
             taskType: "",
+            importance: nil,
+            urgency: nil,
+            tags: [],
+            dueDate: nil,
             modelContext: context
         )
 
@@ -115,11 +127,50 @@ final class TaskSplitServiceTests: XCTestCase {
             originalTaskID: original.uuid.uuidString,
             suggestions: [(title: "", minutes: 15)],
             taskType: "",
+            importance: nil,
+            urgency: nil,
+            tags: [],
+            dueDate: nil,
             modelContext: context
         )
 
         XCTAssertEqual(created, 0, "Should create 0 sub-tasks")
         XCTAssertFalse(original.isCompleted, "Original should NOT be completed when no valid sub-tasks")
+    }
+
+    /// GIVEN: Original task has importance, urgency, tags, dueDate
+    /// WHEN: persistSplit is called with inherited attributes
+    /// THEN: Sub-tasks inherit all attributes from original
+    func test_persistSplit_inheritsAttributes() throws {
+        let context = container.mainContext
+        let original = LocalTask(title: "Großprojekt")
+        original.taskType = "project"
+        original.importance = 3
+        original.urgency = "urgent"
+        original.tags = ["arbeit", "Q2"]
+        original.dueDate = Date(timeIntervalSince1970: 1800000000)
+        context.insert(original)
+        try context.save()
+
+        TaskSplitService.persistSplit(
+            originalTaskID: original.uuid.uuidString,
+            suggestions: [(title: "Schritt 1", minutes: 30)],
+            taskType: "project",
+            importance: 3,
+            urgency: "urgent",
+            tags: ["arbeit", "Q2"],
+            dueDate: Date(timeIntervalSince1970: 1800000000),
+            modelContext: context
+        )
+
+        let allTasks = try context.fetch(FetchDescriptor<LocalTask>())
+        let sub = allTasks.first { $0.parentTaskID == original.uuid.uuidString }!
+
+        XCTAssertEqual(sub.importance, 3, "Should inherit importance")
+        XCTAssertEqual(sub.urgency, "urgent", "Should inherit urgency")
+        XCTAssertEqual(sub.tags, ["arbeit", "Q2"], "Should inherit tags")
+        XCTAssertEqual(sub.dueDate?.timeIntervalSince1970, 1800000000, "Should inherit dueDate")
+        XCTAssertEqual(sub.taskType, "project", "Should inherit taskType")
     }
 
     // MARK: - Availability Guard
