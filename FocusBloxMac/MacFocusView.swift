@@ -71,6 +71,8 @@ struct MacFocusView: View {
                     block: block,
                     tasks: tasksForBlock(block),
                     onDismiss: {
+                        // Bug #218: Block-End-Notification aus Notification Center entfernen
+                        NotificationService.cleanupBlockEndNotification(blockID: block.id)
                         reviewDismissed = true
                         Task {
                             if block.isPast {
@@ -316,6 +318,8 @@ struct MacFocusView: View {
                 .foregroundStyle(.secondary)
 
             Button {
+                // Bug #218: Pending Block-End-Notification entfernen (Early Review)
+                NotificationService.cleanupBlockEndNotification(blockID: block.id)
                 showSprintReview = true
             } label: {
                 Text("Sprint Review starten")
@@ -429,6 +433,10 @@ struct MacFocusView: View {
             activeBlock = blocks.first { $0.isActive }
                 ?? blocks.filter { $0.isPast }.last
             if activeBlock?.isPast == true && !reviewDismissed {
+                // Bug #218: Block-End-Notification entfernen (App-Neustart Szenario)
+                if let blockID = activeBlock?.id {
+                    NotificationService.cleanupBlockEndNotification(blockID: blockID)
+                }
                 showSprintReview = true
             }
         } catch {
@@ -569,6 +577,8 @@ struct MacFocusView: View {
                 taskStartTime = nil
             }
             SoundService.playEndGong()
+            // Bug #218: Block-End-Notification entfernen (pending + delivered)
+            NotificationService.cleanupBlockEndNotification(blockID: block.id)
             showSprintReview = true
             warningPlayed = false
             // Reload to get fresh taskTimes for Sprint Review

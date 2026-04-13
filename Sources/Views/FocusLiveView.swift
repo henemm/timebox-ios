@@ -144,6 +144,10 @@ struct FocusLiveView: View {
                 )
             }
             .sheet(isPresented: $showSprintReview, onDismiss: {
+                // Bug #218: Block-End-Notification aus Notification Center entfernen
+                if let blockID = activeBlock?.id {
+                    NotificationService.cleanupBlockEndNotification(blockID: blockID)
+                }
                 // Bug #211: Cleanup bei Swipe-Down (wenn onDismiss-Callback nicht aufgerufen wurde)
                 if isAbortingBlock {
                     isAbortingBlock = false
@@ -158,6 +162,8 @@ struct FocusLiveView: View {
                         completedTaskIDs: block.completedTaskIDs,
                         isAborted: isAbortingBlock,
                         onDismiss: {
+                            // Bug #218: Block-End-Notification aus Notification Center entfernen
+                            NotificationService.cleanupBlockEndNotification(blockID: block.id)
                             // Bug #211: isAbortingBlock VOR dem Check lesen, dann erst zurücksetzen
                             let wasAborted = isAbortingBlock
                             isAbortingBlock = false
@@ -365,6 +371,8 @@ struct FocusLiveView: View {
                 liveActivityManager.endActivity()
                 liveActivityStarted = false
                 taskStartTime = nil
+                // Bug #218: Pending Block-End-Notification entfernen
+                NotificationService.cleanupBlockEndNotification(blockID: block.id)
                 showSprintReview = true
             } label: {
                 Label("Abbrechen", systemImage: "xmark.circle")
@@ -502,6 +510,8 @@ struct FocusLiveView: View {
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
             Button {
+                // Bug #218: Pending Block-End-Notification entfernen (Early Review)
+                NotificationService.cleanupBlockEndNotification(blockID: block.id)
                 showSprintReview = true
             } label: {
                 Text("Sprint Review starten")
@@ -583,6 +593,10 @@ struct FocusLiveView: View {
             activeBlock = eligibleBlocks.first { $0.isActive }
                 ?? eligibleBlocks.filter { $0.isPast }.last
             if activeBlock?.isPast == true && !reviewDismissed {
+                // Bug #218: Block-End-Notification entfernen (App-Neustart Szenario)
+                if let blockID = activeBlock?.id {
+                    NotificationService.cleanupBlockEndNotification(blockID: blockID)
+                }
                 // Bug #221: End Live Activity BEFORE showing Sprint Review
                 liveActivityManager.endActivity()
                 liveActivityManager.cleanupOrphans()
@@ -736,6 +750,8 @@ struct FocusLiveView: View {
                 taskStartTime = nil
             }
             SoundService.playEndGong()
+            // Bug #218: Block-End-Notification entfernen (pending + delivered)
+            NotificationService.cleanupBlockEndNotification(blockID: block.id)
             showSprintReview = true
             warningPlayed = false  // Reset for next block
             // End Live Activity

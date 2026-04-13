@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		656D41E1C06782EF56D1FE83 /* BlockEndNotificationCleanupTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D363DA94F56D02861D7BEBBF /* BlockEndNotificationCleanupTests.swift */; };
 		EA20355C03CBD8ED9B8716DD /* BacklogHealthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D618F7073BA70D38D932075 /* BacklogHealthService.swift */; };
 		ECFA2EF469DE97AFCFD59D87 /* BacklogHygieneNudgeUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FB946941A7D364D764DAC8B /* BacklogHygieneNudgeUITests.swift */; };
 		E44675C4F9D8C03F8C36CC83 /* BacklogHygieneNudgeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1CE3BC8DD3A4250A0F131F5 /* BacklogHygieneNudgeTests.swift */; };
@@ -696,6 +697,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		D363DA94F56D02861D7BEBBF /* BlockEndNotificationCleanupTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = BlockEndNotificationCleanupTests.swift; path = FocusBloxTests/BlockEndNotificationCleanupTests.swift; sourceTree = SOURCE_ROOT; };
 		3FB946941A7D364D764DAC8B /* BacklogHygieneNudgeUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = BacklogHygieneNudgeUITests.swift; path = FocusBloxUITests/BacklogHygieneNudgeUITests.swift; sourceTree = SOURCE_ROOT; };
 		F1CE3BC8DD3A4250A0F131F5 /* BacklogHygieneNudgeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = BacklogHygieneNudgeTests.swift; path = FocusBloxTests/BacklogHygieneNudgeTests.swift; sourceTree = SOURCE_ROOT; };
 		D98B4BC2E3713C913E8F5F61 /* TaskSplitView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TaskSplitView.swift; path = Sources/Views/TaskSplitView.swift; sourceTree = SOURCE_ROOT; };
@@ -1685,6 +1687,7 @@
 		A6B3805EF19D1B131D346DDD /* FocusBloxTests */ = {
 			isa = PBXGroup;
 			children = (
+				D363DA94F56D02861D7BEBBF /* BlockEndNotificationCleanupTests.swift */,
 				F1CE3BC8DD3A4250A0F131F5 /* BacklogHygieneNudgeTests.swift */,
 				161F42475FC5E233C8B71793 /* TaskSplitServiceTests.swift */,
 				819EE8E46855DD04709EF5B3 /* BacklogHealthServiceTests.swift */,
@@ -2878,6 +2881,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				656D41E1C06782EF56D1FE83 /* BlockEndNotificationCleanupTests.swift in Sources */,
 				E44675C4F9D8C03F8C36CC83 /* BacklogHygieneNudgeTests.swift in Sources */,
 				49A0241CB3C9739D362C2F7F /* TaskSplitServiceTests.swift in Sources */,
 				A3807E05353BD27C00133695 /* BacklogHealthServiceTests.swift in Sources */,

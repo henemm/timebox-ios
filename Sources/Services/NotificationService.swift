@@ -252,6 +252,17 @@ enum NotificationService {
             .removePendingNotificationRequests(withIdentifiers: [identifier, endIdentifier])
     }
 
+    // MARK: - Focus Block End Notification Cleanup (Bug #218)
+
+    /// Remove block-end notification from both pending queue and delivered list.
+    /// Called when Sprint Review opens or is dismissed.
+    static func cleanupBlockEndNotification(blockID: String) {
+        let identifier = "\(focusBlockEndPrefix)\(blockID)"
+        let center = UNUserNotificationCenter.current()
+        center.removePendingNotificationRequests(withIdentifiers: [identifier])
+        center.removeDeliveredNotifications(withIdentifiers: [identifier])
+    }
+
     // MARK: - Focus Block End Notifications
 
     /// Schedule a notification when a focus block ends
