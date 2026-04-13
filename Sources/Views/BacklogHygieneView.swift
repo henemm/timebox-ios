@@ -13,13 +13,14 @@ struct BacklogHygieneView: View {
     }
 
     enum HygieneAction {
-        case parked, deleted, kept
+        case parked, deleted, kept, split
     }
 
     @State private var currentIndex = 0
     @State private var actions: [HygieneAction] = []
     @State private var showSummary = false
     @State private var keepHintVisible = false
+    @State private var showSplitSheet = false
 
     private var currentTask: PlanItem? {
         guard currentIndex < tasks.count else { return nil }
@@ -29,6 +30,7 @@ struct BacklogHygieneView: View {
     private var parkedCount: Int { actions.filter { $0 == .parked }.count }
     private var deletedCount: Int { actions.filter { $0 == .deleted }.count }
     private var keptCount: Int { actions.filter { $0 == .kept }.count }
+    private var splitCount: Int { actions.filter { $0 == .split }.count }
 
     var body: some View {
         NavigationStack {
@@ -108,15 +110,29 @@ struct BacklogHygieneView: View {
                     .accessibilityIdentifier("hygieneDeleteButton")
                 }
 
-                Button {
-                    keepTask()
-                } label: {
-                    Label("Behalten", systemImage: "checkmark.circle")
-                        .frame(maxWidth: .infinity)
+                HStack(spacing: 12) {
+                    Button {
+                        keepTask()
+                    } label: {
+                        Label("Behalten", systemImage: "checkmark.circle")
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.bordered)
+                    .tint(.secondary)
+                    .accessibilityIdentifier("hygieneKeepButton")
+
+                    if TaskSplitService.isAvailable {
+                        Button {
+                            showSplitSheet = true
+                        } label: {
+                            Label("Aufteilen", systemImage: "scissors")
+                                .frame(maxWidth: .infinity)
+                        }
+                        .buttonStyle(.bordered)
+                        .tint(.purple)
+                        .accessibilityIdentifier("hygieneSplitButton")
+                    }
                 }
-                .buttonStyle(.bordered)
-                .tint(.secondary)
-                .accessibilityIdentifier("hygieneKeepButton")
             }
 
             if keepHintVisible {
@@ -130,6 +146,11 @@ struct BacklogHygieneView: View {
             Spacer()
         }
         .padding()
+        .sheet(isPresented: $showSplitSheet, onDismiss: splitCompleted) {
+            if let currentTask {
+                TaskSplitView(planItem: currentTask)
+            }
+        }
     }
 
     // MARK: - Summary
@@ -143,7 +164,7 @@ struct BacklogHygieneView: View {
             Text("Backlog aufgeräumt!")
                 .font(.title2.weight(.semibold))
 
-            Text("\(parkedCount) geparkt · \(deletedCount) gelöscht · \(keptCount) behalten")
+            Text(summaryText)
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
                 .accessibilityIdentifier("hygieneSummary")
@@ -206,6 +227,11 @@ struct BacklogHygieneView: View {
         }
     }
 
+    private func splitCompleted() {
+        actions.append(.split)
+        advanceOrFinish()
+    }
+
     private func advanceOrFinish() {
         if currentIndex + 1 < tasks.count {
             withAnimation(.smooth) {
@@ -227,6 +253,15 @@ struct BacklogHygieneView: View {
     }
 
     // MARK: - Helpers
+
+    private var summaryText: String {
+        var parts: [String] = []
+        if parkedCount > 0 { parts.append("\(parkedCount) geparkt") }
+        if deletedCount > 0 { parts.append("\(deletedCount) gelöscht") }
+        if keptCount > 0 { parts.append("\(keptCount) behalten") }
+        if splitCount > 0 { parts.append("\(splitCount) aufgeteilt") }
+        return parts.joined(separator: " · ")
+    }
 
     private func ageText(for task: PlanItem) -> String {
         let days = Calendar.current.dateComponents([.day], from: task.createdAt, to: Date()).day ?? 0
