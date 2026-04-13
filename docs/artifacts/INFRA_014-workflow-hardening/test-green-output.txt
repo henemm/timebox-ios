@@ -1,0 +1,22 @@
+test_inspect_ui_gate_allows_ui_test_with_preflight (docs.artifacts.INFRA_014-workflow-hardening.test_workflow_hardening.TestInspectUIGate.test_inspect_ui_gate_allows_ui_test_with_preflight)
+AC-A2: UI-Test-Edit in Phase 5 MIT inspect_ui_done → ALLOW. ... ok
+test_inspect_ui_gate_blocks_ui_test_without_preflight (docs.artifacts.INFRA_014-workflow-hardening.test_workflow_hardening.TestInspectUIGate.test_inspect_ui_gate_blocks_ui_test_without_preflight)
+AC-A1: UI-Test-Edit in Phase 5 OHNE inspect_ui_done → BLOCK. ... BLOCKED: /inspect-ui nicht ausgeführt. PFLICHT vor UI-Tests. Führe /inspect-ui aus und dann: python3 .claude/hooks/workflow.py mark-inspect-ui-done '<screen-name + beobachtete IDs>'
+ok
+test_inspect_ui_gate_ignores_unit_tests (docs.artifacts.INFRA_014-workflow-hardening.test_workflow_hardening.TestInspectUIGate.test_inspect_ui_gate_ignores_unit_tests)
+AC-A3: Unit-Test-Edit OHNE inspect_ui_done → ALLOW (kein Gate). ... ok
+test_transition_blocked_without_inspect_ui (docs.artifacts.INFRA_014-workflow-hardening.test_workflow_hardening.TestPhaseTransitionInspectUI.test_transition_blocked_without_inspect_ui)
+AC-A4: Phase5→Phase6 mit ui_test_red_done aber OHNE inspect_ui_done → BLOCK. ... ok
+test_check_test_coverage_all_present (docs.artifacts.INFRA_014-workflow-hardening.test_workflow_hardening.TestSpecTestPlanParsing.test_check_test_coverage_all_present)
+AC-B2 (Gegenprobe): Alle Tests vorhanden → 0 MISSING. ... ok
+test_check_test_coverage_finds_missing (docs.artifacts.INFRA_014-workflow-hardening.test_workflow_hardening.TestSpecTestPlanParsing.test_check_test_coverage_finds_missing)
+AC-B2: 3 geplante Tests, nur 2 vorhanden → 1 MISSING. ... ok
+test_parse_spec_test_plan_extracts_items (docs.artifacts.INFRA_014-workflow-hardening.test_workflow_hardening.TestSpecTestPlanParsing.test_parse_spec_test_plan_extracts_items)
+AC-B1: Spec mit Test Plan → korrekte Liste. ... ok
+test_mark_inspect_ui_done_sets_field (docs.artifacts.INFRA_014-workflow-hardening.test_workflow_hardening.TestWorkflowInspectUIField.test_mark_inspect_ui_done_sets_field)
+AC-A4 Voraussetzung: mark-inspect-ui-done setzt inspect_ui_done=true. ... ok
+
+----------------------------------------------------------------------
+Ran 8 tests in 0.012s
+
+OK

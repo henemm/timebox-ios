@@ -1,0 +1,87 @@
+test_inspect_ui_gate_allows_ui_test_with_preflight (docs.artifacts.INFRA_014-workflow-hardening.test_workflow_hardening.TestInspectUIGate.test_inspect_ui_gate_allows_ui_test_with_preflight)
+AC-A2: UI-Test-Edit in Phase 5 MIT inspect_ui_done → ALLOW. ... ok
+test_inspect_ui_gate_blocks_ui_test_without_preflight (docs.artifacts.INFRA_014-workflow-hardening.test_workflow_hardening.TestInspectUIGate.test_inspect_ui_gate_blocks_ui_test_without_preflight)
+AC-A1: UI-Test-Edit in Phase 5 OHNE inspect_ui_done → BLOCK. ... FAIL
+test_inspect_ui_gate_ignores_unit_tests (docs.artifacts.INFRA_014-workflow-hardening.test_workflow_hardening.TestInspectUIGate.test_inspect_ui_gate_ignores_unit_tests)
+AC-A3: Unit-Test-Edit OHNE inspect_ui_done → ALLOW (kein Gate). ... ok
+test_transition_blocked_without_inspect_ui (docs.artifacts.INFRA_014-workflow-hardening.test_workflow_hardening.TestPhaseTransitionInspectUI.test_transition_blocked_without_inspect_ui)
+AC-A4: Phase5→Phase6 mit ui_test_red_done aber OHNE inspect_ui_done → BLOCK. ... FAIL
+test_check_test_coverage_all_present (docs.artifacts.INFRA_014-workflow-hardening.test_workflow_hardening.TestSpecTestPlanParsing.test_check_test_coverage_all_present)
+AC-B2 (Gegenprobe): Alle Tests vorhanden → 0 MISSING. ... ERROR
+test_check_test_coverage_finds_missing (docs.artifacts.INFRA_014-workflow-hardening.test_workflow_hardening.TestSpecTestPlanParsing.test_check_test_coverage_finds_missing)
+AC-B2: 3 geplante Tests, nur 2 vorhanden → 1 MISSING. ... ERROR
+test_parse_spec_test_plan_extracts_items (docs.artifacts.INFRA_014-workflow-hardening.test_workflow_hardening.TestSpecTestPlanParsing.test_parse_spec_test_plan_extracts_items)
+AC-B1: Spec mit Test Plan → korrekte Liste. ... ERROR
+test_mark_inspect_ui_done_sets_field (docs.artifacts.INFRA_014-workflow-hardening.test_workflow_hardening.TestWorkflowInspectUIField.test_mark_inspect_ui_done_sets_field)
+AC-A4 Voraussetzung: mark-inspect-ui-done setzt inspect_ui_done=true. ... FAIL
+
+======================================================================
+ERROR: test_check_test_coverage_all_present (docs.artifacts.INFRA_014-workflow-hardening.test_workflow_hardening.TestSpecTestPlanParsing.test_check_test_coverage_all_present)
+AC-B2 (Gegenprobe): Alle Tests vorhanden → 0 MISSING.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/hem/Developer/my-daily-sprints/docs/artifacts/INFRA_014-workflow-hardening/test_workflow_hardening.py", line 223, in test_check_test_coverage_all_present
+    missing = adversary_dialog.check_test_coverage(spec_path, [test_file.name])
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'adversary_dialog' has no attribute 'check_test_coverage'
+
+======================================================================
+ERROR: test_check_test_coverage_finds_missing (docs.artifacts.INFRA_014-workflow-hardening.test_workflow_hardening.TestSpecTestPlanParsing.test_check_test_coverage_finds_missing)
+AC-B2: 3 geplante Tests, nur 2 vorhanden → 1 MISSING.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/hem/Developer/my-daily-sprints/docs/artifacts/INFRA_014-workflow-hardening/test_workflow_hardening.py", line 194, in test_check_test_coverage_finds_missing
+    missing = adversary_dialog.check_test_coverage(spec_path, [test_file.name])
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'adversary_dialog' has no attribute 'check_test_coverage'
+
+======================================================================
+ERROR: test_parse_spec_test_plan_extracts_items (docs.artifacts.INFRA_014-workflow-hardening.test_workflow_hardening.TestSpecTestPlanParsing.test_parse_spec_test_plan_extracts_items)
+AC-B1: Spec mit Test Plan → korrekte Liste.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/hem/Developer/my-daily-sprints/docs/artifacts/INFRA_014-workflow-hardening/test_workflow_hardening.py", line 162, in test_parse_spec_test_plan_extracts_items
+    result = adversary_dialog.parse_spec_test_plan(spec_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'adversary_dialog' has no attribute 'parse_spec_test_plan'
+
+======================================================================
+FAIL: test_inspect_ui_gate_blocks_ui_test_without_preflight (docs.artifacts.INFRA_014-workflow-hardening.test_workflow_hardening.TestInspectUIGate.test_inspect_ui_gate_blocks_ui_test_without_preflight)
+AC-A1: UI-Test-Edit in Phase 5 OHNE inspect_ui_done → BLOCK.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/hem/Developer/my-daily-sprints/docs/artifacts/INFRA_014-workflow-hardening/test_workflow_hardening.py", line 72, in test_inspect_ui_gate_blocks_ui_test_without_preflight
+    self.assertEqual(ctx.exception.code, 2,
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+                     "UI-Test-Edit ohne inspect_ui_done sollte BLOCKED sein (exit 2)")
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0 != 2 : UI-Test-Edit ohne inspect_ui_done sollte BLOCKED sein (exit 2)
+
+======================================================================
+FAIL: test_transition_blocked_without_inspect_ui (docs.artifacts.INFRA_014-workflow-hardening.test_workflow_hardening.TestPhaseTransitionInspectUI.test_transition_blocked_without_inspect_ui)
+AC-A4: Phase5→Phase6 mit ui_test_red_done aber OHNE inspect_ui_done → BLOCK.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/hem/Developer/my-daily-sprints/docs/artifacts/INFRA_014-workflow-hardening/test_workflow_hardening.py", line 272, in test_transition_blocked_without_inspect_ui
+    self.assertIsNotNone(error,
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^
+                         "Transition phase5→phase6 sollte blockiert sein ohne inspect_ui_done")
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: unexpectedly None : Transition phase5→phase6 sollte blockiert sein ohne inspect_ui_done
+
+======================================================================
+FAIL: test_mark_inspect_ui_done_sets_field (docs.artifacts.INFRA_014-workflow-hardening.test_workflow_hardening.TestWorkflowInspectUIField.test_mark_inspect_ui_done_sets_field)
+AC-A4 Voraussetzung: mark-inspect-ui-done setzt inspect_ui_done=true.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/hem/Developer/my-daily-sprints/docs/artifacts/INFRA_014-workflow-hardening/test_workflow_hardening.py", line 241, in test_mark_inspect_ui_done_sets_field
+    self.assertIn("mark-inspect-ui-done", workflow.COMMANDS,
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   "mark-inspect-ui-done muss als Command in workflow.py registriert sein")
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'mark-inspect-ui-done' not found in {'start': <function cmd_start at 0x10645eb90>, 'switch': <function cmd_switch at 0x10645ecf0>, 'status': <function cmd_status at 0x10645ee50>, 'phase': <function cmd_phase at 0x10645efb0>, 'set-field': <function cmd_set_field at 0x10645f110>, 'set-affected-files': <function cmd_set_affected_files at 0x10645f270>, 'add-artifact': <function cmd_add_artifact at 0x10645f3d0>, 'mark-red': <function cmd_mark_red at 0x10645f530>, 'mark-ui-red': <function cmd_mark_ui_red at 0x10645f690>, 'mark-green': <function cmd_mark_green at 0x10645f7f0>, 'mark-ui-green': <function cmd_mark_ui_green at 0x10645f950>, 'mark-regression-done': <function cmd_mark_regression_done at 0x10645fab0>, 'mark-docs-updated': <function cmd_mark_docs_updated at 0x10645fc10>, 'mark-validation-done': <function cmd_mark_validation_done at 0x10645fd70>, 'mark-visual-inspection': <function cmd_mark_visual_inspection at 0x10645fed0>, 'mark-user-expectation': <function cmd_mark_user_expectation at 0x1064f00f0>, 'mark-result-inspection': <function cmd_mark_result_inspection at 0x1064f0250>, 'mark-fix-proposal': <function cmd_mark_fix_proposal at 0x1064f03b0>, 'mark-analysis': <function cmd_mark_analysis at 0x1064f0510>, 'mark-challenge': <function cmd_mark_challenge at 0x1064f0670>, 'mark-context': <function cmd_mark_context at 0x1064f07d0>, 'mark-existence-check': <function cmd_mark_existence_check at 0x1064f0930>, 'mark-dead-code-check': <function cmd_mark_dead_code_check at 0x1064f0a90>, 'mark-github-issue-updated': <function cmd_mark_github_issue_updated at 0x1064f0bf0>, 'complete': <function cmd_complete at 0x1064f0d50>, 'list': <function cmd_list at 0x1064f0eb0>, 'snapshot-tests': <function cmd_snapshot_tests at 0x1064f1010>} : mark-inspect-ui-done muss als Command in workflow.py registriert sein
+
+----------------------------------------------------------------------
+Ran 8 tests in 0.007s
+
+FAILED (failures=3, errors=3)

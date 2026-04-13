@@ -50,14 +50,29 @@ Task 1 (general-purpose/haiku) - TEST CHECK:
 Task 2 (general-purpose/haiku) - SPEC COMPLIANCE:
   "Lies die Spec: [spec_file_path]
   Pruefe jeden Acceptance Criterion gegen die Implementation.
-  Report: Welche Kriterien sind erfuellt, welche nicht?"
+
+  ZUSAETZLICH (INFRA_014): Testplan-Coverage-Check:
+  python3 .claude/hooks/adversary_dialog.py coverage [spec_file_path] [test-file1] [test-file2...]
+  Fehlende Tests = FAIL der Validation.
+
+  Report: Welche Kriterien sind erfuellt, welche nicht?
+  Testplan-Coverage: N/M Tests implementiert."
 
 Task 3 (general-purpose/haiku) - REGRESSION CHECK:
-  "Fuehre die vollstaendige Test-Suite aus (nicht nur Feature-Tests).
-  ./scripts/sim.sh unit [AllTests]
-  ./scripts/sim.sh test [AllUITests]
-  Report: Gibt es Regressionen? Welche Tests die vorher gruen waren
-  sind jetzt rot?"
+  "Fuehre einen Regressions-Check mit MINDEST-SCOPE aus (INFRA_014):
+
+  MINIMUM (PFLICHT):
+  1. Volle Unit-Suite: ./scripts/sim.sh unit FocusBloxTests
+  2. 3 Haupt-UI-Test-Suiten:
+     ./scripts/sim.sh test BacklogViewUITests
+     ./scripts/sim.sh test DayViewUITests
+     ./scripts/sim.sh test CoachTabLayoutUITests
+  3. Alle Tests der direkt betroffenen Module
+
+  OPTIONAL (empfohlen bei grossem Scope):
+  4. Volle UI-Test-Suite
+
+  Report: Anzahl Tests ausgefuehrt, passed/failed, Regressionen?"
 
 Task 4 (general-purpose/haiku) - SCOPE CHECK:
   "Vergleiche die geaenderten Dateien mit der Spec.

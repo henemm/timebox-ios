@@ -42,6 +42,20 @@ python3 .claude/hooks/workflow.py status
 python3 .claude/hooks/workflow.py phase phase5_tdd_red
 ```
 
+### 1b. Inspect-UI Preflight (PFLICHT vor UI-Tests — INFRA_014)
+
+**BEVOR du UI-Tests schreibst:**
+1. Fuehre `/inspect-ui` aus fuer den Ziel-Screen
+2. Notiere alle relevanten AccessibilityIdentifier
+3. Markiere den Preflight als erledigt:
+```bash
+python3 .claude/hooks/workflow.py mark-inspect-ui-done "<screen-name>: <beobachtete IDs, z.B. addTaskButton, saveButton, backlogTab>"
+```
+
+**Ohne diesen Schritt blockiert der edit_gate Hook alle Edits auf UI-Test-Dateien!**
+
+Unit-Tests (FocusBloxTests/) sind NICHT betroffen — nur UI-Tests erfordern den Preflight.
+
 ### 2. Unit Tests schreiben — PFLICHT fuer Business-Logik
 
 **Unit Tests sind PFLICHT wenn Business-Logik betroffen ist.**
@@ -137,6 +151,7 @@ python3 .claude/hooks/workflow.py snapshot-tests
 
 ## RED Phase Checklist
 
+- [ ] `/inspect-ui` ausgefuehrt und `mark-inspect-ui-done` gesetzt (PFLICHT vor UI-Tests)
 - [ ] Ich kann fuer JEDEN Test sagen welche Zeile ihn brechen wuerde
 - [ ] Unit Tests geschrieben — PFLICHT bei Business-Logik
 - [ ] Unit Tests ausgefuehrt und FEHLGESCHLAGEN

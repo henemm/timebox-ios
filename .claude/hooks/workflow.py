@@ -289,6 +289,8 @@ def _new_workflow(name: str) -> dict:
         # Feature gates
         "user_expectation_done": False,
         "result_inspection_done": False,
+        # Inspect-UI preflight gate (INFRA_014)
+        "inspect_ui_done": False,
         # Workflow type: "bug" or "feature" (set by /10-bug or /11-feature)
         "workflow_type": None,
     }
@@ -387,6 +389,12 @@ def _validate_transition(data: dict, target: str) -> str | None:
         if not data.get("ui_test_red_done"):
             return ("ui_test_red_done not set — UI tests are MANDATORY for every "
                     "feature/bug. Run UI tests in /04-tdd-red and mark-ui-red")
+
+    # --- Gate: Inspect-UI preflight before implementation (INFRA_014) ---
+    if tgt_idx >= PHASES.index("phase6_implement"):
+        if data.get("ui_test_red_done") and not data.get("inspect_ui_done"):
+            return ("inspect_ui_done not set — run /inspect-ui before writing UI tests. "
+                    "Then mark with: mark-inspect-ui-done <screen-name + observations>")
 
     # --- Gate: Result inspection before adversary (features) ---
     if tgt_idx >= PHASES.index("phase6b_adversary"):
@@ -692,6 +700,19 @@ def cmd_mark_visual_inspection(args: list[str]) -> None:
     print(f"Visual inspection marked done.")
 
 
+def cmd_mark_inspect_ui_done(args: list[str]) -> None:
+    notes = " ".join(args) if args else ""
+    if len(notes) < MIN_NOTES_LEN:
+        print(f"BLOCKED: Notes too short ({len(notes)}/{MIN_NOTES_LEN} chars). "
+              f"Provide screen name and observed accessibility identifiers.", file=sys.stderr)
+        sys.exit(1)
+    data, name = _read_active()
+    data["inspect_ui_done"] = True
+    data["inspect_ui_notes"] = notes
+    _save_active(data)
+    print(f"Inspect-UI preflight marked done.")
+
+
 def cmd_mark_user_expectation(args: list[str]) -> None:
     notes = " ".join(args) if args else ""
     if len(notes) < MIN_NOTES_LEN:
@@ -908,6 +929,7 @@ COMMANDS = {
     "mark-regression-done": cmd_mark_regression_done,
     "mark-docs-updated": cmd_mark_docs_updated,
     "mark-validation-done": cmd_mark_validation_done,
+    "mark-inspect-ui-done": cmd_mark_inspect_ui_done,
     "mark-visual-inspection": cmd_mark_visual_inspection,
     "mark-user-expectation": cmd_mark_user_expectation,
     "mark-result-inspection": cmd_mark_result_inspection,

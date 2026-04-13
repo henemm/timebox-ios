@@ -53,6 +53,25 @@ Task (general-purpose/haiku): "Du bist der spec-validator Agent.
 2. Dispatche spec-validator erneut
 3. Wiederhole bis VALID
 
+### Step 3b: Affected-Files Cross-Check (PFLICHT — INFRA_014)
+
+**Nach Spec-Erstellung, VOR Workflow-Update:**
+
+1. Extrahiere alle Dateipfade aus der Spec (Source-Verweise, Code-Bloecke, `file_path` References)
+2. Vergleiche mit den aktuellen `affected_files` im Workflow-State:
+   ```bash
+   python3 .claude/hooks/workflow.py status
+   ```
+3. Wenn die Spec Dateien referenziert die NICHT in `affected_files` stehen:
+   - Registriere sie automatisch:
+   ```bash
+   python3 .claude/hooks/workflow.py set-affected-files "Sources/fehlende/Datei.swift"
+   ```
+4. **Warnung wenn > 2 Dateien nachregistriert werden:**
+   > "WARNUNG: Die Analyse in Phase 2 hat [N] Dateien uebersehen. Das deutet auf eine unvollstaendige Analyse hin. Pruefe ob der Scope korrekt erfasst wurde."
+
+**Ziel:** Keine Ueberraschungen in Phase 5/6, wenn ploetzlich Dateien fehlen und man zurueck zu Phase 4 muss.
+
 ### Step 4: Workflow State aktualisieren
 
 ```bash

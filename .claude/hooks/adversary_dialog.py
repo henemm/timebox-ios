@@ -67,6 +67,111 @@ def parse_spec_expected_behavior(spec_path: str) -> list[str]:
     return points
 
 
+def parse_spec_test_plan(spec_path: str) -> list[str]:
+    """Parse a spec file and extract Test Plan bullet points.
+
+    Sucht nach einer '## Test Plan' Section und extrahiert
+    alle Bullet-Points bis zur naechsten '## ' Section oder Dateiende.
+
+    Returns:
+        Liste von Strings, jeder ein Test-Plan-Punkt.
+        Leere Liste wenn keine Section gefunden.
+    """
+    path = Path(spec_path)
+    if not path.exists():
+        return []
+
+    content = path.read_text(errors="replace")
+    lines = content.splitlines()
+
+    in_section = False
+    points = []
+
+    for line in lines:
+        stripped = line.strip()
+
+        # Section-Start erkennen (## Test Plan oder ### Unit Tests etc.)
+        if re.match(r"^##\s+Test Plan", stripped, re.IGNORECASE):
+            in_section = True
+            continue
+
+        # Naechste gleichrangige Section beendet Test Plan
+        if in_section and re.match(r"^##\s+(?!#)", stripped):
+            # Check it's not a subsection (### is ok, ## is end)
+            if not stripped.startswith("###"):
+                break
+
+        # Subsections die keine automatisierten Tests enthalten ueberspringen
+        if in_section and re.match(r"^###\s+", stripped):
+            subsection = stripped.lstrip("#").strip().lower()
+            if "manuell" in subsection or "manual" in subsection:
+                # Manuelle Verifikation-Subsection: Items ueberspringen bis naechste ###
+                in_section = False  # Wird bei naechstem ### wieder aktiviert
+                continue
+            else:
+                in_section = True  # Automatisierte Subsection: weiter sammeln
+                continue
+
+        # Bullet-Points und nummerierte Listen sammeln
+        if in_section and (re.match(r"^-\s+", stripped) or re.match(r"^\d+\.\s+", stripped)):
+            point = re.sub(r"^(-\s+|\d+\.\s+)", "", stripped)
+            if point:
+                points.append(point)
+
+    return points
+
+
+def check_test_coverage(spec_path: str, test_files: list[str]) -> list[str]:
+    """Compare spec test plan against actual test methods in files.
+
+    Extrahiert geplante Tests aus der Spec und vergleicht sie mit
+    tatsaechlich vorhandenen func test*() Methoden in den Test-Dateien.
+
+    Returns:
+        Liste von fehlenden Test-Beschreibungen (Spec-Punkte ohne Match).
+    """
+    # 1. Geplante Tests aus Spec
+    planned = parse_spec_test_plan(spec_path)
+    if not planned:
+        return []
+
+    # 2. Tatsaechliche Test-Methoden sammeln
+    actual_methods = []
+    for tf in test_files:
+        p = Path(tf)
+        if not p.exists():
+            continue
+        content = p.read_text(errors="replace")
+        # Swift: func test...() oder func test_...()
+        methods = re.findall(r"func\s+(test\w+)\s*\(", content)
+        # Python: def test...()
+        methods += re.findall(r"def\s+(test\w+)\s*\(", content)
+        actual_methods.extend(methods)
+
+    # 3. Fuzzy-Matching: Fuer jeden geplanten Test pruefen ob ein Match existiert
+    missing = []
+    for plan_item in planned:
+        # Extrahiere Test-Name aus Plan-Item (z.B. "test_create_task — Task erstellen")
+        # Nimm alles vor " — " oder " - " als Funktionsname
+        name_part = re.split(r"\s*[—\-]\s*", plan_item)[0].strip()
+        # Entferne Backticks
+        name_part = name_part.strip("`")
+
+        # Suche ob irgendeine tatsaechliche Methode den Kern-Namen enthaelt
+        name_lower = name_part.lower().replace("_", "")
+        found = False
+        for method in actual_methods:
+            method_lower = method.lower().replace("_", "")
+            if name_lower in method_lower or method_lower in name_lower:
+                found = True
+                break
+
+        if not found:
+            missing.append(plan_item)
+
+    return missing
+
+
 def create_checklist(points: list[str]) -> list[dict]:
     """Erstellt eine Checkliste aus Expected-Behavior-Punkten.
 
@@ -224,6 +329,28 @@ def main():
         valid, message = validate_dialog_artifact(artifact_path)
         print(message)
         sys.exit(0 if valid else 1)
+
+    elif cmd == "coverage":
+        if len(sys.argv) < 4:
+            print("Usage: python3 adversary_dialog.py coverage <spec-path> <test-file1> [test-file2...]")
+            sys.exit(1)
+        spec_path = sys.argv[2]
+        test_files = sys.argv[3:]
+        planned = parse_spec_test_plan(spec_path)
+        if not planned:
+            print("Keine Test-Plan-Punkte in der Spec gefunden.")
+            sys.exit(0)
+        missing = check_test_coverage(spec_path, test_files)
+        print(f"Spec-Testplan: {len(planned)} geplante Tests")
+        print(f"Abgedeckt: {len(planned) - len(missing)}/{len(planned)}")
+        if missing:
+            print(f"\nFEHLENDE Tests ({len(missing)}):")
+            for m in missing:
+                print(f"  MISSING: {m}")
+            sys.exit(1)
+        else:
+            print("Alle geplanten Tests sind implementiert.")
+            sys.exit(0)
 
     else:
         print(f"Unknown command: {cmd}")

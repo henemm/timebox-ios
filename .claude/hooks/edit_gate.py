@@ -316,7 +316,17 @@ def main():
     elif phase in TEST_ONLY_PHASES:
         # phase5_tdd_red: nur Test-Dateien erlaubt
         if is_test:
-            sys.exit(0)  # Test-Dateien direkt erlaubt in TDD RED
+            # INFRA_014: UI-Test-Dateien erfordern inspect_ui_done Preflight
+            ui_test_dirs = ["FocusBloxUITests/", "FocusBloxMacUITests/"]
+            is_ui_test = any(d in file_path for d in ui_test_dirs)
+            if is_ui_test and not workflow.get("inspect_ui_done", False):
+                if not _has_override_token(wf_name):
+                    print("BLOCKED: /inspect-ui nicht ausgeführt. PFLICHT vor UI-Tests. "
+                          "Führe /inspect-ui aus und dann: python3 .claude/hooks/workflow.py "
+                          "mark-inspect-ui-done '<screen-name + beobachtete IDs>'",
+                          file=sys.stderr)
+                    sys.exit(2)
+            sys.exit(0)  # Test-Dateien erlaubt in TDD RED
         if not _has_override_token(wf_name):
             print(f"BLOCKED: Phase {phase} erlaubt nur Test-Dateien. Sources sind gesperrt.", file=sys.stderr)
             sys.exit(2)
