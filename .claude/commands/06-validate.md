@@ -80,6 +80,20 @@ Task 4 (general-purpose/haiku) - SCOPE CHECK:
   Wurden mehr als 5 Dateien / 250 LoC geaendert?"
 ```
 
+### Step 1b: Validation-Flags setzen (PFLICHT — INFRA_015)
+
+Nach Abschluss von Task 2 (Spec Compliance) muessen BEIDE Flags gesetzt werden:
+
+```bash
+# Nach Spec-Compliance-Check (Task 2):
+python3 .claude/hooks/workflow.py mark-spec-compliance "N/N AC erfuellt. [Details zu jedem Criterion]"
+
+# Nach Coverage-Check (adversary_dialog.py coverage):
+python3 .claude/hooks/workflow.py mark-coverage-check "N/N Tests matched. [Fehlende Tests oder 'alle abgedeckt']"
+```
+
+**Ohne diese Flags blockiert `mark-validation-done` den Workflow-Abschluss!**
+
 ### Step 2: Ergebnis-Auswertung
 
 Werte die 4 Reports aus:

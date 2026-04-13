@@ -53,6 +53,13 @@ Task (general-purpose/haiku): "Du bist der spec-validator Agent.
 2. Dispatche spec-validator erneut
 3. Wiederhole bis VALID
 
+**Nach VALID — Gate setzen (PFLICHT — INFRA_015):**
+```bash
+python3 .claude/hooks/workflow.py mark-spec-validated "VALID: All required fields, sections present. No placeholders. [Details]"
+```
+
+**Ohne `spec_validated=true` blockiert das Gate den Wechsel zu phase4_approved!**
+
 ### Step 3b: Affected-Files Cross-Check (PFLICHT — INFRA_014)
 
 **Nach Spec-Erstellung, VOR Workflow-Update:**

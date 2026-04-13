@@ -370,6 +370,9 @@ def _validate_transition(data: dict, target: str) -> str | None:
             return "spec_file not set — run /03-write-spec first"
         if not data.get("spec_approved"):
             return "Spec not approved — user must say 'approved'"
+        if not data.get("spec_validated"):
+            return ("spec_validated not set — run spec-validator agent and "
+                    "mark-spec-validated with validation result")
 
     # --- Gate: Fix proposal must be approved before TDD RED ---
     if tgt_idx >= PHASES.index("phase5_tdd_red"):
@@ -482,7 +485,10 @@ def cmd_status(args: list[str]) -> None:
     print(f"Test Artifacts: {artifacts}")
     print(f"green_test_done: {green_test}")
     print(f"ui_test_green_done: {'Yes' if data.get('ui_test_green_done') else 'No'}")
+    print(f"spec_validated: {'Yes' if data.get('spec_validated') else 'No'}")
     print(f"regression_check_done: {regression}")
+    print(f"spec_compliance_done: {'Yes' if data.get('spec_compliance_done') else 'No'}")
+    print(f"coverage_check_done: {'Yes' if data.get('coverage_check_done') else 'No'}")
     print(f"docs_updated: {docs}")
     print(f"validation_done: {validation}")
 
@@ -527,6 +533,9 @@ PROTECTED_FIELDS = {
     "existence_check_done",
     "dead_code_check_done",
     "github_issue_updated",
+    "spec_validated",
+    "spec_compliance_done",
+    "coverage_check_done",
 }
 
 
@@ -645,13 +654,76 @@ def cmd_mark_ui_green(args: list[str]) -> None:
     print(f"GREEN UI test marked done: {result}")
 
 
+REQUIRED_REGRESSION_SUITES = [
+    "FocusBloxTests",
+    "BacklogViewUITests",
+    "DayViewUITests",
+    "CoachTabLayoutUITests",
+]
+
+
 def cmd_mark_regression_done(args: list[str]) -> None:
     result = " ".join(args) if args else "no regressions"
     data, name = _read_active()
+    # Keyword validation: all 4 required suites must be mentioned
+    wf_name = data.get("name", "")
+    if not _has_override_token(wf_name):
+        missing_suites = [s for s in REQUIRED_REGRESSION_SUITES if s not in result]
+        if missing_suites:
+            print(f"BLOCKED: Regression evidence must mention all required suites. "
+                  f"Missing: {', '.join(missing_suites)}. "
+                  f"Run: ./scripts/sim.sh unit FocusBloxTests && "
+                  f"./scripts/sim.sh test BacklogViewUITests && "
+                  f"./scripts/sim.sh test DayViewUITests && "
+                  f"./scripts/sim.sh test CoachTabLayoutUITests",
+                  file=sys.stderr)
+            sys.exit(1)
     data["regression_check_done"] = True
     data["regression_check_result"] = result
     _save_active(data)
     print(f"Regression check marked done: {result}")
+
+
+def cmd_mark_spec_validated(args: list[str]) -> None:
+    notes = " ".join(args) if args else ""
+    if len(notes) < MIN_NOTES_LEN:
+        print(f"BLOCKED: Notes too short ({len(notes)}/{MIN_NOTES_LEN} chars). "
+              f"Provide spec-validator result (VALID/INVALID + details).",
+              file=sys.stderr)
+        sys.exit(1)
+    data, name = _read_active()
+    data["spec_validated"] = True
+    data["spec_validated_notes"] = notes
+    _save_active(data)
+    print(f"Spec validation marked done.")
+
+
+def cmd_mark_spec_compliance(args: list[str]) -> None:
+    notes = " ".join(args) if args else ""
+    if len(notes) < MIN_NOTES_LEN:
+        print(f"BLOCKED: Notes too short ({len(notes)}/{MIN_NOTES_LEN} chars). "
+              f"Provide spec compliance result (N/N AC fulfilled).",
+              file=sys.stderr)
+        sys.exit(1)
+    data, name = _read_active()
+    data["spec_compliance_done"] = True
+    data["spec_compliance_notes"] = notes
+    _save_active(data)
+    print(f"Spec compliance marked done.")
+
+
+def cmd_mark_coverage_check(args: list[str]) -> None:
+    notes = " ".join(args) if args else ""
+    if len(notes) < MIN_NOTES_LEN:
+        print(f"BLOCKED: Notes too short ({len(notes)}/{MIN_NOTES_LEN} chars). "
+              f"Provide coverage check result from adversary_dialog.py coverage.",
+              file=sys.stderr)
+        sys.exit(1)
+    data, name = _read_active()
+    data["coverage_check_done"] = True
+    data["coverage_check_notes"] = notes
+    _save_active(data)
+    print(f"Coverage check marked done.")
 
 
 def cmd_mark_docs_updated(args: list[str]) -> None:
@@ -666,7 +738,7 @@ def cmd_mark_docs_updated(args: list[str]) -> None:
 def cmd_mark_validation_done(args: list[str]) -> None:
     result = " ".join(args) if args else "all checks passed"
     data, name = _read_active()
-    # Prerequisite check: green + regression + docs must be done
+    # Prerequisite check: green + regression + docs + compliance + coverage must be done
     missing = []
     if not data.get("green_test_done"):
         missing.append("green_test_done (run mark-green first)")
@@ -674,6 +746,10 @@ def cmd_mark_validation_done(args: list[str]) -> None:
         missing.append("regression_check_done (run mark-regression-done first)")
     if not data.get("docs_updated"):
         missing.append("docs_updated (run mark-docs-updated first)")
+    if not data.get("spec_compliance_done"):
+        missing.append("spec_compliance_done (run mark-spec-compliance first)")
+    if not data.get("coverage_check_done"):
+        missing.append("coverage_check_done (run mark-coverage-check first)")
     if missing:
         print(f"BLOCKED: Prerequisites missing: {', '.join(missing)}",
               file=sys.stderr)
@@ -927,6 +1003,9 @@ COMMANDS = {
     "mark-green": cmd_mark_green,
     "mark-ui-green": cmd_mark_ui_green,
     "mark-regression-done": cmd_mark_regression_done,
+    "mark-spec-validated": cmd_mark_spec_validated,
+    "mark-spec-compliance": cmd_mark_spec_compliance,
+    "mark-coverage-check": cmd_mark_coverage_check,
     "mark-docs-updated": cmd_mark_docs_updated,
     "mark-validation-done": cmd_mark_validation_done,
     "mark-inspect-ui-done": cmd_mark_inspect_ui_done,
