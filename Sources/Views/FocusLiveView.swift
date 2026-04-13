@@ -176,6 +176,10 @@ struct FocusLiveView: View {
         }
         .task {
             await loadData()
+            // Bug #221: Clean up orphaned Live Activities after app restart
+            if activeBlock == nil || activeBlock?.isPast == true {
+                liveActivityManager.cleanupOrphans()
+            }
         }
         .onReceive(timer) { time in
             currentTime = time
@@ -579,6 +583,10 @@ struct FocusLiveView: View {
             activeBlock = eligibleBlocks.first { $0.isActive }
                 ?? eligibleBlocks.filter { $0.isPast }.last
             if activeBlock?.isPast == true && !reviewDismissed {
+                // Bug #221: End Live Activity BEFORE showing Sprint Review
+                liveActivityManager.endActivity()
+                liveActivityManager.cleanupOrphans()
+                liveActivityStarted = false
                 showSprintReview = true
             }
             print("📥 [FocusLiveView] activeBlock=\(activeBlock?.title ?? "nil")")

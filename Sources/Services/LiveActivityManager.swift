@@ -97,6 +97,21 @@ final class LiveActivityManager: Sendable {
         }
     }
 
+    /// Clean up any orphaned Live Activities (e.g. after app restart)
+    /// Bug #221: Works WITHOUT currentActivity — cleans system-level orphans directly
+    func cleanupOrphans() {
+        let orphans = Activity<FocusBlockActivityAttributes>.activities
+        guard !orphans.isEmpty else { return }
+        print("🧹 [LiveActivity] CLEANUP: \(orphans.count) orphan(s) found")
+        for orphan in orphans {
+            nonisolated(unsafe) let captured = orphan
+            Task { @MainActor in
+                await captured.end(nil, dismissalPolicy: .immediate)
+            }
+        }
+        print("✅ [LiveActivity] CLEANUP complete")
+    }
+
     /// End the current activity
     func endActivity() {
         guard let activity = currentActivity else {

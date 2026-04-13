@@ -82,6 +82,32 @@ final class LiveActivityManagerTests: XCTestCase {
         // (On real device it might be non-nil)
     }
 
+    // MARK: - Orphan Cleanup Tests (Bug #221)
+
+    /// GIVEN: LiveActivityManager with no currentActivity (fresh init, e.g. after app restart)
+    /// WHEN: cleanupOrphans() is called
+    /// THEN: Method exists and does not crash — ensures orphan activities are cleaned up
+    /// Bricht wenn: cleanupOrphans() Methode nicht existiert oder currentActivity-unabhängig nicht funktioniert
+    func test_cleanupOrphans_existsAndDoesNotCrash() {
+        XCTAssertNil(manager.currentActivity, "Precondition: no activity running")
+        // cleanupOrphans() must work WITHOUT currentActivity being set
+        manager.cleanupOrphans()
+        // If we get here without crash, the method exists and handles nil currentActivity
+        XCTAssertNil(manager.currentActivity, "currentActivity should remain nil after cleanup")
+    }
+
+    /// GIVEN: LiveActivityManager with no currentActivity
+    /// WHEN: endActivity() is called followed by cleanupOrphans()
+    /// THEN: Neither should crash — endActivity guard returns, cleanupOrphans cleans system activities
+    /// Bricht wenn: cleanupOrphans() nicht unabhängig von endActivity() funktioniert
+    func test_cleanupOrphans_worksIndependentlyOfEndActivity() {
+        // endActivity() should return early (guard on nil currentActivity)
+        manager.endActivity()
+        // cleanupOrphans() should still work even after endActivity() returned early
+        manager.cleanupOrphans()
+        XCTAssertNil(manager.currentActivity)
+    }
+
     // MARK: - Helper Methods
 
     private func createMockFocusBlock() -> FocusBlock {
