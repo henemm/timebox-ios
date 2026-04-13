@@ -518,6 +518,7 @@ PROTECTED_FIELDS = {
     "context_file",
     "existence_check_done",
     "dead_code_check_done",
+    "github_issue_updated",
 }
 
 
@@ -798,6 +799,21 @@ def cmd_mark_dead_code_check(args: list[str]) -> None:
     print(f"Dead-code check marked done: {notes}")
 
 
+def cmd_mark_github_issue_updated(args: list[str]) -> None:
+    details = " ".join(args) if args else ""
+    if len(details) < 10:
+        print("BLOCKED: Beschreibe was mit dem GitHub Issue passiert ist "
+              "(z.B. 'closed #42' oder 'commented on #42 with fix summary'). "
+              f"Mindestens 10 Zeichen, aktuell: {len(details)}.",
+              file=sys.stderr)
+        sys.exit(1)
+    data, name = _read_active()
+    data["github_issue_updated"] = True
+    data["github_issue_update_details"] = details
+    _save_active(data)
+    print(f"GitHub Issue Update markiert: {details}")
+
+
 def cmd_complete(args: list[str]) -> None:
     data, name = _read_active()
     data["current_phase"] = "phase8_complete"
@@ -901,6 +917,7 @@ COMMANDS = {
     "mark-context": cmd_mark_context,
     "mark-existence-check": cmd_mark_existence_check,
     "mark-dead-code-check": cmd_mark_dead_code_check,
+    "mark-github-issue-updated": cmd_mark_github_issue_updated,
     "complete": cmd_complete,
     "list": cmd_list,
     "snapshot-tests": cmd_snapshot_tests,

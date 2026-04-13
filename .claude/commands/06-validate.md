@@ -163,16 +163,24 @@ Erstelle eine Zusammenfassung:
 
 **Nach erfolgreicher Validation, VOR phase8_complete:**
 
-1. **GitHub Issue schliessen:**
+1. **GitHub Issue aktualisieren (PFLICHT — Commit-Gate-enforced!):**
    ```bash
+   # Issue schliessen oder kommentieren:
    gh issue close <number> --comment "Fixed in <commit-hash>"
+   # ODER bei Features/nicht-abgeschlossenen Issues:
+   gh issue comment <number> --body "Implemented in <commit-hash>"
    ```
 
-2. **`CLAUDE.md`** aktualisieren (nur bei Architektur-Aenderungen)
+2. **GitHub-Issue-Update markieren (blockiert sonst Commit!):**
+   ```bash
+   python3 .claude/hooks/workflow.py mark-github-issue-updated "closed #<number> with fix summary"
+   ```
 
-3. **Flag setzen** (blockiert sonst phase8_complete):
+3. **`CLAUDE.md`** aktualisieren (nur bei Architektur-Aenderungen)
+
+4. **Docs-Flag setzen** (blockiert sonst phase8_complete):
 ```bash
-python3 .claude/hooks/workflow.py mark-docs-updated "GitHub Issue #<number> closed"
+python3 .claude/hooks/workflow.py mark-docs-updated "GitHub Issue #<number> closed, docs updated"
 ```
 
 ## Next Step

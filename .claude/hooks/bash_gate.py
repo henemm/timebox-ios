@@ -371,6 +371,23 @@ def main():
                               "Führe /06-validate vollständig aus (mark-validation-done).",
                               file=sys.stderr)
                         sys.exit(2)
+                    # 6d. Workflow-Phase Gate — Workflow muss in phase8_complete sein
+                    current_phase = active_wf.get("current_phase", "")
+                    if current_phase != "phase8_complete":
+                        print(f"BLOCKED: Kein Commit ohne abgeschlossenen Workflow! "
+                              f"Aktuelle Phase: '{current_phase}'. "
+                              f"Workflow muss phase8_complete erreichen oder tippe 'override'.",
+                              file=sys.stderr)
+                        sys.exit(2)
+                    # 6e. GitHub-Issue-Update Gate — Issue muss aktualisiert sein
+                    if not active_wf.get("github_issue_updated"):
+                        issue_ref = active_wf.get("github_issue", "")
+                        print(f"BLOCKED: Kein Commit ohne GitHub-Issue-Update! "
+                              f"Issue: '{issue_ref}'. "
+                              f"Aktualisiere das GitHub Issue (gh issue close/comment) "
+                              f"und setze 'github_issue_updated: true' im Workflow oder tippe 'override'.",
+                              file=sys.stderr)
+                        sys.exit(2)
 
     # 7. Allow
     sys.exit(0)
