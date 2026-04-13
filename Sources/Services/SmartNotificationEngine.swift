@@ -41,6 +41,7 @@ enum SmartNotificationEngine {
     static let budgetTimers: Int = 4
     static let budgetTasks: Int  = 20
     static let budgetReview: Int = 14
+    static let budgetHygiene: Int = 1
 
     // MARK: - Cached AI Content (set during reconcile, used by buildReviewRequests)
 
@@ -96,6 +97,10 @@ enum SmartNotificationEngine {
         if profile == .balanced || profile == .active {
             await precomputeNotificationContent(container: container, eventKitRepo: eventKitRepo)
             requests += buildReviewRequests(now: Date())
+        }
+
+        if profile == .balanced || profile == .active {
+            requests += buildBacklogHygieneRequest(profile: profile, container: container)
         }
 
         return Array(requests.prefix(64))
@@ -233,6 +238,10 @@ enum SmartNotificationEngine {
         if profile == .balanced || profile == .active {
             await precomputeNotificationContent(context: context, eventKitRepo: eventKitRepo)
             requests += buildReviewRequests(now: Date())
+        }
+
+        if profile == .balanced || profile == .active {
+            requests += buildBacklogHygieneRequest(profile: profile, context: context)
         }
 
         return Array(requests.prefix(64))
@@ -473,4 +482,58 @@ enum SmartNotificationEngine {
         try? BGTaskScheduler.shared.submit(request)
     }
     #endif
+
+    // MARK: - Prio 4: Backlog Hygiene Request (#215)
+
+    static func buildBacklogHygieneRequest(
+        profile: NotificationProfile,
+        container: ModelContainer
+    ) -> [UNNotificationRequest] {
+        guard AppSettings.shared.backlogHygieneNudgeEnabled else { return [] }
+        guard profile != .quiet else { return [] }
+
+        let context = ModelContext(container)
+        return buildHygieneRequestFromContext(context)
+    }
+
+    static func buildBacklogHygieneRequest(
+        profile: NotificationProfile,
+        context: ModelContext
+    ) -> [UNNotificationRequest] {
+        guard AppSettings.shared.backlogHygieneNudgeEnabled else { return [] }
+        guard profile != .quiet else { return [] }
+
+        return buildHygieneRequestFromContext(context)
+    }
+
+    private static func buildHygieneRequestFromContext(
+        _ context: ModelContext
+    ) -> [UNNotificationRequest] {
+        let descriptor = FetchDescriptor<LocalTask>(
+            predicate: #Predicate<LocalTask> { !$0.isCompleted && !$0.isParked && !$0.isTemplate }
+        )
+        guard let tasks = try? context.fetch(descriptor) else { return [] }
+
+        let planItems = tasks.map { PlanItem(localTask: $0) }
+        let staleTasks = BacklogHealthService.findStaleTasks(in: planItems)
+        guard !staleTasks.isEmpty else { return [] }
+
+        var dateComponents = DateComponents()
+        dateComponents.weekday = 2  // Monday
+        dateComponents.hour = 9
+        dateComponents.minute = 0
+        let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: true)
+
+        let content = UNMutableNotificationContent()
+        content.title = "Backlog aufräumen?"
+        content.body = "\(staleTasks.count) Tasks warten auf eine Entscheidung"
+        content.sound = .default
+        content.userInfo = ["target": "backlog", "action": "hygiene"]
+
+        return [UNNotificationRequest(
+            identifier: "focusblox.backlog-hygiene",
+            content: content,
+            trigger: trigger
+        )]
+    }
 }

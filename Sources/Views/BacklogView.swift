@@ -277,6 +277,9 @@ struct BacklogView: View {
             .sheet(isPresented: $showHygieneSheet) {
                 BacklogHygieneView(staleTasks: staleTasks)
             }
+            .onReceive(NotificationCenter.default.publisher(for: NotificationActionDelegate.navigateToBacklogHygieneNotification)) { _ in
+                showHygieneSheet = true
+            }
             .sheet(item: $taskToEdit) { task in
                 TaskDetailSheet(
                     task: task,

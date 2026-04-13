@@ -19,12 +19,27 @@ final class NotificationActionDelegate: NSObject, @preconcurrency UNUserNotifica
     /// userInfo contains "phase" key with value "morning", "evening", or "daytime".
     static let navigateToDayViewNotification = Notification.Name("NavigateToDayView")
 
+    /// Notification name posted when user taps a Backlog Hygiene notification (#215).
+    static let navigateToBacklogHygieneNotification = Notification.Name("NavigateToBacklogHygiene")
+
     nonisolated func userNotificationCenter(
         _ center: UNUserNotificationCenter,
         didReceive response: UNNotificationResponse,
         withCompletionHandler completionHandler: @escaping @Sendable () -> Void
     ) {
         let userInfo = response.notification.request.content.userInfo
+
+        // Deep-Link: Backlog Hygiene notifications with target="backlog" (#215)
+        if let target = userInfo["target"] as? String, target == "backlog" {
+            Task { @MainActor in
+                NotificationCenter.default.post(
+                    name: Self.navigateToBacklogHygieneNotification,
+                    object: nil
+                )
+                completionHandler()
+            }
+            return
+        }
 
         // Deep-Link: Review notifications with target="day"
         if let target = userInfo["target"] as? String, target == "day" {

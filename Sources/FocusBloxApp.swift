@@ -465,6 +465,9 @@ struct FocusBloxApp: App {
             .onReceive(NotificationCenter.default.publisher(for: .quickCaptureRequested)) { _ in
                 showQuickCapture = true
             }
+            .onReceive(NotificationCenter.default.publisher(for: NotificationActionDelegate.navigateToBacklogHygieneNotification)) { _ in
+                selectedTab = .backlog
+            }
             .onReceive(NotificationCenter.default.publisher(for: NotificationActionDelegate.navigateToDayViewNotification)) { notification in
                 selectedTab = dayTab
                 if let phaseStr = notification.userInfo?["phase"] as? String {

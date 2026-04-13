@@ -158,6 +158,11 @@ struct ContentView: View {
         tasks.filter { $0.isTemplate && !$0.isCompleted }.count
     }
 
+    private var staleTaskCount: Int {
+        let items = visibleTasks.map { PlanItem(localTask: $0) }
+        return BacklogHealthService.findStaleTasks(in: items).count
+    }
+
     // Filtered tasks based on sidebar selection + search
     private var filteredTasks: [LocalTask] {
         let base: [LocalTask]
@@ -207,7 +212,8 @@ struct ContentView: View {
                     selectedFilter: $selectedFilter,
                     overdueCount: overdueCount,
                     completedCount: completedCount,
-                    recurringCount: recurringCount
+                    recurringCount: recurringCount,
+                    staleTaskCount: staleTaskCount
                 )
                 .navigationSplitViewColumnWidth(min: 180, ideal: 220, max: 280)
             } else {

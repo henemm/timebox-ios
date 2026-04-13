@@ -13,6 +13,14 @@ struct MainTabView: View {
     var dayViewForcedPhase: DayPhase?
     var useCoachLayout: Bool = false
 
+    @Query(filter: #Predicate<LocalTask> { !$0.isCompleted && !$0.isParked && !$0.isTemplate })
+    private var backlogTasks: [LocalTask]
+
+    private var staleTaskCount: Int {
+        let items = backlogTasks.map { PlanItem(localTask: $0) }
+        return BacklogHealthService.findStaleTasks(in: items).count
+    }
+
     var body: some View {
         if useCoachLayout {
             coachTabView
@@ -30,6 +38,7 @@ struct MainTabView: View {
                     Label("Backlog", systemImage: "list.bullet")
                 }
                 .tag(AppTab.backlog)
+                .badge(staleTaskCount)
 
             BlockPlanningView()
                 .tabItem {
@@ -67,6 +76,7 @@ struct MainTabView: View {
                     Label("Backlog", systemImage: "list.bullet")
                 }
                 .tag(AppTab.backlog)
+                .badge(staleTaskCount)
 
             BlockPlanningView()
                 .tabItem {

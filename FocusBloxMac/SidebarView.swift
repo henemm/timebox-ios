@@ -45,11 +45,25 @@ struct SidebarView: View {
     let overdueCount: Int
     let completedCount: Int
     let recurringCount: Int
+    var staleTaskCount: Int = 0
 
     var body: some View {
         List {
             Section("Ansicht") {
-                filterRow(label: "Priorität", icon: "chart.bar.fill", filter: .priority)
+                HStack {
+                    Label("Priorität", systemImage: "chart.bar.fill")
+                        .accessibilityIdentifier("sidebarFilter_priority")
+                    Spacer()
+                    if staleTaskCount > 0 {
+                        badgeView(count: staleTaskCount, color: .orange)
+                            .accessibilityIdentifier("sidebarStaleBadge")
+                    }
+                }
+                .tag(SidebarFilter.priority)
+                .contentShape(Rectangle())
+                .onTapGesture { selectedFilter = .priority }
+                .listRowBackground(selectedFilter == .priority ? Color.accentColor.opacity(0.15) : Color.clear)
+
                 filterRow(label: "Zuletzt", icon: "clock.arrow.circlepath", filter: .recent)
 
                 HStack {

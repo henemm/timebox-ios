@@ -130,6 +130,10 @@ final class LocalTask {
     /// RW 2.4b: NUR manuell — Score-Tiers bestimmen Dringend/Bald/Später, nicht Geparkt.
     var isParked: Bool = false
 
+    /// Timestamp when task was last reviewed in Backlog Hygiene (#215).
+    /// Tasks with hygieneReviewedAt within last 30 days are excluded from stale count.
+    var hygieneReviewedAt: Date?
+
     // MARK: - Follow-up Chain (RW 3.3)
 
     /// ID of the original task in a follow-up chain (flat: always points to root).

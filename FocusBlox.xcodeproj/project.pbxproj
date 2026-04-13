@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		EA20355C03CBD8ED9B8716DD /* BacklogHealthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D618F7073BA70D38D932075 /* BacklogHealthService.swift */; };
+		ECFA2EF469DE97AFCFD59D87 /* BacklogHygieneNudgeUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FB946941A7D364D764DAC8B /* BacklogHygieneNudgeUITests.swift */; };
+		E44675C4F9D8C03F8C36CC83 /* BacklogHygieneNudgeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1CE3BC8DD3A4250A0F131F5 /* BacklogHygieneNudgeTests.swift */; };
 		7CAABB4083FEC96458CD655F /* TaskSplitView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D98B4BC2E3713C913E8F5F61 /* TaskSplitView.swift */; };
 		854DE0BB666F1A626A01639F /* TaskSplitUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 081C022BC0D3AEC12410625D /* TaskSplitUITests.swift */; };
 		49A0241CB3C9739D362C2F7F /* TaskSplitServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 161F42475FC5E233C8B71793 /* TaskSplitServiceTests.swift */; };
@@ -693,6 +696,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		3FB946941A7D364D764DAC8B /* BacklogHygieneNudgeUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = BacklogHygieneNudgeUITests.swift; path = FocusBloxUITests/BacklogHygieneNudgeUITests.swift; sourceTree = SOURCE_ROOT; };
+		F1CE3BC8DD3A4250A0F131F5 /* BacklogHygieneNudgeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = BacklogHygieneNudgeTests.swift; path = FocusBloxTests/BacklogHygieneNudgeTests.swift; sourceTree = SOURCE_ROOT; };
 		D98B4BC2E3713C913E8F5F61 /* TaskSplitView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TaskSplitView.swift; path = Sources/Views/TaskSplitView.swift; sourceTree = SOURCE_ROOT; };
 		081C022BC0D3AEC12410625D /* TaskSplitUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TaskSplitUITests.swift; path = FocusBloxUITests/TaskSplitUITests.swift; sourceTree = SOURCE_ROOT; };
 		161F42475FC5E233C8B71793 /* TaskSplitServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TaskSplitServiceTests.swift; path = FocusBloxTests/TaskSplitServiceTests.swift; sourceTree = SOURCE_ROOT; };
@@ -1391,6 +1396,7 @@
 		05D90FB2A2CE48689EC309B4 /* FocusBloxUITests */ = {
 			isa = PBXGroup;
 			children = (
+				3FB946941A7D364D764DAC8B /* BacklogHygieneNudgeUITests.swift */,
 				081C022BC0D3AEC12410625D /* TaskSplitUITests.swift */,
 				F18474B615562084306A7610 /* BacklogHygieneUITests.swift */,
 				365E461EF1EDB22FEC78B7F4 /* CoachMorningSlotUITests.swift */,
@@ -1679,6 +1685,7 @@
 		A6B3805EF19D1B131D346DDD /* FocusBloxTests */ = {
 			isa = PBXGroup;
 			children = (
+				F1CE3BC8DD3A4250A0F131F5 /* BacklogHygieneNudgeTests.swift */,
 				161F42475FC5E233C8B71793 /* TaskSplitServiceTests.swift */,
 				819EE8E46855DD04709EF5B3 /* BacklogHealthServiceTests.swift */,
 				540FC8B31790262D5E96D546 /* NotificationFreeTimeTests.swift */,
@@ -2740,6 +2747,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				ECFA2EF469DE97AFCFD59D87 /* BacklogHygieneNudgeUITests.swift in Sources */,
 				854DE0BB666F1A626A01639F /* TaskSplitUITests.swift in Sources */,
 				C5124F141765BA1BD5FCA850 /* BacklogHygieneUITests.swift in Sources */,
 				7156677C1EC12AE558C55597 /* CoachMorningSlotUITests.swift in Sources */,
@@ -2870,6 +2878,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E44675C4F9D8C03F8C36CC83 /* BacklogHygieneNudgeTests.swift in Sources */,
 				49A0241CB3C9739D362C2F7F /* TaskSplitServiceTests.swift in Sources */,
 				A3807E05353BD27C00133695 /* BacklogHealthServiceTests.swift in Sources */,
 				253139E2003B91137C87379B /* NotificationFreeTimeTests.swift in Sources */,
@@ -3058,6 +3067,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EA20355C03CBD8ED9B8716DD /* BacklogHealthService.swift in Sources */,
 				8E83A6881ACAE567E1A80956 /* BacklogRow.swift in Sources */,
 				6D9F3CC3F3C21C0143D86B9F /* TaskSuggestionService.swift in Sources */,
 				SSV01MACBLD00001 /* SuccessStoryView.swift in Sources */,

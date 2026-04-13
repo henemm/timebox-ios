@@ -66,6 +66,9 @@ struct PlanItem: Identifiable, Sendable {
     /// Manuell geparkt (RW 2.4b: nur noch manuell, nicht mehr Score-basiert)
     let isParked: Bool
 
+    /// Timestamp when task was last reviewed in Backlog Hygiene (#215)
+    let hygieneReviewedAt: Date?
+
     /// True wenn dieser Task in der "Geparkt"-Sektion erscheinen soll.
     /// RW 2.4b: NUR manuell geparkt. Score-Tiers bestimmen Dringend/Bald/Später.
     var isInParkdeck: Bool {
@@ -183,6 +186,7 @@ struct PlanItem: Identifiable, Sendable {
         self.blockerTaskID = nil
         self.lifecycleStatus = "active"  // Reminders are always active
         self.isParked = false  // Reminders have no parkdeck concept
+        self.hygieneReviewedAt = nil
 
         self.scheduledDate = nil
         self.scheduledDuration = nil
@@ -243,6 +247,7 @@ struct PlanItem: Identifiable, Sendable {
         self.blockerTaskID = localTask.blockerTaskID
         self.lifecycleStatus = localTask.lifecycleStatus
         self.isParked = localTask.isParked
+        self.hygieneReviewedAt = localTask.hygieneReviewedAt
 
         self.scheduledDate = localTask.scheduledDate
         self.scheduledDuration = localTask.scheduledDuration

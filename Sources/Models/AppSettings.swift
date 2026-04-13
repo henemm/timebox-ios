@@ -111,4 +111,7 @@ final class AppSettings: ObservableObject {
     /// Reschedule count after which a task is suggested for cleanup (1-10)
     @AppStorage("backlogStaleRescheduleCount") var backlogStaleRescheduleCount: Int = 3
 
+    /// Whether weekly backlog hygiene nudge notifications are enabled (#215)
+    @AppStorage("backlogHygieneNudgeEnabled") var backlogHygieneNudgeEnabled: Bool = true
+
 }
