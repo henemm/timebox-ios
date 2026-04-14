@@ -1,6 +1,6 @@
-# Phase 6: Implementation (TDD GREEN)
+# Phase 5: Implementation (TDD GREEN)
 
-You are in **Phase 6 - Implementation / TDD GREEN Phase**.
+You are in **Phase 5 - Implementation / TDD GREEN Phase**.
 
 ## Purpose
 
@@ -8,16 +8,15 @@ Write the **minimal code** to make failing tests pass. No more, no less.
 
 ## Prerequisites
 
-- Spec approved (`phase4_approved`)
-- TDD RED complete (`phase5_tdd_red`)
+- Spec approved
+- TDD RED complete (`phase4_tdd_red`)
+- Checkpoint 2 approved (Henning said "go")
 - Test artifacts registered showing failures
 
 Check status:
 ```bash
 python3 .claude/hooks/workflow.py status
 ```
-
-**If TDD RED artifacts are missing, the `tdd_enforcement` hook will BLOCK your edits!**
 
 ## Your Tasks
 
@@ -27,24 +26,11 @@ python3 .claude/hooks/workflow.py status
 python3 .claude/hooks/workflow.py status
 ```
 
-### Step 2: Kontext laden (Explore/Haiku)
+### Step 2: Kontext laden
 
-Dispatche einen **Explore/Haiku Subagenten** um den Implementierungs-Kontext zu laden:
+Lies die Spec und betroffene Dateien. Verstehe was implementiert werden muss.
 
-```
-Task (Explore/haiku): "Lies folgende Dateien und fasse den relevanten Kontext
-  zusammen:
-  - Spec: [spec_file_path]
-  - Betroffene Dateien: [affected_files]
-  - Test-Dateien: [test_files]
-
-  Fasse zusammen: Welche Interfaces existieren, welche Methoden muessen
-  implementiert werden, welche Imports werden benoetigt."
-```
-
-### Step 3: Implementieren (Hauptkontext / Opus)
-
-Die eigentliche Implementation passiert im **Hauptkontext** (Opus) fuer hoechste Qualitaet:
+### Step 3: Implementieren
 
 - Lies und befolge die approved Spec exakt
 - Schreibe Code der die Tests gruen macht
@@ -56,161 +42,80 @@ Die eigentliche Implementation passiert im **Hauptkontext** (Opus) fuer hoechste
 - Don't optimize prematurely
 - Don't refactor yet
 
-### Step 4: Parallele Side-Tasks
+### Step 4: Tests ausfuehren
 
-Dispatche parallel waehrend/nach der Implementation:
-
+```bash
+./scripts/sim.sh unit [TestClass]
+./scripts/sim.sh test [UITestClass]
 ```
-Task 1 (general-purpose/haiku): "Fuehre die Tests aus:
-  xcodebuild test -project FocusBlox.xcodeproj -scheme FocusBlox \
-    -destination 'id=548B4A2F-FDFF-4F9E-8335-1A7A7B98E492'
-  Fasse Ergebnisse zusammen: passed/failed/errors."
 
-Task 2 (general-purpose/haiku): "Pruefe ob Konfigurationsdateien
-  aktualisiert werden muessen fuer [Feature].
-  Check: Info.plist, xcstrings, Assets.xcassets."
-```
+Bei Shared-Code-Aenderungen (`Sources/`): AUCH `./scripts/sim.sh mac-build` ausfuehren!
 
 ### Step 5: GREEN Artifacts erfassen
 
 ```bash
-# Test output erfassen
-xcodebuild test -project FocusBlox.xcodeproj -scheme FocusBlox \
-  -destination 'id=548B4A2F-FDFF-4F9E-8335-1A7A7B98E492' \
-  2>&1 > docs/artifacts/[workflow]/test-green-output.txt
-
-python3 .claude/hooks/workflow.py add-artifact test_output "docs/artifacts/[workflow]/test-green-output.txt" "All tests PASSED" phase6_implement
+python3 .claude/hooks/workflow.py mark-green "[N] unit tests passed"
+python3 .claude/hooks/workflow.py mark-ui-green "[M] UI tests passed"
 ```
 
-### Step 6: User-Freigabe der GREEN-Ergebnisse (PFLICHT)
+### Step 6: Bug-Reproduktion wiederholen (NUR bei Bug-Workflows)
 
-**STOP! Du darfst NICHT weitermachen ohne User-Freigabe!**
+**Wenn `workflow_type == bug`:**
 
-Praesentiere dem User eine verstaendliche Zusammenfassung:
+1. **Gleiche Schritte wie bei der urspruenglichen Reproduktion ausfuehren**
+2. **Nachher-Screenshot machen:**
+```bash
+./scripts/sim.sh screenshot /tmp/bug_nachher.png
+```
+3. **Vergleich:** Ist der Bug weg? Sieht es korrekt aus?
+
+Wenn der Bug immer noch auftritt → **Fix ueberarbeiten, NICHT zum Checkpoint!**
+
+### Step 7: **CHECKPOINT 3** — Henning das Ergebnis praesentieren
+
+**STOP! Ohne Hennings Freigabe kein Commit!**
+
+Praesentiere:
 
 ```markdown
-## TDD GREEN Ergebnisse
+## Ergebnis
 
-### Was wurde getestet?
-- [Feature/Bug in User-Sprache beschreiben]
+### Was wurde gebaut/gefixt?
+- [In User-Sprache, 1-2 Saetze]
 
 ### Test-Ergebnisse
-- Unit Tests: [N] bestanden, [N] fehlgeschlagen
-- UI Tests: [N] bestanden, [N] fehlgeschlagen
+- Unit Tests: [N] bestanden
+- UI Tests: [M] bestanden
+- ALL GREEN ✓
 
-### Was die Tests pruefen
-- [Beschreibung in User-Sprache, z.B. "Task wird erstellt und erscheint in der Liste"]
-- [Nicht: "XCTAssertTrue(button.exists)" sondern: "Der Speichern-Button ist sichtbar"]
+### Visuelle Pruefung
+- [Bei Bugs: Vorher-Screenshot + Nachher-Screenshot]
+- [Bei Features: Screenshot des fertigen Features + Vergleich mit User-Erwartung]
 
-### Auffaelligkeiten / Warnungen
-- [Alles was aufgefallen ist — auch wenn DU es fuer irrelevant haeltst]
-- [Der USER entscheidet was relevant ist, nicht du!]
+### Auffaelligkeiten
+- [Alles was aufgefallen ist — DU entscheidest NICHT was relevant ist]
 
-Sage "go" wenn du mit den Ergebnissen zufrieden bist.
+Sage "commit" wenn du zufrieden bist.
+Optional: Starte `/adversary` in einer zweiten Claude-Session fuer eine unabhaengige Pruefung.
 ```
 
-**WICHTIG:**
-- Du darfst NICHT selbst entscheiden ob Auffaelligkeiten relevant sind
-- Du darfst NICHT "go" simulieren oder die Freigabe umgehen
-- Der `tdd_green_gate` Hook BLOCKT /06-validate ohne User-Freigabe
-- Der User gibt frei mit: "go", "weiter", "tests ok", "green ok"
+**Henning sagt "commit" → Checkpoint 3 freigeschaltet → Commit erlaubt.**
 
-### Step 7: Update Workflow State to Adversary Phase
+### Step 7: Commit + Cleanup
 
 ```bash
-python3 .claude/hooks/workflow.py phase phase6b_adversary
-```
-
-### Step 8: Run Adversary Dialog (MANDATORY)
-
-**Du kannst NICHT direkt zu `/06-validate` springen. Der Adversary-Dialog muss zuerst stattfinden.**
-
-#### 8a. Spec parsen — Checkliste erstellen
-
-```bash
-python3 .claude/hooks/adversary_dialog.py parse <spec-pfad>
-```
-
-Das zeigt dir die Expected-Behavior-Punkte die bewiesen werden muessen.
-
-#### 8b. Adversary-Dialog fuehren
-
-Starte den `implementation-validator` Agent mit der Checkliste:
-
-```
-Task (implementation-validator): "Pruefe den aktuellen Workflow gegen die Spec.
-  Hier ist die Checkliste der zu beweisenden Punkte:
-  [Punkte aus 8a einfuegen]
-
-  REGELN:
-  - Lies NUR die Spec (nicht den Code!)
-  - Fordere fuer JEDEN Punkt einen Beweis (Screenshot, Test-Output, konkreter Code-Pfad)
-  - Akzeptiere NICHT die erste Antwort — bohre nach, frage nach Edge Cases
-  - Mindestens 2 Runden Dialog
-  - Fuehre Tests aus → /tmp/adversary_test_output.txt
-  - Mach Screenshots → /tmp/adversary_screenshot.png"
-```
-
-Der Dialog laeuft als Hin-und-Her zwischen dir (Implementierer) und dem Agent (Adversary):
-1. Agent nennt naechsten offenen Punkt + was er sehen will
-2. Du lieferst Beweis (Screenshot, Test-Output)
-3. Agent bewertet: AKZEPTIERT oder NACHFRAGE
-4. Wiederholen bis alle Punkte bewiesen ODER Defekt gefunden
-
-#### 8c. Dialog-Protokoll speichern
-
-Speichere das Protokoll als Artifact:
-```
-docs/artifacts/<workflow-name>/adversary-dialog.md
-```
-
-Format: Siehe `adversary_dialog.py render_dialog_artifact()` — mit Checkliste, Runden, Verdict.
-
-Registriere das Artifact im Workflow:
-```bash
-python3 .claude/hooks/workflow.py add-artifact adversary_dialog "docs/artifacts/<workflow-name>/adversary-dialog.md" "Adversary Dialog Protokoll" phase6b_adversary
-```
-
-#### 8d. QA-Gate mit Checklist-Validierung
-
-```bash
-# Fuer App-Features (mit XCTest-Output):
-python3 .claude/hooks/qa_gate.py /tmp/adversary_test_output.txt \
-  --checklist docs/artifacts/<workflow-name>/adversary-dialog.md \
-  --screenshot /tmp/adversary_screenshot.png
-
-# Fuer Infra-Tickets (mit Python-unittest-Output, ohne UI):
-python3 .claude/hooks/qa_gate.py /tmp/adversary_test_output.txt \
-  --checklist docs/artifacts/<workflow-name>/adversary-dialog.md \
-  --infra --no-visual "Infra-Ticket ohne UI"
-```
-
-Das Gate prueft zusaetzlich:
-- Alle Checklisten-Punkte bewiesen ([x])
-- Mindestens 2 Dialog-Runden dokumentiert
-- Artifact ist aktuell (< 60 Min)
-
-**Wenn BROKEN:**
-- Fixen und Step 7 wiederholen (neuer Dialog!)
-
-**Wenn VERIFIED:**
-- Weiter zu Phase 7:
-```bash
-python3 .claude/hooks/workflow.py phase phase7_validate
+python3 .claude/hooks/workflow.py phase phase6_done
+# Git commit (mit Issue-Referenz!)
+# GitHub Issue schliessen
+python3 .claude/hooks/workflow.py complete
 ```
 
 ## Implementation Constraints
 
-Follow scoping limits:
 - **Max 4-5 files** per change
 - **Max +/-250 LoC** total
 - **Functions <= 50 LoC**
 - **No side effects** outside spec scope
-
-## Next Step
-
-After adversary verification:
-> "Implementation complete. Adversary verified. Ready for `/06-validate`."
 
 ## Common Mistakes
 
@@ -218,5 +123,3 @@ After adversary verification:
 - **Skipping tests** -> Not TDD
 - **Large functions** -> Hard to test/maintain
 - **Not running tests** -> Might still be RED
-- **Skipping adversary** -> Commit will be BLOCKED
-- **Skipping User-Freigabe** -> tdd_green_gate BLOCKT validation

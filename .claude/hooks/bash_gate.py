@@ -314,7 +314,7 @@ def main():
             print("BLOCKED: fix:/feat: commits must reference a GitHub Issue (e.g. 'fixes #42').", file=sys.stderr)
             sys.exit(2)
 
-        # 6b. Adversary-Verdict Gate — kein Commit ohne bestandene Prüfung
+        # 6b. Checkpoint 3 Gate — kein Commit ohne Hennings Freigabe
         if is_fix_or_feat:
             wf_dir = _project_root() / ".claude" / "workflows"
             active_wf = None
@@ -345,49 +345,11 @@ def main():
                     except (json.JSONDecodeError, OSError):
                         pass
             if active_wf:
-                # Override-Token prüfen — User kann Gate umgehen
-                wf_name = active_wf.get("name", "")
-                has_override = False
-                if wf_name:
-                    token_file = _project_root() / ".claude" / "user_override_token.json"
-                    if token_file.exists():
-                        try:
-                            token_data = json.loads(token_file.read_text())
-                            tokens = token_data.get("tokens", {}) if token_data.get("version") == 2 else {}
-                            has_override = wf_name in tokens or "__global__" in tokens
-                        except (json.JSONDecodeError, OSError):
-                            pass
-
-                if not has_override:
-                    verdict = active_wf.get("adversary_verdict", "")
-                    if not verdict or not str(verdict).startswith("VERIFIED"):
-                        print(f"BLOCKED: Kein Commit ohne bestandene Adversary-Prüfung! "
-                              f"Aktuelles Verdict: '{verdict}'. "
-                              f"Führe /06-validate aus oder tippe 'override'.", file=sys.stderr)
-                        sys.exit(2)
-                    # 6c. validation_done Gate — /06-validate muss vollständig durchlaufen sein
-                    if not active_wf.get("validation_done"):
-                        print("BLOCKED: Kein Commit ohne validation_done! "
-                              "Führe /06-validate vollständig aus (mark-validation-done).",
-                              file=sys.stderr)
-                        sys.exit(2)
-                    # 6d. Workflow-Phase Gate — Workflow muss in phase8_complete sein
-                    current_phase = active_wf.get("current_phase", "")
-                    if current_phase != "phase8_complete":
-                        print(f"BLOCKED: Kein Commit ohne abgeschlossenen Workflow! "
-                              f"Aktuelle Phase: '{current_phase}'. "
-                              f"Workflow muss phase8_complete erreichen oder tippe 'override'.",
-                              file=sys.stderr)
-                        sys.exit(2)
-                    # 6e. GitHub-Issue-Update Gate — Issue muss aktualisiert sein
-                    if not active_wf.get("github_issue_updated"):
-                        issue_ref = active_wf.get("github_issue", "")
-                        print(f"BLOCKED: Kein Commit ohne GitHub-Issue-Update! "
-                              f"Issue: '{issue_ref}'. "
-                              f"Aktualisiere das GitHub Issue (gh issue close/comment) "
-                              f"und setze 'github_issue_updated: true' im Workflow oder tippe 'override'.",
-                              file=sys.stderr)
-                        sys.exit(2)
+                if not active_wf.get("checkpoint3_approved"):
+                    print("BLOCKED: Kein Commit ohne Checkpoint 3! "
+                          "Präsentiere Henning das Ergebnis (ALL GREEN + Screenshot). "
+                          "Henning muss 'commit' sagen.", file=sys.stderr)
+                    sys.exit(2)
 
     # 7. Allow
     sys.exit(0)

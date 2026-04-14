@@ -1,6 +1,6 @@
 # Workflow Management
 
-Manage multiple parallel workflows in your project.
+Manage workflows with the 3-Checkpoint system.
 
 ## Commands
 
@@ -9,25 +9,9 @@ Manage multiple parallel workflows in your project.
 python3 .claude/hooks/workflow.py list
 ```
 
-Output:
-```
-→ feature-login-oauth: Phase 4 - Spec Approved
-  bugfix-crash-on-start: Phase 6 - Implementation
-  feature-dark-mode: Phase 2 - Analysis
-```
-
 ### Check Current Status
 ```bash
 python3 .claude/hooks/workflow.py status
-```
-
-Output:
-```
-Workflow: feature-login-oauth
-Phase: Phase 4 - Spec Approved
-Spec: docs/specs/auth/login-oauth.md
-Approved: Yes
-Test Artifacts: 2
 ```
 
 ### Start New Workflow
@@ -40,122 +24,52 @@ python3 .claude/hooks/workflow.py start "feature-name"
 python3 .claude/hooks/workflow.py switch "other-feature"
 ```
 
-### Advance to Next Phase
-```bash
-python3 .claude/hooks/workflow.py advance
-```
-
 ### Set Specific Phase
 ```bash
-python3 .claude/hooks/workflow.py phase phase4_approved
+python3 .claude/hooks/workflow.py phase phase3_spec
 ```
 
-## Workflow Phases
+## Workflow Phases (v5)
 
-| Phase | Name | Description |
-|-------|------|-------------|
-| `phase0_idle` | Idle | No workflow started |
-| `phase1_context` | Context | Gathering relevant context |
-| `phase2_analyse` | Analysis | Analysing requirements |
-| `phase3_spec` | Specification | Writing spec |
-| `phase4_approved` | Approved | User approved spec |
-| `phase5_tdd_red` | TDD RED | Writing failing tests |
-| `phase6_implement` | Implementation | Writing code (TDD GREEN) |
-| `phase7_validate` | Validation | Manual testing |
-| `phase8_complete` | Complete | Ready for commit |
+| Phase | Name | Gate to enter | Gate to leave |
+|-------|------|---------------|---------------|
+| `phase0_idle` | Idle | — | /01-context |
+| `phase1_context` | Context | — | context_file exists |
+| `phase2_analyse` | Analysis | context_file | **Checkpoint 1** ("stimmt") |
+| `phase3_spec` | Spec & Approval | checkpoint1 | spec_file + "approved" |
+| `phase4_tdd_red` | TDD RED | spec_approved | RED artifacts + **Checkpoint 2** ("go") |
+| `phase5_implement` | Implementation | checkpoint2 | Tests GREEN + **Checkpoint 3** ("commit") |
+| `phase6_done` | Done | checkpoint3 | git commit erlaubt |
 
-## Backlog Status (v2.1)
+## 3 Human Checkpoints
 
-Separate from workflow phase - tracks the overall feature status for project planning.
+| # | Keyword | Phase | Was Henning sieht |
+|---|---------|-------|-------------------|
+| 1 | "stimmt" | phase2_analyse | Root Cause + betroffene Stellen + Ansatz |
+| 2 | "go" | phase4_tdd_red | Testname + was er prueft + FAILED Output |
+| 3 | "commit" | phase5_implement | ALL GREEN Output + Screenshot |
 
-| Status | Meaning | When Set |
-|--------|---------|----------|
-| `open` | Work not started or in early phases | phase0-3 |
-| `spec_ready` | Spec approved, implementation pending | phase4 or on pause |
-| `in_progress` | Active implementation | phase5-7 |
-| `done` | Feature complete | phase8 |
-| `blocked` | Cannot proceed (manual) | Set explicitly |
-
-### Commands
-
-```bash
-# Check current backlog status
-python3 .claude/hooks/workflow.py status
-
-# Set backlog status explicitly
-python3 .claude/hooks/workflow.py backlog spec_ready
-
-# Pause workflow (sets appropriate status)
-python3 .claude/hooks/workflow.py pause
-```
-
-### Phase vs. Backlog Status
-
-**Phase** = Where you are in the workflow process
-**Backlog Status** = Feature readiness for project tracking
-
-Example: A feature in `phase4_approved` has backlog status `spec_ready` - the spec is done but implementation hasn't started.
-
-### Pause Behavior
-
-When user indicates they want to pause (phrases like "ich höre hier auf", "später implementieren", "nur die spec"):
-
-- If in phase4+ (spec approved): Status → `spec_ready`
-- If in phase0-3: Status → `open`
-- **Never** → `done` (unless phase8_complete reached)
-
-**IMPORTANT for AI assistants:**
-- "Spec fertig" ≠ "Feature fertig"
-- Only `phase8_complete` = `done`
-- Workflow pause after spec approval = `spec_ready`
-
-## Parallel Workflows
-
-You can work on multiple features simultaneously:
-
-1. **Start workflows** for each feature
-2. **Switch** between them as needed
-3. Each workflow tracks its own:
-   - Current phase
-   - Spec file
-   - Approval status
-   - Test artifacts
+**Nur Henning kann Checkpoints freischalten.** Claude kann `mark-checkpoint1/2/3` nicht direkt aufrufen — nur `phase_listener.py` (ausgeloest durch Hennings Eingabe) hat diese Berechtigung.
 
 ## Code Modification Rules
 
-Code files can only be modified in:
-- `phase6_implement`
-- `phase7_validate`
-- `phase8_complete`
+- **phase4_tdd_red:** Nur Test-Dateien editierbar
+- **phase5_implement:** Nur Source-Dateien editierbar (Tests gesperrt!)
+- **Alle anderen Phasen:** Keine Code-Edits
 
-And only if:
-- TDD RED phase artifacts exist
-- Artifacts are valid (real files, not placeholders)
-- At least one artifact shows test failure
+## Entry Points
 
-## Automatic Phase Detection
+| Command | Zweck |
+|---------|-------|
+| `/10-bug [description]` | Bug analysieren und fixen |
+| `/11-feature [description]` | Feature planen und implementieren |
+| `/01-context` | Manuell Kontext generieren |
 
-Some phase transitions happen automatically:
-- User says "approved" → `phase4_approved`
-- `/01-context` completed → `phase1_context`
-- `/02-analyse` completed → `phase2_analyse`
-- `/03-write-spec` completed → `phase3_spec`
+## Parallel Workflows
+
+Mehrere Workflows koennen gleichzeitig existieren. Jeder trackt eigene Phase, Spec, Artifacts und Checkpoints.
 
 ## State File Location
 
-`.claude/workflow_state.json` contains all workflow data.
-
-Format (v2.0):
-```json
-{
-  "version": "2.0",
-  "workflows": {
-    "feature-name": {
-      "current_phase": "phase4_approved",
-      "spec_file": "docs/specs/...",
-      "test_artifacts": [...]
-    }
-  },
-  "active_workflow": "feature-name"
-}
-```
+`.claude/workflows/<name>.json` — pro Workflow eine Datei.
+`.claude/workflows/.sessions.json` — Session-Mapping.

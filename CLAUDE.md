@@ -37,31 +37,30 @@ Wenn eine macOS-View Task-Daten ändert (`modelContext.save()`), MUSS sie danach
 damit `ContentView.refreshTasks()` getriggert wird. Neue macOS-Views mit Mutations
 immer nach diesem Pattern implementieren. Details: `docs/reference/learnings.md`
 
-## Workflow
+## Workflow — 3-Checkpoint System (v5)
 
-This project uses the **OpenSpec TDD Workflow**:
+| Phase | Command | Gate to leave |
+|-------|---------|---------------|
+| 0 | `/00-reset` | Reset |
+| 1 | `/01-context` | context_file exists |
+| 2 | `/02-analyse` | **Checkpoint 1** — Henning sagt "stimmt" |
+| 3 | `/03-write-spec` | spec_file + Henning sagt "approved" |
+| 4 | `/04-tdd-red` | RED artifacts + **Checkpoint 2** — Henning sagt "go" |
+| 5 | `/05-implement` | Tests GREEN + **Checkpoint 3** — Henning sagt "commit" |
+| 6 | Done | git commit erlaubt |
 
-| Phase | Command | Purpose |
-|-------|---------|---------|
-| 0 | `/00-reset` | Reset workflow to idle |
-| 1 | `/01-context` | Context generation |
-| 2 | `/02-analyse` | Deep analysis of request |
-| 3 | `/03-write-spec` | Create specification |
-| 4 | User: "approved" | Spec approval |
-| 5 | `/04-tdd-red` | Write failing tests (TDD RED) |
-| 6 | `/05-implement` | Implement to make tests pass (TDD GREEN) |
-| 7 | `/06-validate` | Validate before commit |
+**3 Human Checkpoints:** Nur Henning kann Checkpoints freischalten (via phase_listener.py). Claude kann sich selbst NICHT freischalten.
 
-Hooks enforce phase progression. Edit/Write on protected files is blocked without active workflow + TDD RED artifacts.
+Hooks enforce phase progression. Edit/Write on code files is blocked without active workflow + TDD RED artifacts.
 
-For bug fixes: `/10-bug <description>` triggers Analysis-First → Spec → TDD RED → Implement → Validate.
+For bug fixes: `/10-bug <description>` triggers Analysis-First → Checkpoint 1 → Spec → TDD RED → Checkpoint 2 → Implement → Checkpoint 3 → Commit.
 
 ## TDD & Testing Rules
 
 - UI tests are **mandatory** for every feature/bug — written BEFORE implementation (TDD RED)
 - Tests must FAIL first, then PASS after implementation — no retroactive tests
 - **Never ask for manual testing** — fix the code until tests are green
-- `tdd_enforcement.py` hook verifies real test artifacts with timestamps
+- `edit_gate.py` enforces TDD phases (tests only in phase4, code only in phase5)
 
 **Build & Test Tool: `./scripts/sim.sh`**
 

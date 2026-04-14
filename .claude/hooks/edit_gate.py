@@ -54,7 +54,7 @@ PROTECTED_STATE_FILES = [
 INFRASTRUCTURE_DIRS = [".claude/hooks/", ".claude/agents/"]
 
 IMPL_PHASES = {
-    "phase6_implement", "phase6b_adversary", "phase7_validate", "phase8_complete",
+    "phase5_implement", "phase6_done",
 }
 
 TEST_DIRS = [
@@ -65,14 +65,11 @@ TEST_DIRS = [
 
 SOURCE_DIRS = ["Sources/", "FocusBloxMac/"]
 
-# Phase5: nur Test-Dateien editierbar (TDD RED — Tests schreiben)
-TEST_ONLY_PHASES = {"phase5_tdd_red"}
+# Phase4: nur Test-Dateien editierbar (TDD RED — Tests schreiben)
+TEST_ONLY_PHASES = {"phase4_tdd_red"}
 
-# Phase6: nur Source-Dateien editierbar (Tests dürfen NICHT angepasst werden!)
-SOURCE_ONLY_PHASES = {"phase6_implement"}
-
-# Phase6b/7: keine Code-Edits (nur lesen und testen)
-NO_EDIT_PHASES = {"phase6b_adversary", "phase7_validate"}
+# Phase5: nur Source-Dateien editierbar (Tests dürfen NICHT angepasst werden!)
+SOURCE_ONLY_PHASES = {"phase5_implement"}
 
 
 # --- Helpers ---
@@ -159,7 +156,7 @@ def _find_workflow_for_file(file_path: str) -> dict | None:
         if data is None:
             continue
         phase = data.get("current_phase", "phase0_idle")
-        if phase in ("phase8_complete", "phase0_idle"):
+        if phase in ("phase6_done", "phase0_idle"):
             continue
         for af in data.get("affected_files", []):
             if rel == af or rel.endswith("/" + af) or af.endswith("/" + rel):
@@ -307,25 +304,9 @@ def main():
     # 8. Phase-spezifische Edit-Einschränkungen
     is_test = _is_test_file(file_path)
 
-    if phase in NO_EDIT_PHASES:
-        # phase6b_adversary / phase7_validate: keine Code-Edits
-        if not _has_override_token(wf_name):
-            print(f"BLOCKED: Phase {phase} erlaubt keine Code-Edits.", file=sys.stderr)
-            sys.exit(2)
-
-    elif phase in TEST_ONLY_PHASES:
-        # phase5_tdd_red: nur Test-Dateien erlaubt
+    if phase in TEST_ONLY_PHASES:
+        # phase4_tdd_red: nur Test-Dateien erlaubt
         if is_test:
-            # INFRA_014: UI-Test-Dateien erfordern inspect_ui_done Preflight
-            ui_test_dirs = ["FocusBloxUITests/", "FocusBloxMacUITests/"]
-            is_ui_test = any(d in file_path for d in ui_test_dirs)
-            if is_ui_test and not workflow.get("inspect_ui_done", False):
-                if not _has_override_token(wf_name):
-                    print("BLOCKED: /inspect-ui nicht ausgeführt. PFLICHT vor UI-Tests. "
-                          "Führe /inspect-ui aus und dann: python3 .claude/hooks/workflow.py "
-                          "mark-inspect-ui-done '<screen-name + beobachtete IDs>'",
-                          file=sys.stderr)
-                    sys.exit(2)
             sys.exit(0)  # Test-Dateien erlaubt in TDD RED
         if not _has_override_token(wf_name):
             print(f"BLOCKED: Phase {phase} erlaubt nur Test-Dateien. Sources sind gesperrt.", file=sys.stderr)
@@ -354,7 +335,7 @@ def main():
         red_done = workflow.get("red_test_done", False) or workflow.get("ui_test_red_done", False)
         if not red_done:
             red_arts = [a for a in workflow.get("test_artifacts", [])
-                       if a.get("phase") == "phase5_tdd_red"]
+                       if a.get("phase") == "phase4_tdd_red"]
             if not red_arts:
                 print("BLOCKED: No RED test artifacts. Run /04-tdd-red first.", file=sys.stderr)
                 sys.exit(2)

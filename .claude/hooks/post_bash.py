@@ -91,12 +91,12 @@ def _analyze_test_output(command: str, output: str) -> None:
         pass
 
     # Phase-specific warnings (stderr only, no blocking)
-    if phase == "phase5_tdd_red" and passed:
+    if phase == "phase4_tdd_red" and passed:
         print(f"WARNING: Tests PASSED in TDD RED phase! "
               f"Tests sollen in phase5 FEHLSCHLAGEN (RED). "
               f"Ergebnis: {result_str}", file=sys.stderr)
 
-    elif phase == "phase6_implement" and not passed:
+    elif phase == "phase5_implement" and not passed:
         print(f"WARNING: Tests FAILED in Implementation phase! "
               f"Ergebnis: {result_str}. "
               f"Tests muessen GRUEN sein bevor weitergearbeitet wird.", file=sys.stderr)

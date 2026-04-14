@@ -1,7 +1,5 @@
 # Feature planen oder aendern
 
-Starte den `feature-planner` Agenten aus `.agent-os/agents/feature-planner.md`.
-
 **Anfrage:** $ARGUMENTS
 
 ---
@@ -11,51 +9,25 @@ Starte den `feature-planner` Agenten aus `.agent-os/agents/feature-planner.md`.
 | Formulierung | Modus |
 |--------------|-------|
 | "Neues Feature...", "Fuege hinzu...", "Implementiere..." | **NEU** |
-| "Aenderung an...", "Passe an...", "Erweitere...", "Modifiziere..." | **AENDERUNG** |
+| "Aenderung an...", "Passe an...", "Erweitere..." | **AENDERUNG** |
 
 ---
 
-**Befolge den Workflow aus `.agent-os/workflows/feature-workflow.md`**
-
-**Injizierte Standards:**
-- `.agent-os/standards/global/analysis-first.md`
-- `.agent-os/standards/global/scoping-limits.md`
-- `.agent-os/standards/global/documentation-rules.md`
-- `.agent-os/standards/swiftui/state-management.md`
-
----
-
-## ⛔ ZWINGENDE CHECKPOINTS
-
-Der Feature-Workflow hat **BLOCKING Checkpoints**. Diese MUESSEN erfuellt sein:
-
-| Checkpoint | Wann | Hook/Gate | Blockiert |
-|------------|------|-----------|-----------|
-| ⛔ User-Erwartung | VOR technischer Analyse | `workflow.py` → `user_expectation_done` | phase3_spec |
-| ⛔ Tests definieren | VOR Implementierung | `edit_gate.py` → RED test artifacts | Code-Edits |
-| ⛔ Fresh-Eyes Inspektion | NACH Implementierung | `workflow.py` → `result_inspection_done` | phase6b_adversary |
-| ⛔ Adversary | NACH Fresh-Eyes | `qa_gate.py` → `adversary_verdict` | phase8_complete |
-| ⛔ Unit + UI Tests | NACH Adversary | `bash_gate.py` → Commit-Gate | git commit |
-
----
-
-## Anweisung
-
-### Schritt -1: Workflow-Typ registrieren
+## Schritt 0: Workflow starten
 
 ```bash
+python3 .claude/hooks/workflow.py start "feature-[kurzer-name]"
 python3 .claude/hooks/workflow.py set-field workflow_type feature
+python3 .claude/hooks/workflow.py phase phase1_context
 ```
 
-### Schritt 0: User-Perspektive ZUERST — Was soll der User erleben?
+## Schritt 1: User-Perspektive ZUERST — Was soll der User erleben?
 
-**PFLICHT VOR ALLEM ANDEREN!**
-
-Bevor du auch nur eine Zeile Code liest oder Architektur-Entscheidungen triffst:
+**BEVOR du auch nur eine Zeile Code liest:**
 
 **1. User-Advocate Agent starten — NUR mit Feature-Beschreibung:**
 ```
-Task: user-advocate Agent
+Agent: user-advocate
 Input: NUR Hennings Feature-Beschreibung in seinen eigenen Worten
 KEIN Code-Kontext! KEINE Architektur! KEINE bestehenden Specs!
 ```
@@ -66,120 +38,95 @@ Der Agent denkt ausschliesslich aus User-Perspektive:
 - Was wuerde mich verwirren?
 - Woran merke ich dass es funktioniert hat?
 
-**2. User-Erwartung als Massstab festhalten:**
-```bash
-python3 .claude/hooks/workflow.py mark-user-expectation "Zusammenfassung der User-Erwartung"
-```
+**2. User-Erwartung festhalten** (fuer Checkpoint 1)
 
-**OHNE `user_expectation_done=true` werden alle technischen Agents BLOCKIERT!**
-
-**3. Henning die User-Erwartung zeigen:**
-- "So stellt sich der User-Advocate das Feature vor: [Zusammenfassung]"
-- "Passt das zu deiner Vorstellung?"
-- Erst nach Bestätigung → weiter zur technischen Analyse
-
-> Warum? Weil Claude sonst direkt in Code abtaucht und ein Feature baut das
-> technisch funktioniert aber an der User-Erwartung vorbeigeht.
-
----
-
-### Danach: Technische Planung
+## Schritt 2: Technische Analyse
 
 1. **Modus bestimmen:** NEU oder AENDERUNG?
-2. Feature-Intent verstehen (WAS, WARUM, Kategorie)
-3. **Bei AENDERUNG:** Aktuellen Zustand dokumentieren, Delta identifizieren
-4. Bestehende Systeme pruefen (KRITISCH!)
+2. **Bei AENDERUNG:** Aktuellen Zustand dokumentieren, Delta identifizieren
+3. Betroffene Dateien identifizieren
+4. Bestehende Systeme/Patterns pruefen
 5. Scoping (Max 4-5 Dateien, +/-250 LoC)
-6. ⛔ **Affected Files registrieren** (PFLICHT — Code Gate blockiert sonst!):
-   ```bash
-   python3 .claude/hooks/workflow.py set-affected-files --replace \
-     "Sources/path/to/file.swift" "Tests/path/to/Test.swift"
-   ```
-7. ⛔ **ERST Tests definieren** in `openspec/changes/[feature-name]/tests.md`
-8. Dokumentiere in DOCS/ACTIVE-roadmap.md
-9. **NEU:** Erstelle OpenSpec Proposal in `openspec/changes/[feature-name]/`
-10. **AENDERUNG:** Aktualisiere bestehende Spec in `openspec/specs/`
-11. Implementieren
+
+## Schritt 3: **CHECKPOINT 1** — Henning die Analyse praesentieren
+
+**Zeige Henning:**
+1. **User-Erwartung** (vom user-advocate): "So stellt sich der User das Feature vor: [...]"
+2. Was das Feature technisch tun soll (User-Sprache)
+3. Betroffene Stellen (welche Screens/Views)
+4. Vorgeschlagener Ansatz (1-2 Saetze)
+5. Scope-Schaetzung (Dateien, LoC)
+6. Frage: "Passt die User-Erwartung zu deiner Vorstellung?"
+
+**Henning sagt "stimmt" → Checkpoint 1 freigeschaltet.**
+
+```bash
+python3 .claude/hooks/workflow.py phase phase3_spec
+```
+
+## Schritt 4: Spec schreiben + Approval
+
+Nutze `/03-write-spec`.
+
+```bash
+python3 .claude/hooks/workflow.py set-affected-files --replace \
+  "Sources/path/to/file.swift" "Tests/path/to/Test.swift"
+```
+
+**Henning sagt "approved" → Spec freigeschaltet.**
+
+## Schritt 5: TDD RED
+
+```bash
+python3 .claude/hooks/workflow.py phase phase4_tdd_red
+```
+
+Nutze `/04-tdd-red`.
+
+## Schritt 5.5: **CHECKPOINT 2** — Henning die Tests praesentieren
+
+**Zeige Henning:**
+| Test | Was er prueft | Status |
+|------|--------------|--------|
+| testFeatureX | Prueft ob X sichtbar ist nach Y | FAILED ✓ |
+
+**Henning sagt "go" → Checkpoint 2 freigeschaltet.**
+
+## Schritt 6: Implementation
+
+```bash
+python3 .claude/hooks/workflow.py phase phase5_implement
+```
+
+Nutze `/05-implement`.
+
+## Schritt 7: **CHECKPOINT 3** — Henning das Ergebnis praesentieren
+
+**Zeige Henning:**
+1. ALL GREEN Test-Output
+2. Screenshot des fertigen Features
+3. Vergleich mit User-Erwartung aus Schritt 1: "Der user-advocate hatte erwartet: [...]. So sieht es aus: [Screenshot]"
+4. Kurze Zusammenfassung was sich geaendert hat
+
+**Optional:** Henning kann jetzt `/adversary` in einer zweiten Claude-Session starten.
+
+**Henning sagt "commit" → Checkpoint 3 freigeschaltet.**
+
+## Schritt 8: Commit + Dokumentation
+
+```bash
+python3 .claude/hooks/workflow.py phase phase6_done
+```
+
+- Git commit mit Issue-Referenz
+- GitHub Issue schliessen/kommentieren
+- `python3 .claude/hooks/workflow.py complete`
 
 ---
 
-### Nach Implementation: Ergebnis-Inspektion
+## Anti-Patterns
 
-**PFLICHT NACH JEDER FEATURE-IMPLEMENTIERUNG!**
-
-**1. Screenshot des Ergebnisses machen:**
-```bash
-xcrun simctl io booted screenshot /tmp/feature_result.png
-```
-
-**2. Fresh-Eyes Agent losschicken — OHNE Feature-Kontext:**
-```
-Task: fresh-eyes-inspector Agent
-Input: NUR den Screenshot-Pfad (/tmp/feature_result.png)
-KEIN Feature-Name! KEINE Spec! NICHT was gebaut werden sollte!
-```
-
-**3. Abgleich mit User-Erwartung:**
-- Was hat der Fresh-Eyes Agent gesehen?
-- Was hatte der User-Advocate sich vorgestellt?
-- **Passt das zusammen?**
-
-| Ergebnis | Aktion |
-|----------|--------|
-| Fresh-Eyes sieht was User-Advocate erwartet hat | Weiter zu Tests |
-| Fresh-Eyes sieht etwas anderes | STOP — was stimmt nicht? |
-| Fresh-Eyes findet UX-Probleme | STOP — nachbessern |
-
-```bash
-python3 .claude/hooks/workflow.py mark-result-inspection "Fresh-Eyes: [Was gesehen]. Abgleich mit Erwartung: [Vergleich]"
-```
-
----
-
-### Nach Fresh-Eyes: Adversary — Beweisen dass es kaputt ist
-
-**PFLICHT! Gilt fuer Features genauso wie fuer Bugs.**
-
-```bash
-python3 .claude/hooks/workflow.py phase phase6b_adversary
-```
-
-**1. Implementation-Validator Agent starten:**
-```
-Task: implementation-validator Agent
-Input: Spec-Pfad des aktuellen Workflows
-Der Agent liest NUR die Spec (nicht den Code!) und versucht zu beweisen
-dass das Feature NICHT funktioniert.
-```
-
-Der Agent:
-- Liest die Spec (was wurde versprochen?)
-- Fuehrt ALLE Tests aus (Unit + UI)
-- Macht Screenshots
-- Sucht Edge Cases
-- Ruft `adversary_gate.py` auf mit Beweis
-
-**2. Ergebnis:**
-
-| Verdict | Aktion |
-|---------|--------|
-| BROKEN — Agent hat Fehler gefunden | STOP — fixen, DANN erneut validieren |
-| HAELT — Agent konnte nichts kaputt machen | Weiter zu Validate |
-
-**KEIN Commit ohne bestandene Adversary-Pruefung!**
-
-Der `adversary_gate.py` setzt das Verdict im Workflow-State.
-Ohne `VERIFIED` Verdict blockiert `workflow_gate.py` die Validation-Phase.
-
----
-
-### Dann: Validate
-
-12. ⛔ **Adversary bestanden** (siehe oben)
-13. ⛔ **Alle Tests gruen** (Unit + UI)
-
-```bash
-python3 .claude/hooks/workflow.py phase phase7_validate
-```
-
-**KEINE direkte Implementierung ohne User-Erwartung!**
+- **Direkt in Code abtauchen ohne User-Perspektive** — user-advocate ZUERST
+- **"Bitte manuell testen"** — UI Tests sind PFLICHT
+- **Scope ueberschreiten** — Max 4-5 Dateien
+- **User-Erwartung ignorieren** — bei Checkpoint 3 mit Ergebnis vergleichen

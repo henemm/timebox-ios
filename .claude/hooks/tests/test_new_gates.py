@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Tests for 4 new workflow gates (2026-04-12).
+"""Tests for 3-Checkpoint workflow system (v5).
 
 Tests verify:
-1. UI-Test-Pflicht: phase6_implement blocked without ui_test_red_done
-2. Existenz-Check: phase3_spec blocked for bugs without existence_check_done
-3. Dead-Code-Check: phase7_validate blocked without dead_code_check_done
-4. validation_done in Commit-Gate: bash_gate blocks commit without validation_done
+1. Checkpoint gates: phase transitions blocked without checkpoint approval
+2. UI-Test-Pflicht: phase5_implement blocked without ui_test_red_done
+3. Checkpoint fields are protected: Claude cannot set them directly
+4. Phase listener integration: checkpoints only settable via WORKFLOW_CALLER
 """
 
 import json
@@ -29,7 +29,6 @@ class WorkflowGateTestBase(unittest.TestCase):
         self.tmpdir = tempfile.mkdtemp()
         self.wf_dir = Path(self.tmpdir) / ".claude" / "workflows"
         self.wf_dir.mkdir(parents=True)
-        # Patch _project_root to use temp dir
         self._patcher = patch.object(workflow, "_project_root",
                                      return_value=Path(self.tmpdir))
         self._patcher.start()
@@ -41,7 +40,6 @@ class WorkflowGateTestBase(unittest.TestCase):
         data = workflow._new_workflow(name)
         data.update(overrides)
         workflow._atomic_write(self.wf_dir / f"{name}.json", data)
-        # Set as active via symlink
         link = self.wf_dir / ".active"
         if link.is_symlink() or link.exists():
             link.unlink()
@@ -49,181 +47,179 @@ class WorkflowGateTestBase(unittest.TestCase):
         return data
 
 
-class TestUITestGate(WorkflowGateTestBase):
-    """Gate 1: ui_test_red_done required for phase6_implement."""
+class TestCheckpoint1Gate(WorkflowGateTestBase):
+    """Gate: checkpoint1_approved required for phase3_spec."""
 
-    def _bug_prereqs(self, **overrides):
-        """Common prerequisites for a bug workflow at phase5_tdd_red."""
-        defaults = dict(
-            current_phase="phase5_tdd_red",
+    def test_blocks_without_checkpoint1(self):
+        """phase3_spec must be blocked without checkpoint1_approved."""
+        self._create_workflow(
+            current_phase="phase2_analyse",
             context_file="ctx.md",
+            checkpoint1_approved=False,
+        )
+        data, _ = workflow._read_active()
+        err = workflow._validate_transition(data, "phase3_spec")
+        self.assertIsNotNone(err)
+        self.assertIn("Checkpoint 1", err)
+
+    def test_allows_with_checkpoint1(self):
+        """phase3_spec should pass with checkpoint1_approved."""
+        self._create_workflow(
+            current_phase="phase2_analyse",
+            context_file="ctx.md",
+            checkpoint1_approved=True,
+        )
+        data, _ = workflow._read_active()
+        err = workflow._validate_transition(data, "phase3_spec")
+        self.assertIsNone(err)
+
+
+class TestCheckpoint2Gate(WorkflowGateTestBase):
+    """Gate: checkpoint2_approved required for phase5_implement."""
+
+    def _tdd_prereqs(self, **overrides):
+        defaults = dict(
+            current_phase="phase4_tdd_red",
+            context_file="ctx.md",
+            checkpoint1_approved=True,
             spec_file="spec.md",
             spec_approved=True,
-            fix_proposal_approved=True,
-            workflow_type="bug",
-            visual_inspection_done=True,
-            existence_check_done=True,
-            analysis_file="analysis.md",
-            analysis_findings="found something",
-            challenge_verdict="SOLIDE",
-            test_artifacts=[{"phase": "phase5_tdd_red", "path": "test.swift"}],
+            ui_test_red_done=True,
+            test_artifacts=[{"phase": "phase4_tdd_red", "path": "test.swift"}],
         )
         defaults.update(overrides)
         return defaults
 
-    def test_blocks_without_ui_test_red(self):
-        """phase6_implement must be blocked when ui_test_red_done is False."""
-        self._create_workflow(**self._bug_prereqs(ui_test_red_done=False))
+    def test_blocks_without_checkpoint2(self):
+        """phase5_implement must be blocked without checkpoint2_approved."""
+        self._create_workflow(**self._tdd_prereqs(checkpoint2_approved=False))
         data, _ = workflow._read_active()
-        err = workflow._validate_transition(data, "phase6_implement")
+        err = workflow._validate_transition(data, "phase5_implement")
+        self.assertIsNotNone(err)
+        self.assertIn("Checkpoint 2", err)
+
+    def test_allows_with_checkpoint2(self):
+        """phase5_implement should pass with checkpoint2_approved."""
+        self._create_workflow(**self._tdd_prereqs(checkpoint2_approved=True))
+        data, _ = workflow._read_active()
+        err = workflow._validate_transition(data, "phase5_implement")
+        self.assertIsNone(err)
+
+
+class TestCheckpoint3Gate(WorkflowGateTestBase):
+    """Gate: checkpoint3_approved required for phase6_done."""
+
+    def test_blocks_without_checkpoint3(self):
+        """phase6_done must be blocked without checkpoint3_approved."""
+        self._create_workflow(
+            current_phase="phase5_implement",
+            context_file="ctx.md",
+            checkpoint1_approved=True,
+            checkpoint2_approved=True,
+            checkpoint3_approved=False,
+            spec_file="spec.md",
+            spec_approved=True,
+            ui_test_red_done=True,
+            test_artifacts=[{"phase": "phase4_tdd_red", "path": "test.swift"}],
+        )
+        data, _ = workflow._read_active()
+        err = workflow._validate_transition(data, "phase6_done")
+        self.assertIsNotNone(err)
+        self.assertIn("Checkpoint 3", err)
+
+    def test_allows_with_checkpoint3(self):
+        """phase6_done should pass with checkpoint3_approved."""
+        self._create_workflow(
+            current_phase="phase5_implement",
+            context_file="ctx.md",
+            checkpoint1_approved=True,
+            checkpoint2_approved=True,
+            checkpoint3_approved=True,
+            spec_file="spec.md",
+            spec_approved=True,
+            ui_test_red_done=True,
+            test_artifacts=[{"phase": "phase4_tdd_red", "path": "test.swift"}],
+        )
+        data, _ = workflow._read_active()
+        err = workflow._validate_transition(data, "phase6_done")
+        self.assertIsNone(err)
+
+
+class TestUITestGate(WorkflowGateTestBase):
+    """Gate: ui_test_red_done required for phase5_implement."""
+
+    def test_blocks_without_ui_test_red(self):
+        """phase5_implement must be blocked when ui_test_red_done is False."""
+        self._create_workflow(
+            current_phase="phase4_tdd_red",
+            context_file="ctx.md",
+            checkpoint1_approved=True,
+            checkpoint2_approved=True,
+            spec_file="spec.md",
+            spec_approved=True,
+            ui_test_red_done=False,
+            test_artifacts=[{"phase": "phase4_tdd_red", "path": "test.swift"}],
+        )
+        data, _ = workflow._read_active()
+        err = workflow._validate_transition(data, "phase5_implement")
         self.assertIsNotNone(err)
         self.assertIn("ui_test_red_done", err)
 
     def test_allows_with_ui_test_red(self):
-        """phase6_implement should pass when ui_test_red_done is True."""
-        self._create_workflow(**self._bug_prereqs(ui_test_red_done=True))
-        data, _ = workflow._read_active()
-        err = workflow._validate_transition(data, "phase6_implement")
-        self.assertIsNone(err)
-
-
-class TestExistenceCheckGate(WorkflowGateTestBase):
-    """Gate 2: existence_check_done required for phase3_spec (bugs)."""
-
-    def test_blocks_bug_without_existence_check(self):
-        """phase3_spec must be blocked for bugs without existence_check_done."""
+        """phase5_implement should pass when ui_test_red_done is True."""
         self._create_workflow(
-            current_phase="phase2_analyse",
-            workflow_type="bug",
-            visual_inspection_done=True,
-            existence_check_done=False,  # <-- THIS should block
+            current_phase="phase4_tdd_red",
             context_file="ctx.md",
-            analysis_file="analysis.md",
-            analysis_findings="root cause found",
-            challenge_verdict="SOLIDE",
-        )
-        data, _ = workflow._read_active()
-        err = workflow._validate_transition(data, "phase3_spec")
-        self.assertIsNotNone(err)
-        self.assertIn("existence_check_done", err)
-
-    def test_allows_bug_with_existence_check(self):
-        """phase3_spec should pass for bugs with existence_check_done."""
-        self._create_workflow(
-            current_phase="phase2_analyse",
-            workflow_type="bug",
-            visual_inspection_done=True,
-            existence_check_done=True,
-            analysis_file="analysis.md",
-            analysis_findings="root cause found",
-            challenge_verdict="SOLIDE",
-            context_file="ctx.md",
-        )
-        data, _ = workflow._read_active()
-        err = workflow._validate_transition(data, "phase3_spec")
-        self.assertIsNone(err)
-
-    def test_feature_not_blocked_by_existence_check(self):
-        """Features should NOT require existence_check_done."""
-        self._create_workflow(
-            current_phase="phase2_analyse",
-            workflow_type="feature",
-            user_expectation_done=True,
-            existence_check_done=False,  # Should NOT matter for features
-            context_file="ctx.md",
-        )
-        data, _ = workflow._read_active()
-        err = workflow._validate_transition(data, "phase3_spec")
-        self.assertIsNone(err)
-
-
-class TestDeadCodeCheckGate(WorkflowGateTestBase):
-    """Gate 3: dead_code_check_done required for phase7_validate."""
-
-    def _validate_prereqs(self, **overrides):
-        """Common prerequisites for reaching phase7_validate."""
-        defaults = dict(
-            current_phase="phase6b_adversary",
-            context_file="ctx.md",
+            checkpoint1_approved=True,
+            checkpoint2_approved=True,
             spec_file="spec.md",
             spec_approved=True,
-            fix_proposal_approved=True,
-            workflow_type="bug",
-            visual_inspection_done=True,
-            existence_check_done=True,
-            analysis_file="analysis.md",
-            analysis_findings="found something",
-            challenge_verdict="SOLIDE",
             ui_test_red_done=True,
-            adversary_phase_visited=True,
-            test_artifacts=[
-                {"phase": "phase5_tdd_red", "path": "test.swift"},
-                {"phase": "phase6_implement", "path": "test.swift"},
-            ],
+            test_artifacts=[{"phase": "phase4_tdd_red", "path": "test.swift"}],
         )
-        defaults.update(overrides)
-        return defaults
-
-    def test_blocks_without_dead_code_check(self):
-        """phase7_validate must be blocked without dead_code_check_done."""
-        self._create_workflow(**self._validate_prereqs(dead_code_check_done=False))
         data, _ = workflow._read_active()
-        err = workflow._validate_transition(data, "phase7_validate")
-        self.assertIsNotNone(err)
-        self.assertIn("dead_code_check_done", err)
-
-    def test_allows_with_dead_code_check(self):
-        """phase7_validate should pass with dead_code_check_done."""
-        self._create_workflow(**self._validate_prereqs(dead_code_check_done=True))
-        data, _ = workflow._read_active()
-        err = workflow._validate_transition(data, "phase7_validate")
+        err = workflow._validate_transition(data, "phase5_implement")
         self.assertIsNone(err)
 
 
-class TestMarkCommands(WorkflowGateTestBase):
-    """Tests for mark-existence-check and mark-dead-code-check commands."""
+class TestCheckpointProtection(WorkflowGateTestBase):
+    """Checkpoint fields must be protected from direct Claude access."""
 
-    def test_mark_existence_check_requires_notes(self):
-        """mark-existence-check must reject short notes."""
-        self._create_workflow()
-        with self.assertRaises(SystemExit) as ctx:
-            workflow.cmd_mark_existence_check(["too short"])
-        self.assertEqual(ctx.exception.code, 1)
+    def test_checkpoint_fields_are_protected(self):
+        """All 3 checkpoint fields must be in PROTECTED_FIELDS."""
+        self.assertIn("checkpoint1_approved", workflow.PROTECTED_FIELDS)
+        self.assertIn("checkpoint2_approved", workflow.PROTECTED_FIELDS)
+        self.assertIn("checkpoint3_approved", workflow.PROTECTED_FIELDS)
 
-    def test_mark_existence_check_accepts_long_notes(self):
-        """mark-existence-check must accept notes >= 30 chars."""
+    def test_checkpoint_fields_are_in_checkpoint_set(self):
+        """All 3 checkpoint fields must be in CHECKPOINT_FIELDS."""
+        self.assertIn("checkpoint1_approved", workflow.CHECKPOINT_FIELDS)
+        self.assertIn("checkpoint2_approved", workflow.CHECKPOINT_FIELDS)
+        self.assertIn("checkpoint3_approved", workflow.CHECKPOINT_FIELDS)
+
+    def test_set_field_blocks_checkpoint_without_caller(self):
+        """set-field must block checkpoint fields without WORKFLOW_CALLER."""
         self._create_workflow()
-        workflow.cmd_mark_existence_check([
-            "git log shows no prior implementation, GitHub Issue #42 is open"
-        ])
+        with patch.dict(os.environ, {"WORKFLOW_CALLER": ""}):
+            with self.assertRaises(SystemExit) as ctx:
+                workflow.cmd_set_field(["checkpoint1_approved", "true"])
+            self.assertEqual(ctx.exception.code, 1)
+
+    def test_set_field_allows_checkpoint_from_phase_listener(self):
+        """set-field must allow checkpoint fields from phase_listener."""
+        self._create_workflow()
+        with patch.dict(os.environ, {"WORKFLOW_CALLER": "phase_listener"}):
+            workflow.cmd_set_field(["checkpoint1_approved", "true"])
         data, _ = workflow._read_active()
-        self.assertTrue(data["existence_check_done"])
+        self.assertTrue(data["checkpoint1_approved"])
 
-    def test_mark_dead_code_check_requires_notes(self):
-        """mark-dead-code-check must reject short notes."""
+    def test_mark_checkpoint_blocks_without_caller(self):
+        """mark-checkpoint1 must block without WORKFLOW_CALLER=phase_listener."""
         self._create_workflow()
-        with self.assertRaises(SystemExit) as ctx:
-            workflow.cmd_mark_dead_code_check(["too short"])
-        self.assertEqual(ctx.exception.code, 1)
-
-    def test_mark_dead_code_check_accepts_long_notes(self):
-        """mark-dead-code-check must accept notes >= 30 chars."""
-        self._create_workflow()
-        workflow.cmd_mark_dead_code_check([
-            "grep confirms handleAbort() called from FocusLiveView.swift:142"
-        ])
-        data, _ = workflow._read_active()
-        self.assertTrue(data["dead_code_check_done"])
-
-
-class TestProtectedFields(WorkflowGateTestBase):
-    """New fields must be in PROTECTED_FIELDS."""
-
-    def test_existence_check_done_is_protected(self):
-        self.assertIn("existence_check_done", workflow.PROTECTED_FIELDS)
-
-    def test_dead_code_check_done_is_protected(self):
-        self.assertIn("dead_code_check_done", workflow.PROTECTED_FIELDS)
+        with patch.dict(os.environ, {"WORKFLOW_CALLER": ""}):
+            with self.assertRaises(SystemExit) as ctx:
+                workflow.cmd_mark_checkpoint1(["test"])
+            self.assertEqual(ctx.exception.code, 1)
 
 
 if __name__ == "__main__":

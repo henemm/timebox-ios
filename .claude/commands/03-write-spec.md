@@ -36,31 +36,7 @@ Task (general-purpose/sonnet): "Du bist der spec-writer Agent.
   nach dem spec-writer Workflow. Beachte alle Qualitaetsregeln."
 ```
 
-### Step 3: Spec validieren (spec-validator/Haiku)
-
-Dispatche den **spec-validator/Haiku** zur Validierung:
-
-```
-Task (general-purpose/haiku): "Du bist der spec-validator Agent.
-
-  Validiere die Spec: docs/specs/[category]/[entity].md
-  Pruefe alle Required Fields, Sections, Placeholders.
-  Output: VALID oder INVALID mit Details."
-```
-
-**Bei INVALID:**
-1. Behebe die gemeldeten Fehler in der Spec
-2. Dispatche spec-validator erneut
-3. Wiederhole bis VALID
-
-**Nach VALID — Gate setzen (PFLICHT — INFRA_015):**
-```bash
-python3 .claude/hooks/workflow.py mark-spec-validated "VALID: All required fields, sections present. No placeholders. [Details]"
-```
-
-**Ohne `spec_validated=true` blockiert das Gate den Wechsel zu phase4_approved!**
-
-### Step 3b: Affected-Files Cross-Check (PFLICHT — INFRA_014)
+### Step 3: Affected-Files Cross-Check
 
 **Nach Spec-Erstellung, VOR Workflow-Update:**
 
@@ -111,8 +87,8 @@ Present the spec and request approval:
 ## After Approval
 
 When user approves:
-1. `workflow_state_updater` hook detects approval phrase
-2. State advances to `phase4_approved`
+1. `phase_listener` hook detects approval phrase
+2. State sets `spec_approved = true`
 3. Next: `/04-tdd-red` to write failing tests
 
 **IMPORTANT:**

@@ -1,15 +1,17 @@
 #!/usr/bin/env python3
 """
-Phase Listener v3 — Consolidated UserPromptSubmit Hook
+Phase Listener v4 — 3-Checkpoint System
 
-Replaces 6 separate hooks with 1. Listens for keywords in user messages:
+Listens for keywords in user messages and updates workflow state.
+This is the ONLY way to unlock checkpoints — Claude cannot set them.
 
-- "approved"/"freigabe"/"lgtm" → spec_approved = true
+Keywords:
+- "stimmt" → checkpoint1_approved (only in phase2_analyse)
+- "go" → checkpoint2_approved (only in phase4_tdd_red)
+- "commit" → checkpoint3_approved (only in phase5_implement)
+- "approved"/"freigabe"/"lgtm" → spec_approved (only in phase3_spec)
 - "stop"/"stopp" → stop-lock enable
 - "weiter"/"continue" → stop-lock disable
-- "override"/"ich genehmige" → override token
-- "neues ui" → is_new_ui = true
-- "go"/"green ok"/"tests ok" → green_approved = true
 
 Exit Codes: 0 always (never blocks, only updates state)
 """
@@ -17,6 +19,7 @@ Exit Codes: 0 always (never blocks, only updates state)
 import json
 import os
 import re
+import subprocess
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -34,14 +37,13 @@ def _project_root() -> Path:
 
 
 def _get_hook_input() -> dict:
-    """Read full hook input from stdin. Returns parsed dict."""
+    """Read full hook input from stdin."""
     tool_input = os.environ.get("CLAUDE_TOOL_INPUT", "")
     if tool_input:
         try:
             return json.loads(tool_input)
         except json.JSONDecodeError:
             return {"content": tool_input}
-
     try:
         return json.load(sys.stdin)
     except (json.JSONDecodeError, Exception):
@@ -49,25 +51,17 @@ def _get_hook_input() -> dict:
 
 
 def _get_user_message(hook_input: dict) -> str:
-    """Extract user message from hook input."""
     return hook_input.get("prompt", hook_input.get("content", hook_input.get("message", "")))
 
 
 def _get_session_id(hook_input: dict) -> str:
-    """Extract session_id from hook input or environment."""
     return os.environ.get("CLAUDE_SESSION_ID", "") or hook_input.get("session_id", "")
 
 
 def _read_active_workflow(session_id: str = "") -> tuple[dict | None, Path | None]:
-    """Read active workflow for session. Returns (data, file_path).
-
-    Priority:
-    1. Session mapping (.sessions.json) if session_id is provided
-    2. Fallback to .active symlink
-    """
+    """Read active workflow for session. Returns (data, file_path)."""
     wf_dir = _project_root() / ".claude" / "workflows"
 
-    # Try session mapping first
     if session_id:
         sessions_file = wf_dir / ".sessions.json"
         if sessions_file.exists():
@@ -81,7 +75,6 @@ def _read_active_workflow(session_id: str = "") -> tuple[dict | None, Path | Non
             except (OSError, json.JSONDecodeError):
                 pass
 
-    # Fallback: .active symlink
     link = wf_dir / ".active"
     if not link.exists():
         return None, None
@@ -101,28 +94,10 @@ def _save_workflow(data: dict, path: Path) -> None:
     path.write_text(json.dumps(data, indent=2))
 
 
-def _create_override_token(workflow_name: str) -> None:
-    token_file = _project_root() / ".claude" / "user_override_token.json"
-    tokens = {}
-    if token_file.exists():
-        try:
-            raw = json.loads(token_file.read_text())
-            tokens = raw.get("tokens", {}) if raw.get("version") == 2 else {}
-        except (json.JSONDecodeError, OSError):
-            pass
-    tokens[workflow_name] = {
-        "created": datetime.now().isoformat(),
-        "granted_by": "user_prompt",
-    }
-    token_file.parent.mkdir(parents=True, exist_ok=True)
-    token_file.write_text(json.dumps({"version": 2, "tokens": tokens}, indent=2))
-
-
 def _set_stop_lock(enabled: bool, session_id: str = "") -> None:
     lock_file = _project_root() / ".claude" / "stop_lock.json"
     lock_file.parent.mkdir(parents=True, exist_ok=True)
     if enabled:
-        # Read existing locks, add this session
         existing = {}
         if lock_file.exists():
             try:
@@ -134,7 +109,6 @@ def _set_stop_lock(enabled: bool, session_id: str = "") -> None:
         sessions[key] = {"created": datetime.now().isoformat()}
         lock_file.write_text(json.dumps({"version": 2, "sessions": sessions}, indent=2))
     else:
-        # Remove this session's lock (or clear all if no session)
         if lock_file.exists():
             try:
                 existing = json.loads(lock_file.read_text())
@@ -152,15 +126,35 @@ def _set_stop_lock(enabled: bool, session_id: str = "") -> None:
                 lock_file.unlink(missing_ok=True)
 
 
+def _call_workflow_checkpoint(checkpoint_num: int, notes: str) -> None:
+    """Call workflow.py mark-checkpoint{N} with WORKFLOW_CALLER=phase_listener."""
+    env = os.environ.copy()
+    env["WORKFLOW_CALLER"] = "phase_listener"
+    try:
+        result = subprocess.run(
+            ["python3", str(_project_root() / ".claude" / "hooks" / "workflow.py"),
+             f"mark-checkpoint{checkpoint_num}", notes],
+            env=env, capture_output=True, text=True, timeout=5
+        )
+        if result.returncode == 0:
+            print(result.stdout.strip(), file=sys.stderr)
+        else:
+            print(result.stderr.strip(), file=sys.stderr)
+    except Exception as e:
+        print(f"Error calling mark-checkpoint{checkpoint_num}: {e}", file=sys.stderr)
+
+
+# --- Keyword definitions ---
+
+CHECKPOINT1_PHRASES = ["stimmt"]
+CHECKPOINT2_PHRASES = ["go"]
+CHECKPOINT3_PHRASES = ["commit"]
 APPROVAL_PHRASES = [
     "approved", "freigabe", "lgtm", "spec ok", "genehmigt",
     "abgenommen", "passt", "sieht gut aus",
 ]
-
 STOP_PHRASES = ["stop", "stopp", "halt", "anhalten"]
 CONTINUE_PHRASES = ["weiter", "continue", "weitermachen", "fortfahren"]
-OVERRIDE_PHRASES = ["override", "ich genehmige", "ich genehmige das", "genehmige"]
-GREEN_PHRASES = ["go", "green ok", "tests ok", "weiter", "gruen ok"]
 
 
 def _matches(message: str, phrases: list[str]) -> bool:
@@ -178,15 +172,8 @@ def main():
         sys.exit(0)
 
     session_id = _get_session_id(hook_input)
-    wf_data, wf_path = _read_active_workflow(session_id)
 
-    # Override token (works even without workflow)
-    if _matches(message, OVERRIDE_PHRASES):
-        wf_name = wf_data["name"] if wf_data else "__global__"
-        _create_override_token(wf_name)
-        print(f"Override token created for workflow: {wf_name}", file=sys.stderr)
-
-    # Stop-lock (per-session)
+    # Stop-lock (per-session) — works without workflow
     if _matches(message, STOP_PHRASES) and not _matches(message, CONTINUE_PHRASES):
         _set_stop_lock(True, session_id)
         print("Stop-lock enabled for this session.", file=sys.stderr)
@@ -195,32 +182,34 @@ def main():
     if _matches(message, CONTINUE_PHRASES):
         _set_stop_lock(False, session_id)
 
+    wf_data, wf_path = _read_active_workflow(session_id)
     if not wf_data or not wf_path:
         sys.exit(0)
 
+    phase = wf_data.get("current_phase", "")
     changed = False
 
-    # Approval
+    # Checkpoint 1: "stimmt" — only in phase2_analyse
+    if _matches(message, CHECKPOINT1_PHRASES):
+        if phase == "phase2_analyse" and not wf_data.get("checkpoint1_approved"):
+            _call_workflow_checkpoint(1, f"User approved at {datetime.now().isoformat()}")
+
+    # Checkpoint 2: "go" — only in phase4_tdd_red
+    if _matches(message, CHECKPOINT2_PHRASES):
+        if phase == "phase4_tdd_red" and not wf_data.get("checkpoint2_approved"):
+            _call_workflow_checkpoint(2, f"User approved at {datetime.now().isoformat()}")
+
+    # Checkpoint 3: "commit" — only in phase5_implement
+    if _matches(message, CHECKPOINT3_PHRASES):
+        if phase == "phase5_implement" and not wf_data.get("checkpoint3_approved"):
+            _call_workflow_checkpoint(3, f"User approved at {datetime.now().isoformat()}")
+
+    # Spec approval: "approved" etc. — only in phase3_spec
     if _matches(message, APPROVAL_PHRASES):
-        phase = wf_data.get("current_phase", "")
-        if phase in ("phase3_spec",) and not wf_data.get("spec_approved"):
+        if phase == "phase3_spec" and not wf_data.get("spec_approved"):
             wf_data["spec_approved"] = True
-            wf_data["current_phase"] = "phase4_approved"
             changed = True
-            print(f"Spec approved for '{wf_data['name']}'! You may now run /04-tdd-red", file=sys.stderr)
-
-    # New UI flag
-    if "neues ui" in message.lower():
-        wf_data["is_new_ui"] = True
-        changed = True
-
-    # GREEN approval
-    if _matches(message, GREEN_PHRASES):
-        phase = wf_data.get("current_phase", "")
-        if phase in ("phase6_implement", "phase6b_adversary"):
-            wf_data["green_approved"] = True
-            changed = True
-            print("GREEN approved.", file=sys.stderr)
+            print(f"Spec approved for '{wf_data['name']}'!", file=sys.stderr)
 
     if changed:
         _save_workflow(wf_data, wf_path)

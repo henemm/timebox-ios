@@ -1,17 +1,18 @@
 #!/usr/bin/env python3
 """
-QA Gate v3 — Validates test output and sets adversary_verdict.
+QA Gate v4 — Validates test output (utility, no longer sets workflow state).
 
-Replaces adversary_gate.py. Works with v3 workflow system
-(.claude/workflows/ instead of workflow_state.json).
+With the 3-Checkpoint system, qa_gate is a pure validation utility.
+Claude uses it to prepare Checkpoint 3 presentations, but only Henning
+typing 'commit' actually unlocks the commit gate.
 
 Usage:
-    python3 qa_gate.py <test-output-file> --no-visual "reason"
+    python3 qa_gate.py <test-output-file>
+    python3 qa_gate.py <test-output-file> --infra
     python3 qa_gate.py <test-output-file> --screenshot <path>
-    python3 qa_gate.py <test-output-file> --infra --no-visual "reason"
     python3 qa_gate.py --check
 
-Exit Codes: 0 = VERIFIED, 1 = FAILED
+Exit Codes: 0 = valid, 1 = invalid
 """
 
 import json
@@ -29,17 +30,6 @@ def _project_root() -> Path:
         if (parent / ".git").exists():
             return parent
     return cwd
-
-
-def _set_verdict(verdict: str) -> None:
-    """Set adversary_verdict on active workflow via workflow.py CLI."""
-    workflow_py = _project_root() / ".claude" / "hooks" / "workflow.py"
-    env = os.environ.copy()
-    env["WORKFLOW_CALLER"] = "qa_gate"
-    subprocess.run(
-        [sys.executable, str(workflow_py), "set-field", "adversary_verdict", verdict],
-        capture_output=True, text=True, env=env,
-    )
 
 
 def validate_test_output(filepath: str, infra: bool = False) -> tuple[bool, str]:
@@ -88,7 +78,7 @@ def validate_test_output(filepath: str, infra: bool = False) -> tuple[bool, str]
             return False, f"Tests FAILED: {failures}/{total} failures"
         return True, f"Tests PASSED: {total} tests across {len(exec_matches)} runs, 0 failures"
 
-    # Python unittest: "Ran N tests in X.XXXs" + "OK" or "FAILED"
+    # Python unittest
     py_exec = re.search(r"Ran (\d+) tests? in", content)
     if py_exec:
         total = int(py_exec.group(1))
@@ -112,14 +102,12 @@ def main():
     args = sys.argv[1:]
 
     if not args or args[0] == "--check":
-        # Just show current verdict
         workflow_py = _project_root() / ".claude" / "hooks" / "workflow.py"
         subprocess.run([sys.executable, str(workflow_py), "status"])
         sys.exit(0)
 
     filepath = args[0]
     infra = "--infra" in args
-    no_visual = "--no-visual" in args
     screenshot = None
 
     if "--screenshot" in args:
@@ -127,34 +115,17 @@ def main():
         if idx + 1 < len(args):
             screenshot = args[idx + 1]
 
-    if no_visual:
-        idx = args.index("--no-visual")
-        reason = args[idx + 1] if idx + 1 < len(args) else "no reason given"
-        print(f"Screenshot skipped: {reason}")
-
-    # Get active workflow name for output
-    workflow_py = _project_root() / ".claude" / "hooks" / "workflow.py"
-    result = subprocess.run(
-        [sys.executable, str(workflow_py), "status"],
-        capture_output=True, text=True
-    )
-    wf_name = "unknown"
-    for line in result.stdout.splitlines():
-        if line.startswith("Workflow:"):
-            wf_name = line.split(":", 1)[1].strip()
-
     print(f"Validating test output: {filepath}")
 
     valid, message = validate_test_output(filepath, infra=infra)
 
     if not valid:
         print(f"\nFAILED — {message}")
-        print(f"Workflow: {wf_name}")
         print("Fix the issues and re-run tests.")
         sys.exit(1)
 
-    # Validate screenshot if required
-    if screenshot and not no_visual:
+    # Validate screenshot if provided
+    if screenshot:
         ss_path = Path(screenshot)
         if not ss_path.exists():
             print(f"\nFAILED — Screenshot not found: {screenshot}")
@@ -163,28 +134,8 @@ def main():
             print(f"\nFAILED — Screenshot too small ({ss_path.stat().st_size} bytes)")
             sys.exit(1)
 
-    # Validate dialog artifact if --checklist provided
-    checklist_path = None
-    if "--checklist" in args:
-        idx = args.index("--checklist")
-        if idx + 1 < len(args):
-            checklist_path = args[idx + 1]
-
-    if checklist_path:
-        from adversary_dialog import validate_dialog_artifact
-        cl_valid, cl_message = validate_dialog_artifact(checklist_path)
-        if not cl_valid:
-            print(f"\nFAILED — Dialog: {cl_message}")
-            print(f"Workflow: {wf_name}")
-            sys.exit(1)
-        print(f"Dialog: {cl_message}")
-
-    verdict = f"VERIFIED:{message}"
-    _set_verdict(verdict)
-
-    print(f"\n{verdict}")
-    print(f"Workflow: {wf_name}")
-    print("Commit is now allowed.")
+    print(f"\nVALID — {message}")
+    print("Present this to Henning for Checkpoint 3 approval ('commit').")
     sys.exit(0)
 
 

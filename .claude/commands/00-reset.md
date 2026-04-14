@@ -12,33 +12,21 @@ Reset the workflow state to start fresh.
 
 ## What Happens
 
-Resets workflow state to idle:
-- Phase → `idle`
-- All flags → cleared
-- Feature name → cleared
-- Spec file → cleared
+Archives and removes the active workflow.
 
 ## Execute Reset
 
 ```bash
-# If using workflow.py
-python3 .claude/hooks/workflow.py reset
-
-# Or manually clear state
-echo '{"current_phase": "idle", "workflows": {}}' > .claude/workflow_state.json
+python3 .claude/hooks/workflow.py complete
 ```
 
-## State After Reset
+Or if the workflow is stuck/broken:
+```bash
+# List active workflows
+python3 .claude/hooks/workflow.py list
 
-```json
-{
-  "current_phase": "idle",
-  "feature_name": null,
-  "spec_file": null,
-  "spec_approved": false,
-  "implementation_done": false,
-  "validation_done": false
-}
+# Start fresh
+python3 .claude/hooks/workflow.py start "new-workflow-name"
 ```
 
 ## Next Steps
@@ -46,8 +34,9 @@ echo '{"current_phase": "idle", "workflows": {}}' > .claude/workflow_state.json
 After reset, start a new workflow:
 
 ```
-/02-analyse [feature/bug]  → Start analysis
-/01-context               → Gather context first
+/10-bug [description]    → Bug analysis & fix
+/11-feature [description] → Feature planning
+/01-context              → Manual context generation
 ```
 
 ---

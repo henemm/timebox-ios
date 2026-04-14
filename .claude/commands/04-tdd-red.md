@@ -1,6 +1,6 @@
-# Phase 5: TDD RED - Write Failing Tests
+# Phase 4: TDD RED - Write Failing Tests
 
-You are in **Phase 5 - TDD RED Phase**.
+You are in **Phase 4 - TDD RED Phase**.
 
 ## Purpose
 
@@ -26,7 +26,8 @@ Wenn du Frage 3 nicht beantworten kannst → der Test ist wertlos. Schreib ihn n
 
 ## Prerequisites
 
-- Spec approved (`phase4_approved`)
+- Spec approved
+- Checkpoint 1 approved (Henning said "stimmt")
 - Test plan defined in spec
 
 Check status:
@@ -39,22 +40,13 @@ python3 .claude/hooks/workflow.py status
 ### 1. Enter TDD RED Phase
 
 ```bash
-python3 .claude/hooks/workflow.py phase phase5_tdd_red
+python3 .claude/hooks/workflow.py phase phase4_tdd_red
 ```
 
-### 1b. Inspect-UI Preflight (PFLICHT vor UI-Tests — INFRA_014)
+### 1b. Inspect-UI empfohlen (vor UI-Tests)
 
-**BEVOR du UI-Tests schreibst:**
-1. Fuehre `/inspect-ui` aus fuer den Ziel-Screen
-2. Notiere alle relevanten AccessibilityIdentifier
-3. Markiere den Preflight als erledigt:
-```bash
-python3 .claude/hooks/workflow.py mark-inspect-ui-done "<screen-name>: <beobachtete IDs, z.B. addTaskButton, saveButton, backlogTab>"
-```
-
-**Ohne diesen Schritt blockiert der edit_gate Hook alle Edits auf UI-Test-Dateien!**
-
-Unit-Tests (FocusBloxTests/) sind NICHT betroffen — nur UI-Tests erfordern den Preflight.
+Fuehre `/inspect-ui` aus fuer den Ziel-Screen um AccessibilityIdentifier zu finden.
+Nicht mehr Gate-enforced, aber weiterhin Best Practice.
 
 ### 2. Unit Tests schreiben — PFLICHT fuer Business-Logik
 
@@ -132,8 +124,8 @@ grep -E "(passed|failed|error:)" docs/artifacts/[workflow]/ui-test-red-output.tx
 
 ```bash
 # Register artifacts
-python3 .claude/hooks/workflow.py add-artifact test_output "docs/artifacts/[workflow]/unit-test-red-output.txt" "Unit Test FAILED: [describe what failed]" phase5_tdd_red
-python3 .claude/hooks/workflow.py add-artifact ui_test_output "docs/artifacts/[workflow]/ui-test-red-output.txt" "UI Test FAILED: [describe what failed]" phase5_tdd_red
+python3 .claude/hooks/workflow.py add-artifact test_output "docs/artifacts/[workflow]/unit-test-red-output.txt" "Unit Test FAILED: [describe what failed]" phase4_tdd_red
+python3 .claude/hooks/workflow.py add-artifact ui_test_output "docs/artifacts/[workflow]/ui-test-red-output.txt" "UI Test FAILED: [describe what failed]" phase4_tdd_red
 
 # Set mandatory RED flags
 python3 .claude/hooks/workflow.py mark-red "failed: [describe what failed]"
@@ -151,20 +143,19 @@ python3 .claude/hooks/workflow.py snapshot-tests
 
 ## RED Phase Checklist
 
-- [ ] `/inspect-ui` ausgefuehrt und `mark-inspect-ui-done` gesetzt (PFLICHT vor UI-Tests)
 - [ ] Ich kann fuer JEDEN Test sagen welche Zeile ihn brechen wuerde
 - [ ] Unit Tests geschrieben — PFLICHT bei Business-Logik
 - [ ] Unit Tests ausgefuehrt und FEHLGESCHLAGEN
 - [ ] UI Tests geschrieben in `FocusBloxUITests/`
 - [ ] UI Tests ausgefuehrt und FEHLGESCHLAGEN
-- [ ] `ui_test_red_done: true` gesetzt
+- [ ] `mark-red` und `mark-ui-red` gesetzt
 - [ ] Alle Artefakte registriert
-- [ ] Test-Snapshot erstellt (`red_test_snapshot` im Workflow State)
+- [ ] **CHECKPOINT 2 praesentieren** — Henning sagt "go"
 
 ## Next Step
 
 ```bash
-python3 .claude/hooks/workflow.py phase phase6_implement
+python3 .claude/hooks/workflow.py phase phase5_implement
 ```
 
 ## Common Mistakes
