@@ -105,7 +105,7 @@ final class BacklogHygieneNudgeTests: XCTestCase {
 
     // MARK: - ReviewedAt Filter Tests
 
-    /// Verhalten: Task mit reviewedAt < 30 Tage → wird NICHT als stale gezählt
+    /// Verhalten: Task mit reviewedAt < 14 Tage (default staleAgeDays) → wird NICHT als stale gezählt
     /// Bricht wenn: hygieneReviewedAt-Filter in findStaleTasks() fehlt
     func test_staleTasksExcludesRecentlyReviewed() {
         let task = makeReviewedPlanItem(title: "Reviewed", daysOld: 20, reviewedDaysAgo: 10)
@@ -115,14 +115,55 @@ final class BacklogHygieneNudgeTests: XCTestCase {
         XCTAssertTrue(result.isEmpty, "Task reviewed 10 days ago should NOT be stale")
     }
 
-    /// Verhalten: Task mit reviewedAt > 30 Tage → wird als stale gezählt
-    /// Bricht wenn: 30-Tage-Schwelle in findStaleTasks() nicht korrekt implementiert
+    /// Verhalten: Task mit reviewedAt > staleAgeDays → wird als stale gezählt
+    /// Bricht wenn: Grace-Period-Schwelle nicht korrekt implementiert
     func test_staleTasksIncludesOldReview() {
         let task = makeReviewedPlanItem(title: "Old Review", daysOld: 45, reviewedDaysAgo: 35)
 
         let result = BacklogHealthService.findStaleTasks(in: [task])
 
         XCTAssertEqual(result.count, 1, "Task reviewed 35 days ago should be stale again")
+    }
+
+    // MARK: - Bug #219: Grace Period = staleAgeDays (nicht hardcoded 30)
+
+    /// Verhalten: Grace Period nutzt staleAgeDays statt hardcoded 30
+    /// TDD RED: Schlägt fehl weil hygieneReviewGraceDays aktuell hardcoded 30 ist
+    /// Bricht wenn: findStaleTasks() den staleAgeDays-Parameter nicht für Grace Period nutzt
+    func test_gracePeriodMatchesStaleAgeDays() {
+        // Task reviewed vor 20 Tagen, staleAgeDays = 14
+        // Mit hardcoded 30: Task wird NICHT als stale gezählt (20 < 30) → FALSCH
+        // Mit staleAgeDays=14: Task SOLLTE stale sein (20 > 14) → RICHTIG
+        let task = makeReviewedPlanItem(title: "Grace Test", daysOld: 30, reviewedDaysAgo: 20)
+
+        let result = BacklogHealthService.findStaleTasks(in: [task], staleAgeDays: 14)
+
+        XCTAssertEqual(result.count, 1, "Task reviewed 20 days ago with staleAgeDays=14 should be stale again (grace period = staleAgeDays, not hardcoded 30)")
+    }
+
+    /// Verhalten: Bei custom staleAgeDays=7 ist Grace Period auch 7
+    /// TDD RED: Schlägt fehl weil Grace Period hardcoded 30 ist
+    func test_gracePeriodWithCustomStaleAge() {
+        // Task reviewed vor 10 Tagen, staleAgeDays = 7
+        // Mit hardcoded 30: Task wird NICHT als stale gezählt (10 < 30) → FALSCH
+        // Mit staleAgeDays=7: Task SOLLTE stale sein (10 > 7) → RICHTIG
+        let task = makeReviewedPlanItem(title: "Custom Grace", daysOld: 20, reviewedDaysAgo: 10)
+
+        let result = BacklogHealthService.findStaleTasks(in: [task], staleAgeDays: 7)
+
+        XCTAssertEqual(result.count, 1, "Task reviewed 10 days ago with staleAgeDays=7 should be stale (grace = 7)")
+    }
+
+    /// Verhalten: Task innerhalb Grace Period wird ausgeschlossen
+    /// Sicherstellen dass die Grace Period noch korrekt filtert
+    func test_gracePeriodStillExcludesRecentReview() {
+        // Task reviewed vor 5 Tagen, staleAgeDays = 14
+        // Grace Period = 14 → 5 < 14 → Task wird NICHT als stale gezählt → KORREKT
+        let task = makeReviewedPlanItem(title: "Recent Review", daysOld: 20, reviewedDaysAgo: 5)
+
+        let result = BacklogHealthService.findStaleTasks(in: [task], staleAgeDays: 14)
+
+        XCTAssertTrue(result.isEmpty, "Task reviewed 5 days ago should NOT be stale with 14-day grace period")
     }
 
     // MARK: - Helpers

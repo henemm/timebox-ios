@@ -10,9 +10,6 @@ enum BacklogHealthService {
     ///   - staleAgeDays: Days after which a task is considered stale (default: 14)
     ///   - staleRescheduleCount: Reschedule count threshold (default: 3)
     /// - Returns: Stale tasks sorted oldest first
-    /// Grace period after a hygiene review: task won't be flagged as stale for 30 days.
-    static let hygieneReviewGraceDays = 30
-
     static func findStaleTasks(
         in tasks: [PlanItem],
         staleAgeDays: Int = 14,
@@ -29,10 +26,11 @@ enum BacklogHealthService {
                     return false
                 }
 
-                // Tasks reviewed in hygiene within grace period are excluded (#215)
+                // Tasks reviewed in hygiene within grace period are excluded (#215, #219)
+                // Grace period matches staleAgeDays (configurable, default 14)
                 if let reviewedAt = task.hygieneReviewedAt {
                     let daysSinceReview = calendar.dateComponents([.day], from: reviewedAt, to: now).day ?? 0
-                    if daysSinceReview < hygieneReviewGraceDays {
+                    if daysSinceReview < staleAgeDays {
                         return false
                     }
                 }

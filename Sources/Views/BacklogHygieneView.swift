@@ -215,6 +215,11 @@ struct BacklogHygieneView: View {
     }
 
     private func keepTask() {
+        if let task = currentTask, let localTask = findLocalTask(id: task.id) {
+            localTask.hygieneReviewedAt = Date()
+            localTask.modifiedAt = Date()
+            try? modelContext.save()
+        }
         actions.append(.kept)
         withAnimation(.smooth) {
             keepHintVisible = true

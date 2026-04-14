@@ -127,6 +127,44 @@ final class BacklogHygieneUITests: XCTestCase {
         }
     }
 
+    // MARK: - Bug #219: Keep Action persistiert hygieneReviewedAt
+
+    /// GIVEN: User processed all stale tasks with "Behalten"
+    /// WHEN: User closes dialog and reopens Backlog
+    /// THEN: Hygiene banner should NOT reappear (tasks have been reviewed)
+    /// TDD RED: Banner reappears because keepTask() doesn't set hygieneReviewedAt
+    func test_hygieneView_keepAction_taskNotSuggested_afterReview() throws {
+        let banner = app.buttons["hygieneCleanupBanner"]
+        XCTAssertTrue(banner.waitForExistence(timeout: 5))
+        banner.tap()
+
+        // Process all tasks by tapping "Behalten" until summary appears
+        for _ in 0..<10 {
+            let summary = app.staticTexts["hygieneSummary"]
+            if summary.waitForExistence(timeout: 1) { break }
+
+            let keepButton = app.buttons["hygieneKeepButton"]
+            if keepButton.waitForExistence(timeout: 3) {
+                keepButton.tap()
+            } else {
+                break
+            }
+        }
+
+        let summary = app.staticTexts["hygieneSummary"]
+        XCTAssertTrue(summary.waitForExistence(timeout: 5), "Summary should appear")
+
+        // Close the hygiene dialog
+        let doneButton = app.buttons["Fertig"]
+        XCTAssertTrue(doneButton.waitForExistence(timeout: 3))
+        doneButton.tap()
+
+        // Banner should NOT reappear — all tasks were reviewed
+        let bannerAfter = app.buttons["hygieneCleanupBanner"]
+        let bannerReappeared = bannerAfter.waitForExistence(timeout: 3)
+        XCTAssertFalse(bannerReappeared, "Hygiene banner should NOT reappear after all tasks were reviewed with 'Behalten'")
+    }
+
     // MARK: - Summary
 
     /// GIVEN: User has processed all stale tasks
