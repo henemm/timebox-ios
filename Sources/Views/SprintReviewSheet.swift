@@ -80,14 +80,6 @@ struct SprintReviewSheet: View {
             }
             .navigationTitle("Sprint Review")
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button("Fertig") {
-                        dismiss()
-                        onDismiss()
-                    }
-                }
-            }
         }
     }
 
@@ -326,6 +318,7 @@ struct SprintReviewSheet: View {
                     .foregroundStyle(.white)
             }
             .buttonStyle(.plain)
+            .accessibilityIdentifier("sprintReviewDismissButton")
         }
         .padding(.top)
     }

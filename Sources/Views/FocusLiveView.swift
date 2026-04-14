@@ -148,12 +148,13 @@ struct FocusLiveView: View {
                 if let blockID = activeBlock?.id {
                     NotificationService.cleanupBlockEndNotification(blockID: blockID)
                 }
-                // Bug #211: Cleanup bei Swipe-Down (wenn onDismiss-Callback nicht aufgerufen wurde)
+                // Bug #216: reviewDismissed IMMER setzen (nicht nur bei Abort)
+                // Verhindert Review-Loop bei Swipe-Down-Dismiss
+                reviewDismissed = true
                 if isAbortingBlock {
                     isAbortingBlock = false
-                    reviewDismissed = true
-                    Task { await loadData() }
                 }
+                Task { await loadData() }
             }) {
                 if let block = activeBlock {
                     SprintReviewSheet(
@@ -364,22 +365,25 @@ struct FocusLiveView: View {
             }
 
             // Abort button (RW 3.3) — Bug #211: State sofort zurücksetzen
-            Button {
-                isAbortingBlock = true
-                abortedBlockID = block.id  // Bug #211: Block nach Abort ignorieren
-                // Bug #211: LiveActivity + Timer-State sofort beenden
-                liveActivityManager.endActivity()
-                liveActivityStarted = false
-                taskStartTime = nil
-                // Bug #218: Pending Block-End-Notification entfernen
-                NotificationService.cleanupBlockEndNotification(blockID: block.id)
-                showSprintReview = true
-            } label: {
-                Label("Abbrechen", systemImage: "xmark.circle")
-                    .font(.subheadline)
-                    .foregroundStyle(.red)
+            // Bug #216: Nur bei laufendem Sprint anzeigen (nicht nach Ende)
+            if !block.isPast {
+                Button {
+                    isAbortingBlock = true
+                    abortedBlockID = block.id  // Bug #211: Block nach Abort ignorieren
+                    // Bug #211: LiveActivity + Timer-State sofort beenden
+                    liveActivityManager.endActivity()
+                    liveActivityStarted = false
+                    taskStartTime = nil
+                    // Bug #218: Pending Block-End-Notification entfernen
+                    NotificationService.cleanupBlockEndNotification(blockID: block.id)
+                    showSprintReview = true
+                } label: {
+                    Label("Abbrechen", systemImage: "xmark.circle")
+                        .font(.subheadline)
+                        .foregroundStyle(.red)
+                }
+                .accessibilityIdentifier("abortBlockButton")
             }
-            .accessibilityIdentifier("abortBlockButton")
         }
         .padding()
         .background(.ultraThinMaterial)
@@ -505,24 +509,32 @@ struct FocusLiveView: View {
                 .foregroundStyle(.green)
             Text("Alle Tasks erledigt!")
                 .font(.title2.weight(.semibold))
-            Text("Warte auf Block-Ende oder starte Sprint Review")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
-            Button {
-                // Bug #218: Pending Block-End-Notification entfernen (Early Review)
-                NotificationService.cleanupBlockEndNotification(blockID: block.id)
-                showSprintReview = true
-            } label: {
-                Text("Sprint Review starten")
-                    .font(.headline)
-                    .foregroundStyle(.white)
-                    .padding(.horizontal, 24)
-                    .padding(.vertical, 12)
-                    .background(.blue, in: Capsule())
+            // Bug #216: Nach Review "Sprint beendet" statt erneut startbar
+            if reviewDismissed {
+                Text("Sprint beendet")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .accessibilityIdentifier("sprintEndedLabel")
+            } else {
+                Text("Warte auf Block-Ende oder starte Sprint Review")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                Button {
+                    // Bug #218: Pending Block-End-Notification entfernen (Early Review)
+                    NotificationService.cleanupBlockEndNotification(blockID: block.id)
+                    showSprintReview = true
+                } label: {
+                    Text("Sprint Review starten")
+                        .font(.headline)
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 24)
+                        .padding(.vertical, 12)
+                        .background(.blue, in: Capsule())
+                }
+                .buttonStyle(.plain)
+                .padding(.top, 8)
             }
-            .buttonStyle(.plain)
-            .padding(.top, 8)
         }
         .padding()
     }

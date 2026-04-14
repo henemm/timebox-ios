@@ -48,13 +48,13 @@ final class FocusBlockAbortStateUITests: XCTestCase {
             "Sprint Review muss nach Abort erscheinen"
         )
 
-        // Sprint Review schließen via "Fertig"
-        let fertigButton = app.buttons["Fertig"]
-        guard fertigButton.waitForExistence(timeout: 3) else {
-            XCTFail("Fertig-Button muss in Sprint Review existieren")
+        // Sprint Review schließen via "Sprint Review beenden" (Bug #216: "Fertig" entfernt)
+        let dismissButton = app.buttons["sprintReviewDismissButton"]
+        guard dismissButton.waitForExistence(timeout: 3) else {
+            XCTFail("Sprint Review beenden Button muss existieren")
             return
         }
-        fertigButton.tap()
+        dismissButton.tap()
 
         // Assert: Abort-Button darf NICHT mehr existieren (kein aktiver Block)
         let abortAfterDismiss = app.buttons["abortBlockButton"]

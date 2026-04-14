@@ -65,7 +65,14 @@ struct MacFocusView: View {
             currentTime = time
             checkBlockEnd()
         }
-        .sheet(isPresented: $showSprintReview) {
+        .sheet(isPresented: $showSprintReview, onDismiss: {
+            // Bug #216: reviewDismissed IMMER setzen (Swipe-Down + Button)
+            reviewDismissed = true
+            if let blockID = activeBlock?.id {
+                NotificationService.cleanupBlockEndNotification(blockID: blockID)
+            }
+            Task { await loadData() }
+        }) {
             if let block = activeBlock {
                 MacSprintReviewSheet(
                     block: block,
@@ -313,20 +320,27 @@ struct MacFocusView: View {
             Text("Alle Tasks erledigt!")
                 .font(.title.weight(.semibold))
 
-            Text("Starte das Sprint Review")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
+            // Bug #216: Nach Review "Sprint beendet" statt erneut startbar
+            if reviewDismissed {
+                Text("Sprint beendet")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            } else {
+                Text("Starte das Sprint Review")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
 
-            Button {
-                // Bug #218: Pending Block-End-Notification entfernen (Early Review)
-                NotificationService.cleanupBlockEndNotification(blockID: block.id)
-                showSprintReview = true
-            } label: {
-                Text("Sprint Review starten")
-                    .font(.headline)
+                Button {
+                    // Bug #218: Pending Block-End-Notification entfernen (Early Review)
+                    NotificationService.cleanupBlockEndNotification(blockID: block.id)
+                    showSprintReview = true
+                } label: {
+                    Text("Sprint Review starten")
+                        .font(.headline)
+                }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.large)
             }
-            .buttonStyle(.borderedProminent)
-            .controlSize(.large)
         }
         .padding()
     }

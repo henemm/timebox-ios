@@ -176,8 +176,23 @@ struct FocusBloxApp: App {
                 completedTaskIDs: []
             )
 
+            // Focus Block 5: PAST BLOCK (for Bug #216 sprint-end testing)
+            // Ended 5min ago, all tasks completed
+            let pastBlockStart = calendar.date(byAdding: .minute, value: -65, to: now)!
+            let pastBlockEnd = calendar.date(byAdding: .minute, value: -5, to: now)!
+            let pastBlock = FocusBlock(
+                id: "mock-block-past",
+                title: "Past Test Block",
+                startDate: pastBlockStart,
+                endDate: pastBlockEnd,
+                taskIDs: ["00000000-0000-0000-0000-000000000001"],
+                completedTaskIDs: ["00000000-0000-0000-0000-000000000001"]
+            )
+
             if !ProcessInfo.processInfo.arguments.contains("--empty-morning") {
-                if ProcessInfo.processInfo.arguments.contains("--no-active-block") {
+                if ProcessInfo.processInfo.arguments.contains("--past-block") {
+                    mock.mockFocusBlocks = [pastBlock]
+                } else if ProcessInfo.processInfo.arguments.contains("--no-active-block") {
                     mock.mockFocusBlocks = [focusBlock1, focusBlock2, unalignedBlock]
                 } else {
                     mock.mockFocusBlocks = [focusBlock1, focusBlock2, activeBlock, unalignedBlock]
