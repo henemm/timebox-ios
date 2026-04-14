@@ -125,7 +125,8 @@ enum TaskSplitService {
         let valid = suggestions.filter { !$0.title.isEmpty }
         guard !valid.isEmpty else { return 0 }
 
-        for suggestion in valid {
+        var previousTaskID: String?
+        for (index, suggestion) in valid.enumerated() {
             let newTask = LocalTask(title: suggestion.title)
             newTask.estimatedDuration = suggestion.minutes
             newTask.taskType = taskType
@@ -134,10 +135,16 @@ enum TaskSplitService {
             newTask.tags = tags.isEmpty ? nil : tags
             newTask.dueDate = dueDate
             newTask.parentTaskID = originalTaskID
+            newTask.sortOrder = index
+            if let prev = previousTaskID {
+                newTask.blockerTaskID = prev
+            }
             modelContext.insert(newTask)
+            previousTaskID = newTask.id
         }
 
         if let uuid = UUID(uuidString: originalTaskID) {
+            let originalIDString = uuid.uuidString
             let descriptor = FetchDescriptor<LocalTask>(
                 predicate: #Predicate<LocalTask> { $0.uuid == uuid }
             )
@@ -145,6 +152,16 @@ enum TaskSplitService {
                 original.isCompleted = true
                 original.completedAt = Date()
                 original.modifiedAt = Date()
+            }
+
+            // Free tasks that depended on the original (like SyncEngine.completeTask)
+            let depDescriptor = FetchDescriptor<LocalTask>(
+                predicate: #Predicate<LocalTask> { $0.blockerTaskID == originalIDString }
+            )
+            if let dependents = try? modelContext.fetch(depDescriptor) {
+                for dep in dependents {
+                    dep.blockerTaskID = nil
+                }
             }
         }
 

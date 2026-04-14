@@ -173,6 +173,148 @@ final class TaskSplitServiceTests: XCTestCase {
         XCTAssertEqual(sub.taskType, "project", "Should inherit taskType")
     }
 
+    // MARK: - Dependency Chain (Bug #220)
+
+    /// GIVEN: 3 sub-task suggestions
+    /// WHEN: persistSplit is called
+    /// THEN: First sub-task has no blocker, each subsequent blocks on its predecessor
+    func test_persistSplit_createsDependencyChain() throws {
+        let context = container.mainContext
+        let original = LocalTask(title: "Großes Projekt")
+        context.insert(original)
+        try context.save()
+
+        let suggestions: [(title: String, minutes: Int)] = [
+            (title: "Schritt 1", minutes: 15),
+            (title: "Schritt 2", minutes: 30),
+            (title: "Schritt 3", minutes: 15)
+        ]
+
+        TaskSplitService.persistSplit(
+            originalTaskID: original.uuid.uuidString,
+            suggestions: suggestions,
+            taskType: "",
+            importance: nil,
+            urgency: nil,
+            tags: [],
+            dueDate: nil,
+            modelContext: context
+        )
+
+        let allTasks = try context.fetch(FetchDescriptor<LocalTask>())
+        let subTasks = allTasks
+            .filter { $0.parentTaskID == original.uuid.uuidString }
+            .sorted { $0.sortOrder < $1.sortOrder }
+
+        XCTAssertEqual(subTasks.count, 3, "Should create 3 sub-tasks")
+
+        // First sub-task: no blocker (freely actionable)
+        XCTAssertNil(subTasks[0].blockerTaskID, "First sub-task should have no blocker")
+
+        // Second sub-task: blocked by first
+        XCTAssertEqual(subTasks[1].blockerTaskID, subTasks[0].id,
+                        "Second sub-task should be blocked by first")
+
+        // Third sub-task: blocked by second
+        XCTAssertEqual(subTasks[2].blockerTaskID, subTasks[1].id,
+                        "Third sub-task should be blocked by second")
+    }
+
+    /// GIVEN: 3 sub-task suggestions
+    /// WHEN: persistSplit is called
+    /// THEN: Sub-tasks have deterministic sortOrder (0, 1, 2)
+    func test_persistSplit_setsSortOrder() throws {
+        let context = container.mainContext
+        let original = LocalTask(title: "Sortiertest")
+        context.insert(original)
+        try context.save()
+
+        let suggestions: [(title: String, minutes: Int)] = [
+            (title: "Erster", minutes: 5),
+            (title: "Zweiter", minutes: 15),
+            (title: "Dritter", minutes: 30)
+        ]
+
+        TaskSplitService.persistSplit(
+            originalTaskID: original.uuid.uuidString,
+            suggestions: suggestions,
+            taskType: "",
+            importance: nil,
+            urgency: nil,
+            tags: [],
+            dueDate: nil,
+            modelContext: context
+        )
+
+        let allTasks = try context.fetch(FetchDescriptor<LocalTask>())
+        let subTasks = allTasks
+            .filter { $0.parentTaskID == original.uuid.uuidString }
+            .sorted { $0.sortOrder < $1.sortOrder }
+
+        XCTAssertEqual(subTasks[0].sortOrder, 0, "First sub-task sortOrder should be 0")
+        XCTAssertEqual(subTasks[0].title, "Erster")
+        XCTAssertEqual(subTasks[1].sortOrder, 1, "Second sub-task sortOrder should be 1")
+        XCTAssertEqual(subTasks[1].title, "Zweiter")
+        XCTAssertEqual(subTasks[2].sortOrder, 2, "Third sub-task sortOrder should be 2")
+        XCTAssertEqual(subTasks[2].title, "Dritter")
+    }
+
+    /// GIVEN: Original task blocks another task (dependent)
+    /// WHEN: persistSplit completes the original
+    /// THEN: The dependent task's blockerTaskID is cleared (freed)
+    func test_persistSplit_freesDependentsOfOriginal() throws {
+        let context = container.mainContext
+        let original = LocalTask(title: "Blocker-Task")
+        context.insert(original)
+
+        let dependent = LocalTask(title: "Abhängiger Task")
+        dependent.blockerTaskID = original.id
+        context.insert(dependent)
+        try context.save()
+
+        XCTAssertEqual(dependent.blockerTaskID, original.id, "Dependent should be blocked before split")
+
+        TaskSplitService.persistSplit(
+            originalTaskID: original.uuid.uuidString,
+            suggestions: [(title: "Sub 1", minutes: 15)],
+            taskType: "",
+            importance: nil,
+            urgency: nil,
+            tags: [],
+            dueDate: nil,
+            modelContext: context
+        )
+
+        XCTAssertNil(dependent.blockerTaskID, "Dependent should be freed after original is completed by split")
+    }
+
+    /// GIVEN: Only 1 sub-task suggestion
+    /// WHEN: persistSplit is called
+    /// THEN: Single sub-task has no blocker (no chain needed)
+    func test_persistSplit_singleSubTaskHasNoBlocker() throws {
+        let context = container.mainContext
+        let original = LocalTask(title: "Kleiner Task")
+        context.insert(original)
+        try context.save()
+
+        TaskSplitService.persistSplit(
+            originalTaskID: original.uuid.uuidString,
+            suggestions: [(title: "Einziger Schritt", minutes: 15)],
+            taskType: "",
+            importance: nil,
+            urgency: nil,
+            tags: [],
+            dueDate: nil,
+            modelContext: context
+        )
+
+        let allTasks = try context.fetch(FetchDescriptor<LocalTask>())
+        let sub = allTasks.first { $0.parentTaskID == original.uuid.uuidString }!
+
+        XCTAssertNil(sub.blockerTaskID, "Single sub-task should have no blocker")
+        XCTAssertEqual(sub.sortOrder, 0)
+    }
+
     // MARK: - Availability Guard
 
     func test_suggestSplit_returnsEmptyWhenUnavailable() async {

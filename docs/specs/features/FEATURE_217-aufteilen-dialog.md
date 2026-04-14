@@ -100,6 +100,17 @@ static func persistSplit(
 
 Jeder neue `LocalTask` bekommt diese Attribute.
 
+### 6. Dependency Chain — Kaskadierung der Sub-Tasks (Bug #220)
+
+Sub-Tasks werden als Finish-to-Start Dependency Chain erstellt:
+- Erster Sub-Task: `blockerTaskID = nil` (frei verfügbar)
+- Jeder weitere: `blockerTaskID = vorheriger Sub-Task ID`
+- `sortOrder` wird sequentiell gesetzt (0, 1, 2, ...)
+
+Dadurch erscheint im Backlog nur der erste Sub-Task als aktiv — die restlichen sind blockiert und werden erst nach Abschluss des Vorgängers sichtbar.
+
+Zusätzlich: Wenn der Original-Task selbst andere Tasks blockierte (`blockerTaskID == original.id`), werden diese beim Split befreit (analog zu `SyncEngine.completeTask()` → `freeDependents()`).
+
 ### Accessibility Identifiers
 
 Bestehend (angepasst):
@@ -135,6 +146,9 @@ Entfernt (ersetzt durch BacklogRow):
 - **AC6 — Label "Neu generieren":** Button trägt Label "Neu generieren".
 - **AC7 — Bestätigungs-Alert:** Bei Änderungen erscheint "Änderungen verwerfen?" Alert vor Regenerierung.
 - **AC8 — Attribute werden persistiert:** Beim Erstellen erben Sub-Tasks alle vererbten Attribute (nicht nur taskType).
+- **AC9 — Dependency Chain (Bug #220):** Sub-Tasks werden als Finish-to-Start Kette erstellt — erster frei, jeder weitere blockt auf Vorgänger.
+- **AC10 — sortOrder (Bug #220):** Sub-Tasks haben deterministische Reihenfolge (0, 1, 2, ...).
+- **AC11 — freeDependents (Bug #220):** Tasks die vom Original-Task abhingen werden beim Split befreit.
 
 ## Test Plan
 
@@ -152,6 +166,10 @@ Alle Tests in `FocusBloxUITests/TaskSplitUITests.swift`:
 | `test_regenerateButton_labelIsNeuGenerieren` | Button-Label ist "Neu generieren" |
 | `test_regenerateWithChanges_showsAlert` | Alert erscheint nach Änderung + Tap auf "Neu generieren" |
 | `test_splitView_createPersistsInheritedAttributes` | Nach Erstellen: neue Tasks haben vererbte Kategorie |
+| `test_persistSplit_createsDependencyChain` | Sub-Tasks bilden Finish-to-Start Kette via blockerTaskID (AC9) |
+| `test_persistSplit_setsSortOrder` | Sub-Tasks haben sortOrder 0, 1, 2 (AC10) |
+| `test_persistSplit_freesDependentsOfOriginal` | Dependents des Originals werden befreit (AC11) |
+| `test_persistSplit_singleSubTaskHasNoBlocker` | Einzelner Sub-Task hat keinen Blocker (Edge Case) |
 
 ## Nicht im Scope
 
@@ -164,3 +182,4 @@ Alle Tests in `FocusBloxUITests/TaskSplitUITests.swift`:
 
 - 2026-04-13: v1.0 Initial spec (einfache Dauer-Badges + Löschen-Button)
 - 2026-04-13: v2.0 Redesign — BacklogRow-Konsistenz mit vererbten Attributen
+- 2026-04-14: v2.1 Bug #220 — Dependency Chain (AC9-AC11): blockerTaskID-Kaskadierung, sortOrder, freeDependents
