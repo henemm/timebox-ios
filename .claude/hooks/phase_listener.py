@@ -146,12 +146,21 @@ def _call_workflow_checkpoint(checkpoint_num: int, notes: str) -> None:
 
 # --- Keyword definitions ---
 
-CHECKPOINT1_PHRASES = ["stimmt"]
-CHECKPOINT2_PHRASES = ["go"]
-CHECKPOINT3_PHRASES = ["commit"]
+CHECKPOINT1_PHRASES = [
+    "stimmt", "ja", "richtig", "korrekt", "genau", "passt",
+    "weiter", "sehr gut", "sieht gut aus", "einverstanden",
+]
+CHECKPOINT2_PHRASES = [
+    "go", "los", "mach", "anfangen", "start", "weiter",
+    "ja", "passt", "sehr gut", "einverstanden",
+]
+CHECKPOINT3_PHRASES = [
+    "commit", "ja", "passt", "weiter", "sehr gut",
+    "einverstanden", "abschicken", "fertig",
+]
 APPROVAL_PHRASES = [
     "approved", "freigabe", "lgtm", "spec ok", "genehmigt",
-    "abgenommen", "passt", "sieht gut aus",
+    "abgenommen", "passt", "sieht gut aus", "ja", "einverstanden",
 ]
 STOP_PHRASES = ["stop", "stopp", "halt", "anhalten"]
 CONTINUE_PHRASES = ["weiter", "continue", "weitermachen", "fortfahren"]

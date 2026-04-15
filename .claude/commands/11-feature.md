@@ -87,7 +87,7 @@ Falls keine Spannungen: Diesen Abschnitt weglassen.
 4. **"Aufwand:"** [Geschaetzte Groesse]
 5. **"Passt die User-Erwartung zu deiner Vorstellung?"**
 
-→ Henning sagt **"stimmt"**
+→ Henning gibt Freigabe (z.B. "stimmt", "ja", "passt", "weiter", …)
 
 ```bash
 python3 .claude/hooks/workflow.py phase phase3_spec
@@ -104,7 +104,7 @@ python3 .claude/hooks/workflow.py set-affected-files --replace \
   "Sources/path/to/file.swift" "Tests/path/to/Test.swift"
 ```
 
-→ Henning sagt **"approved"**
+→ Henning gibt Freigabe (z.B. "approved", "passt", "ja", "freigabe", …)
 
 ---
 
@@ -133,7 +133,7 @@ Praesentiere Henning:
 |-------------------|--------|
 | [User-verstaendliche Beschreibung] | Schlaegt fehl (erwartet) |
 
-→ Henning sagt **"go"**
+→ Henning gibt Freigabe (z.B. "go", "los", "ja", "weiter", …)
 
 ---
 
@@ -190,7 +190,7 @@ Praesentiere Henning:
 
 4. **User-Erwartung:** "Der User Advocate hatte erwartet: [X]. So sieht es aus: [Screenshot/Beschreibung]"
 
-→ Henning sagt **"commit"** → Fertig. Keine weiteren Schritte danach.
+→ Henning gibt Freigabe (z.B. "commit", "ja", "passt", "fertig", …) → Fertig. Keine weiteren Schritte danach.
 
 ```bash
 python3 .claude/hooks/workflow.py phase phase6_done
