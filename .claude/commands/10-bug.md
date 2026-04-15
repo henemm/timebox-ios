@@ -95,6 +95,15 @@ Erstelle `docs/artifacts/bug-[name]/analysis.md` mit:
 ### 5c. Wahrscheinlichste Ursache(n) mit Begruendung
 ### 5d. Blast Radius
 
+## Schritt 5.5: Phase auf Analyse setzen
+
+**PFLICHT vor Checkpoint 1** — sonst erkennt phase_listener "stimmt" nicht:
+
+```bash
+python3 .claude/hooks/workflow.py mark-context "docs/artifacts/bug-[name]/analysis.md"
+python3 .claude/hooks/workflow.py phase phase2_analyse
+```
+
 ## Schritt 6: **CHECKPOINT 1** — Henning die Analyse praesentieren
 
 **Zeige Henning:**
@@ -155,7 +164,15 @@ Nutze `/05-implement` — dort ist die Bug-Reproduktions-Wiederholung eingebaut 
 2. ALL GREEN Test-Output
 3. Kurze Zusammenfassung was sich geaendert hat
 
-**Optional:** Henning kann jetzt `/adversary` in einer zweiten Claude-Session starten.
+**PFLICHT: Adversary-Agent automatisch starten.**
+Spawn einen Agent (subagent_type: general-purpose) mit dem Adversary-Prompt:
+- Lies die Spec (`spec_file` aus workflow status)
+- Lies alle `affected_files`
+- Fuehre Tests aus (`./scripts/sim.sh unit`, `./scripts/sim.sh test`)
+- Erstelle einen Adversary-Report mit Verdict (BESTANDEN/NICHT BESTANDEN)
+- Bei NICHT BESTANDEN: Blocker zuerst fixen, dann erneut pruefen
+
+**Zeige Henning den Adversary-Report zusammen mit den Test-Ergebnissen.**
 
 **Henning sagt "commit" → Checkpoint 3 freigeschaltet.**
 
