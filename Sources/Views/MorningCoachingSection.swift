@@ -4,6 +4,7 @@ struct MorningCoachingSection: View {
     let suggestions: [NextUpSuggestion]
     let onConfirm: (NextUpSuggestion) -> Void
     let onDismiss: (NextUpSuggestion) -> Void
+    var aiReasonTexts: [String: String] = [:]
     var limitationWarning: LimitationWarning? = nil
     var onDismissWarning: (() -> Void)? = nil
 
@@ -16,7 +17,7 @@ struct MorningCoachingSection: View {
                 VStack(alignment: .leading, spacing: 4) {
                     suggestionTaskRow(suggestion.planItem)
 
-                    Text(NextUpSuggestionService.reasonText(for: suggestion.planItem))
+                    Text(aiReasonTexts[suggestion.id] ?? NextUpSuggestionService.reasonText(for: suggestion.planItem))
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .italic()

@@ -43,6 +43,7 @@ struct CoachView: View {
     @State private var activeDrawer: DayPhase?
     @State private var dismissedTaskIDs: Set<String> = []
     @State private var selectedTasksPerSlot: [UUID: Set<String>] = [:]
+    @State private var aiReasonTexts: [String: String] = [:]  // [taskID: reason]
     @State private var slotCandidates: [UUID: [NextUpSuggestion]] = [:]
 
     private var currentPhase: DayPhase {
@@ -792,6 +793,15 @@ struct CoachView: View {
         VStack(alignment: .leading, spacing: 6) {
             BacklogRow(item: task, isCompletionPending: completed)
 
+            // AI-Begründung (Feature #234)
+            if showActions, let reason = aiReasonTexts[task.id] {
+                Text(reason)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .padding(.leading, 34)
+                    .transition(.opacity)
+            }
+
             if showActions {
                 HStack(spacing: 12) {
                     Button {
@@ -961,5 +971,21 @@ struct CoachView: View {
             completedTasks: completedTasks,
             focusBlocks: focusBlocks
         )
+
+        // AI-Begründungen für Vorschläge laden (async, non-blocking)
+        await loadAIReasons()
+    }
+
+    private func loadAIReasons() async {
+        let tasksToExplain = morningTopTasks
+        guard !tasksToExplain.isEmpty else { return }
+
+        for task in tasksToExplain {
+            let slot = morningSuggestions.first { $0.planItem.id == task.id }?.slot
+            let reason = await AICoachReasonService.reason(
+                for: task, slot: slot, profile: behavioralProfile, allItems: allTasks
+            )
+            aiReasonTexts[task.id] = reason
+        }
     }
 }

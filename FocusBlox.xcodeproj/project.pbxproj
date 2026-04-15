@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		78009F72593D68442E8498FF /* AICoachReasonService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2AC854841D3BE31CDA672 /* AICoachReasonService.swift */; };
+		F5D66EDE2BE1DB966F4C6E20 /* AICoachReasonServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55921281D2AA80B142A603DA /* AICoachReasonServiceTests.swift */; };
 		08A8A68F7DE457F45B871CFD /* CoachSuggestionUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEE29F820045B57F618C2332 /* CoachSuggestionUITests.swift */; };
 		9FBA522B76FBC7FA31AED9F7 /* ShakeUndoHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54BF85733F8AE9505BA457C8 /* ShakeUndoHandler.swift */; };
 		FAF13C9EC472DB8EB792905D /* ShakeUndoConfirmationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAD2889BC9E0BC02588A1583 /* ShakeUndoConfirmationTests.swift */; };
@@ -470,6 +472,7 @@
 		SNDSVC02BUILDFILE0001 /* SoundService.swift in Sources */ = {isa = PBXBuildFile; fileRef = SNDSVC02FILEREF00001 /* SoundService.swift */; };
 		SNDUI001BUILDFILE0001 /* SoundSettingsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = SNDUI001FILEREF00001 /* SoundSettingsUITests.swift */; };
 		SPRNTRV01BUILD0001 /* SprintReviewUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = SPRNTRV01FILE00001 /* SprintReviewUITests.swift */; };
+		ACR01MACBLD00001 /* AICoachReasonService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2AC854841D3BE31CDA672 /* AICoachReasonService.swift */; };
 		SSS01MACBLD00001 /* SuccessStoryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1F900DD6600DBC1E2C448F6 /* SuccessStoryService.swift */; };
 		SSV01MACBLD00001 /* SuccessStoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5850078865CF21FABB28AD9F /* SuccessStoryView.swift */; };
 		SYNSET01BUILD0001 /* SyncedSettingsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = SYNSET01FILE00001 /* SyncedSettingsTests.swift */; };
@@ -704,6 +707,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		E1A2AC854841D3BE31CDA672 /* AICoachReasonService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AICoachReasonService.swift; path = Sources/Services/AICoachReasonService.swift; sourceTree = SOURCE_ROOT; };
+		55921281D2AA80B142A603DA /* AICoachReasonServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AICoachReasonServiceTests.swift; path = FocusBloxTests/AICoachReasonServiceTests.swift; sourceTree = SOURCE_ROOT; };
 		BEE29F820045B57F618C2332 /* CoachSuggestionUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CoachSuggestionUITests.swift; path = FocusBloxUITests/CoachSuggestionUITests.swift; sourceTree = SOURCE_ROOT; };
 		54BF85733F8AE9505BA457C8 /* ShakeUndoHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ShakeUndoHandler.swift; path = Sources/Services/ShakeUndoHandler.swift; sourceTree = SOURCE_ROOT; };
 		EAD2889BC9E0BC02588A1583 /* ShakeUndoConfirmationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ShakeUndoConfirmationTests.swift; path = FocusBloxTests/ShakeUndoConfirmationTests.swift; sourceTree = SOURCE_ROOT; };
@@ -1704,6 +1709,7 @@
 		A6B3805EF19D1B131D346DDD /* FocusBloxTests */ = {
 			isa = PBXGroup;
 			children = (
+				55921281D2AA80B142A603DA /* AICoachReasonServiceTests.swift */,
 				EAD2889BC9E0BC02588A1583 /* ShakeUndoConfirmationTests.swift */,
 				9C5707D2EB4E5F854A5A33E6 /* DoNowBadgeTests.swift */,
 				D363DA94F56D02861D7BEBBF /* BlockEndNotificationCleanupTests.swift */,
@@ -1870,6 +1876,7 @@
 		E8F581D4C161751425D7F776 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				E1A2AC854841D3BE31CDA672 /* AICoachReasonService.swift */,
 				54BF85733F8AE9505BA457C8 /* ShakeUndoHandler.swift */,
 				CDEC968759D860953246E6C2 /* BacklogBadgeService.swift */,
 				1988F7DB042B0D4323446828 /* TaskSplitService.swift */,
@@ -2625,6 +2632,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				78009F72593D68442E8498FF /* AICoachReasonService.swift in Sources */,
 				9FBA522B76FBC7FA31AED9F7 /* ShakeUndoHandler.swift in Sources */,
 				0A96CB42A72DE72E591A2C28 /* BacklogBadgeService.swift in Sources */,
 				7CAABB4083FEC96458CD655F /* TaskSplitView.swift in Sources */,
@@ -2907,6 +2915,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F5D66EDE2BE1DB966F4C6E20 /* AICoachReasonServiceTests.swift in Sources */,
 				FAF13C9EC472DB8EB792905D /* ShakeUndoConfirmationTests.swift in Sources */,
 				5DE1A4BA4F2338D381F436E6 /* DoNowBadgeTests.swift in Sources */,
 				656D41E1C06782EF56D1FE83 /* BlockEndNotificationCleanupTests.swift in Sources */,
@@ -3103,6 +3112,7 @@
 				8E83A6881ACAE567E1A80956 /* BacklogRow.swift in Sources */,
 				6D9F3CC3F3C21C0143D86B9F /* TaskSuggestionService.swift in Sources */,
 				SSV01MACBLD00001 /* SuccessStoryView.swift in Sources */,
+				ACR01MACBLD00001 /* AICoachReasonService.swift in Sources */,
 				SSS01MACBLD00001 /* SuccessStoryService.swift in Sources */,
 				ISS01MACBLD00001 /* IntentionSuggestionService.swift in Sources */,
 				DI001MACBLD00001 /* DayIntention.swift in Sources */,
