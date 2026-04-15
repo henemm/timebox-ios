@@ -16,9 +16,9 @@ struct MainTabView: View {
     @Query(filter: #Predicate<LocalTask> { !$0.isCompleted && !$0.isParked && !$0.isTemplate })
     private var backlogTasks: [LocalTask]
 
-    private var staleTaskCount: Int {
+    private var doNowTaskCount: Int {
         let items = backlogTasks.map { PlanItem(localTask: $0) }
-        return BacklogHealthService.findStaleTasks(in: items).count
+        return BacklogBadgeService.countDoNowTasks(in: items)
     }
 
     var body: some View {
@@ -38,7 +38,7 @@ struct MainTabView: View {
                     Label("Backlog", systemImage: "list.bullet")
                 }
                 .tag(AppTab.backlog)
-                .badge(staleTaskCount)
+                .badge(doNowTaskCount)
 
             BlockPlanningView()
                 .tabItem {
@@ -76,7 +76,7 @@ struct MainTabView: View {
                     Label("Backlog", systemImage: "list.bullet")
                 }
                 .tag(AppTab.backlog)
-                .badge(staleTaskCount)
+                .badge(doNowTaskCount)
 
             BlockPlanningView()
                 .tabItem {

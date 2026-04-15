@@ -131,6 +131,9 @@ struct PlanItem: Identifiable, Sendable {
         TaskPriorityScoringService.PriorityTier.from(score: priorityScore)
     }
 
+    /// Whether this task needs immediate attention (score >= 60, tier "doNow")
+    var isDoNow: Bool { priorityTier == .doNow }
+
     /// Backwards compatibility for priority-based code
     var priority: TaskPriority {
         guard let imp = importance else { return .low }

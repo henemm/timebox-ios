@@ -30,6 +30,15 @@ struct BacklogRow: View {
 
     var body: some View {
         HStack(spacing: 12) {
+            // doNow Marker (red dot for high-priority tasks, Bug #223)
+            if item.isDoNow {
+                Circle()
+                    .fill(.red)
+                    .frame(width: 8, height: 8)
+                    .accessibilityIdentifier("doNowMarker_\(item.id)")
+                    .accessibilityLabel("Sofort erledigen")
+            }
+
             // Completion Checkbox
             Button {
                 if isBlocked { return }
