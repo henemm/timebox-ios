@@ -74,6 +74,35 @@ python3 .claude/hooks/workflow.py phase phase2_analyse
 
 Praesentiere Henning (in SEINER Sprache, kein Fachjargon):
 
+### Team-Analyse (Stimmen der Agenten)
+
+Zeige die einzelnen Agenten-Ergebnisse als benannte Perspektiven:
+
+**User Advocate sagt:**
+> [Zitat/Zusammenfassung — was der User erwartet, was ihn verwirrt]
+
+**Investigator "Datenfluss" sagt:**
+> [Was dieser Agent als Ursache identifiziert hat]
+
+**Investigator "Szenarien" sagt:**
+> [Welche Szenarien betroffen sind]
+
+**Investigator "Blast Radius" sagt:**
+> [Was noch betroffen sein koennte]
+
+*(Nur die Investigatoren zeigen, die relevante Erkenntnisse haben — nicht alle 5 wenn manche nichts Neues finden.)*
+
+### Spannungen
+
+Falls Agenten sich widersprechen oder unterschiedliche Schwerpunkte setzen:
+
+> **⚡ Spannung:** [Agent A] sagt X, aber [Agent B] sagt Y.
+> **Meine Entscheidung:** [Wie du den Widerspruch aufloest und warum]
+
+Falls keine Spannungen: Diesen Abschnitt weglassen.
+
+### Synthese
+
 1. **"Das Problem:"** [Was der User erlebt — aus User-Advocate-Ergebnis]
 2. **"Die Ursache:"** [Root Cause in einfachen Worten]
 3. **"Was betroffen ist:"** [Welche Screens/Features]
@@ -174,7 +203,15 @@ Praesentiere Henning:
 
 1. **Zusammenfassung:** "Bug ist gefixt. [Was geaendert wurde in 1 Satz]"
 2. **Tests:** "Alle [N] Tests gruen"
-3. **Adversary:** "Unabhaengige Pruefung: BESTANDEN"
+3. **Adversary-Report** (wichtigste Punkte zeigen, nicht nur Verdict):
+
+> **Adversary hat geprueft:**
+> - ✅ [Acceptance Criterion 1] — Beweis: [kurz]
+> - ✅ [Acceptance Criterion 2] — Beweis: [kurz]
+> - ⚠️ [Falls Warnings] — [was und warum akzeptabel]
+>
+> **Verdict: BESTANDEN**
+
 4. Falls UI-Bug: Vorher/Nachher-Screenshots
 
 → Henning sagt **"commit"** → Fertig. Keine weiteren Schritte danach.

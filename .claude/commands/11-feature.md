@@ -62,6 +62,25 @@ python3 .claude/hooks/workflow.py phase phase2_analyse
 
 Praesentiere Henning (in SEINER Sprache, kein Fachjargon):
 
+### Team-Analyse (Stimmen der Agenten)
+
+**User Advocate sagt:**
+> [Zitat/Zusammenfassung — wie sich das Feature anfuehlen soll, was der User erwartet, moegliche Verwirrungen]
+
+**Feature Planner sagt:**
+> [Was sich technisch aendern muss, welche Screens betroffen sind, bestehende Patterns]
+
+### Spannungen
+
+Falls die Agenten unterschiedliche Vorstellungen haben:
+
+> **⚡ Spannung:** User Advocate erwartet [X], aber Feature Planner sagt [Y ist aufwendig/nicht moeglich/anders geloest].
+> **Meine Entscheidung:** [Wie du den Widerspruch aufloest und warum]
+
+Falls keine Spannungen: Diesen Abschnitt weglassen.
+
+### Synthese
+
 1. **"Der User erwartet:"** [User-Advocate-Zusammenfassung]
 2. **"Technisch bedeutet das:"** [Was sich aendert, in einfachen Worten]
 3. **"Betrifft:"** [Welche Screens/Features]
@@ -160,7 +179,15 @@ Praesentiere Henning:
 
 1. **Zusammenfassung:** "Feature ist fertig. [Was gebaut wurde in 1 Satz]"
 2. **Tests:** "Alle [N] Tests gruen"
-3. **Adversary:** "Unabhaengige Pruefung: BESTANDEN"
+3. **Adversary-Report** (wichtigste Punkte zeigen, nicht nur Verdict):
+
+> **Adversary hat geprueft:**
+> - ✅ [Acceptance Criterion 1] — Beweis: [kurz]
+> - ✅ [Acceptance Criterion 2] — Beweis: [kurz]
+> - ⚠️ [Falls Warnings] — [was und warum akzeptabel]
+>
+> **Verdict: BESTANDEN**
+
 4. **User-Erwartung:** "Der User Advocate hatte erwartet: [X]. So sieht es aus: [Screenshot/Beschreibung]"
 
 → Henning sagt **"commit"** → Fertig. Keine weiteren Schritte danach.
