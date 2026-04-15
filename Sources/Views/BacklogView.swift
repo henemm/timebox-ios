@@ -69,9 +69,8 @@ struct BacklogView: View {
     @State private var editSeriesMode: Bool = false
     @State private var taskToEndSeries: PlanItem?
     @State private var searchText = ""
-    @State private var showUndoAlert = false
+    @StateObject private var shakeUndoHandler = ShakeUndoHandler()
     @State private var showSettings = false
-    @State private var undoResultMessage = ""
     @State private var focusSprintConflictTitle: String?
     @State private var focusSprintFeedback = false
     @State private var showHygieneSheet = false
@@ -245,20 +244,23 @@ struct BacklogView: View {
             }
             .sheet(item: $selectedItemForDuration) { item in
                 DurationPicker(currentDuration: item.effectiveDuration) { newDuration in
-                    updateDuration(for: item, minutes: newDuration)
+                    let capturedItem = item
                     selectedItemForDuration = nil
+                    updateDuration(for: capturedItem, minutes: newDuration)
                 }
             }
             .sheet(item: $selectedItemForImportance) { item in
                 ImportancePicker(currentImportance: item.importance) { newImportance in
-                    updateImportance(for: item, importance: newImportance)
+                    let capturedItem = item
                     selectedItemForImportance = nil
+                    updateImportance(for: capturedItem, importance: newImportance)
                 }
             }
             .sheet(item: $selectedItemForCategory) { item in
                 CategoryPicker(currentCategory: item.taskType) { newCategory in
-                    updateCategory(for: item, category: newCategory)
+                    let capturedItem = item
                     selectedItemForCategory = nil
+                    updateCategory(for: capturedItem, category: newCategory)
                 }
             }
             .sheet(item: $taskToEditDirectly) { task in
@@ -365,13 +367,23 @@ struct BacklogView: View {
         .searchable(text: $searchText, prompt: "Tasks durchsuchen")
         #if canImport(UIKit)
         .onShake {
-            undoLastCompletion()
+            shakeUndoHandler.requestShakeUndo()
         }
         #endif
-        .alert("Rückgängig", isPresented: $showUndoAlert) {
+        .confirmationDialog("Rückgängig machen?", isPresented: $shakeUndoHandler.showUndoConfirmation) {
+            Button("Rückgängig machen") {
+                shakeUndoHandler.confirmShakeUndo(in: modelContext)
+                completeFeedback.toggle()
+                Task { await loadTasks() }
+            }
+            Button("Abbrechen", role: .cancel) {
+                shakeUndoHandler.cancelShakeUndo()
+            }
+        }
+        .alert("Rückgängig", isPresented: $shakeUndoHandler.showUndoAlert) {
             Button("OK") { }
         } message: {
-            Text(undoResultMessage)
+            Text(shakeUndoHandler.undoResultMessage)
         }
         .task(id: remindersSyncEnabled) {
             await loadTasks()
@@ -393,24 +405,6 @@ struct BacklogView: View {
         .onReceive(NotificationCenter.default.publisher(for: LocalTaskSource.taskCreatedNotification)) { _ in
             Task { await loadTasks() }
         }
-    }
-
-    private func undoLastCompletion() {
-        guard TaskCompletionUndoService.canUndo else {
-            undoResultMessage = "Nichts zum Rückgängigmachen"
-            showUndoAlert = true
-            return
-        }
-        do {
-            if let title = try TaskCompletionUndoService.undo(in: modelContext) {
-                undoResultMessage = "\(title) wiederhergestellt"
-                completeFeedback.toggle()
-                Task { await loadTasks() }
-            }
-        } catch {
-            undoResultMessage = "Fehler: \(error.localizedDescription)"
-        }
-        showUndoAlert = true
     }
 
     private func loadTasks() async {

@@ -1,6 +1,8 @@
 import Foundation
 
-struct PlanItem: Identifiable, Sendable {
+struct PlanItem: Identifiable, Hashable, Sendable {
+    static func == (lhs: PlanItem, rhs: PlanItem) -> Bool { lhs.id == rhs.id }
+    func hash(into hasher: inout Hasher) { hasher.combine(id) }
     let id: String
     let title: String
     let isCompleted: Bool
@@ -322,7 +324,7 @@ extension Array where Element == PlanItem {
     }
 }
 
-enum DurationSource: Sendable {
+enum DurationSource: Sendable, Equatable, Hashable {
     case manual
     case parsed
     case `default`

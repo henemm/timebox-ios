@@ -55,6 +55,8 @@ INFRASTRUCTURE_DIRS = [".claude/hooks/", ".claude/agents/"]
 
 IMPL_PHASES = {
     "phase5_implement", "phase6_done",
+    # v4 backward compat (old workflows not yet archived)
+    "phase6_implement", "phase6b_adversary", "phase7_validate", "phase8_complete",
 }
 
 TEST_DIRS = [

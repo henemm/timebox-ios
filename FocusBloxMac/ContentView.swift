@@ -1304,8 +1304,13 @@ struct ContentView: View {
             onDurationSelect: { duration in
                 freezeSortOrder()
                 task.estimatedDuration = duration
-                try? modelContext.save()
+                do {
+                    try modelContext.save()
+                } catch {
+                    print("[ContentView] Save failed after duration change: \(error)")
+                }
                 deferredSort.scheduleDeferredResort(id: task.id)
+                NotificationCenter.default.post(name: .taskDataChanged, object: nil)
             },
             isPendingResort: deferredSort.isPending(task.id),
             isCompletionPending: deferredCompletion.isPending(task.id),
