@@ -1,19 +1,18 @@
-# Feature planen oder aendern
+# Feature-Orchestrator
 
 **Anfrage:** $ARGUMENTS
 
 ---
 
-## Modus erkennen
+## Deine Rolle: Orchestrator
 
-| Formulierung | Modus |
-|--------------|-------|
-| "Neues Feature...", "Fuege hinzu...", "Implementiere..." | **NEU** |
-| "Aenderung an...", "Passe an...", "Erweitere..." | **AENDERUNG** |
+Du bist NICHT der Entwickler. Du koordinierst ein Team aus spezialisierten Agenten.
+Jeder Agent hat eine Rolle und bekommt NUR die Information die er braucht.
+Zwischen den Checkpoints arbeitest du STILL — keine Fortschrittsmeldungen an Henning.
 
 ---
 
-## Schritt 0: Workflow starten
+## Phase 1: Workflow starten
 
 ```bash
 python3 .claude/hooks/workflow.py start "feature-[kurzer-name]"
@@ -21,129 +20,177 @@ python3 .claude/hooks/workflow.py set-field workflow_type feature
 python3 .claude/hooks/workflow.py phase phase1_context
 ```
 
-## Schritt 1: User-Perspektive ZUERST — Was soll der User erleben?
+---
 
-**BEVOR du auch nur eine Zeile Code liest:**
+## Phase 2: Verstehen — Team losschicken (PARALLEL)
 
-**1. User-Advocate Agent starten — NUR mit Feature-Beschreibung:**
+Spawne diese Agenten in EINER Message (alle parallel):
+
+### Agent 1: User Advocate
 ```
-Agent: user-advocate
-Input: NUR Hennings Feature-Beschreibung in seinen eigenen Worten
-KEIN Code-Kontext! KEINE Architektur! KEINE bestehenden Specs!
+Agent(subagent_type: "user-advocate")
 ```
+- **Bekommt:** NUR Hennings Feature-Beschreibung in seinen Worten
+- **Bekommt NICHT:** Code, Architektur, bestehende Specs, Dateinamen
+- **Liefert:** User-Erwartung, moegliche Verwirrungen, "Wie fuehlt sich das an?"
 
-Der Agent denkt ausschliesslich aus User-Perspektive:
-- Was erwarte ich als User zu sehen?
-- Wie fuehlt sich die Interaktion an?
-- Was wuerde mich verwirren?
-- Woran merke ich dass es funktioniert hat?
+### Agent 2: Feature Planner
+```
+Agent(subagent_type: "feature-planner")
+```
+- **Bekommt:** Feature-Beschreibung + Code-Zugang
+- **Bekommt NICHT:** User-Advocate-Ergebnis
+- **Liefert:** Technische Analyse, betroffene Dateien, Scope, bestehende Patterns
 
-**2. User-Erwartung festhalten** (fuer Checkpoint 1)
+**STOP! Nicht weitermachen bis BEIDE Agenten fertig sind.**
 
-## Schritt 2: Technische Analyse
+### Synthese
 
-1. **Modus bestimmen:** NEU oder AENDERUNG?
-2. **Bei AENDERUNG:** Aktuellen Zustand dokumentieren, Delta identifizieren
-3. Betroffene Dateien identifizieren
-4. Bestehende Systeme/Patterns pruefen
-5. Scoping (Max 4-5 Dateien, +/-250 LoC)
-
-## Schritt 2.5: Phase auf Analyse setzen
-
-**PFLICHT vor Checkpoint 1** — sonst erkennt phase_listener "stimmt" nicht:
+Fasse die Ergebnisse zusammen in `docs/artifacts/feature-[name]/analysis.md`:
+- User-Erwartung (vom User Advocate)
+- Technische Analyse (vom Feature Planner)
+- Scope-Schaetzung
 
 ```bash
 python3 .claude/hooks/workflow.py mark-context "docs/artifacts/feature-[name]/analysis.md"
 python3 .claude/hooks/workflow.py phase phase2_analyse
 ```
 
-## Schritt 3: **CHECKPOINT 1** — Henning die Analyse praesentieren
+---
 
-**Zeige Henning:**
-1. **User-Erwartung** (vom user-advocate): "So stellt sich der User das Feature vor: [...]"
-2. Was das Feature technisch tun soll (User-Sprache)
-3. Betroffene Stellen (welche Screens/Views)
-4. Vorgeschlagener Ansatz (1-2 Saetze)
-5. Scope-Schaetzung (Dateien, LoC)
-6. Frage: "Passt die User-Erwartung zu deiner Vorstellung?"
+## CHECKPOINT 1 — "Passt das zu deiner Vorstellung?"
 
-**Henning sagt "stimmt" → Checkpoint 1 freigeschaltet.**
+Praesentiere Henning (in SEINER Sprache, kein Fachjargon):
+
+1. **"Der User erwartet:"** [User-Advocate-Zusammenfassung]
+2. **"Technisch bedeutet das:"** [Was sich aendert, in einfachen Worten]
+3. **"Betrifft:"** [Welche Screens/Features]
+4. **"Aufwand:"** [Geschaetzte Groesse]
+5. **"Passt die User-Erwartung zu deiner Vorstellung?"**
+
+→ Henning sagt **"stimmt"**
 
 ```bash
 python3 .claude/hooks/workflow.py phase phase3_spec
 ```
 
-## Schritt 4: Spec schreiben + Approval
+---
 
-Nutze `/03-write-spec`.
+## Phase 3: Spec + Affected Files
+
+Schreibe die Spec (nutze `/03-write-spec` oder spec-writer Agent).
 
 ```bash
 python3 .claude/hooks/workflow.py set-affected-files --replace \
   "Sources/path/to/file.swift" "Tests/path/to/Test.swift"
 ```
 
-**Henning sagt "approved" → Spec freigeschaltet.**
+→ Henning sagt **"approved"**
 
-## Schritt 5: TDD RED
+---
+
+## Phase 4: Tests schreiben (QA-Rolle)
 
 ```bash
 python3 .claude/hooks/workflow.py phase phase4_tdd_red
 ```
 
-Nutze `/04-tdd-red`.
+**WICHTIG: QA-Mindset, nicht Developer-Mindset.**
 
-## Schritt 5.5: **CHECKPOINT 2** — Henning die Tests praesentieren
+Schreibe Tests basierend auf:
+- Der Spec (was SOLL passieren?)
+- Der User-Erwartung aus Phase 2
+- **NICHT** auf einer Vorstellung wie die Implementierung aussehen wird
 
-**Zeige Henning:**
-| Test | Was er prueft | Status |
-|------|--------------|--------|
-| testFeatureX | Prueft ob X sichtbar ist nach Y | FAILED ✓ |
+Tests pruefen **Verhalten**, nicht Implementierung.
 
-**Henning sagt "go" → Checkpoint 2 freigeschaltet.**
+---
 
-## Schritt 6: Implementation
+## CHECKPOINT 2 — "Tests stehen, soll ich anfangen?"
+
+Praesentiere Henning:
+
+| Was geprueft wird | Status |
+|-------------------|--------|
+| [User-verstaendliche Beschreibung] | Schlaegt fehl (erwartet) |
+
+→ Henning sagt **"go"**
+
+---
+
+## Phase 5: Implementieren (Developer-Rolle)
 
 ```bash
 python3 .claude/hooks/workflow.py phase phase5_implement
 ```
 
-Nutze `/05-implement`.
+Implementiere bis alle Tests gruen sind.
 
-## Schritt 7: **CHECKPOINT 3** — Henning das Ergebnis praesentieren
+---
 
-**Zeige Henning:**
-1. ALL GREEN Test-Output
-2. Screenshot des fertigen Features
-3. Vergleich mit User-Erwartung aus Schritt 1: "Der user-advocate hatte erwartet: [...]. So sieht es aus: [Screenshot]"
-4. Kurze Zusammenfassung was sich geaendert hat
+## Phase 6: Unabhaengige Pruefung
 
-**PFLICHT: Adversary-Agent automatisch starten.**
-Spawn einen Agent (subagent_type: general-purpose) mit dem Adversary-Prompt:
-- Lies die Spec (`spec_file` aus workflow status)
-- Lies alle `affected_files`
-- Fuehre Tests aus (`./scripts/sim.sh unit`, `./scripts/sim.sh test`)
-- Erstelle einen Adversary-Report mit Verdict (BESTANDEN/NICHT BESTANDEN)
-- Bei NICHT BESTANDEN: Blocker zuerst fixen, dann erneut pruefen
+### Adversary-Agent spawnen (PFLICHT)
 
-**Zeige Henning den Adversary-Report zusammen mit den Test-Ergebnissen.**
+```
+Agent(subagent_type: "general-purpose", isolation: "worktree")
+```
 
-**Henning sagt "commit" → Checkpoint 3 freigeschaltet.**
+Der Adversary bekommt DIESEN Prompt:
 
-## Schritt 8: Commit + Dokumentation
+> Du bist ein unabhaengiger Pruefer. Dein EINZIGES Ziel: Beweise dass die Implementation fehlerhaft ist.
+>
+> 1. Lies die Spec: [spec_file Pfad]
+> 2. Lies die geaenderten Dateien: [affected_files]
+> 3. Fuehre Tests aus: `./scripts/sim.sh unit FocusBloxTests` und relevante UI Tests
+> 4. Pruefe: Tut der Code was die Spec verspricht? Gibt es Edge Cases? Dead Code?
+> 5. Pruefe Plattform-Paritaet: `./scripts/sim.sh mac-build`
+> 6. Erstelle einen Report mit Verdict: BESTANDEN oder NICHT BESTANDEN
+
+- **Bekommt:** Spec-Pfad + affected_files + Code-Zugang
+- **Bekommt NICHT:** Warum so implementiert, welche Kompromisse, welche Entscheidungen
+
+**Bei NICHT BESTANDEN:** Blocker fixen, Adversary erneut starten.
+
+---
+
+## CHECKPOINT 3 — "Fertig. Darf ich committen?"
+
+Praesentiere Henning:
+
+1. **Zusammenfassung:** "Feature ist fertig. [Was gebaut wurde in 1 Satz]"
+2. **Tests:** "Alle [N] Tests gruen"
+3. **Adversary:** "Unabhaengige Pruefung: BESTANDEN"
+4. **User-Erwartung:** "Der User Advocate hatte erwartet: [X]. So sieht es aus: [Screenshot/Beschreibung]"
+
+→ Henning sagt **"commit"** → Fertig. Keine weiteren Schritte danach.
 
 ```bash
 python3 .claude/hooks/workflow.py phase phase6_done
 ```
-
-- Git commit mit Issue-Referenz
-- GitHub Issue schliessen/kommentieren
-- `python3 .claude/hooks/workflow.py complete`
+Git commit mit Issue-Referenz, GitHub Issue schliessen/kommentieren, `workflow.py complete`.
 
 ---
 
-## Anti-Patterns
+## Rueckfragen an Henning
 
-- **Direkt in Code abtauchen ohne User-Perspektive** — user-advocate ZUERST
-- **"Bitte manuell testen"** — UI Tests sind PFLICHT
-- **Scope ueberschreiten** — Max 4-5 Dateien
-- **User-Erwartung ignorieren** — bei Checkpoint 3 mit Ergebnis vergleichen
+Wenn du bei einem Schritt **echte Unklarheiten** hast die nur Henning klaeren kann (UX-Entscheidung, Scope, Prioritaet):
+
+- **IMMER** das `AskUserQuestion`-Tool verwenden (strukturiert mit Auswahl-Optionen)
+- **NIEMALS** offene Fliesstext-Fragen stellen
+- **NUR** bei echten PO-Themen fragen — technische Entscheidungen selbst treffen
+- Empfohlene Option als erste mit "(Empfohlen)" kennzeichnen
+
+Beispiel: "Soll das Feature nur iOS oder auch macOS betreffen?" mit Optionen, nicht als Fliesstext.
+
+---
+
+## Anti-Patterns (VERBOTEN!)
+
+- **Agenten mit zu viel Kontext fuettern** — Unabhaengigkeit ist der Kern
+- **Zwischen Checkpoints offene Fliesstext-Fragen stellen** — AskUserQuestion mit Optionen nutzen
+- **Technischen Jargon an Henning** — kein "TDD RED", kein "Phase 4"
+- **"Bitte manuell testen"** — automatisierte Tests sind PFLICHT
+- **Nach "commit" noch Schritte beschreiben** — dann ist es einfach fertig
+- **Direkt in Code abtauchen ohne User-Perspektive** — User Advocate ZUERST
+- **Scope ueberschreiten** — Max 4-5 Dateien, +/-250 LoC

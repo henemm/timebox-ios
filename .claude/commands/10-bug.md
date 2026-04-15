@@ -1,64 +1,18 @@
-# Bug analysieren und fixen
+# Bug-Orchestrator
 
 **Bug:** $ARGUMENTS
 
 ---
 
-## GRUNDANNAHME: ICH LIEGE FALSCH
+## Deine Rolle: Orchestrator
 
-Gehe bei JEDEM Schritt davon aus, dass deine Annahme falsch ist.
-
-- Wenn du **ueberzeugt bist** die Ursache zu kennen → du brauchst TROTZDEM Beweis
-- Wenn du denkst Debugging sei unnoetig → **genau dann ist es noetig**
-- Wenn dein Fix "offensichtlich richtig" aussieht → pruefe ob er ueberhaupt aufgerufen wird
-- Wenn du nur eine Plattform pruefst → **die andere ist wahrscheinlich auch betroffen**
+Du bist NICHT der Entwickler. Du koordinierst ein Team aus spezialisierten Agenten.
+Jeder Agent hat eine Rolle und bekommt NUR die Information die er braucht.
+Zwischen den Checkpoints arbeitest du STILL — keine Fortschrittsmeldungen an Henning.
 
 ---
 
-## Schritt 0: TRIAGE — 3 Fragen BEVOR irgendetwas passiert
-
-1. **Welche Plattform?** (iOS, macOS, oder beide?)
-2. **Welcher Screen/View?** (Was siehst du gerade?)
-3. **Was genau getan, was genau gesehen?**
-
-**Kein naechster Schritt ohne Antworten.**
-
----
-
-## Schritt 0.5: BUG REPRODUZIEREN — "So sieht es kaputt aus"
-
-**BEVOR du in den Code schaust: Bug nachstellen!**
-
-Ohne Reproduktion kannst du nie beweisen, dass dein Fix funktioniert hat.
-
-1. **Simulator starten, zum betroffenen Screen navigieren**
-2. **Bug ausloesen** (die Schritte aus der Beschreibung nachstellen)
-3. **Screenshot machen:**
-```bash
-./scripts/sim.sh screenshot /tmp/bug_vorher.png
-```
-4. **Ergebnis festhalten:** Was genau ist sichtbar? Was fehlt? Was ist falsch?
-
-### Bug nicht reproduzierbar?
-
-| Situation | Aktion |
-|-----------|--------|
-| Bug tritt nicht auf | Henning fragen: "Ich kann den Bug nicht reproduzieren. Kannst du die Schritte praezisieren?" |
-| Bug ist Timing-abhaengig | Notieren und in Analyse beruecksichtigen |
-| Bug braucht bestimmte Daten | Mock-Daten/Launch-Arguments nutzen |
-
-**KEIN naechster Schritt ohne Reproduktion oder Erklaerung warum nicht moeglich.**
-
----
-
-## STRUKTURELLER ZWANG: Parallele Agenten mit verschiedenen Diagnosen
-
-**KEIN Fix-Vorschlag bevor ALLE Investigate-Tasks COMPLETED sind.**
-Die Agenten MUESSEN verschiedene Richtungen untersuchen — nicht alle die gleiche Hypothese bestaetigen.
-
----
-
-## Schritt 1: Workflow starten
+## Phase 1: Workflow starten + Bug reproduzieren
 
 ```bash
 python3 .claude/hooks/workflow.py start "bug-[kurzer-name]"
@@ -66,134 +20,193 @@ python3 .claude/hooks/workflow.py set-field workflow_type bug
 python3 .claude/hooks/workflow.py phase phase1_context
 ```
 
-## Schritt 2: Investigate-Tasks erstellen
+**Bug reproduzieren** (falls UI-Bug):
+```bash
+./scripts/sim.sh screenshot /tmp/bug_vorher.png
+```
 
-Erstelle mit `TaskCreate` diese 5 Tasks (ALLE PFLICHT):
+---
 
-| # | Task Subject | Description |
-|---|-------------|-------------|
-| 1 | **Wiederholungs-Check** | Git-History, GitHub Issues und Memory nach verwandten Bugs durchsuchen. |
-| 2 | **Datenfluss-Trace** | KOMPLETTEN Datenfluss tracen: Wo erstellt, transformiert, gespeichert, gelesen. |
-| 3 | **Alle Schreiber finden** | JEDE Stelle die das betroffene Feld/Objekt SCHREIBT. |
-| 4 | **Alle Szenarien auflisten** | ALLE Szenarien: User-Flows, Sync, Timer, Background, Edge Cases. |
-| 5 | **Blast Radius pruefen** | Welche anderen Features nutzen denselben Code? |
+## Phase 2: Verstehen — Team losschicken (PARALLEL)
 
-## Schritt 3: Agenten PARALLEL losschicken
+Spawne diese Agenten in EINER Message (alle parallel):
 
-**ALLE 5 PARALLEL** — nicht sequentiell!
+### Agent 1: User Advocate
+```
+Agent(subagent_type: "user-advocate")
+```
+- **Bekommt:** NUR Hennings Bug-Beschreibung in seinen Worten
+- **Bekommt NICHT:** Code, Dateinamen, technische Details, Zeilennummern
+- **Liefert:** Was der User erwartet haette, was ihn verwirrt
 
-## Schritt 4: WARTEN bis ALLE Agenten fertig sind
+### Agent 2-6: Bug Investigator (5 parallele Investigationen)
+```
+Agent(subagent_type: "bug-investigator")
+```
+Erstelle 5 Investigate-Tasks und schicke je einen bug-investigator Agent:
 
-**STOP!** Nicht weitermachen bis alle 5 Tasks COMPLETED sind.
+| # | Auftrag | Was der Agent bekommt | Was der Agent NICHT bekommt |
+|---|---------|----------------------|---------------------------|
+| 1 | Wiederholungs-Check | Bug-Beschreibung + git/issues Zugang | User-Advocate-Ergebnis |
+| 2 | Datenfluss-Trace | Bug-Beschreibung + Code-Zugang | Ergebnisse anderer Investigatoren |
+| 3 | Alle Schreiber finden | Bug-Beschreibung + Code-Zugang | Ergebnisse anderer Investigatoren |
+| 4 | Alle Szenarien auflisten | Bug-Beschreibung + Code-Zugang | Ergebnisse anderer Investigatoren |
+| 5 | Blast Radius pruefen | Bug-Beschreibung + Code-Zugang | Ergebnisse anderer Investigatoren |
 
-## Schritt 5: Synthese — Analyse-Dokument erstellen
+**STOP! Nicht weitermachen bis ALLE 6 Agenten fertig sind.**
 
-Erstelle `docs/artifacts/bug-[name]/analysis.md` mit:
+### Synthese
 
-### 5a. Zusammenfassung der Agenten-Ergebnisse
-### 5b. ALLE moeglichen Ursachen (mindestens 3 Hypothesen)
-### 5c. Wahrscheinlichste Ursache(n) mit Begruendung
-### 5d. Blast Radius
-
-## Schritt 5.5: Phase auf Analyse setzen
-
-**PFLICHT vor Checkpoint 1** — sonst erkennt phase_listener "stimmt" nicht:
+Fasse die Ergebnisse zusammen in `docs/artifacts/bug-[name]/analysis.md`:
+- User-Erwartung (vom User Advocate)
+- Alle Hypothesen (mindestens 3)
+- Wahrscheinlichste Ursache mit Begruendung
+- Blast Radius
 
 ```bash
 python3 .claude/hooks/workflow.py mark-context "docs/artifacts/bug-[name]/analysis.md"
 python3 .claude/hooks/workflow.py phase phase2_analyse
 ```
 
-## Schritt 6: **CHECKPOINT 1** — Henning die Analyse praesentieren
+---
 
-**Zeige Henning:**
-1. **Kaputt-Screenshot** (aus Schritt 0.5) — "So sieht der Bug aus"
-2. Root Cause (in verstaendlicher Sprache)
-3. Betroffene Stellen (welche Screens/Features)
-4. Vorgeschlagener Ansatz (1-2 Saetze)
-5. Blast Radius
+## CHECKPOINT 1 — "Habe ich das richtig verstanden?"
 
-**Henning sagt "stimmt" → Checkpoint 1 freigeschaltet.**
+Praesentiere Henning (in SEINER Sprache, kein Fachjargon):
+
+1. **"Das Problem:"** [Was der User erlebt — aus User-Advocate-Ergebnis]
+2. **"Die Ursache:"** [Root Cause in einfachen Worten]
+3. **"Was betroffen ist:"** [Welche Screens/Features]
+4. **"Mein Vorschlag:"** [1-2 Saetze was du tun willst]
+
+Falls Bug sichtbar: Kaputt-Screenshot zeigen.
+
+→ Henning sagt **"stimmt"**
 
 ```bash
 python3 .claude/hooks/workflow.py phase phase3_spec
 ```
 
-## Schritt 7: Spec schreiben + Approval
+---
 
-Nutze `/03-write-spec` fuer die Spec.
-**Henning sagt "approved" → Spec freigeschaltet.**
+## Phase 3: Spec + Affected Files
 
-## Schritt 7.5: Affected Files registrieren
+Schreibe die Spec (nutze `/03-write-spec` oder spec-writer Agent).
 
 ```bash
 python3 .claude/hooks/workflow.py set-affected-files --replace \
-  "Sources/path/to/affected1.swift" \
-  "Tests/path/to/TestFile.swift"
+  "Sources/path/to/file.swift" "Tests/path/to/Test.swift"
 ```
 
-## Schritt 8: TDD RED
+→ Henning sagt **"approved"**
+
+---
+
+## Phase 4: Tests schreiben (QA-Rolle)
 
 ```bash
 python3 .claude/hooks/workflow.py phase phase4_tdd_red
 ```
 
-Nutze `/04-tdd-red` — leite Tests aus der Analyse ab.
+**WICHTIG: QA-Mindset, nicht Developer-Mindset.**
 
-## Schritt 8.5: **CHECKPOINT 2** — Henning die Tests praesentieren
+Schreibe Tests basierend auf:
+- Der Spec (was SOLL passieren?)
+- Der User-Erwartung aus Phase 2
+- **NICHT** auf einer Vorstellung wie die Implementierung aussehen wird
 
-**Zeige Henning:**
-| Test | Was er prueft | Status |
-|------|--------------|--------|
-| testXYZ | Prueft ob X passiert wenn Y | FAILED ✓ |
+Tests pruefen **Verhalten**, nicht Implementierung.
 
-**Henning sagt "go" → Checkpoint 2 freigeschaltet.**
+---
 
-## Schritt 9: Implementation
+## CHECKPOINT 2 — "Tests stehen, soll ich anfangen?"
+
+Praesentiere Henning:
+
+| Was geprueft wird | Status |
+|-------------------|--------|
+| [User-verstaendliche Beschreibung] | Schlaegt fehl (erwartet) |
+
+→ Henning sagt **"go"**
+
+---
+
+## Phase 5: Implementieren (Developer-Rolle)
 
 ```bash
 python3 .claude/hooks/workflow.py phase phase5_implement
 ```
 
-Nutze `/05-implement` — dort ist die Bug-Reproduktions-Wiederholung eingebaut (Step 6).
+Implementiere bis alle Tests gruen sind.
+Bei UI-Bugs: Nachher-Screenshot machen.
 
-## Schritt 10: **CHECKPOINT 3** — Henning das Ergebnis praesentieren
+---
 
-**Zeige Henning:**
-1. **Vorher-Screenshot** (aus Schritt 0.5) + **Nachher-Screenshot** (aus /05-implement Step 6)
-2. ALL GREEN Test-Output
-3. Kurze Zusammenfassung was sich geaendert hat
+## Phase 6: Unabhaengige Pruefung
 
-**PFLICHT: Adversary-Agent automatisch starten.**
-Spawn einen Agent (subagent_type: general-purpose) mit dem Adversary-Prompt:
-- Lies die Spec (`spec_file` aus workflow status)
-- Lies alle `affected_files`
-- Fuehre Tests aus (`./scripts/sim.sh unit`, `./scripts/sim.sh test`)
-- Erstelle einen Adversary-Report mit Verdict (BESTANDEN/NICHT BESTANDEN)
-- Bei NICHT BESTANDEN: Blocker zuerst fixen, dann erneut pruefen
+### Adversary-Agent spawnen (PFLICHT)
 
-**Zeige Henning den Adversary-Report zusammen mit den Test-Ergebnissen.**
+```
+Agent(subagent_type: "general-purpose", isolation: "worktree")
+```
 
-**Henning sagt "commit" → Checkpoint 3 freigeschaltet.**
+Der Adversary bekommt DIESEN Prompt:
 
-## Schritt 11: Commit + Dokumentation
+> Du bist ein unabhaengiger Pruefer. Dein EINZIGES Ziel: Beweise dass die Implementation fehlerhaft ist.
+>
+> 1. Lies die Spec: [spec_file Pfad]
+> 2. Lies die geaenderten Dateien: [affected_files]
+> 3. Fuehre Tests aus: `./scripts/sim.sh unit FocusBloxTests` und relevante UI Tests
+> 4. Pruefe: Tut der Code was die Spec verspricht? Gibt es Edge Cases? Dead Code?
+> 5. Pruefe Plattform-Paritaet: `./scripts/sim.sh mac-build`
+> 6. Erstelle einen Report mit Verdict: BESTANDEN oder NICHT BESTANDEN
+
+- **Bekommt:** Spec-Pfad + affected_files + Code-Zugang
+- **Bekommt NICHT:** Warum so implementiert, welche Kompromisse, welche Entscheidungen
+
+**Bei NICHT BESTANDEN:** Blocker fixen, Adversary erneut starten.
+
+---
+
+## CHECKPOINT 3 — "Fertig. Darf ich committen?"
+
+Praesentiere Henning:
+
+1. **Zusammenfassung:** "Bug ist gefixt. [Was geaendert wurde in 1 Satz]"
+2. **Tests:** "Alle [N] Tests gruen"
+3. **Adversary:** "Unabhaengige Pruefung: BESTANDEN"
+4. Falls UI-Bug: Vorher/Nachher-Screenshots
+
+→ Henning sagt **"commit"** → Fertig. Keine weiteren Schritte danach.
 
 ```bash
 python3 .claude/hooks/workflow.py phase phase6_done
 ```
+Git commit mit Issue-Referenz, GitHub Issue schliessen, `workflow.py complete`.
 
-- Git commit mit Issue-Referenz
-- GitHub Issue schliessen (`gh issue close <number>`)
-- `python3 .claude/hooks/workflow.py complete`
+---
+
+## Rueckfragen an Henning
+
+Wenn du bei einem Schritt **echte Unklarheiten** hast die nur Henning klaeren kann (UX-Entscheidung, Scope, Prioritaet):
+
+- **IMMER** das `AskUserQuestion`-Tool verwenden (strukturiert mit Auswahl-Optionen)
+- **NIEMALS** offene Fliesstext-Fragen stellen
+- **NUR** bei echten PO-Themen fragen — technische Entscheidungen selbst treffen
+- Empfohlene Option als erste mit "(Empfohlen)" kennzeichnen
+
+Beispiel: "Soll der Fix nur iOS oder auch macOS betreffen?" mit Optionen, nicht als Fliesstext.
 
 ---
 
 ## Anti-Patterns (VERBOTEN!)
 
-- **Fix vorschlagen bevor alle Tasks completed**
-- **Nur 1 Hypothese aufstellen** — mindestens 3 Hypothesen PFLICHT
-- **"Bitte manuell testen"** — UI Tests sind PFLICHT
-- **Bisherige Fixes ignorieren** — Wiederholungs-Check ist Task 1
+- **Agenten mit zu viel Kontext fuettern** — Unabhaengigkeit ist der Kern
+- **Zwischen Checkpoints offene Fliesstext-Fragen stellen** — AskUserQuestion mit Optionen nutzen
+- **Technischen Jargon an Henning** — kein "TDD RED", kein "Phase 4"
+- **"Bitte manuell testen"** — automatisierte Tests sind PFLICHT
+- **Nach "commit" noch Schritte beschreiben** — dann ist es einfach fertig
+- **Fix vorschlagen bevor alle Investigatoren fertig sind**
 
 ### Eskalations-Regel
 
