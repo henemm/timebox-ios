@@ -69,13 +69,15 @@ enum NextUpSuggestionService {
                 !item.isCompleted &&
                 item.isActionable &&
                 !item.isNextUp &&
+                !item.isScheduled &&
+                item.assignedFocusBlockID == nil &&
                 item.estimatedDuration != nil &&
                 item.estimatedDuration! <= slot.durationMinutes &&
                 !usedIDs.contains(item.id)
             }
 
             guard let best = candidates
-                .map({ (item: $0, score: score(item: $0, slot: slot, profile: profile, now: now)) })
+                .map({ (item: $0, score: score(item: $0, slot: slot, profile: profile, now: now, allItems: items)) })
                 .max(by: { $0.score < $1.score })
             else { continue }
 
@@ -109,10 +111,12 @@ enum NextUpSuggestionService {
                     !item.isCompleted &&
                     item.isActionable &&
                     !item.isNextUp &&
+                    !item.isScheduled &&
+                    item.assignedFocusBlockID == nil &&
                     item.estimatedDuration != nil &&
                     item.estimatedDuration! <= slot.durationMinutes
                 }
-                .map { (item: $0, score: score(item: $0, slot: slot, profile: profile, now: now)) }
+                .map { (item: $0, score: score(item: $0, slot: slot, profile: profile, now: now, allItems: items)) }
                 .sorted { $0.score > $1.score }
                 .prefix(maxPerSlot)
                 .map { NextUpSuggestion(id: $0.item.id, planItem: $0.item, slot: slot, score: $0.score) }
@@ -129,12 +133,15 @@ enum NextUpSuggestionService {
         item: PlanItem,
         slot: TimeSlot,
         profile: BehavioralProfile,
-        now: Date
+        now: Date,
+        allItems: [PlanItem] = []
     ) -> Double {
         let base = Double(item.priorityScore)
         let affinity = timeAffinityBonus(item: item, slot: slot, profile: profile)
         let reschedule = rescheduleBonus(count: item.rescheduleCount)
-        return base * affinity * reschedule
+        let energy = energyMatchBonus(item: item, slot: slot)
+        let tagCluster = tagClusterBonus(item: item, allItems: allItems)
+        return base * affinity * reschedule * energy * tagCluster
     }
 
     static func meetingLoadForToday(events: [CalendarEvent], date: Date) -> MeetingLoad {
@@ -291,5 +298,33 @@ enum NextUpSuggestionService {
         case 3...4: return 1.25
         default:   return 1.5
         }
+    }
+
+    /// Energy-Match: Morgens (vor 12 Uhr) high-energy bevorzugen, nachmittags low-energy.
+    private static func energyMatchBonus(item: PlanItem, slot: TimeSlot) -> Double {
+        guard let energy = item.aiEnergyLevel else { return 1.0 }
+        let hour = Calendar.current.component(.hour, from: slot.startDate)
+        let isMorning = hour < 12
+        switch (isMorning, energy) {
+        case (true, "high"):  return 1.3
+        case (true, "low"):   return 0.8
+        case (false, "low"):  return 1.3
+        case (false, "high"): return 0.8
+        default:              return 1.0
+        }
+    }
+
+    /// Tag-Cluster-Bonus: Tasks die Tags mit anderen offenen Tasks teilen bekommen einen Boost.
+    /// Ermöglicht Bündelung ("3× #computer — erledige sie in einem Rutsch").
+    private static func tagClusterBonus(item: PlanItem, allItems: [PlanItem]) -> Double {
+        guard !item.tags.isEmpty, allItems.count > 1 else { return 1.0 }
+        let otherItems = allItems.filter { $0.id != item.id && !$0.isCompleted && $0.isActionable }
+        var maxShared = 0
+        for tag in item.tags {
+            let shared = otherItems.filter { $0.tags.contains(tag) }.count
+            maxShared = max(maxShared, shared)
+        }
+        // 2+ Tasks mit gleichem Tag → 1.15× Bonus
+        return maxShared >= 1 ? 1.15 : 1.0
     }
 }

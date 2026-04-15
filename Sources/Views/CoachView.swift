@@ -126,6 +126,7 @@ struct CoachView: View {
             await loadAllData()
         }
         .onAppear {
+            loadPersistedDismissals()
             refreshID = UUID()
             // --open-drawer morning/daytime/evening: bestimmten Drawer öffnen (für Screenshots)
             if let idx = ProcessInfo.processInfo.arguments.firstIndex(of: "--open-drawer"),
@@ -211,7 +212,11 @@ struct CoachView: View {
 
     private var morningTopTasks: [PlanItem] {
         allTasks
-            .filter { !$0.isCompleted && $0.isActionable && !$0.isNextUp && !dismissedTaskIDs.contains($0.id) }
+            .filter {
+                !$0.isCompleted && $0.isActionable && !$0.isNextUp &&
+                !$0.isScheduled && $0.assignedFocusBlockID == nil &&
+                !dismissedTaskIDs.contains($0.id)
+            }
             .sorted { $0.priorityScore > $1.priorityScore }
             .prefix(5)
             .map { $0 }
@@ -275,6 +280,7 @@ struct CoachView: View {
         let taskSource = LocalTaskSource(modelContext: modelContext)
         let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
         try? syncEngine.updateNextUp(itemID: task.id, isNextUp: true)
+        NextUpSuggestionService.invalidateCache()
         refreshID = UUID()
     }
 
@@ -798,7 +804,7 @@ struct CoachView: View {
                     .tint(.blue)
 
                     Button {
-                        dismissedTaskIDs.insert(task.id)
+                        dismissTask(task.id)
                     } label: {
                         Label("Ausblenden", systemImage: "eye.slash")
                             .font(.caption.weight(.medium))
@@ -808,6 +814,41 @@ struct CoachView: View {
                 }
                 .padding(.leading, 34)
             }
+        }
+    }
+
+    // MARK: - Dismissal Persistence (Bug #226)
+
+    /// Dismissals werden tagesbasiert in UserDefaults gespeichert.
+    /// Tasks kommen frühestens nach 3 Tagen wieder.
+    private func dismissTask(_ taskID: String) {
+        dismissedTaskIDs.insert(taskID)
+        var stored = Self.loadDismissals()
+        stored[taskID] = Date()
+        Self.saveDismissals(stored)
+    }
+
+    private func loadPersistedDismissals() {
+        let stored = Self.loadDismissals()
+        let cutoff = Calendar.current.date(byAdding: .day, value: -3, to: Date()) ?? Date()
+        dismissedTaskIDs = Set(stored.filter { $0.value > cutoff }.map(\.key))
+    }
+
+    private static let dismissalsKey = "coachDismissedSuggestions"
+
+    private static func loadDismissals() -> [String: Date] {
+        guard let data = UserDefaults.standard.data(forKey: dismissalsKey),
+              let decoded = try? JSONDecoder().decode([String: Date].self, from: data)
+        else { return [:] }
+        return decoded
+    }
+
+    private static func saveDismissals(_ dismissals: [String: Date]) {
+        // Alte Einträge (>7 Tage) bereinigen
+        let cutoff = Calendar.current.date(byAdding: .day, value: -7, to: Date()) ?? Date()
+        let cleaned = dismissals.filter { $0.value > cutoff }
+        if let data = try? JSONEncoder().encode(cleaned) {
+            UserDefaults.standard.set(data, forKey: dismissalsKey)
         }
     }
 

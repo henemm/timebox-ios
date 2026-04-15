@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		08A8A68F7DE457F45B871CFD /* CoachSuggestionUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEE29F820045B57F618C2332 /* CoachSuggestionUITests.swift */; };
 		9FBA522B76FBC7FA31AED9F7 /* ShakeUndoHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54BF85733F8AE9505BA457C8 /* ShakeUndoHandler.swift */; };
 		FAF13C9EC472DB8EB792905D /* ShakeUndoConfirmationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAD2889BC9E0BC02588A1583 /* ShakeUndoConfirmationTests.swift */; };
 		0A96CB42A72DE72E591A2C28 /* BacklogBadgeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDEC968759D860953246E6C2 /* BacklogBadgeService.swift */; };
@@ -703,6 +704,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		BEE29F820045B57F618C2332 /* CoachSuggestionUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CoachSuggestionUITests.swift; path = FocusBloxUITests/CoachSuggestionUITests.swift; sourceTree = SOURCE_ROOT; };
 		54BF85733F8AE9505BA457C8 /* ShakeUndoHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ShakeUndoHandler.swift; path = Sources/Services/ShakeUndoHandler.swift; sourceTree = SOURCE_ROOT; };
 		EAD2889BC9E0BC02588A1583 /* ShakeUndoConfirmationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ShakeUndoConfirmationTests.swift; path = FocusBloxTests/ShakeUndoConfirmationTests.swift; sourceTree = SOURCE_ROOT; };
 		CDEC968759D860953246E6C2 /* BacklogBadgeService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = BacklogBadgeService.swift; path = Sources/Services/BacklogBadgeService.swift; sourceTree = SOURCE_ROOT; };
@@ -1410,6 +1412,7 @@
 		05D90FB2A2CE48689EC309B4 /* FocusBloxUITests */ = {
 			isa = PBXGroup;
 			children = (
+				BEE29F820045B57F618C2332 /* CoachSuggestionUITests.swift */,
 				DE474618567511DD53CF7CE3 /* DoNowBadgeUITests.swift */,
 				69EAF8A756980AD4790CA636 /* SprintEndUITests.swift */,
 				3FB946941A7D364D764DAC8B /* BacklogHygieneNudgeUITests.swift */,
@@ -2770,6 +2773,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				08A8A68F7DE457F45B871CFD /* CoachSuggestionUITests.swift in Sources */,
 				C5833B7EE763E58A9DCFA51A /* DoNowBadgeUITests.swift in Sources */,
 				4D4959878471FD760482BBF1 /* SprintEndUITests.swift in Sources */,
 				ECFA2EF469DE97AFCFD59D87 /* BacklogHygieneNudgeUITests.swift in Sources */,

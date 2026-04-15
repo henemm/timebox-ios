@@ -33,7 +33,11 @@ final class NextUpSuggestionServiceTests: XCTestCase {
         isNextUp: Bool = false,
         isCompleted: Bool = false,
         blockerTaskID: String? = nil,
-        dueDate: Date? = nil
+        dueDate: Date? = nil,
+        scheduledDate: Date? = nil,
+        assignedFocusBlockID: String? = nil,
+        aiEnergyLevel: String? = nil,
+        tags: [String]? = nil
     ) -> PlanItem {
         let task = LocalTask(
             title: title,
@@ -47,6 +51,10 @@ final class NextUpSuggestionServiceTests: XCTestCase {
         task.isCompleted = isCompleted
         task.blockerTaskID = blockerTaskID
         task.dueDate = dueDate
+        task.scheduledDate = scheduledDate
+        task.assignedFocusBlockID = assignedFocusBlockID
+        task.aiEnergyLevel = aiEnergyLevel
+        if let tags { task.tags = tags }
         return PlanItem(localTask: task)
     }
 
@@ -370,6 +378,147 @@ final class NextUpSuggestionServiceTests: XCTestCase {
         let slot2Count = result[slots[1].id]?.count ?? 0
         XCTAssertEqual(slot1Count, 1, "Task soll im ersten Slot vorgeschlagen werden")
         XCTAssertEqual(slot2Count, 1, "Gleicher Task soll auch im zweiten Slot vorgeschlagen werden")
+    }
+
+    // MARK: - Original Tests
+
+    // MARK: - Bug #226: Scheduled/Assigned Tasks ausfiltern (RC-3)
+
+    /// Verhalten: Tasks die per Direct Scheduling auf der Timeline liegen werden nicht vorgeschlagen.
+    /// Bricht wenn: compute() den isScheduled-Check nicht hat.
+    func test_compute_excludesScheduledTasks() {
+        let slots = [makeSlot(startHour: 9, endHour: 10)]
+        let tasks = [
+            makePlanItem(title: "On Timeline", importance: 3, urgency: "urgent",
+                         scheduledDate: futureDate(hour: 14)),
+            makePlanItem(title: "Not Scheduled", importance: 1, urgency: "not_urgent"),
+        ]
+        let profile = makeProfile()
+
+        let result = NextUpSuggestionService.compute(
+            items: tasks, slots: slots, profile: profile,
+            calendarEvents: [], now: tomorrowDate
+        )
+
+        XCTAssertEqual(result.count, 1)
+        XCTAssertEqual(result[0].planItem.title, "Not Scheduled",
+                       "Tasks auf der Timeline duerfen nicht als Vorschlag erscheinen")
+    }
+
+    /// Verhalten: Tasks die einem FocusBlock zugewiesen sind werden nicht vorgeschlagen.
+    /// Bricht wenn: compute() den assignedFocusBlockID-Check nicht hat.
+    func test_compute_excludesAssignedToFocusBlock() {
+        let slots = [makeSlot(startHour: 9, endHour: 10)]
+        let tasks = [
+            makePlanItem(title: "In Block", importance: 3, urgency: "urgent",
+                         assignedFocusBlockID: "block-123"),
+            makePlanItem(title: "Free", importance: 1, urgency: "not_urgent"),
+        ]
+        let profile = makeProfile()
+
+        let result = NextUpSuggestionService.compute(
+            items: tasks, slots: slots, profile: profile,
+            calendarEvents: [], now: tomorrowDate
+        )
+
+        XCTAssertEqual(result.count, 1)
+        XCTAssertEqual(result[0].planItem.title, "Free",
+                       "Tasks in einem FocusBlock duerfen nicht als Vorschlag erscheinen")
+    }
+
+    /// Verhalten: candidatesPerSlot filtert ebenfalls scheduled und assigned Tasks.
+    /// Bricht wenn: candidatesPerSlot() den erweiterten Filter nicht hat.
+    func test_candidatesPerSlot_excludesScheduledAndAssigned() {
+        let slots = [makeSlot(startHour: 9, endHour: 10)]
+        let tasks = [
+            makePlanItem(title: "Scheduled", scheduledDate: futureDate(hour: 14)),
+            makePlanItem(title: "Assigned", assignedFocusBlockID: "block-1"),
+            makePlanItem(title: "Available"),
+        ]
+        let profile = makeProfile()
+
+        let result = NextUpSuggestionService.candidatesPerSlot(
+            items: tasks, slots: slots, profile: profile,
+            calendarEvents: [], now: tomorrowDate, maxPerSlot: 3
+        )
+
+        let candidates = result[slots[0].id] ?? []
+        XCTAssertEqual(candidates.count, 1)
+        XCTAssertEqual(candidates[0].planItem.title, "Available",
+                       "Nur nicht-zugewiesene, nicht-geplante Tasks als Kandidaten")
+    }
+
+    // MARK: - Bug #226: Energy-Matching (B1)
+
+    /// Verhalten: Morgens (vor 12 Uhr) werden Tasks mit aiEnergyLevel "high" bevorzugt.
+    /// Bricht wenn: score() keinen Energy-Bonus berechnet.
+    func test_score_prefersHighEnergyInMorning() {
+        let morningSlot = makeSlot(startHour: 9, endHour: 10)
+        let deepWork = makePlanItem(title: "Deep Work", aiEnergyLevel: "high")
+        let routine = makePlanItem(title: "Routine", aiEnergyLevel: "low")
+        let profile = makeProfile()
+
+        let deepScore = NextUpSuggestionService.score(
+            item: deepWork, slot: morningSlot, profile: profile, now: tomorrowDate
+        )
+        let routineScore = NextUpSuggestionService.score(
+            item: routine, slot: morningSlot, profile: profile, now: tomorrowDate
+        )
+
+        XCTAssertGreaterThan(deepScore, routineScore,
+                             "Morgens soll high-energy Task hoeher scoren als low-energy")
+    }
+
+    /// Verhalten: Nachmittags (nach 12 Uhr) werden Tasks mit aiEnergyLevel "low" bevorzugt.
+    /// Bricht wenn: score() den Energy-Bonus nicht nach Tageszeit differenziert.
+    func test_score_prefersLowEnergyInAfternoon() {
+        let afternoonSlot = makeSlot(startHour: 14, endHour: 15)
+        let deepWork = makePlanItem(title: "Deep Work", aiEnergyLevel: "high")
+        let routine = makePlanItem(title: "Routine", aiEnergyLevel: "low")
+        let profile = makeProfile()
+
+        let deepScore = NextUpSuggestionService.score(
+            item: deepWork, slot: afternoonSlot, profile: profile, now: tomorrowDate
+        )
+        let routineScore = NextUpSuggestionService.score(
+            item: routine, slot: afternoonSlot, profile: profile, now: tomorrowDate
+        )
+
+        XCTAssertGreaterThan(routineScore, deepScore,
+                             "Nachmittags soll low-energy Task hoeher scoren als high-energy")
+    }
+
+    // MARK: - Bug #226: Tag-Buendelung im Scoring (D3)
+
+    /// Verhalten: Wenn mehrere Tasks denselben Tag teilen, werden sie gegenueber
+    /// Solo-Tasks bevorzugt (Buendelungs-Bonus). Getestet via compute(): Bei gleicher
+    /// Prioritaet sollen Tag-Cluster-Tasks zuerst vorgeschlagen werden.
+    /// Bricht wenn: compute()/score() keinen Tag-Cluster-Bonus beruecksichtigt.
+    func test_compute_prefersTagClusterTasks() {
+        let slots = [
+            makeSlot(startHour: 9, endHour: 10),
+            makeSlot(startHour: 11, endHour: 12),
+        ]
+        let profile = makeProfile()
+
+        // 3 Tasks mit #computer Tag (gleiche Prioritaet wie Solo)
+        let tasks = [
+            makePlanItem(title: "Email", importance: 2, urgency: "not_urgent", tags: ["computer"]),
+            makePlanItem(title: "Report", importance: 2, urgency: "not_urgent", tags: ["computer"]),
+            makePlanItem(title: "Backup", importance: 2, urgency: "not_urgent", tags: ["computer"]),
+            makePlanItem(title: "Solo Telefon", importance: 2, urgency: "not_urgent", tags: ["telefon"]),
+        ]
+
+        let result = NextUpSuggestionService.compute(
+            items: tasks, slots: slots, profile: profile,
+            calendarEvents: [], now: tomorrowDate
+        )
+
+        // Bei gleicher Prioritaet sollen #computer Tasks (Cluster von 3) bevorzugt werden
+        let suggestedTitles = result.map(\.planItem.title)
+        let computerCount = suggestedTitles.filter { $0 != "Solo Telefon" }.count
+        XCTAssertEqual(computerCount, 2,
+                       "Beide Slots sollen von #computer Cluster-Tasks belegt werden, nicht vom Solo-Task")
     }
 
     // MARK: - Original Tests
