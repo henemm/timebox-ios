@@ -42,7 +42,7 @@ enum SidebarFilter: Hashable {
 /// Matches iOS BacklogView.ViewMode: Priorität, Zuletzt, Überfällig, Wiederkehrend, Erledigt
 struct SidebarView: View {
     @Binding var selectedFilter: SidebarFilter
-    let overdueCount: Int
+    let doNowCount: Int
     let completedCount: Int
     let recurringCount: Int
     var staleTaskCount: Int = 0
@@ -70,8 +70,8 @@ struct SidebarView: View {
                     Label("Überfällig", systemImage: "exclamationmark.circle")
                         .accessibilityIdentifier("sidebarFilter_overdue")
                     Spacer()
-                    if overdueCount > 0 {
-                        badgeView(count: overdueCount, color: .red)
+                    if doNowCount > 0 {
+                        badgeView(count: doNowCount, color: .red)
                     }
                 }
                 .tag(SidebarFilter.overdue)
@@ -143,7 +143,7 @@ struct SidebarView: View {
 #Preview {
     SidebarView(
         selectedFilter: .constant(.priority),
-        overdueCount: 2,
+        doNowCount: 2,
         completedCount: 10,
         recurringCount: 3
     )

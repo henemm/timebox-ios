@@ -1,40 +1,46 @@
-# Bug #223: Count Badge unklar — Analyse
+# Bug #227: Count-Badge Inkonsistenz — Analyse
 
-## Zusammenfassung
-
-Das Tab-Badge am Backlog zeigt eine Zahl (z.B. "7"), aber der User kann nicht erkennen, WELCHE Tasks dahinterstecken. Im Backlog selbst haben die gezählten Tasks keine visuelle Kennzeichnung.
-
-## Was der Badge tatsächlich zählt
-
-**"Stale Tasks"** — Tasks die Aufmerksamkeit brauchen, weil sie:
-- >= 14 Tage alt sind (seit Erstellung), ODER
-- >= 3x verschoben wurden (`rescheduleCount >= 3`)
-
-Ausgenommen: erledigte, geparkte, Template-Tasks, und Tasks mit Hygiene-Review innerhalb der letzten 14 Tage.
-
-**Code:** `MainTabView.swift:19-22` → `BacklogHealthService.findStaleTasks()`
+## User-Erwartung
+Badge, Tab-Zahl und Liste zeigen immer exakt dieselbe Menge — ohne Ausnahme, ohne Sonderfälle, ohne Erklärungsbedarf. "Eine Zahl, eine Bedeutung."
 
 ## Root Cause
+Es gibt **drei völlig unabhängige Zähllogiken**, die verschiedene Dinge messen:
 
-**Zwei Probleme:**
+| Badge | Datei | Zählt | Filter |
+|-------|-------|-------|--------|
+| App-Icon (Homescreen) | `NotificationService.swift:106` | Überfällige Tasks | `dueDate < heute`, nicht NextUp, kein FocusBlock |
+| Tab-Badge (Backlog-Tab) | `MainTabView.swift:16` + `BacklogBadgeService.swift` | DoNow-Tasks | Score >= 60, nicht completed/parked/template |
+| Backlog-Liste "Dringend" | `BacklogView.swift:105` | Sichtbare DoNow-Tasks | Score >= 60, nicht NextUp, kein FocusBlock, nicht überfällig |
 
-1. **Fehlende visuelle Markierung:** Die stale Tasks im Backlog-Liste sind nicht visuell hervorgehoben. Der User sieht "(7)" am Tab, aber im Backlog sehen alle Tasks gleich aus. Es gibt zwar einen Hygiene-Banner ("X Tasks liegen seit Wochen rum"), aber die einzelnen Tasks selbst sind nicht markiert.
+### Konkrete Divergenzen
 
-2. **Inkonsistenz Badge vs. Hygiene-Sheet:** `MainTabView` nutzt Default-Werte (14 Tage / 3x), `BacklogView` nutzt `AppSettings`-Werte. Wenn der User die Schwellwerte ändert, stimmen Badge und Hygiene-Sheet nicht mehr überein.
+| Dimension | App-Icon | Tab-Badge | Liste "Dringend" |
+|-----------|----------|-----------|-------------------|
+| Kriterium | überfällig (Datum) | hoher Score | hoher Score |
+| isParked | **nicht gefiltert** | gefiltert | gefiltert |
+| isNextUp | gefiltert | **nicht gefiltert** | gefiltert |
+| assignedFocusBlockID | gefiltert | **nicht gefiltert** | gefiltert |
+| Update-Timing | nur bei App-Foreground | live (@Query) | live (async) |
 
-3. **macOS hat kein Badge:** Kein Tab-Badge, kein Sidebar-Badge — Feature fehlt komplett.
+### Beispiele
+- Task mit Score 80, bereits in FocusBlock: Tab-Badge zählt ihn, Liste zeigt ihn NICHT
+- Task mit dueDate gestern, Score 30: App-Icon zählt ihn, Tab-Badge NICHT
+- Geparkter überfälliger Task: App-Icon zählt ihn, Tab-Badge und Liste NICHT
 
 ## Hypothesen
-
-| # | Hypothese | Wahrscheinlichkeit |
-|---|-----------|-------------------|
-| 1 | Stale Tasks brauchen visuelle Kennzeichnung in der Liste | **HOCH** — Kernproblem |
-| 2 | Badge-Zahl stimmt nicht mit sichtbaren Stale-Tasks überein (Inkonsistenz) | MITTEL — latenter Bug |
-| 3 | Badge-Konzept "stale" ist dem User nicht erklärt | MITTEL — kein Tooltip/Erklärung |
+1. **Hauptursache:** Drei verschiedene Semantiken unter demselben visuellen Konzept
+2. **Tab-Badge zu hoch:** Ignoriert isNextUp und assignedFocusBlockID
+3. **App-Icon zählt anders:** Basiert auf Datum statt Score
+4. **Timing-Divergenz:** App-Icon nur bei Foreground, Tab-Badge live
 
 ## Blast Radius
+- iOS Tab-Badge: `BacklogBadgeService.swift` + `MainTabView.swift`
+- iOS App-Icon: `NotificationService.swift` + 2 Aufrufstellen
+- macOS Sidebar: Eigene Logik in `ContentView.swift` (teilweise betroffen)
+- Widgets/watchOS: NICHT betroffen
 
-- `BacklogHealthService.findStaleTasks()` wird genutzt von: Tab-Badge, Hygiene-Sheet, SmartNotificationEngine
-- App-Icon-Badge (iOS) hat separate Logik (überfällige Tasks, nicht stale)
-- macOS: kein Badge implementiert
-- Änderungen an der Stale-Logik betreffen alle drei Verbraucher
+## Vorgeschichte
+Issue #223 (Commit `97651f3`) hat `BacklogBadgeService` eingeführt und Tab-Badge auf doNow umgestellt — dabei aber die Inkonsistenz zwischen den 3 Zählern nicht behoben.
+
+## Empfehlung
+Eine einheitliche Zähllogik für alle Badges: "doNow-Tasks die im Backlog sichtbar sind" (Score >= 60, nicht completed, nicht parked, nicht template, nicht NextUp, kein FocusBlock).

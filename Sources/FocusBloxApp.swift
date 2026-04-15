@@ -449,7 +449,7 @@ struct FocusBloxApp: App {
                         )
                     }
                     #if !os(macOS)
-                    NotificationService.updateOverdueBadge(container: sharedModelContainer)
+                    NotificationService.updateDoNowBadge(container: sharedModelContainer)
                     #endif
                     WidgetDataPublisher.publish(context: sharedModelContainer.mainContext)
                 }

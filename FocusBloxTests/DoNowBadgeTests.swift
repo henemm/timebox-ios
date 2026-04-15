@@ -19,7 +19,8 @@ final class DoNowBadgeTests: XCTestCase {
         isNextUp: Bool = false,
         isCompleted: Bool = false,
         isParked: Bool = false,
-        isTemplate: Bool = false
+        isTemplate: Bool = false,
+        assignedFocusBlockID: String? = nil
     ) -> PlanItem {
         let task = LocalTask(
             title: title,
@@ -35,6 +36,7 @@ final class DoNowBadgeTests: XCTestCase {
         task.isTemplate = isTemplate
         task.isNextUp = isNextUp
         task.taskType = taskType
+        task.assignedFocusBlockID = assignedFocusBlockID
         return PlanItem(localTask: task)
     }
 
@@ -142,5 +144,87 @@ final class DoNowBadgeTests: XCTestCase {
     func test_planItem_isDoNow_falseForLowScore() {
         let task = makePlanItem()
         XCTAssertFalse(task.isDoNow, "Task ohne Score darf nicht isDoNow sein")
+    }
+
+    // MARK: - Bug #227: Overdue-Score erhöht (25 → 35)
+
+    /// Verhalten: Überfälliger Task mit "nur dringend" (kein Importance) erreicht doNow
+    /// Bricht wenn: Overdue-Score < 35
+    func test_overdueUrgentOnly_isDoNow() {
+        let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: Date())!
+        // Eisenhower 25 (nur urgent) + Deadline 35 = 60 → doNow
+        let task = makePlanItem(urgency: "urgent", dueDate: yesterday)
+        XCTAssertGreaterThanOrEqual(task.priorityScore, 60,
+            "Überfälliger + dringender Task muss Score >= 60 haben (Overdue-Score 35)")
+        XCTAssertEqual(task.priorityTier, .doNow)
+    }
+
+    /// Verhalten: Überfälliger Task mit Imp 1 + urgent erreicht doNow
+    /// Bricht wenn: Overdue-Score < 35
+    func test_overdueLowImportanceUrgent_isDoNow() {
+        let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: Date())!
+        // Eisenhower 30 (imp1+urgent) + Deadline 35 = 65 → doNow
+        let task = makePlanItem(importance: 1, urgency: "urgent", dueDate: yesterday)
+        XCTAssertGreaterThanOrEqual(task.priorityScore, 60)
+        XCTAssertEqual(task.priorityTier, .doNow)
+    }
+
+    /// Verhalten: Überfälliger Task ohne Bewertung bleibt unter doNow
+    /// Bricht wenn: Overdue-Score allein >= 60 (zu hoch)
+    func test_overdueUnrated_isNotDoNow() {
+        let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: Date())!
+        // Eisenhower 0 + Deadline 35 = 35 → planSoon (+ evtl. Neglect, aber frisch erstellt)
+        let task = makePlanItem(dueDate: yesterday)
+        XCTAssertLessThan(task.priorityScore, 60,
+            "Überfälliger Task ohne Bewertung darf nicht doNow sein")
+        XCTAssertNotEqual(task.priorityTier, .doNow)
+    }
+
+    /// Verhalten: Überfälliger Task mit Imp 1 + not_urgent bleibt unter doNow
+    /// Bricht wenn: Overdue-Score zu hoch
+    func test_overdueLowImportanceNotUrgent_isNotDoNow() {
+        let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: Date())!
+        // Eisenhower 10 (imp1+not_urgent) + Deadline 35 = 45 → planSoon
+        let task = makePlanItem(importance: 1, urgency: "not_urgent", dueDate: yesterday)
+        XCTAssertLessThan(task.priorityScore, 60)
+        XCTAssertNotEqual(task.priorityTier, .doNow)
+    }
+
+    // MARK: - Bug #227: Badge-Filter Konsistenz
+
+    /// Verhalten: NextUp-Tasks werden nicht im Badge gezählt
+    /// Bricht wenn: countDoNowTasks isNextUp nicht filtert
+    func test_countDoNowTasks_excludesNextUp() {
+        let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: Date())!
+        let nextUp = makePlanItem(title: "NextUp", importance: 3, urgency: "urgent",
+                                  dueDate: yesterday, isNextUp: true)
+        let count = BacklogBadgeService.countDoNowTasks(in: [nextUp])
+        XCTAssertEqual(count, 0, "NextUp-Tasks dürfen nicht im Badge gezählt werden")
+    }
+
+    /// Verhalten: Tasks in FocusBlock werden nicht im Badge gezählt
+    /// Bricht wenn: countDoNowTasks assignedFocusBlockID nicht filtert
+    func test_countDoNowTasks_excludesFocusBlockTasks() {
+        let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: Date())!
+        let inBlock = makePlanItem(title: "InBlock", importance: 3, urgency: "urgent",
+                                   dueDate: yesterday, assignedFocusBlockID: "block-123")
+        let count = BacklogBadgeService.countDoNowTasks(in: [inBlock])
+        XCTAssertEqual(count, 0, "Tasks in FocusBlock dürfen nicht im Badge gezählt werden")
+    }
+
+    /// Verhalten: Nur sichtbare Backlog-Tasks werden gezählt
+    /// Bricht wenn: Filter nicht konsistent mit Backlog-Liste
+    func test_countDoNowTasks_onlyCountsVisibleBacklogTasks() {
+        let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: Date())!
+        let visible = makePlanItem(title: "Sichtbar", importance: 3, urgency: "urgent", dueDate: yesterday)
+        let nextUp = makePlanItem(title: "NextUp", importance: 3, urgency: "urgent",
+                                  dueDate: yesterday, isNextUp: true)
+        let inBlock = makePlanItem(title: "InBlock", importance: 3, urgency: "urgent",
+                                   dueDate: yesterday, assignedFocusBlockID: "block-1")
+        let parked = makePlanItem(title: "Geparkt", importance: 3, urgency: "urgent",
+                                  dueDate: yesterday, isParked: true)
+
+        let count = BacklogBadgeService.countDoNowTasks(in: [visible, nextUp, inBlock, parked])
+        XCTAssertEqual(count, 1, "Nur der sichtbare Backlog-Task soll gezählt werden")
     }
 }

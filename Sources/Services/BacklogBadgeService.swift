@@ -8,7 +8,9 @@ enum BacklogBadgeService {
     /// Excludes completed, parked, and template tasks.
     static func countDoNowTasks(in tasks: [PlanItem]) -> Int {
         tasks.filter { task in
-            !task.isCompleted && !task.isParked && !task.isTemplate && task.priorityTier == .doNow
+            !task.isCompleted && !task.isParked && !task.isTemplate
+            && !task.isNextUp && task.assignedFocusBlockID == nil
+            && task.priorityTier == .doNow
         }.count
     }
 }

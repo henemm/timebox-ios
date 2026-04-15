@@ -142,12 +142,11 @@ struct ContentView: View {
     }
 
     // Computed properties for sidebar badges
-    private var overdueCount: Int {
-        let startOfToday = Calendar.current.startOfDay(for: Date())
-        return visibleTasks.filter { task in
-            guard let dueDate = task.dueDate else { return false }
-            return dueDate < startOfToday && !task.isNextUp && task.assignedFocusBlockID == nil
-        }.count
+    private var doNowCount: Int {
+        let items = visibleTasks
+            .filter { !$0.isNextUp && $0.assignedFocusBlockID == nil && !$0.isParked }
+            .map { PlanItem(localTask: $0) }
+        return items.filter { $0.priorityTier == .doNow }.count
     }
 
     private var completedCount: Int {
@@ -210,7 +209,7 @@ struct ContentView: View {
             if selectedSection == .backlog {
                 SidebarView(
                     selectedFilter: $selectedFilter,
-                    overdueCount: overdueCount,
+                    doNowCount: doNowCount,
                     completedCount: completedCount,
                     recurringCount: recurringCount,
                     staleTaskCount: staleTaskCount

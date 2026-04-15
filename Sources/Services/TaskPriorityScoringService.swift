@@ -91,7 +91,7 @@ struct TaskPriorityScoringService {
         }
     }
 
-    // MARK: - Deadline Proximity (0-25)
+    // MARK: - Deadline Proximity (0-35)
 
     static func deadlineScore(dueDate: Date?, now: Date = Date()) -> Int {
         guard let dueDate else { return 0 }
@@ -100,7 +100,7 @@ struct TaskPriorityScoringService {
         let daysUntil = calendar.dateComponents([.day], from: calendar.startOfDay(for: now), to: calendar.startOfDay(for: dueDate)).day ?? 0
 
         switch daysUntil {
-        case ...0:   return 25  // Overdue or today
+        case ...0:   return 35  // Overdue or today
         case 1:      return 22  // Tomorrow
         case 2...3:  return 18  // Within 3 days
         case 4...7:  return 12  // This week

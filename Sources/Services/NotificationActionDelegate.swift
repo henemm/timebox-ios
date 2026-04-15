@@ -135,7 +135,7 @@ final class NotificationActionDelegate: NSObject, @preconcurrency UNUserNotifica
         }
 
         #if !os(macOS)
-        NotificationService.updateOverdueBadge(container: container)
+        NotificationService.updateDoNowBadge(container: container)
         #endif
     }
 

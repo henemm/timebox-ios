@@ -80,32 +80,31 @@ enum NotificationService {
 
     // MARK: - Badge
 
-    /// Count overdue tasks that belong in the backlog (not NextUp, not assigned to a FocusBlock).
+    /// Count doNow tasks visible in the backlog (not NextUp, not in FocusBlock, not parked).
     /// Shared between iOS badge and macOS sidebar badge for consistent counting.
-    static func countOverdueBadgeTasks(context: ModelContext) -> Int {
-        let startOfToday = Calendar.current.startOfDay(for: Date())
-
+    static func countDoNowBadgeTasks(context: ModelContext) -> Int {
         let descriptor = FetchDescriptor<LocalTask>(
             predicate: #Predicate<LocalTask> {
-                $0.dueDate != nil && !$0.isCompleted && !$0.isTemplate
+                !$0.isCompleted && !$0.isParked && !$0.isTemplate
                 && !$0.isNextUp && $0.assignedFocusBlockID == nil
             }
         )
 
         do {
             let tasks = try context.fetch(descriptor)
-            return tasks.filter { $0.dueDate! < startOfToday }.count
+            let items = tasks.map { PlanItem(localTask: $0) }
+            return items.filter { $0.priorityTier == .doNow }.count
         } catch {
-            print("Failed to count overdue badge tasks: \(error)")
+            print("Failed to count doNow badge tasks: \(error)")
             return 0
         }
     }
 
     #if !os(macOS)
-    /// Update app icon badge with overdue backlog task count.
-    static func updateOverdueBadge(container: ModelContainer) {
+    /// Update app icon badge with doNow backlog task count.
+    static func updateDoNowBadge(container: ModelContainer) {
         let context = ModelContext(container)
-        let count = countOverdueBadgeTasks(context: context)
+        let count = countDoNowBadgeTasks(context: context)
         UNUserNotificationCenter.current().setBadgeCount(count)
     }
     #endif
