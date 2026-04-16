@@ -171,22 +171,41 @@ Der Adversary bekommt DIESEN Prompt:
 
 **Bei NICHT BESTANDEN:** Blocker fixen, Adversary erneut starten.
 
+### Adversary-Findings registrieren (PFLICHT)
+
+Der Adversary liefert am Ende einen JSON-Block mit strukturierten Findings.
+Fuer JEDES Finding:
+
+```bash
+python3 .claude/hooks/workflow.py add-finding "<titel>" "<impact>" "<beweis>"
+```
+
+Dann JEDES Finding EINZELN via **AskUserQuestion** vorlegen:
+- Titel + Impact (in Hennings Sprache) + Beweis
+- Claudes Empfehlung als "(Empfohlen)" markieren
+- Optionen: "Fixen" / "Akzeptabel" / "Zurueckstellen"
+
+Hennings Antwort wird automatisch von phase_listener erkannt und das Finding aufgeloest.
+Bei 0 Findings: Nichts registrieren, direkt zu Checkpoint 3.
+
+Findings mit Status "Fixen" → als GitHub Issue anlegen.
+
 ---
 
 ## CHECKPOINT 3 — "Fertig. Darf ich committen?"
+
+**WICHTIG:** Checkpoint 3 wird NUR freigeschaltet wenn ALLE Adversary-Findings beantwortet sind.
 
 Praesentiere Henning:
 
 1. **Zusammenfassung:** "Feature ist fertig. [Was gebaut wurde in 1 Satz]"
 2. **Tests:** "Alle [N] Tests gruen"
-3. **Adversary-Report** (wichtigste Punkte zeigen, nicht nur Verdict):
+3. **Adversary-Findings:** Zusammenfassung der Entscheidungen:
 
-> **Adversary hat geprueft:**
-> - ✅ [Acceptance Criterion 1] — Beweis: [kurz]
-> - ✅ [Acceptance Criterion 2] — Beweis: [kurz]
-> - ⚠️ [Falls Warnings] — [was und warum akzeptabel]
->
-> **Verdict: BESTANDEN**
+> | Finding | Entscheidung |
+> |---------|-------------|
+> | [Titel 1] | Fixen / Akzeptabel / Zurueckstellen |
+> | [Titel 2] | ... |
 
 4. **User-Erwartung:** "Der User Advocate hatte erwartet: [X]. So sieht es aus: [Screenshot/Beschreibung]"
 
