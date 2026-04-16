@@ -235,25 +235,46 @@ struct CoachView: View {
             }
 
             if !morningTopTasks.isEmpty {
-                let groups = groupTasksByReason(morningTopTasks)
-                if groups.count > 1 {
-                    coachHeadline(morningCoachingText)
+                let clusterResult = NextUpSuggestionService.tagClusterGroups(from: morningTopTasks)
+
+                // Tag-Cluster zuerst (wenn vorhanden, max 1)
+                if let cluster = clusterResult.clusters.first {
+                    let clusterCoachText = NextUpSuggestionService.tagClusterCoachText(
+                        tag: cluster.tag, count: cluster.tasks.count
+                    )
+                    coachTaskSection(
+                        title: "#\(cluster.tag)",
+                        titleIcon: "tag.fill",
+                        titleColor: .blue,
+                        tasks: cluster.tasks,
+                        coachOverrideText: clusterCoachText,
+                        showReason: false,
+                        showActions: true
+                    )
                 }
-                coachTaskSection(
-                    title: "Vorschläge für heute",
-                    titleIcon: "lightbulb.fill",
-                    titleColor: .orange,
-                    tasks: morningTopTasks,
-                    showReason: true,
-                    showActions: true
-                )
+
+                // Restliche Tasks mit Reason-Gruppierung
+                if !clusterResult.remaining.isEmpty {
+                    let groups = groupTasksByReason(clusterResult.remaining)
+                    if groups.count > 1 || !clusterResult.clusters.isEmpty {
+                        coachHeadline(morningCoachingText(for: clusterResult.remaining))
+                    }
+                    coachTaskSection(
+                        title: "Vorschläge für heute",
+                        titleIcon: "lightbulb.fill",
+                        titleColor: .orange,
+                        tasks: clusterResult.remaining,
+                        showReason: true,
+                        showActions: true
+                    )
+                }
             }
         }
     }
 
-    private var morningCoachingText: String {
-        let groups = groupTasksByReason(morningTopTasks)
-        let count = morningTopTasks.count
+    private func morningCoachingText(for tasks: [PlanItem]) -> String {
+        let groups = groupTasksByReason(tasks)
+        let count = tasks.count
         let groupCount = groups.count
 
         // Überblick über alle Gruppen — nicht den Inhalt einer Gruppe wiederholen
@@ -722,6 +743,7 @@ struct CoachView: View {
         titleIcon: String,
         titleColor: Color,
         tasks: [PlanItem],
+        coachOverrideText: String? = nil,
         showReason: Bool,
         showActions: Bool,
         completed: Bool = false
@@ -744,7 +766,13 @@ struct CoachView: View {
         }
         .padding(.top, 8)
 
-        if showReason {
+        if let overrideText = coachOverrideText {
+            // Tag-Cluster: einzelner Coach-Text + Tasks
+            coachText(overrideText)
+            ForEach(tasks) { task in
+                taskWithActions(task, showActions: showActions, completed: completed)
+            }
+        } else if showReason {
             // Gruppiert: Coaching-Text als Card → Tasks darunter
             let groups = groupTasksByReason(tasks)
             ForEach(groups, id: \.category) { group in
@@ -987,5 +1015,58 @@ struct CoachView: View {
             )
             aiReasonTexts[task.id] = reason
         }
+    }
+}
+
+// MARK: - Tag-Cluster Grouping (#236)
+
+extension NextUpSuggestionService {
+
+    struct TagCluster {
+        let tag: String
+        let tasks: [PlanItem]
+    }
+
+    struct TagClusterResult {
+        let clusters: [TagCluster]
+        let remaining: [PlanItem]
+    }
+
+    /// Findet den größten Tag-Cluster (≥2 Tasks mit gleichem Tag).
+    /// Maximal 1 Cluster. Bei Gleichstand: alphabetisch erster Tag.
+    static func tagClusterGroups(from tasks: [PlanItem]) -> TagClusterResult {
+        var tagTasks: [String: [PlanItem]] = [:]
+        for task in tasks {
+            for tag in task.tags {
+                tagTasks[tag, default: []].append(task)
+            }
+        }
+
+        let bestCluster = tagTasks
+            .filter { $0.value.count >= 2 }
+            .sorted { lhs, rhs in
+                if lhs.value.count != rhs.value.count {
+                    return lhs.value.count > rhs.value.count
+                }
+                return lhs.key < rhs.key
+            }
+            .first
+
+        guard let best = bestCluster else {
+            return TagClusterResult(clusters: [], remaining: tasks)
+        }
+
+        let clusterTaskIDs = Set(best.value.map(\.id))
+        let remaining = tasks.filter { !clusterTaskIDs.contains($0.id) }
+
+        return TagClusterResult(
+            clusters: [TagCluster(tag: best.key, tasks: best.value)],
+            remaining: remaining
+        )
+    }
+
+    /// Coaching-Text für eine Tag-Gruppe.
+    static func tagClusterCoachText(tag: String, count: Int) -> String {
+        "\(count) Aufgaben mit #\(tag) — erledige sie in einem Rutsch"
     }
 }

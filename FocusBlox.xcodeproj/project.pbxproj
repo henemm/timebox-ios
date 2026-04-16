@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		85CC16E1755B06359DEF90AC /* CoachTagGroupingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 128FFA0AAD6490F8EE2BA721 /* CoachTagGroupingTests.swift */; };
 		B767DF2974CF7C3924817151 /* AITagSuggestionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79C538AA010D98BCAA5FE7D1 /* AITagSuggestionsTests.swift */; };
 		78009F72593D68442E8498FF /* AICoachReasonService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2AC854841D3BE31CDA672 /* AICoachReasonService.swift */; };
 		F5D66EDE2BE1DB966F4C6E20 /* AICoachReasonServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55921281D2AA80B142A603DA /* AICoachReasonServiceTests.swift */; };
@@ -708,6 +709,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		128FFA0AAD6490F8EE2BA721 /* CoachTagGroupingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CoachTagGroupingTests.swift; path = FocusBloxTests/CoachTagGroupingTests.swift; sourceTree = SOURCE_ROOT; };
 		79C538AA010D98BCAA5FE7D1 /* AITagSuggestionsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AITagSuggestionsTests.swift; path = FocusBloxTests/AITagSuggestionsTests.swift; sourceTree = SOURCE_ROOT; };
 		E1A2AC854841D3BE31CDA672 /* AICoachReasonService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AICoachReasonService.swift; path = Sources/Services/AICoachReasonService.swift; sourceTree = SOURCE_ROOT; };
 		55921281D2AA80B142A603DA /* AICoachReasonServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AICoachReasonServiceTests.swift; path = FocusBloxTests/AICoachReasonServiceTests.swift; sourceTree = SOURCE_ROOT; };
@@ -1711,6 +1713,7 @@
 		A6B3805EF19D1B131D346DDD /* FocusBloxTests */ = {
 			isa = PBXGroup;
 			children = (
+				128FFA0AAD6490F8EE2BA721 /* CoachTagGroupingTests.swift */,
 				79C538AA010D98BCAA5FE7D1 /* AITagSuggestionsTests.swift */,
 				55921281D2AA80B142A603DA /* AICoachReasonServiceTests.swift */,
 				EAD2889BC9E0BC02588A1583 /* ShakeUndoConfirmationTests.swift */,
@@ -2918,6 +2921,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				85CC16E1755B06359DEF90AC /* CoachTagGroupingTests.swift in Sources */,
 				B767DF2974CF7C3924817151 /* AITagSuggestionsTests.swift in Sources */,
 				F5D66EDE2BE1DB966F4C6E20 /* AICoachReasonServiceTests.swift in Sources */,
 				FAF13C9EC472DB8EB792905D /* ShakeUndoConfirmationTests.swift in Sources */,
