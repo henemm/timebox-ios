@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		304371189D89C1DC87260422 /* TaskIdeaSuggestionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1E7B7758F57E936CF46FDCD /* TaskIdeaSuggestionService.swift */; };
+		522472270E2CC019DD5ACFF2 /* TaskIdeaSuggestionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1E7B7758F57E936CF46FDCD /* TaskIdeaSuggestionService.swift */; };
+		2F22134CBC7A0E7B71B9E474 /* TaskIdeaSuggestionUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 227760C3AC4AC01683358A4B /* TaskIdeaSuggestionUITests.swift */; };
+		43C572CF40040642AF9960EB /* TaskIdeaSuggestionServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95E810436DD458D261733601 /* TaskIdeaSuggestionServiceTests.swift */; };
 		85CC16E1755B06359DEF90AC /* CoachTagGroupingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 128FFA0AAD6490F8EE2BA721 /* CoachTagGroupingTests.swift */; };
 		B767DF2974CF7C3924817151 /* AITagSuggestionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79C538AA010D98BCAA5FE7D1 /* AITagSuggestionsTests.swift */; };
 		78009F72593D68442E8498FF /* AICoachReasonService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2AC854841D3BE31CDA672 /* AICoachReasonService.swift */; };
@@ -709,6 +713,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		D1E7B7758F57E936CF46FDCD /* TaskIdeaSuggestionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TaskIdeaSuggestionService.swift; path = Sources/Services/TaskIdeaSuggestionService.swift; sourceTree = SOURCE_ROOT; };
+		227760C3AC4AC01683358A4B /* TaskIdeaSuggestionUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TaskIdeaSuggestionUITests.swift; path = FocusBloxUITests/TaskIdeaSuggestionUITests.swift; sourceTree = SOURCE_ROOT; };
+		95E810436DD458D261733601 /* TaskIdeaSuggestionServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TaskIdeaSuggestionServiceTests.swift; path = FocusBloxTests/TaskIdeaSuggestionServiceTests.swift; sourceTree = SOURCE_ROOT; };
 		128FFA0AAD6490F8EE2BA721 /* CoachTagGroupingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CoachTagGroupingTests.swift; path = FocusBloxTests/CoachTagGroupingTests.swift; sourceTree = SOURCE_ROOT; };
 		79C538AA010D98BCAA5FE7D1 /* AITagSuggestionsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AITagSuggestionsTests.swift; path = FocusBloxTests/AITagSuggestionsTests.swift; sourceTree = SOURCE_ROOT; };
 		E1A2AC854841D3BE31CDA672 /* AICoachReasonService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AICoachReasonService.swift; path = Sources/Services/AICoachReasonService.swift; sourceTree = SOURCE_ROOT; };
@@ -1421,6 +1428,7 @@
 		05D90FB2A2CE48689EC309B4 /* FocusBloxUITests */ = {
 			isa = PBXGroup;
 			children = (
+				227760C3AC4AC01683358A4B /* TaskIdeaSuggestionUITests.swift */,
 				BEE29F820045B57F618C2332 /* CoachSuggestionUITests.swift */,
 				DE474618567511DD53CF7CE3 /* DoNowBadgeUITests.swift */,
 				69EAF8A756980AD4790CA636 /* SprintEndUITests.swift */,
@@ -1713,6 +1721,7 @@
 		A6B3805EF19D1B131D346DDD /* FocusBloxTests */ = {
 			isa = PBXGroup;
 			children = (
+				95E810436DD458D261733601 /* TaskIdeaSuggestionServiceTests.swift */,
 				128FFA0AAD6490F8EE2BA721 /* CoachTagGroupingTests.swift */,
 				79C538AA010D98BCAA5FE7D1 /* AITagSuggestionsTests.swift */,
 				55921281D2AA80B142A603DA /* AICoachReasonServiceTests.swift */,
@@ -1882,6 +1891,7 @@
 		E8F581D4C161751425D7F776 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				D1E7B7758F57E936CF46FDCD /* TaskIdeaSuggestionService.swift */,
 				E1A2AC854841D3BE31CDA672 /* AICoachReasonService.swift */,
 				54BF85733F8AE9505BA457C8 /* ShakeUndoHandler.swift */,
 				CDEC968759D860953246E6C2 /* BacklogBadgeService.swift */,
@@ -2638,6 +2648,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				522472270E2CC019DD5ACFF2 /* TaskIdeaSuggestionService.swift in Sources */,
 				78009F72593D68442E8498FF /* AICoachReasonService.swift in Sources */,
 				9FBA522B76FBC7FA31AED9F7 /* ShakeUndoHandler.swift in Sources */,
 				0A96CB42A72DE72E591A2C28 /* BacklogBadgeService.swift in Sources */,
@@ -2787,6 +2798,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2F22134CBC7A0E7B71B9E474 /* TaskIdeaSuggestionUITests.swift in Sources */,
 				08A8A68F7DE457F45B871CFD /* CoachSuggestionUITests.swift in Sources */,
 				C5833B7EE763E58A9DCFA51A /* DoNowBadgeUITests.swift in Sources */,
 				4D4959878471FD760482BBF1 /* SprintEndUITests.swift in Sources */,
@@ -2921,6 +2933,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				43C572CF40040642AF9960EB /* TaskIdeaSuggestionServiceTests.swift in Sources */,
 				85CC16E1755B06359DEF90AC /* CoachTagGroupingTests.swift in Sources */,
 				B767DF2974CF7C3924817151 /* AITagSuggestionsTests.swift in Sources */,
 				F5D66EDE2BE1DB966F4C6E20 /* AICoachReasonServiceTests.swift in Sources */,
@@ -3116,6 +3129,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				304371189D89C1DC87260422 /* TaskIdeaSuggestionService.swift in Sources */,
 				EA20355C03CBD8ED9B8716DD /* BacklogHealthService.swift in Sources */,
 				8E83A6881ACAE567E1A80956 /* BacklogRow.swift in Sources */,
 				6D9F3CC3F3C21C0143D86B9F /* TaskSuggestionService.swift in Sources */,

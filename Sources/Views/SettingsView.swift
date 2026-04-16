@@ -14,6 +14,7 @@ struct SettingsView: View {
     @AppStorage("defaultTaskDuration") private var defaultTaskDuration: Int = 15
     @AppStorage("aiScoringEnabled") private var aiScoringEnabled: Bool = true
     @AppStorage("taskSuggestionsEnabled") private var taskSuggestionsEnabled: Bool = true
+    @AppStorage("taskIdeaSuggestionsEnabled") private var taskIdeaSuggestionsEnabled: Bool = false
     @AppStorage("dueDateMorningReminderEnabled") private var dueDateMorningReminderEnabled: Bool = true
     @AppStorage("dueDateMorningReminderHour") private var dueDateMorningReminderHour: Int = 9
     @AppStorage("dueDateMorningReminderMinute") private var dueDateMorningReminderMinute: Int = 0
@@ -203,6 +204,15 @@ struct SettingsView: View {
                     Text("Automatische Task-Analyse")
                 } footer: {
                     Text("Bereinigt Titel, extrahiert Datumsangaben und ergänzt fehlende Attribute (Wichtigkeit, Dringlichkeit, Kategorie, Dauer) automatisch.")
+                }
+
+                if TaskIdeaSuggestionService.isAIAvailable {
+                    Section {
+                        Toggle("KI Task-Ideen", isOn: $taskIdeaSuggestionsEnabled)
+                            .accessibilityIdentifier("taskIdeaSuggestionsToggle")
+                    } footer: {
+                        Text("Beim Erstellen eines Tasks erscheinen 2–3 Ideen für verwandte Aufgaben.")
+                    }
                 }
 
                 // Section 1: Target Calendar

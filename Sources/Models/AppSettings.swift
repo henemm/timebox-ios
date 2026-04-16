@@ -114,4 +114,9 @@ final class AppSettings: ObservableObject {
     /// Whether weekly backlog hygiene nudge notifications are enabled (#215)
     @AppStorage("backlogHygieneNudgeEnabled") var backlogHygieneNudgeEnabled: Bool = true
 
+    // MARK: - KI Task-Ideen (#199)
+
+    /// Whether AI-generated task ideas are shown in CreateTaskView (default: OFF)
+    @AppStorage("taskIdeaSuggestionsEnabled") var taskIdeaSuggestionsEnabled: Bool = false
+
 }

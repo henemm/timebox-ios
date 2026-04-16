@@ -31,6 +31,10 @@ struct CreateTaskView: View {
     @State private var duplicateMatch: DuplicateMatch?
     @State private var duplicateDismissed = false
 
+    // MARK: - KI Task-Ideen (#199)
+    @State private var ideaSuggestions: [String] = []
+    @State private var ideaSuggestionsLoaded = false
+
     var onSave: (() -> Void)?
 
     var body: some View {
@@ -274,11 +278,48 @@ struct CreateTaskView: View {
                 } header: {
                     Text("Beschreibung (optional)")
                 }
+
+                // MARK: - KI Task-Ideen (#199)
+
+                if AppSettings.shared.taskIdeaSuggestionsEnabled,
+                   TaskIdeaSuggestionService.isAIAvailable,
+                   !ideaSuggestions.isEmpty {
+                    Section {
+                        ForEach(Array(ideaSuggestions.enumerated()), id: \.offset) { index, idea in
+                            Button {
+                                adoptIdea(idea)
+                            } label: {
+                                HStack {
+                                    Image(systemName: "lightbulb")
+                                        .foregroundStyle(.secondary)
+                                        .font(.caption)
+                                    Text(idea)
+                                        .foregroundStyle(.primary)
+                                }
+                            }
+                            .accessibilityIdentifier("taskIdea_\(index)")
+                        }
+                    } header: {
+                        Text("Vielleicht auch interessant?")
+                    }
+                }
             }
             .navigationTitle("Neuer Task")
             #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
             #endif
+            .task {
+                if AppSettings.shared.taskIdeaSuggestionsEnabled,
+                   TaskIdeaSuggestionService.isAIAvailable {
+                    var descriptor = FetchDescriptor<LocalTask>(
+                        sortBy: [SortDescriptor(\.createdAt, order: .reverse)]
+                    )
+                    descriptor.fetchLimit = 30
+                    let tasks = (try? modelContext.fetch(descriptor)) ?? []
+                    ideaSuggestions = await TaskIdeaSuggestionService.suggestions(existingTasks: tasks)
+                    ideaSuggestionsLoaded = true
+                }
+            }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Abbrechen") {
@@ -310,6 +351,24 @@ struct CreateTaskView: View {
         let service = TaskSuggestionService(modelContext: modelContext)
         Task {
             duplicateMatch = await service.findDuplicate(for: input)
+        }
+    }
+
+    private func adoptIdea(_ idea: String) {
+        Task {
+            let taskSource = LocalTaskSource(modelContext: modelContext)
+            do {
+                _ = try await taskSource.createTask(title: idea)
+                ideaSuggestions.removeAll { $0 == idea }
+
+                await SmartNotificationEngine.reconcile(
+                    reason: .taskChanged,
+                    context: modelContext,
+                    eventKitRepo: eventKitRepo
+                )
+            } catch {
+                // Task creation failed — keep idea in list so user can retry
+            }
         }
     }
 
