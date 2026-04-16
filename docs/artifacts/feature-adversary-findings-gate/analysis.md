@@ -1,34 +1,27 @@
-# Feature-Analyse: Adversary-Findings-Gate
+# Analyse: #238 Adversary-Findings-Gate (Update 2026-04-16)
 
 ## User-Erwartung (User Advocate)
 
-Henning will ALLE Findings sehen und SELBST entscheiden. Kein Vorfiltern durch Claude.
+Henning will **Vertrauen durch Kontrolle**: Kein Finding darf an ihm vorbei. Jedes Problem wird ihm einzeln vorgelegt, er entscheidet bewusst (Fixen / Akzeptabel / Zurückstellen). Erst wenn alles beantwortet ist, wird Commit freigeschaltet.
 
-Jedes Finding muss:
-- In nicht-technischer Sprache beschrieben sein
-- Einen Beweis haben (Test/Screenshot)
-- Sagen: "Was passiert wenn ich es NICHT fixe?"
-- Per Auswahl beantwortet werden (Fixen / Akzeptabel)
-- Dokumentiert werden für spätere Nachvollziehbarkeit
+**Kern-Wert:** Nicht Vertrauen in Claude, sondern Vertrauen in sich selbst als PO — "Nichts ist durchgerutscht, weil ich jede Entscheidung bewusst getroffen habe."
 
-Risiko: Zu viele Code-Quality-Findings (fehlende Kommentare etc.) nerven. Der Adversary soll nur User-relevante Findings vorlegen, keine Code-Reviews.
+**Risiko:** Wenn Findings trivial oder unverständlich sind, klickt Henning blind durch → Sicherheitstheater statt echte Kontrolle.
 
 ## Technische Analyse (Feature Planner)
 
-### Betroffene Dateien (4 Dateien)
-1. `.claude/hooks/workflow.py` — neue Commands `add-finding`, `resolve-finding` + Gate in `_validate_transition()`
-2. `.claude/hooks/bash_gate.py` — Commit-Gate prüft offene Findings
-3. `.claude/hooks/phase_listener.py` — minimale Erweiterung
-4. `.claude/commands/adversary.md` — Prompt-Erweiterung für strukturierte Findings
+**Kern-Feature ist BEREITS implementiert** (Commit a800d03):
+- `workflow.py`: add-finding, resolve-finding, list-findings, Transition-Gate
+- `phase_listener.py`: Keywords (fixen/akzeptabel/zurückstellen), CP3-Check
+- `bash_gate.py`: Commit-Block bei offenen Findings
+- `adversary.md`: JSON-Output-Format für strukturierte Findings
 
-### Bestehende Patterns
-- `test_artifacts`-Liste als Vorlage für `adversary_findings`-Struktur
-- `PROTECTED_FIELDS` + `WORKFLOW_CALLER`-Check für Schutz
-- `_validate_transition()` Erweiterungs-Pattern
+**Was noch fehlt:**
+1. **Auto-Ticket für "fix"-Findings** — Roadmap sagt "wird automatisch zu GitHub Issue", Code fehlt
+2. **`import-findings` Kommando** — Adversary generiert JSON, aber Claude muss manuell `add-finding` pro Finding aufrufen (fehleranfällig)
+3. **`status` zeigt keine Findings** — Henning sieht beim Status-Aufruf nicht welche Findings offen sind
 
-### Flow
-1. Adversary schreibt Findings als JSON-Block
-2. Claude überträgt via `workflow.py add-finding`
-3. Claude legt jedes Finding via AskUserQuestion vor
-4. Henning antwortet → Claude ruft `workflow.py resolve-finding <id> <status>`
-5. Gate in `_validate_transition()` prüft: alle resolved? → Checkpoint 3 möglich
+## Scope-Schätzung
+
+- 1 Datei betroffen: `workflow.py` (~50-70 LoC)
+- Weit unter Scoping-Limit

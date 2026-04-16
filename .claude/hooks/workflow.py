@@ -397,6 +397,10 @@ def cmd_status(args: list[str]) -> None:
     print(f"Test Artifacts: {artifacts}")
     print(f"RED done: {'Yes' if data.get('red_test_done') else 'No'}")
     print(f"UI RED done: {'Yes' if data.get('ui_test_red_done') else 'No'}")
+    findings = data.get("adversary_findings", [])
+    if findings:
+        unresolved = sum(1 for f in findings if f.get("status") is None)
+        print(f"Adversary Findings: {len(findings)} total, {unresolved} open")
 
 
 def cmd_phase(args: list[str]) -> None:
@@ -663,9 +667,62 @@ def cmd_resolve_finding(args: list[str]) -> None:
             f["resolved_at"] = datetime.now().isoformat()
             _save_active(data)
             print(f"Finding #{finding_id} resolved: {status}")
+            if status == "fix":
+                import subprocess as _sp
+                title_text = f"[Adversary-Finding] {f['title']}"
+                body_text = (f"**Impact:** {f['impact']}\n\n"
+                             f"**Proof:** {f['proof']}\n\n"
+                             f"Aus Workflow: {name}")
+                try:
+                    _sp.run(
+                        ["gh", "issue", "create", "--title", title_text,
+                         "--body", body_text],
+                        capture_output=True, text=True, check=True
+                    )
+                    print(f"GitHub Issue created for Finding #{finding_id}")
+                except (FileNotFoundError, _sp.CalledProcessError) as e:
+                    print(f"Warning: Could not create GitHub Issue: {e}",
+                          file=sys.stderr)
             return
     print(f"Finding #{finding_id} not found.", file=sys.stderr)
     sys.exit(1)
+
+
+def cmd_import_findings(args: list[str]) -> None:
+    """Import findings from JSON string. Usage: import-findings '<json_array>'"""
+    import json as json_mod
+    if not args:
+        print("Usage: workflow.py import-findings '<json_array>'", file=sys.stderr)
+        sys.exit(1)
+    raw = " ".join(args)
+    try:
+        items = json_mod.loads(raw)
+    except json_mod.JSONDecodeError as e:
+        print(f"Invalid JSON: {e}", file=sys.stderr)
+        sys.exit(1)
+    if not isinstance(items, list):
+        print("JSON must be an array of findings.", file=sys.stderr)
+        sys.exit(1)
+    data, name = _read_active()
+    findings = data.setdefault("adversary_findings", [])
+    next_id = max((f.get("id", 0) for f in findings), default=0) + 1
+    added = 0
+    for item in items:
+        if not all(k in item for k in ("title", "impact", "proof")):
+            print(f"Skipping invalid finding (missing title/impact/proof): {item}", file=sys.stderr)
+            continue
+        findings.append({
+            "id": next_id,
+            "title": item["title"],
+            "impact": item["impact"],
+            "proof": item["proof"],
+            "status": None,
+            "resolved_at": None,
+        })
+        next_id += 1
+        added += 1
+    _save_active(data)
+    print(f"Imported {added} findings.")
 
 
 def cmd_list_findings(args: list[str]) -> None:
@@ -770,6 +827,7 @@ COMMANDS = {
     "mark-checkpoint2": cmd_mark_checkpoint2,
     "mark-checkpoint3": cmd_mark_checkpoint3,
     "add-finding": cmd_add_finding,
+    "import-findings": cmd_import_findings,
     "resolve-finding": cmd_resolve_finding,
     "list-findings": cmd_list_findings,
     "complete": cmd_complete,

@@ -401,5 +401,233 @@ class TestPhaseListenerFindingResolution(unittest.TestCase):
         self.assertEqual(findings[1]["status"], "accept")
 
 
+class TestStatusShowsFindings(unittest.TestCase):
+    """workflow.py status muss Adversary-Findings anzeigen."""
+
+    def setUp(self):
+        self.tmp_dir = tempfile.mkdtemp()
+        self.wf_dir = Path(self.tmp_dir) / ".claude" / "workflows"
+        self.wf_dir.mkdir(parents=True)
+
+        self.wf_data = {
+            "name": "test-findings",
+            "current_phase": "phase5_implement",
+            "created": datetime.now().isoformat(),
+            "last_updated": datetime.now().isoformat(),
+            "context_file": "docs/context.md",
+            "spec_file": "docs/spec.md",
+            "spec_approved": True,
+            "checkpoint1_approved": True,
+            "checkpoint2_approved": True,
+            "checkpoint3_approved": False,
+            "red_test_done": True,
+            "ui_test_red_done": True,
+            "test_artifacts": [],
+            "adversary_findings": [
+                {"id": 1, "title": "Bug 1", "status": None},
+                {"id": 2, "title": "Bug 2", "status": "fix"},
+                {"id": 3, "title": "Bug 3", "status": None},
+            ],
+        }
+        wf_file = self.wf_dir / "test-findings.json"
+        wf_file.write_text(json.dumps(self.wf_data, indent=2))
+        os.symlink("test-findings.json", str(self.wf_dir / ".active"))
+
+    def tearDown(self):
+        import shutil
+        shutil.rmtree(self.tmp_dir, ignore_errors=True)
+
+    def test_status_shows_findings_count(self):
+        """status muss Findings-Anzahl und offene Findings anzeigen."""
+        env = os.environ.copy()
+        env["CLAUDE_PROJECT_DIR"] = self.tmp_dir
+
+        result = subprocess.run(
+            ["python3", str(HOOKS_DIR / "workflow.py"), "status"],
+            env=env, capture_output=True, text=True, timeout=5
+        )
+        self.assertEqual(result.returncode, 0)
+        self.assertIn("Findings", result.stdout,
+                       "Status-Output muss 'Findings' enthalten")
+        self.assertIn("2 open", result.stdout,
+                       "Status muss 2 offene Findings anzeigen")
+
+
+class TestImportFindings(unittest.TestCase):
+    """workflow.py import-findings muss JSON-Array batch-importieren."""
+
+    def setUp(self):
+        self.tmp_dir = tempfile.mkdtemp()
+        self.wf_dir = Path(self.tmp_dir) / ".claude" / "workflows"
+        self.wf_dir.mkdir(parents=True)
+
+        self.wf_data = {
+            "name": "test-findings",
+            "current_phase": "phase5_implement",
+            "created": datetime.now().isoformat(),
+            "last_updated": datetime.now().isoformat(),
+            "adversary_findings": [],
+        }
+        wf_file = self.wf_dir / "test-findings.json"
+        wf_file.write_text(json.dumps(self.wf_data, indent=2))
+        os.symlink("test-findings.json", str(self.wf_dir / ".active"))
+
+    def tearDown(self):
+        import shutil
+        shutil.rmtree(self.tmp_dir, ignore_errors=True)
+
+    def test_import_findings_command_exists(self):
+        """import-findings muss als Command registriert sein."""
+        import workflow
+        self.assertIn("import-findings", workflow.COMMANDS,
+                       "import-findings muss in workflow.COMMANDS registriert sein")
+
+    def test_import_findings_creates_entries(self):
+        """import-findings mit JSON-Array erstellt alle Findings."""
+        env = os.environ.copy()
+        env["CLAUDE_PROJECT_DIR"] = self.tmp_dir
+
+        findings_json = json.dumps([
+            {"title": "Bug A", "impact": "User sieht Fehler", "proof": "Screenshot X"},
+            {"title": "Bug B", "impact": "Daten gehen verloren", "proof": "Unit Test Y"},
+        ])
+
+        result = subprocess.run(
+            ["python3", str(HOOKS_DIR / "workflow.py"), "import-findings", findings_json],
+            env=env, capture_output=True, text=True, timeout=5
+        )
+        self.assertEqual(result.returncode, 0, f"import-findings fehlgeschlagen: {result.stderr}")
+        self.assertIn("Imported 2", result.stdout)
+
+        # Prüfe Workflow-State
+        wf_file = self.wf_dir / "test-findings.json"
+        data = json.loads(wf_file.read_text())
+        findings = data.get("adversary_findings", [])
+        self.assertEqual(len(findings), 2)
+        self.assertEqual(findings[0]["id"], 1)
+        self.assertEqual(findings[0]["title"], "Bug A")
+        self.assertIsNone(findings[0]["status"])
+        self.assertEqual(findings[1]["id"], 2)
+        self.assertEqual(findings[1]["title"], "Bug B")
+
+    def test_import_findings_skips_invalid_entries(self):
+        """Einträge ohne title/impact/proof werden übersprungen."""
+        env = os.environ.copy()
+        env["CLAUDE_PROJECT_DIR"] = self.tmp_dir
+
+        findings_json = json.dumps([
+            {"title": "Valid", "impact": "Ja", "proof": "Test"},
+            {"title": "Missing proof"},
+        ])
+
+        result = subprocess.run(
+            ["python3", str(HOOKS_DIR / "workflow.py"), "import-findings", findings_json],
+            env=env, capture_output=True, text=True, timeout=5
+        )
+        self.assertEqual(result.returncode, 0)
+        self.assertIn("Imported 1", result.stdout)
+
+    def test_import_findings_rejects_invalid_json(self):
+        """Ungültiges JSON → Exit 1."""
+        env = os.environ.copy()
+        env["CLAUDE_PROJECT_DIR"] = self.tmp_dir
+
+        result = subprocess.run(
+            ["python3", str(HOOKS_DIR / "workflow.py"), "import-findings", "not json"],
+            env=env, capture_output=True, text=True, timeout=5
+        )
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("Invalid JSON", result.stderr)
+
+    def test_import_findings_continues_id_sequence(self):
+        """IDs setzen dort fort wo bestehende Findings aufhören."""
+        env = os.environ.copy()
+        env["CLAUDE_PROJECT_DIR"] = self.tmp_dir
+
+        # Erst ein Finding manuell hinzufügen
+        subprocess.run(
+            ["python3", str(HOOKS_DIR / "workflow.py"), "add-finding",
+             "Existing", "Impact", "Proof"],
+            env=env, capture_output=True, text=True, timeout=5
+        )
+
+        # Dann importieren
+        findings_json = json.dumps([
+            {"title": "New", "impact": "X", "proof": "Y"},
+        ])
+        subprocess.run(
+            ["python3", str(HOOKS_DIR / "workflow.py"), "import-findings", findings_json],
+            env=env, capture_output=True, text=True, timeout=5
+        )
+
+        wf_file = self.wf_dir / "test-findings.json"
+        data = json.loads(wf_file.read_text())
+        findings = data.get("adversary_findings", [])
+        self.assertEqual(findings[0]["id"], 1)
+        self.assertEqual(findings[1]["id"], 2, "Importiertes Finding muss ID 2 haben")
+
+
+class TestAutoTicketForFixFindings(unittest.TestCase):
+    """resolve-finding mit status 'fix' soll gh issue create aufrufen."""
+
+    def setUp(self):
+        self.tmp_dir = tempfile.mkdtemp()
+        self.wf_dir = Path(self.tmp_dir) / ".claude" / "workflows"
+        self.wf_dir.mkdir(parents=True)
+
+        self.wf_data = {
+            "name": "test-auto-ticket",
+            "current_phase": "phase5_implement",
+            "created": datetime.now().isoformat(),
+            "last_updated": datetime.now().isoformat(),
+            "adversary_findings": [
+                {"id": 1, "title": "Schwerer Bug", "impact": "User verliert Daten",
+                 "proof": "Unit Test zeigt Datenverlust", "status": None, "resolved_at": None},
+            ],
+        }
+        wf_file = self.wf_dir / "test-auto-ticket.json"
+        wf_file.write_text(json.dumps(self.wf_data, indent=2))
+        os.symlink("test-auto-ticket.json", str(self.wf_dir / ".active"))
+
+    def tearDown(self):
+        import shutil
+        shutil.rmtree(self.tmp_dir, ignore_errors=True)
+
+    def test_fix_status_triggers_gh_issue_create(self):
+        """resolve-finding mit 'fix' muss versuchen ein GitHub Issue zu erstellen."""
+        env = os.environ.copy()
+        env["CLAUDE_PROJECT_DIR"] = self.tmp_dir
+        env["WORKFLOW_CALLER"] = "phase_listener"
+
+        result = subprocess.run(
+            ["python3", str(HOOKS_DIR / "workflow.py"), "resolve-finding", "1", "fix"],
+            env=env, capture_output=True, text=True, timeout=10
+        )
+        self.assertEqual(result.returncode, 0, f"resolve-finding fehlgeschlagen: {result.stderr}")
+
+        # Prüfe dass "Issue" in stdout oder stderr erwähnt wird
+        combined = result.stdout + result.stderr
+        self.assertTrue(
+            "Issue" in combined or "issue" in combined,
+            "resolve-finding mit 'fix' sollte GitHub Issue erstellen (oder Warnung ausgeben)"
+        )
+
+    def test_accept_status_does_not_create_ticket(self):
+        """resolve-finding mit 'accept' soll KEIN Issue erstellen."""
+        env = os.environ.copy()
+        env["CLAUDE_PROJECT_DIR"] = self.tmp_dir
+        env["WORKFLOW_CALLER"] = "phase_listener"
+
+        result = subprocess.run(
+            ["python3", str(HOOKS_DIR / "workflow.py"), "resolve-finding", "1", "accept"],
+            env=env, capture_output=True, text=True, timeout=10
+        )
+        self.assertEqual(result.returncode, 0)
+
+        combined = result.stdout + result.stderr
+        self.assertNotIn("Issue created", combined,
+                         "accept sollte kein Issue erstellen")
+
+
 if __name__ == "__main__":
     unittest.main()
