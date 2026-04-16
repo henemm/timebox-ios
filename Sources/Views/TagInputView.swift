@@ -5,6 +5,7 @@ import SwiftData
 /// Works on both iOS and macOS.
 struct TagInputView: View {
     @Binding var tags: [String]
+    var aiSuggestions: [String] = []
     @Environment(\.modelContext) private var modelContext
 
     @State private var newTag = ""
@@ -16,9 +17,42 @@ struct TagInputView: View {
         return available.filter { $0.localizedCaseInsensitiveContains(newTag) }
     }
 
+    /// AI suggestions filtered to exclude already-assigned tags
+    private var visibleAISuggestions: [String] {
+        aiSuggestions.filter { !tags.contains($0) }
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            // Suggestions as FlowLayout chips (prominent, at top)
+            // AI-suggested tags (sparkle icon, visually distinct)
+            if !visibleAISuggestions.isEmpty {
+                FlowLayout(spacing: 6) {
+                    ForEach(visibleAISuggestions, id: \.self) { suggestion in
+                        Button {
+                            if !tags.contains(suggestion) {
+                                tags.append(suggestion)
+                            }
+                        } label: {
+                            HStack(spacing: 3) {
+                                Image(systemName: "sparkles")
+                                    .font(.system(size: 9))
+                                Text(suggestion)
+                                    .font(.caption)
+                            }
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background(Capsule().fill(Color.purple.opacity(0.15)))
+                            .foregroundStyle(Color.purple)
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityIdentifier("aiTagSuggestion_\(suggestion)")
+                    }
+                }
+                .accessibilityElement(children: .contain)
+                .accessibilityIdentifier("aiTagSuggestionsContainer")
+            }
+
+            // Existing tag suggestions as FlowLayout chips
             if !suggestions.isEmpty {
                 FlowLayout(spacing: 6) {
                     ForEach(suggestions, id: \.self) { suggestion in

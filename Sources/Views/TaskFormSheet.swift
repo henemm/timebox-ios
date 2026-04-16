@@ -48,6 +48,10 @@ struct TaskFormSheet: View {
     @State private var suggestionTask: Task<Void, Never>?
     @State private var skipNextSuggestionUpdate = false
 
+    // AI Tag Suggestions
+    @State private var aiTagSuggestions: [String] = []
+    @State private var tagSuggestionTask: Task<Void, Never>?
+
     // Dependency State
     @State private var blockerTaskID: String? = nil
     @State private var showBlockerPicker = false
@@ -87,6 +91,7 @@ struct TaskFormSheet: View {
         _priority = State(initialValue: task.importance)  // Keep nil if task is TBD
         _duration = State(initialValue: task.estimatedDuration)  // Keep nil if task is TBD
         _tags = State(initialValue: task.tags ?? [])
+        _aiTagSuggestions = State(initialValue: task.suggestedTags ?? [])
         _urgency = State(initialValue: task.urgency)  // Keep nil if task is TBD
         _taskType = State(initialValue: task.taskType)
         _hasDueDate = State(initialValue: task.dueDate != nil)
@@ -135,6 +140,10 @@ struct TaskFormSheet: View {
                                 }
                                 if skipNextSuggestionUpdate {
                                     skipNextSuggestionUpdate = false
+                                }
+                                // Debounced AI tag suggestions
+                                if case .create = mode {
+                                    updateAITagSuggestions(for: newValue)
                                 }
                             }
 
@@ -286,7 +295,7 @@ struct TaskFormSheet: View {
 
                     // MARK: - Tags
                     glassCardSection(id: "tags", header: "Tags") {
-                        TagInputView(tags: $tags)
+                        TagInputView(tags: $tags, aiSuggestions: aiTagSuggestions)
                     }
 
                     // MARK: - Due Date
@@ -558,6 +567,27 @@ struct TaskFormSheet: View {
         }
     }
 
+    private func updateAITagSuggestions(for input: String) {
+        tagSuggestionTask?.cancel()
+        let trimmed = input.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard trimmed.count >= 3 else {
+            aiTagSuggestions = []
+            return
+        }
+        let ctx = modelContext
+        tagSuggestionTask = Task {
+            // 1.5s debounce — suggestions appear after user pauses typing
+            try? await Task.sleep(for: .milliseconds(1500))
+            guard !Task.isCancelled else { return }
+            let service = SmartTaskEnrichmentService(modelContext: ctx)
+            let taskSource = LocalTaskSource(modelContext: ctx)
+            let existingTags = (try? taskSource.fetchAllUsedTags()) ?? []
+            let result = await service.suggestTagsForTitle(trimmed, existingTags: existingTags)
+            guard !Task.isCancelled else { return }
+            aiTagSuggestions = result
+        }
+    }
+
     // MARK: - Save
 
     private func saveTask() {
@@ -635,12 +665,17 @@ struct TaskFormSheet: View {
             let monthDayValue: Int? = recurrencePattern.requiresCustomConfig ? customBasePatternCode : (recurrencePattern.requiresMonthDay ? monthDay : nil)
             let intervalValue: Int? = recurrencePattern.requiresCustomConfig ? customInterval : nil
 
-            // Save blocker dependency directly (not part of callback chain)
+            // Save blocker dependency and clean up accepted tag suggestions
             // Use stored $0.uuid property (not computed $0.id) for SwiftData predicate
             if let editUUID = UUID(uuidString: editTask.id) {
                 let descriptor = FetchDescriptor<LocalTask>(predicate: #Predicate { $0.uuid == editUUID })
                 if let localTask = try? modelContext.fetch(descriptor).first {
                     localTask.blockerTaskID = blockerTaskID
+                    // Remove accepted tags from suggestedTags (Finding 1: keep data consistent)
+                    if let suggested = localTask.suggestedTags {
+                        let remaining = suggested.filter { !tags.contains($0) }
+                        localTask.suggestedTags = remaining.isEmpty ? nil : remaining
+                    }
                     try? modelContext.save()
                 }
             }

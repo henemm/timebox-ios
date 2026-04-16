@@ -69,8 +69,22 @@ final class SmartTaskEnrichmentService {
 
         @Guide(description: "Estimated duration in minutes: 5, 15, 30, or 60")
         let suggestedDurationMinutes: Int
+
+        @Guide(description: "Up to 3 suggested tags for this task. Prefer tags the user already uses. At most 1 completely new tag. Empty array if no good match.")
+        let suggestedTags: [String]
+    }
+
+    @Generable
+    struct TagSuggestion {
+        @Guide(description: "Up to 3 suggested tags. Prefer from user's existing tags. Max 1 new tag.")
+        let tags: [String]
     }
     #endif
+
+    // MARK: - Seed Tags
+
+    /// Base tags suggested for new users who haven't created any tags yet.
+    static let seedTags = ["computer", "telefon", "unterwegs", "zuhause", "einkauf"]
 
     // MARK: - Properties
 
@@ -108,6 +122,23 @@ final class SmartTaskEnrichmentService {
         }
         #endif
         return 0
+    }
+
+    // MARK: - Live Tag Suggestions
+
+    /// Lightweight tag suggestion for the task creation form.
+    /// Returns 0-3 tag suggestions based on title and existing user tags.
+    func suggestTagsForTitle(_ title: String, existingTags: [String]) async -> [String] {
+        guard Self.isAvailable else { return [] }
+        guard AppSettings.shared.aiScoringEnabled else { return [] }
+        guard !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return [] }
+
+        #if canImport(FoundationModels)
+        if #available(iOS 26.0, macOS 26.0, *) {
+            return await performTagSuggestion(title: title, existingTags: existingTags)
+        }
+        #endif
+        return []
     }
 
     /// Re-analyze all incomplete tasks: title cleanup, date extraction, and AI enrichment.
@@ -333,6 +364,12 @@ final class SmartTaskEnrichmentService {
                 "  Server ist down → importance: 3, urgent: true, category: income, energy: high"
                 "  Netflix schauen → importance: 1, urgent: false, category: recharge, energy: low"
                 ""
+                "Tag-Vorschläge (suggestedTags):"
+                "  Bevorzuge Tags die der Nutzer bereits verwendet."
+                "  Maximal 1 komplett neuer Tag erlaubt."
+                "  Falls keine Tags passen: leeres Array []."
+                "  Nutzer-Tags: \(fetchUserTags().joined(separator: ", "))"
+                ""
                 "Orientiere dich an den Attributen ähnlicher bestehender Tasks wenn vorhanden."
             }
 
@@ -366,12 +403,78 @@ final class SmartTaskEnrichmentService {
                 }
             }
 
+            // Tag suggestions: only when user hasn't set manual tags
+            if (task.tags ?? []).isEmpty, !result.suggestedTags.isEmpty {
+                let userTags = fetchUserTags()
+                let filtered = filterTagSuggestions(result.suggestedTags, existingTags: userTags)
+                if !filtered.isEmpty {
+                    task.suggestedTags = filtered
+                }
+            }
+
             try modelContext.save()
         } catch {
             print("[SmartEnrichment] Failed to enrich task '\(task.title)': \(error)")
         }
     }
+
+    @available(iOS 26.0, macOS 26.0, *)
+    private func performTagSuggestion(title: String, existingTags: [String]) async -> [String] {
+        let tagContext = existingTags.isEmpty ? Self.seedTags : existingTags
+
+        do {
+            let session = LanguageModelSession {
+                "Du schlägst passende Tags für eine Aufgabe vor."
+                ""
+                "Regeln:"
+                "  - Maximal 3 Tags vorschlagen"
+                "  - Bevorzuge Tags aus der Liste des Nutzers"
+                "  - Maximal 1 komplett neuer Tag erlaubt"
+                "  - Nur Tags die wirklich zum Titel passen"
+                "  - Falls nichts passt: leeres Array"
+                ""
+                "Verfügbare Tags des Nutzers: \(tagContext.joined(separator: ", "))"
+            }
+
+            let response = try await session.respond(to: "Aufgabe: \(title)", generating: TagSuggestion.self)
+            return filterTagSuggestions(response.content.tags, existingTags: tagContext)
+        } catch {
+            print("[SmartEnrichment] Tag suggestion failed for '\(title)': \(error)")
+            return []
+        }
+    }
     #endif
+
+    // MARK: - Tag Helpers
+
+    /// Fetches all user-used tags sorted by frequency, falls back to seed tags.
+    private func fetchUserTags() -> [String] {
+        let taskSource = LocalTaskSource(modelContext: modelContext)
+        let tags = (try? taskSource.fetchAllUsedTags()) ?? []
+        return tags.isEmpty ? Self.seedTags : tags
+    }
+
+    /// Filters AI tag suggestions: max 3 total, max 1 new tag.
+    private func filterTagSuggestions(_ suggestions: [String], existingTags: [String]) -> [String] {
+        let loweredExisting = Set(existingTags.map { $0.lowercased() })
+        var result: [String] = []
+        var newTagCount = 0
+
+        for tag in suggestions.prefix(3) {
+            let cleaned = tag.lowercased().trimmingCharacters(in: .whitespacesAndNewlines)
+                .replacingOccurrences(of: "#", with: "")
+            guard !cleaned.isEmpty else { continue }
+
+            if loweredExisting.contains(cleaned) {
+                result.append(cleaned)
+            } else if newTagCount < 1 {
+                result.append(cleaned)
+                newTagCount += 1
+            }
+        }
+
+        return result
+    }
 
     // MARK: - Similar-Task Context
 

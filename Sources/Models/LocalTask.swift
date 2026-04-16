@@ -209,6 +209,9 @@ final class LocalTask {
     /// AI-suggested energy level ("high" / "low")
     var suggestedEnergyLevel: String?
 
+    /// AI-suggested tags (max 3), stored until user accepts/dismisses
+    var suggestedTags: [String]?
+
     /// External system identifier for sync (e.g., Notion page ID)
     var externalID: String?
 

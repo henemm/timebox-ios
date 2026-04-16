@@ -94,6 +94,7 @@ struct PlanItem: Identifiable, Hashable, Sendable {
     let suggestedImportance: Int?
     let suggestedUrgency: String?
     let suggestedEnergyLevel: String?
+    let suggestedTags: [String]?
 
     /// Number of tasks that depend on this task (populated externally)
     var dependentCount: Int = 0
@@ -201,6 +202,7 @@ struct PlanItem: Identifiable, Hashable, Sendable {
         self.suggestedImportance  = nil
         self.suggestedUrgency     = nil
         self.suggestedEnergyLevel = nil
+        self.suggestedTags        = nil
     }
 
     init(localTask: LocalTask) {
@@ -262,6 +264,7 @@ struct PlanItem: Identifiable, Hashable, Sendable {
         self.suggestedImportance  = localTask.suggestedImportance
         self.suggestedUrgency     = localTask.suggestedUrgency
         self.suggestedEnergyLevel = localTask.suggestedEnergyLevel
+        self.suggestedTags        = localTask.suggestedTags
     }
 
     private static func resolveDuration(manual: Int?, title: String?) -> (Int, DurationSource) {
