@@ -126,6 +126,31 @@ def _set_stop_lock(enabled: bool, session_id: str = "") -> None:
                 lock_file.unlink(missing_ok=True)
 
 
+def _resolve_next_finding(wf_data: dict, wf_path: Path, status: str) -> bool:
+    """Resolve the first unresolved adversary finding. Returns True if resolved."""
+    findings = wf_data.get("adversary_findings", [])
+    for f in findings:
+        if f.get("status") is None:
+            # Call workflow.py resolve-finding with WORKFLOW_CALLER=phase_listener
+            env = os.environ.copy()
+            env["WORKFLOW_CALLER"] = "phase_listener"
+            try:
+                result = subprocess.run(
+                    ["python3", str(Path(__file__).parent / "workflow.py"),
+                     "resolve-finding", str(f["id"]), status],
+                    env=env, capture_output=True, text=True, timeout=5
+                )
+                if result.returncode == 0:
+                    print(result.stdout.strip(), file=sys.stderr)
+                else:
+                    print(result.stderr.strip(), file=sys.stderr)
+                return result.returncode == 0
+            except Exception as e:
+                print(f"Error resolving finding #{f['id']}: {e}", file=sys.stderr)
+                return False
+    return False
+
+
 def _call_workflow_checkpoint(checkpoint_num: int, notes: str) -> None:
     """Call workflow.py mark-checkpoint{N} with WORKFLOW_CALLER=phase_listener."""
     env = os.environ.copy()
@@ -162,6 +187,9 @@ APPROVAL_PHRASES = [
     "approved", "freigabe", "lgtm", "spec ok", "genehmigt",
     "abgenommen", "passt", "sieht gut aus", "ja", "einverstanden",
 ]
+FINDING_FIX_PHRASES = ["fixen", "fix", "beheben", "reparieren"]
+FINDING_ACCEPT_PHRASES = ["akzeptabel", "akzeptieren", "ok so", "passt so"]
+FINDING_DEFER_PHRASES = ["zurückstellen", "später", "defer", "ticket"]
 STOP_PHRASES = ["stop", "stopp", "halt", "anhalten"]
 CONTINUE_PHRASES = ["weiter", "continue", "weitermachen", "fortfahren"]
 
@@ -208,10 +236,25 @@ def main():
         if phase == "phase4_tdd_red" and not wf_data.get("checkpoint2_approved"):
             _call_workflow_checkpoint(2, f"User approved at {datetime.now().isoformat()}")
 
-    # Checkpoint 3: "commit" — only in phase5_implement
+    # Checkpoint 3: "commit" — only in phase5_implement, AND only if no unresolved findings
     if _matches(message, CHECKPOINT3_PHRASES):
         if phase == "phase5_implement" and not wf_data.get("checkpoint3_approved"):
-            _call_workflow_checkpoint(3, f"User approved at {datetime.now().isoformat()}")
+            findings = wf_data.get("adversary_findings", [])
+            has_unresolved = any(f.get("status") is None for f in findings)
+            if not has_unresolved:
+                _call_workflow_checkpoint(3, f"User approved at {datetime.now().isoformat()}")
+
+    # Finding resolution: "fixen"/"akzeptabel"/"zurückstellen" — only in phase5_implement
+    if phase == "phase5_implement":
+        findings = wf_data.get("adversary_findings", [])
+        has_unresolved = any(f.get("status") is None for f in findings)
+        if has_unresolved:
+            if _matches(message, FINDING_FIX_PHRASES):
+                _resolve_next_finding(wf_data, wf_path, "fix")
+            elif _matches(message, FINDING_ACCEPT_PHRASES):
+                _resolve_next_finding(wf_data, wf_path, "accept")
+            elif _matches(message, FINDING_DEFER_PHRASES):
+                _resolve_next_finding(wf_data, wf_path, "defer")
 
     # Spec approval: "approved" etc. — only in phase3_spec
     if _matches(message, APPROVAL_PHRASES):

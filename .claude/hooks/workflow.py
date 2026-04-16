@@ -335,6 +335,15 @@ def _validate_transition(data: dict, target: str) -> str | None:
                     "(ALL GREEN Output + vorher/nachher Screenshot). "
                     "Henning muss 'commit' sagen.")
 
+    # --- Gate: Adversary Findings müssen alle resolved sein ---
+    if tgt_idx >= PHASES.index("phase6_done"):
+        findings = data.get("adversary_findings", [])
+        unresolved = [f for f in findings if f.get("status") is None]
+        if unresolved:
+            titles = ", ".join(f["title"] for f in unresolved[:3])
+            return (f"BLOCKED: {len(unresolved)} Adversary-Finding(s) noch offen: {titles}. "
+                    "Jedes Finding muss von Henning beantwortet werden.")
+
     return None
 
 
@@ -602,6 +611,77 @@ def cmd_mark_checkpoint3(args: list[str]) -> None:
     print(f"Checkpoint 3 approved: {notes}")
 
 
+def cmd_add_finding(args: list[str]) -> None:
+    """Add an adversary finding. Usage: add-finding <title> <impact> <proof>"""
+    if len(args) < 3:
+        print("Usage: workflow.py add-finding <title> <impact> <proof>", file=sys.stderr)
+        sys.exit(1)
+    title, impact, proof = args[0], args[1], args[2]
+    data, name = _read_active()
+    findings = data.setdefault("adversary_findings", [])
+    next_id = max((f.get("id", 0) for f in findings), default=0) + 1
+    findings.append({
+        "id": next_id,
+        "title": title,
+        "impact": impact,
+        "proof": proof,
+        "status": None,
+        "resolved_at": None,
+    })
+    _save_active(data)
+    print(f"Finding #{next_id} added: {title}")
+
+
+def cmd_resolve_finding(args: list[str]) -> None:
+    """Resolve an adversary finding. ONLY callable from phase_listener.
+    Usage: resolve-finding <id> <status>
+    Status: fix, accept, defer
+    """
+    caller = os.environ.get("WORKFLOW_CALLER", "")
+    if caller != "phase_listener":
+        print("BLOCKED: resolve-finding can only be called by phase_listener.py "
+              "(triggered by Henning's input). Claude cannot resolve findings.",
+              file=sys.stderr)
+        sys.exit(1)
+    if len(args) < 2:
+        print("Usage: workflow.py resolve-finding <id> <status>", file=sys.stderr)
+        sys.exit(1)
+    try:
+        finding_id = int(args[0])
+    except ValueError:
+        print(f"Invalid finding ID: {args[0]}. Must be a number.", file=sys.stderr)
+        sys.exit(1)
+    status = args[1]
+    if status not in ("fix", "accept", "defer"):
+        print(f"Invalid status: {status}. Must be fix, accept, or defer.", file=sys.stderr)
+        sys.exit(1)
+    data, name = _read_active()
+    findings = data.get("adversary_findings", [])
+    for f in findings:
+        if f.get("id") == finding_id:
+            f["status"] = status
+            f["resolved_at"] = datetime.now().isoformat()
+            _save_active(data)
+            print(f"Finding #{finding_id} resolved: {status}")
+            return
+    print(f"Finding #{finding_id} not found.", file=sys.stderr)
+    sys.exit(1)
+
+
+def cmd_list_findings(args: list[str]) -> None:
+    """List all adversary findings with status."""
+    data, name = _read_active()
+    findings = data.get("adversary_findings", [])
+    if not findings:
+        print("No adversary findings.")
+        return
+    for f in findings:
+        status = f.get("status") or "OPEN"
+        print(f"  #{f['id']}: [{status.upper()}] {f['title']}")
+    unresolved = sum(1 for f in findings if f.get("status") is None)
+    print(f"\n{len(findings)} findings total, {unresolved} open")
+
+
 def cmd_complete(args: list[str]) -> None:
     data, name = _read_active()
     data["current_phase"] = "phase6_done"
@@ -689,6 +769,9 @@ COMMANDS = {
     "mark-checkpoint1": cmd_mark_checkpoint1,
     "mark-checkpoint2": cmd_mark_checkpoint2,
     "mark-checkpoint3": cmd_mark_checkpoint3,
+    "add-finding": cmd_add_finding,
+    "resolve-finding": cmd_resolve_finding,
+    "list-findings": cmd_list_findings,
     "complete": cmd_complete,
     "list": cmd_list,
     "snapshot-tests": cmd_snapshot_tests,

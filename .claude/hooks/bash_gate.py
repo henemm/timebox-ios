@@ -81,6 +81,9 @@ MAX_WAIT = 240
 
 
 def _project_root() -> Path:
+    env_dir = os.environ.get("CLAUDE_PROJECT_DIR")
+    if env_dir:
+        return Path(env_dir)
     cwd = Path.cwd()
     for parent in [cwd] + list(cwd.parents):
         if (parent / ".git").exists():
@@ -248,8 +251,8 @@ def main():
         print("BLOCKED: Stop-lock active.", file=sys.stderr)
         sys.exit(2)
 
-    # Git commands always pass (early exit for performance)
-    if command.lstrip().startswith("git "):
+    # Git commands always pass (early exit for performance) — EXCEPT git commit
+    if command.lstrip().startswith("git ") and "git commit" not in command:
         sys.exit(0)
 
     # 2. State-integrity: protected file + write indicator
@@ -349,6 +352,14 @@ def main():
                     print("BLOCKED: Kein Commit ohne Checkpoint 3! "
                           "Präsentiere Henning das Ergebnis (ALL GREEN + Screenshot). "
                           "Henning muss 'commit' sagen.", file=sys.stderr)
+                    sys.exit(2)
+                # 6c. Adversary-Findings Gate
+                findings = active_wf.get("adversary_findings", [])
+                unresolved = [f for f in findings if f.get("status") is None]
+                if unresolved:
+                    print(f"BLOCKED: {len(unresolved)} Adversary-Finding(s) noch offen. "
+                          "Jedes Finding muss von Henning beantwortet werden.",
+                          file=sys.stderr)
                     sys.exit(2)
 
     # 7. Allow

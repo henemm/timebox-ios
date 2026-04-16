@@ -194,6 +194,30 @@ ODER
 **NICHT BESTANDEN** — [N] Blocker gefunden:
 1. [Blocker 1]
 2. [Blocker 2]
+
+## Strukturierte Findings (PFLICHT)
+
+Gib am Ende deines Reports ZUSAETZLICH diesen JSON-Block aus — exakt dieses Format:
+
+```json
+{
+  "findings": [
+    {
+      "title": "Kurzer Titel des Problems",
+      "impact": "Was passiert wenn es NICHT gefixt wird? In User-Sprache, nicht technisch. Z.B. 'Der User sieht einen leeren Screen wenn er X macht'",
+      "proof": "Konkreter Beweis: Test-Name + Ergebnis, Screenshot-Pfad, oder Code-Stelle mit Zeilennummer"
+    }
+  ]
+}
+```
+
+REGELN fuer Findings:
+- NUR User-sichtbare Probleme (Workflow kaputt, falsches Verhalten, Datenverlust)
+- KEINE Code-Style-Issues (Naming, Kommentare, Formatierung)
+- KEINE "nice-to-have" Verbesserungen
+- Jedes Finding MUSS einen konkreten Beweis haben (Test, Screenshot, Code-Stelle)
+- "impact" in Hennings Sprache — kein Fachjargon
+- Bei 0 Findings: `{"findings": []}`
 ```
 
 ---
