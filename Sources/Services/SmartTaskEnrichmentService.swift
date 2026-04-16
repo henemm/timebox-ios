@@ -74,11 +74,6 @@ final class SmartTaskEnrichmentService {
         let suggestedTags: [String]
     }
 
-    @Generable
-    struct TagSuggestion {
-        @Guide(description: "Up to 3 suggested tags. Prefer from user's existing tags. Max 1 new tag.")
-        let tags: [String]
-    }
     #endif
 
     // MARK: - Seed Tags
@@ -124,21 +119,37 @@ final class SmartTaskEnrichmentService {
         return 0
     }
 
-    // MARK: - Live Tag Suggestions
+    // MARK: - Live Enrichment
 
-    /// Lightweight tag suggestion for the task creation form.
-    /// Returns 0-3 tag suggestions based on title and existing user tags.
-    func suggestTagsForTitle(_ title: String, existingTags: [String]) async -> [String] {
-        guard Self.isAvailable else { return [] }
-        guard AppSettings.shared.aiScoringEnabled else { return [] }
-        guard !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return [] }
+    /// Result of a combined live enrichment call (tags + duration + importance).
+    struct LiveEnrichmentResult {
+        let tags: [String]
+        let durationMinutes: Int?
+        let importance: Int?
+
+        static let empty = LiveEnrichmentResult(tags: [], durationMinutes: nil, importance: nil)
+    }
+
+    /// Combined live enrichment for the task creation form.
+    /// Returns tags, suggested duration, and suggested importance in one AI call.
+    func suggestLiveEnrichment(title: String, existingTags: [String]) async -> LiveEnrichmentResult {
+        guard Self.isAvailable else { return .empty }
+        guard AppSettings.shared.aiScoringEnabled else { return .empty }
+        guard !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return .empty }
 
         #if canImport(FoundationModels)
         if #available(iOS 26.0, macOS 26.0, *) {
-            return await performTagSuggestion(title: title, existingTags: existingTags)
+            return await performLiveEnrichment(title: title, existingTags: existingTags)
         }
         #endif
-        return []
+        return .empty
+    }
+
+    // MARK: - Live Tag Suggestions
+
+    /// Tag-only convenience wrapper around suggestLiveEnrichment.
+    func suggestTagsForTitle(_ title: String, existingTags: [String]) async -> [String] {
+        await suggestLiveEnrichment(title: title, existingTags: existingTags).tags
     }
 
     /// Re-analyze all incomplete tasks: title cleanup, date extraction, and AI enrichment.
@@ -419,30 +430,55 @@ final class SmartTaskEnrichmentService {
     }
 
     @available(iOS 26.0, macOS 26.0, *)
-    private func performTagSuggestion(title: String, existingTags: [String]) async -> [String] {
+    private func performLiveEnrichment(title: String, existingTags: [String]) async -> LiveEnrichmentResult {
         let tagContext = existingTags.isEmpty ? Self.seedTags : existingTags
+        let taskContext = fetchRecentTaskContext()
 
         do {
             let session = LanguageModelSession {
-                "Du schlägst passende Tags für eine Aufgabe vor."
+                "Du analysierst einen Task-Titel und schlägst Tags, Dauer und Wichtigkeit vor."
                 ""
-                "Regeln:"
+                "Wichtigkeit (1-3):"
+                "  1 = nice to have (Freizeit, Hobby, optional)"
+                "  2 = should do (MEISTE Alltagstasks: Haushalt, Einkaufen, Termine)"
+                "  3 = must do (NUR echte Pflichten mit Konsequenzen)"
+                "Im Zweifel importance=2."
+                ""
+                "Dauer in Minuten: 5, 15, 30, oder 60"
+                ""
+                "Tag-Regeln:"
                 "  - Maximal 3 Tags vorschlagen"
                 "  - Bevorzuge Tags aus der Liste des Nutzers"
                 "  - Maximal 1 komplett neuer Tag erlaubt"
-                "  - Nur Tags die wirklich zum Titel passen"
                 "  - Falls nichts passt: leeres Array"
                 ""
                 "Verfügbare Tags des Nutzers: \(tagContext.joined(separator: ", "))"
+                if !taskContext.isEmpty {
+                    ""
+                    "Bestehende Tasks des Nutzers (orientiere dich an deren Attributen):"
+                    taskContext
+                }
             }
 
-            let response = try await session.respond(to: "Aufgabe: \(title)", generating: TagSuggestion.self)
-            return filterTagSuggestions(response.content.tags, existingTags: tagContext)
+            let response = try await session.respond(to: "Aufgabe: \(title)", generating: TaskEnrichment.self)
+            let enrichment = response.content
+            let filteredTags = filterTagSuggestions(enrichment.suggestedTags, existingTags: tagContext)
+            let validDuration = [5, 15, 30, 60].contains(enrichment.suggestedDurationMinutes)
+                ? enrichment.suggestedDurationMinutes : nil
+            let validImportance = (1...3).contains(enrichment.suggestedImportance)
+                ? enrichment.suggestedImportance : nil
+
+            return LiveEnrichmentResult(
+                tags: filteredTags,
+                durationMinutes: validDuration,
+                importance: validImportance
+            )
         } catch {
-            print("[SmartEnrichment] Tag suggestion failed for '\(title)': \(error)")
-            return []
+            print("[SmartEnrichment] Live enrichment failed for '\(title)': \(error)")
+            return .empty
         }
     }
+
     #endif
 
     // MARK: - Tag Helpers
@@ -500,6 +536,8 @@ final class SmartTaskEnrichmentService {
             if !task.taskType.isEmpty { parts.append("Kat: \(task.taskType)") }
             if let imp = task.importance { parts.append("Imp: \(imp)") }
             if let urg = task.urgency { parts.append("Urg: \(urg)") }
+            if let dur = task.estimatedDuration { parts.append("Dauer: \(dur)min") }
+            if let tags = task.tags, !tags.isEmpty { parts.append("Tags: \(tags.joined(separator: ", "))") }
             return parts.joined(separator: " | ")
         }.joined(separator: "\n")
     }

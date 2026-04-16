@@ -422,6 +422,92 @@ final class SmartTaskEnrichmentServiceTests: XCTestCase {
     /// Praxistest: Schickt 12 realistische Task-Titel durch die Enrichment-Pipeline
     /// und prüft ob die AI sinnvolle Werte zurückgibt (≥70% korrekt).
     /// Bricht wenn: Prompt-Balance oder Constraints falsche Werte produzieren
+    // MARK: - Live Enrichment (#184)
+
+    /// GIVEN: Ein Task-Titel und erledigte Tasks als Lernbasis
+    /// WHEN: suggestLiveEnrichment() aufgerufen wird
+    /// THEN: Ergebnis enthält Tags, Dauer und Importance
+    func test_suggestLiveEnrichment_returnsCombinedResult() async throws {
+        guard SmartTaskEnrichmentService.isAvailable else {
+            throw XCTSkip("Apple Intelligence nicht verfügbar")
+        }
+
+        let context = container.mainContext
+
+        let done1 = LocalTask(title: "Steuererklärung abgeben", importance: 3, estimatedDuration: 60, taskType: "maintenance")
+        done1.isCompleted = true
+        done1.tags = ["admin"]
+        context.insert(done1)
+
+        let done2 = LocalTask(title: "Einkaufen gehen", importance: 2, estimatedDuration: 30, taskType: "maintenance")
+        done2.isCompleted = true
+        done2.tags = ["unterwegs"]
+        context.insert(done2)
+        try context.save()
+
+        let service = SmartTaskEnrichmentService(modelContext: context)
+        let result = await service.suggestLiveEnrichment(
+            title: "Steuern vorbereiten",
+            existingTags: ["admin", "unterwegs", "computer"]
+        )
+
+        XCTAssertFalse(result.tags.isEmpty, "Sollte Tags vorschlagen")
+        XCTAssertNotNil(result.durationMinutes, "Sollte Dauer vorschlagen")
+        XCTAssertNotNil(result.importance, "Sollte Wichtigkeit vorschlagen")
+
+        if let dur = result.durationMinutes {
+            XCTAssertTrue([5, 15, 30, 60].contains(dur), "Dauer muss 5/15/30/60 sein — war \(dur)")
+        }
+        if let imp = result.importance {
+            XCTAssertTrue((1...3).contains(imp), "Importance muss 1-3 sein — war \(imp)")
+        }
+    }
+
+    /// GIVEN: AI deaktiviert → THEN: Leeres Ergebnis
+    func test_suggestLiveEnrichment_returnsEmptyWhenDisabled() async throws {
+        let context = container.mainContext
+        UserDefaults.standard.set(false, forKey: "aiScoringEnabled")
+
+        let service = SmartTaskEnrichmentService(modelContext: context)
+        let result = await service.suggestLiveEnrichment(title: "Test Task", existingTags: [])
+
+        XCTAssertTrue(result.tags.isEmpty)
+        XCTAssertNil(result.durationMinutes)
+        XCTAssertNil(result.importance)
+    }
+
+    /// GIVEN: Leerer Titel → THEN: Leeres Ergebnis
+    func test_suggestLiveEnrichment_returnsEmptyForEmptyTitle() async throws {
+        let context = container.mainContext
+        let service = SmartTaskEnrichmentService(modelContext: context)
+        let result = await service.suggestLiveEnrichment(title: "", existingTags: [])
+
+        XCTAssertTrue(result.tags.isEmpty)
+        XCTAssertNil(result.durationMinutes)
+        XCTAssertNil(result.importance)
+    }
+
+    // MARK: - Context includes duration and tags (#184)
+
+    /// GIVEN: Tasks mit Dauer und Tags → THEN: Context enthält beides
+    func test_fetchRecentTaskContext_includesDurationAndTags() async throws {
+        let context = container.mainContext
+
+        let task = LocalTask(title: "Meeting vorbereiten", importance: 2, estimatedDuration: 30, taskType: "income")
+        task.tags = ["arbeit", "computer"]
+        context.insert(task)
+        try context.save()
+
+        let service = SmartTaskEnrichmentService(modelContext: context)
+        let result = service.fetchRecentTaskContext()
+
+        XCTAssertTrue(result.contains("Meeting vorbereiten"), "Context sollte Task enthalten")
+        XCTAssertTrue(result.contains("30"), "Context sollte Dauer enthalten")
+        XCTAssertTrue(result.contains("arbeit"), "Context sollte Tags enthalten")
+    }
+
+    // MARK: - Real-World Quality Check
+
     func test_enrichment_realWorldTitles_qualityCheck() async throws {
         guard SmartTaskEnrichmentService.isAvailable else {
             throw XCTSkip("Apple Intelligence nicht verfügbar")

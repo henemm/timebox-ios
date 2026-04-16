@@ -48,8 +48,10 @@ struct TaskFormSheet: View {
     @State private var suggestionTask: Task<Void, Never>?
     @State private var skipNextSuggestionUpdate = false
 
-    // AI Tag Suggestions
+    // AI Enrichment Suggestions
     @State private var aiTagSuggestions: [String] = []
+    @State private var aiSuggestedDuration: Int?
+    @State private var aiSuggestedPriority: Int?
     @State private var tagSuggestionTask: Task<Void, Never>?
 
     // Dependency State
@@ -205,19 +207,34 @@ struct TaskFormSheet: View {
                     // MARK: - Duration (Quick Select) - all unselected by default
                     glassCardSection(id: "duration", header: "Dauer") {
                         HStack(spacing: 8) {
-                            OptionalDurationButton(minutes: 5, selectedMinutes: $duration)
-                            OptionalDurationButton(minutes: 15, selectedMinutes: $duration)
-                            OptionalDurationButton(minutes: 30, selectedMinutes: $duration)
-                            OptionalDurationButton(minutes: 60, selectedMinutes: $duration)
+                            ForEach([5, 15, 30, 60], id: \.self) { minutes in
+                                OptionalDurationButton(minutes: minutes, selectedMinutes: $duration)
+                                    .overlay(alignment: .topTrailing) {
+                                        if duration == nil, aiSuggestedDuration == minutes {
+                                            Image(systemName: "sparkles")
+                                                .font(.system(size: 10))
+                                                .foregroundStyle(.purple)
+                                                .offset(x: 4, y: -4)
+                                        }
+                                    }
+                            }
                         }
                     }
 
                     // MARK: - Importance (3 Levels) - all unselected by default
                     glassCardSection(id: "importance", header: "Wichtigkeit") {
                         HStack(spacing: 6) {
-                            OptionalPriorityButton(priority: 1, selectedPriority: $priority)
-                            OptionalPriorityButton(priority: 2, selectedPriority: $priority)
-                            OptionalPriorityButton(priority: 3, selectedPriority: $priority)
+                            ForEach([1, 2, 3], id: \.self) { level in
+                                OptionalPriorityButton(priority: level, selectedPriority: $priority)
+                                    .overlay(alignment: .topTrailing) {
+                                        if priority == nil, aiSuggestedPriority == level {
+                                            Image(systemName: "sparkles")
+                                                .font(.system(size: 10))
+                                                .foregroundStyle(.purple)
+                                                .offset(x: 4, y: -4)
+                                        }
+                                    }
+                            }
                         }
                         .accessibilityIdentifier("Wichtigkeit")
                     }
@@ -572,6 +589,8 @@ struct TaskFormSheet: View {
         let trimmed = input.trimmingCharacters(in: .whitespacesAndNewlines)
         guard trimmed.count >= 3 else {
             aiTagSuggestions = []
+            aiSuggestedDuration = nil
+            aiSuggestedPriority = nil
             return
         }
         let ctx = modelContext
@@ -582,9 +601,12 @@ struct TaskFormSheet: View {
             let service = SmartTaskEnrichmentService(modelContext: ctx)
             let taskSource = LocalTaskSource(modelContext: ctx)
             let existingTags = (try? taskSource.fetchAllUsedTags()) ?? []
-            let result = await service.suggestTagsForTitle(trimmed, existingTags: existingTags)
+            let result = await service.suggestLiveEnrichment(title: trimmed, existingTags: existingTags)
             guard !Task.isCancelled else { return }
-            aiTagSuggestions = result
+            aiTagSuggestions = result.tags
+            // Only suggest if user hasn't already picked a value
+            if duration == nil { aiSuggestedDuration = result.durationMinutes }
+            if priority == nil { aiSuggestedPriority = result.importance }
         }
     }
 
