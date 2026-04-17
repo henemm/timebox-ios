@@ -50,8 +50,18 @@ def _get_hook_input() -> dict:
         return {}
 
 
+_METADATA_FIELDS = {"session_id", "cwd", "transcript_path", "permission_mode", "hook_event_name"}
+
+
 def _get_user_message(hook_input: dict) -> str:
-    return hook_input.get("prompt", hook_input.get("content", hook_input.get("message", "")))
+    msg = hook_input.get("prompt", hook_input.get("content", hook_input.get("message", "")))
+    if not msg:
+        # Fallback: Durchsuche alle String-Werte (z.B. AskUserQuestion-Antworten)
+        for key, val in hook_input.items():
+            if isinstance(val, str) and len(val) > 1 and key not in _METADATA_FIELDS:
+                msg = val
+                break
+    return msg
 
 
 def _get_session_id(hook_input: dict) -> str:
@@ -257,16 +267,22 @@ def main():
                       file=sys.stderr)
 
     # Finding resolution: "fixen"/"akzeptabel"/"zurückstellen" — only in phase5_implement
+    # Supports multiple keywords per message (e.g. "1 fixen, 2 zurückstellen")
     if phase == "phase5_implement":
         findings = wf_data.get("adversary_findings", [])
         has_unresolved = any(f.get("status") is None for f in findings)
         if has_unresolved:
-            if _matches(message, FINDING_FIX_PHRASES):
-                _resolve_next_finding(wf_data, wf_path, "fix", session_id=session_id)
-            elif _matches(message, FINDING_ACCEPT_PHRASES):
-                _resolve_next_finding(wf_data, wf_path, "accept", session_id=session_id)
-            elif _matches(message, FINDING_DEFER_PHRASES):
-                _resolve_next_finding(wf_data, wf_path, "defer", session_id=session_id)
+            for phrases, status in [
+                (FINDING_FIX_PHRASES, "fix"),
+                (FINDING_ACCEPT_PHRASES, "accept"),
+                (FINDING_DEFER_PHRASES, "defer"),
+            ]:
+                if _matches(message, phrases):
+                    _resolve_next_finding(wf_data, wf_path, status, session_id=session_id)
+                    # Re-read workflow for next iteration
+                    wf_data, wf_path = _read_active_workflow(session_id)
+                    if not wf_data:
+                        break
 
     # Spec approval: "approved" etc. — only in phase3_spec
     if _matches(message, APPROVAL_PHRASES):

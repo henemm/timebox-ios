@@ -12,13 +12,22 @@ Zwischen den Checkpoints arbeitest du STILL — keine Fortschrittsmeldungen an H
 
 ---
 
-## Phase 1: Workflow starten + Bug reproduzieren
+## Phase 1: Workflow starten + Bug Intake + Reproduzieren
 
 ```bash
 python3 .claude/hooks/workflow.py start "bug-[kurzer-name]"
 python3 .claude/hooks/workflow.py set-field workflow_type bug
 python3 .claude/hooks/workflow.py phase phase1_context
 ```
+
+### Bug Intake (strukturierte Erfassung)
+
+Spawne einen bug-intake Agenten fuer die strukturierte Erfassung:
+```
+Agent(subagent_type: "bug-intake")
+```
+- **Bekommt:** Hennings Bug-Beschreibung + Code-Zugang
+- **Liefert:** Strukturierter Report (Symptom, Reproduktionsschritte, erste Hypothesen, betroffene Komponenten)
 
 **Bug reproduzieren** (falls UI-Bug):
 ```bash
@@ -176,7 +185,7 @@ Bei UI-Bugs: Nachher-Screenshot machen.
 ### Adversary-Agent spawnen (PFLICHT)
 
 ```
-Agent(subagent_type: "general-purpose", isolation: "worktree")
+Agent(subagent_type: "general-purpose", model: "sonnet")
 ```
 
 Der Adversary bekommt DIESEN Prompt:

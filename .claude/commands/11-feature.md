@@ -152,7 +152,7 @@ Implementiere bis alle Tests gruen sind.
 ### Adversary-Agent spawnen (PFLICHT)
 
 ```
-Agent(subagent_type: "general-purpose", isolation: "worktree")
+Agent(subagent_type: "general-purpose", model: "sonnet")
 ```
 
 Der Adversary bekommt DIESEN Prompt:
