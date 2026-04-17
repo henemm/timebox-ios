@@ -256,6 +256,10 @@ def _new_workflow(name: str) -> dict:
         "checkpoint3_approved": False,  # "commit" — result works
         # Workflow type: "bug" or "feature"
         "workflow_type": None,
+        # Pflichtschritte Gates (INFRA_015b)
+        "inspect_ui_done": False,
+        "localize_checked": False,
+        "no_user_strings": False,
     }
 
 
@@ -414,6 +418,9 @@ def cmd_phase(args: list[str]) -> None:
         print(f"BLOCKED: {error}", file=sys.stderr)
         sys.exit(1)
     data["current_phase"] = target
+    # Reset inspect_ui_done when re-entering TDD RED
+    if target == "phase4_tdd_red":
+        data["inspect_ui_done"] = False
     _save_active(data)
     print(f"Set phase to: {target}")
 
@@ -433,6 +440,9 @@ PROTECTED_FIELDS = {
     "red_test_done",
     "ui_test_red_done",
     "context_file",
+    "inspect_ui_done",
+    "localize_checked",
+    # no_user_strings bewusst NICHT protected — Claude darf es setzen
 }
 
 
@@ -613,6 +623,22 @@ def cmd_mark_checkpoint3(args: list[str]) -> None:
     data["checkpoint3_notes"] = notes
     _save_active(data)
     print(f"Checkpoint 3 approved: {notes}")
+
+
+def cmd_mark_inspect_ui(args: list[str]) -> None:
+    """Mark inspect-ui as done for current workflow."""
+    data, name = _read_active()
+    data["inspect_ui_done"] = True
+    _save_active(data)
+    print(f"inspect-ui marked done for {name}")
+
+
+def cmd_mark_localize(args: list[str]) -> None:
+    """Mark localization check as done for current workflow."""
+    data, name = _read_active()
+    data["localize_checked"] = True
+    _save_active(data)
+    print(f"Localization check marked done for {name}")
 
 
 def cmd_add_finding(args: list[str]) -> None:
@@ -823,6 +849,8 @@ COMMANDS = {
     "mark-green": cmd_mark_green,
     "mark-ui-green": cmd_mark_ui_green,
     "mark-context": cmd_mark_context,
+    "mark-inspect-ui": cmd_mark_inspect_ui,
+    "mark-localize": cmd_mark_localize,
     "mark-checkpoint1": cmd_mark_checkpoint1,
     "mark-checkpoint2": cmd_mark_checkpoint2,
     "mark-checkpoint3": cmd_mark_checkpoint3,

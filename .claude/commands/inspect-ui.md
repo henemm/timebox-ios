@@ -71,16 +71,13 @@ Fasse die relevanten Informationen zusammen:
 
 ## State-Tracking
 
-**Nach erfolgreicher Ausfuehrung** schreibe ein State-File, damit der Preflight-Hook weiss, dass `/inspect-ui` kuerzlich lief:
+**Nach erfolgreicher Ausfuehrung** im Workflow registrieren:
 
 ```bash
-# State-File schreiben (nach erfolgreichem Hierarchy-Dump)
-python3 .claude/hooks/preflight_gate.py main
+python3 .claude/hooks/workflow.py mark-inspect-ui
 ```
 
-Ersetze `main` durch den tatsaechlichen Screen-Namen (z.B. `backlog`, `settings`).
-
-Dies ist **PFLICHT** nach jeder `/inspect-ui` Ausfuehrung — der Hook `ui_test_preflight.py` blockiert UI-Test-Edits wenn dieses File fehlt oder aelter als 15 Minuten ist.
+Dies ist **PFLICHT** — der edit_gate Hook blockiert UI-Test-Writes ohne dieses Flag.
 
 ---
 

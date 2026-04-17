@@ -309,6 +309,13 @@ def main():
     if phase in TEST_ONLY_PHASES:
         # phase4_tdd_red: nur Test-Dateien erlaubt
         if is_test:
+            # Gate: inspect-ui PFLICHT vor UI-Test-Writes
+            if any(d in file_path for d in ["UITests/", "FocusBloxUITests/", "FocusBloxMacUITests/"]):
+                if not workflow.get("inspect_ui_done"):
+                    print("BLOCKED: /inspect-ui ist PFLICHT vor UI-Test-Writes. "
+                          "Führe /inspect-ui aus, um die Accessibility-Hierarchie zu inspizieren.",
+                          file=sys.stderr)
+                    sys.exit(2)
             sys.exit(0)  # Test-Dateien erlaubt in TDD RED
         if not _has_override_token(wf_name):
             print(f"BLOCKED: Phase {phase} erlaubt nur Test-Dateien. Sources sind gesperrt.", file=sys.stderr)

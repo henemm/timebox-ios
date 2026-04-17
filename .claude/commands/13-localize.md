@@ -19,3 +19,17 @@ Starte den `localizer` Agenten aus `.agent-os/agents/localizer.md`.
 5. Gib Test-Anweisungen fuer alle Sprachen
 
 **Qualitaet:** Natuerlich klingende Texte, konsistente Terminologie!
+
+## State-Tracking
+
+**Nach erfolgreicher Ausfuehrung** im Workflow registrieren:
+
+```bash
+python3 .claude/hooks/workflow.py mark-localize
+```
+
+Dies ist **PFLICHT** — der bash_gate Hook blockiert git commit ohne dieses Flag.
+Falls keine User-facing Strings betroffen sind:
+```bash
+python3 .claude/hooks/workflow.py set-field no_user_strings true
+```

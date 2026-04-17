@@ -361,6 +361,15 @@ def main():
                           "Jedes Finding muss von Henning beantwortet werden.",
                           file=sys.stderr)
                     sys.exit(2)
+                # 6d. Localize Gate — kein Commit ohne Lokalisierungs-Check
+                loc_checked = active_wf.get("localize_checked", False)
+                no_strings = active_wf.get("no_user_strings", False)
+                if not loc_checked and not no_strings:
+                    print("BLOCKED: /13-localize ist PFLICHT vor dem Commit. "
+                          "Führe /13-localize aus oder setze no_user_strings: "
+                          "workflow.py set-field no_user_strings true",
+                          file=sys.stderr)
+                    sys.exit(2)
 
     # 7. Allow
     sys.exit(0)

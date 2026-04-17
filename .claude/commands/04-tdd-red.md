@@ -43,10 +43,12 @@ python3 .claude/hooks/workflow.py status
 python3 .claude/hooks/workflow.py phase phase4_tdd_red
 ```
 
-### 1b. Inspect-UI empfohlen (vor UI-Tests)
+### 1b. Inspect-UI (PFLICHT vor UI-Tests)
+
+**⛔ Gate-enforced:** Der edit_gate Hook blockiert UI-Test-Writes ohne vorheriges `/inspect-ui`.
 
 Fuehre `/inspect-ui` aus fuer den Ziel-Screen um AccessibilityIdentifier zu finden.
-Nicht mehr Gate-enforced, aber weiterhin Best Practice.
+Danach wird `inspect_ui_done` automatisch im Workflow registriert.
 
 ### 2. Unit Tests schreiben — PFLICHT fuer Business-Logik
 

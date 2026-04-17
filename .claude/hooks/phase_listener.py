@@ -236,13 +236,21 @@ def main():
         if phase == "phase4_tdd_red" and not wf_data.get("checkpoint2_approved"):
             _call_workflow_checkpoint(2, f"User approved at {datetime.now().isoformat()}")
 
-    # Checkpoint 3: "commit" — only in phase5_implement, AND only if no unresolved findings
+    # Checkpoint 3: "commit" — only in phase5_implement, AND only if no unresolved findings AND screenshot exists
     if _matches(message, CHECKPOINT3_PHRASES):
         if phase == "phase5_implement" and not wf_data.get("checkpoint3_approved"):
             findings = wf_data.get("adversary_findings", [])
             has_unresolved = any(f.get("status") is None for f in findings)
-            if not has_unresolved:
+            # Gate: Screenshot-Artifact prüfen (außer bei neuem UI)
+            has_screenshot = wf_data.get("is_new_ui") or any(
+                a.get("type") == "screenshot" for a in wf_data.get("test_artifacts", []))
+            if not has_unresolved and has_screenshot:
                 _call_workflow_checkpoint(3, f"User approved at {datetime.now().isoformat()}")
+            elif not has_screenshot:
+                print("HINWEIS: Checkpoint 3 benötigt einen Screenshot. "
+                      "Führe ./scripts/sim.sh screenshot aus und registriere: "
+                      "workflow.py add-artifact screenshot <pfad> <beschreibung> phase5_implement",
+                      file=sys.stderr)
 
     # Finding resolution: "fixen"/"akzeptabel"/"zurückstellen" — only in phase5_implement
     if phase == "phase5_implement":
