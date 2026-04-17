@@ -126,7 +126,7 @@ def _set_stop_lock(enabled: bool, session_id: str = "") -> None:
                 lock_file.unlink(missing_ok=True)
 
 
-def _resolve_next_finding(wf_data: dict, wf_path: Path, status: str) -> bool:
+def _resolve_next_finding(wf_data: dict, wf_path: Path, status: str, session_id: str = "") -> bool:
     """Resolve the first unresolved adversary finding. Returns True if resolved."""
     findings = wf_data.get("adversary_findings", [])
     for f in findings:
@@ -134,6 +134,8 @@ def _resolve_next_finding(wf_data: dict, wf_path: Path, status: str) -> bool:
             # Call workflow.py resolve-finding with WORKFLOW_CALLER=phase_listener
             env = os.environ.copy()
             env["WORKFLOW_CALLER"] = "phase_listener"
+            if session_id:
+                env["CLAUDE_SESSION_ID"] = session_id
             try:
                 result = subprocess.run(
                     ["python3", str(Path(__file__).parent / "workflow.py"),
@@ -151,10 +153,12 @@ def _resolve_next_finding(wf_data: dict, wf_path: Path, status: str) -> bool:
     return False
 
 
-def _call_workflow_checkpoint(checkpoint_num: int, notes: str) -> None:
+def _call_workflow_checkpoint(checkpoint_num: int, notes: str, session_id: str = "") -> None:
     """Call workflow.py mark-checkpoint{N} with WORKFLOW_CALLER=phase_listener."""
     env = os.environ.copy()
     env["WORKFLOW_CALLER"] = "phase_listener"
+    if session_id:
+        env["CLAUDE_SESSION_ID"] = session_id
     try:
         result = subprocess.run(
             ["python3", str(_project_root() / ".claude" / "hooks" / "workflow.py"),
@@ -173,14 +177,14 @@ def _call_workflow_checkpoint(checkpoint_num: int, notes: str) -> None:
 
 CHECKPOINT1_PHRASES = [
     "stimmt", "ja", "richtig", "korrekt", "genau", "passt",
-    "weiter", "sehr gut", "sieht gut aus", "einverstanden",
+    "sehr gut", "sieht gut aus", "einverstanden",
 ]
 CHECKPOINT2_PHRASES = [
-    "go", "los", "mach", "anfangen", "start", "weiter",
+    "go", "los", "mach", "anfangen", "start",
     "ja", "passt", "sehr gut", "einverstanden",
 ]
 CHECKPOINT3_PHRASES = [
-    "commit", "ja", "passt", "weiter", "sehr gut",
+    "commit", "ja", "passt", "sehr gut",
     "einverstanden", "abschicken", "fertig",
 ]
 APPROVAL_PHRASES = [
@@ -229,12 +233,12 @@ def main():
     # Checkpoint 1: "stimmt" — only in phase2_analyse
     if _matches(message, CHECKPOINT1_PHRASES):
         if phase == "phase2_analyse" and not wf_data.get("checkpoint1_approved"):
-            _call_workflow_checkpoint(1, f"User approved at {datetime.now().isoformat()}")
+            _call_workflow_checkpoint(1, f"User approved at {datetime.now().isoformat()}", session_id=session_id)
 
     # Checkpoint 2: "go" — only in phase4_tdd_red
     if _matches(message, CHECKPOINT2_PHRASES):
         if phase == "phase4_tdd_red" and not wf_data.get("checkpoint2_approved"):
-            _call_workflow_checkpoint(2, f"User approved at {datetime.now().isoformat()}")
+            _call_workflow_checkpoint(2, f"User approved at {datetime.now().isoformat()}", session_id=session_id)
 
     # Checkpoint 3: "commit" — only in phase5_implement, AND only if no unresolved findings AND screenshot exists
     if _matches(message, CHECKPOINT3_PHRASES):
@@ -245,7 +249,7 @@ def main():
             has_screenshot = wf_data.get("is_new_ui") or any(
                 a.get("type") == "screenshot" for a in wf_data.get("test_artifacts", []))
             if not has_unresolved and has_screenshot:
-                _call_workflow_checkpoint(3, f"User approved at {datetime.now().isoformat()}")
+                _call_workflow_checkpoint(3, f"User approved at {datetime.now().isoformat()}", session_id=session_id)
             elif not has_screenshot:
                 print("HINWEIS: Checkpoint 3 benötigt einen Screenshot. "
                       "Führe ./scripts/sim.sh screenshot aus und registriere: "
@@ -258,11 +262,11 @@ def main():
         has_unresolved = any(f.get("status") is None for f in findings)
         if has_unresolved:
             if _matches(message, FINDING_FIX_PHRASES):
-                _resolve_next_finding(wf_data, wf_path, "fix")
+                _resolve_next_finding(wf_data, wf_path, "fix", session_id=session_id)
             elif _matches(message, FINDING_ACCEPT_PHRASES):
-                _resolve_next_finding(wf_data, wf_path, "accept")
+                _resolve_next_finding(wf_data, wf_path, "accept", session_id=session_id)
             elif _matches(message, FINDING_DEFER_PHRASES):
-                _resolve_next_finding(wf_data, wf_path, "defer")
+                _resolve_next_finding(wf_data, wf_path, "defer", session_id=session_id)
 
     # Spec approval: "approved" etc. — only in phase3_spec
     if _matches(message, APPROVAL_PHRASES):
