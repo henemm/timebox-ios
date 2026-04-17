@@ -171,10 +171,24 @@ class TestScreenshotGate(WorkflowGateTestBase):
                 {"phase": "phase4_tdd_red", "path": "test.swift", "type": "test_output"},
             ],
         )
-        has_screenshot = wf_data.get("is_new_ui") or any(
+        has_screenshot = wf_data.get("is_new_ui") or wf_data.get("no_ui_change") or any(
             a.get("type") == "screenshot" for a in wf_data.get("test_artifacts", []))
         self.assertTrue(has_screenshot,
                         "is_new_ui should bypass screenshot requirement")
+
+    def test_checkpoint3_allowed_with_no_ui_change(self):
+        """Checkpoint 3 may proceed without screenshot if no_ui_change=True.
+        Bricht wenn: phase_listener.py no_ui_change-Ausnahme nicht hat."""
+        wf_data = self._impl_prereqs(
+            no_ui_change=True,
+            test_artifacts=[
+                {"phase": "phase4_tdd_red", "path": "test.swift", "type": "test_output"},
+            ],
+        )
+        has_screenshot = wf_data.get("is_new_ui") or wf_data.get("no_ui_change") or any(
+            a.get("type") == "screenshot" for a in wf_data.get("test_artifacts", []))
+        self.assertTrue(has_screenshot,
+                        "no_ui_change should bypass screenshot requirement")
 
 
 # =============================================================================
@@ -197,6 +211,18 @@ class TestLocalizeGateWorkflowFields(WorkflowGateTestBase):
         data = workflow._new_workflow("test")
         self.assertIn("no_user_strings", data)
         self.assertFalse(data["no_user_strings"])
+
+    def test_new_workflow_has_no_ui_change_field(self):
+        """_new_workflow must include no_ui_change=False.
+        Bricht wenn: workflow.py _new_workflow() das Feld nicht enthält."""
+        data = workflow._new_workflow("test")
+        self.assertIn("no_ui_change", data)
+        self.assertFalse(data["no_ui_change"])
+
+    def test_no_ui_change_not_protected(self):
+        """no_ui_change must NOT be in PROTECTED_FIELDS (Claude darf es setzen).
+        Bricht wenn: workflow.py PROTECTED_FIELDS das Feld enthält."""
+        self.assertNotIn("no_ui_change", workflow.PROTECTED_FIELDS)
 
     def test_localize_checked_is_protected(self):
         """localize_checked must be in PROTECTED_FIELDS.

@@ -260,6 +260,7 @@ def _new_workflow(name: str) -> dict:
         "inspect_ui_done": False,
         "localize_checked": False,
         "no_user_strings": False,
+        "no_ui_change": False,
     }
 
 

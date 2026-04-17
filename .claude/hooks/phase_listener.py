@@ -245,8 +245,8 @@ def main():
         if phase == "phase5_implement" and not wf_data.get("checkpoint3_approved"):
             findings = wf_data.get("adversary_findings", [])
             has_unresolved = any(f.get("status") is None for f in findings)
-            # Gate: Screenshot-Artifact prüfen (außer bei neuem UI)
-            has_screenshot = wf_data.get("is_new_ui") or any(
+            # Gate: Screenshot-Artifact prüfen (außer bei neuem UI oder Non-UI-Bugs)
+            has_screenshot = wf_data.get("is_new_ui") or wf_data.get("no_ui_change") or any(
                 a.get("type") == "screenshot" for a in wf_data.get("test_artifacts", []))
             if not has_unresolved and has_screenshot:
                 _call_workflow_checkpoint(3, f"User approved at {datetime.now().isoformat()}", session_id=session_id)
