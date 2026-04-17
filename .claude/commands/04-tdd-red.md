@@ -50,66 +50,35 @@ python3 .claude/hooks/workflow.py phase phase4_tdd_red
 Fuehre `/inspect-ui` aus fuer den Ziel-Screen um AccessibilityIdentifier zu finden.
 Danach wird `inspect_ui_done` automatisch im Workflow registriert.
 
-### 2. Unit Tests schreiben — PFLICHT fuer Business-Logik
+### 2. QA-Agent dispatchen (PFLICHT fuer Swift-Features/Bugs)
 
-**Unit Tests sind PFLICHT wenn Business-Logik betroffen ist.**
-Pure Functions MUESSEN Unit Tests haben.
-Nur reine UI-Aenderungen (Farbe, Layout, Text) duerfen ohne Unit Tests auskommen.
+**Spawne den QA-Agent der Tests UNABHAENGIG schreibt — nur basierend auf Spec + User-Erwartung:**
 
-Fuer jeden Test: Schreib als Kommentar dazu welche Zeile den Test brechen wuerde.
-
-```swift
-// FocusBloxTests/[FeatureName]Tests.swift
-
-import XCTest
-@testable import FocusBlox
-
-final class [FeatureName]Tests: XCTestCase {
-
-    /// Verhalten: [konkrete Beschreibung]
-    /// Bricht wenn: [Datei:Zeile — was aendern]
-    func test_[verhalten]() {
-        // Arrange: konkreter Input
-        // Act: ECHTE Funktion aufrufen
-        // Assert: konkreter erwarteter Output
-    }
-}
+```
+Agent(subagent_type: "qa-writer", model: "sonnet")
 ```
 
-Ausfuehren:
+Prompt:
+> Du bist QA. Schreibe Tests die beweisen dass das Feature/der Fix funktioniert.
+>
+> Spec: [spec_file Pfad]
+> User-Erwartung: [Zusammenfassung aus Phase 2]
+> inspect-ui Output: [falls vorhanden, einfuegen]
+>
+> Regeln:
+> - Tests MUESSEN FEHLSCHLAGEN (TDD RED)
+> - Unit Tests PFLICHT bei Business-Logik
+> - UI Tests PFLICHT fuer jedes Feature/Bug
+> - Tests pruefen VERHALTEN, nicht Implementation
+
+**Ausnahme:** Bei reinen Infrastruktur-Aenderungen (Python Hooks, Scripts) schreibt der Orchestrator die Tests selbst — der QA-Agent ist fuer Swift-Code gedacht.
+
+### 3. Tests ausfuehren
+
+Nachdem der QA-Agent die Test-Dateien geschrieben hat:
+
 ```bash
 ./scripts/sim.sh unit [FeatureName]Tests 2>&1 | tee docs/artifacts/[workflow]/unit-test-red-output.txt
-```
-
-### 3. UI Tests schreiben
-
-**EVERY feature and EVERY bug MUST have UI tests.**
-
-```swift
-// FocusBloxUITests/[FeatureName]UITests.swift
-
-import XCTest
-
-final class [FeatureName]UITests: XCTestCase {
-    var app: XCUIApplication!
-
-    override func setUpWithError() throws {
-        continueAfterFailure = false
-        app = XCUIApplication()
-        app.launchArguments = ["--uitesting", "--mock-data"]
-        app.launch()
-    }
-
-    /// EXPECTED TO FAIL: Element doesn't exist yet
-    func test[Element]Exists() throws {
-        let element = app.buttons["expectedButtonName"]
-        XCTAssertTrue(element.waitForExistence(timeout: 5), "Element should exist")
-    }
-}
-```
-
-Ausfuehren:
-```bash
 ./scripts/sim.sh test [FeatureName]UITests 2>&1 | tee docs/artifacts/[workflow]/ui-test-red-output.txt
 ```
 
