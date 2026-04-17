@@ -134,7 +134,7 @@ final class RemindersImportServiceTests: XCTestCase {
         let result = try await sut.importAll()
 
         // Then: Priorities mapped correctly
-        let tasksByTitle = Dictionary(uniqueKeysWithValues: result.imported.map { ($0.title, $0) })
+        let tasksByTitle = Dictionary(result.imported.map { ($0.title, $0) }, uniquingKeysWith: { _, last in last })
         XCTAssertNil(tasksByTitle["None"]?.importance)      // 0 → nil (TBD)
         XCTAssertEqual(tasksByTitle["High"]?.importance, 3)  // 1-4 → 3
         XCTAssertEqual(tasksByTitle["Medium"]?.importance, 2) // 5 → 2
