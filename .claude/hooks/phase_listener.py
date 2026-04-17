@@ -260,11 +260,15 @@ def main():
                 a.get("type") == "screenshot" for a in wf_data.get("test_artifacts", []))
             if not has_unresolved and has_screenshot:
                 _call_workflow_checkpoint(3, f"User approved at {datetime.now().isoformat()}", session_id=session_id)
+            elif has_unresolved:
+                unresolved_titles = [f["title"] for f in findings if f.get("status") is None]
+                print(f"Checkpoint 3 nicht gesetzt: {len(unresolved_titles)} Adversary-Finding(s) noch offen: "
+                      f"{', '.join(unresolved_titles[:3])}. "
+                      "Jedes Finding muss von Henning beantwortet werden (fixen/akzeptabel/zurückstellen).")
             elif not has_screenshot:
-                print("HINWEIS: Checkpoint 3 benötigt einen Screenshot. "
+                print("Checkpoint 3 nicht gesetzt: Screenshot fehlt. "
                       "Führe ./scripts/sim.sh screenshot aus und registriere: "
-                      "workflow.py add-artifact screenshot <pfad> <beschreibung> phase5_implement",
-                      file=sys.stderr)
+                      "workflow.py add-artifact screenshot <pfad> <beschreibung> phase5_implement")
 
     # Finding resolution: "fixen"/"akzeptabel"/"zurückstellen" — only in phase5_implement
     # Supports multiple keywords per message (e.g. "1 fixen, 2 zurückstellen")
