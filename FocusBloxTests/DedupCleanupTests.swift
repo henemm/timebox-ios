@@ -92,6 +92,85 @@ final class DedupCleanupTests: XCTestCase {
         XCTAssertEqual(remaining.count, 2, "All tasks should remain")
     }
 
+    // MARK: - UUID Dedup Tests (#255)
+
+    /// Verhalten: 2 Tasks mit gleicher UUID → Cleanup löscht 1
+    /// Bricht wenn: FocusBloxApp.cleanupUUIDDuplicates() nicht existiert oder nicht löscht
+    func testUUIDDedupRemovesExactDuplicate() throws {
+        let sharedUUID = UUID()
+        let task1 = LocalTask(title: "Einkaufen")
+        task1.uuid = sharedUUID
+        let task2 = LocalTask(title: "Einkaufen")
+        task2.uuid = sharedUUID
+
+        context.insert(task1)
+        context.insert(task2)
+        try context.save()
+
+        let deletedCount = FocusBloxApp.cleanupUUIDDuplicates(in: context)
+
+        let remaining = try context.fetch(FetchDescriptor<LocalTask>())
+        XCTAssertEqual(deletedCount, 1, "Should delete 1 UUID duplicate")
+        XCTAssertEqual(remaining.count, 1, "Should keep 1 task")
+    }
+
+    /// Verhalten: Bei UUID-Duplikaten bleibt der mit mehr Attributen
+    /// Bricht wenn: cleanupUUIDDuplicates den falschen Task behält
+    func testUUIDDedupKeepsHigherScore() throws {
+        let sharedUUID = UUID()
+        let enriched = LocalTask(title: "Sport", importance: 3)
+        enriched.uuid = sharedUUID
+        enriched.urgency = "urgent"
+        enriched.estimatedDuration = 45
+        enriched.taskType = "deep_work"
+        enriched.tags = ["fitness"]
+
+        let bare = LocalTask(title: "Sport")
+        bare.uuid = sharedUUID
+
+        context.insert(enriched)
+        context.insert(bare)
+        try context.save()
+
+        let deletedCount = FocusBloxApp.cleanupUUIDDuplicates(in: context)
+
+        let remaining = try context.fetch(FetchDescriptor<LocalTask>())
+        XCTAssertEqual(deletedCount, 1, "Should delete 1 duplicate")
+        XCTAssertEqual(remaining.first?.importance, 3, "Enriched task should survive")
+    }
+
+    /// Verhalten: 2 Tasks mit verschiedener UUID → beide bleiben
+    /// Bricht wenn: cleanupUUIDDuplicates false positives erzeugt
+    func testUUIDDedupNoFalsePositives() throws {
+        let task1 = LocalTask(title: "Task A")
+        let task2 = LocalTask(title: "Task B")
+
+        context.insert(task1)
+        context.insert(task2)
+        try context.save()
+
+        let deletedCount = FocusBloxApp.cleanupUUIDDuplicates(in: context)
+
+        let remaining = try context.fetch(FetchDescriptor<LocalTask>())
+        XCTAssertEqual(deletedCount, 0, "Should delete nothing")
+        XCTAssertEqual(remaining.count, 2, "Both tasks should remain")
+    }
+
+    /// Verhalten: Return-Wert = Anzahl gelöschter Tasks
+    /// Bricht wenn: cleanupUUIDDuplicates falschen Count zurückgibt
+    func testUUIDDedupReturnsCorrectCount() throws {
+        let sharedUUID = UUID()
+        for _ in 0..<4 {
+            let task = LocalTask(title: "Vierfach")
+            task.uuid = sharedUUID
+            context.insert(task)
+        }
+        try context.save()
+
+        let deletedCount = FocusBloxApp.cleanupUUIDDuplicates(in: context)
+        XCTAssertEqual(deletedCount, 3, "Should delete 3 of 4 duplicates")
+    }
+
     // MARK: - Test 4: Three duplicates, only most enriched survives
 
     func testDedupKeepsMostEnrichedOfThree() throws {

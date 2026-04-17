@@ -352,6 +352,7 @@ struct FocusBloxApp: App {
                     Self.cleanupLeakedTestData(in: sharedModelContainer.mainContext)
                     RemindersImportService.migrateRemindersToLocal(in: sharedModelContainer.mainContext)
                     Self.cleanupRemindersDuplicates(in: sharedModelContainer.mainContext)
+                    Self.cleanupUUIDDuplicates(in: sharedModelContainer.mainContext)
                     Self.cleanupOrphanedBlockAssignments(in: sharedModelContainer.mainContext)
                     Self.forceCloudKitFieldSync(in: sharedModelContainer.mainContext)
                     // BUG_108: Order matters — migrate + dedup first to ensure clean state, then repair
@@ -599,6 +600,41 @@ struct FocusBloxApp: App {
         if !task.taskType.isEmpty { score += 1 }
         if !(task.tags ?? []).isEmpty { score += 1 }
         return score
+    }
+
+    /// Bug 255: Remove duplicate LocalTasks with identical UUIDs (CloudKit sync artifact).
+    @discardableResult
+    static func cleanupUUIDDuplicates(in context: ModelContext) -> Int {
+        do {
+            let allTasks = try context.fetch(FetchDescriptor<LocalTask>())
+            guard allTasks.count > 1 else { return 0 }
+
+            var groups: [UUID: [LocalTask]] = [:]
+            for task in allTasks {
+                groups[task.uuid, default: []].append(task)
+            }
+
+            var deletedCount = 0
+            for (_, tasks) in groups where tasks.count > 1 {
+                let sorted = tasks.sorted { a, b in
+                    let scoreA = Self.attributeScore(a)
+                    let scoreB = Self.attributeScore(b)
+                    if scoreA != scoreB { return scoreA > scoreB }
+                    return a.createdAt < b.createdAt
+                }
+                for task in sorted.dropFirst() {
+                    context.delete(task)
+                    deletedCount += 1
+                }
+            }
+
+            if deletedCount > 0 {
+                try context.save()
+            }
+            return deletedCount
+        } catch {
+            return -1
+        }
     }
 
     /// Bug 52: Clear orphaned assignedFocusBlockID on tasks that are not in Next Up and not completed.
