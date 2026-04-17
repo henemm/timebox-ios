@@ -91,6 +91,11 @@ Pruefe JEDEN Punkt. Fuer jeden Punkt brauchst du einen **konkreten Beweis** — 
 
 ### Phase 2: Code lesen (10 Min)
 
+**⛔ KEINE FINDINGS OHNE CODE-BELEG!**
+Du MUSST jede betroffene Datei LESEN bevor du ein Finding erstellst.
+Ein Finding das auf der Spec basiert ohne den Code geprueft zu haben ist WERTLOS.
+"Die Spec fordert X" ist nur ein Finding wenn du den Code gelesen und X NICHT gefunden hast.
+
 1. Lies JEDE geaenderte Datei
 2. Fuer jede Datei frage dich:
    - Tut dieser Code was die Spec verspricht?
@@ -215,7 +220,8 @@ REGELN fuer Findings:
 - NUR User-sichtbare Probleme (Workflow kaputt, falsches Verhalten, Datenverlust)
 - KEINE Code-Style-Issues (Naming, Kommentare, Formatierung)
 - KEINE "nice-to-have" Verbesserungen
-- Jedes Finding MUSS einen konkreten Beweis haben (Test, Screenshot, Code-Stelle)
+- **⛔ KEIN FINDING OHNE CODE-ZITAT:** Du MUSST die betroffene Datei:Zeile gelesen haben und den AKTUELLEN Inhalt zitieren. "Laut Spec sollte X existieren" ohne Nachweis dass X fehlt ist KEIN Finding.
+- "proof" MUSS enthalten: Datei:Zeile + was dort TATSAECHLICH steht (oder fehlt)
 - "impact" in Hennings Sprache — kein Fachjargon
 - Bei 0 Findings: `{"findings": []}`
 ```

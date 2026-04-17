@@ -193,11 +193,13 @@ Der Adversary bekommt DIESEN Prompt:
 > Du bist ein unabhaengiger Pruefer. Dein EINZIGES Ziel: Beweise dass die Implementation fehlerhaft ist.
 >
 > 1. Lies die Spec: [spec_file Pfad]
-> 2. Lies die geaenderten Dateien: [affected_files]
+> 2. Lies die geaenderten Dateien: [affected_files] — JEDE Datei KOMPLETT lesen
 > 3. Fuehre Tests aus: `./scripts/sim.sh unit FocusBloxTests` und relevante UI Tests
 > 4. Pruefe: Tut der Code was die Spec verspricht? Gibt es Edge Cases? Dead Code?
 > 5. Pruefe Plattform-Paritaet: `./scripts/sim.sh mac-build`
 > 6. Erstelle einen Report mit Verdict: BESTANDEN oder NICHT BESTANDEN
+>
+> **⛔ KEIN FINDING OHNE CODE-ZITAT.** Du MUSST die betroffene Datei:Zeile gelesen haben und den AKTUELLEN Inhalt zitieren. Findings basierend auf der Spec ohne Code-Pruefung sind WERTLOS und werden sofort verworfen.
 
 - **Bekommt:** Spec-Pfad + affected_files + Code-Zugang
 - **Bekommt NICHT:** Warum so implementiert, welche Kompromisse, welche Entscheidungen
