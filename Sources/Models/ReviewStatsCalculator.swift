@@ -53,7 +53,7 @@ struct ReviewStatsCalculator {
     ///   - allTasks: All tasks (to look up estimatedDuration and rescheduleCount)
     /// - Returns: PlanningAccuracyStats with faster/slower/onTime counts
     func computePlanningAccuracy(blocks: [FocusBlock], allTasks: [PlanItem]) -> PlanningAccuracyStats {
-        let taskMap = Dictionary(uniqueKeysWithValues: allTasks.map { ($0.id, $0) })
+        let taskMap = Dictionary(allTasks.map { ($0.id, $0) }, uniquingKeysWith: { _, last in last })
         var fasterCount = 0
         var slowerCount = 0
         var onTimeCount = 0

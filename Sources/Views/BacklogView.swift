@@ -692,7 +692,7 @@ struct BacklogView: View {
     private func freezeSortOrder() {
         // Freeze ALL visible tasks (backlog + nextUp), not just backlog
         let allVisible = backlogTasks + nextUpTasks
-        deferredSort.freeze(scores: Dictionary(uniqueKeysWithValues: allVisible.map { ($0.id, effectivePriorityScore(for: $0)) }))
+        deferredSort.freeze(scores: Dictionary(allVisible.map { ($0.id, effectivePriorityScore(for: $0)) }, uniquingKeysWith: { _, last in last }))
     }
 
     private func scheduleDeferredResort(for itemID: String) {

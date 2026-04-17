@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B0E469DB0FEC9CB72CFAEC53 /* DuplicateKeysCrashTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E465C0C2239803CC57D663E /* DuplicateKeysCrashTests.swift */; };
 		304371189D89C1DC87260422 /* TaskIdeaSuggestionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1E7B7758F57E936CF46FDCD /* TaskIdeaSuggestionService.swift */; };
 		522472270E2CC019DD5ACFF2 /* TaskIdeaSuggestionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1E7B7758F57E936CF46FDCD /* TaskIdeaSuggestionService.swift */; };
 		2F22134CBC7A0E7B71B9E474 /* TaskIdeaSuggestionUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 227760C3AC4AC01683358A4B /* TaskIdeaSuggestionUITests.swift */; };
@@ -713,6 +714,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		5E465C0C2239803CC57D663E /* DuplicateKeysCrashTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DuplicateKeysCrashTests.swift; path = FocusBloxTests/DuplicateKeysCrashTests.swift; sourceTree = SOURCE_ROOT; };
 		D1E7B7758F57E936CF46FDCD /* TaskIdeaSuggestionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TaskIdeaSuggestionService.swift; path = Sources/Services/TaskIdeaSuggestionService.swift; sourceTree = SOURCE_ROOT; };
 		227760C3AC4AC01683358A4B /* TaskIdeaSuggestionUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TaskIdeaSuggestionUITests.swift; path = FocusBloxUITests/TaskIdeaSuggestionUITests.swift; sourceTree = SOURCE_ROOT; };
 		95E810436DD458D261733601 /* TaskIdeaSuggestionServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TaskIdeaSuggestionServiceTests.swift; path = FocusBloxTests/TaskIdeaSuggestionServiceTests.swift; sourceTree = SOURCE_ROOT; };
@@ -1721,6 +1723,7 @@
 		A6B3805EF19D1B131D346DDD /* FocusBloxTests */ = {
 			isa = PBXGroup;
 			children = (
+				5E465C0C2239803CC57D663E /* DuplicateKeysCrashTests.swift */,
 				95E810436DD458D261733601 /* TaskIdeaSuggestionServiceTests.swift */,
 				128FFA0AAD6490F8EE2BA721 /* CoachTagGroupingTests.swift */,
 				79C538AA010D98BCAA5FE7D1 /* AITagSuggestionsTests.swift */,
@@ -2933,6 +2936,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B0E469DB0FEC9CB72CFAEC53 /* DuplicateKeysCrashTests.swift in Sources */,
 				43C572CF40040642AF9960EB /* TaskIdeaSuggestionServiceTests.swift in Sources */,
 				85CC16E1755B06359DEF90AC /* CoachTagGroupingTests.swift in Sources */,
 				B767DF2974CF7C3924817151 /* AITagSuggestionsTests.swift in Sources */,

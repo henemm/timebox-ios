@@ -1323,9 +1323,9 @@ struct ContentView: View {
     // MARK: - Deferred Sort Helper (delegates to shared DeferredSortController)
 
     private func freezeSortOrder() {
-        deferredSort.freeze(scores: Dictionary(uniqueKeysWithValues: visibleTasks.filter { !$0.isNextUp }.map {
+        deferredSort.freeze(scores: Dictionary(visibleTasks.filter { !$0.isNextUp }.map {
             ($0.id, scoreFor($0))
-        }))
+        }, uniquingKeysWith: { _, last in last }))
     }
 }
 

@@ -161,7 +161,7 @@ final class LocalTask {
     /// Walks the blocker chain from `blockerID` upward; if it reaches `taskID`, it's a cycle.
     static func wouldCreateCycle(settingBlocker blockerID: String, on taskID: String, allTasks: [LocalTask]) -> Bool {
         if blockerID == taskID { return true }
-        let lookup = Dictionary(uniqueKeysWithValues: allTasks.map { ($0.id, $0.blockerTaskID) })
+        let lookup = Dictionary(allTasks.map { ($0.id, $0.blockerTaskID) }, uniquingKeysWith: { _, last in last })
         var current: String? = blockerID
         var visited: Set<String> = []
         while let id = current {
