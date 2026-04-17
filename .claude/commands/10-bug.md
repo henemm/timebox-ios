@@ -34,6 +34,29 @@ Agent(subagent_type: "bug-intake")
 ./scripts/sim.sh screenshot /tmp/bug_vorher.png
 ```
 
+### Fresh-Eyes-Inspector (NUR bei UI-Bugs)
+
+Falls ein Screenshot gemacht wurde — spawne den User Advocate mit NUR dem Screenshot:
+
+```
+Agent(subagent_type: "user-advocate")
+```
+
+Prompt:
+> Schau dir diesen Screenshot an. Du weisst NICHTS ueber den Bug, die App oder den Kontext.
+> Beschreibe nur:
+> 1. Was siehst du?
+> 2. Was faellt dir auf — was sieht falsch, seltsam oder kaputt aus?
+> 3. Was wuerdest du als User erwarten stattdessen zu sehen?
+>
+> Screenshot: /tmp/bug_vorher.png
+
+- **Bekommt:** NUR den Screenshot
+- **Bekommt NICHT:** Bug-Beschreibung, Code, Dateinamen, Kontext
+- **Liefert:** Unvoreingenommene Beobachtungen — fliessen in Phase 2 Synthese ein
+
+**Bei Nicht-UI-Bugs (Crashes, Infrastruktur):** Diesen Schritt ueberspringen.
+
 ---
 
 ## Phase 2: Verstehen — Team losschicken (PARALLEL)
