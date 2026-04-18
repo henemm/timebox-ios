@@ -572,7 +572,7 @@ struct TaskInspector: View {
 
     /// Save and notify ContentView to refresh backlog (Bug #189/#190/#191)
     private func saveAndNotify() {
-        saveAndNotify()
+        try? modelContext.save()
         NotificationCenter.default.post(name: .taskDataChanged, object: nil)
     }
 }
