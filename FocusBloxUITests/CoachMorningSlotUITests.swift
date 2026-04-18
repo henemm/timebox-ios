@@ -1,11 +1,9 @@
 import XCTest
 
-/// UI Tests for Feature #206: Coach Morning — Freie Luecken mit Call-to-Action
+/// UI Tests for Coach Morning — Zeitbudget-Anzeige (Bug #252 Redesign)
 ///
-/// WICHTIG: Freie Slots haengen von echten Kalender-Events ab (EventKit).
-/// In der UI-Test-Umgebung ohne Kalender-Zugriff gibt es keine Slots.
-/// Tests mit Slot-Interaktion nutzen daher guard + XCTSkip.
-/// Die Business-Logik (candidatesPerSlot, Duration-Filter) ist durch Unit Tests abgedeckt.
+/// Die alten Slot-Karten (Task-Toggles, "Block erstellen") wurden entfernt.
+/// Stattdessen zeigt der Morning View nur noch eine Zeitbudget-Anzeige.
 final class CoachMorningSlotUITests: XCTestCase {
 
     var app: XCUIApplication!
@@ -13,114 +11,83 @@ final class CoachMorningSlotUITests: XCTestCase {
     override func setUpWithError() throws {
         continueAfterFailure = false
         app = XCUIApplication()
-        app.launchArguments = ["-UITesting", "--coach-tab-layout"]
+        app.launchArguments = ["-UITesting", "--coach-tab-layout", "--open-drawer", "morning"]
     }
 
     override func tearDownWithError() throws {
         app = nil
     }
 
-    private func openMorningDrawer() {
+    private func navigateToCoachMorning() {
+        app.launch()
         let tabBar = app.tabBars.firstMatch
         XCTAssertTrue(tabBar.waitForExistence(timeout: 5))
         tabBar.buttons["Coach"].tap()
 
-        let morningDrawer = app.buttons["coachDrawer_Guten Morgen"]
-        XCTAssertTrue(morningDrawer.waitForExistence(timeout: 5),
-                      "Morning drawer must exist")
-        morningDrawer.tap()
+        let coachView = app.otherElements["coachView"]
+        XCTAssertTrue(coachView.waitForExistence(timeout: 8), "Coach view should exist")
     }
 
-    // MARK: - Coach Morning Structure (always testable)
+    // MARK: - Slot-Karten sind entfernt
 
-    /// GIVEN: Coach layout active
-    /// WHEN: User opens Coach tab
-    /// THEN: Morning drawer button exists and is tappable
-    func testMorningDrawerExists() throws {
-        app.launch()
+    /// GIVEN: Coach Morning is open
+    /// WHEN: User looks at morning content
+    /// THEN: No slot cards exist (removed by Bug #252 redesign)
+    func testSlotCardsAreRemoved() throws {
+        navigateToCoachMorning()
 
-        let tabBar = app.tabBars.firstMatch
-        XCTAssertTrue(tabBar.waitForExistence(timeout: 5))
-        tabBar.buttons["Coach"].tap()
-
-        let morningDrawer = app.buttons["coachDrawer_Guten Morgen"]
-        XCTAssertTrue(morningDrawer.waitForExistence(timeout: 5),
-                      "Morning drawer button must exist on Coach tab")
-    }
-
-    // MARK: - Slot Section (requires calendar access)
-
-    /// GIVEN: Coach Morning with free time slots (requires calendar)
-    /// WHEN: User opens morning drawer
-    /// THEN: Free slots section is visible with task toggles
-    func testSlotSectionShowsTaskToggles() throws {
-        app.launch()
-        openMorningDrawer()
-
+        // Old slot section should NOT exist
         let slotsSection = app.otherElements["coachMorningSlotsSection"]
-        guard slotsSection.waitForExistence(timeout: 5) else {
-            throw XCTSkip("No free slots available — requires calendar with gaps")
-        }
+        XCTAssertFalse(slotsSection.waitForExistence(timeout: 3),
+                       "Slot section should be removed — replaced by time budget")
 
-        let slotTasks = app.buttons.matching(
+        // Old slot task toggles should NOT exist
+        let slotToggles = app.buttons.matching(
             NSPredicate(format: "identifier BEGINSWITH 'slotTaskToggle_'")
         )
-        XCTAssertTrue(slotTasks.firstMatch.waitForExistence(timeout: 3),
-                      "Task toggles must exist under a visible slot")
-        XCTAssertGreaterThan(slotTasks.count, 0,
-                             "At least one task suggestion must appear")
-        XCTAssertLessThanOrEqual(slotTasks.count, 9,
-                                 "Max 3 tasks per slot, max 3 slots = 9 toggles max")
+        XCTAssertEqual(slotToggles.count, 0,
+                       "Slot task toggles should be removed")
+
+        // Old "Block erstellen" buttons should NOT exist
+        let createButtons = app.buttons.matching(
+            NSPredicate(format: "identifier BEGINSWITH 'createBlockButton_'")
+        )
+        XCTAssertEqual(createButtons.count, 0,
+                       "Create block buttons should be removed")
     }
 
-    /// GIVEN: Free slot with tasks, user selects a task
-    /// WHEN: User taps toggle
-    /// THEN: "Block erstellen" button appears
-    func testSelectTaskShowsCreateBlockButton() throws {
-        app.launch()
-        openMorningDrawer()
+    // MARK: - Zeitbudget-Anzeige
 
-        let firstToggle = app.buttons.matching(
-            NSPredicate(format: "identifier BEGINSWITH 'slotTaskToggle_'")
+    /// GIVEN: Coach Morning is open
+    /// WHEN: User has free time today
+    /// THEN: Time budget indicator is shown
+    func testTimeBudgetIsShown() throws {
+        navigateToCoachMorning()
+
+        let timeBudget = app.staticTexts.matching(
+            NSPredicate(format: "identifier == 'coachTimeBudget'")
         ).firstMatch
 
-        guard firstToggle.waitForExistence(timeout: 5) else {
-            throw XCTSkip("No free slots available — requires calendar with gaps")
-        }
-
-        firstToggle.tap()
-
-        let createButton = app.buttons.matching(
-            NSPredicate(format: "identifier BEGINSWITH 'createBlockButton_'")
-        ).firstMatch
-        XCTAssertTrue(createButton.waitForExistence(timeout: 3),
-                      "Create block button must appear after selecting a task")
+        // With mock data (some events), time budget should appear
+        XCTAssertTrue(timeBudget.waitForExistence(timeout: 8),
+                      "Time budget indicator should be visible in morning content")
     }
 
-    /// GIVEN: Free slot, user selects task and creates block
-    /// WHEN: User taps "Block erstellen"
-    /// THEN: Slot disappears from the list
-    func testCreateBlockRemovesSlot() throws {
-        app.launch()
-        openMorningDrawer()
+    // MARK: - Task-Vorschläge bleiben
 
-        let firstToggle = app.buttons.matching(
-            NSPredicate(format: "identifier BEGINSWITH 'slotTaskToggle_'")
-        ).firstMatch
+    /// GIVEN: Coach Morning is open
+    /// WHEN: Tasks exist in backlog
+    /// THEN: Task suggestions ("Vorschläge für heute") still appear
+    func testTaskSuggestionsStillExist() throws {
+        navigateToCoachMorning()
 
-        guard firstToggle.waitForExistence(timeout: 5) else {
-            throw XCTSkip("No free slots available — requires calendar with gaps")
-        }
-
-        firstToggle.tap()
-
-        let createButton = app.buttons.matching(
-            NSPredicate(format: "identifier BEGINSWITH 'createBlockButton_'")
-        ).firstMatch
-        XCTAssertTrue(createButton.waitForExistence(timeout: 3))
-        createButton.tap()
-
-        XCTAssertFalse(createButton.waitForExistence(timeout: 3),
-                       "Create block button must disappear after block creation")
+        // Task suggestions should still exist (they're independent of slots)
+        let taskTitles = app.staticTexts.matching(
+            NSPredicate(format: "identifier BEGINSWITH 'taskTitle_'")
+        )
+        // Wait for data to load
+        let first = taskTitles.element(boundBy: 0)
+        XCTAssertTrue(first.waitForExistence(timeout: 8),
+                      "Task suggestions should still appear in morning content")
     }
 }

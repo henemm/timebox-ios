@@ -38,7 +38,6 @@ struct GapFinder {
 
     private let startHour = 6
     private let endHour = 22
-    private let defaultSuggestionHours = [9, 11, 14, 16]
 
     /// Find free slots within the min/max duration range
     func findFreeSlots(minMinutes: Int = 30, maxMinutes: Int = 60) -> [TimeSlot] {
@@ -122,44 +121,6 @@ struct GapFinder {
             }
         }
 
-        // If day is mostly free (no gaps found or only huge gaps), show default suggestions
-        if gaps.isEmpty || isWholeDayFree(busyPeriods: busyPeriods, dayStart: dayStart, dayEnd: dayEnd) {
-            return createDefaultSuggestions(maxMinutes: maxMinutes)
-        }
-
         return gaps
-    }
-
-    private func isWholeDayFree(busyPeriods: [(start: Date, end: Date)], dayStart: Date, dayEnd: Date) -> Bool {
-        // Day is considered "free" if total busy time is less than 2 hours
-        let totalBusyMinutes = busyPeriods
-            .filter { $0.end > dayStart && $0.start < dayEnd }
-            .reduce(0) { total, period in
-                let start = max(period.start, dayStart)
-                let end = min(period.end, dayEnd)
-                return total + Int(end.timeIntervalSince(start) / 60)
-            }
-        return totalBusyMinutes < 120
-    }
-
-    private func createDefaultSuggestions(maxMinutes: Int) -> [TimeSlot] {
-        let calendar = Calendar.current
-        let now = Date()
-        let isToday = calendar.isDate(now, inSameDayAs: date)
-
-        return defaultSuggestionHours.compactMap { hour in
-            var components = calendar.dateComponents([.year, .month, .day], from: date)
-            components.hour = hour
-            components.minute = 0
-            guard let start = calendar.date(from: components) else { return nil }
-
-            // Filter out past suggestions for today
-            if isToday && start < now {
-                return nil
-            }
-
-            let end = start.addingTimeInterval(Double(maxMinutes) * 60)
-            return TimeSlot(startDate: start, endDate: end)
-        }
     }
 }

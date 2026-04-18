@@ -16,6 +16,7 @@ struct CoachView: View {
     @State private var focusBlocks: [FocusBlock] = []
     @State private var nextUpTasks: [PlanItem] = []
     @State private var freeSlots: [TimeSlot] = []
+    @State private var totalFreeMinutesToday: Int = 0
     @State private var morningSuggestions: [NextUpSuggestion] = []
 
     // Daytime data
@@ -43,9 +44,7 @@ struct CoachView: View {
     @State private var eveningReflectionText: String = ""
     @State private var activeDrawer: DayPhase?
     @State private var dismissedTaskIDs: Set<String> = []
-    @State private var selectedTasksPerSlot: [UUID: Set<String>] = [:]
     @State private var aiReasonTexts: [String: String] = [:]  // [taskID: reason]
-    @State private var slotCandidates: [UUID: [NextUpSuggestion]] = [:]
 
     // Task interaction state (Bug #248)
     @State private var completeFeedback = false
@@ -281,11 +280,12 @@ struct CoachView: View {
     private var morningContent: some View {
         if isLoading {
             ProgressView()
-        } else if morningTopTasks.isEmpty && freeSlots.isEmpty {
-            coachText("Alles geplant — guter Start! Du weißt was heute zählt.")
         } else {
-            if !freeSlots.isEmpty && !slotCandidates.isEmpty {
-                morningSlotSection
+            // Zeitbudget-Anzeige (Bug #252)
+            timeBudgetView
+
+            if morningTopTasks.isEmpty {
+                coachText("Alles geplant — guter Start! Du weißt was heute zählt.")
             }
 
             if !morningTopTasks.isEmpty {
@@ -360,131 +360,22 @@ struct CoachView: View {
         refreshID = UUID()
     }
 
-    // MARK: - Morning Slot Section (Feature #206)
+    // MARK: - Time Budget (Bug #252 — replaces old Slot Cards)
 
-    private var morningSlotSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Label("Freie Lücken", systemImage: "clock.badge.questionmark")
-                .font(.subheadline.weight(.semibold))
-                .foregroundStyle(.secondary)
+    private var timeBudgetView: some View {
+        let hours = totalFreeMinutesToday / 60
+        let minutes = totalFreeMinutesToday % 60
+        let timeText = hours > 0
+            ? (minutes > 0 ? "\(hours) Std \(minutes) Min" : "\(hours) Std")
+            : "\(minutes) Min"
 
-            ForEach(freeSlots) { slot in
-                if let candidates = slotCandidates[slot.id], !candidates.isEmpty {
-                    slotCard(slot: slot, candidates: candidates)
-                }
-            }
+        return HStack(spacing: 8) {
+            Image(systemName: "clock")
+                .foregroundStyle(.blue)
+            Text("Dein Tag: \(timeText) frei")
+                .font(.subheadline.weight(.medium))
         }
-        .accessibilityIdentifier("coachMorningSlotsSection")
-    }
-
-    @ViewBuilder
-    private func slotCard(slot: TimeSlot, candidates: [NextUpSuggestion]) -> some View {
-        let selected = selectedTasksPerSlot[slot.id] ?? []
-        let totalMinutes = candidates
-            .filter { selected.contains($0.id) }
-            .compactMap(\.planItem.estimatedDuration)
-            .reduce(0, +)
-        let exceedsSlot = totalMinutes > slot.durationMinutes
-
-        VStack(alignment: .leading, spacing: 10) {
-            // Header: Time + Duration
-            HStack {
-                Text(slot.startDate, style: .time)
-                    .font(.subheadline.weight(.medium))
-                Text("—")
-                    .foregroundStyle(.tertiary)
-                Text("\(slot.durationMinutes) Min frei")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-            }
-
-            // Task candidates with toggles
-            ForEach(candidates) { suggestion in
-                let isSelected = selected.contains(suggestion.id)
-                Button {
-                    withAnimation(.smooth) {
-                        var current = selectedTasksPerSlot[slot.id] ?? []
-                        if isSelected {
-                            current.remove(suggestion.id)
-                        } else {
-                            current.insert(suggestion.id)
-                        }
-                        selectedTasksPerSlot[slot.id] = current
-                    }
-                } label: {
-                    HStack(spacing: 10) {
-                        Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
-                            .foregroundStyle(isSelected ? Color.blue : Color.gray.opacity(0.4))
-                            .imageScale(.medium)
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(suggestion.planItem.title)
-                                .font(.subheadline)
-                                .lineLimit(1)
-                            if let duration = suggestion.planItem.estimatedDuration {
-                                Text("\(duration) Min")
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                            }
-                        }
-                        Spacer()
-                    }
-                }
-                .buttonStyle(.plain)
-                .accessibilityIdentifier("slotTaskToggle_\(suggestion.id)")
-            }
-
-            // Duration warning
-            if exceedsSlot {
-                Label("Tasks dauern länger als die Lücke (\(totalMinutes) Min)", systemImage: "exclamationmark.triangle.fill")
-                    .font(.caption)
-                    .foregroundStyle(.orange)
-                    .accessibilityIdentifier("slotDurationWarning")
-            }
-
-            // Create block button
-            if !selected.isEmpty {
-                Button {
-                    createBlockForSlot(slot: slot, taskIDs: Array(selected))
-                } label: {
-                    Label("Block erstellen", systemImage: "plus.rectangle.fill.on.rectangle.fill")
-                        .font(.subheadline.weight(.medium))
-                        .frame(maxWidth: .infinity)
-                }
-                .buttonStyle(.borderedProminent)
-                .tint(.blue)
-                .accessibilityIdentifier("createBlockButton_\(slot.id)")
-            }
-        }
-        .padding(12)
-        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
-    }
-
-    private func createBlockForSlot(slot: TimeSlot, taskIDs: [String]) {
-        Task {
-            do {
-                let blockID = try eventKitRepo.createFocusBlock(
-                    startDate: slot.startDate, endDate: slot.endDate
-                )
-                try eventKitRepo.updateFocusBlock(
-                    eventID: blockID, taskIDs: taskIDs,
-                    completedTaskIDs: [], taskTimes: [:]
-                )
-
-                let taskSource = LocalTaskSource(modelContext: modelContext)
-                let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
-                for taskID in taskIDs {
-                    try syncEngine.updateAssignedFocusBlock(itemID: taskID, focusBlockID: blockID)
-                }
-
-                withAnimation(.smooth) {
-                    freeSlots.removeAll { $0.id == slot.id }
-                    selectedTasksPerSlot.removeValue(forKey: slot.id)
-                    slotCandidates.removeValue(forKey: slot.id)
-                }
-            } catch {
-                // Silently fail — block creation is non-critical
-            }
-        }
+        .accessibilityIdentifier("coachTimeBudget")
     }
 
     // MARK: - Daytime Content
@@ -1180,10 +1071,14 @@ struct CoachView: View {
                         Double($0.scheduledDuration ?? $0.estimatedDuration ?? 30) * 60
                     )
                 ) }
-            freeSlots = GapFinder(
+            let gapFinder = GapFinder(
                 events: calendarEvents, focusBlocks: focusBlocks,
                 scheduledTasks: scheduledPairs, date: Date()
-            ).findFreeSlots(minMinutes: 30, maxMinutes: 60)
+            )
+            freeSlots = gapFinder.findFreeSlots(minMinutes: 30, maxMinutes: 60)
+            // Zeitbudget: alle freien Minuten ohne Cap (für Anzeige)
+            let allGaps = gapFinder.findFreeSlots(minMinutes: 1, maxMinutes: 960)
+            totalFreeMinutesToday = allGaps.reduce(0) { $0 + $1.durationMinutes }
 
             let profile = BehavioralProfileService.profile(
                 tasks: try await LocalTaskSource(modelContext: modelContext).fetchIncompleteTasks(),
@@ -1195,12 +1090,6 @@ struct CoachView: View {
                 items: allTasks, slots: freeSlots,
                 profile: profile, calendarEvents: calendarEvents
             )
-            slotCandidates = NextUpSuggestionService.candidatesPerSlot(
-                items: allTasks, slots: freeSlots,
-                profile: profile, calendarEvents: calendarEvents,
-                now: Date(), maxPerSlot: 3
-            )
-
             timelineSegments = DayView.buildEveningSegments(
                 events: calendarEvents, completed: completedTasks, unfinished: unfinishedTasks
             )

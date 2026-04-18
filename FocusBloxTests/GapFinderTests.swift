@@ -48,27 +48,28 @@ final class GapFinderTests: XCTestCase {
 
     // MARK: - Default Suggestions
 
-    /// Verhalten: Leerer Kalender gibt Default-Vorschlaege [09, 11, 14, 16]
-    /// Bricht wenn: GapFinder.swift:114 — isWholeDayFree check oder :115 createDefaultSuggestions entfernt
-    func test_emptyCalendar_returnsDefaultSuggestions() {
+    /// Verhalten: Leerer Kalender gibt echte Luecke (06-22, gecapped)
+    /// Bug #252: Default-Suggestions entfernt — echte Gaps immer
+    func test_emptyCalendar_returnsRealGap() {
         let finder = GapFinder(events: [], focusBlocks: [], date: tomorrowDate)
         let slots = finder.findFreeSlots()
 
-        XCTAssertEqual(slots.count, 4, "Empty calendar should return 4 default suggestions")
-        let hours = slots.map { Calendar.current.component(.hour, from: $0.startDate) }
-        XCTAssertEqual(hours, [9, 11, 14, 16], "Default hours should be 9, 11, 14, 16")
+        XCTAssertEqual(slots.count, 1, "Empty calendar should return 1 real gap (capped)")
+        let hour = Calendar.current.component(.hour, from: slots.first!.startDate)
+        XCTAssertEqual(hour, 6, "Gap should start at 06:00")
     }
 
-    /// Verhalten: Tag mit <2h Busy-Time gilt als "frei" → Default Suggestions
-    /// Bricht wenn: GapFinder.swift:130 — Threshold von 120 Minuten geaendert
-    func test_mostlyFreeDay_returnsDefaultSuggestions() {
-        // 1 hour meeting = less than 120 min busy → "whole day free"
+    /// Verhalten: Tag mit 1h Busy gibt echte Luecken vor und nach dem Event
+    /// Bug #252: isWholeDayFree-Bypass entfernt
+    func test_mostlyFreeDay_returnsRealGaps() {
         let event = makeEvent(startHour: 10, endHour: 11)
         let finder = GapFinder(events: [event], focusBlocks: [], date: tomorrowDate)
         let slots = finder.findFreeSlots()
 
+        XCTAssertGreaterThanOrEqual(slots.count, 2, "Should have gaps before and after event")
         let hours = slots.map { Calendar.current.component(.hour, from: $0.startDate) }
-        XCTAssertEqual(hours, [9, 11, 14, 16], "Day with <2h busy should return defaults")
+        XCTAssertTrue(hours.contains(6), "Gap before event at 06:00")
+        XCTAssertTrue(hours.contains(11), "Gap after event at 11:00")
     }
 
     // MARK: - Gap Detection
@@ -145,8 +146,8 @@ final class GapFinderTests: XCTestCase {
         let finder = GapFinder(events: [allDay], focusBlocks: [], date: tomorrowDate)
         let slots = finder.findFreeSlots()
 
-        // All-day event excluded → empty busy periods → default suggestions
-        XCTAssertEqual(slots.count, 4, "All-day event should be excluded — returns defaults")
+        // All-day event excluded → empty busy periods → real gap (whole day free)
+        XCTAssertEqual(slots.count, 1, "All-day event excluded — returns 1 real gap")
     }
 
     // MARK: - Focus Blocks as Busy
@@ -177,40 +178,34 @@ final class GapFinderTests: XCTestCase {
         let finder = GapFinder(events: [earlyEvent], focusBlocks: [], date: tomorrowDate)
         let slots = finder.findFreeSlots()
 
-        // Early event ignored → 0 busy → default suggestions
-        XCTAssertEqual(slots.count, 4, "Events outside working hours should be ignored")
+        // Early event ignored → 0 busy → real gap (whole day)
+        XCTAssertEqual(slots.count, 1, "Events outside working hours should be ignored — 1 real gap")
     }
 
     // MARK: - Full Day
 
     /// Verhalten: Komplett voller Tag (06-22) ergibt leere Gaps → Default Suggestions (da <120min false)
     /// Bricht wenn: GapFinder.swift:100 — End-of-day gap check oder :114 empty check entfernt
-    func test_fullDay_returnsEmptyOrDefaults() {
+    func test_fullDay_returnsEmpty() {
         // Pack the entire day 06:00-22:00
         let event = makeEvent(startHour: 6, endHour: 22)
         let finder = GapFinder(events: [event], focusBlocks: [], date: tomorrowDate)
         let slots = finder.findFreeSlots(minMinutes: 30, maxMinutes: 60)
 
-        // Full day = no gaps found, BUT isWholeDayFree is false (16h busy > 120min)
-        // gaps.isEmpty=true → createDefaultSuggestions, BUT the OR condition means
-        // defaults are returned even though day isn't free
-        // Key: no gaps with >= minMinutes should exist
-        let realGaps = slots.filter { $0.durationMinutes >= 30 }
-        // Should be defaults since gaps.isEmpty
-        XCTAssertFalse(realGaps.isEmpty, "Full day should return default suggestions as fallback")
+        // Full day = no gaps → empty result (no more default fallback)
+        XCTAssertTrue(slots.isEmpty, "Full day should return no slots")
     }
 
     // MARK: - Default Suggestions Duration
 
     /// Verhalten: Default Suggestions haben Dauer = maxMinutes
     /// Bricht wenn: GapFinder.swift:149 — maxMinutes nicht an Slot-Ende uebergeben
-    func test_defaultSuggestions_haveMaxMinutesDuration() {
+    func test_emptyCalendar_gapIsCappedToMaxMinutes() {
         let finder = GapFinder(events: [], focusBlocks: [], date: tomorrowDate)
         let slots = finder.findFreeSlots(minMinutes: 30, maxMinutes: 45)
 
-        for slot in slots {
-            XCTAssertEqual(slot.durationMinutes, 45, "Default suggestions should use maxMinutes=45")
-        }
+        XCTAssertEqual(slots.count, 1, "Should return 1 capped gap")
+        XCTAssertEqual(slots.first!.durationMinutes, 45, "Gap should be capped to maxMinutes=45")
     }
 
     // MARK: - Overlapping Events
@@ -242,19 +237,16 @@ final class GapFinderTests: XCTestCase {
 
     /// Verhalten: Fuer "heute" werden vergangene Slots herausgefiltert
     /// Bricht wenn: GapFinder.swift:69 — `isDate(now, inSameDayAs: date)` Check entfernt
-    func test_today_defaultSuggestions_excludesPastHours() {
-        // Use "today" as date — any default suggestion hour before now should be excluded
+    func test_today_gapsStartFromNow() {
+        // Use "today" as date — gaps should start from current time, not from 06:00
         let finder = GapFinder(events: [], focusBlocks: [], date: Date())
-        let slots = finder.findFreeSlots()
+        let slots = finder.findFreeSlots(minMinutes: 1, maxMinutes: 960)
 
         let now = Date()
-        let currentHour = Calendar.current.component(.hour, from: now)
-
         for slot in slots {
-            let slotHour = Calendar.current.component(.hour, from: slot.startDate)
-            XCTAssertTrue(
-                slotHour >= currentHour,
-                "Today's suggestions should not include past hours — got \(slotHour) but current hour is \(currentHour)"
+            XCTAssertGreaterThanOrEqual(
+                slot.startDate, now.addingTimeInterval(-60),
+                "Today's gaps should not start before current time"
             )
         }
     }
