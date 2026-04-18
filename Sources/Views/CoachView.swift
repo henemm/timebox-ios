@@ -9,6 +9,7 @@ struct CoachView: View {
     @AppStorage("eveningStartHour") private var eveningStartHour = 18
     @Environment(\.eventKitRepository) private var eventKitRepo
     @Environment(\.modelContext) private var modelContext
+    @Environment(DeferredCompletionController.self) private var deferredCompletion
 
     // Morning data
     @State private var calendarEvents: [CalendarEvent] = []
@@ -45,6 +46,13 @@ struct CoachView: View {
     @State private var selectedTasksPerSlot: [UUID: Set<String>] = [:]
     @State private var aiReasonTexts: [String: String] = [:]  // [taskID: reason]
     @State private var slotCandidates: [UUID: [NextUpSuggestion]] = [:]
+
+    // Task interaction state (Bug #248)
+    @State private var completeFeedback = false
+    @State private var errorMessage: String?
+    @State private var taskToEditDirectly: PlanItem?
+    @State private var selectedItemForDuration: PlanItem?
+    @State private var selectedItemForCategory: PlanItem?
 
     private var currentPhase: DayPhase {
         let hour = Calendar.current.component(.hour, from: Date())
@@ -140,6 +148,52 @@ struct CoachView: View {
                 }
             } else if activeDrawer == nil {
                 activeDrawer = currentPhase
+            }
+        }
+        .sensoryFeedback(.success, trigger: completeFeedback)
+        .sheet(item: $taskToEditDirectly) { task in
+            TaskFormSheet(
+                task: task,
+                onSave: { title, priority, duration, tags, urgency, taskType, dueDate, description, recurrencePattern, recurrenceWeekdays, recurrenceMonthDay, recurrenceInterval in
+                    do {
+                        let taskSource = LocalTaskSource(modelContext: modelContext)
+                        let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
+                        try syncEngine.updateTask(
+                            itemID: task.id, title: title, importance: priority,
+                            duration: duration, tags: tags, urgency: urgency,
+                            taskType: taskType, dueDate: dueDate, description: description,
+                            recurrencePattern: recurrencePattern,
+                            recurrenceWeekdays: recurrenceWeekdays,
+                            recurrenceMonthDay: recurrenceMonthDay,
+                            recurrenceInterval: recurrenceInterval
+                        )
+                        Task { await loadAllData() }
+                        NotificationCenter.default.post(name: .taskDataChanged, object: nil)
+                    } catch {
+                        errorMessage = "Task konnte nicht gespeichert werden."
+                    }
+                },
+                onDelete: { deleteTask(task) }
+            )
+        }
+        .sheet(item: $selectedItemForDuration) { item in
+            DurationPicker(currentDuration: item.effectiveDuration) { newDuration in
+                updateDuration(for: item, minutes: newDuration)
+            }
+        }
+        .sheet(item: $selectedItemForCategory) { item in
+            CategoryPicker(currentCategory: item.taskType) { newCategory in
+                updateCategory(for: item, category: newCategory)
+            }
+        }
+        .alert("Fehler", isPresented: Binding(
+            get: { errorMessage != nil },
+            set: { if !$0 { errorMessage = nil } }
+        )) {
+            Button("OK") { errorMessage = nil }
+        } message: {
+            if let msg = errorMessage {
+                Text(msg)
             }
         }
     }
@@ -819,7 +873,45 @@ struct CoachView: View {
     @ViewBuilder
     private func taskWithActions(_ task: PlanItem, showActions: Bool, completed: Bool) -> some View {
         VStack(alignment: .leading, spacing: 6) {
-            BacklogRow(item: task, isCompletionPending: completed)
+            BacklogRow(
+                item: task,
+                onComplete: { completeTask(task) },
+                onCancelCompletion: { cancelCompletion(task) },
+                onDurationTap: { selectedItemForDuration = task },
+                onImportanceCycle: { newImportance in updateImportance(for: task, importance: newImportance) },
+                onUrgencyToggle: { newUrgency in updateUrgency(for: task, urgency: newUrgency) },
+                onCategoryTap: { selectedItemForCategory = task },
+                onEditTap: { taskToEditDirectly = task },
+                onDeleteTap: { deleteTask(task) },
+                onStartFocusSprint: { startFocusSprint(for: task) },
+                onTitleSave: { newTitle in saveTitleEdit(for: task, title: newTitle) },
+                isCompletionPending: completed || deferredCompletion.isPending(task.id)
+            )
+            .contextMenu {
+                if !task.isNextUp {
+                    Button {
+                        addToToday(task)
+                    } label: {
+                        Label("Für heute einplanen", systemImage: "calendar.circle.fill")
+                    }
+                }
+                Button {
+                    startFocusSprint(for: task)
+                } label: {
+                    Label("Focus Sprint", systemImage: "bolt.fill")
+                }
+                Divider()
+                Button {
+                    taskToEditDirectly = task
+                } label: {
+                    Label("Bearbeiten", systemImage: "pencil")
+                }
+                Button(role: .destructive) {
+                    deleteTask(task)
+                } label: {
+                    Label("Löschen", systemImage: "trash")
+                }
+            }
 
             // AI-Begründung (Feature #234)
             if showActions, let reason = aiReasonTexts[task.id] {
@@ -887,6 +979,128 @@ struct CoachView: View {
         let cleaned = dismissals.filter { $0.value > cutoff }
         if let data = try? JSONEncoder().encode(cleaned) {
             UserDefaults.standard.set(data, forKey: dismissalsKey)
+        }
+    }
+
+    // MARK: - Task Interactions (Bug #248)
+
+    private func completeTask(_ item: PlanItem) {
+        completeFeedback.toggle()
+        deferredCompletion.scheduleCompletion(id: item.id) { [modelContext] in
+            do {
+                let taskSource = LocalTaskSource(modelContext: modelContext)
+                let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
+                try syncEngine.completeTask(itemID: item.id)
+                await loadAllData()
+            } catch {
+                errorMessage = "Task konnte nicht als erledigt markiert werden."
+            }
+        }
+        NotificationCenter.default.post(name: .taskDataChanged, object: nil)
+    }
+
+    private func cancelCompletion(_ item: PlanItem) {
+        deferredCompletion.cancelCompletion(id: item.id)
+    }
+
+    private func deleteTask(_ task: PlanItem) {
+        do {
+            let taskSource = LocalTaskSource(modelContext: modelContext)
+            let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
+            try syncEngine.deleteTask(itemID: task.id)
+            Task { await loadAllData() }
+            NotificationCenter.default.post(name: .taskDataChanged, object: nil)
+        } catch {
+            errorMessage = "Task konnte nicht gelöscht werden."
+        }
+    }
+
+    private func updateImportance(for item: PlanItem, importance: Int?) {
+        do {
+            guard let itemUUID = UUID(uuidString: item.id) else { return }
+            let descriptor = FetchDescriptor<LocalTask>(predicate: #Predicate { $0.uuid == itemUUID })
+            guard let task = try modelContext.fetch(descriptor).first else { return }
+            task.importance = importance
+            task.modifiedAt = Date()
+            try modelContext.save()
+            NotificationCenter.default.post(name: .taskDataChanged, object: nil)
+        } catch {
+            errorMessage = "Wichtigkeit konnte nicht aktualisiert werden."
+        }
+    }
+
+    private func updateUrgency(for item: PlanItem, urgency: String?) {
+        do {
+            guard let itemUUID = UUID(uuidString: item.id) else { return }
+            let descriptor = FetchDescriptor<LocalTask>(predicate: #Predicate { $0.uuid == itemUUID })
+            guard let task = try modelContext.fetch(descriptor).first else { return }
+            task.urgency = urgency
+            task.modifiedAt = Date()
+            try modelContext.save()
+            NotificationCenter.default.post(name: .taskDataChanged, object: nil)
+        } catch {
+            errorMessage = "Dringlichkeit konnte nicht aktualisiert werden."
+        }
+    }
+
+    private func updateDuration(for item: PlanItem, minutes: Int?) {
+        do {
+            guard let itemUUID = UUID(uuidString: item.id) else { return }
+            let descriptor = FetchDescriptor<LocalTask>(predicate: #Predicate { $0.uuid == itemUUID })
+            guard let task = try modelContext.fetch(descriptor).first else { return }
+            task.estimatedDuration = minutes
+            task.modifiedAt = Date()
+            try modelContext.save()
+            NotificationCenter.default.post(name: .taskDataChanged, object: nil)
+        } catch {
+            errorMessage = "Dauer konnte nicht aktualisiert werden."
+        }
+    }
+
+    private func updateCategory(for item: PlanItem, category: String) {
+        do {
+            guard let itemUUID = UUID(uuidString: item.id) else { return }
+            let descriptor = FetchDescriptor<LocalTask>(predicate: #Predicate { $0.uuid == itemUUID })
+            guard let task = try modelContext.fetch(descriptor).first else { return }
+            task.taskType = category
+            task.modifiedAt = Date()
+            try modelContext.save()
+            NotificationCenter.default.post(name: .taskDataChanged, object: nil)
+        } catch {
+            errorMessage = "Kategorie konnte nicht aktualisiert werden."
+        }
+    }
+
+    private func startFocusSprint(for item: PlanItem) {
+        do {
+            let result = try FocusBlockActionService.startImmediate(
+                taskID: item.id,
+                eventKitRepo: eventKitRepo,
+                modelContext: modelContext
+            )
+            switch result {
+            case .started:
+                NotificationCenter.default.post(name: .focusSprintStarted, object: nil)
+            case .blockedByActiveBlock:
+                errorMessage = "Focus Sprint blockiert — es läuft bereits ein Block."
+            }
+        } catch {
+            errorMessage = "Focus Sprint konnte nicht gestartet werden."
+        }
+    }
+
+    private func saveTitleEdit(for task: PlanItem, title: String) {
+        do {
+            guard let itemUUID = UUID(uuidString: task.id) else { return }
+            let descriptor = FetchDescriptor<LocalTask>(predicate: #Predicate { $0.uuid == itemUUID })
+            guard let localTask = try modelContext.fetch(descriptor).first else { return }
+            localTask.title = title
+            localTask.modifiedAt = Date()
+            try modelContext.save()
+            Task { await loadAllData() }
+            NotificationCenter.default.post(name: .taskDataChanged, object: nil)
+        } catch {
+            errorMessage = "Titel konnte nicht gespeichert werden."
         }
     }
 

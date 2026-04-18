@@ -16,6 +16,7 @@ private let logger = Logger(subsystem: "com.henning.focusblox", category: "Remin
 // Bug #189/#190/#191: Notification for child-view task mutations → ContentView refresh
 extension Notification.Name {
     static let taskDataChanged = Notification.Name("taskDataChanged")
+    static let focusSprintStarted = Notification.Name("FocusSprintStarted")
 }
 
 // MARK: - Focused Values for Keyboard Commands

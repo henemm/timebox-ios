@@ -9,6 +9,7 @@ import UserNotifications
 extension Notification.Name {
     static let quickCaptureRequested = Notification.Name("QuickCaptureRequested")
     static let focusSprintStarted = Notification.Name("FocusSprintStarted")
+    static let taskDataChanged = Notification.Name("taskDataChanged")
 }
 
 @main

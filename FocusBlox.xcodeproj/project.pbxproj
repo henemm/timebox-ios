@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		91D0BC937BC868B971E344BE /* CoachTaskInteractionsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F3A916413B1A5982A9338DF /* CoachTaskInteractionsUITests.swift */; };
 		2F42B12BABD0CAB500D1936F /* TaskInspectorSaveTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4B346F7B234B47464B8ADA3 /* TaskInspectorSaveTests.swift */; };
 		03A94D15FBA2530D8C629546 /* BacklogRowRedesignUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54C8A326C1D84FA7A3BD27A8 /* BacklogRowRedesignUITests.swift */; };
 		03B86DB53FA9687DF2B2A37A /* MockEventKitRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 993E45CA1F0174CC0345C92C /* MockEventKitRepository.swift */; };
@@ -715,6 +716,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		4F3A916413B1A5982A9338DF /* CoachTaskInteractionsUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CoachTaskInteractionsUITests.swift; path = FocusBloxUITests/CoachTaskInteractionsUITests.swift; sourceTree = SOURCE_ROOT; };
 		F4B346F7B234B47464B8ADA3 /* TaskInspectorSaveTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TaskInspectorSaveTests.swift; path = FocusBloxMacTests/TaskInspectorSaveTests.swift; sourceTree = SOURCE_ROOT; };
 		01344413B23EDC8D6C17192A /* CountOpenTasksIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CountOpenTasksIntent.swift; path = Sources/Intents/CountOpenTasksIntent.swift; sourceTree = SOURCE_ROOT; };
 		01F676CC7EA20C97ACDD9D18 /* LocalTaskTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalTaskTests.swift; sourceTree = "<group>"; };
@@ -1432,6 +1434,7 @@
 		05D90FB2A2CE48689EC309B4 /* FocusBloxUITests */ = {
 			isa = PBXGroup;
 			children = (
+				4F3A916413B1A5982A9338DF /* CoachTaskInteractionsUITests.swift */,
 				227760C3AC4AC01683358A4B /* TaskIdeaSuggestionUITests.swift */,
 				BEE29F820045B57F618C2332 /* CoachSuggestionUITests.swift */,
 				DE474618567511DD53CF7CE3 /* DoNowBadgeUITests.swift */,
@@ -2804,6 +2807,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				91D0BC937BC868B971E344BE /* CoachTaskInteractionsUITests.swift in Sources */,
 				2F22134CBC7A0E7B71B9E474 /* TaskIdeaSuggestionUITests.swift in Sources */,
 				08A8A68F7DE457F45B871CFD /* CoachSuggestionUITests.swift in Sources */,
 				C5833B7EE763E58A9DCFA51A /* DoNowBadgeUITests.swift in Sources */,

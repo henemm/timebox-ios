@@ -30,7 +30,7 @@ set -eo pipefail
 # ============================================
 # KONFIGURATION — Einzige Quelle der Wahrheit
 # ============================================
-SIM_ID="C2B2472D-F80A-4AD4-A1D9-571948F0B106"
+SIM_ID="082B5651-70F0-47DF-9E73-93CF2DA2D123"
 SIM_NAME="FocusBlox"
 PROJECT="FocusBlox.xcodeproj"
 SCHEME="FocusBlox"
@@ -176,7 +176,7 @@ cmd_build() {
     xcodebuild build \
         -project "$PROJECT" \
         -scheme "$SCHEME" \
-        -destination "id=$SIM_ID" \
+        -destination "platform=iOS Simulator,id=$SIM_ID" \
         -derivedDataPath "$SESSION_DERIVED_DATA" \
         CODE_SIGNING_ALLOWED=NO \
         -quiet \
@@ -263,10 +263,10 @@ cmd_navigate() {
 
     # Validate screen name
     case "$SCREEN" in
-        backlog|blox|day|focus|review|refiner) ;;
+        backlog|blox|day|focus|review|refiner|coach) ;;
         *)
             error "Unbekannter Screen: $SCREEN"
-            echo "Verfuegbar: backlog, blox, day, focus, review, refiner"
+            echo "Verfuegbar: backlog, blox, day, focus, review, refiner, coach"
             return 1
             ;;
     esac
@@ -321,7 +321,7 @@ cmd_test() {
     xcodebuild test \
         -project "$PROJECT" \
         -scheme "$SCHEME" \
-        -destination "id=$SIM_ID" \
+        -destination "platform=iOS Simulator,id=$SIM_ID" \
         -derivedDataPath "$SESSION_DERIVED_DATA" \
         -only-testing:"FocusBloxUITests/$TEST_TARGET" \
         -parallel-testing-enabled NO \
@@ -367,7 +367,7 @@ cmd_unit() {
     xcodebuild test \
         -project "$PROJECT" \
         -scheme "$SCHEME" \
-        -destination "id=$SIM_ID" \
+        -destination "platform=iOS Simulator,id=$SIM_ID" \
         -derivedDataPath "$SESSION_DERIVED_DATA" \
         -only-testing:"FocusBloxTests/$TEST_TARGET" \
         -parallel-testing-enabled NO \
@@ -479,6 +479,72 @@ cmd_mac_test() {
     return $EXIT_CODE
 }
 
+cmd_coach_screenshot() {
+    local DRAWER="${1:-}"
+    local OUTPUT="${2:-/tmp/coach_screenshot.png}"
+
+    info "Coach-Screenshot (Drawer: ${DRAWER:-auto})..."
+
+    # Simulator-Lock fuer exklusiven Zugriff
+    acquire_sim_lock
+
+    # Sicherstellen dass Simulator laeuft
+    cmd_boot
+
+    # Gebaute App finden
+    local APP_PATH
+    APP_PATH=$(find "$SESSION_DERIVED_DATA"/Build/Products/Debug-iphonesimulator -name "FocusBlox.app" -maxdepth 1 2>/dev/null | head -1)
+    if [ -z "$APP_PATH" ]; then
+        APP_PATH=$(find "$DERIVED_DATA"/FocusBlox-*/Build/Products/Debug-iphonesimulator -name "FocusBlox.app" -maxdepth 1 2>/dev/null | head -1)
+    fi
+    if [ -z "$APP_PATH" ]; then
+        error "Keine gebaute App gefunden! Erst: ./scripts/sim.sh build"
+        release_sim_lock
+        return 1
+    fi
+
+    local BUNDLE_ID
+    BUNDLE_ID=$(plutil -extract CFBundleIdentifier raw "$APP_PATH/Info.plist")
+
+    # App beenden, installieren, mit Coach-Screen + optionalem Drawer starten
+    xcrun simctl terminate "$SIM_ID" "$BUNDLE_ID" 2>/dev/null || true
+    xcrun simctl install "$SIM_ID" "$APP_PATH"
+
+    local LAUNCH_ARGS=("-UITesting" "--coach-tab-layout" "--screen" "coach")
+    if [ -n "$DRAWER" ]; then
+        case "$DRAWER" in
+            morning|daytime|evening)
+                LAUNCH_ARGS+=("--open-drawer" "$DRAWER")
+                ;;
+            *)
+                error "Unbekannter Drawer: $DRAWER (morning/daytime/evening)"
+                release_sim_lock
+                return 1
+                ;;
+        esac
+    fi
+
+    xcrun simctl launch "$SIM_ID" "$BUNDLE_ID" "${LAUNCH_ARGS[@]}"
+
+    # Warten bis App UI bereit ist
+    sleep 2
+
+    # Screenshot
+    rm -f "$OUTPUT" 2>/dev/null || true
+    xcrun simctl io "$SIM_ID" screenshot "$OUTPUT" 2>/dev/null
+
+    release_sim_lock
+
+    if [ -f "$OUTPUT" ]; then
+        local SIZE
+        SIZE=$(stat -f%z "$OUTPUT" 2>/dev/null || echo "0")
+        success "Coach-Screenshot: $OUTPUT ($SIZE bytes)"
+    else
+        error "Screenshot fehlgeschlagen!"
+        return 1
+    fi
+}
+
 cmd_help() {
     echo "sim.sh — FocusBlox Simulator-Toolkit"
     echo ""
@@ -492,6 +558,7 @@ cmd_help() {
     echo "  navigate <screen>               App neu starten + zum Screen navigieren"
     echo "                                  Screens: backlog, blox, day, focus, review, refiner"
     echo "  screenshot [path]               Screenshot (default: /tmp/sim_screenshot.png)"
+    echo "  coach-screenshot [drawer] [path] Coach-Tab Screenshot (drawer: morning/daytime/evening)"
     echo "  test <TestClass[/method]>        UI Test ausfuehren"
     echo "  unit <TestClass[/method]>        Unit Test ausfuehren"
     echo "  mac-build                       macOS App bauen (nativ)"
@@ -515,7 +582,8 @@ case "$COMMAND" in
     build)      cmd_build ;;
     launch)     cmd_launch "$@" ;;
     navigate)   cmd_navigate "$@" ;;
-    screenshot) cmd_screenshot "$@" ;;
+    screenshot)       cmd_screenshot "$@" ;;
+    coach-screenshot) cmd_coach_screenshot "$@" ;;
     test)       cmd_test "$@" ;;
     unit)       cmd_unit "$@" ;;
     mac-build)  cmd_mac_build ;;
