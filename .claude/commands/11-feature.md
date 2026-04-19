@@ -153,7 +153,7 @@ python3 .claude/hooks/workflow.py phase phase5_implement
 **Du schreibst KEINEN Code. Du spawnst den Developer-Agent.**
 
 ```
-Agent(subagent_type: "developer", isolation: "worktree")
+Agent(subagent_type: "general-purpose", isolation: "worktree")
 ```
 
 ### Developer-Agent Input:

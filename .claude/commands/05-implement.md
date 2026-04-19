@@ -17,7 +17,7 @@ Checkpoint 2 muss approved sein, RED-Artifacts muessen existieren.
 ### Developer-Agent spawnen
 
 ```
-Agent(subagent_type: "developer", isolation: "worktree")
+Agent(subagent_type: "general-purpose", isolation: "worktree")
 ```
 
 **Input fuer den Developer-Agent:**
