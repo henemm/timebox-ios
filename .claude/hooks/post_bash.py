@@ -101,6 +101,11 @@ def _analyze_test_output(command: str, output: str) -> None:
               f"Ergebnis: {result_str}. "
               f"Tests muessen GRUEN sein bevor weitergearbeitet wird.", file=sys.stderr)
 
+    elif phase == "phase6_adversary" and not passed:
+        print(f"WARNING: Tests FAILED in Adversary phase! "
+              f"Ergebnis: {result_str}. "
+              f"Adversary hat moeglicherweise ein Problem gefunden.", file=sys.stderr)
+
 
 def main():
     global _STDIN_SESSION_ID

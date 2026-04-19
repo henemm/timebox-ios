@@ -37,7 +37,7 @@ Wenn eine macOS-View Task-Daten ändert (`modelContext.save()`), MUSS sie danach
 damit `ContentView.refreshTasks()` getriggert wird. Neue macOS-Views mit Mutations
 immer nach diesem Pattern implementieren. Details: `docs/reference/learnings.md`
 
-## Workflow — 3-Checkpoint System (v5)
+## Workflow — Orchestrator-Pattern (v6)
 
 | Phase | Command | Gate to leave |
 |-------|---------|---------------|
@@ -46,14 +46,21 @@ immer nach diesem Pattern implementieren. Details: `docs/reference/learnings.md`
 | 2 | `/02-analyse` | **Checkpoint 1** — Henning sagt "stimmt" |
 | 3 | `/03-write-spec` | spec_file + Henning sagt "approved" |
 | 4 | `/04-tdd-red` | RED artifacts + **Checkpoint 2** — Henning sagt "go" |
-| 5 | `/05-implement` | Tests GREEN + **Checkpoint 3** — Henning sagt "commit" |
-| 6 | Done | git commit erlaubt |
+| 5 | `/05-implement` | Developer-Agent in Worktree, Tests GREEN |
+| 6 | Adversary | Implementation-Validator prüft, **Checkpoint 3** — Henning sagt "commit" |
+| 7 | Done | git commit erlaubt |
+
+**Orchestrator-Pattern:** Haupttask schreibt KEINEN Code. Developer-Agent (Opus) arbeitet in Worktree-Isolation. Implementation-Validator (Sonnet) prüft unabhängig.
 
 **3 Human Checkpoints:** Nur Henning kann Checkpoints freischalten (via phase_listener.py). Claude kann sich selbst NICHT freischalten.
 
+**Scope-Guard:** Max 5 Code-Dateien pro Workflow (Hook enforced). Max ±250 LoC.
+
 Hooks enforce phase progression. Edit/Write on code files is blocked without active workflow + TDD RED artifacts.
 
-For bug fixes: `/10-bug <description>` triggers Analysis-First → Checkpoint 1 → Spec → TDD RED → Checkpoint 2 → Implement → Checkpoint 3 → Commit.
+For bug fixes: `/10-bug <description>` triggers Analysis-First → Checkpoint 1 → Spec → TDD RED → Checkpoint 2 → Developer-Agent → Adversary → Checkpoint 3 → Commit.
+
+For features: `/11-feature <description>` triggers User Advocate + Feature Planner → Checkpoint 1 → Spec → TDD RED → Checkpoint 2 → Developer-Agent → Adversary → Checkpoint 3 → Commit.
 
 ## TDD & Testing Rules
 

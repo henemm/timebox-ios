@@ -54,7 +54,9 @@ PROTECTED_STATE_FILES = [
 INFRASTRUCTURE_DIRS = [".claude/hooks/", ".claude/agents/"]
 
 IMPL_PHASES = {
-    "phase5_implement", "phase6_done",
+    "phase5_implement", "phase6_adversary", "phase7_done",
+    # v5 backward compat
+    "phase6_done",
     # v4 backward compat (old workflows not yet archived)
     "phase6_implement", "phase6b_adversary", "phase7_validate", "phase8_complete",
 }
@@ -335,11 +337,21 @@ def main():
             print(f"BLOCKED: Phase {phase} erlaubt keine Code-Edits. Starte mit /01-context.", file=sys.stderr)
             sys.exit(2)
 
-    # 9. Override token skips TDD check
+    # 9. Scope-Guard: max 5 Code-Dateien pro Workflow
+    if phase in IMPL_PHASES:
+        affected = workflow.get("affected_files", [])
+        code_affected = [f for f in affected if any(f.endswith(ext) for ext in CODE_EXTENSIONS)]
+        if len(code_affected) > 5:
+            print(f"BLOCKED: Scope-Limit überschritten — {len(code_affected)} Code-Dateien "
+                  f"(max 5). Ticket aufteilen oder Scope reduzieren.",
+                  file=sys.stderr)
+            sys.exit(2)
+
+    # 10. Override token skips TDD check
     if _has_override_token(wf_name):
         sys.exit(0)
 
-    # 10. RED test artifacts
+    # 11. RED test artifacts
     if phase in IMPL_PHASES:
         red_done = workflow.get("red_test_done", False) or workflow.get("ui_test_red_done", False)
         if not red_done:
@@ -349,7 +361,7 @@ def main():
                 print("BLOCKED: No RED test artifacts. Run /04-tdd-red first.", file=sys.stderr)
                 sys.exit(2)
 
-    # 11. Allow
+    # 12. Allow
     sys.exit(0)
 
 

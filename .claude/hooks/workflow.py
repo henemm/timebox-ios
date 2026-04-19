@@ -1,18 +1,18 @@
 #!/usr/bin/env python3
 """
-Workflow v5 — 3-Checkpoint System
+Workflow v6 — Orchestrator-Pattern + Multi-Session
 
-Simplified from v4 (17+ gates) to 3 human checkpoints + deterministic hard gates.
-Self-policing removed. Only Henning can unlock checkpoints via phase_listener.py.
+Main task acts as Product Owner (orchestrator) — delegates code to Developer-Agent
+in worktree isolation. Implementation-Validator (Adversary) runs independently.
 
-Phases (6 instead of 9):
+Phases (8):
   phase0_idle → phase1_context → phase2_analyse → phase3_spec
-  → phase4_tdd_red → phase5_implement → phase6_done
+  → phase4_tdd_red → phase5_implement → phase6_adversary → phase7_done
 
 Checkpoints (set ONLY by phase_listener.py, never by Claude):
   checkpoint1_approved — "stimmt" (after analysis, before spec)
   checkpoint2_approved — "go" (after TDD RED, before implementation)
-  checkpoint3_approved — "commit" (after implementation, before git commit)
+  checkpoint3_approved — "commit" (after adversary review, before git commit)
 
 Usage:
     python3 workflow.py start <name>
@@ -30,6 +30,7 @@ Usage:
     python3 workflow.py mark-checkpoint1 <notes>
     python3 workflow.py mark-checkpoint2 <notes>
     python3 workflow.py mark-checkpoint3 <notes>
+    python3 workflow.py mark-adversary-verdict <VERIFIED|BROKEN|AMBIGUOUS>
     python3 workflow.py complete
     python3 workflow.py list
     python3 workflow.py snapshot-tests
@@ -51,8 +52,16 @@ PHASES = [
     "phase3_spec",
     "phase4_tdd_red",
     "phase5_implement",
-    "phase6_done",
+    "phase6_adversary",
+    "phase7_done",
 ]
+
+# Backward-compat aliases for v5 workflows and gregor_zwanzig compat
+PHASE_ALIASES = {
+    "phase6_done": "phase7_done",
+    "phase6b_adversary": "phase6_adversary",
+    "phase8_complete": "phase7_done",
+}
 
 PHASE_NAMES = {
     "phase0_idle": "Idle",
@@ -60,8 +69,11 @@ PHASE_NAMES = {
     "phase2_analyse": "Analysis",
     "phase3_spec": "Specification & Approval",
     "phase4_tdd_red": "TDD RED - Write Failing Tests",
-    "phase5_implement": "Implementation (TDD GREEN)",
-    "phase6_done": "Done - Ready to Commit",
+    "phase5_implement": "Implementation (Developer-Agent)",
+    "phase6_adversary": "Adversary Verification",
+    "phase7_done": "Done - Ready to Commit",
+    # v5 backward compat
+    "phase6_done": "Done - Ready to Commit (v5)",
 }
 
 
@@ -261,6 +273,10 @@ def _new_workflow(name: str) -> dict:
         "localize_checked": False,
         "no_user_strings": False,
         "no_ui_change": False,
+        # v6: Adversary verification
+        "adversary_verdict": None,
+        "adversary_run_count": 0,
+        "green_test_done": False,
     }
 
 
@@ -281,7 +297,11 @@ def _has_override_token(workflow_name: str) -> bool:
 
 def _validate_transition(data: dict, target: str) -> str | None:
     """Validate phase transition prerequisites. Returns error message or None."""
+    # Resolve phase aliases (v5 backward compat)
+    target = PHASE_ALIASES.get(target, target)
+
     current = data.get("current_phase", "phase0_idle")
+    current = PHASE_ALIASES.get(current, current)
     cur_idx = PHASES.index(current) if current in PHASES else 0
     tgt_idx = PHASES.index(target) if target in PHASES else -1
 
@@ -333,15 +353,21 @@ def _validate_transition(data: dict, target: str) -> str | None:
                     "(Testname + was er prüft + FAILED Output). "
                     "Henning muss 'go' sagen.")
 
+    # --- Gate: GREEN tests before adversary ---
+    if tgt_idx >= PHASES.index("phase6_adversary"):
+        if not data.get("green_test_done"):
+            return ("green_test_done not set — Tests müssen grün sein bevor "
+                    "der Adversary prüfen kann. mark-green aufrufen.")
+
     # --- Gate: Checkpoint 3 — Henning approved result ---
-    if tgt_idx >= PHASES.index("phase6_done"):
+    if tgt_idx >= PHASES.index("phase7_done"):
         if not data.get("checkpoint3_approved"):
             return ("Checkpoint 3 nicht bestanden — präsentiere Henning das Ergebnis "
-                    "(ALL GREEN Output + vorher/nachher Screenshot). "
+                    "(Adversary-Verdict + ALL GREEN Output + Screenshot). "
                     "Henning muss 'commit' sagen.")
 
     # --- Gate: Adversary Findings müssen alle resolved sein ---
-    if tgt_idx >= PHASES.index("phase6_done"):
+    if tgt_idx >= PHASES.index("phase7_done"):
         findings = data.get("adversary_findings", [])
         unresolved = [f for f in findings if f.get("status") is None]
         if unresolved:
@@ -402,6 +428,10 @@ def cmd_status(args: list[str]) -> None:
     print(f"Test Artifacts: {artifacts}")
     print(f"RED done: {'Yes' if data.get('red_test_done') else 'No'}")
     print(f"UI RED done: {'Yes' if data.get('ui_test_red_done') else 'No'}")
+    print(f"GREEN done: {'Yes' if data.get('green_test_done') else 'No'}")
+    verdict = data.get("adversary_verdict") or "Not run"
+    run_count = data.get("adversary_run_count", 0)
+    print(f"Adversary Verdict: {verdict} (runs: {run_count})")
     findings = data.get("adversary_findings", [])
     if findings:
         unresolved = sum(1 for f in findings if f.get("status") is None)
@@ -412,7 +442,7 @@ def cmd_phase(args: list[str]) -> None:
     if not args:
         print("Usage: workflow.py phase <phase>", file=sys.stderr)
         sys.exit(1)
-    target = args[0]
+    target = PHASE_ALIASES.get(args[0], args[0])
     data, name = _read_active()
     error = _validate_transition(data, target)
     if error:
@@ -634,6 +664,24 @@ def cmd_mark_inspect_ui(args: list[str]) -> None:
     print(f"inspect-ui marked done for {name}")
 
 
+def cmd_mark_adversary_verdict(args: list[str]) -> None:
+    """Record adversary verdict. Usage: mark-adversary-verdict VERIFIED|BROKEN|AMBIGUOUS"""
+    if not args:
+        print("Usage: workflow.py mark-adversary-verdict <VERIFIED|BROKEN|AMBIGUOUS>",
+              file=sys.stderr)
+        sys.exit(1)
+    verdict = args[0].upper()
+    if verdict not in ("VERIFIED", "BROKEN", "AMBIGUOUS"):
+        print(f"Invalid verdict: {verdict}. Must be VERIFIED, BROKEN, or AMBIGUOUS.",
+              file=sys.stderr)
+        sys.exit(1)
+    data, name = _read_active()
+    data["adversary_verdict"] = verdict
+    data["adversary_run_count"] = data.get("adversary_run_count", 0) + 1
+    _save_active(data)
+    print(f"Adversary verdict recorded: {verdict} (run #{data['adversary_run_count']})")
+
+
 def cmd_mark_localize(args: list[str]) -> None:
     """Mark localization check as done for current workflow."""
     data, name = _read_active()
@@ -768,7 +816,7 @@ def cmd_list_findings(args: list[str]) -> None:
 
 def cmd_complete(args: list[str]) -> None:
     data, name = _read_active()
-    data["current_phase"] = "phase6_done"
+    data["current_phase"] = "phase7_done"
     archive = _archive_dir()
     archive.mkdir(parents=True, exist_ok=True)
     _atomic_write(archive / f"{name}.json", data)
@@ -852,6 +900,7 @@ COMMANDS = {
     "mark-context": cmd_mark_context,
     "mark-inspect-ui": cmd_mark_inspect_ui,
     "mark-localize": cmd_mark_localize,
+    "mark-adversary-verdict": cmd_mark_adversary_verdict,
     "mark-checkpoint1": cmd_mark_checkpoint1,
     "mark-checkpoint2": cmd_mark_checkpoint2,
     "mark-checkpoint3": cmd_mark_checkpoint3,

@@ -1,125 +1,52 @@
-# Phase 5: Implementation (TDD GREEN)
+# Phase 5: Implementation (Workflow v6 — Developer-Agent)
 
-You are in **Phase 5 - Implementation / TDD GREEN Phase**.
+You are in **Phase 5 - Implementation**.
 
-## Purpose
+## v6 Orchestrator-Pattern
 
-Write the **minimal code** to make failing tests pass. No more, no less.
+**Du schreibst KEINEN Code selbst.** Du spawnst den Developer-Agent im Worktree.
 
-## Prerequisites
-
-- Spec approved
-- TDD RED complete (`phase4_tdd_red`)
-- Checkpoint 2 approved (Henning said "go")
-- Test artifacts registered showing failures
-
-Check status:
-```bash
-python3 .claude/hooks/workflow.py status
-```
-
-## Your Tasks
-
-### Step 1: Verify RED Phase Complete
+### Voraussetzungen pruefen
 
 ```bash
 python3 .claude/hooks/workflow.py status
 ```
 
-### Step 2: Kontext laden
+Checkpoint 2 muss approved sein, RED-Artifacts muessen existieren.
 
-Lies die Spec und betroffene Dateien. Verstehe was implementiert werden muss.
+### Developer-Agent spawnen
 
-### Step 3: Implementieren
+```
+Agent(subagent_type: "developer", isolation: "worktree")
+```
 
-- Lies und befolge die approved Spec exakt
-- Schreibe Code der die Tests gruen macht
-- Halte dich an die Scoping-Limits
+**Input fuer den Developer-Agent:**
+- Spec-Pfad: [spec_file aus Workflow-State]
+- RED-Tests: [test_artifacts — Dateipfade der fehlschlagenden Tests]
+- Affected Files: [affected_files]
+- Konventionen: `./scripts/sim.sh` nutzen, max 4-5 Dateien, max 250 LoC
 
-**TDD GREEN Rules:**
-- Only write code that makes a test pass
-- Don't add features not covered by tests
-- Don't optimize prematurely
-- Don't refactor yet
+### Nach Developer-Report
 
-### Step 4: Tests ausfuehren
+1. Pruefe: Alle Tests gruen? Scope eingehalten? Von Spec abgewichen?
+2. Bei Fehlern: Developer-Agent erneut spawnen mit Feedback (max 3 Versuche)
+3. Nach 3 Fehlschlaegen: Eskalation an Henning
+
+### GREEN Artifacts erfassen
 
 ```bash
-./scripts/sim.sh unit [TestClass]
-./scripts/sim.sh test [UITestClass]
+python3 .claude/hooks/workflow.py mark-green "[test-output-summary]"
+python3 .claude/hooks/workflow.py mark-ui-green "[UI test summary]"
 ```
 
-Bei Shared-Code-Aenderungen (`Sources/`): AUCH `./scripts/sim.sh mac-build` ausfuehren!
-
-### Step 5: GREEN Artifacts erfassen
+### Weiter zur Adversary-Phase
 
 ```bash
-python3 .claude/hooks/workflow.py mark-green "[N] unit tests passed"
-python3 .claude/hooks/workflow.py mark-ui-green "[M] UI tests passed"
+python3 .claude/hooks/workflow.py phase phase6_adversary
 ```
 
-### Step 6: Bug-Reproduktion wiederholen (NUR bei Bug-Workflows)
+Dann den Implementation-Validator spawnen (siehe `/11-feature` oder `/10-bug` Phase 6).
 
-**Wenn `workflow_type == bug`:**
+## Fallback: Direktes Implementieren
 
-1. **Gleiche Schritte wie bei der urspruenglichen Reproduktion ausfuehren**
-2. **Nachher-Screenshot machen:**
-```bash
-./scripts/sim.sh screenshot /tmp/bug_nachher.png
-```
-3. **Vergleich:** Ist der Bug weg? Sieht es korrekt aus?
-
-Wenn der Bug immer noch auftritt → **Fix ueberarbeiten, NICHT zum Checkpoint!**
-
-### Step 7: **CHECKPOINT 3** — Henning das Ergebnis praesentieren
-
-**STOP! Ohne Hennings Freigabe kein Commit!**
-
-Praesentiere:
-
-```markdown
-## Ergebnis
-
-### Was wurde gebaut/gefixt?
-- [In User-Sprache, 1-2 Saetze]
-
-### Test-Ergebnisse
-- Unit Tests: [N] bestanden
-- UI Tests: [M] bestanden
-- ALL GREEN ✓
-
-### Visuelle Pruefung
-- [Bei Bugs: Vorher-Screenshot + Nachher-Screenshot]
-- [Bei Features: Screenshot des fertigen Features + Vergleich mit User-Erwartung]
-
-### Auffaelligkeiten
-- [Alles was aufgefallen ist — DU entscheidest NICHT was relevant ist]
-
-Sage "commit" wenn du zufrieden bist.
-Optional: Starte `/adversary` in einer zweiten Claude-Session fuer eine unabhaengige Pruefung.
-```
-
-**Henning sagt "commit" → Checkpoint 3 freigeschaltet → Commit erlaubt.**
-
-### Step 7: Commit + Cleanup
-
-```bash
-python3 .claude/hooks/workflow.py phase phase6_done
-# Git commit (mit Issue-Referenz!)
-# GitHub Issue schliessen
-python3 .claude/hooks/workflow.py complete
-```
-
-## Implementation Constraints
-
-- **Max 4-5 files** per change
-- **Max +/-250 LoC** total
-- **Functions <= 50 LoC**
-- **No side effects** outside spec scope
-
-## Common Mistakes
-
-- **Adding unrequested features** -> Scope creep
-- **Skipping tests** -> Not TDD
-- **Large functions** -> Hard to test/maintain
-- **Not running tests** -> Might still be RED
+Wenn der Developer-Agent aus technischen Gruenden nicht funktioniert (z.B. Worktree-Probleme mit Xcode), darf der Orchestrator ausnahmsweise selbst implementieren. Dies sollte aber die Ausnahme sein, nicht die Regel.

@@ -35,7 +35,7 @@ SIM_NAME="FocusBlox"
 PROJECT="FocusBlox.xcodeproj"
 SCHEME="FocusBlox"
 MAC_SCHEME="FocusBloxMac"
-PROJECT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+PROJECT_DIR="${CLAUDE_PROJECT_DIR:-$(cd "$(dirname "$0")/.." && pwd)}"
 DERIVED_DATA="$HOME/Library/Developer/Xcode/DerivedData"
 
 # --- Session-Isolation ---

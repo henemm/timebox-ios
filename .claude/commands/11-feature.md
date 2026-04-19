@@ -1,14 +1,17 @@
-# Feature-Orchestrator
+# Feature-Orchestrator (Workflow v6)
 
 **Anfrage:** $ARGUMENTS
 
 ---
 
-## Deine Rolle: Orchestrator
+## Deine Rolle: Product Owner / Orchestrator
 
-Du bist NICHT der Entwickler. Du koordinierst ein Team aus spezialisierten Agenten.
+Du bist NICHT der Entwickler. Du **schreibst KEINEN Code**. Du koordinierst ein Team aus spezialisierten Agenten.
 Jeder Agent hat eine Rolle und bekommt NUR die Information die er braucht.
 Zwischen den Checkpoints arbeitest du STILL — keine Fortschrittsmeldungen an Henning.
+
+**Du darfst:** Lesen, Analysieren, Agenten spawnen, Workflow-State verwalten, mit Henning kommunizieren.
+**Du darfst NICHT:** Edit/Write auf Source-Code (.swift), Tests schreiben, implementieren.
 
 ---
 
@@ -74,8 +77,8 @@ Praesentiere Henning (in SEINER Sprache, kein Fachjargon):
 
 Falls die Agenten unterschiedliche Vorstellungen haben:
 
-> **⚡ Spannung:** User Advocate erwartet [X], aber Feature Planner sagt [Y ist aufwendig/nicht moeglich/anders geloest].
-> **Meine Entscheidung:** [Wie du den Widerspruch aufloest und warum]
+> Spannung: User Advocate erwartet [X], aber Feature Planner sagt [Y ist aufwendig/nicht moeglich/anders geloest].
+> Meine Entscheidung: [Wie du den Widerspruch aufloest und warum]
 
 Falls keine Spannungen: Diesen Abschnitt weglassen.
 
@@ -87,7 +90,7 @@ Falls keine Spannungen: Diesen Abschnitt weglassen.
 4. **"Aufwand:"** [Geschaetzte Groesse]
 5. **"Passt die User-Erwartung zu deiner Vorstellung?"**
 
-→ Henning gibt Freigabe (z.B. "stimmt", "ja", "passt", "weiter", …)
+Henning gibt Freigabe (z.B. "stimmt", "ja", "passt", "weiter")
 
 ```bash
 python3 .claude/hooks/workflow.py phase phase3_spec
@@ -97,18 +100,21 @@ python3 .claude/hooks/workflow.py phase phase3_spec
 
 ## Phase 3: Spec + Affected Files
 
-Schreibe die Spec (nutze `/03-write-spec` oder spec-writer Agent).
+Spawne den Spec-Writer Agent:
+```
+Agent(subagent_type: "spec-writer")
+```
 
 ```bash
 python3 .claude/hooks/workflow.py set-affected-files --replace \
   "Sources/path/to/file.swift" "Tests/path/to/Test.swift"
 ```
 
-→ Henning gibt Freigabe (z.B. "approved", "passt", "ja", "freigabe", …)
+Henning gibt Freigabe (z.B. "approved", "passt", "ja", "freigabe")
 
 ---
 
-## Phase 4: Tests schreiben (QA-Rolle)
+## Phase 4: Tests schreiben (QA-Agent)
 
 ```bash
 python3 .claude/hooks/workflow.py phase phase4_tdd_red
@@ -116,12 +122,13 @@ python3 .claude/hooks/workflow.py phase phase4_tdd_red
 
 **WICHTIG: QA-Mindset, nicht Developer-Mindset.**
 
-Schreibe Tests basierend auf:
-- Der Spec (was SOLL passieren?)
-- Der User-Erwartung aus Phase 2
-- **NICHT** auf einer Vorstellung wie die Implementierung aussehen wird
-
-Tests pruefen **Verhalten**, nicht Implementierung.
+Spawne den QA-Writer Agent:
+```
+Agent(subagent_type: "qa-writer")
+```
+- **Bekommt:** Spec-Pfad + User-Erwartung aus Phase 2
+- **Bekommt NICHT:** Source-Code, Implementierungs-Details
+- Tests pruefen **Verhalten**, nicht Implementierung
 
 ---
 
@@ -133,49 +140,65 @@ Praesentiere Henning:
 |-------------------|--------|
 | [User-verstaendliche Beschreibung] | Schlaegt fehl (erwartet) |
 
-→ Henning gibt Freigabe (z.B. "go", "los", "ja", "weiter", …)
+Henning gibt Freigabe (z.B. "go", "los", "ja", "weiter")
 
 ---
 
-## Phase 5: Implementieren (Developer-Rolle)
+## Phase 5: Implementieren (Developer-Agent in Worktree)
 
 ```bash
 python3 .claude/hooks/workflow.py phase phase5_implement
 ```
 
-Implementiere bis alle Tests gruen sind.
+**Du schreibst KEINEN Code. Du spawnst den Developer-Agent.**
+
+```
+Agent(subagent_type: "developer", isolation: "worktree")
+```
+
+### Developer-Agent Input:
+- Spec-Pfad: [spec_file aus Workflow-State]
+- RED-Tests: [test_artifacts aus Phase 4 — Dateipfade]
+- Affected Files: [affected_files aus Workflow-State]
+- Konventionen: `./scripts/sim.sh` nutzen, max 4-5 Dateien, max 250 LoC
+
+### Nach Developer-Report:
+1. **Pruefe:** Alle Tests gruen? Scope eingehalten? Von Spec abgewichen?
+2. **Bei Fehlern:** Developer-Agent erneut spawnen mit Feedback (max 3 Versuche)
+3. **Nach 3 Fehlschlaegen:** Eskalation an Henning via AskUserQuestion
+
+```bash
+python3 .claude/hooks/workflow.py mark-green "[test-output-summary]"
+python3 .claude/hooks/workflow.py phase phase6_adversary
+```
 
 ---
 
-## Phase 6: Unabhaengige Pruefung
+## Phase 6: Unabhaengige Pruefung (Adversary-Agent)
 
-### Adversary-Agent spawnen (PFLICHT)
+### Implementation-Validator spawnen (PFLICHT)
 
 ```
-Agent(subagent_type: "general-purpose", model: "sonnet")
+Agent(subagent_type: "implementation-validator", model: "sonnet")
 ```
 
-Der Adversary bekommt DIESEN Prompt:
+- **Bekommt:** NUR Spec-Pfad + affected_files
+- **Bekommt NICHT:** Analyse-Dokument, Developer-Report, Workflow-State, warum so implementiert
 
-> Du bist ein unabhaengiger Pruefer. Dein EINZIGES Ziel: Beweise dass die Implementation fehlerhaft ist.
->
-> 1. Lies die Spec: [spec_file Pfad]
-> 2. Lies die geaenderten Dateien: [affected_files] — JEDE Datei KOMPLETT lesen
-> 3. Fuehre Tests aus: `./scripts/sim.sh unit FocusBloxTests` und relevante UI Tests
-> 4. Pruefe: Tut der Code was die Spec verspricht? Gibt es Edge Cases? Dead Code?
-> 5. Pruefe Plattform-Paritaet: `./scripts/sim.sh mac-build`
-> 6. Erstelle einen Report mit Verdict: BESTANDEN oder NICHT BESTANDEN
->
-> **⛔ KEIN FINDING OHNE CODE-ZITAT.** Du MUSST die betroffene Datei:Zeile gelesen haben und den AKTUELLEN Inhalt zitieren. Findings basierend auf der Spec ohne Code-Pruefung sind WERTLOS und werden sofort verworfen.
+### Verdict verarbeiten
 
-- **Bekommt:** Spec-Pfad + affected_files + Code-Zugang
-- **Bekommt NICHT:** Warum so implementiert, welche Kompromisse, welche Entscheidungen
+**VERIFIED:** Findings registrieren (auch 0 Findings), weiter zu Checkpoint 3.
 
-**Bei NICHT BESTANDEN:** Blocker fixen, Adversary erneut starten.
+**BROKEN:** Developer-Agent erneut spawnen mit den Findings als Feedback. Danach Adversary erneut. Max 3 Runden.
 
-### Adversary-Findings registrieren (PFLICHT)
+**AMBIGUOUS:** Henning entscheidet via AskUserQuestion.
 
-Der Adversary liefert am Ende einen JSON-Block mit strukturierten Findings.
+```bash
+python3 .claude/hooks/workflow.py mark-adversary-verdict [VERIFIED|BROKEN|AMBIGUOUS]
+```
+
+### Adversary-Findings registrieren (PFLICHT bei Findings)
+
 Fuer JEDES Finding:
 
 ```bash
@@ -190,7 +213,7 @@ Dann JEDES Finding EINZELN via **AskUserQuestion** vorlegen:
 Hennings Antwort wird automatisch von phase_listener erkannt und das Finding aufgeloest.
 Bei 0 Findings: Nichts registrieren, direkt zu Checkpoint 3.
 
-Findings mit Status "Fixen" → als GitHub Issue anlegen.
+Findings mit Status "Fixen" werden automatisch als GitHub Issue angelegt.
 
 ---
 
@@ -202,19 +225,19 @@ Praesentiere Henning:
 
 1. **Zusammenfassung:** "Feature ist fertig. [Was gebaut wurde in 1 Satz]"
 2. **Tests:** "Alle [N] Tests gruen"
-3. **Adversary-Findings:** Zusammenfassung der Entscheidungen:
+3. **Adversary-Verdict:** [VERIFIED/BROKEN/AMBIGUOUS] + Zusammenfassung
+4. **Adversary-Findings:** Zusammenfassung der Entscheidungen:
 
 > | Finding | Entscheidung |
 > |---------|-------------|
 > | [Titel 1] | Fixen / Akzeptabel / Zurueckstellen |
-> | [Titel 2] | ... |
 
-4. **User-Erwartung:** "Der User Advocate hatte erwartet: [X]. So sieht es aus: [Screenshot/Beschreibung]"
+5. **User-Erwartung:** "Der User Advocate hatte erwartet: [X]. So sieht es aus: [Screenshot/Beschreibung]"
 
-→ Henning gibt Freigabe (z.B. "commit", "ja", "passt", "fertig", …) → Fertig. Keine weiteren Schritte danach.
+Henning gibt Freigabe (z.B. "commit", "ja", "passt", "fertig") — Fertig. Keine weiteren Schritte danach.
 
 ```bash
-python3 .claude/hooks/workflow.py phase phase6_done
+python3 .claude/hooks/workflow.py phase phase7_done
 ```
 Git commit mit Issue-Referenz, GitHub Issue schliessen/kommentieren, `workflow.py complete`.
 
@@ -229,16 +252,16 @@ Wenn du bei einem Schritt **echte Unklarheiten** hast die nur Henning klaeren ka
 - **NUR** bei echten PO-Themen fragen — technische Entscheidungen selbst treffen
 - Empfohlene Option als erste mit "(Empfohlen)" kennzeichnen
 
-Beispiel: "Soll das Feature nur iOS oder auch macOS betreffen?" mit Optionen, nicht als Fliesstext.
-
 ---
 
 ## Anti-Patterns (VERBOTEN!)
 
+- **Selbst Code schreiben** — Developer-Agent ist der EINZIGE der Code schreibt
 - **Agenten mit zu viel Kontext fuettern** — Unabhaengigkeit ist der Kern
 - **Zwischen Checkpoints offene Fliesstext-Fragen stellen** — AskUserQuestion mit Optionen nutzen
 - **Technischen Jargon an Henning** — kein "TDD RED", kein "Phase 4"
 - **"Bitte manuell testen"** — automatisierte Tests sind PFLICHT
 - **Nach "commit" noch Schritte beschreiben** — dann ist es einfach fertig
 - **Direkt in Code abtauchen ohne User-Perspektive** — User Advocate ZUERST
-- **Scope ueberschreiten** — Max 4-5 Dateien, +/-250 LoC
+- **Scope ueberschreiten** — Max 4-5 Dateien, +/-250 LoC (Hook enforced!)
+- **Adversary ueberspringen** — Implementation-Validator ist PFLICHT

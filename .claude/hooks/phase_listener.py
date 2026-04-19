@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Phase Listener v4 — 3-Checkpoint System
+Phase Listener v5 — 3-Checkpoint System (Workflow v6)
 
 Listens for keywords in user messages and updates workflow state.
 This is the ONLY way to unlock checkpoints — Claude cannot set them.
@@ -8,7 +8,7 @@ This is the ONLY way to unlock checkpoints — Claude cannot set them.
 Keywords:
 - "stimmt" → checkpoint1_approved (only in phase2_analyse)
 - "go" → checkpoint2_approved (only in phase4_tdd_red)
-- "commit" → checkpoint3_approved (only in phase5_implement)
+- "commit" → checkpoint3_approved (only in phase6_adversary)
 - "approved"/"freigabe"/"lgtm" → spec_approved (only in phase3_spec)
 - "stop"/"stopp" → stop-lock enable
 - "weiter"/"continue" → stop-lock disable
@@ -250,9 +250,9 @@ def main():
         if phase == "phase4_tdd_red" and not wf_data.get("checkpoint2_approved"):
             _call_workflow_checkpoint(2, f"User approved at {datetime.now().isoformat()}", session_id=session_id)
 
-    # Checkpoint 3: "commit" — only in phase5_implement, AND only if no unresolved findings AND screenshot exists
+    # Checkpoint 3: "commit" — only in phase6_adversary, AND only if no unresolved findings AND screenshot exists
     if _matches(message, CHECKPOINT3_PHRASES):
-        if phase == "phase5_implement" and not wf_data.get("checkpoint3_approved"):
+        if phase in ("phase6_adversary", "phase5_implement") and not wf_data.get("checkpoint3_approved"):
             findings = wf_data.get("adversary_findings", [])
             has_unresolved = any(f.get("status") is None for f in findings)
             # Gate: Screenshot-Artifact prüfen (außer bei neuem UI oder Non-UI-Bugs)
@@ -270,9 +270,9 @@ def main():
                       "Führe ./scripts/sim.sh screenshot aus und registriere: "
                       "workflow.py add-artifact screenshot <pfad> <beschreibung> phase5_implement")
 
-    # Finding resolution: "fixen"/"akzeptabel"/"zurückstellen" — only in phase5_implement
+    # Finding resolution: "fixen"/"akzeptabel"/"zurückstellen" — in phase5_implement or phase6_adversary
     # Supports multiple keywords per message (e.g. "1 fixen, 2 zurückstellen")
-    if phase == "phase5_implement":
+    if phase in ("phase6_adversary", "phase5_implement"):
         findings = wf_data.get("adversary_findings", [])
         has_unresolved = any(f.get("status") is None for f in findings)
         if has_unresolved:
