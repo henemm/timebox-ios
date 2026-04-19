@@ -190,13 +190,13 @@ struct StackingBadge: View {
 
     var body: some View {
         Text("x\(count)")
-            .font(.caption2.weight(count >= 3 ? .bold : .regular))
-            .foregroundStyle(count >= 3 ? .orange : .secondary)
+            .font(.caption2.weight(count >= 2 ? .bold : .regular))
+            .foregroundStyle(count >= 2 ? .orange : .secondary)
             .padding(.horizontal, badgePaddingH)
             .padding(.vertical, badgePaddingV)
             .background(
                 Capsule()
-                    .fill(count >= 3 ? Color.orange.opacity(0.2) : Color.secondary.opacity(0.15))
+                    .fill(count >= 2 ? Color.orange.opacity(0.2) : Color.secondary.opacity(0.15))
             )
             .accessibilityIdentifier("stackingBadge_\(taskId)")
             .accessibilityLabel("\(count) aufgelaufene Instanzen")

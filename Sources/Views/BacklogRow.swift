@@ -86,7 +86,7 @@ struct BacklogRow: View {
             RoundedRectangle(cornerRadius: 16)
                 .fill(.ultraThinMaterial)
                 .overlay(
-                    item.stackedInstanceCount >= 3
+                    item.stackedInstanceCount >= 2
                         ? RoundedRectangle(cornerRadius: 16).fill(Color.orange.opacity(0.06))
                         : nil
                 )
@@ -132,6 +132,13 @@ struct BacklogRow: View {
             // Title (bold, max 2 lines, italic + gray if TBD)
             titleView
                 .accessibilityIdentifier("taskTitle_\(item.id)")
+
+            // Stacking Subtitle (e.g. "3 Instanzen seit Mo, 14. Apr")
+            if item.stackedInstanceCount >= 2, let oldestDate = item.stackedOldestDueDate {
+                Text("\(item.stackedInstanceCount) Instanzen seit \(oldestDate, format: .dateTime.weekday(.abbreviated).day().month(.abbreviated))")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+            }
 
             // Metadata Row
             metadataRow

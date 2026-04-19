@@ -39,7 +39,8 @@ enum MacBacklogStackingHelper {
         var ungrouped: [LocalTask] = []
 
         for task in tasks {
-            if let gid = task.recurrenceGroupID, !gid.isEmpty {
+            if let gid = task.recurrenceGroupID, !gid.isEmpty,
+               !task.isTemplate, !task.isCompleted, !task.isNextUp {
                 grouped[gid, default: []].append(task)
             } else {
                 ungrouped.append(task)

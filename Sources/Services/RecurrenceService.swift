@@ -471,9 +471,21 @@ enum RecurrenceService {
                 continue
             }
 
-            if let _ = createNextInstance(from: task, in: modelContext) {
-                repaired += 1
+            // Bug #279: Create ALL missed instances (not just one successor).
+            // Loop forward from last completion's dueDate until we reach today.
+            // Max 30 instances per series to prevent unbounded growth.
+            var created = 0
+            var currentSource = task
+            while created < 30 {
+                guard let instance = createNextInstance(
+                    from: currentSource, in: modelContext
+                ) else { break }
+                created += 1
+                // If the new instance's dueDate is in the future, stop
+                if let due = instance.dueDate, due > Date() { break }
+                currentSource = instance
             }
+            repaired += created
         }
 
         if repaired > 0 { try? modelContext.save() }

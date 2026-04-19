@@ -943,7 +943,8 @@ struct BacklogView: View {
         for (index, item) in planItems.enumerated() {
             guard let groupID = item.recurrenceGroupID,
                   !item.isTemplate,
-                  !item.isCompleted else { continue }
+                  !item.isCompleted,
+                  !item.isNextUp else { continue }
             let key = "\(groupID)_\(item.isParked ? "parked" : "active")"
             groups[key, default: []].append(index)
         }
@@ -957,6 +958,9 @@ struct BacklogView: View {
             } ?? indices[0]
 
             planItems[representativeIndex].stackedInstanceCount = indices.count
+            planItems[representativeIndex].stackedOldestDueDate = indices
+                .compactMap { planItems[$0].dueDate }
+                .min()
             for idx in indices where idx != representativeIndex {
                 indicesToRemove.insert(idx)
             }

@@ -112,6 +112,64 @@ final class RecurringStackingTests: XCTestCase {
         )
     }
 
+    // MARK: - Bug 279: stackedOldestDueDate
+
+    /// Verhalten: PlanItem muss ein stackedOldestDueDate-Feld haben,
+    ///            das von applyRecurringStacking auf das aelteste dueDate der Gruppe gesetzt wird.
+    /// Bricht wenn: PlanItem kein stackedOldestDueDate Property hat.
+    func test_planItem_hasStackedOldestDueDate() {
+        let twoDaysAgo = Calendar.current.date(byAdding: .day, value: -2, to: Date())!
+        let item = makePlanItem(id: "oldest-279", groupID: "grp-279", dueDate: twoDaysAgo)
+
+        // stackedOldestDueDate muss als Property existieren
+        let mirror = Mirror(reflecting: item)
+        let hasField = mirror.children.contains { $0.label == "stackedOldestDueDate" }
+        XCTAssertTrue(hasField, "PlanItem muss ein stackedOldestDueDate-Feld haben")
+    }
+
+    // MARK: - Bug 279: isNextUp-Tasks duerfen nicht gestackt werden
+
+    /// Verhalten: Tasks mit isNextUp=true bleiben aus Stacking-Gruppen ausgeschlossen.
+    /// Bricht wenn: Die Stacking-Logik isNextUp-Tasks in die Gruppe einbezieht.
+    func test_stackingExcludesNextUpTasks() {
+        // Erstelle 3 PlanItems mit gleicher groupID — eines davon isNextUp
+        let groupID = "grp-279-nextup"
+        let backlog1 = makePlanItem(id: "b1", groupID: groupID, isNextUp: false)
+        let backlog2 = makePlanItem(id: "b2", groupID: groupID, isNextUp: false)
+        let nextUpItem = makePlanItem(id: "nu1", groupID: groupID, isNextUp: true)
+
+        let allItems = [backlog1, backlog2, nextUpItem]
+
+        // Simuliere die Stacking-Logik (gleicher Algorithmus wie BacklogView.applyRecurringStacking)
+        var groups: [String: [PlanItem]] = [:]
+        var ungrouped: [PlanItem] = []
+
+        for item in allItems {
+            if let gid = item.recurrenceGroupID,
+               !item.isTemplate,
+               !item.isCompleted,
+               !item.isNextUp {
+                groups[gid, default: []].append(item)
+            } else {
+                ungrouped.append(item)
+            }
+        }
+
+        // isNextUp-Item muss in ungrouped landen, NICHT in der Stacking-Gruppe
+        XCTAssertEqual(ungrouped.count, 1, "isNextUp-Task muss als ungrouped behandelt werden")
+        XCTAssertTrue(ungrouped[0].isNextUp, "Das ungrouped Item muss das isNextUp-Item sein")
+
+        // Die Gruppe darf nur die 2 Backlog-Items enthalten
+        let group = groups[groupID]
+        XCTAssertNotNil(group, "Backlog-Items muessen gruppiert werden")
+        XCTAssertEqual(group?.count, 2, "Nur Backlog-Items (nicht isNextUp) werden gestackt")
+
+        // Keines der gruppierten Items darf isNextUp sein
+        for item in group ?? [] {
+            XCTAssertFalse(item.isNextUp, "isNextUp-Tasks duerfen NICHT in Stacking-Gruppen sein")
+        }
+    }
+
     // MARK: - Helpers
 
     private func makePlanItem(

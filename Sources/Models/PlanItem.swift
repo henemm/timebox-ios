@@ -102,6 +102,9 @@ struct PlanItem: Identifiable, Hashable, Sendable {
     /// Number of stacked recurring instances (populated externally during grouping)
     var stackedInstanceCount: Int = 1
 
+    /// Oldest dueDate among stacked recurring instances (populated externally during grouping)
+    var stackedOldestDueDate: Date?
+
     /// Whether this task is blocked by another task
     var isBlocked: Bool { blockerTaskID != nil }
 

@@ -130,4 +130,41 @@ final class BacklogStackingUITests: XCTestCase {
             "Badge count should change after completing oldest stacked instance"
         )
     }
+
+    // MARK: - TEST_05: Gestackter Task zeigt Untertitel (Bug 279)
+
+    /// Verhalten: Ein gestackter Task zeigt einen Untertitel "X Instanzen seit [Datum]".
+    /// Bricht wenn: BacklogRow keinen Untertitel rendert wenn stackedOldestDueDate gesetzt ist.
+    func test_stackedTaskShowsSubtitle() {
+        navigateToBacklogPriority()
+
+        let list = app.collectionViews["backlogTaskList"]
+        XCTAssertTrue(list.waitForExistence(timeout: 5), "Backlog-Liste muss existieren")
+
+        let subtitlePredicate = NSPredicate(format: "label CONTAINS 'Instanzen seit'")
+        let subtitleTexts = app.staticTexts.matching(subtitlePredicate)
+
+        XCTAssertGreaterThan(
+            subtitleTexts.count,
+            0,
+            "Gestackte Tasks müssen einen Untertitel 'X Instanzen seit [Datum]' zeigen"
+        )
+    }
+
+    // MARK: - TEST_06: Badge ist orange ab 2 Instanzen (Bug 279)
+
+    /// Verhalten: Das Stacking-Badge wird ab 2 Instanzen orange (nicht erst ab 3).
+    /// Bricht wenn: StackingBadge.count >= 3 Schwelle statt >= 2 verwendet.
+    func test_stackingBadgeExistsForTwoInstances() {
+        navigateToBacklogPriority()
+
+        let x2Badge = app.staticTexts.matching(
+            NSPredicate(format: "label == 'x2' AND identifier BEGINSWITH 'stackingBadge_'")
+        ).firstMatch
+
+        XCTAssertTrue(
+            x2Badge.waitForExistence(timeout: 5),
+            "Ein Badge mit 'x2' muss existieren — orange ab 2 Instanzen"
+        )
+    }
 }
