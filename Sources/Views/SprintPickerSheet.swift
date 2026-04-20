@@ -23,13 +23,13 @@ struct SprintPickerSheet: View {
                     taskList
                 }
             }
-            .navigationTitle("Sprint starten")
+            .navigationTitle("FocusBlox starten")
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Schließen") { dismiss() }
                 }
             }
-            .alert("Sprint läuft bereits", isPresented: .init(
+            .alert("FocusBlox läuft bereits", isPresented: .init(
                 get: { conflictTitle != nil },
                 set: { if !$0 { conflictTitle = nil } }
             )) {

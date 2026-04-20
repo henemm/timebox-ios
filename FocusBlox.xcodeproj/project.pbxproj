@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		62350D53367F9E6E27EFEA91 /* SprintWordingBatch1Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F76CB4EF25B8523692B2D8E /* SprintWordingBatch1Tests.swift */; };
 		474AE8C33568E502A6EF493F /* ToolbarConsistencyUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A212E6DA5167EDF57B91736 /* ToolbarConsistencyUITests.swift */; };
 		A41453E41D3E0736EC7355B8 /* DragDropBarrierUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 221619C0DF7C056E62ACDF33 /* DragDropBarrierUITests.swift */; };
 		ECFC71629F9356F282022533 /* ErrorAlertModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 543C332BFE3FA5F071E97CE5 /* ErrorAlertModifier.swift */; };
@@ -720,6 +721,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		9F76CB4EF25B8523692B2D8E /* SprintWordingBatch1Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SprintWordingBatch1Tests.swift; path = FocusBloxTests/SprintWordingBatch1Tests.swift; sourceTree = SOURCE_ROOT; };
 		0A212E6DA5167EDF57B91736 /* ToolbarConsistencyUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ToolbarConsistencyUITests.swift; path = FocusBloxUITests/ToolbarConsistencyUITests.swift; sourceTree = SOURCE_ROOT; };
 		221619C0DF7C056E62ACDF33 /* DragDropBarrierUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DragDropBarrierUITests.swift; path = FocusBloxUITests/DragDropBarrierUITests.swift; sourceTree = SOURCE_ROOT; };
 		543C332BFE3FA5F071E97CE5 /* ErrorAlertModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ErrorAlertModifier.swift; path = Sources/Views/Modifiers/ErrorAlertModifier.swift; sourceTree = SOURCE_ROOT; };
@@ -1739,6 +1741,7 @@
 		A6B3805EF19D1B131D346DDD /* FocusBloxTests */ = {
 			isa = PBXGroup;
 			children = (
+				9F76CB4EF25B8523692B2D8E /* SprintWordingBatch1Tests.swift */,
 				1332CF8A63D514CFDC0B7F10 /* ErrorAlertModifierTests.swift */,
 				5E465C0C2239803CC57D663E /* DuplicateKeysCrashTests.swift */,
 				95E810436DD458D261733601 /* TaskIdeaSuggestionServiceTests.swift */,
@@ -2958,6 +2961,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				62350D53367F9E6E27EFEA91 /* SprintWordingBatch1Tests.swift in Sources */,
 				0564EE0CA14D7755E12D1821 /* ErrorAlertModifierTests.swift in Sources */,
 				B0E469DB0FEC9CB72CFAEC53 /* DuplicateKeysCrashTests.swift in Sources */,
 				43C572CF40040642AF9960EB /* TaskIdeaSuggestionServiceTests.swift in Sources */,

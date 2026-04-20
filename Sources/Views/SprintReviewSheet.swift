@@ -78,7 +78,7 @@ struct SprintReviewSheet: View {
                 }
                 .padding()
             }
-            .navigationTitle("Sprint Review")
+            .navigationTitle("FocusBlox Review")
             .navigationBarTitleDisplayMode(.inline)
         }
     }
@@ -310,7 +310,7 @@ struct SprintReviewSheet: View {
                 dismiss()
                 onDismiss()
             } label: {
-                Text("Sprint Review beenden")
+                Text("FocusBlox Review beenden")
                     .font(.headline)
                     .frame(maxWidth: .infinity)
                     .padding()

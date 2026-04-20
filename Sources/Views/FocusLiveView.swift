@@ -512,12 +512,12 @@ struct FocusLiveView: View {
                 .font(.title2.weight(.semibold))
             // Bug #216: Nach Review "Sprint beendet" statt erneut startbar
             if reviewDismissed {
-                Text("Sprint beendet")
+                Text("FocusBlox beendet")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .accessibilityIdentifier("sprintEndedLabel")
             } else {
-                Text("Warte auf Block-Ende oder starte Sprint Review")
+                Text("Warte auf Block-Ende oder starte FocusBlox Review")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
@@ -526,7 +526,7 @@ struct FocusLiveView: View {
                     NotificationService.cleanupBlockEndNotification(blockID: block.id)
                     showSprintReview = true
                 } label: {
-                    Text("Sprint Review starten")
+                    Text("FocusBlox Review starten")
                         .font(.headline)
                         .foregroundStyle(.white)
                         .padding(.horizontal, 24)

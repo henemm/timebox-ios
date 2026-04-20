@@ -563,7 +563,7 @@ struct DailyReviewView: View {
     private var outsideSprintSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
-                Text("Ohne Sprint erledigt")
+                Text("Ohne FocusBlox erledigt")
                     .font(.headline)
                 Spacer()
                 Text("\(todayOutsideSprintTasks.count)")
@@ -592,7 +592,7 @@ struct DailyReviewView: View {
     private var weeklyOutsideSprintSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
-                Text("Ohne Sprint erledigt")
+                Text("Ohne FocusBlox erledigt")
                     .font(.headline)
                 Spacer()
                 Text("\(weekOutsideSprintTasks.count)")

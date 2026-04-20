@@ -789,7 +789,7 @@ struct CoachView: View {
                 Button {
                     startFocusSprint(for: task)
                 } label: {
-                    Label("Focus Sprint", systemImage: "bolt.fill")
+                    Label("FocusBlox", systemImage: "bolt.fill")
                 }
                 Divider()
                 Button {
@@ -973,10 +973,10 @@ struct CoachView: View {
             case .started:
                 NotificationCenter.default.post(name: .focusSprintStarted, object: nil)
             case .blockedByActiveBlock:
-                errorMessage = "Focus Sprint blockiert — es läuft bereits ein Block."
+                errorMessage = "FocusBlox blockiert — es läuft bereits ein Block."
             }
         } catch {
-            errorMessage = "Focus Sprint konnte nicht gestartet werden."
+            errorMessage = "FocusBlox konnte nicht gestartet werden."
         }
     }
 
