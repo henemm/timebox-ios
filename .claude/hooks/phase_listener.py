@@ -288,6 +288,18 @@ def main():
                     if not wf_data:
                         break
 
+            # Re-check: If last finding was just resolved, auto-set checkpoint 3
+            if wf_data and not wf_data.get("checkpoint3_approved"):
+                wf_data, wf_path = _read_active_workflow(session_id)
+                if wf_data:
+                    findings = wf_data.get("adversary_findings", [])
+                    has_unresolved = any(f.get("status") is None for f in findings)
+                    has_screenshot = wf_data.get("is_new_ui") or wf_data.get("no_ui_change") or any(
+                        a.get("type") == "screenshot" for a in wf_data.get("test_artifacts", []))
+                    if not has_unresolved and has_screenshot:
+                        _call_workflow_checkpoint(3, "Auto-set after last finding resolved", session_id=session_id)
+                        print("Checkpoint 3 auto-gesetzt: Alle Findings aufgelöst + Screenshot vorhanden.", file=sys.stderr)
+
     # Spec approval: "approved" etc. — only in phase3_spec
     if _matches(message, APPROVAL_PHRASES):
         if phase == "phase3_spec" and not wf_data.get("spec_approved"):
