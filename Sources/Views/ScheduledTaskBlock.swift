@@ -48,7 +48,7 @@ struct ScheduledTaskBlock: View {
                 Button {
                     onSprint()
                 } label: {
-                    Label("Focus Sprint starten", systemImage: "bolt.fill")
+                    Label("FocusBlox starten", systemImage: "bolt.fill")
                 }
                 Divider()
             }

@@ -672,7 +672,7 @@ struct BlockPlanningView: View {
                 await loadData()
                 assignmentFeedback.toggle()
             } catch {
-                errorMessage = "Focus Sprint konnte nicht gestartet werden."
+                errorMessage = "FocusBlox konnte nicht gestartet werden."
             }
         }
     }

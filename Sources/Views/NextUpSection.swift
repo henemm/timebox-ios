@@ -59,7 +59,7 @@ struct NextUpSection: View {
                                 Button {
                                     onStartFocusSprint?(task.id)
                                 } label: {
-                                    Label("Focus Sprint starten", systemImage: "bolt.fill")
+                                    Label("FocusBlox starten", systemImage: "bolt.fill")
                                 }
                                 Divider()
                             }
@@ -152,7 +152,7 @@ struct NextUpRow: View {
                 }
                 .buttonStyle(.plain)
                 .accessibilityIdentifier("nextUpSprintButton_\(task.id)")
-                .accessibilityLabel("Focus Sprint starten")
+                .accessibilityLabel("FocusBlox starten")
             }
 
             Button {

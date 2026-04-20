@@ -245,7 +245,7 @@ struct PlanningView: View {
                 await loadData()
                 focusSprintFeedback.toggle()
             } catch {
-                errorMessage = "Focus Sprint konnte nicht gestartet werden."
+                errorMessage = "FocusBlox konnte nicht gestartet werden."
             }
         }
     }

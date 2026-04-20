@@ -550,7 +550,7 @@ struct BacklogView: View {
                 focusSprintConflictTitle = title
             }
         } catch {
-            errorMessage = "Focus Sprint konnte nicht gestartet werden: \(error.localizedDescription)"
+            errorMessage = "FocusBlox konnte nicht gestartet werden: \(error.localizedDescription)"
         }
     }
 
