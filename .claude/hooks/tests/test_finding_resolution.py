@@ -129,5 +129,224 @@ class TestAdversaryNoWorktree(unittest.TestCase):
         self.assertNotIn('isolation: "worktree"', content)
 
 
+class TestAutoCloseGitHubIssues(unittest.TestCase):
+    """Auto-Close Finding-Issues: Issue-Nummer persistieren und beim Complete schließen."""
+
+    @patch("workflow._save_active")
+    @patch("workflow._read_active")
+    @patch("subprocess.run")
+    def test_resolve_finding_fix_stores_github_issue(
+        self, mock_run, mock_read, mock_save
+    ):
+        """Nach resolve-finding mit status 'fix' hat das Finding github_issue: 42.
+        Bricht wenn: cmd_resolve_finding die Issue-Nummer nicht im Finding speichert."""
+        data = {
+            "current_phase": "phase5_implement",
+            "adversary_findings": [
+                {
+                    "id": 1,
+                    "title": "Null-Check fehlt",
+                    "impact": "crash",
+                    "proof": "line 42",
+                    "status": None,
+                    "resolved_at": None,
+                }
+            ],
+        }
+        mock_read.return_value = (data, "TEST_001")
+        mock_run.return_value = MagicMock(
+            returncode=0,
+            stdout="https://github.com/owner/repo/issues/42\n",
+            stderr="",
+        )
+        os.environ["WORKFLOW_CALLER"] = "phase_listener"
+        try:
+            import workflow
+            workflow.cmd_resolve_finding(["1", "fix"])
+        finally:
+            del os.environ["WORKFLOW_CALLER"]
+
+        saved_data = mock_save.call_args[0][0]
+        finding = saved_data["adversary_findings"][0]
+        self.assertEqual(
+            finding.get("github_issue"),
+            42,
+            "Finding muss github_issue: 42 enthalten nach gh issue create",
+        )
+
+    @patch("workflow._save_active")
+    @patch("workflow._read_active")
+    @patch("subprocess.run")
+    def test_resolve_finding_fix_gh_error_no_crash(
+        self, mock_run, mock_read, mock_save
+    ):
+        """Wenn gh issue create fehlschlägt, kein Crash und kein github_issue im Finding.
+        Bricht wenn: cmd_resolve_finding bei gh-Fehler den Workflow abbricht."""
+        import subprocess
+        data = {
+            "current_phase": "phase5_implement",
+            "adversary_findings": [
+                {
+                    "id": 2,
+                    "title": "Edge Case",
+                    "impact": "minor",
+                    "proof": "line 7",
+                    "status": None,
+                    "resolved_at": None,
+                }
+            ],
+        }
+        mock_read.return_value = (data, "TEST_002")
+        mock_run.side_effect = subprocess.CalledProcessError(1, "gh")
+        os.environ["WORKFLOW_CALLER"] = "phase_listener"
+        try:
+            import workflow
+            # Darf NICHT werfen
+            workflow.cmd_resolve_finding(["2", "fix"])
+        finally:
+            del os.environ["WORKFLOW_CALLER"]
+
+        saved_data = mock_save.call_args[0][0]
+        finding = saved_data["adversary_findings"][0]
+        self.assertNotIn(
+            "github_issue",
+            finding,
+            "Bei gh-Fehler darf kein github_issue Feld gesetzt werden",
+        )
+
+    @patch("workflow._archive_dir")
+    @patch("workflow._active_link")
+    @patch("workflow._get_session_id")
+    @patch("workflow._locked_sessions")
+    @patch("workflow._workflow_file")
+    @patch("workflow._atomic_write")
+    @patch("workflow._save_active")
+    @patch("workflow._read_active")
+    @patch("subprocess.run")
+    def test_complete_closes_fix_issues(
+        self,
+        mock_run,
+        mock_read,
+        mock_save,
+        mock_atomic,
+        mock_wf_file,
+        mock_sessions,
+        mock_session_id,
+        mock_link,
+        mock_archive,
+    ):
+        """cmd_complete ruft gh issue close für alle fix-Findings mit github_issue auf.
+        Bricht wenn: cmd_complete GitHub Issues nicht schließt."""
+        archive_path = MagicMock()
+        archive_path.__truediv__ = lambda self, other: MagicMock()
+        mock_archive.return_value = archive_path
+        mock_wf_file.return_value = MagicMock(exists=lambda: False)
+        mock_session_id.return_value = None
+        link_mock = MagicMock()
+        link_mock.is_symlink.return_value = False
+        mock_link.return_value = link_mock
+        data = {
+            "current_phase": "phase6_adversary",
+            "adversary_findings": [
+                {
+                    "id": 1,
+                    "title": "Bug A",
+                    "status": "fix",
+                    "github_issue": 42,
+                },
+                {
+                    "id": 2,
+                    "title": "Bug B",
+                    "status": "fix",
+                    "github_issue": 99,
+                },
+                {
+                    "id": 3,
+                    "title": "Nitpick",
+                    "status": "accept",
+                    "github_issue": 55,
+                },
+            ],
+        }
+        mock_read.return_value = (data, "TEST_003")
+        mock_run.return_value = MagicMock(returncode=0, stdout="", stderr="")
+
+        import workflow
+        workflow.cmd_complete([])
+
+        close_calls = [
+            c
+            for c in mock_run.call_args_list
+            if c[0][0][0] == "gh" and "close" in c[0][0]
+        ]
+        closed_numbers = [int(c[0][0][3]) for c in close_calls]
+        self.assertIn(42, closed_numbers, "Issue #42 muss geschlossen werden")
+        self.assertIn(99, closed_numbers, "Issue #99 muss geschlossen werden")
+        self.assertNotIn(55, closed_numbers, "Issue #55 (accept) darf nicht geschlossen werden")
+
+    @patch("workflow._archive_dir")
+    @patch("workflow._active_link")
+    @patch("workflow._get_session_id")
+    @patch("workflow._locked_sessions")
+    @patch("workflow._workflow_file")
+    @patch("workflow._atomic_write")
+    @patch("workflow._save_active")
+    @patch("workflow._read_active")
+    @patch("subprocess.run")
+    def test_complete_skips_findings_without_github_issue(
+        self,
+        mock_run,
+        mock_read,
+        mock_save,
+        mock_atomic,
+        mock_wf_file,
+        mock_sessions,
+        mock_session_id,
+        mock_link,
+        mock_archive,
+    ):
+        """Findings ohne github_issue Feld werden beim Complete übersprungen (kein Crash).
+        Bricht wenn: cmd_complete bei fehlendem github_issue abstürzt."""
+        archive_path = MagicMock()
+        archive_path.__truediv__ = lambda self, other: MagicMock()
+        mock_archive.return_value = archive_path
+        mock_wf_file.return_value = MagicMock(exists=lambda: False)
+        mock_session_id.return_value = None
+        link_mock = MagicMock()
+        link_mock.is_symlink.return_value = False
+        mock_link.return_value = link_mock
+        data = {
+            "current_phase": "phase6_adversary",
+            "adversary_findings": [
+                {
+                    "id": 1,
+                    "title": "Alter Bug ohne Issue",
+                    "status": "fix",
+                    # kein 'github_issue' Feld — alter Workflow
+                },
+            ],
+        }
+        mock_read.return_value = (data, "TEST_004")
+        mock_run.return_value = MagicMock(returncode=0, stdout="", stderr="")
+
+        import workflow
+        # Darf NICHT werfen
+        try:
+            workflow.cmd_complete([])
+        except Exception as e:
+            self.fail(f"cmd_complete darf bei fehlendem github_issue nicht crashen: {e}")
+
+        close_calls = [
+            c
+            for c in mock_run.call_args_list
+            if c[0][0][0] == "gh" and "close" in c[0][0]
+        ]
+        self.assertEqual(
+            len(close_calls),
+            0,
+            "Kein gh issue close ohne github_issue Feld",
+        )
+
+
 if __name__ == "__main__":
     unittest.main()

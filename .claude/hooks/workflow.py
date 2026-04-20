@@ -749,12 +749,20 @@ def cmd_resolve_finding(args: list[str]) -> None:
                              f"**Proof:** {f['proof']}\n\n"
                              f"Aus Workflow: {name}")
                 try:
-                    _sp.run(
+                    result = _sp.run(
                         ["gh", "issue", "create", "--title", title_text,
                          "--body", body_text],
                         capture_output=True, text=True, check=True
                     )
                     print(f"GitHub Issue created for Finding #{finding_id}")
+                    try:
+                        issue_url = result.stdout.strip()
+                        issue_number = int(issue_url.rstrip("/").split("/")[-1])
+                        f["github_issue"] = issue_number
+                        _save_active(data)
+                    except (ValueError, IndexError):
+                        print("Warning: Could not extract issue number from gh output.",
+                              file=sys.stderr)
                 except (FileNotFoundError, _sp.CalledProcessError) as e:
                     print(f"Warning: Could not create GitHub Issue: {e}",
                           file=sys.stderr)
@@ -817,6 +825,18 @@ def cmd_list_findings(args: list[str]) -> None:
 def cmd_complete(args: list[str]) -> None:
     data, name = _read_active()
     data["current_phase"] = "phase7_done"
+    # Auto-close GitHub Issues for "fix" findings
+    import subprocess as _sp
+    for finding in data.get("adversary_findings", []):
+        issue_num = finding.get("github_issue")
+        if finding.get("status") == "fix" and issue_num:
+            try:
+                _sp.run(["gh", "issue", "close", str(issue_num)],
+                        capture_output=True, text=True, check=True)
+                print(f"Closed GitHub Issue #{issue_num}")
+            except (FileNotFoundError, _sp.CalledProcessError) as e:
+                print(f"Warning: Could not close Issue #{issue_num}: {e}",
+                      file=sys.stderr)
     archive = _archive_dir()
     archive.mkdir(parents=True, exist_ok=True)
     _atomic_write(archive / f"{name}.json", data)
