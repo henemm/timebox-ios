@@ -126,6 +126,7 @@ struct BlockPlanningView: View {
                 await loadData()
             }
         }
+        .errorAlert(message: $errorMessage)
     }
 
     // MARK: - Timeline Content (Canvas-based, Bug 70c-1b)
@@ -531,7 +532,6 @@ struct BlockPlanningView: View {
 
     private func loadData() async {
         isLoading = true
-        errorMessage = nil
         isPermissionDenied = false
 
         do {

@@ -405,12 +405,12 @@ struct BacklogView: View {
         .onReceive(NotificationCenter.default.publisher(for: LocalTaskSource.taskCreatedNotification)) { _ in
             Task { await loadTasks() }
         }
+        .errorAlert(message: $errorMessage)
     }
 
     private func loadTasks() async {
         cloudKitMonitor.triggerSync()
         isLoading = true
-        errorMessage = nil
 
         do {
             let taskSource = LocalTaskSource(modelContext: modelContext)

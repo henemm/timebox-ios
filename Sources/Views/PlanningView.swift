@@ -110,11 +110,11 @@ struct PlanningView: View {
                 await loadData()
             }
         }
+        .errorAlert(message: $errorMessage)
     }
 
     private func loadData() async {
         isLoading = true
-        errorMessage = nil
         isPermissionDenied = false
 
         do {

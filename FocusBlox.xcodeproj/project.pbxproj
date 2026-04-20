@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		ECFC71629F9356F282022533 /* ErrorAlertModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 543C332BFE3FA5F071E97CE5 /* ErrorAlertModifier.swift */; };
+		0564EE0CA14D7755E12D1821 /* ErrorAlertModifierTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1332CF8A63D514CFDC0B7F10 /* ErrorAlertModifierTests.swift */; };
 		91D0BC937BC868B971E344BE /* CoachTaskInteractionsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F3A916413B1A5982A9338DF /* CoachTaskInteractionsUITests.swift */; };
 		2F42B12BABD0CAB500D1936F /* TaskInspectorSaveTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4B346F7B234B47464B8ADA3 /* TaskInspectorSaveTests.swift */; };
 		03A94D15FBA2530D8C629546 /* BacklogRowRedesignUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54C8A326C1D84FA7A3BD27A8 /* BacklogRowRedesignUITests.swift */; };
@@ -716,6 +718,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		543C332BFE3FA5F071E97CE5 /* ErrorAlertModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ErrorAlertModifier.swift; path = Sources/Views/Modifiers/ErrorAlertModifier.swift; sourceTree = SOURCE_ROOT; };
+		1332CF8A63D514CFDC0B7F10 /* ErrorAlertModifierTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ErrorAlertModifierTests.swift; path = FocusBloxTests/ErrorAlertModifierTests.swift; sourceTree = SOURCE_ROOT; };
 		4F3A916413B1A5982A9338DF /* CoachTaskInteractionsUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CoachTaskInteractionsUITests.swift; path = FocusBloxUITests/CoachTaskInteractionsUITests.swift; sourceTree = SOURCE_ROOT; };
 		F4B346F7B234B47464B8ADA3 /* TaskInspectorSaveTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TaskInspectorSaveTests.swift; path = FocusBloxMacTests/TaskInspectorSaveTests.swift; sourceTree = SOURCE_ROOT; };
 		01344413B23EDC8D6C17192A /* CountOpenTasksIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CountOpenTasksIntent.swift; path = Sources/Intents/CountOpenTasksIntent.swift; sourceTree = SOURCE_ROOT; };
@@ -1645,6 +1649,7 @@
 		7613DF2BEF00711C6BDA68E3 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				543C332BFE3FA5F071E97CE5 /* ErrorAlertModifier.swift */,
 				D98B4BC2E3713C913E8F5F61 /* TaskSplitView.swift */,
 				F06EE41E85B8D03CDD433CAB /* BacklogHygieneView.swift */,
 				217C7AD059FD114C1AD7845D /* BacklogRow.swift */,
@@ -1728,6 +1733,7 @@
 		A6B3805EF19D1B131D346DDD /* FocusBloxTests */ = {
 			isa = PBXGroup;
 			children = (
+				1332CF8A63D514CFDC0B7F10 /* ErrorAlertModifierTests.swift */,
 				5E465C0C2239803CC57D663E /* DuplicateKeysCrashTests.swift */,
 				95E810436DD458D261733601 /* TaskIdeaSuggestionServiceTests.swift */,
 				128FFA0AAD6490F8EE2BA721 /* CoachTagGroupingTests.swift */,
@@ -2657,6 +2663,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				ECFC71629F9356F282022533 /* ErrorAlertModifier.swift in Sources */,
 				522472270E2CC019DD5ACFF2 /* TaskIdeaSuggestionService.swift in Sources */,
 				78009F72593D68442E8498FF /* AICoachReasonService.swift in Sources */,
 				9FBA522B76FBC7FA31AED9F7 /* ShakeUndoHandler.swift in Sources */,
@@ -2943,6 +2950,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0564EE0CA14D7755E12D1821 /* ErrorAlertModifierTests.swift in Sources */,
 				B0E469DB0FEC9CB72CFAEC53 /* DuplicateKeysCrashTests.swift in Sources */,
 				43C572CF40040642AF9960EB /* TaskIdeaSuggestionServiceTests.swift in Sources */,
 				85CC16E1755B06359DEF90AC /* CoachTagGroupingTests.swift in Sources */,

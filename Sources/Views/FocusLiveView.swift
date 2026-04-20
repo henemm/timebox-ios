@@ -205,6 +205,7 @@ struct FocusLiveView: View {
                 liveActivityStarted = false
             }
         }
+        .errorAlert(message: $errorMessage)
     }
     // MARK: - Live Activity Management
     private func startLiveActivity(for block: FocusBlock) {
@@ -582,7 +583,6 @@ struct FocusLiveView: View {
     // MARK: - Helper Functions
     private func loadData() async {
         isLoading = true
-        errorMessage = nil
         isPermissionDenied = false
         print("📥 [FocusLiveView] loadData: starting...")
         do {
