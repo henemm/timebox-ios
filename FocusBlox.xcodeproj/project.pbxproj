@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		474AE8C33568E502A6EF493F /* ToolbarConsistencyUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A212E6DA5167EDF57B91736 /* ToolbarConsistencyUITests.swift */; };
 		A41453E41D3E0736EC7355B8 /* DragDropBarrierUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 221619C0DF7C056E62ACDF33 /* DragDropBarrierUITests.swift */; };
 		ECFC71629F9356F282022533 /* ErrorAlertModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 543C332BFE3FA5F071E97CE5 /* ErrorAlertModifier.swift */; };
 		0564EE0CA14D7755E12D1821 /* ErrorAlertModifierTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1332CF8A63D514CFDC0B7F10 /* ErrorAlertModifierTests.swift */; };
@@ -719,6 +720,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		0A212E6DA5167EDF57B91736 /* ToolbarConsistencyUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ToolbarConsistencyUITests.swift; path = FocusBloxUITests/ToolbarConsistencyUITests.swift; sourceTree = SOURCE_ROOT; };
 		221619C0DF7C056E62ACDF33 /* DragDropBarrierUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DragDropBarrierUITests.swift; path = FocusBloxUITests/DragDropBarrierUITests.swift; sourceTree = SOURCE_ROOT; };
 		543C332BFE3FA5F071E97CE5 /* ErrorAlertModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ErrorAlertModifier.swift; path = Sources/Views/Modifiers/ErrorAlertModifier.swift; sourceTree = SOURCE_ROOT; };
 		1332CF8A63D514CFDC0B7F10 /* ErrorAlertModifierTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ErrorAlertModifierTests.swift; path = FocusBloxTests/ErrorAlertModifierTests.swift; sourceTree = SOURCE_ROOT; };
@@ -1440,6 +1442,7 @@
 		05D90FB2A2CE48689EC309B4 /* FocusBloxUITests */ = {
 			isa = PBXGroup;
 			children = (
+				0A212E6DA5167EDF57B91736 /* ToolbarConsistencyUITests.swift */,
 				221619C0DF7C056E62ACDF33 /* DragDropBarrierUITests.swift */,
 				4F3A916413B1A5982A9338DF /* CoachTaskInteractionsUITests.swift */,
 				227760C3AC4AC01683358A4B /* TaskIdeaSuggestionUITests.swift */,
@@ -2817,6 +2820,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				474AE8C33568E502A6EF493F /* ToolbarConsistencyUITests.swift in Sources */,
 				A41453E41D3E0736EC7355B8 /* DragDropBarrierUITests.swift in Sources */,
 				91D0BC937BC868B971E344BE /* CoachTaskInteractionsUITests.swift in Sources */,
 				2F22134CBC7A0E7B71B9E474 /* TaskIdeaSuggestionUITests.swift in Sources */,

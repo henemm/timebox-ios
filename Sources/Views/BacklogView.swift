@@ -204,13 +204,6 @@ struct BacklogView: View {
                     }
                     .accessibilityIdentifier("addTaskButton")
 
-                    Button {
-                        showHygieneSheet = true
-                    } label: {
-                        Image(systemName: "sparkles")
-                    }
-                    .accessibilityIdentifier("hygieneToolbarButton")
-
                     viewModeSwitcher
 
                     Button {
