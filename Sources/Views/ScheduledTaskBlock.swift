@@ -60,6 +60,11 @@ struct ScheduledTaskBlock: View {
         }
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("scheduledTaskBlock_\(taskID)")
+        .draggable(CalendarEventTransfer(
+            taskID: taskID,
+            title: title,
+            durationMinutes: Int(endDate.timeIntervalSince(startDate) / 60)
+        ))
     }
 
     private var timeRangeText: String {

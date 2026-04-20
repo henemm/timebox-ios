@@ -160,6 +160,10 @@ struct BlockPlanningView: View {
                             column: positioned.column,
                             totalColumns: positioned.totalColumns
                         )
+                        .if(!positioned.event.isReadOnly) { view in
+                            view.draggable(CalendarEventTransfer(from: positioned.event))
+                        }
+                        .onDrop(of: [.calendarEvent], delegate: timelineDropDelegate)
                     }
 
                     // Focus blocks
@@ -181,6 +185,8 @@ struct BlockPlanningView: View {
                             column: positioned.column,
                             totalColumns: positioned.totalColumns
                         )
+                        .opacity(positioned.block.isFuture ? 1.0 : 0.6)
+                        .onDrop(of: [.calendarEvent], delegate: timelineDropDelegate)
                     }
 
                     // Free slots
@@ -198,6 +204,7 @@ struct BlockPlanningView: View {
                             column: 0,
                             totalColumns: 1
                         )
+                        .onDrop(of: [.calendarEvent], delegate: timelineDropDelegate)
                     }
 
                     // Scheduled tasks (RW_3.1b)
@@ -218,6 +225,12 @@ struct BlockPlanningView: View {
                             column: positioned.column,
                             totalColumns: positioned.totalColumns
                         )
+                        .draggable(CalendarEventTransfer(
+                            taskID: positioned.taskID,
+                            title: positioned.title,
+                            durationMinutes: max(Int(positioned.endDate.timeIntervalSince(positioned.startDate) / 60), 15)
+                        ))
+                        .onDrop(of: [.calendarEvent], delegate: timelineDropDelegate)
                     }
                 }
                 .padding(.leading, timeColumnWidth)
@@ -236,16 +249,7 @@ struct BlockPlanningView: View {
             .frame(height: totalHeight)
             .accessibilityElement(children: .contain)
             .accessibilityIdentifier("canvasDropZone")
-            .onDrop(of: [.calendarEvent], delegate: TimelineDropDelegate(
-                hourHeight: hourHeight,
-                startHour: startHour,
-                selectedDate: selectedDate,
-                focusBlocks: focusBlocks,
-                dropTargetTime: $dropTargetTime,
-                onDrop: { blockID, snappedTime in
-                    moveFocusBlock(blockID: blockID, to: snappedTime)
-                }
-            ))
+            .onDrop(of: [.calendarEvent], delegate: timelineDropDelegate)
         }
         .accessibilityIdentifier("planningTimeline")
         .refreshable {
@@ -502,12 +506,58 @@ struct BlockPlanningView: View {
         }
     }
 
+    private var timelineDropDelegate: TimelineDropDelegate {
+        TimelineDropDelegate(
+            hourHeight: hourHeight,
+            startHour: startHour,
+            selectedDate: selectedDate,
+            focusBlocks: focusBlocks,
+            dropTargetTime: $dropTargetTime,
+            onDrop: { id, snappedTime in
+                if focusBlocks.contains(where: { $0.id == id }) {
+                    moveFocusBlock(blockID: id, to: snappedTime)
+                } else if positionedEvents.contains(where: { $0.event.id == id }) {
+                    moveCalendarEvent(eventID: id, to: snappedTime)
+                } else {
+                    moveScheduledTask(taskID: id, to: snappedTime)
+                }
+            }
+        )
+    }
+
     private func moveFocusBlock(blockID: String, to newStart: Date) {
         guard let block = focusBlocks.first(where: { $0.id == blockID }),
               block.isFuture else { return }
         let duration = block.endDate.timeIntervalSince(block.startDate)
         let newEnd = newStart.addingTimeInterval(duration)
         updateBlock(block, startDate: newStart, endDate: newEnd)
+    }
+
+    private func moveCalendarEvent(eventID: String, to newStart: Date) {
+        guard let event = calendarEvents.first(where: { $0.id == eventID }) else { return }
+        Task {
+            do {
+                try eventKitRepo.moveCalendarEvent(eventID: event.id, to: newStart, duration: event.durationMinutes)
+                await loadData()
+            } catch {
+                errorMessage = "Termin konnte nicht verschoben werden."
+            }
+        }
+    }
+
+    private func moveScheduledTask(taskID: String, to newStart: Date) {
+        Task {
+            do {
+                let taskSource = LocalTaskSource(modelContext: modelContext)
+                let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
+                let item = allTasks.first { $0.id == taskID }
+                let duration = item?.scheduledDuration ?? item?.estimatedDuration ?? 30
+                try syncEngine.scheduleTask(itemID: taskID, date: newStart, duration: duration)
+                await loadData()
+            } catch {
+                errorMessage = "Task konnte nicht verschoben werden."
+            }
+        }
     }
 
     private func resizeFocusBlock(_ block: FocusBlock, newEndDate: Date) {
@@ -1255,6 +1305,12 @@ struct TimelineEventRow: View {
             }
 
             Spacer()
+
+            if event.isReadOnly {
+                Image(systemName: "lock.fill")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+            }
 
             if let categoryString = event.category,
                let config = TaskCategory(rawValue: categoryString) {

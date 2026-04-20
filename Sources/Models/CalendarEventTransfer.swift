@@ -26,6 +26,13 @@ struct CalendarEventTransfer: Codable, Transferable, Sendable {
         self.reminderID = nil
     }
 
+    init(taskID: String, title: String, durationMinutes: Int) {
+        self.id = taskID
+        self.title = title
+        self.duration = durationMinutes
+        self.reminderID = nil
+    }
+
     static var transferRepresentation: some TransferRepresentation {
         CodableRepresentation(contentType: .calendarEvent)
     }
