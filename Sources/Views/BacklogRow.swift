@@ -78,7 +78,7 @@ struct BacklogRow: View {
                 }
                 .buttonStyle(.borderless)
                 .accessibilityIdentifier("focusSprintButton_\(item.id)")
-                .accessibilityLabel("Focus Sprint starten")
+                .accessibilityLabel("FocusBlox starten")
             }
         }
         .padding(12)

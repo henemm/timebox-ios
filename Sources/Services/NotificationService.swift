@@ -301,7 +301,7 @@ enum NotificationService {
 
         let content = UNMutableNotificationContent()
         content.title = "FocusBlox beendet"
-        content.body = "\(blockTitle) - \(completedCount)/\(totalCount) Tasks erledigt. Zeit für dein Sprint Review!"
+        content.body = "\(blockTitle) - \(completedCount)/\(totalCount) Tasks erledigt. Zeit für dein FocusBlox Review!"
         content.sound = .default
 
         let trigger = UNTimeIntervalNotificationTrigger(
@@ -346,7 +346,7 @@ enum NotificationService {
 
         let content = UNMutableNotificationContent()
         content.title = "Heute fällig"
-        content.body = "\(title) — pack ihn in einen Sprint"
+        content.body = "\(title) — pack ihn in einen FocusBlox"
         content.sound = .default
         content.categoryIdentifier = dueDateInteractiveCategory
         content.userInfo = ["taskID": taskID]
