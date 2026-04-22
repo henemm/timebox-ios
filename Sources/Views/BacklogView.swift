@@ -74,6 +74,7 @@ struct BacklogView: View {
     @State private var focusSprintConflictTitle: String?
     @State private var focusSprintFeedback = false
     @State private var showHygieneSheet = false
+    @State private var taskForDurationPicker: PlanItem?
 
     // MARK: - Stale Tasks (Backlog Hygiene)
     private var staleTasks: [PlanItem] {
@@ -535,12 +536,13 @@ struct BacklogView: View {
         }
     }
 
-    private func startFocusSprint(for item: PlanItem) {
+    private func startFocusSprint(for item: PlanItem, duration: Int? = nil) {
         do {
             let result = try FocusBlockActionService.startImmediate(
                 taskID: item.id,
                 eventKitRepo: eventKitRepo,
-                modelContext: modelContext
+                modelContext: modelContext,
+                durationMinutes: duration
             )
             switch result {
             case .started:
@@ -1005,22 +1007,36 @@ struct BacklogView: View {
         if !nextUpTasks.isEmpty {
             Section {
                 ForEach(nextUpTasks) { item in
-                    BacklogRow(
-                        item: item,
-                        onComplete: { completeTask(item) },
-                        onCancelCompletion: { cancelCompletion(item) },
-                        onDurationTap: { selectedItemForDuration = item },
-                        onAddToNextUp: { updateNextUp(for: item, isNextUp: false) },
-                        onImportanceCycle: { newImportance in updateImportance(for: item, importance: newImportance) },
-                        onUrgencyToggle: { newUrgency in updateUrgency(for: item, urgency: newUrgency) },
-                        onCategoryTap: { selectedItemForCategory = item },
-                        onEditTap: { taskToEditDirectly = item },
-                        onDeleteTap: { deleteTask(item) },
-                        onStartFocusSprint: { startFocusSprint(for: item) },
-                        onTitleSave: { newTitle in saveTitleEdit(for: item, title: newTitle) },
-                        isPendingResort: deferredSort.isPending(item.id),
-                        isCompletionPending: deferredCompletion.isPending(item.id)
-                    )
+                    VStack(alignment: .leading, spacing: 8) {
+                        BacklogRow(
+                            item: item,
+                            onComplete: { completeTask(item) },
+                            onCancelCompletion: { cancelCompletion(item) },
+                            onDurationTap: { selectedItemForDuration = item },
+                            onAddToNextUp: { updateNextUp(for: item, isNextUp: false) },
+                            onImportanceCycle: { newImportance in updateImportance(for: item, importance: newImportance) },
+                            onUrgencyToggle: { newUrgency in updateUrgency(for: item, urgency: newUrgency) },
+                            onCategoryTap: { selectedItemForCategory = item },
+                            onEditTap: { taskToEditDirectly = item },
+                            onDeleteTap: { deleteTask(item) },
+                            onStartFocusSprint: { taskForDurationPicker = item },
+                            onTitleSave: { newTitle in saveTitleEdit(for: item, title: newTitle) },
+                            isPendingResort: deferredSort.isPending(item.id),
+                            isCompletionPending: deferredCompletion.isPending(item.id)
+                        )
+
+                        if taskForDurationPicker?.id == item.id {
+                            DurationPickerChips(
+                                defaultDuration: item.estimatedDuration ?? 25
+                            ) { duration in
+                                taskForDurationPicker = nil
+                                startFocusSprint(for: item, duration: duration)
+                            }
+                            .padding(.leading, 34)
+                            .transition(.opacity.combined(with: .move(edge: .top)))
+                        }
+                    }
+                    .animation(.spring(duration: 0.3), value: taskForDurationPicker?.id)
                     .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
                     .listRowBackground(Color.clear)
                     .listRowSeparator(.hidden)
@@ -1073,23 +1089,37 @@ struct BacklogView: View {
     // MARK: - Backlog Row with Swipe Actions (shared helper)
     @ViewBuilder
     private func backlogRowWithSwipe(_ item: PlanItem) -> some View {
-        BacklogRow(
-            item: item,
-            onComplete: { completeTask(item) },
-            onCancelCompletion: { cancelCompletion(item) },
-            onDurationTap: { selectedItemForDuration = item },
-            onAddToNextUp: { updateNextUp(for: item, isNextUp: true) },
-            onImportanceCycle: { newImportance in updateImportance(for: item, importance: newImportance) },
-            onUrgencyToggle: { newUrgency in updateUrgency(for: item, urgency: newUrgency) },
-            onCategoryTap: { selectedItemForCategory = item },
-            onEditTap: { handleEditTap(item) },
-            onDeleteTap: { deleteTask(item) },
-            onStartFocusSprint: { startFocusSprint(for: item) },
-            onTitleSave: { newTitle in saveTitleEdit(for: item, title: newTitle) },
-            isPendingResort: deferredSort.isPending(item.id),
-            isCompletionPending: deferredCompletion.isPending(item.id),
-            effectiveScore: effectivePriorityScore(for: item)
-        )
+        VStack(alignment: .leading, spacing: 8) {
+            BacklogRow(
+                item: item,
+                onComplete: { completeTask(item) },
+                onCancelCompletion: { cancelCompletion(item) },
+                onDurationTap: { selectedItemForDuration = item },
+                onAddToNextUp: { updateNextUp(for: item, isNextUp: true) },
+                onImportanceCycle: { newImportance in updateImportance(for: item, importance: newImportance) },
+                onUrgencyToggle: { newUrgency in updateUrgency(for: item, urgency: newUrgency) },
+                onCategoryTap: { selectedItemForCategory = item },
+                onEditTap: { handleEditTap(item) },
+                onDeleteTap: { deleteTask(item) },
+                onStartFocusSprint: { taskForDurationPicker = item },
+                onTitleSave: { newTitle in saveTitleEdit(for: item, title: newTitle) },
+                isPendingResort: deferredSort.isPending(item.id),
+                isCompletionPending: deferredCompletion.isPending(item.id),
+                effectiveScore: effectivePriorityScore(for: item)
+            )
+
+            if taskForDurationPicker?.id == item.id {
+                DurationPickerChips(
+                    defaultDuration: item.estimatedDuration ?? 25
+                ) { duration in
+                    taskForDurationPicker = nil
+                    startFocusSprint(for: item, duration: duration)
+                }
+                .padding(.leading, 34)
+                .transition(.opacity.combined(with: .move(edge: .top)))
+            }
+        }
+        .animation(.spring(duration: 0.3), value: taskForDurationPicker?.id)
         .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
         .listRowBackground(Color.clear)
         .listRowSeparator(.hidden)

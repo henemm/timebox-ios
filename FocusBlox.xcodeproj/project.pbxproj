@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		BB89EB2BFBE316692E44CE67 /* DurationPickerChips.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A05C790D7493F4FF9F789A1 /* DurationPickerChips.swift */; };
+		3BC2BB1C58592C9E1B7D2C6C /* DurationPickerChips.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A05C790D7493F4FF9F789A1 /* DurationPickerChips.swift */; };
 		A5341EBD6FB31D49C990DC6C /* CoachInlineActionsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE6DEB50B25D011AF11B166E /* CoachInlineActionsUITests.swift */; };
 		62350D53367F9E6E27EFEA91 /* SprintWordingBatch1Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F76CB4EF25B8523692B2D8E /* SprintWordingBatch1Tests.swift */; };
 		474AE8C33568E502A6EF493F /* ToolbarConsistencyUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A212E6DA5167EDF57B91736 /* ToolbarConsistencyUITests.swift */; };
@@ -722,6 +724,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		5A05C790D7493F4FF9F789A1 /* DurationPickerChips.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DurationPickerChips.swift; path = Sources/Views/Components/DurationPickerChips.swift; sourceTree = SOURCE_ROOT; };
 		CE6DEB50B25D011AF11B166E /* CoachInlineActionsUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CoachInlineActionsUITests.swift; path = FocusBloxUITests/CoachInlineActionsUITests.swift; sourceTree = SOURCE_ROOT; };
 		9F76CB4EF25B8523692B2D8E /* SprintWordingBatch1Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SprintWordingBatch1Tests.swift; path = FocusBloxTests/SprintWordingBatch1Tests.swift; sourceTree = SOURCE_ROOT; };
 		0A212E6DA5167EDF57B91736 /* ToolbarConsistencyUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ToolbarConsistencyUITests.swift; path = FocusBloxUITests/ToolbarConsistencyUITests.swift; sourceTree = SOURCE_ROOT; };
@@ -2113,6 +2116,7 @@
 		SETCMP01GROUP00001 /* Components */ = {
 			isa = PBXGroup;
 			children = (
+				5A05C790D7493F4FF9F789A1 /* DurationPickerChips.swift */,
 				SETCMP01FILE000001 /* SettingsComponents.swift */,
 				TSKBDG02FILE00001 /* TaskBadges.swift */,
 				SHRSHT02FILE00001 /* SharedSheets.swift */,
@@ -2675,6 +2679,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3BC2BB1C58592C9E1B7D2C6C /* DurationPickerChips.swift in Sources */,
 				ECFC71629F9356F282022533 /* ErrorAlertModifier.swift in Sources */,
 				522472270E2CC019DD5ACFF2 /* TaskIdeaSuggestionService.swift in Sources */,
 				78009F72593D68442E8498FF /* AICoachReasonService.swift in Sources */,
@@ -3164,6 +3169,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BB89EB2BFBE316692E44CE67 /* DurationPickerChips.swift in Sources */,
 				304371189D89C1DC87260422 /* TaskIdeaSuggestionService.swift in Sources */,
 				EA20355C03CBD8ED9B8716DD /* BacklogHealthService.swift in Sources */,
 				8E83A6881ACAE567E1A80956 /* BacklogRow.swift in Sources */,

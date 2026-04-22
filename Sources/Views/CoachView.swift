@@ -52,6 +52,7 @@ struct CoachView: View {
     @State private var taskToEditDirectly: PlanItem?
     @State private var selectedItemForDuration: PlanItem?
     @State private var selectedItemForCategory: PlanItem?
+    @State private var taskForDurationPicker: PlanItem?
 
     enum CoachTaskActionType {
         case suggest      // Vorschläge: "Für heute einplanen" + "Ausblenden"
@@ -261,7 +262,7 @@ struct CoachView: View {
                     }
                     .padding()
                 }
-                .transition(.opacity.combined(with: .move(edge: .top)))
+                .transition(AnyTransition.opacity.combined(with: AnyTransition.move(edge: .top)))
             }
         }
         .frame(maxHeight: isOpen ? .infinity : nil)
@@ -790,7 +791,7 @@ struct CoachView: View {
                 onCategoryTap: { selectedItemForCategory = task },
                 onEditTap: { taskToEditDirectly = task },
                 onDeleteTap: { deleteTask(task) },
-                onStartFocusSprint: { startFocusSprint(for: task) },
+                onStartFocusSprint: { taskForDurationPicker = task },
                 onTitleSave: { newTitle in saveTitleEdit(for: task, title: newTitle) },
                 isCompletionPending: completed || deferredCompletion.isPending(task.id)
             )
@@ -803,7 +804,7 @@ struct CoachView: View {
                     }
                 }
                 Button {
-                    startFocusSprint(for: task)
+                    taskForDurationPicker = task
                 } label: {
                     Label("FocusBlox", systemImage: "bolt.fill")
                 }
@@ -818,6 +819,17 @@ struct CoachView: View {
                 } label: {
                     Label("Löschen", systemImage: "trash")
                 }
+            }
+
+            if taskForDurationPicker?.id == task.id {
+                DurationPickerChips(
+                    defaultDuration: task.estimatedDuration ?? 25
+                ) { duration in
+                    taskForDurationPicker = nil
+                    startFocusSprint(for: task, duration: duration)
+                }
+                .padding(.leading, 34)
+                .transition(AnyTransition.opacity.combined(with: AnyTransition.move(edge: .top)))
             }
 
             // AI-Begründung (Feature #234)
@@ -879,6 +891,7 @@ struct CoachView: View {
                 EmptyView()
             }
         }
+        .animation(.spring(duration: 0.3), value: taskForDurationPicker?.id)
     }
 
     // MARK: - Dismissal Persistence (Bug #226)
@@ -1005,12 +1018,13 @@ struct CoachView: View {
         }
     }
 
-    private func startFocusSprint(for item: PlanItem) {
+    private func startFocusSprint(for item: PlanItem, duration: Int? = nil) {
         do {
             let result = try FocusBlockActionService.startImmediate(
                 taskID: item.id,
                 eventKitRepo: eventKitRepo,
-                modelContext: modelContext
+                modelContext: modelContext,
+                durationMinutes: duration
             )
             switch result {
             case .started:
