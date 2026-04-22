@@ -20,12 +20,17 @@ Replaces 17 separate hooks with 1. Sequential short-circuit logic:
 Exit Codes: 0 = allowed, 2 = blocked
 """
 
-import fcntl
 import json
 import os
 import re
 import sys
 from pathlib import Path
+
+from hook_utils import (
+    _project_root,
+    _read_workflow_locked,
+    read_active_workflow,
+)
 
 # Session ID extracted from stdin JSON (set during main())
 _STDIN_SESSION_ID = ""
@@ -78,72 +83,10 @@ SOURCE_ONLY_PHASES = {"phase5_implement"}
 
 # --- Helpers ---
 
-def _project_root() -> Path:
-    cwd = Path.cwd()
-    for parent in [cwd] + list(cwd.parents):
-        if (parent / ".git").exists():
-            return parent
-    return cwd
-
-
-def _read_workflow_locked(path: Path) -> dict | None:
-    """Read a workflow JSON file with a shared (read) lock to prevent torn reads."""
-    try:
-        fd = os.open(str(path), os.O_RDONLY)
-        try:
-            fcntl.flock(fd, fcntl.LOCK_SH | fcntl.LOCK_NB)
-            content = path.read_text()
-            return json.loads(content) if content.strip() else None
-        except BlockingIOError:
-            # Lock held exclusively — read without lock (best effort)
-            return json.loads(path.read_text())
-        finally:
-            try:
-                fcntl.flock(fd, fcntl.LOCK_UN)
-            except OSError:
-                pass
-            os.close(fd)
-    except (OSError, json.JSONDecodeError):
-        return None
-
-
 def _read_active_workflow() -> dict | None:
-    """Read the active workflow for the current session.
-
-    Priority:
-    1. Session mapping (.sessions.json) if CLAUDE_SESSION_ID is set
-    2. Fallback to .active symlink
-    """
-    wf_dir = _project_root() / ".claude" / "workflows"
-
-    # Try session mapping first
+    """Read the active workflow, passing session ID from stdin if available."""
     session_id = os.environ.get("CLAUDE_SESSION_ID", "") or _STDIN_SESSION_ID
-    if session_id:
-        sessions_file = wf_dir / ".sessions.json"
-        if sessions_file.exists():
-            try:
-                sessions = json.loads(sessions_file.read_text())
-                wf_name = sessions.get(session_id)
-                if wf_name:
-                    wf_path = wf_dir / f"{wf_name}.json"
-                    if wf_path.exists():
-                        return _read_workflow_locked(wf_path)
-            except (OSError, json.JSONDecodeError):
-                pass
-
-    # Fallback: .active symlink
-    link = wf_dir / ".active"
-    if not link.exists():
-        return None
-    try:
-        target = Path(os.readlink(str(link)))
-        if not target.is_absolute():
-            target = link.parent / target
-        if target.exists():
-            return _read_workflow_locked(target)
-    except (OSError, json.JSONDecodeError):
-        pass
-    return None
+    return read_active_workflow(session_id)
 
 
 def _find_workflow_for_file(file_path: str) -> dict | None:

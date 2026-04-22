@@ -24,16 +24,7 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
-
-def _project_root() -> Path:
-    env_dir = os.environ.get("CLAUDE_PROJECT_DIR")
-    if env_dir:
-        return Path(env_dir)
-    cwd = Path.cwd()
-    for parent in [cwd] + list(cwd.parents):
-        if (parent / ".git").exists():
-            return parent
-    return cwd
+from hook_utils import _project_root, read_active_workflow_with_path
 
 
 def _get_hook_input() -> dict:
@@ -70,33 +61,7 @@ def _get_session_id(hook_input: dict) -> str:
 
 def _read_active_workflow(session_id: str = "") -> tuple[dict | None, Path | None]:
     """Read active workflow for session. Returns (data, file_path)."""
-    wf_dir = _project_root() / ".claude" / "workflows"
-
-    if session_id:
-        sessions_file = wf_dir / ".sessions.json"
-        if sessions_file.exists():
-            try:
-                sessions = json.loads(sessions_file.read_text())
-                wf_name = sessions.get(session_id)
-                if wf_name:
-                    wf_path = wf_dir / f"{wf_name}.json"
-                    if wf_path.exists():
-                        return json.loads(wf_path.read_text()), wf_path
-            except (OSError, json.JSONDecodeError):
-                pass
-
-    link = wf_dir / ".active"
-    if not link.exists():
-        return None, None
-    try:
-        target = Path(os.readlink(str(link)))
-        if not target.is_absolute():
-            target = link.parent / target
-        if target.exists():
-            return json.loads(target.read_text()), target
-    except (OSError, json.JSONDecodeError):
-        pass
-    return None, None
+    return read_active_workflow_with_path(session_id)
 
 
 def _save_workflow(data: dict, path: Path) -> None:

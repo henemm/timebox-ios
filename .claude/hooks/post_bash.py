@@ -17,47 +17,16 @@ import subprocess
 import sys
 from pathlib import Path
 
+from hook_utils import _project_root, read_active_workflow
+
 # Session ID extracted from stdin JSON (set during main())
 _STDIN_SESSION_ID = ""
 
 
-def _project_root() -> Path:
-    cwd = Path.cwd()
-    for parent in [cwd] + list(cwd.parents):
-        if (parent / ".git").exists():
-            return parent
-    return cwd
-
-
 def _read_active_workflow() -> dict | None:
-    """Read the active workflow for the current session."""
-    wf_dir = _project_root() / ".claude" / "workflows"
-    session_id = os.environ.get("CLAUDE_SESSION_ID", "")
-    if session_id:
-        sessions_file = wf_dir / ".sessions.json"
-        if sessions_file.exists():
-            try:
-                sessions = json.loads(sessions_file.read_text())
-                wf_name = sessions.get(session_id)
-                if wf_name:
-                    wf_path = wf_dir / f"{wf_name}.json"
-                    if wf_path.exists():
-                        return json.loads(wf_path.read_text())
-            except (OSError, json.JSONDecodeError):
-                pass
-    # Fallback: .active symlink
-    link = wf_dir / ".active"
-    if not link.exists():
-        return None
-    try:
-        target = Path(os.readlink(str(link)))
-        if not target.is_absolute():
-            target = link.parent / target
-        if target.exists():
-            return json.loads(target.read_text())
-    except (OSError, json.JSONDecodeError):
-        pass
-    return None
+    """Read the active workflow, passing session ID from stdin if available."""
+    session_id = os.environ.get("CLAUDE_SESSION_ID", "") or _STDIN_SESSION_ID
+    return read_active_workflow(session_id)
 
 
 def _analyze_test_output(command: str, output: str) -> None:
