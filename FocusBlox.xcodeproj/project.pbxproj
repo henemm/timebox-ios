@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		142A838429C5190459E2EA1E /* CapacityLimitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFBCD75F80AA36B02F327141 /* CapacityLimitTests.swift */; };
 		BB89EB2BFBE316692E44CE67 /* DurationPickerChips.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A05C790D7493F4FF9F789A1 /* DurationPickerChips.swift */; };
 		3BC2BB1C58592C9E1B7D2C6C /* DurationPickerChips.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A05C790D7493F4FF9F789A1 /* DurationPickerChips.swift */; };
 		A5341EBD6FB31D49C990DC6C /* CoachInlineActionsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE6DEB50B25D011AF11B166E /* CoachInlineActionsUITests.swift */; };
@@ -724,6 +725,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		CFBCD75F80AA36B02F327141 /* CapacityLimitTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CapacityLimitTests.swift; path = FocusBloxTests/CapacityLimitTests.swift; sourceTree = SOURCE_ROOT; };
 		5A05C790D7493F4FF9F789A1 /* DurationPickerChips.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DurationPickerChips.swift; path = Sources/Views/Components/DurationPickerChips.swift; sourceTree = SOURCE_ROOT; };
 		CE6DEB50B25D011AF11B166E /* CoachInlineActionsUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CoachInlineActionsUITests.swift; path = FocusBloxUITests/CoachInlineActionsUITests.swift; sourceTree = SOURCE_ROOT; };
 		9F76CB4EF25B8523692B2D8E /* SprintWordingBatch1Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SprintWordingBatch1Tests.swift; path = FocusBloxTests/SprintWordingBatch1Tests.swift; sourceTree = SOURCE_ROOT; };
@@ -1747,6 +1749,7 @@
 		A6B3805EF19D1B131D346DDD /* FocusBloxTests */ = {
 			isa = PBXGroup;
 			children = (
+				CFBCD75F80AA36B02F327141 /* CapacityLimitTests.swift */,
 				9F76CB4EF25B8523692B2D8E /* SprintWordingBatch1Tests.swift */,
 				1332CF8A63D514CFDC0B7F10 /* ErrorAlertModifierTests.swift */,
 				5E465C0C2239803CC57D663E /* DuplicateKeysCrashTests.swift */,
@@ -2970,6 +2973,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				142A838429C5190459E2EA1E /* CapacityLimitTests.swift in Sources */,
 				62350D53367F9E6E27EFEA91 /* SprintWordingBatch1Tests.swift in Sources */,
 				0564EE0CA14D7755E12D1821 /* ErrorAlertModifierTests.swift in Sources */,
 				B0E469DB0FEC9CB72CFAEC53 /* DuplicateKeysCrashTests.swift in Sources */,

@@ -59,7 +59,8 @@ enum NextUpSuggestionService {
         now: Date
     ) -> [NextUpSuggestion] {
         let load = meetingLoadForToday(events: calendarEvents, date: now)
-        let maxCount = maxSuggestionsForLoad(load)
+        let alreadyPlanned = items.filter { $0.isNextUp && !$0.isCompleted }.count
+        let maxCount = capacityBasedMax(profile: profile, alreadyPlanned: alreadyPlanned, meetingLoad: load)
 
         var usedIDs = Set<String>()
         var suggestions: [NextUpSuggestion] = []
@@ -160,6 +161,21 @@ enum NextUpSuggestionService {
         case .medium: return 4
         case .high:   return 3
         }
+    }
+
+    static func capacityBasedMax(
+        profile: BehavioralProfile,
+        alreadyPlanned: Int,
+        meetingLoad: MeetingLoad
+    ) -> Int {
+        let meetingMax = maxSuggestionsForLoad(meetingLoad)
+
+        guard let avgTasks = profile.avgTasksPerDay else {
+            return meetingMax
+        }
+
+        let capacityLeft = max(0, Int(avgTasks.rounded()) - alreadyPlanned)
+        return min(capacityLeft, meetingMax)
     }
 
     // MARK: - Reason Category (Gruppen-Key)
