@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A5341EBD6FB31D49C990DC6C /* CoachInlineActionsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE6DEB50B25D011AF11B166E /* CoachInlineActionsUITests.swift */; };
 		62350D53367F9E6E27EFEA91 /* SprintWordingBatch1Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F76CB4EF25B8523692B2D8E /* SprintWordingBatch1Tests.swift */; };
 		474AE8C33568E502A6EF493F /* ToolbarConsistencyUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A212E6DA5167EDF57B91736 /* ToolbarConsistencyUITests.swift */; };
 		A41453E41D3E0736EC7355B8 /* DragDropBarrierUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 221619C0DF7C056E62ACDF33 /* DragDropBarrierUITests.swift */; };
@@ -721,6 +722,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		CE6DEB50B25D011AF11B166E /* CoachInlineActionsUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CoachInlineActionsUITests.swift; path = FocusBloxUITests/CoachInlineActionsUITests.swift; sourceTree = SOURCE_ROOT; };
 		9F76CB4EF25B8523692B2D8E /* SprintWordingBatch1Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SprintWordingBatch1Tests.swift; path = FocusBloxTests/SprintWordingBatch1Tests.swift; sourceTree = SOURCE_ROOT; };
 		0A212E6DA5167EDF57B91736 /* ToolbarConsistencyUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ToolbarConsistencyUITests.swift; path = FocusBloxUITests/ToolbarConsistencyUITests.swift; sourceTree = SOURCE_ROOT; };
 		221619C0DF7C056E62ACDF33 /* DragDropBarrierUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DragDropBarrierUITests.swift; path = FocusBloxUITests/DragDropBarrierUITests.swift; sourceTree = SOURCE_ROOT; };
@@ -1444,6 +1446,7 @@
 		05D90FB2A2CE48689EC309B4 /* FocusBloxUITests */ = {
 			isa = PBXGroup;
 			children = (
+				CE6DEB50B25D011AF11B166E /* CoachInlineActionsUITests.swift */,
 				0A212E6DA5167EDF57B91736 /* ToolbarConsistencyUITests.swift */,
 				221619C0DF7C056E62ACDF33 /* DragDropBarrierUITests.swift */,
 				4F3A916413B1A5982A9338DF /* CoachTaskInteractionsUITests.swift */,
@@ -2823,6 +2826,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A5341EBD6FB31D49C990DC6C /* CoachInlineActionsUITests.swift in Sources */,
 				474AE8C33568E502A6EF493F /* ToolbarConsistencyUITests.swift in Sources */,
 				A41453E41D3E0736EC7355B8 /* DragDropBarrierUITests.swift in Sources */,
 				91D0BC937BC868B971E344BE /* CoachTaskInteractionsUITests.swift in Sources */,

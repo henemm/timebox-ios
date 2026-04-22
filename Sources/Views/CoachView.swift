@@ -53,6 +53,14 @@ struct CoachView: View {
     @State private var selectedItemForDuration: PlanItem?
     @State private var selectedItemForCategory: PlanItem?
 
+    enum CoachTaskActionType {
+        case suggest      // Vorschläge: "Für heute einplanen" + "Ausblenden"
+        case planned      // Heute geplant: "Erledigt" + "Entplanen"
+        case remaining    // Offen geblieben: "Erledigt" + "Auf morgen"
+        case completed    // Erledigt: keine Actions
+        case none         // Keine Inline-Actions
+    }
+
     private var currentPhase: DayPhase {
         let hour = Calendar.current.component(.hour, from: Date())
         return DayPhase.from(hour: hour, morningEnd: morningEndHour, eveningStart: eveningStartHour)
@@ -303,7 +311,7 @@ struct CoachView: View {
                         tasks: cluster.tasks,
                         coachOverrideText: clusterCoachText,
                         showReason: false,
-                        showActions: true
+                        actionType: .suggest
                     )
                 }
 
@@ -319,7 +327,7 @@ struct CoachView: View {
                         titleColor: .orange,
                         tasks: clusterResult.remaining,
                         showReason: true,
-                        showActions: true
+                        actionType: .suggest
                     )
                 }
             }
@@ -356,6 +364,14 @@ struct CoachView: View {
         let taskSource = LocalTaskSource(modelContext: modelContext)
         let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
         try? syncEngine.updateNextUp(itemID: task.id, isNextUp: true)
+        NextUpSuggestionService.invalidateCache()
+        refreshID = UUID()
+    }
+
+    private func removeFromToday(_ task: PlanItem) {
+        let taskSource = LocalTaskSource(modelContext: modelContext)
+        let syncEngine = SyncEngine(taskSource: taskSource, modelContext: modelContext)
+        try? syncEngine.updateNextUp(itemID: task.id, isNextUp: false)
         NextUpSuggestionService.invalidateCache()
         refreshID = UUID()
     }
@@ -405,7 +421,7 @@ struct CoachView: View {
                     titleColor: .blue,
                     tasks: todayPlannedTasks,
                     showReason: true,
-                    showActions: false
+                    actionType: .planned
                 )
             }
 
@@ -417,7 +433,7 @@ struct CoachView: View {
                     titleColor: .green,
                     tasks: completedTasks,
                     showReason: false,
-                    showActions: false,
+                    actionType: .completed,
                     completed: true
                 )
             }
@@ -430,7 +446,7 @@ struct CoachView: View {
                     titleColor: .orange,
                     tasks: Array(morningTopTasks.prefix(3)),
                     showReason: true,
-                    showActions: true
+                    actionType: .suggest
                 )
             }
 
@@ -505,7 +521,7 @@ struct CoachView: View {
                     titleColor: .green,
                     tasks: completedTasks,
                     showReason: false,
-                    showActions: false,
+                    actionType: .completed,
                     completed: true
                 )
             }
@@ -518,7 +534,7 @@ struct CoachView: View {
                     titleColor: .orange,
                     tasks: unfinishedTasks,
                     showReason: false,
-                    showActions: false
+                    actionType: .remaining
                 )
             }
 
@@ -690,7 +706,7 @@ struct CoachView: View {
         tasks: [PlanItem],
         coachOverrideText: String? = nil,
         showReason: Bool,
-        showActions: Bool,
+        actionType: CoachTaskActionType,
         completed: Bool = false
     ) -> some View {
         // Section Header
@@ -715,7 +731,7 @@ struct CoachView: View {
             // Tag-Cluster: einzelner Coach-Text + Tasks
             coachText(overrideText)
             ForEach(tasks) { task in
-                taskWithActions(task, showActions: showActions, completed: completed)
+                taskWithActions(task, actionType: actionType, completed: completed)
             }
         } else if showReason {
             // Gruppiert: Coaching-Text als Card → Tasks darunter
@@ -726,13 +742,13 @@ struct CoachView: View {
 
                 // Tasks als Beleg
                 ForEach(group.tasks) { task in
-                    taskWithActions(task, showActions: showActions, completed: completed)
+                    taskWithActions(task, actionType: actionType, completed: completed)
                 }
             }
         } else {
             // Ungegruppiert: nur Tasks
             ForEach(tasks) { task in
-                taskWithActions(task, showActions: showActions, completed: completed)
+                taskWithActions(task, actionType: actionType, completed: completed)
             }
         }
     }
@@ -762,7 +778,7 @@ struct CoachView: View {
     }
 
     @ViewBuilder
-    private func taskWithActions(_ task: PlanItem, showActions: Bool, completed: Bool) -> some View {
+    private func taskWithActions(_ task: PlanItem, actionType: CoachTaskActionType, completed: Bool) -> some View {
         VStack(alignment: .leading, spacing: 6) {
             BacklogRow(
                 item: task,
@@ -805,7 +821,7 @@ struct CoachView: View {
             }
 
             // AI-Begründung (Feature #234)
-            if showActions, let reason = aiReasonTexts[task.id] {
+            if actionType == .suggest, let reason = aiReasonTexts[task.id] {
                 Text(reason)
                     .font(.caption)
                     .foregroundStyle(.secondary)
@@ -813,27 +829,54 @@ struct CoachView: View {
                     .transition(.opacity)
             }
 
-            if showActions {
+            switch actionType {
+            case .suggest:
                 HStack(spacing: 12) {
-                    Button {
-                        addToToday(task)
-                    } label: {
+                    Button { addToToday(task) } label: {
                         Label("Für heute einplanen", systemImage: "calendar.badge.plus")
                             .font(.caption.weight(.medium))
                     }
-                    .buttonStyle(.borderedProminent)
-                    .tint(.blue)
-
-                    Button {
-                        dismissTask(task.id)
-                    } label: {
+                    .buttonStyle(.borderedProminent).tint(.blue)
+                    Button { dismissTask(task.id) } label: {
                         Label("Ausblenden", systemImage: "eye.slash")
                             .font(.caption.weight(.medium))
                     }
-                    .buttonStyle(.bordered)
-                    .tint(.secondary)
+                    .buttonStyle(.bordered).tint(.secondary)
                 }
                 .padding(.leading, 34)
+
+            case .planned:
+                HStack(spacing: 12) {
+                    Button { completeTask(task) } label: {
+                        Label("Erledigt", systemImage: "checkmark.circle")
+                            .font(.caption.weight(.medium))
+                    }
+                    .buttonStyle(.borderedProminent).tint(.green)
+                    Button { removeFromToday(task) } label: {
+                        Label("Entplanen", systemImage: "calendar.badge.minus")
+                            .font(.caption.weight(.medium))
+                    }
+                    .buttonStyle(.bordered).tint(.secondary)
+                }
+                .padding(.leading, 34)
+
+            case .remaining:
+                HStack(spacing: 12) {
+                    Button { completeTask(task) } label: {
+                        Label("Erledigt", systemImage: "checkmark.circle")
+                            .font(.caption.weight(.medium))
+                    }
+                    .buttonStyle(.borderedProminent).tint(.green)
+                    Button { dismissTask(task.id) } label: {
+                        Label("Auf morgen", systemImage: "arrow.right.circle")
+                            .font(.caption.weight(.medium))
+                    }
+                    .buttonStyle(.bordered).tint(.secondary)
+                }
+                .padding(.leading, 34)
+
+            case .completed, .none:
+                EmptyView()
             }
         }
     }
