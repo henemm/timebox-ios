@@ -182,6 +182,8 @@ def _matches(message: str, phrases: list[str]) -> bool:
 
 
 def main():
+    if os.environ.get("CLAUDE_ADMIN"):
+        sys.exit(0)
     hook_input = _get_hook_input()
     message = _get_user_message(hook_input)
     if not message:

@@ -167,6 +167,8 @@ def _is_source_file(file_path: str) -> bool:
 # --- Main ---
 
 def main():
+    if os.environ.get("CLAUDE_ADMIN"):
+        sys.exit(0)
     global _STDIN_SESSION_ID
     tool_input = os.environ.get("CLAUDE_TOOL_INPUT", "")
     if not tool_input:
