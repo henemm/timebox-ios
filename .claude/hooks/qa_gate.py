@@ -98,8 +98,83 @@ def validate_test_output(filepath: str, infra: bool = False) -> tuple[bool, str]
     return False, "Could not determine test result."
 
 
+def _hook_mode() -> int:
+    """PreToolUse-Hook-Modus: prüft Bash-Commands die mark-red/green aufrufen.
+
+    Liest Bash-Command aus CLAUDE_TOOL_INPUT oder stdin. Wenn der Command
+    workflow.py mark-red/mark-ui-red/mark-green/mark-ui-green enthält,
+    extrahiert das Test-Output-Argument und validiert es.
+
+    Returns Exit Code (0 = pass, 2 = block).
+    """
+    if os.environ.get("CLAUDE_ADMIN"):
+        return 0
+
+    tool_input_raw = os.environ.get("CLAUDE_TOOL_INPUT", "")
+    command = ""
+    if tool_input_raw:
+        try:
+            data = json.loads(tool_input_raw)
+            command = data.get("command", "") if isinstance(data, dict) else ""
+        except json.JSONDecodeError:
+            command = ""
+    if not command:
+        try:
+            data = json.load(sys.stdin)
+            if isinstance(data, dict):
+                ti = data.get("tool_input", data)
+                command = ti.get("command", "") if isinstance(ti, dict) else ""
+        except (json.JSONDecodeError, ValueError, OSError):
+            return 0  # No input — passthrough
+
+    if not command:
+        return 0
+
+    mark_pattern = re.search(
+        r"workflow\.py\s+(mark-red|mark-ui-red|mark-green|mark-ui-green)\s+(\S+)",
+        command,
+    )
+    if not mark_pattern:
+        return 0  # Not a mark-* command — passthrough
+
+    output_path = mark_pattern.group(2)
+    # Strip quotes if any
+    output_path = output_path.strip("'\"")
+
+    # Determine infra flag from active workflow
+    infra = False
+    try:
+        wf_dir = _project_root() / ".claude" / "workflows"
+        active = wf_dir / ".active"
+        if active.exists():
+            wf_data = json.loads(active.resolve().read_text() if active.is_symlink()
+                                 else active.read_text())
+            wf_type = wf_data.get("workflow_type", "")
+            if wf_type == "feature" and not wf_data.get("is_new_ui"):
+                # Heuristic: infra-features have no UI
+                if any(p in str(wf_data.get("affected_files", []))
+                       for p in [".claude/", "scripts/", "tests/"]):
+                    infra = True
+    except (json.JSONDecodeError, OSError):
+        pass
+
+    valid, message = validate_test_output(output_path, infra=infra)
+    if not valid:
+        print(
+            f"BLOCKED: qa_gate validation failed for {mark_pattern.group(1)}: {message}\n"
+            f"Output file: {output_path}\n"
+            f"Run tests again and re-mark with the new output file.",
+            file=sys.stderr,
+        )
+        return 2
+    return 0
+
+
 def main():
     args = sys.argv[1:]
+
+    if args and args[0] == "--hook-mode":
+        sys.exit(_hook_mode())
 
     if not args or args[0] == "--check":
         workflow_py = _project_root() / ".claude" / "hooks" / "workflow.py"

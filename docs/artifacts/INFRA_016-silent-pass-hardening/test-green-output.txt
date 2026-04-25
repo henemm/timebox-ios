@@ -1,0 +1,39 @@
+test_adversary_md_has_before_after_table (__main__.TestAdversaryPreFixValidation.test_adversary_md_has_before_after_table)
+adversary.md enthält 'Vor Fix' Tabellen-Header für Pre-Fix-Reporting. ... ok
+test_adversary_md_has_pre_fix_phase (__main__.TestAdversaryPreFixValidation.test_adversary_md_has_pre_fix_phase)
+adversary.md enthält 'Phase 3b: Pre-Fix-Test-Validation'. ... ok
+test_validator_md_forbids_green_as_proof (__main__.TestAdversaryPreFixValidation.test_validator_md_forbids_green_as_proof)
+implementation-validator.md Verboten-Liste enthält Eintrag gegen 'GREEN als Beweis'. ... ok
+test_validator_md_has_test_quality_audit (__main__.TestAdversaryPreFixValidation.test_validator_md_has_test_quality_audit)
+implementation-validator.md enthält 'Test-Quality-Audit' als Standard-Schritt. ... ok
+test_claude_md_has_anti_pattern_section (__main__.TestDocumentationUpdates.test_claude_md_has_anti_pattern_section)
+CLAUDE.md enthält Section 'Anti-Pattern: Silent-Pass-Tests'. ... ok
+test_developer_md_handles_silent_pass_blocker (__main__.TestDocumentationUpdates.test_developer_md_handles_silent_pass_blocker)
+developer.md enthält Anweisung 'BLOCKER an Orchestrator melden'. ... ok
+test_qa_writer_md_forbids_silent_pass (__main__.TestDocumentationUpdates.test_qa_writer_md_forbids_silent_pass)
+qa-writer.md Verbots-Liste enthält 'guard let ... else { return }'. ... ok
+test_settings_json_registers_qa_gate_hook_mode (__main__.TestHookRegistration.test_settings_json_registers_qa_gate_hook_mode)
+settings.json registriert qa_gate.py --hook-mode als Bash Hook. ... ok
+test_settings_json_registers_test_quality_gate (__main__.TestHookRegistration.test_settings_json_registers_test_quality_gate)
+settings.json registriert test_quality_gate.py als Edit|Write Hook. ... ok
+test_qa_gate_hook_mode_allows_valid_output (__main__.TestQaGateHookMode.test_qa_gate_hook_mode_allows_valid_output)
+mark-red mit echtem XCTest-Output → Exit 0. ... ok
+test_qa_gate_hook_mode_blocks_invalid_output (__main__.TestQaGateHookMode.test_qa_gate_hook_mode_blocks_invalid_output)
+mark-red mit nicht-existentem Output-File → Exit 2. ... ok
+test_qa_gate_hook_mode_passes_unrelated_bash (__main__.TestQaGateHookMode.test_qa_gate_hook_mode_passes_unrelated_bash)
+Bash ohne mark-red/green → Exit 0 (passthrough). ... ok
+test_silent_pass_hook_allows_if_let_with_xctfail (__main__.TestQualityGateBlocksSilentPass.test_silent_pass_hook_allows_if_let_with_xctfail)
+if let mit else { XCTFail } → durchgelassen. ... ok
+test_silent_pass_hook_allows_xctunwrap (__main__.TestQualityGateBlocksSilentPass.test_silent_pass_hook_allows_xctunwrap)
+XCTUnwrap statt guard let → durchgelassen. ... ok
+test_silent_pass_hook_blocks_guard_let_return (__main__.TestQualityGateBlocksSilentPass.test_silent_pass_hook_blocks_guard_let_return)
+P1: guard let ... else { return } in Test-File → Exit 2. ... ok
+test_silent_pass_hook_respects_infra_token (__main__.TestQualityGateBlocksSilentPass.test_silent_pass_hook_respects_infra_token)
+Mit __infra__-Token im user_override_token.json → durchgelassen. ... ok
+test_silent_pass_hook_skips_non_test_files (__main__.TestQualityGateBlocksSilentPass.test_silent_pass_hook_skips_non_test_files)
+Sources/Foo.swift mit guard let return → durchgelassen (Production-Code). ... ok
+
+----------------------------------------------------------------------
+Ran 17 tests in 0.214s
+
+OK

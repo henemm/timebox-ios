@@ -69,6 +69,18 @@ For features: `/11-feature <description>` triggers User Advocate + Feature Plann
 - **Never ask for manual testing** — fix the code until tests are green
 - `edit_gate.py` enforces TDD phases (tests only in phase4, code only in phase5)
 
+### Anti-Pattern: Silent-Pass-Tests
+
+Tests die GREEN melden ohne den Code-Pfad zu testen sind WERTLOS — auch wenn sie kompilieren.
+
+**Verboten in Test-Dateien** (vom `test_quality_gate.py` Hook erzwungen):
+- `guard let x = ... else { return }` — verwende `try XCTUnwrap(x)`
+- `if let x = ... { ... }` ohne `else { XCTFail(...) }`
+- `view?.button?.tap()` in UI-Test-Assertions — wenn `view` nil, passiert nichts und Test "besteht"
+
+**"GREEN" bedeutet:** Bug ist beweisbar gefixt — nicht "Code kompiliert".
+Adversary muss beweisen: Test wäre OHNE Fix rot. Sonst ist GREEN bedeutungslos.
+
 **Build & Test Tool: `./scripts/sim.sh`**
 
 **IMMER dieses Script benutzen** — NIEMALS `xcrun`/`xcodebuild` manuell zusammenbauen!

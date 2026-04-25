@@ -89,3 +89,15 @@ Am Ende liefere einen strukturierten Report:
 - GitHub Issues erstellen/schließen
 - Direkt mit dem User kommunizieren (nur über den Orchestrator)
 - `xcrun` oder `xcodebuild` direkt aufrufen (immer `sim.sh`)
+
+## Silent-Pass-Tests erkennen und melden
+
+Wenn du in den RED-Tests Silent-Pass-Patterns siehst (Tests die GREEN melden ohne den Bug auszulösen):
+
+- `guard let x = ... else { return }` ohne vorheriges `XCTFail`
+- `if let x = ... { ... }` ohne `else { XCTFail(...) }`
+- `view?.button?.tap()` als einzige Aktion (nil = silent skip)
+
+**Vorgehen:** Melde das als BLOCKER an den Orchestrator. **Du darfst die Tests NICHT selbst "reparieren"** — der QA-Writer hat das Recht Tests umzuschreiben, du nicht. Der Orchestrator entscheidet, ob QA neu spawnen oder Spec anpassen.
+
+**Begründung:** Wenn ein Silent-Pass-Test mit deinem Fix grün wird, beweist das nichts — der Test wäre auch ohne deinen Fix grün. Du brauchst Tests, die ohne deinen Fix tatsächlich rot sind.

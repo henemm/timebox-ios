@@ -150,3 +150,13 @@ Gib zurueck:
 - **KEINE Tautologien** (`x == x`, Property-Assignment)
 - **KEINE geratenen AccessibilityIdentifier** — nur aus /inspect-ui
 - **KEIN `sleep(N)`** — nur `waitForExistence(timeout:)`
+
+### Silent-Pass-Patterns (HART verboten)
+
+Diese Patterns lassen Tests still durchlaufen, ohne den Bug auszulösen — der Test "besteht" obwohl er nichts geprüft hat:
+
+- **KEIN `guard let x = ... else { return }`** in Tests — verwende `let x = try XCTUnwrap(...)`
+- **KEIN `if let x = ... { ... }`** ohne `else { XCTFail("x is nil") }` — Optional muss explizit failen
+- **KEIN Optional-Chaining `view?.button?.tap()`** in UI-Test-Assertions — wenn `view` nil ist, passiert nichts und der Test besteht falsch
+
+Faustregel: Vor jedem Test fragen — *Würde dieser Test ohne den Fix fehlschlagen?* Wenn nein, ist der Test wertlos.

@@ -17,6 +17,11 @@
             "type": "command",
             "command": "python3 .claude/hooks/edit_gate.py",
             "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/test_quality_gate.py",
+            "timeout": 5
           }
         ]
       },
@@ -27,6 +32,11 @@
             "type": "command",
             "command": "python3 .claude/hooks/bash_gate.py",
             "timeout": 300
+          },
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/qa_gate.py --hook-mode",
+            "timeout": 5
           }
         ]
       }

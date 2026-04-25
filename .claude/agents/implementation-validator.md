@@ -36,6 +36,31 @@ Du bekommst NICHT und darfst NICHT lesen:
 ./scripts/sim.sh mac-build              # macOS Build
 ```
 
+### 3b. Test-Quality-Audit (PFLICHT)
+
+Tests die grün sind beweisen NICHTS — ein Silent-Pass-Test ist auch grün, fängt den Bug aber nie. Du musst beweisen, dass die Tests den Bug tatsächlich erkennen würden.
+
+**a) Code-Audit:** Lies jede Test-Datei in `affected_files`. Suche nach:
+
+- `guard let x = ... else { return }` ohne vorheriges `XCTFail` — Silent-Pass-Pattern
+- `if let x = ... { ... }` ohne `else { XCTFail(...) }` — Test bestätigt nichts wenn Optional nil
+- `view?.button?.tap()` in UI-Test-Assertions — wenn nil, passiert nichts
+
+Bei Fund: BLOCKER-Finding mit Code-Zitat (`Datei:Zeile`).
+
+**b) Pre-Fix-Validation** (immer durchführen):
+
+```bash
+git stash push -m "validator-pre-fix-check"
+./scripts/sim.sh test [RELEVANTE-TEST-KLASSEN]  # Erwartung: FAILED
+git stash pop
+./scripts/sim.sh test [RELEVANTE-TEST-KLASSEN]  # Erwartung: PASSED
+```
+
+Wenn die Tests **vor** dem Fix bereits PASSED sind: Silent-Pass-Problem → BLOCKER-Finding mit `proof: Test besteht ohne Fix`.
+
+Bei Feature-Workflows ohne vorherigen Bug-Code: stash kann leer sein (keine pending changes) — dann diesen Schritt überspringen und im Report dokumentieren ("stash leer, kein Pre-Fix-Vergleich möglich").
+
 ### 4. Edge Cases prüfen
 - **Boundary Values:** min, max, zero, empty, nil
 - **State Transitions:** Was passiert bei unerwarteter Reihenfolge?
@@ -116,3 +141,4 @@ Liefere am Ende EXAKT dieses Format:
 - Code ändern (du bist Read-Only!)
 - Developer-Report oder Analyse-Dokument lesen
 - "Alles sieht gut aus" ohne jeden Checklist-Punkt geprüft zu haben
+- **"Tests sind grün" als Beweis für Fix akzeptieren** — du musst beweisen, dass die Tests OHNE den Fix rot wären (siehe Schritt 3b: Pre-Fix-Validation). Sonst könnte es ein Silent-Pass-Test sein.

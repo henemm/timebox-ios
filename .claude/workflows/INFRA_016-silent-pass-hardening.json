@@ -1,0 +1,99 @@
+{
+  "name": "INFRA_016-silent-pass-hardening",
+  "current_phase": "phase7_done",
+  "created": "2026-04-25T08:21:02.679579",
+  "last_updated": "2026-04-25T12:52:43.168424",
+  "spec_file": "docs/specs/infra/INFRA_016-silent-pass-hardening.md",
+  "spec_approved": true,
+  "context_file": "docs/context/INFRA_016-silent-pass-hardening.md",
+  "affected_files": [
+    ".claude/hooks/test_quality_gate.py",
+    ".claude/hooks/qa_gate.py",
+    ".claude/settings.json",
+    ".claude/commands/adversary.md",
+    ".claude/agents/implementation-validator.md",
+    ".claude/agents/qa-writer.md",
+    ".claude/agents/developer.md",
+    "CLAUDE.md",
+    ".claude/hooks/tests/test_silent_pass_hardening.py"
+  ],
+  "test_artifacts": [
+    {
+      "type": "test_output",
+      "path": "docs/artifacts/INFRA_016-silent-pass-hardening/test-red-output.txt",
+      "description": "TDD RED: 17/17 fail (12 FAIL + 5 ERROR) - alle Hooks/Docs/Settings fehlen noch",
+      "phase": "phase4_tdd_red",
+      "created": "2026-04-25T09:59:14.007135"
+    },
+    {
+      "type": "test_output",
+      "path": "docs/artifacts/INFRA_016-silent-pass-hardening/test-green-output.txt",
+      "description": "TDD GREEN: 17/17 Python-Tests passed nach Implementation aller 4 Ma\u00dfnahmen",
+      "phase": "phase5_implement",
+      "created": "2026-04-25T11:00:29.553667"
+    }
+  ],
+  "red_test_done": true,
+  "ui_test_red_done": true,
+  "checkpoint1_approved": true,
+  "checkpoint2_approved": true,
+  "checkpoint3_approved": true,
+  "workflow_type": "feature",
+  "inspect_ui_done": false,
+  "localize_checked": true,
+  "no_user_strings": true,
+  "no_ui_change": true,
+  "adversary_verdict": "AMBIGUOUS",
+  "adversary_run_count": 1,
+  "green_test_done": true,
+  "checkpoint1_notes": "Manual test trigger",
+  "red_test_result": "12 failures + 5 errors in test_silent_pass_hardening.py - test_quality_gate.py fehlt, qa_gate.py --hook-mode fehlt, alle Doku-Updates fehlen",
+  "ui_test_red_result": "Infra-Ticket: keine UI-Tests, Python-unittest als Ersatz (vgl. INFRA_013/014/015 Konvention)",
+  "checkpoint2_notes": "User approved go for INFRA_016 implementation",
+  "green_test_result": "17/17 Python unit tests passed - test_quality_gate.py blockiert P1+P3, qa_gate --hook-mode validiert mark-red/green, adversary.md hat Phase 3b, alle Doku aktualisiert",
+  "ui_test_green_done": true,
+  "ui_test_green_result": "Infra-Ticket: keine UI-Tests, Python-unittest GREEN als Ersatz",
+  "adversary_findings": [
+    {
+      "id": 1,
+      "title": "__infra__ Token bleibt nach Implementation aktiv und deaktiviert den neuen Hook session-weit",
+      "impact": "Solange das Token in .claude/user_override_token.json steht, wird test_quality_gate.py f\u00fcr JEDEN Test-File-Edit \u00fcbersprungen \u2014 auch wenn ein User sp\u00e4ter ein Silent-Pass-Pattern schreibt. Der Hook wirkt erst NACH git commit (l\u00f6scht Token automatisch) oder explizitem Token-Cleanup.",
+      "proof": ".claude/user_override_token.json:3-9 enth\u00e4lt __infra__ Token. test_quality_gate.py:55-66 pr\u00fcft nur Token-Existenz, nicht workflow-spezifische Bindung.",
+      "status": "accept",
+      "resolved_at": "2026-04-25T12:48:55.796501"
+    },
+    {
+      "id": 2,
+      "title": "Validator soll Pre-Fix f\u00fcr Bug-Workflows skippen, darf workflow_type aber nicht lesen",
+      "impact": "implementation-validator.md sagt im Schritt 3b: 'Pre-Fix-Validation (f\u00fcr Bug-Workflows mit workflow_type: bug)'. Aber der Validator darf laut Zeile 14-17 keine Workflow-State-Datei lesen. Anweisung ist nicht entscheidbar \u2014 Validator weiss nicht ob er Schritt 3b skippen darf.",
+      "proof": ".claude/agents/implementation-validator.md:51 vs Z.14-17 \u2014 Inkonsistenz",
+      "status": "accept",
+      "resolved_at": "2026-04-25T12:48:55.825792"
+    },
+    {
+      "id": 3,
+      "title": "adversary.md Phase 3b ist als PFLICHT markiert, Report-Header aber nur f\u00fcr Bug-Workflows",
+      "impact": "Phase 3b sagt 'PFLICHT' (mit Stop-Symbol), Report-Tabellen-Header aber 'Pre-Fix-Validation (Bug-Workflows)'. Verletzt AC-C5: Bug-Workflows l\u00f6sen Pre-Fix aus, Feature-Workflows nicht zwingend. Ein User mit Feature-Workflow weiss nicht ob Phase 3b verpflichtend ist.",
+      "proof": ".claude/commands/adversary.md:128 'PFLICHT' vs Z.216 '(Bug-Workflows)'",
+      "status": "accept",
+      "resolved_at": "2026-04-25T12:48:55.859407"
+    },
+    {
+      "id": 4,
+      "title": "Hook pr\u00fcft bei Edit nur new_string, nicht finalen File-Inhalt",
+      "impact": "Wenn jemand ein Test-File mit existierendem 'guard let ... else { return }' editiert und der neue Edit selbst sauber ist (z.B. f\u00fcgt nur einen Test hinzu), l\u00e4sst der Hook das durch. Bestehende Silent-Pass-Patterns werden nicht erkannt, nur neue Edits.",
+      "proof": "test_quality_gate.py:91-97 _extract_content liest content (Write) oder new_string (Edit). Final-File-Inhalt wird nicht rekonstruiert.",
+      "status": "accept",
+      "resolved_at": "2026-04-25T12:48:55.885941"
+    },
+    {
+      "id": 5,
+      "title": "Multi-Optional Pattern guard let a = ..., let b = ... else { return } wird false-positiv blockiert",
+      "impact": "Tests mit zwei Optional-Unwraps in einem guard (idiomatisches Swift) werden vom Hook geblockt. Workaround: Pattern in zwei XCTUnwrap-Statements aufteilen oder Override-Token nutzen. Dokumentiert in Spec Known-Limitations.",
+      "proof": "test_quality_gate.py:32-35 PATTERN_GUARD_LET_RETURN matcht 'guard let \\\\w+.*?else { return' \u2014 auch bei Multi-let.",
+      "status": "accept",
+      "resolved_at": "2026-04-25T11:47:09.240520"
+    }
+  ],
+  "checkpoint3_notes": "User approved commit for INFRA_016-silent-pass-hardening"
+}

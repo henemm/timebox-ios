@@ -125,6 +125,45 @@ Ein Finding das auf der Spec basiert ohne den Code geprueft zu haben ist WERTLOS
 
 4. Notiere: Welche Tests FAILED? Welche PASSED?
 
+### Phase 3b: Pre-Fix-Test-Validation (PFLICHT)
+
+⛔ Du musst BEWEISEN, dass die Tests den Bug erkennen würden — nicht nur dass sie grün sind.
+
+Ein Test der grün ist beweist NICHTS. Ein Silent-Pass-Test (z.B. `guard let x = ... else { return }`) besteht auch ohne dass der Bug gefixt wurde. Daher:
+
+**Schritt 1: Stash den Fix**
+```bash
+git stash push -m "adversary-pre-fix-check"
+```
+
+**Schritt 2: Tests gegen unfixed Code ausführen**
+```bash
+./scripts/sim.sh test [RELEVANTE-UI-TEST-KLASSEN]
+./scripts/sim.sh unit [RELEVANTE-UNIT-TEST-KLASSEN]
+```
+
+**Schritt 3: Erwartung — mindestens EIN Test der den Bug betrifft MUSS jetzt FAILED sein.**
+
+Falls alle Tests immer noch GREEN sind: SILENT-PASS-PROBLEM. Erstelle ein BLOCKER-Finding mit `proof: Test besteht auch ohne Fix — testet den Bug nicht`.
+
+**Schritt 4: Stash zurückbringen**
+```bash
+git stash pop
+```
+
+**Schritt 5: Tests erneut ausführen — müssen jetzt wieder GREEN sein.**
+
+Falls nicht: `git stash pop` hat Konflikte erzeugt → Henning informieren, manuell auflösen lassen.
+
+**Code-Audit der Test-Dateien (zusätzlich):**
+
+Lies jede Test-Datei in `affected_files`. Suche nach:
+- `guard let x = ... else { return }` — Silent-Pass-Pattern
+- `if let x = ... { ... }` ohne `else { XCTFail(...) }`
+- `view?.button?.tap()` in UI-Test-Assertions
+
+Bei Fund: BLOCKER-Finding mit Code-Zitat.
+
 ### Phase 4: Visuelle Pruefung (5 Min)
 
 1. **App im Simulator starten**
@@ -173,6 +212,17 @@ Erstelle einen Report mit diesem Format:
 | Unit Tests | X passed, Y failed | [Details zu Failures] |
 | UI Tests | X passed, Y failed | [Details] |
 | Regression | X passed, Y failed | [Details] |
+
+## Pre-Fix-Validation
+
+Beweis dass Tests den Bug erkennen würden — nicht nur dass sie nach Fix grün sind. Pflicht für Bug-Workflows; bei Feature-Workflows mit leerem Stash dokumentieren ("kein Pre-Fix-Vergleich möglich").
+
+| Test | Vor Fix (`git stash`) | Nach Fix (`stash pop`) |
+|------|------------------------|------------------------|
+| testFoo | FAILED | PASSED |
+| testBar | FAILED | PASSED |
+
+**Falls "Vor Fix" auch PASSED ist → Test ist Silent-Pass → BLOCKER-Finding.**
 
 ## Gefundene Probleme
 
