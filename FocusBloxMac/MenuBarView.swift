@@ -32,6 +32,18 @@ struct MenuBarView: View {
 
     @Query private var allTasks: [LocalTask]
 
+    // MARK: - Filtered Lists (Bug #289 + #287)
+    // Post-Fetch-Filter analog zu LocalTaskSource.fetchIncompleteTasks(),
+    // weil isVisibleInBacklog eine Computed Property ist und nicht im
+    // SwiftData #Predicate verwendbar ist.
+    private var filteredNextUpTasks: [LocalTask] {
+        nextUpTasks.filteredForMenuBarPopover()
+    }
+
+    private var filteredBacklogTasks: [LocalTask] {
+        backlogTasks.filteredForMenuBarPopover()
+    }
+
     @Environment(\.modelContext) private var modelContext
     @Environment(\.openWindow) private var openWindow
     @Environment(\.eventKitRepository) private var eventKitRepo
@@ -73,7 +85,7 @@ struct MenuBarView: View {
             // Next Up Tasks
             nextUpSection
 
-            if !backlogTasks.isEmpty {
+            if !filteredBacklogTasks.isEmpty {
                 Divider()
                 backlogPreview
             }
@@ -243,7 +255,7 @@ struct MenuBarView: View {
             Text("FocusBlox")
                 .font(.headline)
             Spacer()
-            Text("\(nextUpTasks.count + backlogTasks.count) Tasks")
+            Text("\(filteredNextUpTasks.count + filteredBacklogTasks.count) Tasks")
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }
@@ -298,20 +310,20 @@ struct MenuBarView: View {
                 .foregroundStyle(.secondary)
                 .textCase(.uppercase)
 
-            if nextUpTasks.isEmpty {
+            if filteredNextUpTasks.isEmpty {
                 Text("No tasks staged")
                     .font(.caption)
                     .foregroundStyle(.tertiary)
                     .italic()
             } else {
-                ForEach(nextUpTasks.prefix(3), id: \.uuid) { task in
+                ForEach(filteredNextUpTasks.prefix(3), id: \.uuid) { task in
                     MenuBarTaskRow(task: task) {
                         toggleComplete(task)
                     }
                 }
 
-                if nextUpTasks.count > 3 {
-                    Text("+\(nextUpTasks.count - 3) more")
+                if filteredNextUpTasks.count > 3 {
+                    Text("+\(filteredNextUpTasks.count - 3) more")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
@@ -328,14 +340,14 @@ struct MenuBarView: View {
                 .foregroundStyle(.secondary)
                 .textCase(.uppercase)
 
-            ForEach(backlogTasks.prefix(2), id: \.uuid) { task in
+            ForEach(filteredBacklogTasks.prefix(2), id: \.uuid) { task in
                 MenuBarTaskRow(task: task) {
                     toggleComplete(task)
                 }
             }
 
-            if backlogTasks.count > 2 {
-                Text("+\(backlogTasks.count - 2) more in backlog")
+            if filteredBacklogTasks.count > 2 {
+                Text("+\(filteredBacklogTasks.count - 2) more in backlog")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }

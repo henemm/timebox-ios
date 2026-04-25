@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		11B7D9FF086B3BF218B79F8D /* MenuBarFilterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87DC66EEDAF69079597761A7 /* MenuBarFilterTests.swift */; };
+		1DCBDC9082A0F0DE9C25A15A /* Array+MenuBarPopoverFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBB170E5787FF85019D39F45 /* Array+MenuBarPopoverFilter.swift */; };
+		7FC881C488BD484FA0751A6A /* Array+MenuBarPopoverFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBB170E5787FF85019D39F45 /* Array+MenuBarPopoverFilter.swift */; };
 		142A838429C5190459E2EA1E /* CapacityLimitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFBCD75F80AA36B02F327141 /* CapacityLimitTests.swift */; };
 		BB89EB2BFBE316692E44CE67 /* DurationPickerChips.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A05C790D7493F4FF9F789A1 /* DurationPickerChips.swift */; };
 		3BC2BB1C58592C9E1B7D2C6C /* DurationPickerChips.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A05C790D7493F4FF9F789A1 /* DurationPickerChips.swift */; };
@@ -725,6 +728,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		87DC66EEDAF69079597761A7 /* MenuBarFilterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MenuBarFilterTests.swift; path = FocusBloxTests/MenuBarFilterTests.swift; sourceTree = SOURCE_ROOT; };
+		CBB170E5787FF85019D39F45 /* Array+MenuBarPopoverFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Array+MenuBarPopoverFilter.swift"; path = "Sources/Extensions/Array+MenuBarPopoverFilter.swift"; sourceTree = SOURCE_ROOT; };
 		CFBCD75F80AA36B02F327141 /* CapacityLimitTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CapacityLimitTests.swift; path = FocusBloxTests/CapacityLimitTests.swift; sourceTree = SOURCE_ROOT; };
 		5A05C790D7493F4FF9F789A1 /* DurationPickerChips.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DurationPickerChips.swift; path = Sources/Views/Components/DurationPickerChips.swift; sourceTree = SOURCE_ROOT; };
 		CE6DEB50B25D011AF11B166E /* CoachInlineActionsUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CoachInlineActionsUITests.swift; path = FocusBloxUITests/CoachInlineActionsUITests.swift; sourceTree = SOURCE_ROOT; };
@@ -1749,6 +1754,7 @@
 		A6B3805EF19D1B131D346DDD /* FocusBloxTests */ = {
 			isa = PBXGroup;
 			children = (
+				87DC66EEDAF69079597761A7 /* MenuBarFilterTests.swift */,
 				CFBCD75F80AA36B02F327141 /* CapacityLimitTests.swift */,
 				9F76CB4EF25B8523692B2D8E /* SprintWordingBatch1Tests.swift */,
 				1332CF8A63D514CFDC0B7F10 /* ErrorAlertModifierTests.swift */,
@@ -1915,6 +1921,7 @@
 		CLRHEX01GROUP00001 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				CBB170E5787FF85019D39F45 /* Array+MenuBarPopoverFilter.swift */,
 				CLRHEX01FILEREF001 /* Color+Hex.swift */,
 				DUEDT01FILE0000001 /* Date+DueDate.swift */,
 			);
@@ -2682,6 +2689,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1DCBDC9082A0F0DE9C25A15A /* Array+MenuBarPopoverFilter.swift in Sources */,
 				3BC2BB1C58592C9E1B7D2C6C /* DurationPickerChips.swift in Sources */,
 				ECFC71629F9356F282022533 /* ErrorAlertModifier.swift in Sources */,
 				522472270E2CC019DD5ACFF2 /* TaskIdeaSuggestionService.swift in Sources */,
@@ -2973,6 +2981,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				11B7D9FF086B3BF218B79F8D /* MenuBarFilterTests.swift in Sources */,
 				142A838429C5190459E2EA1E /* CapacityLimitTests.swift in Sources */,
 				62350D53367F9E6E27EFEA91 /* SprintWordingBatch1Tests.swift in Sources */,
 				0564EE0CA14D7755E12D1821 /* ErrorAlertModifierTests.swift in Sources */,
@@ -3173,6 +3182,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7FC881C488BD484FA0751A6A /* Array+MenuBarPopoverFilter.swift in Sources */,
 				BB89EB2BFBE316692E44CE67 /* DurationPickerChips.swift in Sources */,
 				304371189D89C1DC87260422 /* TaskIdeaSuggestionService.swift in Sources */,
 				EA20355C03CBD8ED9B8716DD /* BacklogHealthService.swift in Sources */,
