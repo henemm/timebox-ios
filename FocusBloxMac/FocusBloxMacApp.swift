@@ -108,13 +108,18 @@ final class MenuBarController: NSObject {
         }
 
         let pop = NSPopover()
-        pop.contentSize = NSSize(width: 300, height: 450)
+        // Bug #290: Width fixed, height intrinsic (`.fixedSize` on MenuBarView).
+        // NSHostingController computes the height from the SwiftUI content; we
+        // only seed an initial size so the popover is sized before first display.
+        pop.contentSize = NSSize(width: 300, height: 300)
         pop.behavior = .transient
-        pop.contentViewController = NSHostingController(
+        let hosting = NSHostingController(
             rootView: MenuBarView()
                 .modelContainer(container)
                 .environment(\.eventKitRepository, eventKitRepository)
         )
+        hosting.sizingOptions = [.intrinsicContentSize]
+        pop.contentViewController = hosting
 
         self.statusItem = item
         self.popover = pop
@@ -460,6 +465,9 @@ struct FocusBloxMacApp: App {
                         default: dayViewForcedPhase = nil
                         }
                     }
+                }
+                .onReceive(NotificationCenter.default.publisher(for: .navigateToBacklog)) { _ in
+                    selectedSection = .backlog
                 }
                 .onChange(of: selectedSection) { _, newSection in
                     if newSection != .day { dayViewForcedPhase = nil }

@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1CDE1F1E92C80EE354CBF253 /* LocalTask+PriorityTier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62AA96BC4C9B13C7979B5603 /* LocalTask+PriorityTier.swift */; };
+		9DF656B6DD6A57C1A8D7B1E6 /* LocalTask+PriorityTier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62AA96BC4C9B13C7979B5603 /* LocalTask+PriorityTier.swift */; };
+		9AFD59340CE46F3A4DA969EB /* MenuBarTierGroupingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 539D17C342060DF53F0CC0C1 /* MenuBarTierGroupingTests.swift */; };
 		11B7D9FF086B3BF218B79F8D /* MenuBarFilterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87DC66EEDAF69079597761A7 /* MenuBarFilterTests.swift */; };
 		1DCBDC9082A0F0DE9C25A15A /* Array+MenuBarPopoverFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBB170E5787FF85019D39F45 /* Array+MenuBarPopoverFilter.swift */; };
 		7FC881C488BD484FA0751A6A /* Array+MenuBarPopoverFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBB170E5787FF85019D39F45 /* Array+MenuBarPopoverFilter.swift */; };
@@ -728,6 +731,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		539D17C342060DF53F0CC0C1 /* MenuBarTierGroupingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MenuBarTierGroupingTests.swift; path = FocusBloxMacTests/MenuBarTierGroupingTests.swift; sourceTree = SOURCE_ROOT; };
+		62AA96BC4C9B13C7979B5603 /* LocalTask+PriorityTier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "LocalTask+PriorityTier.swift"; path = "Sources/Extensions/LocalTask+PriorityTier.swift"; sourceTree = SOURCE_ROOT; };
 		87DC66EEDAF69079597761A7 /* MenuBarFilterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MenuBarFilterTests.swift; path = FocusBloxTests/MenuBarFilterTests.swift; sourceTree = SOURCE_ROOT; };
 		CBB170E5787FF85019D39F45 /* Array+MenuBarPopoverFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Array+MenuBarPopoverFilter.swift"; path = "Sources/Extensions/Array+MenuBarPopoverFilter.swift"; sourceTree = SOURCE_ROOT; };
 		CFBCD75F80AA36B02F327141 /* CapacityLimitTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CapacityLimitTests.swift; path = FocusBloxTests/CapacityLimitTests.swift; sourceTree = SOURCE_ROOT; };
@@ -1921,6 +1926,7 @@
 		CLRHEX01GROUP00001 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				62AA96BC4C9B13C7979B5603 /* LocalTask+PriorityTier.swift */,
 				CBB170E5787FF85019D39F45 /* Array+MenuBarPopoverFilter.swift */,
 				CLRHEX01FILEREF001 /* Color+Hex.swift */,
 				DUEDT01FILE0000001 /* Date+DueDate.swift */,
@@ -2689,6 +2695,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1CDE1F1E92C80EE354CBF253 /* LocalTask+PriorityTier.swift in Sources */,
 				1DCBDC9082A0F0DE9C25A15A /* Array+MenuBarPopoverFilter.swift in Sources */,
 				3BC2BB1C58592C9E1B7D2C6C /* DurationPickerChips.swift in Sources */,
 				ECFC71629F9356F282022533 /* ErrorAlertModifier.swift in Sources */,
@@ -3182,6 +3189,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9DF656B6DD6A57C1A8D7B1E6 /* LocalTask+PriorityTier.swift in Sources */,
 				7FC881C488BD484FA0751A6A /* Array+MenuBarPopoverFilter.swift in Sources */,
 				BB89EB2BFBE316692E44CE67 /* DurationPickerChips.swift in Sources */,
 				304371189D89C1DC87260422 /* TaskIdeaSuggestionService.swift in Sources */,
@@ -3277,6 +3285,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9AFD59340CE46F3A4DA969EB /* MenuBarTierGroupingTests.swift in Sources */,
 				2F42B12BABD0CAB500D1936F /* TaskInspectorSaveTests.swift in Sources */,
 				CA1535634F6A1689F63F5D2C /* MacCoachVisibleSectionsTests.swift in Sources */,
 				1CEC4456AD6C94BC7DB4977B /* MacBacklogParkdeckStackingTests.swift in Sources */,

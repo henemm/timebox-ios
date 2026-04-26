@@ -20,29 +20,89 @@ enum MenuBarTimerFormatter {
     }
 }
 
+// MARK: - MenuBar Backlog Grouping (Bug #290)
+
+/// Pure-function grouping of `LocalTask` for the MenuBar popover.
+/// Splits a flat task list into Heute / Überfällig / Dringend buckets and
+/// applies a global limit. The result drives the popover's section rendering.
+///
+/// Section semantics (mirrors BacklogView tiers, condensed for popover):
+/// - **heute**: every active `isNextUp` task, sorted by priorityScore desc
+/// - **ueberfaellig**: due before today AND not nextUp (incl. overdue
+///   .doNow tasks — they belong here, not in dringend, to avoid duplicates)
+/// - **dringend**: priorityTier == .doNow, NOT nextUp, NOT overdue
+///
+/// Fill order is Heute → Ueberfaellig → Dringend. Once `limit` is reached
+/// later sections are dropped. `abgeschnittenCount` reports how many BACKLOG
+/// items (Ueberfaellig + Dringend, NOT Heute) didn't fit.
+struct MenuBarBacklogGrouping {
+    struct Result {
+        let heute: [LocalTask]
+        let ueberfaellig: [LocalTask]
+        let dringend: [LocalTask]
+        /// Number of backlog tasks (Ueberfaellig + Dringend) NOT shown.
+        /// Heute-Tasks are intentionally excluded from this count.
+        let abgeschnittenCount: Int
+    }
+
+    static func group(tasks: [LocalTask], limit: Int = 9, now: Date = Date()) -> Result {
+        let startOfToday = Calendar.current.startOfDay(for: now)
+
+        let active = tasks.filter { !$0.isCompleted }
+
+        // Heute: every active nextUp task
+        let heuteAll = active
+            .filter { $0.isNextUp }
+            .sorted { $0.priorityScore > $1.priorityScore }
+
+        // Ueberfaellig: due < startOfToday, NOT nextUp
+        let ueberfaelligAll = active.filter { task in
+            guard let due = task.dueDate else { return false }
+            return due < startOfToday && !task.isNextUp
+        }.sorted { $0.priorityScore > $1.priorityScore }
+
+        // Dringend: tier .doNow, NOT nextUp, NOT overdue
+        let dringendAll = active.filter { task in
+            guard task.priorityTier == .doNow, !task.isNextUp else { return false }
+            if let due = task.dueDate, due < startOfToday { return false }
+            return true
+        }.sorted { $0.priorityScore > $1.priorityScore }
+
+        // Fill order: Heute → Ueberfaellig → Dringend, capped at `limit` total
+        var remaining = max(0, limit)
+        let heute = Array(heuteAll.prefix(remaining))
+        remaining -= heute.count
+        let ueberfaellig = Array(ueberfaelligAll.prefix(remaining))
+        remaining -= ueberfaellig.count
+        let dringend = Array(dringendAll.prefix(remaining))
+
+        // Abgeschnitten = backlog total minus backlog shown.
+        // Heute-Tasks are NOT counted (per Henning's spec).
+        let backlogTotal = ueberfaelligAll.count + dringendAll.count
+        let backlogShown = ueberfaellig.count + dringend.count
+        let abgeschnitten = max(0, backlogTotal - backlogShown)
+
+        return Result(
+            heute: heute,
+            ueberfaellig: ueberfaellig,
+            dringend: dringend,
+            abgeschnittenCount: abgeschnitten
+        )
+    }
+}
+
 /// Menu Bar popover content showing current focus state and quick actions
 struct MenuBarView: View {
     @Query(filter: #Predicate<LocalTask> { !$0.isCompleted && $0.isNextUp },
            sort: \LocalTask.nextUpSortOrder)
     private var nextUpTasks: [LocalTask]
 
-    @Query(filter: #Predicate<LocalTask> { !$0.isCompleted && !$0.isNextUp },
-           sort: \LocalTask.createdAt, order: .reverse)
+    /// Bug #290: Backlog-Tasks ohne SwiftData-Sortierung — Sortierung & Tier-Gruppierung
+    /// per Post-Fetch durch `MenuBarBacklogGrouping` (Score ist computed → kein @Query-Sort).
+    @Query(filter: #Predicate<LocalTask> { !$0.isCompleted && !$0.isNextUp })
     private var backlogTasks: [LocalTask]
 
     @Query private var allTasks: [LocalTask]
-
-    // MARK: - Filtered Lists (Bug #289 + #287)
-    // Post-Fetch-Filter analog zu LocalTaskSource.fetchIncompleteTasks(),
-    // weil isVisibleInBacklog eine Computed Property ist und nicht im
-    // SwiftData #Predicate verwendbar ist.
-    private var filteredNextUpTasks: [LocalTask] {
-        nextUpTasks.filteredForMenuBarPopover()
-    }
-
-    private var filteredBacklogTasks: [LocalTask] {
-        backlogTasks.filteredForMenuBarPopover()
-    }
 
     @Environment(\.modelContext) private var modelContext
     @Environment(\.openWindow) private var openWindow
@@ -82,13 +142,13 @@ struct MenuBarView: View {
 
             Divider()
 
-            // Next Up Tasks
+            // Next Up Tasks (HEUTE — unveraendert seit RW 2.4b)
             nextUpSection
 
-            if !filteredBacklogTasks.isEmpty {
-                Divider()
-                backlogPreview
-            }
+            // Bug #290: Tier-Sektionen statt flacher backlog-Liste.
+            // Heute-Tasks zeigt bereits `nextUpSection` an — `MenuBarBacklogGrouping`
+            // wird hier ohne nextUp-Tasks aufgerufen, damit kein Doppel-Render.
+            tierSections
 
             Divider()
 
@@ -97,6 +157,7 @@ struct MenuBarView: View {
         }
         .padding()
         .frame(width: 300)
+        .fixedSize(horizontal: false, vertical: true)
         .onAppear { loadFocusBlock() }
         .onReceive(activeTimer) { time in
             guard activeBlock != nil else { return }
@@ -255,7 +316,7 @@ struct MenuBarView: View {
             Text("FocusBlox")
                 .font(.headline)
             Spacer()
-            Text("\(filteredNextUpTasks.count + filteredBacklogTasks.count) Tasks")
+            Text("\(nextUpTasks.count + backlogTasks.count) Tasks")
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }
@@ -310,20 +371,20 @@ struct MenuBarView: View {
                 .foregroundStyle(.secondary)
                 .textCase(.uppercase)
 
-            if filteredNextUpTasks.isEmpty {
+            if nextUpTasks.isEmpty {
                 Text("No tasks staged")
                     .font(.caption)
                     .foregroundStyle(.tertiary)
                     .italic()
             } else {
-                ForEach(filteredNextUpTasks.prefix(3), id: \.uuid) { task in
+                ForEach(nextUpTasks.prefix(3), id: \.uuid) { task in
                     MenuBarTaskRow(task: task) {
                         toggleComplete(task)
                     }
                 }
 
-                if filteredNextUpTasks.count > 3 {
-                    Text("+\(filteredNextUpTasks.count - 3) more")
+                if nextUpTasks.count > 3 {
+                    Text("+\(nextUpTasks.count - 3) more")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
@@ -331,27 +392,85 @@ struct MenuBarView: View {
         }
     }
 
-    // MARK: - Backlog Preview
+    // MARK: - Tier Sections (Bug #290)
 
-    private var backlogPreview: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("Backlog")
-                .font(.caption)
-                .foregroundStyle(.secondary)
+    /// Combined Ueberfaellig + Dringend sections with global 9-task-limit.
+    /// Heute is rendered separately via `nextUpSection` to avoid duplication.
+    /// Bug #289 regression fix: filteredForMenuBarPopover() entfernt Templates,
+    /// Future-Recurrence-Instanzen, raw-Tasks, FocusBlock-zugewiesene und blockierte
+    /// Tasks — sonst erscheinen Duplikate die im Hauptfenster nicht sichtbar sind.
+    @ViewBuilder
+    private var tierSections: some View {
+        let backlogOnly = backlogTasks.filteredForMenuBarPopover().filter { !$0.isNextUp }
+        let grouping = MenuBarBacklogGrouping.group(tasks: backlogOnly)
+
+        if !grouping.ueberfaellig.isEmpty || !grouping.dringend.isEmpty || grouping.abgeschnittenCount > 0 {
+            Divider()
+            VStack(alignment: .leading, spacing: 12) {
+                if !grouping.ueberfaellig.isEmpty {
+                    tierSection(
+                        title: "Überfällig",
+                        accent: .red,
+                        tasks: grouping.ueberfaellig,
+                        identifier: "menubar_overdueSection"
+                    )
+                }
+                if !grouping.dringend.isEmpty {
+                    tierSection(
+                        title: "Dringend",
+                        accent: .orange,
+                        tasks: grouping.dringend,
+                        identifier: "menubar_dringendSection"
+                    )
+                }
+                if grouping.abgeschnittenCount > 0 {
+                    moreCounter(grouping.abgeschnittenCount)
+                }
+            }
+        }
+    }
+
+    private func tierSection(
+        title: String,
+        accent: Color,
+        tasks: [LocalTask],
+        identifier: String
+    ) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(title)
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(accent)
                 .textCase(.uppercase)
 
-            ForEach(filteredBacklogTasks.prefix(2), id: \.uuid) { task in
+            ForEach(tasks, id: \.uuid) { task in
                 MenuBarTaskRow(task: task) {
                     toggleComplete(task)
                 }
             }
-
-            if filteredBacklogTasks.count > 2 {
-                Text("+\(filteredBacklogTasks.count - 2) more in backlog")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
         }
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier(identifier)
+    }
+
+    private func moreCounter(_ count: Int) -> some View {
+        Button {
+            // Open main window AND switch to Backlog tab via Notification
+            NSApplication.shared.activate(ignoringOtherApps: true)
+            if let window = NSApplication.shared.windows.first(where: {
+                $0.title == "FocusBlox" || $0.identifier?.rawValue == "main"
+            }) {
+                window.makeKeyAndOrderFront(nil)
+            } else {
+                openWindow(id: "main")
+            }
+            NotificationCenter.default.post(name: .navigateToBacklog, object: nil)
+        } label: {
+            Text("+\(count) weitere im Backlog")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+        .buttonStyle(.borderless)
+        .accessibilityIdentifier("menubar_moreCounter")
     }
 
     // MARK: - Footer Actions
@@ -499,6 +618,13 @@ struct MenuBarTaskRow: View {
         }
         .font(.callout)
     }
+}
+
+// MARK: - Notification (Bug #290)
+
+extension Notification.Name {
+    /// Posted when MenuBar "+M weitere"-Counter is tapped — switches main window to Backlog tab.
+    static let navigateToBacklog = Notification.Name("NavigateToBacklog")
 }
 
 #Preview {
