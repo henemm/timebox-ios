@@ -89,38 +89,67 @@ final class MacParkdeckStackingUITests: XCTestCase {
 
     // MARK: - Stacking Tests
 
-    /// Bricht wenn: MacBacklogRow doesn't render stackingBadge_<id>.
+    /// Bug 279 — Beweis: Wenn Recurring-Group 2+ offene Children hat, muss
+    /// der Stacking-Badge mit `accessibilityIdentifier == 'stackingBadge_<id>'` rendern.
+    /// **Anti-Silent-Pass:** KEIN OR-Fallback auf labels — nur strikte Identifier-Pruefung.
+    /// Bricht wenn: MacBacklogRow rendert kein stackingBadge_<id>.
     func test_stackingBadge_existsForRecurringGroup() throws {
-        // Search for stacking badge across all element types (macOS may render as different type)
-        let badgeByIdentifier = app.descendants(matching: .any).matching(
+        let badge = app.descendants(matching: .any).matching(
             NSPredicate(format: "identifier BEGINSWITH 'stackingBadge_'")
         ).firstMatch
-        let identifierFound = badgeByIdentifier.waitForExistence(timeout: 5)
 
-        // Fallback: search by accessibility label pattern
-        let badgeByLabel = app.descendants(matching: .any).matching(
-            NSPredicate(format: "label CONTAINS 'aufgelaufene Instanzen'")
-        ).firstMatch
-        let labelFound = badgeByLabel.waitForExistence(timeout: 2)
-
-        XCTAssertTrue(identifierFound || labelFound,
-                      "Stacking badge must appear when recurring tasks are grouped")
+        XCTAssertTrue(
+            badge.waitForExistence(timeout: 5),
+            "Bug 279 — Stacking-Badge mit identifier 'stackingBadge_<id>' fehlt. " +
+            "Mock-Daten haben gestackte Recurring-Tasks; macOS-MacBacklogRow rendert kein StackingBadge."
+        )
     }
 
-    /// Bricht wenn: MacBacklogRow doesn't show "x2" or "x3" badge text.
-    func test_stackingBadge_showsCorrectCountFormat() throws {
-        // Search for stacking badge by identifier (macOS doesn't expose labels on nested Text)
-        let badges = app.staticTexts.matching(
-            NSPredicate(format: "identifier BEGINSWITH 'stackingBadge_'")
+    /// Bug 279 — Beweis: Mock-Daten Series 2 hat 3 offene Children → Badge "x3" muss da sein.
+    /// (Mock-Daten in FocusBloxApp.swift sind shared zwischen iOS und macOS.)
+    /// Bricht wenn: applyStacking() setzt count nicht oder MacBacklogRow rendert label nicht.
+    func test_stackingBadge_showsLabelX3_forThreeInstances() throws {
+        let badgeX3 = app.descendants(matching: .any).matching(
+            NSPredicate(format: "label == 'x3' AND identifier BEGINSWITH 'stackingBadge_'")
+        ).firstMatch
+
+        XCTAssertTrue(
+            badgeX3.waitForExistence(timeout: 5),
+            "Bug 279 — Series 2 'Wochenreview' hat 3 offene Children, Badge 'x3' muss sichtbar sein."
+        )
+    }
+
+    /// Bug 279 — Beweis: Mock-Daten Series 1 hat 2 offene Children → Badge "x2" muss da sein
+    /// (Spec: ab 2 Instanzen sichtbar, nicht erst ab 3).
+    /// Bricht wenn: Stacking-Schwelle ist >= 3 statt >= 2 ODER Logik gruppiert nicht.
+    func test_stackingBadge_showsLabelX2_forTwoInstances() throws {
+        let badgeX2 = app.descendants(matching: .any).matching(
+            NSPredicate(format: "label == 'x2' AND identifier BEGINSWITH 'stackingBadge_'")
+        ).firstMatch
+
+        XCTAssertTrue(
+            badgeX2.waitForExistence(timeout: 5),
+            "Bug 279 — Series 1 'Taeglich lesen' hat 2 offene Children, Badge 'x2' muss sichtbar sein " +
+            "(Spec: ab 2 Instanzen, nicht erst ab 3)."
+        )
+    }
+
+    /// Bug 279 — Beweis: 3 Instanzen derselben Serie erscheinen als EINE Row, nicht 3.
+    /// Bricht wenn: macOS-Backlog gruppiert nicht nach recurrenceGroupID.
+    func test_stackedSeries_rendersAsSingleRow() throws {
+        let wochenreviewRows = app.descendants(matching: .any).matching(
+            NSPredicate(format: "label == '[MOCK] Wochenreview'")
         )
 
-        guard badges.count > 0 else {
-            XCTFail("No stacking badges found — check mock data has 2+ recurring children per group")
-            return
-        }
+        // Warte kurz, damit die Liste geladen ist
+        let firstAnchor = app.descendants(matching: .any).matching(
+            NSPredicate(format: "label CONTAINS '[MOCK]'")
+        ).firstMatch
+        _ = firstAnchor.waitForExistence(timeout: 5)
 
-        // Verify we have at least 2 stacking badges (group1 x4 and group2 x2)
-        XCTAssertGreaterThanOrEqual(badges.count, 2,
-            "Should have stacking badges for at least 2 recurring groups, found: \(badges.count)")
+        XCTAssertEqual(
+            wochenreviewRows.count, 1,
+            "Bug 279 — Wochenreview muss als EINE gestackte Row erscheinen, nicht als \(wochenreviewRows.count) separate Rows."
+        )
     }
 }

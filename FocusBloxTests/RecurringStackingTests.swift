@@ -112,63 +112,51 @@ final class RecurringStackingTests: XCTestCase {
         )
     }
 
-    // MARK: - Bug 279: stackedOldestDueDate
+    // MARK: - Bug 279: stackedOldestDueDate (Field-Existenz)
 
-    /// Verhalten: PlanItem muss ein stackedOldestDueDate-Feld haben,
-    ///            das von applyRecurringStacking auf das aelteste dueDate der Gruppe gesetzt wird.
+    /// **STRUKTUR-TEST (kein Behavior-Test):** Prueft nur dass PlanItem das Feld besitzt.
+    /// **WARNUNG:** Dieser Test sagt NICHTS darueber aus ob applyRecurringStacking()
+    /// das Feld korrekt setzt. Behavior wird in BacklogStackingUITests.test_seriesWithThreeInstances_showsBadgeX3
+    /// und test_stackedTaskShowsSubtitle geprueft.
     /// Bricht wenn: PlanItem kein stackedOldestDueDate Property hat.
-    func test_planItem_hasStackedOldestDueDate() {
+    func test_planItem_hasStackedOldestDueDate_FIELD_ONLY() {
         let twoDaysAgo = Calendar.current.date(byAdding: .day, value: -2, to: Date())!
-        let item = makePlanItem(id: "oldest-279", groupID: "grp-279", dueDate: twoDaysAgo)
+        var item = makePlanItem(id: "oldest-279", groupID: "grp-279", dueDate: twoDaysAgo)
 
-        // stackedOldestDueDate muss als Property existieren
-        let mirror = Mirror(reflecting: item)
-        let hasField = mirror.children.contains { $0.label == "stackedOldestDueDate" }
-        XCTAssertTrue(hasField, "PlanItem muss ein stackedOldestDueDate-Feld haben")
+        // Beweis dass das Feld settable ist (nicht nur Mirror-Reflection auf Optional-Default-nil)
+        item.stackedOldestDueDate = twoDaysAgo
+        XCTAssertEqual(item.stackedOldestDueDate, twoDaysAgo,
+                       "PlanItem.stackedOldestDueDate muss settable sein und den Wert behalten")
     }
 
-    // MARK: - Bug 279: isNextUp-Tasks duerfen nicht gestackt werden
+    // MARK: - Bug 279: stackedInstanceCount Setter (Field-Behavior)
 
-    /// Verhalten: Tasks mit isNextUp=true bleiben aus Stacking-Gruppen ausgeschlossen.
-    /// Bricht wenn: Die Stacking-Logik isNextUp-Tasks in die Gruppe einbezieht.
-    func test_stackingExcludesNextUpTasks() {
-        // Erstelle 3 PlanItems mit gleicher groupID — eines davon isNextUp
-        let groupID = "grp-279-nextup"
-        let backlog1 = makePlanItem(id: "b1", groupID: groupID, isNextUp: false)
-        let backlog2 = makePlanItem(id: "b2", groupID: groupID, isNextUp: false)
-        let nextUpItem = makePlanItem(id: "nu1", groupID: groupID, isNextUp: true)
+    /// **STRUKTUR-TEST:** Prueft dass stackedInstanceCount settable ist und priorityScore nutzt.
+    /// **WARNUNG:** Sagt NICHTS darueber aus ob applyRecurringStacking() den Counter setzt.
+    /// Behavior in BacklogStackingUITests.test_seriesWithTwoInstances_showsBadgeX2.
+    func test_planItem_stackedInstanceCount_isSettableAndScored() {
+        var item = makePlanItem(id: "set-test", groupID: "grp-set")
+        XCTAssertEqual(item.stackedInstanceCount, 1, "Default = 1")
 
-        let allItems = [backlog1, backlog2, nextUpItem]
+        let scoreBefore = item.priorityScore
+        item.stackedInstanceCount = 3
+        let scoreAfter = item.priorityScore
 
-        // Simuliere die Stacking-Logik (gleicher Algorithmus wie BacklogView.applyRecurringStacking)
-        var groups: [String: [PlanItem]] = [:]
-        var ungrouped: [PlanItem] = []
-
-        for item in allItems {
-            if let gid = item.recurrenceGroupID,
-               !item.isTemplate,
-               !item.isCompleted,
-               !item.isNextUp {
-                groups[gid, default: []].append(item)
-            } else {
-                ungrouped.append(item)
-            }
-        }
-
-        // isNextUp-Item muss in ungrouped landen, NICHT in der Stacking-Gruppe
-        XCTAssertEqual(ungrouped.count, 1, "isNextUp-Task muss als ungrouped behandelt werden")
-        XCTAssertTrue(ungrouped[0].isNextUp, "Das ungrouped Item muss das isNextUp-Item sein")
-
-        // Die Gruppe darf nur die 2 Backlog-Items enthalten
-        let group = groups[groupID]
-        XCTAssertNotNil(group, "Backlog-Items muessen gruppiert werden")
-        XCTAssertEqual(group?.count, 2, "Nur Backlog-Items (nicht isNextUp) werden gestackt")
-
-        // Keines der gruppierten Items darf isNextUp sein
-        for item in group ?? [] {
-            XCTAssertFalse(item.isNextUp, "isNextUp-Tasks duerfen NICHT in Stacking-Gruppen sein")
-        }
+        XCTAssertEqual(item.stackedInstanceCount, 3, "Setter muss greifen")
+        XCTAssertGreaterThan(scoreAfter, scoreBefore,
+                             "priorityScore muss stackedInstanceCount beruecksichtigen")
     }
+
+    // MARK: - REMOVED: test_stackingExcludesNextUpTasks
+    //
+    // Der frueher hier stehende Test hat die Stacking-Logik IM TEST SELBST nachgebaut
+    // (`for item in allItems { if let gid = ... }`) statt den echten Code aufzurufen.
+    // Das ist ein Silent-Pass-Pattern: Der Test war GREEN obwohl der Bug 279 da war,
+    // weil er nie applyRecurringStacking() in BacklogView.swift aufrief.
+    //
+    // applyRecurringStacking() ist `private` — kann aus Unit-Tests nicht aufgerufen werden.
+    // Der echte Behavior-Test fuer isNextUp-Ausschluss muss als UI-Test laufen.
+    // Siehe: BacklogStackingUITests.test_stackedSeries_rendersAsSingleRow
 
     // MARK: - Helpers
 

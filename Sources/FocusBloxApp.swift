@@ -757,8 +757,12 @@ struct FocusBloxApp: App {
     /// Seed mock data for UI testing
     /// Static so it can be called from the model container initializer (before views load)
     private static func seedUITestData(into context: ModelContext) {
-        // Check if already seeded (avoid duplicates on re-render)
-        let descriptor = FetchDescriptor<LocalTask>(predicate: #Predicate { $0.title == "[MOCK] Task 1 #30min" })
+        // Check if already seeded (avoid duplicates on re-render).
+        // Sentinel must match an actually-seeded task title — older sentinel
+        // "[MOCK] Task 1 #30min" no longer existed, causing duplicate seeds (Bug 279).
+        let descriptor = FetchDescriptor<LocalTask>(
+            predicate: #Predicate { $0.title == "[MOCK] Feature: Dark Mode fuer Settings #30min" }
+        )
         let existingTasks = (try? context.fetch(descriptor)) ?? []
         guard existingTasks.isEmpty else { return }
 

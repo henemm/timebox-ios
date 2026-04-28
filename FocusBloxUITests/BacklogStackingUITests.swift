@@ -1,5 +1,17 @@
 import XCTest
 
+/// Bug 279 — Stacking-Badge wird beim Anhaeufen wiederkehrender Tasks angezeigt.
+///
+/// **Mock-Daten-Setup (FocusBloxApp.swift, ab Zeile 913):**
+/// - Series 1 "Taeglich lesen": 2 offene Children (heute + gestern) → Badge "x2"
+/// - Series 2 "Wochenreview": 3 offene Children (heute + -7T + -14T) → Badge "x3"
+/// - Series 3 "Zweiwochentlich aufraeumen": 1 offenes Child → KEIN Badge
+///
+/// **Anti-Silent-Pass (Bug 279 Re-Open):** Tests pruefen konkrete Label-Werte ("x2", "x3"),
+/// nicht nur Identifier-Existenz oder OR-Fallbacks. Mock-Daten sind deterministisch
+/// geseedet — wenn das Badge fehlt, ist der einzige moegliche Grund:
+/// applyRecurringStacking() setzt stackedInstanceCount nicht oder die Render-Bedingung
+/// in BacklogRow.swift Zeile 228 ist falsch.
 final class BacklogStackingUITests: XCTestCase {
     var app: XCUIApplication!
 
@@ -14,61 +26,90 @@ final class BacklogStackingUITests: XCTestCase {
 
     private func navigateToBacklogPriority() {
         let backlogTab = app.tabBars.buttons["Backlog"]
-        if backlogTab.waitForExistence(timeout: 5) {
-            backlogTab.tap()
-        }
+        XCTAssertTrue(backlogTab.waitForExistence(timeout: 5), "Backlog-Tab muss existieren")
+        backlogTab.tap()
+
+        let list = app.collectionViews.firstMatch
+        XCTAssertTrue(list.waitForExistence(timeout: 5), "Backlog-Liste muss existieren")
     }
 
-    // MARK: - TEST_01: Stacking Badge wird angezeigt
+    // MARK: - TEST_01: Series 2 (3 offene Instanzen) zeigt Badge "x3"
 
-    /// Verhalten: Wenn eine recurring Serie 2+ offene Instanzen hat, wird ein Badge "x2" angezeigt.
-    /// Bricht wenn: BacklogRow kein StackingBadge rendert bei stackedCount >= 2.
-    func test_stackingBadge_showsCountForMultipleInstances() {
+    /// Bug 279 — Beweis: Series 2 'Wochenreview' hat 3 offene Children → Badge "x3" muss sichtbar sein.
+    /// Bricht wenn: applyRecurringStacking() setzt stackedInstanceCount nicht auf 3.
+    func test_seriesWithThreeInstances_showsBadgeX3() throws {
         navigateToBacklogPriority()
 
-        // Suche nach einem Stacking-Badge via accessibilityIdentifier
-        let stackingBadges = app.staticTexts.matching(
-            NSPredicate(format: "identifier BEGINSWITH 'stackingBadge_'")
-        )
-
-        // Es sollte mindestens ein Stacking-Badge existieren wenn recurring Tasks gestackt sind
-        XCTAssertGreaterThan(stackingBadges.count, 0, "Stacking badge (e.g. 'x2', 'x3') should exist for stacked recurring tasks")
-    }
-
-    // MARK: - TEST_02: Gestackte Tasks werden gruppiert
-
-    /// Verhalten: 3 offene Instanzen derselben Serie erscheinen als EINE Zeile, nicht 3.
-    /// Bricht wenn: BacklogView keine Gruppierung nach recurrenceGroupID macht.
-    func test_stackedRecurringTasks_showAsOneRow() {
-        navigateToBacklogPriority()
-
-        // Zaehle sichtbare Task-Titel — gestackte sollten nur einmal erscheinen
-        let list = app.collectionViews.firstMatch.exists
-            ? app.collectionViews.firstMatch
-            : app.tables.firstMatch
-
-        XCTAssertTrue(list.waitForExistence(timeout: 5), "Backlog list should exist")
-
-        // Suche nach dem Stacking-Badge als Beweis fuer Gruppierung
-        let badges = app.staticTexts.matching(
-            NSPredicate(format: "identifier BEGINSWITH 'stackingBadge_'")
-        )
-        // In einer nicht-leeren Backlog mit recurring Tasks sollte mindestens ein Badge existieren
-        XCTAssertGreaterThan(badges.count, 0, "At least one stacking badge should exist for grouped recurring tasks")
-    }
-
-    // MARK: - TEST_03: Kein Badge bei einzelner Instanz
-
-    /// Verhalten: Eine einzelne recurring Instanz (nicht gestackt) zeigt keinen Stacking-Badge.
-    /// Bricht wenn: StackingBadge auch bei stackedCount=1 angezeigt wird.
-    func test_singleRecurringInstance_noStackingBadge() {
-        navigateToBacklogPriority()
-
-        // Teste dass kein Badge mit "x1" existiert (x1 = kein Stacking)
-        let x1Badge = app.staticTexts.matching(
-            NSPredicate(format: "label == 'x1'")
+        let badgeX3 = app.staticTexts.matching(
+            NSPredicate(format: "label == 'x3' AND identifier BEGINSWITH 'stackingBadge_'")
         ).firstMatch
-        XCTAssertFalse(x1Badge.exists, "Single instance should NOT show 'x1' badge")
+
+        XCTAssertTrue(
+            badgeX3.waitForExistence(timeout: 5),
+            "Series 2 'Wochenreview' hat 3 offene Children — Badge 'x3' muss sichtbar sein. " +
+            "Falls fehlt: applyRecurringStacking() setzt stackedInstanceCount nicht korrekt."
+        )
+    }
+
+    // MARK: - TEST_02: Series 1 (2 offene Instanzen) zeigt Badge "x2"
+
+    /// Bug 279 — Beweis: Series 1 hat 2 offene Children → Badge "x2" muss sichtbar sein
+    /// (Spec: ab 2 Instanzen sichtbar, nicht erst ab 3).
+    /// Bricht wenn: Stacking-Schwelle ist >= 3 statt >= 2 ODER Logik gruppiert nicht.
+    func test_seriesWithTwoInstances_showsBadgeX2() throws {
+        navigateToBacklogPriority()
+
+        let badgeX2 = app.staticTexts.matching(
+            NSPredicate(format: "label == 'x2' AND identifier BEGINSWITH 'stackingBadge_'")
+        ).firstMatch
+
+        XCTAssertTrue(
+            badgeX2.waitForExistence(timeout: 5),
+            "Series 1 'Taeglich lesen' hat 2 offene Children — Badge 'x2' muss sichtbar sein " +
+            "(Spec: ab 2 Instanzen orange, nicht erst ab 3)."
+        )
+    }
+
+    // MARK: - TEST_03: Genau EINE Row pro gestackter Serie (nicht 3)
+
+    /// Bug 279 — Beweis: 3 Instanzen derselben Serie erscheinen als EINE Row, nicht 3.
+    /// Bricht wenn: BacklogView gruppiert nicht nach recurrenceGroupID.
+    func test_stackedSeries_rendersAsSingleRow() throws {
+        navigateToBacklogPriority()
+
+        let wochenreviewRows = app.staticTexts.matching(
+            NSPredicate(format: "label == '[MOCK] Wochenreview'")
+        )
+
+        XCTAssertEqual(
+            wochenreviewRows.count, 1,
+            "Wochenreview muss als EINE gestackte Row erscheinen, nicht als \(wochenreviewRows.count) separate Rows."
+        )
+    }
+
+    // MARK: - TEST_04: Negativtest — Series 3 (1 Instanz) hat KEIN Badge
+
+    /// Bug 279 — Beweis: Series mit 1 Instanz darf KEINEN Stacking-Badge zeigen.
+    /// Anti-Silent-Pass: Wartet zuerst auf positiven Anker (irgend ein Badge),
+    /// damit der Test nicht trivially passed wenn ALLE Badges fehlen.
+    /// Bricht wenn: Badge auch bei stackedInstanceCount=1 angezeigt wird.
+    func test_singleInstanceSeries_hasNoStackingBadge() throws {
+        navigateToBacklogPriority()
+
+        // Anker: irgend ein Badge muss existieren (Series 1 oder 2), sonst ist der Test bedeutungslos
+        let anyBadge = app.staticTexts.matching(
+            NSPredicate(format: "identifier BEGINSWITH 'stackingBadge_'")
+        ).firstMatch
+        XCTAssertTrue(
+            anyBadge.waitForExistence(timeout: 5),
+            "Voraussetzung: mindestens ein Badge muss existieren (Series 1 oder 2). " +
+            "Falls keiner: dieser Negativ-Test ist bedeutungslos."
+        )
+
+        let x1Badge = app.staticTexts.matching(
+            NSPredicate(format: "label == 'x1' AND identifier BEGINSWITH 'stackingBadge_'")
+        ).firstMatch
+        XCTAssertFalse(x1Badge.exists, "Bei nur 1 Instanz darf KEIN 'x1' Badge erscheinen")
     }
 
     // MARK: - TEST_04: Completion reduziert Badge
