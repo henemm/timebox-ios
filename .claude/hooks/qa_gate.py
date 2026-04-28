@@ -158,10 +158,39 @@ def _hook_mode() -> int:
     except (json.JSONDecodeError, OSError):
         pass
 
+    mark_cmd = mark_pattern.group(1)
+    expects_failures = mark_cmd in ("mark-red", "mark-ui-red")
+
     valid, message = validate_test_output(output_path, infra=infra)
+
+    if expects_failures:
+        # mark-red/mark-ui-red: TDD-RED erwartet rote Tests.
+        # "Tests FAILED: ..." ist hier der ERWÜNSCHTE Zustand.
+        if not valid and message.startswith(("Tests FAILED:", "Python tests FAILED:")):
+            return 0
+        if valid:
+            print(
+                f"BLOCKED: qa_gate validation failed for {mark_cmd}: "
+                f"all tests passed but TDD-RED requires at least 1 failure. "
+                f"Marking RED with all-passing tests is suspicious — "
+                f"either the bug is not yet covered by a test, or the wrong output file was passed.\n"
+                f"Output file: {output_path}",
+                file=sys.stderr,
+            )
+            return 2
+        # not valid und nicht failure-related (z.B. file missing, fabricated, age)
+        print(
+            f"BLOCKED: qa_gate validation failed for {mark_cmd}: {message}\n"
+            f"Output file: {output_path}\n"
+            f"Run tests again and re-mark with the new output file.",
+            file=sys.stderr,
+        )
+        return 2
+
+    # mark-green/mark-ui-green: bestehende Logik — Output muss valid (alle PASSED) sein
     if not valid:
         print(
-            f"BLOCKED: qa_gate validation failed for {mark_pattern.group(1)}: {message}\n"
+            f"BLOCKED: qa_gate validation failed for {mark_cmd}: {message}\n"
             f"Output file: {output_path}\n"
             f"Run tests again and re-mark with the new output file.",
             file=sys.stderr,

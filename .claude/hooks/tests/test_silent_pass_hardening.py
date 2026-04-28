@@ -213,6 +213,19 @@ class TestQaGateHookMode(unittest.TestCase):
             self.fail(f"qa_gate.py rejected --hook-mode flag: {result.stderr}")
         return result.returncode, result.stdout, result.stderr
 
+    def _make_output(self, failures: int, total: int = 2) -> str:
+        """Erstellt temporären Test-Output mit gewählter Failure-Anzahl. Returns Pfad."""
+        passed = total - failures
+        body = "Test Suite 'FocusBloxTests' started.\n"
+        body += "".join(f"Test Case 'test_p{i}' passed.\n" for i in range(passed))
+        body += "Test Suite 'FocusBloxUITests' started.\n"
+        body += "".join(f"Test Case 'test_f{i}' failed.\n" for i in range(failures))
+        body += f"Executed {total} tests, with {failures} failures (0 unexpected) in 0.5 seconds\n"
+        body += "." * 500
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".txt", delete=False) as f:
+            f.write(body)
+            return f.name
+
     def test_qa_gate_hook_mode_blocks_invalid_output(self):
         """mark-red mit nicht-existentem Output-File → Exit 2."""
         cmd = f"{sys.executable} {HOOKS_DIR}/workflow.py mark-red /tmp/nonexistent_output_xyz.txt"
@@ -220,23 +233,58 @@ class TestQaGateHookMode(unittest.TestCase):
         self.assertEqual(exit_code, 2,
                          f"Expected Exit 2 (invalid output), got {exit_code}. stderr={stderr}")
 
-    def test_qa_gate_hook_mode_allows_valid_output(self):
-        """mark-red mit echtem XCTest-Output → Exit 0."""
-        with tempfile.NamedTemporaryFile(mode="w", suffix=".txt", delete=False) as f:
-            f.write(
-                "Test Suite 'FocusBloxTests' started.\n"
-                "Test Case 'test_foo' passed.\n"
-                "Test Suite 'FocusBloxUITests' started.\n"
-                "Test Case 'test_ui' passed.\n"
-                "Executed 2 tests, with 0 failures (0 unexpected) in 0.5 seconds\n"
-                + ("." * 500)
-            )
-            output_file = f.name
+    def test_qa_gate_mark_red_allows_failing_output(self):
+        """mark-red mit Failures → Exit 0 (TDD-RED erwartet rote Tests)."""
+        output_file = self._make_output(failures=1, total=2)
         try:
             cmd = f"{sys.executable} {HOOKS_DIR}/workflow.py mark-red {output_file}"
             exit_code, _, stderr = self._run_hook_mode(cmd)
             self.assertEqual(exit_code, 0,
-                             f"Expected Exit 0 (valid output), got {exit_code}. stderr={stderr}")
+                             f"Expected Exit 0 (mark-red erlaubt Failures), got {exit_code}. stderr={stderr}")
+        finally:
+            os.unlink(output_file)
+
+    def test_qa_gate_mark_red_blocks_all_passing(self):
+        """mark-red mit 0 Failures → Exit 2 (verdächtig: warum rot markieren wenn alles grün?)."""
+        output_file = self._make_output(failures=0, total=2)
+        try:
+            cmd = f"{sys.executable} {HOOKS_DIR}/workflow.py mark-red {output_file}"
+            exit_code, _, stderr = self._run_hook_mode(cmd)
+            self.assertEqual(exit_code, 2,
+                             f"Expected Exit 2 (mark-red ohne Failures verdächtig), got {exit_code}. stderr={stderr}")
+        finally:
+            os.unlink(output_file)
+
+    def test_qa_gate_mark_green_blocks_failing_output(self):
+        """mark-green mit Failures → Exit 2 (Block, wie heute)."""
+        output_file = self._make_output(failures=1, total=2)
+        try:
+            cmd = f"{sys.executable} {HOOKS_DIR}/workflow.py mark-green {output_file}"
+            exit_code, _, stderr = self._run_hook_mode(cmd)
+            self.assertEqual(exit_code, 2,
+                             f"Expected Exit 2 (mark-green blockiert Failures), got {exit_code}. stderr={stderr}")
+        finally:
+            os.unlink(output_file)
+
+    def test_qa_gate_mark_green_allows_passing_output(self):
+        """mark-green mit 0 Failures → Exit 0 (wie heute)."""
+        output_file = self._make_output(failures=0, total=2)
+        try:
+            cmd = f"{sys.executable} {HOOKS_DIR}/workflow.py mark-green {output_file}"
+            exit_code, _, stderr = self._run_hook_mode(cmd)
+            self.assertEqual(exit_code, 0,
+                             f"Expected Exit 0 (mark-green mit allen passed), got {exit_code}. stderr={stderr}")
+        finally:
+            os.unlink(output_file)
+
+    def test_qa_gate_mark_ui_red_allows_failing_output(self):
+        """mark-ui-red mit Failures → Exit 0 (gleiche Logik wie mark-red)."""
+        output_file = self._make_output(failures=1, total=2)
+        try:
+            cmd = f"{sys.executable} {HOOKS_DIR}/workflow.py mark-ui-red {output_file}"
+            exit_code, _, stderr = self._run_hook_mode(cmd)
+            self.assertEqual(exit_code, 0,
+                             f"Expected Exit 0 (mark-ui-red erlaubt Failures), got {exit_code}. stderr={stderr}")
         finally:
             os.unlink(output_file)
 
