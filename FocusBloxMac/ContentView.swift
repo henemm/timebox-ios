@@ -405,7 +405,8 @@ struct ContentView: View {
     private func macTierSection(
         title: String,
         tiers: [TaskPriorityScoringService.PriorityTier],
-        color: Color
+        color: Color,
+        sectionId: String
     ) -> some View {
         let tierTasks = regularFilteredTasks.filter { task in
             let score = scoreFor(task)
@@ -434,6 +435,8 @@ struct ContentView: View {
                         .clipShape(Capsule())
                 }
             }
+            .accessibilityElement(children: .contain)
+            .accessibilityIdentifier(sectionId)
         }
     }
 
@@ -533,12 +536,14 @@ struct ContentView: View {
                                     .clipShape(Capsule())
                             }
                         }
+                        .accessibilityElement(children: .contain)
+                        .accessibilityIdentifier("ueberfaelligSection")
                     }
 
                     // RW 2.4b: 3 Tier-Sektionen (Dringend, Bald, Später)
-                    macTierSection(title: "Dringend", tiers: [.doNow], color: .red)
-                    macTierSection(title: "Bald", tiers: [.planSoon], color: .orange)
-                    macTierSection(title: "Später", tiers: [.eventually, .someday], color: .yellow)
+                    macTierSection(title: "Dringend", tiers: [.doNow], color: .red, sectionId: "dringendSection")
+                    macTierSection(title: "Bald", tiers: [.planSoon], color: .orange, sectionId: "baldSection")
+                    macTierSection(title: "Später", tiers: [.eventually, .someday], color: .yellow, sectionId: "spaeterSection")
 
                     // RW 2.4b: Geparkt (manuell, immer offen)
                     let geparktTasks = regularFilteredTasks.filter { task in
@@ -567,8 +572,9 @@ struct ContentView: View {
                                     .clipShape(Capsule())
                                     .accessibilityIdentifier("geparktBadgeCount")
                             }
-                            .accessibilityIdentifier("geparktSectionHeader")
                         }
+                        .accessibilityElement(children: .contain)
+                        .accessibilityIdentifier("geparktSection")
                     }
                 } else {
                     // Non-priority filters: flat list (recent, overdue, completed, recurring)

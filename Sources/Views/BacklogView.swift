@@ -1087,7 +1087,9 @@ struct BacklogView: View {
     }
 
     // MARK: - Backlog Row with Swipe Actions (shared helper)
-    @ViewBuilder
+    // Bug #295: Helper liefert eine einzelne View (keine TupleView), damit SwiftUI
+    // die Section korrekt im Accessibility-Tree exposed. Blocked-Dependents werden
+    // separat im Aufrufer via `blockedRowsForEach(item)` gerendert.
     private func backlogRowWithSwipe(_ item: PlanItem) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             BacklogRow(
@@ -1149,7 +1151,11 @@ struct BacklogView: View {
                 postponeMenu(for: item)
             }
         }
-        // Render blocked dependents directly after this task
+    }
+
+    // Bug #295: Separate ForEach fuer blocked-Dependents — wird vom Aufrufer
+    // direkt nach `backlogRowWithSwipe(item)` in derselben Section ausgeloest.
+    private func blockedRowsForEach(_ item: PlanItem) -> some View {
         ForEach(blockedTasks(for: item.id)) { blocked in
             blockedRow(blocked)
         }
@@ -1225,6 +1231,7 @@ struct BacklogView: View {
                 Section {
                     ForEach(overdueTasks) { item in
                         backlogRowWithSwipe(item)
+                        blockedRowsForEach(item)
                     }
                 } header: {
                     HStack {
@@ -1241,12 +1248,14 @@ struct BacklogView: View {
                             .clipShape(Capsule())
                     }
                 }
+                .accessibilityElement(children: .contain)
+                .accessibilityIdentifier("ueberfaelligSection")
             }
 
             // RW 2.4b: 3 Tier-Sektionen + Geparkt
-            tierSection(title: "Dringend", tasks: dringendTasks, color: .red)
-            tierSection(title: "Bald", tasks: baldTasks, color: .orange)
-            tierSection(title: "Später", tasks: spaeterTasks, color: .yellow)
+            tierSection(title: "Dringend", tasks: dringendTasks, color: .red, sectionId: "dringendSection")
+            tierSection(title: "Bald", tasks: baldTasks, color: .orange, sectionId: "baldSection")
+            tierSection(title: "Später", tasks: spaeterTasks, color: .yellow, sectionId: "spaeterSection")
 
             // Geparkt (manuell, immer offen)
             if !geparktTasks.isEmpty {
@@ -1261,6 +1270,7 @@ struct BacklogView: View {
                                 }
                                 .tint(.blue)
                             }
+                        blockedRowsForEach(item)
                     }
                 } header: {
                     HStack {
@@ -1276,8 +1286,9 @@ struct BacklogView: View {
                             .background(Color.secondary.opacity(0.15))
                             .clipShape(Capsule())
                     }
-                    .accessibilityIdentifier("geparktSection")
                 }
+                .accessibilityElement(children: .contain)
+                .accessibilityIdentifier("geparktSection")
             }
         }
         .listStyle(.plain)
@@ -1293,7 +1304,7 @@ struct BacklogView: View {
 
     // MARK: - Tier Section Helper (RW 2.4b)
     @ViewBuilder
-    private func tierSection(title: String, tasks: [PlanItem], color: Color) -> some View {
+    private func tierSection(title: String, tasks: [PlanItem], color: Color, sectionId: String) -> some View {
         if !tasks.isEmpty {
             Section {
                 ForEach(tasks) { item in
@@ -1306,6 +1317,7 @@ struct BacklogView: View {
                             }
                             .tint(.gray)
                         }
+                    blockedRowsForEach(item)
                 }
             } header: {
                 HStack {
@@ -1322,6 +1334,8 @@ struct BacklogView: View {
                         .clipShape(Capsule())
                 }
             }
+            .accessibilityElement(children: .contain)
+            .accessibilityIdentifier(sectionId)
         }
     }
 
@@ -1333,6 +1347,7 @@ struct BacklogView: View {
             Section {
                 ForEach(recentTasks) { item in
                     backlogRowWithSwipe(item)
+                    blockedRowsForEach(item)
                 }
             } header: {
                 Text("Zuletzt bearbeitet")
@@ -1365,6 +1380,7 @@ struct BacklogView: View {
                 Section {
                     ForEach(overdueTasks) { item in
                         backlogRowWithSwipe(item)
+                        blockedRowsForEach(item)
                     }
                 } header: {
                     HStack {
