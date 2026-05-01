@@ -927,44 +927,9 @@ struct BacklogView: View {
 
     // MARK: - Recurring Stacking (RW_3.5)
 
-    /// Groups recurring instances by recurrenceGroupID.
-    /// The oldest instance (earliest dueDate) becomes the representative,
-    /// with stackedInstanceCount set to the group size.
-    /// Non-representative instances are removed from planItems.
+    /// Wendet Stacking auf `planItems` an (siehe `RecurringStackingHelper.apply`).
     private func applyRecurringStacking() {
-        // Group items by recurrenceGroupID + parked status (only non-nil, non-template, non-completed)
-        // RW 2.4b: Geparkte und ungeparkte Instanzen weiterhin getrennt gruppiert
-        var groups: [String: [Int]] = [:]  // "groupID_parked/active" -> indices
-        for (index, item) in planItems.enumerated() {
-            guard let groupID = item.recurrenceGroupID,
-                  !item.isTemplate,
-                  !item.isCompleted,
-                  !item.isNextUp else { continue }
-            let key = "\(groupID)_\(item.isParked ? "parked" : "active")"
-            groups[key, default: []].append(index)
-        }
-
-        // For each group with 2+ instances: mark representative, remove others
-        var indicesToRemove: Set<Int> = []
-        for (_, indices) in groups where indices.count >= 2 {
-            // Find the representative: oldest dueDate (earliest)
-            let representativeIndex = indices.min { a, b in
-                (planItems[a].dueDate ?? .distantFuture) < (planItems[b].dueDate ?? .distantFuture)
-            } ?? indices[0]
-
-            planItems[representativeIndex].stackedInstanceCount = indices.count
-            planItems[representativeIndex].stackedOldestDueDate = indices
-                .compactMap { planItems[$0].dueDate }
-                .min()
-            for idx in indices where idx != representativeIndex {
-                indicesToRemove.insert(idx)
-            }
-        }
-
-        // Remove non-representative items (iterate in reverse to preserve indices)
-        for idx in indicesToRemove.sorted().reversed() {
-            planItems.remove(at: idx)
-        }
+        planItems = RecurringStackingHelper.apply(to: planItems)
     }
 
     // MARK: - View Mode Switcher
@@ -1087,9 +1052,7 @@ struct BacklogView: View {
     }
 
     // MARK: - Backlog Row with Swipe Actions (shared helper)
-    // Bug #295: Helper liefert eine einzelne View (keine TupleView), damit SwiftUI
-    // die Section korrekt im Accessibility-Tree exposed. Blocked-Dependents werden
-    // separat im Aufrufer via `blockedRowsForEach(item)` gerendert.
+    @ViewBuilder
     private func backlogRowWithSwipe(_ item: PlanItem) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             BacklogRow(
@@ -1151,11 +1114,7 @@ struct BacklogView: View {
                 postponeMenu(for: item)
             }
         }
-    }
-
-    // Bug #295: Separate ForEach fuer blocked-Dependents — wird vom Aufrufer
-    // direkt nach `backlogRowWithSwipe(item)` in derselben Section ausgeloest.
-    private func blockedRowsForEach(_ item: PlanItem) -> some View {
+        // Render blocked dependents directly after this task
         ForEach(blockedTasks(for: item.id)) { blocked in
             blockedRow(blocked)
         }
@@ -1231,7 +1190,6 @@ struct BacklogView: View {
                 Section {
                     ForEach(overdueTasks) { item in
                         backlogRowWithSwipe(item)
-                        blockedRowsForEach(item)
                     }
                 } header: {
                     HStack {
@@ -1248,14 +1206,12 @@ struct BacklogView: View {
                             .clipShape(Capsule())
                     }
                 }
-                .accessibilityElement(children: .contain)
-                .accessibilityIdentifier("ueberfaelligSection")
             }
 
             // RW 2.4b: 3 Tier-Sektionen + Geparkt
-            tierSection(title: "Dringend", tasks: dringendTasks, color: .red, sectionId: "dringendSection")
-            tierSection(title: "Bald", tasks: baldTasks, color: .orange, sectionId: "baldSection")
-            tierSection(title: "Später", tasks: spaeterTasks, color: .yellow, sectionId: "spaeterSection")
+            tierSection(title: "Dringend", tasks: dringendTasks, color: .red)
+            tierSection(title: "Bald", tasks: baldTasks, color: .orange)
+            tierSection(title: "Später", tasks: spaeterTasks, color: .yellow)
 
             // Geparkt (manuell, immer offen)
             if !geparktTasks.isEmpty {
@@ -1270,7 +1226,6 @@ struct BacklogView: View {
                                 }
                                 .tint(.blue)
                             }
-                        blockedRowsForEach(item)
                     }
                 } header: {
                     HStack {
@@ -1286,9 +1241,8 @@ struct BacklogView: View {
                             .background(Color.secondary.opacity(0.15))
                             .clipShape(Capsule())
                     }
+                    .accessibilityIdentifier("geparktSection")
                 }
-                .accessibilityElement(children: .contain)
-                .accessibilityIdentifier("geparktSection")
             }
         }
         .listStyle(.plain)
@@ -1304,7 +1258,7 @@ struct BacklogView: View {
 
     // MARK: - Tier Section Helper (RW 2.4b)
     @ViewBuilder
-    private func tierSection(title: String, tasks: [PlanItem], color: Color, sectionId: String) -> some View {
+    private func tierSection(title: String, tasks: [PlanItem], color: Color) -> some View {
         if !tasks.isEmpty {
             Section {
                 ForEach(tasks) { item in
@@ -1317,7 +1271,6 @@ struct BacklogView: View {
                             }
                             .tint(.gray)
                         }
-                    blockedRowsForEach(item)
                 }
             } header: {
                 HStack {
@@ -1334,8 +1287,6 @@ struct BacklogView: View {
                         .clipShape(Capsule())
                 }
             }
-            .accessibilityElement(children: .contain)
-            .accessibilityIdentifier(sectionId)
         }
     }
 
@@ -1347,7 +1298,6 @@ struct BacklogView: View {
             Section {
                 ForEach(recentTasks) { item in
                     backlogRowWithSwipe(item)
-                    blockedRowsForEach(item)
                 }
             } header: {
                 Text("Zuletzt bearbeitet")
@@ -1380,7 +1330,6 @@ struct BacklogView: View {
                 Section {
                     ForEach(overdueTasks) { item in
                         backlogRowWithSwipe(item)
-                        blockedRowsForEach(item)
                     }
                 } header: {
                     HStack {
@@ -1614,6 +1563,50 @@ struct CompletedTaskRow: View {
                 .strokeBorder(.secondary.opacity(0.2), lineWidth: 1)
         )
         .accessibilityIdentifier("completedTaskRow_\(item.id)")
+    }
+}
+
+// MARK: - Recurring Stacking Helper (testable)
+//
+// Bug `bug-recurring-stack-count-badge`: extrahiert aus BacklogView damit Unit-Tests
+// die Stacking-Logik direkt aufrufen koennen.
+
+enum RecurringStackingHelper {
+    /// Wendet Recurring-Stacking auf `items` an: gruppiert nach (recurrenceGroupID, isParked),
+    /// waehlt das **juengste** Child als Repraesentant, setzt `stackedInstanceCount` und
+    /// `stackedOldestDueDate` auf den Repraesentanten und entfernt die anderen Children.
+    static func apply(to items: [PlanItem]) -> [PlanItem] {
+        var planItems = items
+        var groups: [String: [Int]] = [:]
+        for (index, item) in planItems.enumerated() {
+            guard let groupID = item.recurrenceGroupID,
+                  !item.isTemplate,
+                  !item.isCompleted,
+                  !item.isNextUp else { continue }
+            let key = "\(groupID)_\(item.isParked ? "parked" : "active")"
+            groups[key, default: []].append(index)
+        }
+
+        var indicesToRemove: Set<Int> = []
+        for (_, indices) in groups where indices.count >= 2 {
+            // Repraesentant: juengstes Child (groesstes dueDate).
+            let representativeIndex = indices.max { a, b in
+                (planItems[a].dueDate ?? .distantPast) < (planItems[b].dueDate ?? .distantPast)
+            } ?? indices[0]
+
+            planItems[representativeIndex].stackedInstanceCount = indices.count
+            planItems[representativeIndex].stackedOldestDueDate = indices
+                .compactMap { planItems[$0].dueDate }
+                .min()
+            for idx in indices where idx != representativeIndex {
+                indicesToRemove.insert(idx)
+            }
+        }
+
+        for idx in indicesToRemove.sorted().reversed() {
+            planItems.remove(at: idx)
+        }
+        return planItems
     }
 }
 

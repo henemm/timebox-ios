@@ -90,9 +90,12 @@ final class MacBacklogParkdeckStackingTests: XCTestCase {
         XCTAssertEqual(result.first?.stackedCount, 2, "Representative should have stackedCount = totalInstances - 1 = 2")
     }
 
-    /// Verhalten: Representative is the task with the earliest dueDate.
-    /// Bricht wenn: applyStacking() picks wrong representative (not oldest).
-    func test_stackingRepresentative_isOldestByDueDate() {
+    /// Verhalten (Bug `bug-recurring-stack-count-badge`):
+    /// Representative ist das JUENGSTE Child (groesstes dueDate). So bleibt der
+    /// "aktuelle" Eintrag in der Sektion sichtbar; oldestDueDate liefert das
+    /// aelteste dueDate fuer die Counter-Bar.
+    /// Bricht wenn: applyStacking() das aelteste statt das juengste Child waehlt.
+    func test_stackingRepresentative_isYoungestByDueDate() {
         let groupID = "recurring-group-2"
         let oldDate = Calendar.current.date(byAdding: .day, value: -10, to: Date())!
         let newDate = Calendar.current.date(byAdding: .day, value: -1, to: Date())!
@@ -106,10 +109,12 @@ final class MacBacklogParkdeckStackingTests: XCTestCase {
         newTask.dueDate = newDate
 
         // Pass in reverse order to prove sorting works
-        let result = MacBacklogStackingHelper.applyStacking([newTask, oldTask])
+        let result = MacBacklogStackingHelper.applyStacking([oldTask, newTask])
 
-        XCTAssertEqual(result.first?.task.title, "Old Instance",
-                       "Representative must be the oldest instance (earliest dueDate)")
+        XCTAssertEqual(result.first?.task.title, "New Instance",
+                       "Representative muss das juengste Child sein (groesstes dueDate)")
+        XCTAssertEqual(result.first?.oldestDueDate, oldDate,
+                       "oldestDueDate muss das aelteste dueDate der Gruppe sein")
     }
 
     /// Verhalten: Tasks without recurrenceGroupID are passed through ungrouped.

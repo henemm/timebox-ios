@@ -182,24 +182,47 @@ struct DueDateBadge: View {
     }
 }
 
-// MARK: - StackingBadge
+// MARK: - StackingCounterBar
+//
+// Bug `bug-recurring-stack-count-badge`: ersetzt das alte Mini-Badge "x3"
+// durch eine prominente Counter-Bar oben an der Card.
+// Format: "⚠ N× AUFGELAUFEN — seit Fri 17. Apr"
+// Wird sowohl von iOS BacklogRow als auch von MacBacklogRow verwendet.
 
-struct StackingBadge: View {
+struct StackingCounterBar: View {
     let count: Int
+    let oldestDueDate: Date
     let taskId: String
 
+    private static let dateFormatter: DateFormatter = {
+        let f = DateFormatter()
+        // Bug `bug-recurring-stack-count-badge`: App ist deutschsprachig — Counter-Bar nutzt
+        // immer deutsches Datumsformat, unabhaengig vom System-Locale.
+        f.locale = Locale(identifier: "de_DE")
+        f.setLocalizedDateFormatFromTemplate("EEEdMMM")
+        return f
+    }()
+
+    private var label: String {
+        "⚠ \(count)× AUFGELAUFEN — seit \(Self.dateFormatter.string(from: oldestDueDate))"
+    }
+
     var body: some View {
-        Text("x\(count)")
-            .font(.caption2.weight(count >= 2 ? .bold : .regular))
-            .foregroundStyle(count >= 2 ? .orange : .secondary)
-            .padding(.horizontal, badgePaddingH)
-            .padding(.vertical, badgePaddingV)
-            .background(
-                Capsule()
-                    .fill(count >= 2 ? Color.orange.opacity(0.2) : Color.secondary.opacity(0.15))
-            )
-            .accessibilityIdentifier("stackingBadge_\(taskId)")
-            .accessibilityLabel("\(count) aufgelaufene Instanzen")
+        HStack {
+            Text(label)
+                .font(.caption.weight(.bold))
+                .foregroundStyle(.red)
+                .lineLimit(1)
+                .truncationMode(.tail)
+            Spacer(minLength: 0)
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 6)
+        .frame(maxWidth: .infinity)
+        .background(Color.red.opacity(0.15))
+        .accessibilityElement(children: .combine)
+        .accessibilityIdentifier("stackingCounterBar_\(taskId)")
+        .accessibilityLabel(label)
     }
 }
 

@@ -13,6 +13,7 @@ import SwiftData
 struct MacBacklogRow: View {
     let task: LocalTask
     var stackedCount: Int = 0  // MAC_028: Extra instances (0 = no badge, 1 = x2, 2+ = x3+)
+    var oldestDueDate: Date? = nil  // bug-recurring-stack-count-badge: aeltestes dueDate fuer Counter-Bar
     var onToggleComplete: (() -> Void)?
     var onCancelCompletion: (() -> Void)?  // Undo completion during pending phase (BUG-126)
     var onImportanceCycle: ((Int) -> Void)?
@@ -30,6 +31,26 @@ struct MacBacklogRow: View {
     @State private var pendingPulse = false
 
     var body: some View {
+        VStack(spacing: 0) {
+            // Counter-Bar (Bug `bug-recurring-stack-count-badge`)
+            // Erscheint oben an der Zeile wenn 2+ Instanzen aufgelaufen sind.
+            // stackedCount ist EXTRA instances (1 -> total=2, etc.).
+            if stackedCount >= 1, let oldestDueDate = oldestDueDate {
+                StackingCounterBar(
+                    count: stackedCount + 1,
+                    oldestDueDate: oldestDueDate,
+                    taskId: task.uuid.uuidString
+                )
+            }
+
+            rowContent
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    // MARK: - Row Content
+
+    private var rowContent: some View {
         HStack(spacing: 10) {
             // Completion Toggle
             Button {
@@ -135,10 +156,8 @@ struct MacBacklogRow: View {
                 RecurrenceBadge(pattern: task.recurrencePattern, taskId: task.id)
             }
 
-            // 4b. MAC_028: Stacking Badge
-            if stackedCount >= 1 {
-                StackingBadge(count: stackedCount + 1, taskId: task.uuid.uuidString)
-            }
+            // Stacking-Anzeige: keine Mini-Badge mehr — siehe StackingCounterBar oben in der Zeile
+            // (Bug `bug-recurring-stack-count-badge`)
 
             // 5. Tags (Bug 78: guard against detached SwiftData objects)
             if task.modelContext != nil, !(task.tags ?? []).isEmpty {

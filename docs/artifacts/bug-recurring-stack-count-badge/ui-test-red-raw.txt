@@ -1,0 +1,200 @@
+    t =    26.65s         Checking existence of `StaticText (First Match)`
+    t =    26.75s         Capturing element debug description
+    t =    27.67s     Checking `Expect predicate `existsNoRetry == 1` for object StaticText (First Match)`
+    t =    27.67s         Checking existence of `StaticText (First Match)`
+    t =    27.77s         Capturing element debug description
+    t =    28.59s     Checking `Expect predicate `existsNoRetry == 1` for object StaticText (First Match)`
+    t =    28.59s         Checking existence of `StaticText (First Match)`
+    t =    28.69s         Capturing element debug description
+    t =    28.69s     Checking existence of `StaticText (First Match)`
+    t =    28.77s Collecting debug information to assist test failure triage
+    t =    28.77s     Requesting snapshot of accessibility hierarchy for app with pid 2305
+/Users/hem/Developer/my-daily-sprints/FocusBloxUITests/BacklogStackingUITests.swift:130: error: -[FocusBloxUITests.BacklogStackingUITests test_singleInstanceSeries_hasNoCounterBar] : XCTAssertTrue failed - Voraussetzung: mindestens eine Counter-Bar muss existieren (Series 1 oder 2). Falls keine: dieser Negativ-Test ist bedeutungslos.
+    t =    28.86s Tear Down
+Test Case '-[FocusBloxUITests.BacklogStackingUITests test_singleInstanceSeries_hasNoCounterBar]' failed (29.224 seconds).
+Test Case '-[FocusBloxUITests.BacklogStackingUITests test_stackedSeries_rendersAsSingleRow]' started.
+    t =     0.00s Start Test at 2026-05-01 08:12:16.635
+    t =     0.04s Set Up
+    t =     0.04s     Open com.henning.timebox
+    t =     0.04s         Launch com.henning.timebox
+    t =     0.04s             Terminate com.henning.timebox:2305
+2026-05-01 08:12:17.722 xcodebuild[2167:7315027] [MT] IDELaunchParametersSnapshot: The operation couldn’t be completed. (DebuggerLLDB.DebuggerVersionStore.StoreError error 0.)
+2026-05-01 08:12:17.722 xcodebuild[2167:7315027] [MT] IDELaunchParametersSnapshot: no debugger version
+    t =     1.50s             Setting up automation session
+    t =     2.70s             Wait for com.henning.timebox to idle
+2026-05-01 08:12:20.681 xcodebuild[2167:7318002]  DTDKRemoteDeviceConnection: Failed to start remote service "com.apple.mobile.notification_proxy" on device. Error: Error Domain=com.apple.dtdevicekit Code=811 "Failed to start remote service "com.apple.mobile.notification_proxy" on device." UserInfo={NSUnderlyingError=0x98b851ec0 {Error Domain=com.apple.dt.MobileDeviceErrorDomain Code=-402653158 "The device is passcode protected." UserInfo={MobileDeviceErrorCode=(0xE800001A), com.apple.dtdevicekit.stacktrace=(
+	0   DTDeviceKitBase                     0x0000000111e1a65c DTDKCreateNSErrorFromAMDErrorCode + 312
+	1   DTDeviceKitBase                     0x0000000111e26598 __63-[DTDKRemoteDeviceConnection startFirstServiceOf:unlockKeybag:]_block_invoke + 376
+	2   DTDeviceKitBase                     0x0000000111e25da0 __48-[DTDKRemoteDeviceConnection futureWithSession:]_block_invoke_4 + 28
+	3   DTDeviceKitBase                     0x0000000111e1c6d8 __DTDKExecuteInSession_block_invoke_2 + 68
+	4   DTDeviceKitBase                     0x0000000111e1be24 __DTDKExecuteWithConnection_block_invoke_2 + 216
+	5   DTDeviceKitBase                     0x0000000111e1bd1c __DTDKExecuteWithConnection_block_invoke + 116
+	6   libdispatch.dylib                   0x000000018841a4b0 _dispatch_client_callout + 16
+	7   libdispatch.dylib                   0x0000000188410360 _dispatch_lane_barrier_sync_invoke_and_complete + 56
+	8   DVTFoundation                       0x0000000109477808 DVTDispatchBarrierSync + 148
+	9   DVTFoundation                       0x000000010947897c -[DVTDispatchLock performLockedBlock:] + 60
+	10  DTDeviceKitBase                     0x0000000111e1bc14 DTDKExecuteWithConnection + 192
+	11  DTDeviceKitBase                     0x0000000111e1c56c DTDKExecuteInSession + 248
+	12  DTDeviceKitBase                     0x0000000111e25b74 __48-[DTDKRemoteDeviceConnection futureWithSession:]_block_invoke_2 + 212
+	13  DVTFoundation                       0x0000000109476bd0 __DVT_CALLING_CLIENT_BLOCK__ + 16
+	14  DVTFoundation                       0x0000000109477548 __DVTDispatchAsync_block_invoke + 152
+	15  libdispatch.dylib                   0x0000000188400a28 _dispatch_call_block_and_release + 32
+	16  libdispatch.dylib                   0x000000018841a4b0 _dispatch_client_callout + 16
+	17  libdispatch.dylib                   0x0000000188409030 _dispatch_lane_serial_drain + 740
+	18  libdispatch.dylib                   0x0000000188409b64 _dispatch_lane_invoke + 448
+	19  libdispatch.dylib                   0x0000000188413e34 _dispatch_root_queue_drain_deferred_wlh + 284
+	20  libdispatch.dylib                   0x0000000188413734 _dispatch_workloop_worker_thread + 720
+	21  libsystem_pthread.dylib             0x00000001885b7ec0 _pthread_wqthread + 292
+	22  libsystem_pthread.dylib             0x00000001885b6c10 start_wqthread + 8
+), DVTRadarComponentKey=261622, NSLocalizedDescription=The device is passcode protected.}}, NSLocalizedRecoverySuggestion=Please check your connection to your device., DVTRadarComponentKey=261622, NSLocalizedDescription=Failed to start remote service "com.apple.mobile.notification_proxy" on device.}
+    t =     5.18s Waiting 5.0s for "Backlog" Button to exist
+    t =     6.21s     Checking `Expect predicate `existsNoRetry == 1` for object "Backlog" Button`
+    t =     6.21s         Checking existence of `"Backlog" Button`
+    t =     6.33s Tap "Backlog" Button
+    t =     6.33s     Wait for com.henning.timebox to idle
+    t =     6.33s     Find the "Backlog" Button
+    t =     6.40s     Check for interrupting elements affecting "Backlog" Button
+    t =     6.44s     Synthesize event
+    t =     6.74s     Wait for com.henning.timebox to idle
+    t =     7.49s Waiting 5.0s for CollectionView (First Match) to exist
+    t =     8.51s     Checking `Expect predicate `existsNoRetry == 1` for object CollectionView (First Match)`
+    t =     8.51s         Checking existence of `CollectionView (First Match)`
+    t =     8.56s Checking existence of `"backlogTaskList" CollectionView`
+    t =     8.60s Swipe up "backlogTaskList" CollectionView
+    t =     8.60s     Wait for com.henning.timebox to idle
+    t =     8.60s     Find the "backlogTaskList" CollectionView
+    t =     8.64s     Check for interrupting elements affecting "backlogTaskList" CollectionView
+    t =     8.70s     Synthesize event
+    t =     9.14s     Wait for com.henning.timebox to idle
+    t =    11.51s Swipe up "backlogTaskList" CollectionView
+    t =    11.51s     Wait for com.henning.timebox to idle
+    t =    11.51s     Find the "backlogTaskList" CollectionView
+    t =    11.59s     Check for interrupting elements affecting "backlogTaskList" CollectionView
+    t =    11.63s     Synthesize event
+    t =    12.08s     Wait for com.henning.timebox to idle
+    t =    14.18s Swipe up "backlogTaskList" CollectionView
+    t =    14.19s     Wait for com.henning.timebox to idle
+    t =    14.19s     Find the "backlogTaskList" CollectionView
+    t =    14.25s     Check for interrupting elements affecting "backlogTaskList" CollectionView
+    t =    14.30s     Synthesize event
+    t =    14.73s     Wait for com.henning.timebox to idle
+    t =    16.83s Swipe up "backlogTaskList" CollectionView
+    t =    16.83s     Wait for com.henning.timebox to idle
+    t =    16.83s     Find the "backlogTaskList" CollectionView
+    t =    16.89s     Check for interrupting elements affecting "backlogTaskList" CollectionView
+    t =    16.93s     Synthesize event
+    t =    17.37s     Wait for com.henning.timebox to idle
+    t =    18.56s Swipe up "backlogTaskList" CollectionView
+    t =    18.56s     Wait for com.henning.timebox to idle
+    t =    18.57s     Find the "backlogTaskList" CollectionView
+    t =    18.62s     Check for interrupting elements affecting "backlogTaskList" CollectionView
+    t =    18.66s     Synthesize event
+    t =    19.11s     Wait for com.henning.timebox to idle
+    t =    20.13s Swipe up "backlogTaskList" CollectionView
+    t =    20.13s     Wait for com.henning.timebox to idle
+    t =    20.13s     Find the "backlogTaskList" CollectionView
+    t =    20.19s     Check for interrupting elements affecting "backlogTaskList" CollectionView
+    t =    20.23s     Synthesize event
+    t =    20.67s     Wait for com.henning.timebox to idle
+    t =    21.58s Get number of matches for: Elements matching predicate 'label == "[MOCK] Wochenreview"'
+    t =    21.65s Get number of matches for: Elements matching predicate 'label == "[MOCK] Wochenreview"'
+/Users/hem/Developer/my-daily-sprints/FocusBloxUITests/BacklogStackingUITests.swift:112: error: -[FocusBloxUITests.BacklogStackingUITests test_stackedSeries_rendersAsSingleRow] : XCTAssertEqual failed: ("0") is not equal to ("1") - Wochenreview muss als EINE gestackte Row erscheinen, nicht als 0 separate Rows.
+    t =    21.71s Tear Down
+Test Case '-[FocusBloxUITests.BacklogStackingUITests test_stackedSeries_rendersAsSingleRow]' failed (22.047 seconds).
+Test Case '-[FocusBloxUITests.BacklogStackingUITests test_stackedTask_notInOverdueSection]' started.
+    t =     0.00s Start Test at 2026-05-01 08:12:38.685
+    t =     0.04s Set Up
+    t =     0.04s     Open com.henning.timebox
+    t =     0.04s         Launch com.henning.timebox
+    t =     0.04s             Terminate com.henning.timebox:2371
+2026-05-01 08:12:39.831 xcodebuild[2167:7315027] [MT] IDELaunchParametersSnapshot: The operation couldn’t be completed. (DebuggerLLDB.DebuggerVersionStore.StoreError error 0.)
+2026-05-01 08:12:39.831 xcodebuild[2167:7315027] [MT] IDELaunchParametersSnapshot: no debugger version
+    t =     1.57s             Setting up automation session
+    t =     2.92s             Wait for com.henning.timebox to idle
+    t =     6.33s Waiting 5.0s for "Backlog" Button to exist
+    t =     7.36s     Checking `Expect predicate `existsNoRetry == 1` for object "Backlog" Button`
+    t =     7.36s         Checking existence of `"Backlog" Button`
+    t =     7.52s Tap "Backlog" Button
+    t =     7.52s     Wait for com.henning.timebox to idle
+    t =     7.52s     Find the "Backlog" Button
+    t =     7.57s     Check for interrupting elements affecting "Backlog" Button
+    t =     7.63s     Synthesize event
+    t =     7.93s     Wait for com.henning.timebox to idle
+    t =     9.39s Waiting 5.0s for CollectionView (First Match) to exist
+    t =    10.42s     Checking `Expect predicate `existsNoRetry == 1` for object CollectionView (First Match)`
+    t =    10.43s         Checking existence of `CollectionView (First Match)`
+    t =    10.49s Checking existence of `"backlogTaskList" CollectionView`
+    t =    10.54s Swipe up "backlogTaskList" CollectionView
+    t =    10.54s     Wait for com.henning.timebox to idle
+    t =    10.54s     Find the "backlogTaskList" CollectionView
+    t =    10.58s     Check for interrupting elements affecting "backlogTaskList" CollectionView
+    t =    10.62s     Synthesize event
+    t =    11.06s     Wait for com.henning.timebox to idle
+    t =    13.56s Swipe up "backlogTaskList" CollectionView
+    t =    13.56s     Wait for com.henning.timebox to idle
+    t =    13.56s     Find the "backlogTaskList" CollectionView
+    t =    13.64s     Check for interrupting elements affecting "backlogTaskList" CollectionView
+    t =    13.68s     Synthesize event
+    t =    14.12s     Wait for com.henning.timebox to idle
+    t =    16.22s Swipe up "backlogTaskList" CollectionView
+    t =    16.22s     Wait for com.henning.timebox to idle
+    t =    16.22s     Find the "backlogTaskList" CollectionView
+    t =    16.28s     Check for interrupting elements affecting "backlogTaskList" CollectionView
+    t =    16.33s     Synthesize event
+    t =    16.77s     Wait for com.henning.timebox to idle
+    t =    18.89s Swipe up "backlogTaskList" CollectionView
+    t =    18.89s     Wait for com.henning.timebox to idle
+    t =    18.89s     Find the "backlogTaskList" CollectionView
+    t =    18.96s     Check for interrupting elements affecting "backlogTaskList" CollectionView
+    t =    19.00s     Synthesize event
+    t =    19.44s     Wait for com.henning.timebox to idle
+    t =    20.59s Swipe up "backlogTaskList" CollectionView
+    t =    20.59s     Wait for com.henning.timebox to idle
+    t =    20.60s     Find the "backlogTaskList" CollectionView
+    t =    20.66s     Check for interrupting elements affecting "backlogTaskList" CollectionView
+    t =    20.70s     Synthesize event
+    t =    21.15s     Wait for com.henning.timebox to idle
+    t =    22.03s Swipe up "backlogTaskList" CollectionView
+    t =    22.03s     Wait for com.henning.timebox to idle
+    t =    22.03s     Find the "backlogTaskList" CollectionView
+    t =    22.09s     Check for interrupting elements affecting "backlogTaskList" CollectionView
+    t =    22.13s     Synthesize event
+    t =    22.57s     Wait for com.henning.timebox to idle
+    t =    23.63s Waiting 5.0s for StaticText (First Match) to exist
+    t =    24.66s     Checking `Expect predicate `existsNoRetry == 1` for object StaticText (First Match)`
+    t =    24.66s         Checking existence of `StaticText (First Match)`
+    t =    24.76s         Capturing element debug description
+    t =    25.68s     Checking `Expect predicate `existsNoRetry == 1` for object StaticText (First Match)`
+    t =    25.68s         Checking existence of `StaticText (First Match)`
+    t =    25.80s         Capturing element debug description
+    t =    26.72s     Checking `Expect predicate `existsNoRetry == 1` for object StaticText (First Match)`
+    t =    26.72s         Checking existence of `StaticText (First Match)`
+    t =    26.84s         Capturing element debug description
+    t =    27.65s     Checking `Expect predicate `existsNoRetry == 1` for object StaticText (First Match)`
+    t =    27.65s         Checking existence of `StaticText (First Match)`
+    t =    27.75s         Capturing element debug description
+    t =    28.63s     Checking `Expect predicate `existsNoRetry == 1` for object StaticText (First Match)`
+    t =    28.63s         Checking existence of `StaticText (First Match)`
+    t =    28.73s         Capturing element debug description
+    t =    28.74s     Checking existence of `StaticText (First Match)`
+    t =    28.81s Collecting debug information to assist test failure triage
+    t =    28.81s     Requesting snapshot of accessibility hierarchy for app with pid 2383
+/Users/hem/Developer/my-daily-sprints/FocusBloxUITests/BacklogStackingUITests.swift:177: error: -[FocusBloxUITests.BacklogStackingUITests test_stackedTask_notInOverdueSection] : XCTAssertTrue failed - Voraussetzung: mindestens eine Counter-Bar muss existieren
+    t =    28.90s Tear Down
+Test Case '-[FocusBloxUITests.BacklogStackingUITests test_stackedTask_notInOverdueSection]' failed (29.258 seconds).
+Test Suite 'BacklogStackingUITests' failed at 2026-05-01 08:13:07.943.
+	 Executed 6 tests, with 6 failures (0 unexpected) in 164.922 (164.935) seconds
+Test Suite 'FocusBloxUITests.xctest' failed at 2026-05-01 08:13:07.945.
+	 Executed 6 tests, with 6 failures (0 unexpected) in 164.922 (164.936) seconds
+Test Suite 'Selected tests' failed at 2026-05-01 08:13:07.945.
+	 Executed 6 tests, with 6 failures (0 unexpected) in 164.922 (164.937) seconds
+2026-05-01 08:13:23.444 xcodebuild[2167:7315027] [MT] IDETestOperationsObserverDebug: 183.325 elapsed -- Testing started completed.
+2026-05-01 08:13:23.444 xcodebuild[2167:7315027] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2026-05-01 08:13:23.444 xcodebuild[2167:7315027] [MT] IDETestOperationsObserverDebug: 183.325 sec, +183.325 sec -- end
+
+Test session results, code coverage, and logs:
+	/Users/hem/Library/Developer/Xcode/DerivedData/FocusBlox-session-ad384cba-a44d-4c81-b9cb-5c95660593de/Logs/Test/Test-FocusBlox-2026.05.01_08-10-16-+0200.xcresult
+
+** TEST FAILED **
+
+Testing started

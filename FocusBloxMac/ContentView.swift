@@ -384,9 +384,21 @@ struct ContentView: View {
     // Overdue tasks (non-NextUp, non-blocked, dueDate before today, sorted by priority score)
     private var overdueTasks: [LocalTask] {
         let startOfToday = Calendar.current.startOfDay(for: Date())
+        // Recurring-Groups, die mindestens ein "frisches" (nicht-ueberfaelliges) Child haben.
+        // Bug `bug-recurring-stack-count-badge`: aeltere Children solcher Gruppen
+        // gehoeren zum Stack des juengsten Repraesentanten und nicht in die Ueberfaellig-Sektion.
+        let freshGroups: Set<String> = Set(visibleTasks.compactMap { task -> String? in
+            guard let gid = task.recurrenceGroupID, !gid.isEmpty,
+                  !task.isTemplate, !task.isCompleted,
+                  let due = task.dueDate, due >= startOfToday
+            else { return nil }
+            return gid
+        })
         return visibleTasks.filter { task in
             guard !task.isNextUp, task.blockerTaskID == nil, let dueDate = task.dueDate else { return false }
-            return dueDate < startOfToday && matchesSearch(task)
+            guard dueDate < startOfToday && matchesSearch(task) else { return false }
+            if let gid = task.recurrenceGroupID, freshGroups.contains(gid) { return false }
+            return true
         }.sorted { scoreFor($0) > scoreFor($1) }
     }
 
@@ -405,8 +417,7 @@ struct ContentView: View {
     private func macTierSection(
         title: String,
         tiers: [TaskPriorityScoringService.PriorityTier],
-        color: Color,
-        sectionId: String
+        color: Color
     ) -> some View {
         let tierTasks = regularFilteredTasks.filter { task in
             let score = scoreFor(task)
@@ -418,7 +429,7 @@ struct ContentView: View {
         if !tierTasks.isEmpty {
             Section {
                 ForEach(MacBacklogStackingHelper.applyStacking(tierTasks), id: \.task.uuid) { item in
-                    taskRowWithSwipe(task: item.task, stackedCount: item.stackedCount)
+                    taskRowWithSwipe(task: item.task, stackedCount: item.stackedCount, oldestDueDate: item.oldestDueDate)
                 }
             } header: {
                 HStack {
@@ -435,8 +446,6 @@ struct ContentView: View {
                         .clipShape(Capsule())
                 }
             }
-            .accessibilityElement(children: .contain)
-            .accessibilityIdentifier(sectionId)
         }
     }
 
@@ -536,14 +545,12 @@ struct ContentView: View {
                                     .clipShape(Capsule())
                             }
                         }
-                        .accessibilityElement(children: .contain)
-                        .accessibilityIdentifier("ueberfaelligSection")
                     }
 
                     // RW 2.4b: 3 Tier-Sektionen (Dringend, Bald, Später)
-                    macTierSection(title: "Dringend", tiers: [.doNow], color: .red, sectionId: "dringendSection")
-                    macTierSection(title: "Bald", tiers: [.planSoon], color: .orange, sectionId: "baldSection")
-                    macTierSection(title: "Später", tiers: [.eventually, .someday], color: .yellow, sectionId: "spaeterSection")
+                    macTierSection(title: "Dringend", tiers: [.doNow], color: .red)
+                    macTierSection(title: "Bald", tiers: [.planSoon], color: .orange)
+                    macTierSection(title: "Später", tiers: [.eventually, .someday], color: .yellow)
 
                     // RW 2.4b: Geparkt (manuell, immer offen)
                     let geparktTasks = regularFilteredTasks.filter { task in
@@ -554,7 +561,7 @@ struct ContentView: View {
                     if !geparktTasks.isEmpty {
                         Section {
                             ForEach(MacBacklogStackingHelper.applyStacking(geparktTasks), id: \.task.uuid) { item in
-                                taskRowWithSwipe(task: item.task, stackedCount: item.stackedCount)
+                                taskRowWithSwipe(task: item.task, stackedCount: item.stackedCount, oldestDueDate: item.oldestDueDate)
                                     .accessibilityIdentifier("geparktRow_\(item.task.uuid.uuidString)")
                             }
                         } header: {
@@ -572,9 +579,8 @@ struct ContentView: View {
                                     .clipShape(Capsule())
                                     .accessibilityIdentifier("geparktBadgeCount")
                             }
+                            .accessibilityIdentifier("geparktSectionHeader")
                         }
-                        .accessibilityElement(children: .contain)
-                        .accessibilityIdentifier("geparktSection")
                     }
                 } else {
                     // Non-priority filters: flat list (recent, overdue, completed, recurring)
@@ -1218,8 +1224,8 @@ struct ContentView: View {
     // MARK: - Task Row with Swipe Actions (shared by all sections)
 
     @ViewBuilder
-    private func taskRowWithSwipe(task: LocalTask, stackedCount: Int = 0) -> some View {
-        makeBacklogRow(task: task, stackedCount: stackedCount)
+    private func taskRowWithSwipe(task: LocalTask, stackedCount: Int = 0, oldestDueDate: Date? = nil) -> some View {
+        makeBacklogRow(task: task, stackedCount: stackedCount, oldestDueDate: oldestDueDate)
             .id(task.uuid)  // Bug 94: View identity for ScrollViewReader.scrollTo()
             .tag(task.uuid)
             .swipeActions(edge: .leading, allowsFullSwipe: true) {
@@ -1268,10 +1274,11 @@ struct ContentView: View {
     // MARK: - Row Builder
 
     @ViewBuilder
-    private func makeBacklogRow(task: LocalTask, isBlocked: Bool = false, stackedCount: Int = 0) -> some View {
+    private func makeBacklogRow(task: LocalTask, isBlocked: Bool = false, stackedCount: Int = 0, oldestDueDate: Date? = nil) -> some View {
         MacBacklogRow(
             task: task,
             stackedCount: stackedCount,
+            oldestDueDate: oldestDueDate,
             onToggleComplete: {
                 // Templates can't be completed — checkbox means "end series"
                 if task.isTemplate {

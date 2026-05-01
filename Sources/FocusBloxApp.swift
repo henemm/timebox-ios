@@ -757,14 +757,40 @@ struct FocusBloxApp: App {
     /// Seed mock data for UI testing
     /// Static so it can be called from the model container initializer (before views load)
     private static func seedUITestData(into context: ModelContext) {
-        // Check if already seeded (avoid duplicates on re-render).
-        // Sentinel must match an actually-seeded task title — older sentinel
-        // "[MOCK] Task 1 #30min" no longer existed, causing duplicate seeds (Bug 279).
-        let descriptor = FetchDescriptor<LocalTask>(
-            predicate: #Predicate { $0.title == "[MOCK] Feature: Dark Mode fuer Settings #30min" }
+        // Sentinel-Haertung (Bug `bug-recurring-stack-count-badge`):
+        // Der reine Title-Sentinel reicht nicht — wenn die DB aus einer aelteren
+        // Test-Session noch den Sentinel-Task enthaelt, aber die recurring Mocks
+        // fehlen, wuerden Stacking-Tests fehlschlagen. Daher zusaetzlich pruefen,
+        // ob mindestens ZWEI recurring Children fuer Group 2 existieren (-> stack >=2).
+        let sentinelDescriptor = FetchDescriptor<LocalTask>(
+            predicate: #Predicate { $0.title == "[MOCK] Task 1 #30min" }
         )
-        let existingTasks = (try? context.fetch(descriptor)) ?? []
-        guard existingTasks.isEmpty else { return }
+        let sentinelExists = !((try? context.fetch(sentinelDescriptor)) ?? []).isEmpty
+
+        let recurringGroup2ID = "uitest-recurring-group-2"
+        let recurringDescriptor = FetchDescriptor<LocalTask>(
+            predicate: #Predicate {
+                $0.recurrenceGroupID == recurringGroup2ID && $0.isTemplate == false
+            }
+        )
+        let recurringChildren = (try? context.fetch(recurringDescriptor)) ?? []
+        // Group 2 hat 3 Children im seedUITestData (today, -7d, -14d).
+        // Wir verlangen mindestens 3, sonst re-seeden wir.
+        let hasEnoughRecurring = recurringChildren.count >= 3
+
+        // Skip nur, wenn Sentinel UND mindestens 2 recurring Children da sind.
+        if sentinelExists && hasEnoughRecurring { return }
+
+        // Wenn DB stale ist (irgendeines fehlt): ALLE [MOCK]-Tasks loeschen
+        // und re-seeden, damit Stacking-Tests wieder GREEN werden.
+        let allMocksDescriptor = FetchDescriptor<LocalTask>(
+            predicate: #Predicate { $0.title.contains("[MOCK]") }
+        )
+        let staleMocks = (try? context.fetch(allMocksDescriptor)) ?? []
+        for stale in staleMocks {
+            context.delete(stale)
+        }
+        try? context.save()
 
         // Create mock tasks with isNextUp = true (vollständig - nicht TBD)
         let task1 = LocalTask(title: "[MOCK] Feature: Dark Mode fuer Settings #30min", importance: 3, estimatedDuration: 30, urgency: "urgent")

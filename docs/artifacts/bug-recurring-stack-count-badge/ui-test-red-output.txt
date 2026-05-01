@@ -1,0 +1,24 @@
+=== TDD RED: BacklogStackingUITests (iOS) — 2026-05-01 ===
+
+Alle 6 Tests fehlgeschlagen — beweist: Counter-Bar Feature noch nicht implementiert.
+
+FAIL test_counterBar_showsOldestDate
+  → Counter-Bar 'seit [Datum]' nicht gefunden
+
+FAIL test_seriesWithThreeInstances_showsCounterBarX3
+  → Bar mit '3' UND 'AUFGELAUFEN' fehlt → applyRecurringStacking nicht/Counter-Bar nicht gerendert
+
+FAIL test_seriesWithTwoInstances_showsCounterBarX2
+  → Bar mit '2' UND 'AUFGELAUFEN' fehlt
+
+FAIL test_singleInstanceSeries_hasNoCounterBar
+  → Anker fehlt (keine einzige Counter-Bar im Tree)
+
+FAIL test_stackedSeries_rendersAsSingleRow
+  → Wochenreview-Row count=0 (statt 1) → Mock-Sentinel blockiert Re-Seed
+
+FAIL test_stackedTask_notInOverdueSection
+  → Anker fehlt (Voraussetzung Counter-Bar)
+
+Status: 6/6 RED — wie erwartet.
+Implementation in Phase 5 muss diese Tests grün bekommen.

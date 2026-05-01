@@ -158,6 +158,61 @@ final class RecurringStackingTests: XCTestCase {
     // Der echte Behavior-Test fuer isNextUp-Ausschluss muss als UI-Test laufen.
     // Siehe: BacklogStackingUITests.test_stackedSeries_rendersAsSingleRow
 
+    // MARK: - Bug `bug-recurring-stack-count-badge`: RecurringStackingHelper Behavior
+
+    /// Spec AK-2: Repraesentant der Stapel-Row ist das juengste Child (groesstes dueDate).
+    func test_stacking_representativeIsYoungestChild() throws {
+        let today = Date()
+        let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: today)!
+        let weekAgo = Calendar.current.date(byAdding: .day, value: -7, to: today)!
+
+        let groupID = "group-youngest-test"
+        let oldChild = makePlanItem(id: "old", groupID: groupID, dueDate: weekAgo)
+        let middleChild = makePlanItem(id: "mid", groupID: groupID, dueDate: yesterday)
+        let youngChild = makePlanItem(id: "young", groupID: groupID, dueDate: today)
+
+        let result = RecurringStackingHelper.apply(to: [oldChild, middleChild, youngChild])
+
+        let unwrapped = try XCTUnwrap(result.first, "Stacking muss genau einen Repraesentant uebrig lassen")
+        XCTAssertEqual(result.count, 1, "Drei Children einer Gruppe muessen zu 1 Repraesentant zusammengefasst werden")
+        XCTAssertEqual(unwrapped.dueDate, today,
+            "Repraesentant muss juengstes Child sein (dueDate=heute), nicht aeltestes")
+        XCTAssertEqual(unwrapped.stackedInstanceCount, 3, "Counter muss 3 sein")
+    }
+
+    /// Spec: stackedOldestDueDate zeigt das aelteste Child-Datum (fuer Counter-Bar "seit ...").
+    func test_stacking_stackedOldestDueDateIsOldest() throws {
+        let today = Date()
+        let weekAgo = Calendar.current.date(byAdding: .day, value: -7, to: today)!
+        let twoWeeksAgo = Calendar.current.date(byAdding: .day, value: -14, to: today)!
+
+        let groupID = "group-oldest-test"
+        let young = makePlanItem(id: "y", groupID: groupID, dueDate: today)
+        let mid = makePlanItem(id: "m", groupID: groupID, dueDate: weekAgo)
+        let old = makePlanItem(id: "o", groupID: groupID, dueDate: twoWeeksAgo)
+
+        let result = RecurringStackingHelper.apply(to: [young, mid, old])
+
+        let representative = try XCTUnwrap(result.first)
+        XCTAssertEqual(representative.stackedOldestDueDate, twoWeeksAgo,
+            "stackedOldestDueDate muss das aelteste Child-Datum sein, unabhaengig vom Repraesentant")
+    }
+
+    /// Spec AK-4: Bei nur 1 offenen Child der Serie wird KEIN Stacking angewendet.
+    func test_stacking_singleChild_noStacking() throws {
+        let groupID = "group-single-test"
+        let single = makePlanItem(id: "only", groupID: groupID, dueDate: Date())
+
+        let result = RecurringStackingHelper.apply(to: [single])
+
+        let unwrapped = try XCTUnwrap(result.first)
+        XCTAssertEqual(result.count, 1, "Single Child bleibt unveraendert")
+        XCTAssertEqual(unwrapped.stackedInstanceCount, 1,
+            "Bei 1 Child darf stackedInstanceCount nicht erhoeht werden.")
+        XCTAssertNil(unwrapped.stackedOldestDueDate,
+            "Bei 1 Child darf stackedOldestDueDate nicht gesetzt werden.")
+    }
+
     // MARK: - Helpers
 
     private func makePlanItem(

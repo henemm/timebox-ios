@@ -29,68 +29,24 @@ struct BacklogRow: View {
     // MARK: - Body
 
     var body: some View {
-        HStack(spacing: 12) {
-            // doNow Marker (red dot for high-priority tasks, Bug #223)
-            if item.isDoNow {
-                Circle()
-                    .fill(.red)
-                    .frame(width: 8, height: 8)
-                    .accessibilityIdentifier("doNowMarker_\(item.id)")
-                    .accessibilityLabel("Sofort erledigen")
+        VStack(spacing: 0) {
+            // Counter-Bar (Bug `bug-recurring-stack-count-badge`)
+            // Erscheint oben an der Card wenn 2+ Instanzen aufgelaufen sind.
+            if item.stackedInstanceCount >= 2, let oldestDueDate = item.stackedOldestDueDate {
+                StackingCounterBar(
+                    count: item.stackedInstanceCount,
+                    oldestDueDate: oldestDueDate,
+                    taskId: item.id
+                )
             }
 
-            // Completion Checkbox
-            Button {
-                if isBlocked { return }
-                if isCompletionPending {
-                    onCancelCompletion?()
-                } else {
-                    onComplete?()
-                }
-            } label: {
-                Image(systemName: isCompletionPending ? "checkmark.circle.fill" : (isBlocked ? "lock.circle" : "circle"))
-                    .font(.system(size: 22))
-                    .fontWeight(disciplineColor != nil ? .semibold : .regular)
-                    .foregroundStyle(isCompletionPending ? Color.green : (isBlocked ? Color.secondary.opacity(0.5) : (disciplineColor ?? Color.secondary)))
-            }
-            .buttonStyle(.plain)
-            .disabled(isBlocked)
-            .accessibilityIdentifier("completeButton_\(item.id)")
-            .accessibilityLabel(isBlocked ? "Blockiert" : (isCompletionPending ? "Erledigt" : "Als erledigt markieren"))
-            .animation(.smooth(duration: 0.2), value: isCompletionPending)
-
-            // Content (Title + Metadata) - full width, no right column
-            // Swipe actions handle Next Up (right) and Edit/Delete (left)
-            contentSection
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .opacity(isCompletionPending ? 0.5 : 1.0)
-                .strikethrough(isCompletionPending)
-
-            if let onStartFocusSprint {
-                Button {
-                    onStartFocusSprint()
-                } label: {
-                    Image(systemName: "bolt.fill")
-                        .font(.system(size: 16, weight: .semibold))
-                        .foregroundStyle(.white)
-                        .padding(8)
-                        .background(Circle().fill(.orange))
-                }
-                .buttonStyle(.borderless)
-                .accessibilityIdentifier("focusSprintButton_\(item.id)")
-                .accessibilityLabel("FocusBlox starten")
-            }
+            rowContent
         }
-        .padding(12)
         .background(
             RoundedRectangle(cornerRadius: 16)
                 .fill(.ultraThinMaterial)
-                .overlay(
-                    item.stackedInstanceCount >= 2
-                        ? RoundedRectangle(cornerRadius: 16).fill(Color.orange.opacity(0.06))
-                        : nil
-                )
         )
+        .clipShape(RoundedRectangle(cornerRadius: 16))
         .overlay {
             if isPendingResort {
                 RoundedRectangle(cornerRadius: 16)
@@ -125,6 +81,66 @@ struct BacklogRow: View {
         // Parent identifier would override all child identifiers in SwiftUI
     }
 
+    // MARK: - Row Content (HStack with checkbox + content + sprint button)
+    //
+    // Wrapper um die ehemalige body-HStack, damit die Counter-Bar als
+    // separater Block oben in der Card sitzen kann (VStack(spacing: 0)).
+
+    private var rowContent: some View {
+        HStack(spacing: 12) {
+            // doNow Marker (red dot for high-priority tasks, Bug #223)
+            if item.isDoNow {
+                Circle()
+                    .fill(.red)
+                    .frame(width: 8, height: 8)
+                    .accessibilityIdentifier("doNowMarker_\(item.id)")
+                    .accessibilityLabel("Sofort erledigen")
+            }
+
+            // Completion Checkbox
+            Button {
+                if isBlocked { return }
+                if isCompletionPending {
+                    onCancelCompletion?()
+                } else {
+                    onComplete?()
+                }
+            } label: {
+                Image(systemName: isCompletionPending ? "checkmark.circle.fill" : (isBlocked ? "lock.circle" : "circle"))
+                    .font(.system(size: 22))
+                    .fontWeight(disciplineColor != nil ? .semibold : .regular)
+                    .foregroundStyle(isCompletionPending ? Color.green : (isBlocked ? Color.secondary.opacity(0.5) : (disciplineColor ?? Color.secondary)))
+            }
+            .buttonStyle(.plain)
+            .disabled(isBlocked)
+            .accessibilityIdentifier("completeButton_\(item.id)")
+            .accessibilityLabel(isBlocked ? "Blockiert" : (isCompletionPending ? "Erledigt" : "Als erledigt markieren"))
+            .animation(.smooth(duration: 0.2), value: isCompletionPending)
+
+            // Content (Title + Metadata) - full width
+            contentSection
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .opacity(isCompletionPending ? 0.5 : 1.0)
+                .strikethrough(isCompletionPending)
+
+            if let onStartFocusSprint {
+                Button {
+                    onStartFocusSprint()
+                } label: {
+                    Image(systemName: "bolt.fill")
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundStyle(.white)
+                        .padding(8)
+                        .background(Circle().fill(.orange))
+                }
+                .buttonStyle(.borderless)
+                .accessibilityIdentifier("focusSprintButton_\(item.id)")
+                .accessibilityLabel("FocusBlox starten")
+            }
+        }
+        .padding(12)
+    }
+
     // MARK: - Content Section (Left Column)
 
     private var contentSection: some View {
@@ -132,13 +148,6 @@ struct BacklogRow: View {
             // Title (bold, max 2 lines, italic + gray if TBD)
             titleView
                 .accessibilityIdentifier("taskTitle_\(item.id)")
-
-            // Stacking Subtitle (e.g. "3 Instanzen seit Mo, 14. Apr")
-            if item.stackedInstanceCount >= 2, let oldestDate = item.stackedOldestDueDate {
-                Text("\(item.stackedInstanceCount) Instanzen seit \(oldestDate, format: .dateTime.weekday(.abbreviated).day().month(.abbreviated))")
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
-            }
 
             // Metadata Row
             metadataRow
@@ -224,10 +233,8 @@ struct BacklogRow: View {
                 RecurrenceBadge(pattern: pattern, taskId: item.id)
             }
 
-            // 3c. Stacking Badge (only if 2+ recurring instances stacked)
-            if item.stackedInstanceCount >= 2 {
-                StackingBadge(count: item.stackedInstanceCount, taskId: item.id)
-            }
+            // Stacking-Anzeige: keine Mini-Badge mehr — siehe StackingCounterBar oben in der Card
+            // (Bug `bug-recurring-stack-count-badge`)
 
             // 4. Tags
             if !item.tags.isEmpty {

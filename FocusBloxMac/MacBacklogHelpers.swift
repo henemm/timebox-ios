@@ -23,17 +23,21 @@ enum MacBacklogFilterHelper {
 // MARK: - Stacking Grouping Helper
 
 /// Groups recurring task instances by recurrenceGroupID.
-/// Returns one representative per group with a stackedCount.
+/// Returns one representative per group with a stackedCount + oldest dueDate.
 enum MacBacklogStackingHelper {
 
     struct StackedItem {
         let task: LocalTask
         /// Number of EXTRA instances (0 = no stacking, 1 = x2 badge, 2+ = x3+ badge)
         let stackedCount: Int
+        /// Aeltestes dueDate der Gruppe (fuer Counter-Bar "seit ..."). Nil bei stackedCount=0.
+        let oldestDueDate: Date?
     }
 
-    /// Groups tasks by recurrenceGroupID. The oldest instance (earliest dueDate)
-    /// becomes the representative. Non-recurring tasks pass through with stackedCount=0.
+    /// Groups tasks by recurrenceGroupID. Repraesentant ist das JUENGSTE Child
+    /// (Bug `bug-recurring-stack-count-badge`) — so bleibt der "aktuelle" Eintrag
+    /// in der Sektion sichtbar; oldestDueDate liefert das aelteste dueDate fuer
+    /// die Counter-Bar.
     static func applyStacking(_ tasks: [LocalTask]) -> [StackedItem] {
         var grouped: [String: [LocalTask]] = [:]
         var ungrouped: [LocalTask] = []
@@ -47,15 +51,24 @@ enum MacBacklogStackingHelper {
             }
         }
 
-        var result: [StackedItem] = ungrouped.map { StackedItem(task: $0, stackedCount: 0) }
+        var result: [StackedItem] = ungrouped.map {
+            StackedItem(task: $0, stackedCount: 0, oldestDueDate: nil)
+        }
 
         for (_, group) in grouped {
+            // Sortiert aufsteigend nach dueDate (aelteste zuerst, juengste zuletzt).
             let sorted = group.sorted {
                 ($0.dueDate ?? .distantFuture) < ($1.dueDate ?? .distantFuture)
             }
-            let representative = sorted[0]
+            // Repraesentant = juengstes Child (groesstes dueDate).
+            let representative = sorted.last ?? sorted[0]
+            let oldest = sorted.first?.dueDate
             let extraCount = sorted.count - 1
-            result.append(StackedItem(task: representative, stackedCount: extraCount))
+            result.append(StackedItem(
+                task: representative,
+                stackedCount: extraCount,
+                oldestDueDate: oldest
+            ))
         }
 
         return result
