@@ -9,6 +9,26 @@ struct ScheduledTaskBlock: View {
     let endDate: Date
     let onUnschedule: () -> Void
     let onStartFocusSprint: (() -> Void)?
+    /// Optional reference to the underlying PlanItem — used for Long-Press preview (Feature #300).
+    let task: PlanItem?
+
+    init(
+        taskID: String,
+        title: String,
+        startDate: Date,
+        endDate: Date,
+        onUnschedule: @escaping () -> Void,
+        onStartFocusSprint: (() -> Void)? = nil,
+        task: PlanItem? = nil
+    ) {
+        self.taskID = taskID
+        self.title = title
+        self.startDate = startDate
+        self.endDate = endDate
+        self.onUnschedule = onUnschedule
+        self.onStartFocusSprint = onStartFocusSprint
+        self.task = task
+    }
 
     var body: some View {
         HStack(spacing: 8) {
@@ -56,6 +76,10 @@ struct ScheduledTaskBlock: View {
                 onUnschedule()
             } label: {
                 Label("Entplanen", systemImage: "arrow.uturn.backward")
+            }
+        } preview: {
+            if let task {
+                TaskPreviewView(task: task)
             }
         }
         .accessibilityElement(children: .contain)

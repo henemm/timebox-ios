@@ -173,6 +173,28 @@ struct PositionedScheduledTask: Identifiable, Sendable {
     let endDate: Date
     let column: Int
     let totalColumns: Int
+    /// Optional reference to the underlying PlanItem — used for Long-Press preview (Feature #300).
+    let task: PlanItem?
+
+    init(
+        id: String,
+        taskID: String,
+        title: String,
+        startDate: Date,
+        endDate: Date,
+        column: Int,
+        totalColumns: Int,
+        task: PlanItem? = nil
+    ) {
+        self.id = id
+        self.taskID = taskID
+        self.title = title
+        self.startDate = startDate
+        self.endDate = endDate
+        self.column = column
+        self.totalColumns = totalColumns
+        self.task = task
+    }
 }
 
 // MARK: - Timeline Location Calculator

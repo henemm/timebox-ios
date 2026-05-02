@@ -819,6 +819,8 @@ struct CoachView: View {
                 } label: {
                     Label("Löschen", systemImage: "trash")
                 }
+            } preview: {
+                TaskPreviewView(task: task)
             }
 
             if taskForDurationPicker?.id == task.id {

@@ -7,6 +7,15 @@ struct TaskPreviewView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
+            // Title — hidden marker for UI tests (Feature #300).
+            // Apple's .contextMenu(preview:) Snapshot trees don't reliably expose
+            // container-level accessibilityIdentifier; a static text leaf does.
+            Text("taskPreviewCard")
+                .font(.system(size: 0.001))
+                .opacity(0.001)
+                .accessibilityIdentifier("taskPreviewCard")
+                .accessibilityHidden(false)
+
             // Title
             Text(task.title)
                 .font(.headline)
@@ -95,5 +104,6 @@ struct TaskPreviewView: View {
         }
         .padding()
         .frame(width: 260)
+        .accessibilityElement(children: .contain)
     }
 }

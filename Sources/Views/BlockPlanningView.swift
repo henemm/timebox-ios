@@ -215,7 +215,8 @@ struct BlockPlanningView: View {
                             startDate: positioned.startDate,
                             endDate: positioned.endDate,
                             onUnschedule: { unscheduleTask(positioned.taskID) },
-                            onStartFocusSprint: { startFocusSprint(positioned.taskID) }
+                            onStartFocusSprint: { startFocusSprint(positioned.taskID) },
+                            task: positioned.task
                         )
                         .frame(maxHeight: .infinity)
                         .timelinePosition(
@@ -311,10 +312,12 @@ struct BlockPlanningView: View {
     private var positionedScheduledTasks: [PositionedScheduledTask] {
         positionedItems.compactMap { positioned -> PositionedScheduledTask? in
             if case .scheduledTask(let taskID, let title) = positioned.item.type {
+                let planItem = allTasks.first { $0.id == taskID }
                 return PositionedScheduledTask(
                     id: positioned.id, taskID: taskID, title: title,
                     startDate: positioned.item.startDate, endDate: positioned.item.endDate,
-                    column: positioned.column, totalColumns: positioned.totalColumns
+                    column: positioned.column, totalColumns: positioned.totalColumns,
+                    task: planItem
                 )
             }
             return nil

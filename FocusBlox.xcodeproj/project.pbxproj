@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		50A6E216AD80C0AC6E42C63E /* TaskPreviewLongPressTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC237B3E9BE8B646E550BC0D /* TaskPreviewLongPressTests.swift */; };
 		B33E6C7A35B1EAC4A8DD793D /* BacklogBadgeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDEC968759D860953246E6C2 /* BacklogBadgeService.swift */; };
 		275B59FC91AE6FED66B5CE4B /* RecurringStackingHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADCCEC385E2261C3CD83CF10 /* RecurringStackingHelper.swift */; };
 		FB5DB943A9E58B86DA22A1C1 /* MacOverdueMarkerUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1C89B198F13018591D56725 /* MacOverdueMarkerUITests.swift */; };
@@ -414,6 +415,7 @@
 		NOTIFACT01BUILD002 /* NotificationActionDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = NOTIFACT01FREF001 /* NotificationActionDelegate.swift */; };
 		NOTSNZ01BUILD0001 /* NotificationSnoozeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = NOTSNZ01FILE00001 /* NotificationSnoozeTests.swift */; };
 		NXLP01PVBLD0001 /* TaskPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = NXLP01PVREF0001 /* TaskPreviewView.swift */; };
+		NXLP01PVMACBLD0001 /* TaskPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = NXLP01PVREF0001 /* TaskPreviewView.swift */; };
 		NXLP01UIBLD0001 /* NextUpLongPressUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = NXLP01UIREF0001 /* NextUpLongPressUITests.swift */; };
 		NXSWIPE01UIBLD01 /* NextUpSwipeActionsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = NXSWIPE01UIREF01 /* NextUpSwipeActionsUITests.swift */; };
 		NXSWIPE01UTBLD01 /* NextUpSwipeActionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = NXSWIPE01UTREF01 /* NextUpSwipeActionsTests.swift */; };
@@ -739,6 +741,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		AC237B3E9BE8B646E550BC0D /* TaskPreviewLongPressTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TaskPreviewLongPressTests.swift; path = FocusBloxUITests/TaskPreviewLongPressTests.swift; sourceTree = SOURCE_ROOT; };
 		B1C89B198F13018591D56725 /* MacOverdueMarkerUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MacOverdueMarkerUITests.swift; path = FocusBloxMacUITests/MacOverdueMarkerUITests.swift; sourceTree = SOURCE_ROOT; };
 		8BA02D73E4C23FA40309D834 /* OverdueMarkerUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = OverdueMarkerUITests.swift; path = FocusBloxUITests/OverdueMarkerUITests.swift; sourceTree = SOURCE_ROOT; };
 		109B433962D98A3A08A65345 /* OverdueMarkerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = OverdueMarkerTests.swift; path = FocusBloxTests/OverdueMarkerTests.swift; sourceTree = SOURCE_ROOT; };
@@ -1475,6 +1478,7 @@
 		05D90FB2A2CE48689EC309B4 /* FocusBloxUITests */ = {
 			isa = PBXGroup;
 			children = (
+				AC237B3E9BE8B646E550BC0D /* TaskPreviewLongPressTests.swift */,
 				8BA02D73E4C23FA40309D834 /* OverdueMarkerUITests.swift */,
 				956EB17B0A21B117F90F4745 /* BacklogSectionsA11yUITests.swift */,
 				CE6DEB50B25D011AF11B166E /* CoachInlineActionsUITests.swift */,
@@ -2868,6 +2872,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				50A6E216AD80C0AC6E42C63E /* TaskPreviewLongPressTests.swift in Sources */,
 				1F6AE2D7A55A9F1FFBC0AAFE /* OverdueMarkerUITests.swift in Sources */,
 				D0146F1DECA83C078136AF1F /* BacklogSectionsA11yUITests.swift in Sources */,
 				A5341EBD6FB31D49C990DC6C /* CoachInlineActionsUITests.swift in Sources */,
@@ -3211,6 +3216,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				NXLP01PVMACBLD0001 /* TaskPreviewView.swift in Sources */,
 				B33E6C7A35B1EAC4A8DD793D /* BacklogBadgeService.swift in Sources */,
 				275B59FC91AE6FED66B5CE4B /* RecurringStackingHelper.swift in Sources */,
 				9DF656B6DD6A57C1A8D7B1E6 /* LocalTask+PriorityTier.swift in Sources */,

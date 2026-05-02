@@ -1030,6 +1030,8 @@ struct BacklogView: View {
                         if item.dueDate != nil {
                             postponeMenu(for: item)
                         }
+                    } preview: {
+                        TaskPreviewView(task: item)
                     }
                 }
             } header: {
@@ -1113,6 +1115,8 @@ struct BacklogView: View {
             if item.dueDate != nil {
                 postponeMenu(for: item)
             }
+        } preview: {
+            TaskPreviewView(task: item)
         }
         // Render blocked dependents directly after this task
         ForEach(blockedTasks(for: item.id)) { blocked in
@@ -1480,6 +1484,8 @@ struct BacklogView: View {
                         } label: {
                             Label("Löschen", systemImage: "trash")
                         }
+                    } preview: {
+                        TaskPreviewView(task: item)
                     }
                 }
             }

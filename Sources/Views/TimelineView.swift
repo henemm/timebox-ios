@@ -4,6 +4,8 @@ struct TimelineView: View {
     let date: Date
     let events: [CalendarEvent]
     let scheduledTasks: [TimelineItem]
+    /// Optional list of PlanItems used for the Long-Press preview lookup (Feature #300).
+    let allTasks: [PlanItem]
     let onScheduleTask: ((PlanItemTransfer, Date) -> Void)?
     let onMoveEvent: ((CalendarEventTransfer, Date) -> Void)?
     let onEventTap: ((CalendarEvent) -> Void)?
@@ -19,6 +21,7 @@ struct TimelineView: View {
         date: Date,
         events: [CalendarEvent],
         scheduledTasks: [TimelineItem] = [],
+        allTasks: [PlanItem] = [],
         onScheduleTask: ((PlanItemTransfer, Date) -> Void)? = nil,
         onMoveEvent: ((CalendarEventTransfer, Date) -> Void)? = nil,
         onEventTap: ((CalendarEvent) -> Void)? = nil,
@@ -29,6 +32,7 @@ struct TimelineView: View {
         self.date = date
         self.events = events
         self.scheduledTasks = scheduledTasks
+        self.allTasks = allTasks
         self.onScheduleTask = onScheduleTask
         self.onMoveEvent = onMoveEvent
         self.onEventTap = onEventTap
@@ -99,7 +103,8 @@ struct TimelineView: View {
                     startDate: item.startDate,
                     endDate: item.endDate,
                     onUnschedule: { onUnscheduleTask?(id) },
-                    onStartFocusSprint: onStartFocusSprint != nil ? { onStartFocusSprint?(id) } : nil
+                    onStartFocusSprint: onStartFocusSprint != nil ? { onStartFocusSprint?(id) } : nil,
+                    task: allTasks.first { $0.id == id }
                 )
                 .frame(height: height)
                 Spacer().frame(width: 16)
