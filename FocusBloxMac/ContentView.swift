@@ -9,6 +9,7 @@ import SwiftUI
 import SwiftData
 import AppKit
 import CoreSpotlight
+import Combine
 import os
 
 private let logger = Logger(subsystem: "com.henning.focusblox", category: "RemindersImport")
@@ -142,12 +143,24 @@ struct ContentView: View {
         tasks.filter { $0.modelContext != nil && !$0.isCompleted && $0.isVisibleInBacklog }  // Bug 78: skip detached
     }
 
+    /// Live-Tick fuer 60s-Refresh des Overdue-Counters auf macOS (#288/#294/#296).
+    @State private var overdueTimerTick = Date()
+    private let overdueTimer = Timer.publish(every: 60, on: .main, in: .common).autoconnect()
+
     // Computed properties for sidebar badges
+    /// Anzahl ueberfaelliger Backlog-Tasks — delegiert an `BacklogBadgeService`
+    /// fuer Plattform-Paritaet mit iOS Tab-Badge (#288/#294/#296).
+    /// Variable behaelt den Namen `doNowCount`, damit `SidebarView`-API stabil bleibt;
+    /// die Bedeutung ist seit dem Rework "ueberfaellig", nicht mehr "Score-Tier".
+    /// Tasks in der DeferredCompletion-Pending-Phase werden ausgeschlossen
+    /// (AC-13/AC-14): Sidebar-Badge -1 sofort bei Checkbox-Tap, +1 zurueck bei Undo.
     private var doNowCount: Int {
-        let items = visibleTasks
-            .filter { !$0.isNextUp && $0.assignedFocusBlockID == nil && !$0.isParked }
-            .map { PlanItem(localTask: $0) }
-        return items.filter { $0.priorityTier == .doNow }.count
+        _ = overdueTimerTick  // Force recompute on timer fire (60s)
+        let items = visibleTasks.map { PlanItem(localTask: $0) }
+        return BacklogBadgeService.countOverdueTasks(
+            items,
+            excludingPendingIDs: deferredCompletion.pendingIDs
+        )
     }
 
     private var completedCount: Int {
@@ -273,6 +286,10 @@ struct ContentView: View {
         .onReceive(NotificationCenter.default.publisher(for: .taskDataChanged)) { _ in
             // Bug #189/#190/#191: Refresh after child-view task mutations
             refreshTasks()
+        }
+        .onReceive(overdueTimer) { tick in
+            // Issues #288/#294/#296: 60s-Refresh des Overdue-Counters
+            overdueTimerTick = tick
         }
         .toolbar(id: "mainNavigation") {
             // Main navigation in toolbar

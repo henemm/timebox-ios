@@ -106,7 +106,12 @@ struct FocusBloxApp: App {
             // so FocusLiveView.loadData() would find empty store if seeded in .onAppear
             // --empty-morning: Skip seeding to test empty state in DayView morning mode
             if isUITesting && !ProcessInfo.processInfo.arguments.contains("--empty-morning") {
-                FocusBloxApp.seedUITestData(into: container.mainContext)
+                if ProcessInfo.processInfo.arguments.contains("--overdue-uitesting") {
+                    // Issues #288/#294/#296: kontrollierte Datenlage fuer Overdue-Marker-Tests
+                    FocusBloxApp.seedOverdueUITestData(into: container.mainContext)
+                } else {
+                    FocusBloxApp.seedUITestData(into: container.mainContext)
+                }
             }
 
             return container
@@ -1108,6 +1113,69 @@ struct FocusBloxApp: App {
 
         try? context.save()
 
+    }
+    /// Seed fuer Overdue-Marker-UI-Tests (#288/#294/#296).
+    /// 3 ueberfaellige Tasks (gestern), 2 zukuenftige (morgen), 1 ohne Datum.
+    /// Alle Tasks mit Praefix "[OVERDUE-MOCK]" damit Seed-Guard-Logik nicht greift.
+    private static func seedOverdueUITestData(into context: ModelContext) {
+        let descriptor = FetchDescriptor<LocalTask>(predicate: #Predicate {
+            $0.title == "[OVERDUE-MOCK] Ueberfaellig 1"
+        })
+        let existing = (try? context.fetch(descriptor)) ?? []
+        guard existing.isEmpty else { return }
+
+        let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: Date()) ?? Date()
+        let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: Date()) ?? Date()
+
+        // 3 ueberfaellige Tasks OHNE Score-Attribute (zentraler Bug-Beweis)
+        for i in 1...3 {
+            let task = LocalTask(
+                title: "[OVERDUE-MOCK] Ueberfaellig \(i)",
+                importance: nil,
+                isCompleted: false,
+                dueDate: yesterday,
+                estimatedDuration: nil,
+                urgency: nil
+            )
+            task.isNextUp = false
+            task.isParked = false
+            task.isTemplate = false
+            task.assignedFocusBlockID = nil
+            context.insert(task)
+        }
+
+        // 2 zukuenftige Tasks
+        for i in 1...2 {
+            let task = LocalTask(
+                title: "[OVERDUE-MOCK] Zukuenftig \(i)",
+                importance: 3,
+                isCompleted: false,
+                dueDate: tomorrow,
+                estimatedDuration: 30,
+                urgency: "urgent"
+            )
+            task.isNextUp = false
+            task.isParked = false
+            task.isTemplate = false
+            task.assignedFocusBlockID = nil
+            context.insert(task)
+        }
+
+        // 1 Task ohne dueDate
+        let noDate = LocalTask(
+            title: "[OVERDUE-MOCK] Task ohne Datum",
+            importance: 2,
+            isCompleted: false,
+            dueDate: nil,
+            estimatedDuration: 20,
+            urgency: "not_urgent"
+        )
+        noDate.isNextUp = false
+        noDate.isParked = false
+        noDate.isTemplate = false
+        context.insert(noDate)
+
+        try? context.save()
     }
 }
 

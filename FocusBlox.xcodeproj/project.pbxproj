@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B33E6C7A35B1EAC4A8DD793D /* BacklogBadgeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDEC968759D860953246E6C2 /* BacklogBadgeService.swift */; };
+		275B59FC91AE6FED66B5CE4B /* RecurringStackingHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADCCEC385E2261C3CD83CF10 /* RecurringStackingHelper.swift */; };
+		FB5DB943A9E58B86DA22A1C1 /* MacOverdueMarkerUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1C89B198F13018591D56725 /* MacOverdueMarkerUITests.swift */; };
+		1F6AE2D7A55A9F1FFBC0AAFE /* OverdueMarkerUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BA02D73E4C23FA40309D834 /* OverdueMarkerUITests.swift */; };
+		6208D0FD53AD09B023B55524 /* OverdueMarkerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 109B433962D98A3A08A65345 /* OverdueMarkerTests.swift */; };
+		0B560562D07608BB8188F63C /* RecurringStackingHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADCCEC385E2261C3CD83CF10 /* RecurringStackingHelper.swift */; };
 		6F6FCD33B3EC36B08B0FFBAD /* MacBacklogSectionsA11yUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB90AE858D5CC9AB3E45EFE1 /* MacBacklogSectionsA11yUITests.swift */; };
 		D0146F1DECA83C078136AF1F /* BacklogSectionsA11yUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 956EB17B0A21B117F90F4745 /* BacklogSectionsA11yUITests.swift */; };
 		1CDE1F1E92C80EE354CBF253 /* LocalTask+PriorityTier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62AA96BC4C9B13C7979B5603 /* LocalTask+PriorityTier.swift */; };
@@ -733,6 +739,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		B1C89B198F13018591D56725 /* MacOverdueMarkerUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MacOverdueMarkerUITests.swift; path = FocusBloxMacUITests/MacOverdueMarkerUITests.swift; sourceTree = SOURCE_ROOT; };
+		8BA02D73E4C23FA40309D834 /* OverdueMarkerUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = OverdueMarkerUITests.swift; path = FocusBloxUITests/OverdueMarkerUITests.swift; sourceTree = SOURCE_ROOT; };
+		109B433962D98A3A08A65345 /* OverdueMarkerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = OverdueMarkerTests.swift; path = FocusBloxTests/OverdueMarkerTests.swift; sourceTree = SOURCE_ROOT; };
+		ADCCEC385E2261C3CD83CF10 /* RecurringStackingHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = RecurringStackingHelper.swift; path = Sources/Services/RecurringStackingHelper.swift; sourceTree = SOURCE_ROOT; };
 		EB90AE858D5CC9AB3E45EFE1 /* MacBacklogSectionsA11yUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MacBacklogSectionsA11yUITests.swift; path = FocusBloxMacUITests/MacBacklogSectionsA11yUITests.swift; sourceTree = SOURCE_ROOT; };
 		956EB17B0A21B117F90F4745 /* BacklogSectionsA11yUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = BacklogSectionsA11yUITests.swift; path = FocusBloxUITests/BacklogSectionsA11yUITests.swift; sourceTree = SOURCE_ROOT; };
 		539D17C342060DF53F0CC0C1 /* MenuBarTierGroupingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MenuBarTierGroupingTests.swift; path = FocusBloxMacTests/MenuBarTierGroupingTests.swift; sourceTree = SOURCE_ROOT; };
@@ -1465,6 +1475,7 @@
 		05D90FB2A2CE48689EC309B4 /* FocusBloxUITests */ = {
 			isa = PBXGroup;
 			children = (
+				8BA02D73E4C23FA40309D834 /* OverdueMarkerUITests.swift */,
 				956EB17B0A21B117F90F4745 /* BacklogSectionsA11yUITests.swift */,
 				CE6DEB50B25D011AF11B166E /* CoachInlineActionsUITests.swift */,
 				0A212E6DA5167EDF57B91736 /* ToolbarConsistencyUITests.swift */,
@@ -1764,6 +1775,7 @@
 		A6B3805EF19D1B131D346DDD /* FocusBloxTests */ = {
 			isa = PBXGroup;
 			children = (
+				109B433962D98A3A08A65345 /* OverdueMarkerTests.swift */,
 				87DC66EEDAF69079597761A7 /* MenuBarFilterTests.swift */,
 				CFBCD75F80AA36B02F327141 /* CapacityLimitTests.swift */,
 				9F76CB4EF25B8523692B2D8E /* SprintWordingBatch1Tests.swift */,
@@ -1942,6 +1954,7 @@
 		E8F581D4C161751425D7F776 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				ADCCEC385E2261C3CD83CF10 /* RecurringStackingHelper.swift */,
 				D1E7B7758F57E936CF46FDCD /* TaskIdeaSuggestionService.swift */,
 				E1A2AC854841D3BE31CDA672 /* AICoachReasonService.swift */,
 				54BF85733F8AE9505BA457C8 /* ShakeUndoHandler.swift */,
@@ -2700,6 +2713,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0B560562D07608BB8188F63C /* RecurringStackingHelper.swift in Sources */,
 				1CDE1F1E92C80EE354CBF253 /* LocalTask+PriorityTier.swift in Sources */,
 				1DCBDC9082A0F0DE9C25A15A /* Array+MenuBarPopoverFilter.swift in Sources */,
 				3BC2BB1C58592C9E1B7D2C6C /* DurationPickerChips.swift in Sources */,
@@ -2854,6 +2868,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1F6AE2D7A55A9F1FFBC0AAFE /* OverdueMarkerUITests.swift in Sources */,
 				D0146F1DECA83C078136AF1F /* BacklogSectionsA11yUITests.swift in Sources */,
 				A5341EBD6FB31D49C990DC6C /* CoachInlineActionsUITests.swift in Sources */,
 				474AE8C33568E502A6EF493F /* ToolbarConsistencyUITests.swift in Sources */,
@@ -2994,6 +3009,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6208D0FD53AD09B023B55524 /* OverdueMarkerTests.swift in Sources */,
 				11B7D9FF086B3BF218B79F8D /* MenuBarFilterTests.swift in Sources */,
 				142A838429C5190459E2EA1E /* CapacityLimitTests.swift in Sources */,
 				62350D53367F9E6E27EFEA91 /* SprintWordingBatch1Tests.swift in Sources */,
@@ -3195,6 +3211,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B33E6C7A35B1EAC4A8DD793D /* BacklogBadgeService.swift in Sources */,
+				275B59FC91AE6FED66B5CE4B /* RecurringStackingHelper.swift in Sources */,
 				9DF656B6DD6A57C1A8D7B1E6 /* LocalTask+PriorityTier.swift in Sources */,
 				7FC881C488BD484FA0751A6A /* Array+MenuBarPopoverFilter.swift in Sources */,
 				BB89EB2BFBE316692E44CE67 /* DurationPickerChips.swift in Sources */,
@@ -3302,6 +3320,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FB5DB943A9E58B86DA22A1C1 /* MacOverdueMarkerUITests.swift in Sources */,
 				6F6FCD33B3EC36B08B0FFBAD /* MacBacklogSectionsA11yUITests.swift in Sources */,
 				67DC0F36E46E54AEB92C74B5 /* MacCoachTabLayoutUITests.swift in Sources */,
 				76A84BDB9F25A5B323DF9160 /* MacFocusSprintParityUITests.swift in Sources */,

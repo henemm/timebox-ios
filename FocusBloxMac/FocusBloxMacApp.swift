@@ -308,7 +308,12 @@ struct FocusBloxMacApp: App {
                     cloudKitDatabase: .none
                 )
                 container = try ModelContainer(for: schema, configurations: [config])
-                Self.seedUITestData(into: container.mainContext)
+                if ProcessInfo.processInfo.arguments.contains("--overdue-uitesting") {
+                    // Issues #288/#294/#296: kontrollierte Datenlage fuer Overdue-Marker-Tests
+                    Self.seedOverdueUITestData(into: container.mainContext)
+                } else {
+                    Self.seedUITestData(into: container.mainContext)
+                }
             } else {
                 container = try MacModelContainer.create()
             }
@@ -802,5 +807,63 @@ extension FocusBloxMacApp {
         }
         try? context.save()
 
+    }
+    /// Seed fuer Overdue-Marker-UI-Tests auf macOS (#288/#294/#296).
+    /// 3 ueberfaellige Tasks (gestern), 2 zukuenftige (morgen), 1 ohne Datum.
+    static func seedOverdueUITestData(into context: ModelContext) {
+        let descriptor = FetchDescriptor<LocalTask>(predicate: #Predicate {
+            $0.title == "[OVERDUE-MOCK] Ueberfaellig 1"
+        })
+        guard ((try? context.fetch(descriptor))?.isEmpty ?? true) else { return }
+
+        let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: Date()) ?? Date()
+        let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: Date()) ?? Date()
+
+        for i in 1...3 {
+            let task = LocalTask(
+                title: "[OVERDUE-MOCK] Ueberfaellig \(i)",
+                importance: nil,
+                isCompleted: false,
+                dueDate: yesterday,
+                estimatedDuration: nil,
+                urgency: nil
+            )
+            task.isNextUp = false
+            task.isParked = false
+            task.isTemplate = false
+            task.assignedFocusBlockID = nil
+            context.insert(task)
+        }
+
+        for i in 1...2 {
+            let task = LocalTask(
+                title: "[OVERDUE-MOCK] Zukuenftig \(i)",
+                importance: 3,
+                isCompleted: false,
+                dueDate: tomorrow,
+                estimatedDuration: 30,
+                urgency: "urgent"
+            )
+            task.isNextUp = false
+            task.isParked = false
+            task.isTemplate = false
+            task.assignedFocusBlockID = nil
+            context.insert(task)
+        }
+
+        let noDate = LocalTask(
+            title: "[OVERDUE-MOCK] Task ohne Datum",
+            importance: 2,
+            isCompleted: false,
+            dueDate: nil,
+            estimatedDuration: 20,
+            urgency: "not_urgent"
+        )
+        noDate.isNextUp = false
+        noDate.isParked = false
+        noDate.isTemplate = false
+        context.insert(noDate)
+
+        try? context.save()
     }
 }

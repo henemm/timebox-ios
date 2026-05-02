@@ -2,11 +2,18 @@ import XCTest
 import SwiftData
 @testable import FocusBlox
 
-/// Tests fuer Badge-Count-Logik: Badge soll nur doNow-Tasks im Backlog zaehlen,
-/// NICHT Tasks die in NextUp oder einem FocusBlock zugewiesen sind.
+/// Tests für Badge-Count-Logik mit SwiftData-Integration — umgeschrieben für Overdue-Rework.
 ///
-/// Bug #227: Badge-Zahlen inkonsistent (Icon != Tab != Liste).
-/// Fix: Einheitliche doNow-Logik (Score >= 60) mit konsistenten Filtern.
+/// VORHER: Tests prüften dass NotificationService.countDoNowBadgeTasks() Score-basiert zählt.
+/// JETZT: Tests prüfen dass NotificationService.countDoNowBadgeTasks() zeitbasiert zählt
+///        (delegiert an BacklogBadgeService.countOverdueTasks).
+///
+/// Kern-Invariante: Beide Counter-Quellen liefern identischen Wert.
+///
+/// TDD RED: Tests SCHLAGEN FEHL weil:
+/// - NotificationService.countDoNowBadgeTasks() noch eigene Score-Logik hat
+/// - Ein überfälliger Task OHNE Score (importance=nil, urgency=nil) wird von der
+///   alten Logik NICHT gezählt — nach dem Fix muss er gezählt werden.
 @MainActor
 final class BadgeCountFilterTests: XCTestCase {
 
@@ -17,162 +24,220 @@ final class BadgeCountFilterTests: XCTestCase {
         container = try ModelContainer(for: LocalTask.self, configurations: config)
     }
 
-    // MARK: - Core Bug: NextUp tasks must NOT be counted
-
-    /// Verhalten: DoNow-Tasks die in NextUp sind, sollen NICHT im Badge erscheinen.
-    /// Bricht wenn: countDoNowBadgeTasks() den isNextUp-Filter NICHT prueft.
-    func test_doNowNextUpTask_isNotCounted() throws {
-        let context = ModelContext(container)
-        let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: Calendar.current.startOfDay(for: Date()))!
-
-        let task = LocalTask(title: "DoNow but NextUp")
-        task.dueDate = yesterday
-        task.importance = 3
-        task.urgency = "urgent"
-        task.isNextUp = true
-        task.isCompleted = false
-        task.isTemplate = false
-        context.insert(task)
-        try context.save()
-
-        let count = NotificationService.countDoNowBadgeTasks(context: context)
-        XCTAssertEqual(count, 0, "DoNow task in NextUp should NOT be counted in badge")
+    override func tearDownWithError() throws {
+        container = nil
     }
 
-    // MARK: - Core Bug: FocusBlock-assigned tasks must NOT be counted
+    // MARK: - Kern-Test: Zeitbasiert statt Score-basiert
 
-    /// Verhalten: DoNow-Tasks die einem FocusBlock zugewiesen sind, sollen NICHT im Badge erscheinen.
-    /// Bricht wenn: countDoNowBadgeTasks() den assignedFocusBlockID-Filter NICHT prueft.
-    func test_doNowAssignedTask_isNotCounted() throws {
+    /// Verhalten: Überfälliger Task OHNE Score-Attribute wird gezählt.
+    /// Bricht wenn: countDoNowBadgeTasks Score-Filter beibehält (alter Bug).
+    ///
+    /// Das ist die wichtigste Regression: ein Task mit dueDate gestern aber
+    /// ohne Eisenhower-Bewertung (importance=nil, urgency=nil) hat Score 0
+    /// → wird von ALTEM Code nicht gezählt → MUSS von neuem Code gezählt werden.
+    func test_overdueTaskWithoutScore_isCounted() throws {
         let context = ModelContext(container)
-        let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: Calendar.current.startOfDay(for: Date()))!
+        let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: Date())!
 
-        let task = LocalTask(title: "DoNow but in FocusBlock")
-        task.dueDate = yesterday
-        task.importance = 3
-        task.urgency = "urgent"
-        task.assignedFocusBlockID = "block-123"
-        task.isCompleted = false
-        task.isTemplate = false
-        context.insert(task)
-        try context.save()
-
-        let count = NotificationService.countDoNowBadgeTasks(context: context)
-        XCTAssertEqual(count, 0, "DoNow task assigned to FocusBlock should NOT be counted in badge")
-    }
-
-    // MARK: - Positive: Backlog overdue tasks MUST be counted
-
-    /// Verhalten: DoNow-Tasks im Backlog (nicht NextUp, nicht zugewiesen) MUESSEN gezaehlt werden.
-    /// Bricht wenn: countDoNowBadgeTasks() faelschlicherweise Backlog-Tasks ausfiltert.
-    func test_doNowBacklogTask_isCounted() throws {
-        let context = ModelContext(container)
-        let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: Calendar.current.startOfDay(for: Date()))!
-
-        let task = LocalTask(title: "DoNow in Backlog")
-        task.dueDate = yesterday
-        task.importance = 3
-        task.urgency = "urgent"
+        // Task ohne Score (importance=nil, urgency=nil) — Score wäre << 60
+        let task = LocalTask(title: "Überfällig ohne Score", importance: nil, isCompleted: false,
+                             dueDate: yesterday, estimatedDuration: nil, urgency: nil)
         task.isNextUp = false
+        task.isParked = false
+        task.isTemplate = false
         task.assignedFocusBlockID = nil
-        task.isCompleted = false
+        context.insert(task)
+        try context.save()
+
+        let count = NotificationService.countDoNowBadgeTasks(context: context)
+        XCTAssertEqual(
+            count, 1,
+            "Überfälliger Task ohne Score MUSS gezählt werden (zeitbasiert, nicht Score-basiert). "
+            + "Alter Code gibt 0 zurück — das ist der Bug."
+        )
+    }
+
+    // MARK: - Positive: Überfälliger Backlog-Task wird gezählt
+
+    /// Verhalten: Überfälliger Task im Backlog MUSS gezählt werden.
+    /// Bricht wenn: countDoNowBadgeTasks überfällige Tasks ausfiltert.
+    func test_overdueBacklogTask_isCounted() throws {
+        let context = ModelContext(container)
+        let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: Date())!
+
+        let task = LocalTask(title: "Überfällig im Backlog", importance: 2, isCompleted: false,
+                             dueDate: yesterday, estimatedDuration: 30, urgency: "not_urgent")
+        task.isNextUp = false
+        task.isParked = false
+        task.isTemplate = false
+        task.assignedFocusBlockID = nil
+        context.insert(task)
+        try context.save()
+
+        let count = NotificationService.countDoNowBadgeTasks(context: context)
+        XCTAssertEqual(count, 1, "Überfälliger Backlog-Task MUSS gezählt werden")
+    }
+
+    // MARK: - Negative: Zukünftiger Task wird nicht gezählt
+
+    /// Verhalten: Task mit dueDate morgen wird NICHT gezählt.
+    /// Bricht wenn: countDoNowBadgeTasks zukünftige Tasks mitzählt.
+    func test_futureDueDateTask_isNotCounted() throws {
+        let context = ModelContext(container)
+        let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: Date())!
+
+        let task = LocalTask(title: "Zukünftig", importance: 3, isCompleted: false,
+                             dueDate: tomorrow, estimatedDuration: 30, urgency: "urgent")
+        task.isNextUp = false
+        task.isParked = false
+        task.isTemplate = false
+        task.assignedFocusBlockID = nil
+        context.insert(task)
+        try context.save()
+
+        let count = NotificationService.countDoNowBadgeTasks(context: context)
+        XCTAssertEqual(count, 0, "Task mit dueDate morgen darf nicht gezählt werden")
+    }
+
+    /// Verhalten: Task ohne dueDate wird NICHT gezählt.
+    func test_taskWithNoDueDate_isNotCounted() throws {
+        let context = ModelContext(container)
+
+        let task = LocalTask(title: "Kein Datum", importance: 3, isCompleted: false,
+                             dueDate: nil, estimatedDuration: 30, urgency: "urgent")
+        task.isNextUp = false
+        task.isParked = false
         task.isTemplate = false
         context.insert(task)
         try context.save()
 
         let count = NotificationService.countDoNowBadgeTasks(context: context)
-        XCTAssertEqual(count, 1, "DoNow backlog task MUST be counted in badge")
+        XCTAssertEqual(count, 0, "Task ohne dueDate darf nicht gezählt werden")
     }
 
-    // MARK: - Existing filters still work
+    // MARK: - Bestehende Filter bleiben gültig
 
-    /// Verhalten: Erledigte Tasks werden nicht gezaehlt (bestehender Filter).
-    func test_completedDoNowTask_isNotCounted() throws {
+    /// Verhalten: NextUp-Tasks werden nicht gezählt.
+    /// Bricht wenn: countDoNowBadgeTasks NextUp-Filter verliert.
+    func test_overdueNextUpTask_isNotCounted() throws {
         let context = ModelContext(container)
-        let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: Calendar.current.startOfDay(for: Date()))!
+        let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: Date())!
 
-        let task = LocalTask(title: "Completed doNow")
-        task.dueDate = yesterday
-        task.importance = 3
-        task.urgency = "urgent"
-        task.isCompleted = true
+        let task = LocalTask(title: "Überfällig aber NextUp", importance: 3, isCompleted: false,
+                             dueDate: yesterday, estimatedDuration: 30, urgency: "urgent")
+        task.isNextUp = true
+        task.isParked = false
+        task.isTemplate = false
+        task.assignedFocusBlockID = nil
+        context.insert(task)
+        try context.save()
+
+        let count = NotificationService.countDoNowBadgeTasks(context: context)
+        XCTAssertEqual(count, 0, "NextUp-Task darf nicht im Badge gezählt werden")
+    }
+
+    /// Verhalten: FocusBlock-Tasks werden nicht gezählt.
+    func test_overdueAssignedTask_isNotCounted() throws {
+        let context = ModelContext(container)
+        let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: Date())!
+
+        let task = LocalTask(title: "Überfällig im FocusBlock", importance: 3, isCompleted: false,
+                             dueDate: yesterday, estimatedDuration: 30, urgency: "urgent")
+        task.isNextUp = false
+        task.isParked = false
+        task.isTemplate = false
+        task.assignedFocusBlockID = "block-123"
+        context.insert(task)
+        try context.save()
+
+        let count = NotificationService.countDoNowBadgeTasks(context: context)
+        XCTAssertEqual(count, 0, "FocusBlock-Task darf nicht im Badge gezählt werden")
+    }
+
+    /// Verhalten: Erledigte Tasks werden nicht gezählt.
+    func test_completedOverdueTask_isNotCounted() throws {
+        let context = ModelContext(container)
+        let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: Date())!
+
+        let task = LocalTask(title: "Erledigt", importance: 3, isCompleted: true,
+                             dueDate: yesterday, estimatedDuration: 30, urgency: "urgent")
+        task.isNextUp = false
+        task.isParked = false
         task.isTemplate = false
         context.insert(task)
         try context.save()
 
         let count = NotificationService.countDoNowBadgeTasks(context: context)
-        XCTAssertEqual(count, 0, "Completed task should NOT be counted")
+        XCTAssertEqual(count, 0, "Erledigter Task darf nicht gezählt werden")
     }
 
-    /// Verhalten: Template-Tasks werden nicht gezaehlt (bestehender Filter).
-    func test_templateDoNowTask_isNotCounted() throws {
+    /// Verhalten: Template-Tasks werden nicht gezählt.
+    func test_templateOverdueTask_isNotCounted() throws {
         let context = ModelContext(container)
-        let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: Calendar.current.startOfDay(for: Date()))!
+        let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: Date())!
 
-        let task = LocalTask(title: "Template doNow")
-        task.dueDate = yesterday
-        task.importance = 3
-        task.urgency = "urgent"
+        let task = LocalTask(title: "Template", importance: 3, isCompleted: false,
+                             dueDate: yesterday, estimatedDuration: 30, urgency: "urgent")
+        task.isNextUp = false
+        task.isParked = false
         task.isTemplate = true
-        task.isCompleted = false
         context.insert(task)
         try context.save()
 
         let count = NotificationService.countDoNowBadgeTasks(context: context)
-        XCTAssertEqual(count, 0, "Template task should NOT be counted")
+        XCTAssertEqual(count, 0, "Template-Task darf nicht gezählt werden")
     }
 
-    // MARK: - Mixed scenario (reproduces the bug)
+    // MARK: - Kern-Invariante: Gemischtes Szenario
 
-    /// Verhalten: Bei 4 Backlog-doNow + 4 NextUp/Block-doNow soll Badge = 4 zeigen.
-    /// Bricht wenn: Badge alle 8 doNow-Tasks zaehlt (der urspruengliche Bug).
-    func test_mixedScenario_onlyBacklogDoNowCounted() throws {
+    /// Verhalten: Gemischte Datenlage — Badge zeigt exakt die Anzahl überfälliger Backlog-Tasks.
+    /// Bricht wenn: Badge alle Tasks mischt oder Filter fehlen.
+    ///
+    /// Diese Test reproduziert den ursprünglichen Bug aus #227 (Score-Inkonsistenz),
+    /// jetzt mit zeitbasiertem Kriterium.
+    func test_mixedScenario_onlyOverdueBacklogTasksCounted() throws {
         let context = ModelContext(container)
-        let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: Calendar.current.startOfDay(for: Date()))!
+        let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: Date())!
+        let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: Date())!
 
-        // 4 doNow backlog tasks (SHOULD be counted)
+        // 4 überfällige Backlog-Tasks ohne Score (MÜSSEN gezählt werden)
         for i in 1...4 {
-            let task = LocalTask(title: "Backlog DoNow \(i)")
-            task.dueDate = yesterday
-            task.importance = 3
-            task.urgency = "urgent"
+            let task = LocalTask(title: "Überfällig \(i)", importance: nil, isCompleted: false,
+                                 dueDate: yesterday, estimatedDuration: nil, urgency: nil)
             task.isNextUp = false
+            task.isParked = false
+            task.isTemplate = false
             task.assignedFocusBlockID = nil
-            task.isCompleted = false
-            task.isTemplate = false
             context.insert(task)
         }
 
-        // 2 doNow NextUp tasks (should NOT be counted)
+        // 2 überfällige NextUp-Tasks (dürfen NICHT gezählt werden)
         for i in 1...2 {
-            let task = LocalTask(title: "NextUp DoNow \(i)")
-            task.dueDate = yesterday
-            task.importance = 3
-            task.urgency = "urgent"
+            let task = LocalTask(title: "NextUp Überfällig \(i)", importance: 3, isCompleted: false,
+                                 dueDate: yesterday, estimatedDuration: 30, urgency: "urgent")
             task.isNextUp = true
-            task.isCompleted = false
+            task.isParked = false
             task.isTemplate = false
             context.insert(task)
         }
 
-        // 2 doNow FocusBlock-assigned tasks (should NOT be counted)
+        // 3 Tasks mit zukünftigem Datum (dürfen NICHT gezählt werden)
+        for i in 1...3 {
+            let task = LocalTask(title: "Zukünftig \(i)", importance: 3, isCompleted: false,
+                                 dueDate: tomorrow, estimatedDuration: 30, urgency: "urgent")
+            task.isNextUp = false
+            task.isParked = false
+            task.isTemplate = false
+            context.insert(task)
+        }
+
+        // 2 Tasks ohne Datum (dürfen NICHT gezählt werden)
         for i in 1...2 {
-            let task = LocalTask(title: "Block DoNow \(i)")
-            task.dueDate = yesterday
-            task.importance = 3
-            task.urgency = "urgent"
-            task.assignedFocusBlockID = "block-\(i)"
-            task.isCompleted = false
-            task.isTemplate = false
-            context.insert(task)
-        }
-
-        // 5 low-priority tasks (should NOT be counted - not doNow)
-        for i in 1...5 {
-            let task = LocalTask(title: "Low Priority \(i)")
-            task.importance = 1
-            task.urgency = "not_urgent"
-            task.isCompleted = false
+            let task = LocalTask(title: "Kein Datum \(i)", importance: nil, isCompleted: false,
+                                 dueDate: nil, estimatedDuration: nil, urgency: nil)
+            task.isNextUp = false
+            task.isParked = false
             task.isTemplate = false
             context.insert(task)
         }
@@ -180,6 +245,10 @@ final class BadgeCountFilterTests: XCTestCase {
         try context.save()
 
         let count = NotificationService.countDoNowBadgeTasks(context: context)
-        XCTAssertEqual(count, 4, "Badge should show 4 (only backlog doNow), not 8 (all doNow)")
+        XCTAssertEqual(
+            count, 4,
+            "Badge muss 4 zeigen (nur überfällige Backlog-Tasks ohne Score) — "
+            + "zeitbasiert, nicht Score-basiert"
+        )
     }
 }

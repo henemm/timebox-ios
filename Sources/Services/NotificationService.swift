@@ -80,8 +80,10 @@ enum NotificationService {
 
     // MARK: - Badge
 
-    /// Count doNow tasks visible in the backlog (not NextUp, not in FocusBlock, not parked).
-    /// Shared between iOS badge and macOS sidebar badge for consistent counting.
+    /// Count overdue backlog tasks for the App-Icon-Badge.
+    /// Issues #288/#294/#296: delegiert an `BacklogBadgeService.countOverdueTasks`
+    /// — einzige Quelle der Wahrheit, keine eigene Score-Logik.
+    /// Funktionsname bleibt aus API-Kompatibilitaet bestehen (alte Tests/Aufrufer).
     static func countDoNowBadgeTasks(context: ModelContext) -> Int {
         let descriptor = FetchDescriptor<LocalTask>(
             predicate: #Predicate<LocalTask> {
@@ -93,9 +95,9 @@ enum NotificationService {
         do {
             let tasks = try context.fetch(descriptor)
             let items = tasks.map { PlanItem(localTask: $0) }
-            return items.filter { $0.priorityTier == .doNow }.count
+            return BacklogBadgeService.countOverdueTasks(items)
         } catch {
-            print("Failed to count doNow badge tasks: \(error)")
+            print("Failed to count overdue badge tasks: \(error)")
             return 0
         }
     }

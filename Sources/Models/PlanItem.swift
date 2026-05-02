@@ -140,6 +140,14 @@ struct PlanItem: Identifiable, Hashable, Sendable {
     /// Whether this task needs immediate attention (score >= 60, tier "doNow")
     var isDoNow: Bool { priorityTier == .doNow }
 
+    /// Whether this task is overdue right now (uhrzeit-praezise).
+    /// Returns false for tasks without dueDate.
+    /// Issues #288/#294/#296: Roter Punkt + Counter basieren auf dieser Property.
+    var isOverdueNow: Bool {
+        guard let dueDate else { return false }
+        return dueDate < Date()
+    }
+
     /// Backwards compatibility for priority-based code
     var priority: TaskPriority {
         guard let imp = importance else { return .low }

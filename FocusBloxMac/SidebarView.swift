@@ -72,9 +72,11 @@ struct SidebarView: View {
                     Spacer()
                     if doNowCount > 0 {
                         badgeView(count: doNowCount, color: .red)
+                            .accessibilityIdentifier("overdueCountBadge")
                     }
                 }
                 .tag(SidebarFilter.overdue)
+                .accessibilityElement(children: .contain)
                 .contentShape(Rectangle())
                 .onTapGesture { selectedFilter = .overdue }
                 .listRowBackground(selectedFilter == .overdue ? Color.accentColor.opacity(0.15) : Color.clear)

@@ -30,6 +30,13 @@ struct MacBacklogRow: View {
     var effectiveTier: TaskPriorityScoringService.PriorityTier?  // BACKLOG-011: Frozen tier
     @State private var pendingPulse = false
 
+    /// Whether this task is overdue right now. Mirrors `PlanItem.isOverdueNow`
+    /// (#288/#294/#296) — uhrzeit-praezise.
+    private var isOverdueNow: Bool {
+        guard let dueDate = task.dueDate else { return false }
+        return dueDate < Date()
+    }
+
     var body: some View {
         VStack(spacing: 0) {
             // Counter-Bar (Bug `bug-recurring-stack-count-badge`)
@@ -52,6 +59,16 @@ struct MacBacklogRow: View {
 
     private var rowContent: some View {
         HStack(spacing: 10) {
+            // Overdue Marker (red dot, parity with iOS BacklogRow #288/#294/#296).
+            // AC-13/AC-14: Bei Pending-Completion sofort verstecken — synchron zum Counter.
+            if isOverdueNow && !isCompletionPending {
+                Circle()
+                    .fill(.red)
+                    .frame(width: 8, height: 8)
+                    .accessibilityIdentifier("overdueMarker_\(task.id)")
+                    .accessibilityLabel("Ueberfaellig")
+            }
+
             // Completion Toggle
             Button {
                 if isBlocked { return }

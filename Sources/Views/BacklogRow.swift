@@ -88,13 +88,14 @@ struct BacklogRow: View {
 
     private var rowContent: some View {
         HStack(spacing: 12) {
-            // doNow Marker (red dot for high-priority tasks, Bug #223)
-            if item.isDoNow {
+            // Overdue Marker (red dot for overdue tasks, Issues #288/#294/#296).
+            // AC-13/AC-14: Bei Pending-Completion sofort verstecken — synchron zum Counter.
+            if item.isOverdueNow && !isCompletionPending {
                 Circle()
                     .fill(.red)
                     .frame(width: 8, height: 8)
-                    .accessibilityIdentifier("doNowMarker_\(item.id)")
-                    .accessibilityLabel("Sofort erledigen")
+                    .accessibilityIdentifier("overdueMarker_\(item.id)")
+                    .accessibilityLabel("Überfällig")
             }
 
             // Completion Checkbox
