@@ -981,6 +981,18 @@ struct ContentView: View {
         }
     }
 
+    // Wochenende-Quickpick — postpone direkt auf konkretes Date (macOS)
+    private func postponeTaskToDate(_ task: LocalTask, _ date: Date) {
+        LocalTask.postpone(task, to: date, context: modelContext)
+        Task {
+            await SmartNotificationEngine.reconcile(
+                reason: .taskChanged,
+                context: modelContext,
+                eventKitRepo: eventKitRepo
+            )
+        }
+    }
+
     private func releaseDependency(_ task: LocalTask) {
         task.blockerTaskID = nil
         try? modelContext.save()
@@ -1067,6 +1079,10 @@ struct ContentView: View {
             if task.dueDate != nil {
                 Menu("Verschieben") {
                     Button("Morgen") { postponeTask(task, byDays: 1) }
+                    Button("Dieses Wochenende") {
+                        postponeTaskToDate(task, LocalTask.nextSaturdayAt9())
+                    }
+                    .accessibilityIdentifier("weekendMenuButton")
                     Button("Nächste Woche") { postponeTask(task, byDays: 7) }
                     Button("Eigenes Datum...") {
                         customDate = Calendar.current.date(

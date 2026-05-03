@@ -879,6 +879,13 @@ struct BacklogView: View {
                 Label("Morgen", systemImage: "sun.max")
             }
             Button {
+                let target = LocalTask.nextSaturdayAt9()
+                postponeTaskToDate(item, target)
+            } label: {
+                Label("Dieses Wochenende", systemImage: "calendar")
+            }
+            .accessibilityIdentifier("weekendMenuButton")
+            Button {
                 postponeTask(item, byDays: 7)
             } label: {
                 Label("Nächste Woche", systemImage: "calendar.badge.plus")
@@ -926,6 +933,24 @@ struct BacklogView: View {
         guard let task = try? modelContext.fetch(descriptor).first else { return }
         LocalTask.postpone(task, to: customDate, context: modelContext)
         customDateTaskID = nil
+        Task {
+            await SmartNotificationEngine.reconcile(
+                reason: .taskChanged,
+                context: modelContext,
+                eventKitRepo: eventKitRepo
+            )
+            await loadTasks()
+        }
+    }
+
+    // Wochenende-Quickpick — postpone direkt auf konkretes Date
+    private func postponeTaskToDate(_ item: PlanItem, _ date: Date) {
+        guard let taskUUID = UUID(uuidString: item.id) else { return }
+        let descriptor = FetchDescriptor<LocalTask>(
+            predicate: #Predicate<LocalTask> { $0.uuid == taskUUID }
+        )
+        guard let task = try? modelContext.fetch(descriptor).first else { return }
+        LocalTask.postpone(task, to: date, context: modelContext)
         Task {
             await SmartNotificationEngine.reconcile(
                 reason: .taskChanged,

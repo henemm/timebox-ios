@@ -313,6 +313,22 @@ extension LocalTask {
         // FocusBloxShareExtension. Stringbasiert macht den Aufruf target-portabel.
         NotificationCenter.default.post(name: Notification.Name("taskDataChanged"), object: nil)
     }
+
+    /// Berechnet den naechsten Samstag um 09:00 Uhr lokaler Zeit (Wochenende-Quickpick).
+    /// - Mo–Fr: kommender Samstag (1–5 Tage)
+    /// - Sa: NAECHSTER Samstag (in 7 Tagen)
+    /// - So: NAECHSTER Samstag (in 6 Tagen)
+    static func nextSaturdayAt9(from now: Date = Date()) -> Date {
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: now)
+        let weekday = calendar.component(.weekday, from: today)  // 1=So, 7=Sa
+        let daysUntilSat: Int
+        if weekday == 7 { daysUntilSat = 7 }
+        else if weekday == 1 { daysUntilSat = 6 }
+        else { daysUntilSat = 7 - weekday }
+        let nextSat = calendar.date(byAdding: .day, value: daysUntilSat, to: today)!
+        return calendar.date(bySettingHour: 9, minute: 0, second: 0, of: nextSat)!
+    }
 }
 
 // MARK: - Refiner Confirmation

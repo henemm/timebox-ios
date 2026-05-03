@@ -303,4 +303,62 @@ final class TaskPostponeTests: XCTestCase {
         XCTAssertEqual(resultComponents.hour, 14, "Hour should be preserved from original")
         XCTAssertEqual(resultComponents.minute, 30, "Minute should be preserved from original")
     }
+
+    // MARK: - nextSaturdayAt9 (Wochenende-Quickpick)
+
+    /// Verhalten: Mittwoch → kommender Samstag (in 3 Tagen), 09:00
+    /// Bricht wenn: nextSaturdayAt9 falsch berechnet (z.B. 7 Tage statt 3)
+    func test_nextSaturdayAt9_fromWednesday() throws {
+        // 2026-05-06 ist ein Mittwoch
+        var components = DateComponents(year: 2026, month: 5, day: 6, hour: 12, minute: 0)
+        let wednesday = try XCTUnwrap(Calendar.current.date(from: components))
+
+        let result = LocalTask.nextSaturdayAt9(from: wednesday)
+
+        // Erwartet: 2026-05-09 09:00 (Samstag)
+        let expectedComponents = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute, .weekday], from: result)
+        XCTAssertEqual(expectedComponents.year, 2026)
+        XCTAssertEqual(expectedComponents.month, 5)
+        XCTAssertEqual(expectedComponents.day, 9, "Mittwoch +3 Tage = Samstag (09. Mai)")
+        XCTAssertEqual(expectedComponents.hour, 9, "Uhrzeit muss 09:00 sein")
+        XCTAssertEqual(expectedComponents.minute, 0)
+        XCTAssertEqual(expectedComponents.weekday, 7, "Ergebnis muss ein Samstag sein (weekday 7)")
+    }
+
+    /// Verhalten: Samstag → NAECHSTER Samstag (in 7 Tagen), 09:00
+    /// Bricht wenn: nextSaturdayAt9 heute zurueckgibt (Wochenende soll zukuenftig sein)
+    func test_nextSaturdayAt9_fromSaturday() throws {
+        // 2026-05-09 ist ein Samstag
+        var components = DateComponents(year: 2026, month: 5, day: 9, hour: 12, minute: 0)
+        let saturday = try XCTUnwrap(Calendar.current.date(from: components))
+
+        let result = LocalTask.nextSaturdayAt9(from: saturday)
+
+        // Erwartet: 2026-05-16 09:00 (Samstag)
+        let expectedComponents = Calendar.current.dateComponents([.year, .month, .day, .hour, .weekday], from: result)
+        XCTAssertEqual(expectedComponents.year, 2026)
+        XCTAssertEqual(expectedComponents.month, 5)
+        XCTAssertEqual(expectedComponents.day, 16, "Samstag +7 Tage = naechster Samstag (16. Mai)")
+        XCTAssertEqual(expectedComponents.hour, 9, "Uhrzeit muss 09:00 sein")
+        XCTAssertEqual(expectedComponents.weekday, 7, "Ergebnis muss ein Samstag sein")
+    }
+
+    /// Verhalten: Sonntag → NAECHSTER Samstag (in 6 Tagen), 09:00
+    /// Bricht wenn: nextSaturdayAt9 +0 oder +7 zurueckgibt (Sonntag → Sa in 6 Tagen)
+    func test_nextSaturdayAt9_fromSunday() throws {
+        // 2026-05-10 ist ein Sonntag
+        var components = DateComponents(year: 2026, month: 5, day: 10, hour: 12, minute: 0)
+        let sunday = try XCTUnwrap(Calendar.current.date(from: components))
+
+        let result = LocalTask.nextSaturdayAt9(from: sunday)
+
+        // Erwartet: 2026-05-16 09:00 (Samstag)
+        let expectedComponents = Calendar.current.dateComponents([.year, .month, .day, .hour, .weekday], from: result)
+        XCTAssertEqual(expectedComponents.year, 2026)
+        XCTAssertEqual(expectedComponents.month, 5)
+        XCTAssertEqual(expectedComponents.day, 16, "Sonntag +6 Tage = Samstag (16. Mai)")
+        XCTAssertEqual(expectedComponents.hour, 9)
+        XCTAssertEqual(expectedComponents.weekday, 7, "Ergebnis muss ein Samstag sein")
+    }
 }
+

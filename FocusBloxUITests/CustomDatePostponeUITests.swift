@@ -278,4 +278,24 @@ final class CustomDatePostponeUITests: XCTestCase {
             "Nach Bestaetigen muss mindestens eine Backlog-Row ein Datum-Label (dueDateBadge_*) zeigen — Beweis dass dueDate gesetzt wurde"
         )
     }
+
+    // MARK: - TEST_06: Menue zeigt "Dieses Wochenende"-Eintrag (Wochenende-Quickpick)
+
+    /// Verhalten: Long-Press auf Backlog-Task → Verschieben-Untermenue → Eintrag "Dieses Wochenende"
+    ///            mit Identifier weekendMenuButton ist sichtbar
+    /// Bricht wenn: BacklogView.postponeMenu() keinen Eintrag mit diesem Identifier hat
+    func test_postponeMenu_showsWeekendOption() throws {
+        navigateToBacklog()
+
+        guard openPostponeSubmenu() else {
+            XCTFail("Backlog-Row mit Importance-Badge oder Verschieben-Button nicht gefunden")
+            return
+        }
+
+        let weekendButton = app.buttons["weekendMenuButton"]
+        XCTAssertTrue(
+            weekendButton.waitForExistence(timeout: 3),
+            "Verschieben-Untermenue muss Eintrag 'weekendMenuButton' (Dieses Wochenende) enthalten"
+        )
+    }
 }
