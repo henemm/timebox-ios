@@ -191,8 +191,9 @@ struct PlanItem: Identifiable, Hashable, Sendable {
         self.rescheduleCount = 0
         self.manualDiscipline = nil
 
-        // Recurrence fields (Reminders don't have recurrence in this app)
-        self.recurrencePattern = nil
+        // Recurrence fields — Reminders koennen recurring sein (Bug #306):
+        // recurrencePattern wird durchgereicht, "none" wird zu nil normalisiert.
+        self.recurrencePattern = reminder.recurrencePattern == "none" ? nil : reminder.recurrencePattern
         self.recurrenceWeekdays = nil
         self.recurrenceMonthDay = nil
         self.recurrenceInterval = nil

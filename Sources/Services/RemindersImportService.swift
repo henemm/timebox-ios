@@ -68,6 +68,12 @@ final class RemindersImportService {
                 // Enrich recurrencePattern if task has "none" but reminder is recurring
                 if existing.recurrencePattern == "none" && reminder.recurrencePattern != "none" {
                     existing.recurrencePattern = reminder.recurrencePattern
+                    // Bug #306: GroupID nachsetzen falls noch nicht gesetzt — sonst greift
+                    // Stacking Pfad A (Gruppen-Stacking) fuer importierte Tasks nie.
+                    // Bestehende GroupID NICHT ueberschreiben (Stacking-Verkettung erhalten).
+                    if existing.recurrenceGroupID == nil {
+                        existing.recurrenceGroupID = UUID().uuidString
+                    }
                     enrichedRecurrence += 1
                     Self.logger.info("    ENRICHED pattern: '\(reminder.title)' none → '\(reminder.recurrencePattern)'")
                 }
@@ -89,6 +95,11 @@ final class RemindersImportService {
                 externalID: nil,
                 sourceSystem: "local"
             )
+            // Bug #306: GroupID beim Import setzen wenn recurring — damit Stacking
+            // Pfad A (Gruppen-Stacking) fuer importierte Tasks von Anfang an greift.
+            if reminder.recurrencePattern != "none" {
+                task.recurrenceGroupID = UUID().uuidString
+            }
             modelContext.insert(task)
             imported.append(task)
         }

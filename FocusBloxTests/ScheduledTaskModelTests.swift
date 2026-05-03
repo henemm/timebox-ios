@@ -69,6 +69,37 @@ final class ScheduledTaskModelTests: XCTestCase {
         XCTAssertFalse(planItem.isScheduled, "PlanItem aus Reminder darf nicht scheduled sein")
     }
 
+    /// Bug #306 AC-5: PlanItem aus recurring Reminder uebernimmt recurrencePattern
+    /// Bricht wenn: init(reminder:) recurrencePattern hart auf nil setzt
+    func test_planItem_reminder_recurringPattern_isPropagated() {
+        let reminder = ReminderData(
+            id: "rem-1",
+            title: "Weekly task",
+            recurrencePattern: "weekly"
+        )
+        let metadata = TaskMetadata(reminderID: "rem-1", sortOrder: 0)
+        let planItem = PlanItem(reminder: reminder, metadata: metadata)
+
+        XCTAssertEqual(
+            planItem.recurrencePattern,
+            "weekly",
+            "PlanItem aus recurring Reminder muss recurrencePattern uebernehmen (nicht nil)"
+        )
+    }
+
+    /// Bug #306 AC-6: PlanItem aus non-recurring Reminder hat recurrencePattern == nil
+    /// Bricht wenn: init(reminder:) "none"-String durchreicht statt nil
+    func test_planItem_reminder_nonRecurringPattern_isNil() {
+        let reminder = ReminderData(id: "rem-1", title: "One-shot", recurrencePattern: "none")
+        let metadata = TaskMetadata(reminderID: "rem-1", sortOrder: 0)
+        let planItem = PlanItem(reminder: reminder, metadata: metadata)
+
+        XCTAssertNil(
+            planItem.recurrencePattern,
+            "PlanItem aus 'none'-Reminder darf KEIN recurrencePattern haben (nil, nicht 'none')"
+        )
+    }
+
     // MARK: - TimelineItem: Scheduled Task Case
 
     /// Verhalten: TimelineItem aus scheduled Task berechnet Start/End korrekt

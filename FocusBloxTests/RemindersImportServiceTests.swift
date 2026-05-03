@@ -456,4 +456,122 @@ final class RemindersImportServiceTests: XCTestCase {
         XCTAssertEqual(result.markCompleteFailures, 1)
     }
 
+    // MARK: - Bug #306 — recurrenceGroupID beim Import setzen
+
+    /// AC-1: Importierter recurring Reminder → LocalTask hat recurrenceGroupID != nil
+    /// Bricht wenn: RemindersImportService die GroupID nicht setzt → Stacking Pfad A greift nie
+    func test_importAll_setsRecurrenceGroupID_forRecurringReminder() async throws {
+        let futureDate = Calendar.current.date(byAdding: .day, value: 7, to: Date())!
+        mockRepo.mockReminders = [
+            ReminderData(id: "r1", title: "Zehnagel", dueDate: futureDate, recurrencePattern: "weekly")
+        ]
+
+        _ = try await sut.importAll()
+
+        let tasks = try modelContext.fetch(FetchDescriptor<LocalTask>())
+        let task = try XCTUnwrap(tasks.first, "Recurring Reminder muss als Task importiert werden")
+        XCTAssertNotNil(
+            task.recurrenceGroupID,
+            "Importierter recurring Task muss recurrenceGroupID haben (sonst greift Stacking Pfad A nie)"
+        )
+    }
+
+    /// AC-2: Nicht-recurring Reminder → KEIN recurrenceGroupID
+    /// Bricht wenn: GroupID auch fuer non-recurring Tasks gesetzt wird (waere Mis-Use)
+    func test_importAll_doesNotSetGroupID_forNonRecurringReminder() async throws {
+        mockRepo.mockReminders = [
+            ReminderData(id: "r1", title: "Buy milk")  // Default: recurrencePattern = "none"
+        ]
+
+        _ = try await sut.importAll()
+
+        let tasks = try modelContext.fetch(FetchDescriptor<LocalTask>())
+        let task = try XCTUnwrap(tasks.first)
+        XCTAssertNil(
+            task.recurrenceGroupID,
+            "Non-recurring Task darf KEINE recurrenceGroupID haben"
+        )
+    }
+
+    /// AC-3: Bestehender Task wird via Enrichment auf "weekly" geupdated → GroupID wird gesetzt
+    /// Bricht wenn: Enrichment nur recurrencePattern setzt aber GroupID vergisst
+    func test_enrichRecurrence_setsGroupID_whenPreviouslyNil() async throws {
+        let futureDate = Calendar.current.date(byAdding: .day, value: 7, to: Date())!
+        let existing = LocalTask(title: "Zehnagel", dueDate: futureDate)
+        XCTAssertNil(existing.recurrenceGroupID)
+        XCTAssertEqual(existing.recurrencePattern, "none")
+        modelContext.insert(existing)
+        try modelContext.save()
+
+        mockRepo.mockReminders = [
+            ReminderData(id: "r1", title: "Zehnagel", dueDate: futureDate, recurrencePattern: "weekly")
+        ]
+
+        let result = try await sut.importAll()
+
+        XCTAssertEqual(result.enrichedRecurrence, 1, "Pattern muss enriched sein")
+        let tasks = try modelContext.fetch(FetchDescriptor<LocalTask>())
+        let task = try XCTUnwrap(tasks.first)
+        XCTAssertEqual(task.recurrencePattern, "weekly")
+        XCTAssertNotNil(
+            task.recurrenceGroupID,
+            "Beim Enrichment auf recurring Pattern MUSS auch GroupID gesetzt werden"
+        )
+    }
+
+    /// AC-4: Bestehender Task hat bereits GroupID → wird beim Enrichment NICHT ueberschrieben
+    /// Bricht wenn: GroupID bei jedem Import neu generiert wird (zerstoert Stacking-Verkettung)
+    func test_enrichRecurrence_preservesExistingGroupID() async throws {
+        let futureDate = Calendar.current.date(byAdding: .day, value: 7, to: Date())!
+        let existing = LocalTask(title: "Zehnagel", dueDate: futureDate)
+        let originalGroupID = "preserve-this-uuid"
+        existing.recurrenceGroupID = originalGroupID
+        modelContext.insert(existing)
+        try modelContext.save()
+
+        mockRepo.mockReminders = [
+            ReminderData(id: "r1", title: "Zehnagel", dueDate: futureDate, recurrencePattern: "weekly")
+        ]
+
+        _ = try await sut.importAll()
+
+        let tasks = try modelContext.fetch(FetchDescriptor<LocalTask>())
+        let task = try XCTUnwrap(tasks.first)
+        XCTAssertEqual(
+            task.recurrenceGroupID,
+            originalGroupID,
+            "Bestehende GroupID darf beim Enrichment NICHT ueberschrieben werden"
+        )
+    }
+
+    /// AC-7: Stacking Pfad A greift fuer importierte Tasks
+    /// Bricht wenn: Importierte recurring Tasks haben unterschiedliche GroupIDs (statt geteilte)
+    /// Anmerkung: Pruefung ueber RecurringStackingHelper direkt — zwei Tasks mit gleicher GroupID
+    /// muessen als Stack erkannt werden
+    func test_recurringStackingHelper_appliesToImportedTasks() async throws {
+        // Zwei importierte Tasks gleiche Recurrence (weekly), gleicher Titel — sollen
+        // ueber Enrichment denselben GroupID-Pfad nehmen UND gestackt erscheinen
+        let pastDate1 = Calendar.current.date(byAdding: .day, value: -14, to: Date())!
+        let pastDate2 = Calendar.current.date(byAdding: .day, value: -7, to: Date())!
+
+        let task1 = LocalTask(title: "Zehnagel", dueDate: pastDate1, recurrencePattern: "weekly")
+        task1.recurrenceGroupID = "shared-group-id"
+        let task2 = LocalTask(title: "Zehnagel", dueDate: pastDate2, recurrencePattern: "weekly")
+        task2.recurrenceGroupID = "shared-group-id"
+        modelContext.insert(task1)
+        modelContext.insert(task2)
+        try modelContext.save()
+
+        // Apply RecurringStackingHelper auf PlanItems aus diesen Tasks
+        let items = [PlanItem(localTask: task1), PlanItem(localTask: task2)]
+        let stacked = RecurringStackingHelper.apply(to: items)
+
+        // Erwartung: Pfad A greift — mindestens ein Item hat stackedInstanceCount >= 2
+        let counts = stacked.compactMap { $0.stackedInstanceCount }
+        let hasStack = counts.contains { $0 >= 2 }
+        XCTAssertTrue(
+            hasStack,
+            "RecurringStackingHelper muss zwei Tasks gleicher GroupID stacken — \(counts)"
+        )
+    }
 }
