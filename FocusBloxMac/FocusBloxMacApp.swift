@@ -730,9 +730,18 @@ extension FocusBloxMacApp {
         let group2 = "uitest-recurring-group-2"
         let group2Predicate = #Predicate<LocalTask> { $0.recurrenceGroupID == group2 && $0.isTemplate == false }
         let group2Children = (try? context.fetch(FetchDescriptor<LocalTask>(predicate: group2Predicate))) ?? []
-        if group2Children.count >= 3 { return }
-        // Re-Seed: vorhandene [MOCK]-Tasks erst entfernen.
-        let mockPredicate = #Predicate<LocalTask> { $0.title.starts(with: "[MOCK]") }
+
+        // Real-Data-Sentinel (#279): [MOCK-RD] Tagebuch muss existieren — sonst Re-Seed.
+        let realDataPredicate = #Predicate<LocalTask> {
+            $0.title == "[MOCK-RD] Tagebuch (real-data, no groupID)"
+        }
+        let realDataExists = !((try? context.fetch(FetchDescriptor<LocalTask>(predicate: realDataPredicate))) ?? []).isEmpty
+
+        if group2Children.count >= 3 && realDataExists { return }
+        // Re-Seed: vorhandene [MOCK]- UND [MOCK-RD]-Tasks erst entfernen.
+        let mockPredicate = #Predicate<LocalTask> {
+            $0.title.starts(with: "[MOCK]") || $0.title.starts(with: "[MOCK-RD]")
+        }
         let stale = (try? context.fetch(FetchDescriptor<LocalTask>(predicate: mockPredicate))) ?? []
         for t in stale { context.delete(t) }
 
@@ -802,7 +811,28 @@ extension FocusBloxMacApp {
         let depDependent = LocalTask(title: "[MOCK] DEP-Dependent Task", importance: 1, estimatedDuration: 15, urgency: "not_urgent")
         depDependent.blockerTaskID = depBlocker.id
 
-        for task in [task1, task2, task3, longTitleTask, backlogTask1, backlogTask2, tmpl1, child1, child1b, tmpl2, child2, child2b, child2c, tmpl3, child3, completed, depBlocker, depDependent] {
+        // MARK: - Real-Data-Stacking Szenario (#279 — bug-stacking-real-data)
+        // Tasks ohne recurrenceGroupID — simuliert organisch entstandene wiederkehrende
+        // Aufgaben. Pfad B des MacBacklogStackingHelper soll diese erkennen und
+        // Counter-Bar zeigen.
+        let realDataDailyOverdue = LocalTask(
+            title: "[MOCK-RD] Tagebuch (real-data, no groupID)",
+            importance: 2,
+            tags: ["learning"],
+            dueDate: Calendar.current.date(byAdding: .day, value: -3, to: Date()),
+            estimatedDuration: 10,
+            recurrencePattern: "daily"
+        )
+        let realDataWeeklyOverdue = LocalTask(
+            title: "[MOCK-RD] Wochenrueckblick (real-data, no groupID)",
+            importance: 3,
+            tags: ["maintenance"],
+            dueDate: Calendar.current.date(byAdding: .day, value: -21, to: Date()),
+            estimatedDuration: 30,
+            recurrencePattern: "weekly"
+        )
+
+        for task in [task1, task2, task3, longTitleTask, backlogTask1, backlogTask2, tmpl1, child1, child1b, tmpl2, child2, child2b, child2c, tmpl3, child3, completed, depBlocker, depDependent, realDataDailyOverdue, realDataWeeklyOverdue] {
             context.insert(task)
         }
         try? context.save()

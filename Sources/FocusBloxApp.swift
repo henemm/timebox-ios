@@ -783,8 +783,15 @@ struct FocusBloxApp: App {
         // Wir verlangen mindestens 3, sonst re-seeden wir.
         let hasEnoughRecurring = recurringChildren.count >= 3
 
-        // Skip nur, wenn Sentinel UND mindestens 2 recurring Children da sind.
-        if sentinelExists && hasEnoughRecurring { return }
+        // Real-Data-Sentinel (#279): [MOCK-RD] Tagebuch muss existieren — sonst Re-Seed,
+        // damit das Real-Data-Stacking-Szenario fuer UI-Tests verfuegbar ist.
+        let realDataSentinelDescriptor = FetchDescriptor<LocalTask>(
+            predicate: #Predicate { $0.title == "[MOCK-RD] Tagebuch (real-data, no groupID)" }
+        )
+        let realDataSentinelExists = !((try? context.fetch(realDataSentinelDescriptor)) ?? []).isEmpty
+
+        // Skip nur, wenn ALLE Sentinels da sind (klassisch + recurring + real-data).
+        if sentinelExists && hasEnoughRecurring && realDataSentinelExists { return }
 
         // Wenn DB stale ist (irgendeines fehlt): ALLE [MOCK]-Tasks loeschen
         // und re-seeden, damit Stacking-Tests wieder GREEN werden.
@@ -1110,6 +1117,33 @@ struct FocusBloxApp: App {
         coachCompletedTask2.taskType = "deep_work"
         coachCompletedTask2.tags = ["code", "review"]
         context.insert(coachCompletedTask2)
+
+        // MARK: - Real-Data-Stacking Szenario (#279 — bug-stacking-real-data)
+        // Tasks ohne recurrenceGroupID — simuliert organisch entstandene wiederkehrende
+        // Aufgaben (manuell angelegt, aus Reminders importiert, Bestandsdaten vor
+        // Feld-Einfuehrung). Pfad B des RecurringStackingHelper soll diese erkennen
+        // und Counter-Bar zeigen.
+        let realDataDailyOverdue = LocalTask(
+            title: "[MOCK-RD] Tagebuch (real-data, no groupID)",
+            importance: 2,
+            tags: ["learning"],
+            dueDate: Calendar.current.date(byAdding: .day, value: -3, to: Date()),
+            estimatedDuration: 10,
+            recurrencePattern: "daily"
+        )
+        realDataDailyOverdue.isNextUp = false
+        context.insert(realDataDailyOverdue)
+
+        let realDataWeeklyOverdue = LocalTask(
+            title: "[MOCK-RD] Wochenrueckblick (real-data, no groupID)",
+            importance: 3,
+            tags: ["maintenance"],
+            dueDate: Calendar.current.date(byAdding: .day, value: -21, to: Date()),
+            estimatedDuration: 30,
+            recurrencePattern: "weekly"
+        )
+        realDataWeeklyOverdue.isNextUp = false
+        context.insert(realDataWeeklyOverdue)
 
         try? context.save()
 

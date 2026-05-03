@@ -38,6 +38,33 @@ final class BacklogStackingUITests: XCTestCase {
         return counterBars.firstMatch.exists
     }
 
+    /// Scrollt die Backlog-Liste, bis ein Element mit dem gesuchten Label
+    /// existiert. Notwendig weil LazyVStack nur sichtbare Cells in den
+    /// Accessibility-Tree rendert.
+    @discardableResult
+    private func scrollBacklogUntilLabelExists(_ labelContains: String, maxSwipes: Int = 12) -> Bool {
+        // Erst pruefen, ob das Element schon (ohne Scrollen) existiert
+        if app.staticTexts.matching(
+            NSPredicate(format: "label CONTAINS %@", labelContains)
+        ).firstMatch.exists {
+            return true
+        }
+
+        let list = app.collectionViews["backlogTaskList"]
+        guard list.waitForExistence(timeout: 5) else { return false }
+
+        for _ in 0..<maxSwipes {
+            list.swipeUp()
+            // staticTexts statt descendants(.any) — robuster, kein FirstMatch-Crash
+            if app.staticTexts.matching(
+                NSPredicate(format: "label CONTAINS %@", labelContains)
+            ).firstMatch.exists {
+                return true
+            }
+        }
+        return false
+    }
+
     // MARK: - TEST_01: Stacking Counter-Bar wird angezeigt
 
     /// Verhalten: Wenn eine recurring Serie 2+ offene Instanzen hat, wird oben an der Card
@@ -169,5 +196,128 @@ final class BacklogStackingUITests: XCTestCase {
 
         XCTAssertTrue(twoBars.firstMatch.exists,
             "Eine Counter-Bar mit '2×' muss existieren (Schwelle ab 2 Instanzen)")
+    }
+
+    // MARK: - TEST_07: Real-Data daily ohne GroupID zeigt Counter-Bar (Pfad B)
+
+    /// Verhalten: Im Backlog existiert ein Mock-Task mit Praefix '[MOCK-RD] Tagebuch' (daily,
+    /// dueDate = heute - 3 Tage, kein recurrenceGroupID). Nach Pfad-B-Fix erscheint eine
+    /// Counter-Bar mit >= 2 x AUFGELAUFEN an dieser Card.
+    /// Bricht wenn: RecurringStackingHelper Pfad B nicht implementiert ist ODER
+    ///              Mock-Seed-RD-Tasks vom Developer-Agent nicht angelegt wurden.
+    func test_realDataDailyOverdue_showsCounterBarWithoutGroupID() {
+        navigateToBacklogPriority()
+
+        // Mock-Task mit Real-Data-Praefix muss im Backlog vorhanden sein.
+        // Scroll-First, weil LazyVStack nur sichtbare Cells in den
+        // Accessibility-Tree rendert (Ueberfaellig-Sektion ist unten).
+        XCTAssertTrue(scrollBacklogUntilLabelExists("[MOCK-RD] Tagebuch"),
+            "Real-Data-Mock-Task '[MOCK-RD] Tagebuch' muss im Backlog existieren — wird vom Developer-Agent als Mock-Seed-RD angelegt")
+
+        // Visueller Beweis fuer Checkpoint 3 — Screenshot der Counter-Bar nach Scrollen
+        let proofShot = XCUIScreen.main.screenshot()
+        let attachment = XCTAttachment(screenshot: proofShot)
+        attachment.name = "stacking-bar-real-data-after"
+        attachment.lifetime = .keepAlways
+        add(attachment)
+
+        // Counter-Bar mit AUFGELAUFEN-Label muss vorhanden sein
+        let counterBarPredicate = NSPredicate(
+            format: "identifier BEGINSWITH 'stackingCounterBar_' AND label CONTAINS 'AUFGELAUFEN'"
+        )
+        let counterBars = app.descendants(matching: .any).matching(counterBarPredicate)
+
+        // Durch Scrollen suchen, da die Card weiter unten sein kann
+        var found = counterBars.firstMatch.waitForExistence(timeout: 2)
+        if !found {
+            let list = app.collectionViews["backlogTaskList"]
+            for _ in 0..<10 {
+                list.swipeUp()
+                if counterBars.firstMatch.exists {
+                    found = true
+                    break
+                }
+            }
+        }
+
+        XCTAssertTrue(found,
+            "Counter-Bar 'AUFGELAUFEN' muss bei Real-Data-Task ohne recurrenceGroupID erscheinen — Pfad B des RecurringStackingHelper")
+
+        // Bar muss eine Zahl >= 2 enthalten
+        let bar = counterBars.firstMatch
+        let label = bar.label
+        let regex = try! NSRegularExpression(pattern: "(\\d+)\u{00D7}")
+        let matches = regex.matches(in: label, range: NSRange(label.startIndex..., in: label))
+
+        XCTAssertFalse(matches.isEmpty,
+            "Bar-Label muss Nx enthalten, war: '\(label)'")
+
+        if let match = matches.first,
+           match.numberOfRanges > 1,
+           let countRange = Range(match.range(at: 1), in: label),
+           let count = Int(label[countRange]) {
+            XCTAssertGreaterThanOrEqual(count, 2,
+                "Counter muss >= 2 sein (daily, 3 Tage ueberfaellig = 4x erwartet), war: \(count)")
+        } else {
+            XCTFail("Konnte Counter-Zahl aus Bar-Label nicht extrahieren: '\(label)'")
+        }
+    }
+
+    // MARK: - TEST_08: Real-Data weekly ohne GroupID zeigt Counter-Bar mit 4x (Pfad B)
+
+    /// Verhalten: Im Backlog existiert ein Mock-Task mit Praefix '[MOCK-RD] Wochenrueckblick'
+    /// (weekly, dueDate = heute - 21 Tage, kein recurrenceGroupID). Nach Pfad-B-Fix erscheint
+    /// eine Counter-Bar mit 4x AUFGELAUFEN (elapsed=21, cycle=7, missed=3+1=4).
+    /// Bricht wenn: RecurringStackingHelper Pfad B weekly-Cycle (7 Tage) falsch berechnet ODER
+    ///              Mock-Seed-RD-Tasks vom Developer-Agent nicht angelegt wurden.
+    func test_realDataWeeklyOverdue_showsCounterBarWithoutGroupID() {
+        navigateToBacklogPriority()
+
+        // Mock-Task mit Real-Data-Praefix muss im Backlog vorhanden sein.
+        // Scroll-First, weil LazyVStack nur sichtbare Cells in den
+        // Accessibility-Tree rendert (Ueberfaellig-Sektion ist unten).
+        XCTAssertTrue(scrollBacklogUntilLabelExists("[MOCK-RD] Wochenrueckblick"),
+            "Real-Data-Mock-Task '[MOCK-RD] Wochenrueckblick' muss im Backlog existieren — wird vom Developer-Agent als Mock-Seed-RD angelegt")
+
+        // Counter-Bar mit AUFGELAUFEN-Label muss vorhanden sein
+        let counterBarPredicate = NSPredicate(
+            format: "identifier BEGINSWITH 'stackingCounterBar_' AND label CONTAINS 'AUFGELAUFEN'"
+        )
+        let counterBars = app.descendants(matching: .any).matching(counterBarPredicate)
+
+        // Durch Scrollen suchen, da die Card weiter unten sein kann
+        var found = counterBars.firstMatch.waitForExistence(timeout: 2)
+        if !found {
+            let list = app.collectionViews["backlogTaskList"]
+            for _ in 0..<10 {
+                list.swipeUp()
+                if counterBars.firstMatch.exists {
+                    found = true
+                    break
+                }
+            }
+        }
+
+        XCTAssertTrue(found,
+            "Counter-Bar 'AUFGELAUFEN' muss bei Real-Data-Task '[MOCK-RD] Wochenrueckblick' ohne recurrenceGroupID erscheinen — Pfad B des RecurringStackingHelper")
+
+        // Bar muss exakt 4x enthalten (weekly, 21 Tage = 3 verpasste Wochen + dueDate selbst = 4)
+        let bar = counterBars.firstMatch
+        let label = bar.label
+        let regex = try! NSRegularExpression(pattern: "(\\d+)\u{00D7}")
+        let matches = regex.matches(in: label, range: NSRange(label.startIndex..., in: label))
+
+        XCTAssertFalse(matches.isEmpty,
+            "Bar-Label muss Nx enthalten, war: '\(label)'")
+
+        if let match = matches.first,
+           match.numberOfRanges > 1,
+           let countRange = Range(match.range(at: 1), in: label),
+           let count = Int(label[countRange]) {
+            XCTAssertEqual(count, 4,
+                "Counter muss exakt 4 sein (weekly, 21 Tage ueberfaellig: elapsed=21, cycle=7, missed=3+1=4), war: \(count)")
+        } else {
+            XCTFail("Konnte Counter-Zahl aus Bar-Label nicht extrahieren: '\(label)'")
+        }
     }
 }
