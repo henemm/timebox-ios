@@ -1121,6 +1121,11 @@ struct BacklogView: View {
                         .tint(.blue)
                     }
                     .contextMenu {
+                        Button {
+                            taskToEditDirectly = item
+                        } label: {
+                            Label("Bearbeiten", systemImage: "pencil")
+                        }
                         if item.dueDate != nil {
                             postponeMenu(for: item)
                         }
@@ -1206,6 +1211,11 @@ struct BacklogView: View {
             .tint(.blue)
         }
         .contextMenu {
+            Button {
+                handleEditTap(item)
+            } label: {
+                Label("Bearbeiten", systemImage: "pencil")
+            }
             if item.dueDate != nil {
                 postponeMenu(for: item)
             }

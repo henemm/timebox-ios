@@ -131,6 +131,63 @@ final class TaskPreviewLongPressTests: XCTestCase {
                       "Long Press auf Coach-BacklogRow muss taskPreviewCard anzeigen")
     }
 
+    // MARK: - Bug-Tests: Long-Press ohne dueDate (Bug bug-longpress-no-duedate)
+
+    /// Verhalten: Long-Press auf einen Task OHNE dueDate zeigt die Preview-Karte.
+    /// Bricht wenn: Das contextMenu-menuItems leer ist, weil `if item.dueDate != nil` nichts
+    ///              liefert — SwiftUI deaktiviert dann den gesamten .contextMenu(preview:)-Modifier.
+    /// RED-Beweis: Ohne Fix hat backlogTask2 (kein dueDate) einen leeren menuItems-Body.
+    ///             Long-Press loest kein contextMenu aus, taskPreviewCard erscheint nie -> FAIL.
+    func testBacklogLongPressOnTaskWithoutDueDateShowsPreview() throws {
+        app.launch()
+        navigateTo("Backlog")
+
+        // Priority-View sicherstellen, damit die Hauptliste sichtbar ist.
+        selectBacklogViewMode("Priorität")
+
+        // task3 ("Dokumentation aktualisieren") ist isNextUp=true und hat KEIN dueDate.
+        // Die "Heute"-Sektion (NextUp) und die Backlog-Hauptliste teilen sich denselben
+        // contextMenu-Code (BacklogView.swift:1123 + :1208) — beide haben den Bug.
+        // ABSICHTLICH NICHT firstElement(withIdentifierPrefix: "taskTitle_"):
+        // Das wuerde "Lohnsteuererklaerung" (MIT dueDate) liefern und den Bug verstecken.
+        let taskText = app.staticTexts["[MOCK] Dokumentation aktualisieren #45min"]
+        XCTAssertTrue(taskText.waitForExistence(timeout: 5),
+                      "Task ohne dueDate muss in Heute-Sektion sichtbar sein — Mock-Daten fehlen?")
+
+        taskText.press(forDuration: 1.0)
+
+        let previewCard = app.descendants(matching: .any)["taskPreviewCard"]
+        XCTAssertTrue(previewCard.waitForExistence(timeout: 3),
+                      "Long-Press auf Task OHNE dueDate muss taskPreviewCard anzeigen — contextMenu darf nicht leer sein")
+    }
+
+    /// Verhalten: Long-Press auf einen Task zeigt im contextMenu einen 'Bearbeiten'-Eintrag.
+    /// Bricht wenn: Der 'Bearbeiten'-Button noch nicht in .contextMenu eingefuegt wurde.
+    ///              Laut Spec: Label("Bearbeiten", systemImage: "pencil") an Stelle B
+    ///              in backlogRowWithSwipe.
+    /// RED-Beweis: Vor dem Fix enthaelt contextMenu nur postponeMenu (bei dueDate != nil) oder ist
+    ///             komplett leer (bei dueDate == nil) — kein 'Bearbeiten'-Eintrag -> FAIL.
+    func testBacklogLongPressShowsEditButton() throws {
+        app.launch()
+        navigateTo("Backlog")
+
+        // Priority-View sicherstellen.
+        selectBacklogViewMode("Priorität")
+
+        // task3 (kein dueDate, isNextUp=true) verwenden: repraesentiert den schlimmsten Fall.
+        // Nach dem Fix erscheint nur 'Bearbeiten' im Menue (kein postponeMenu, da kein dueDate).
+        let taskText = app.staticTexts["[MOCK] Dokumentation aktualisieren #45min"]
+        XCTAssertTrue(taskText.waitForExistence(timeout: 5),
+                      "Task ohne dueDate muss in Heute-Sektion sichtbar sein — Mock-Daten fehlen?")
+
+        taskText.press(forDuration: 1.0)
+
+        // Label("Bearbeiten", systemImage: "pencil") erscheint als Button im contextMenu.
+        let editButton = app.buttons["Bearbeiten"]
+        XCTAssertTrue(editButton.waitForExistence(timeout: 3),
+                      "contextMenu nach Long-Press muss 'Bearbeiten'-Eintrag enthalten — Button fehlt vor dem Fix")
+    }
+
     /// Verhalten: Langer Druck auf einen Tagesplan-Block im Blox-Tab zeigt die Preview-Karte.
     /// Bricht wenn: ScheduledTaskBlock.swift hat kein `preview:` im .contextMenu ODER
     ///              TaskPreviewView hat keinen Identifier ODER
