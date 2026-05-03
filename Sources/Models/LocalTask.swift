@@ -297,6 +297,22 @@ extension LocalTask {
         try? context.save()
         return newDue
     }
+
+    /// Verschiebt das Faelligkeitsdatum auf ein konkretes Date (Feature #293 — "Eigenes Datum").
+    /// Setzt dueDate exakt auf den uebergebenen Wert (auch Vergangenheit erlaubt).
+    /// Inkrementiert rescheduleCount, aktualisiert modifiedAt, speichert und postet
+    /// `taskDataChanged` (String-Name fuer Target-Uebergreifenheit, siehe ShareExtension)
+    /// fuer plattformuebergreifende View-Refreshes (insb. macOS ContentView.refreshTasks).
+    static func postpone(_ task: LocalTask, to date: Date, context: ModelContext) {
+        task.dueDate = date
+        task.modifiedAt = Date()
+        task.rescheduleCount += 1
+        try? context.save()
+        // Bewusst Notification.Name(_:) statt .taskDataChanged — der Name ist in
+        // FocusBloxApp.swift / FocusBloxMac/ContentView.swift definiert, NICHT in
+        // FocusBloxShareExtension. Stringbasiert macht den Aufruf target-portabel.
+        NotificationCenter.default.post(name: Notification.Name("taskDataChanged"), object: nil)
+    }
 }
 
 // MARK: - Refiner Confirmation

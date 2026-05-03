@@ -108,6 +108,11 @@ struct ContentView: View {
     @State private var editSeriesMode: Bool = false
     @State private var taskToEndSeries: LocalTask?
 
+    // Feature #293 — "Eigenes Datum" im Verschieben-Popover (macOS)
+    @State private var showCustomDatePopover: Bool = false
+    @State private var customDateTaskID: UUID? = nil
+    @State private var customDate: Date = Date()
+
 
     // MARK: - Data Refresh (Bug 90: replaces @Query for reliable CloudKit sync)
 
@@ -644,6 +649,36 @@ struct ContentView: View {
                 refreshTasks()
             }
         }
+        .popover(isPresented: $showCustomDatePopover, arrowEdge: .trailing) {
+            VStack(spacing: 12) {
+                Text("Eigenes Datum")
+                    .font(.headline)
+                DatePicker(
+                    "",
+                    selection: $customDate,
+                    displayedComponents: [.date, .hourAndMinute]
+                )
+                .datePickerStyle(.graphical)
+                .labelsHidden()
+                HStack {
+                    Button("Abbrechen") {
+                        showCustomDatePopover = false
+                    }
+                    .accessibilityIdentifier("customDateCancelButton")
+                    Spacer()
+                    Button("Bestätigen") {
+                        applyCustomDatePostpone()
+                        showCustomDatePopover = false
+                    }
+                    .keyboardShortcut(.defaultAction)
+                    .accessibilityIdentifier("customDateConfirmButton")
+                }
+            }
+            .padding()
+            .frame(minWidth: 320)
+            .accessibilityElement(children: .contain)
+            .accessibilityIdentifier("customDateSheet")
+        }
         .toolbar {
             ToolbarItem {
                 Button {
@@ -931,6 +966,21 @@ struct ContentView: View {
         }
     }
 
+    // Feature #293 — "Eigenes Datum" Bestaetigen-Aktion (macOS)
+    private func applyCustomDatePostpone() {
+        guard let id = customDateTaskID,
+              let task = tasks.first(where: { $0.uuid == id }) else { return }
+        LocalTask.postpone(task, to: customDate, context: modelContext)
+        customDateTaskID = nil
+        Task {
+            await SmartNotificationEngine.reconcile(
+                reason: .taskChanged,
+                context: modelContext,
+                eventKitRepo: eventKitRepo
+            )
+        }
+    }
+
     private func releaseDependency(_ task: LocalTask) {
         task.blockerTaskID = nil
         try? modelContext.save()
@@ -1018,6 +1068,15 @@ struct ContentView: View {
                 Menu("Verschieben") {
                     Button("Morgen") { postponeTask(task, byDays: 1) }
                     Button("Nächste Woche") { postponeTask(task, byDays: 7) }
+                    Button("Eigenes Datum...") {
+                        customDate = Calendar.current.date(
+                            bySettingHour: 9, minute: 0, second: 0,
+                            of: Date.now.addingTimeInterval(86400)
+                        ) ?? Date.now
+                        customDateTaskID = task.uuid
+                        showCustomDatePopover = true
+                    }
+                    .accessibilityIdentifier("customDateMenuButton")
                 }
             }
             if task.blockerTaskID != nil {

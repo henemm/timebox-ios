@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		38DB52183A9C71562EEC70F1 /* CustomDatePostponeUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2285B8A337B3108BC65C2EC /* CustomDatePostponeUITests.swift */; };
 		50A6E216AD80C0AC6E42C63E /* TaskPreviewLongPressTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC237B3E9BE8B646E550BC0D /* TaskPreviewLongPressTests.swift */; };
 		B33E6C7A35B1EAC4A8DD793D /* BacklogBadgeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDEC968759D860953246E6C2 /* BacklogBadgeService.swift */; };
 		275B59FC91AE6FED66B5CE4B /* RecurringStackingHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADCCEC385E2261C3CD83CF10 /* RecurringStackingHelper.swift */; };
@@ -741,6 +742,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		C2285B8A337B3108BC65C2EC /* CustomDatePostponeUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CustomDatePostponeUITests.swift; path = FocusBloxUITests/CustomDatePostponeUITests.swift; sourceTree = SOURCE_ROOT; };
 		AC237B3E9BE8B646E550BC0D /* TaskPreviewLongPressTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TaskPreviewLongPressTests.swift; path = FocusBloxUITests/TaskPreviewLongPressTests.swift; sourceTree = SOURCE_ROOT; };
 		B1C89B198F13018591D56725 /* MacOverdueMarkerUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MacOverdueMarkerUITests.swift; path = FocusBloxMacUITests/MacOverdueMarkerUITests.swift; sourceTree = SOURCE_ROOT; };
 		8BA02D73E4C23FA40309D834 /* OverdueMarkerUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = OverdueMarkerUITests.swift; path = FocusBloxUITests/OverdueMarkerUITests.swift; sourceTree = SOURCE_ROOT; };
@@ -1478,6 +1480,7 @@
 		05D90FB2A2CE48689EC309B4 /* FocusBloxUITests */ = {
 			isa = PBXGroup;
 			children = (
+				C2285B8A337B3108BC65C2EC /* CustomDatePostponeUITests.swift */,
 				AC237B3E9BE8B646E550BC0D /* TaskPreviewLongPressTests.swift */,
 				8BA02D73E4C23FA40309D834 /* OverdueMarkerUITests.swift */,
 				956EB17B0A21B117F90F4745 /* BacklogSectionsA11yUITests.swift */,
@@ -2872,6 +2875,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				38DB52183A9C71562EEC70F1 /* CustomDatePostponeUITests.swift in Sources */,
 				50A6E216AD80C0AC6E42C63E /* TaskPreviewLongPressTests.swift in Sources */,
 				1F6AE2D7A55A9F1FFBC0AAFE /* OverdueMarkerUITests.swift in Sources */,
 				D0146F1DECA83C078136AF1F /* BacklogSectionsA11yUITests.swift in Sources */,

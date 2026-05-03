@@ -75,6 +75,10 @@ struct BacklogView: View {
     @State private var focusSprintFeedback = false
     @State private var showHygieneSheet = false
     @State private var taskForDurationPicker: PlanItem?
+    // Feature #293 — "Eigenes Datum" im Verschieben-Dialog
+    @State private var showCustomDateSheet: Bool = false
+    @State private var customDateTaskID: String? = nil
+    @State private var customDate: Date = Date()
 
     // MARK: - Stale Tasks (Backlog Hygiene)
     private var staleTasks: [PlanItem] {
@@ -272,6 +276,40 @@ struct BacklogView: View {
             }
             .sheet(isPresented: $showHygieneSheet) {
                 BacklogHygieneView(staleTasks: staleTasks)
+            }
+            .sheet(isPresented: $showCustomDateSheet) {
+                NavigationStack {
+                    VStack {
+                        DatePicker(
+                            "",
+                            selection: $customDate,
+                            displayedComponents: [.date, .hourAndMinute]
+                        )
+                        .datePickerStyle(.graphical)
+                        .labelsHidden()
+                        Spacer()
+                    }
+                    .padding()
+                    .navigationTitle("Eigenes Datum")
+                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbar {
+                        ToolbarItem(placement: .cancellationAction) {
+                            Button("Abbrechen") {
+                                showCustomDateSheet = false
+                            }
+                            .accessibilityIdentifier("customDateCancelButton")
+                        }
+                        ToolbarItem(placement: .confirmationAction) {
+                            Button("Bestätigen") {
+                                applyCustomDatePostpone()
+                                showCustomDateSheet = false
+                            }
+                            .accessibilityIdentifier("customDateConfirmButton")
+                        }
+                    }
+                }
+                .accessibilityIdentifier("customDateSheet")
+                .accessibilityElement(children: .contain)
             }
             .onReceive(NotificationCenter.default.publisher(for: NotificationActionDelegate.navigateToBacklogHygieneNotification)) { _ in
                 showHygieneSheet = true
@@ -845,6 +883,17 @@ struct BacklogView: View {
             } label: {
                 Label("Nächste Woche", systemImage: "calendar.badge.plus")
             }
+            Button {
+                customDate = Calendar.current.date(
+                    bySettingHour: 9, minute: 0, second: 0,
+                    of: Date.now.addingTimeInterval(86400)
+                ) ?? Date.now
+                customDateTaskID = item.id
+                showCustomDateSheet = true
+            } label: {
+                Label("Eigenes Datum...", systemImage: "calendar.badge.clock")
+            }
+            .accessibilityIdentifier("customDateMenuButton")
         } label: {
             Label("Verschieben", systemImage: "calendar.badge.clock")
         }
@@ -857,6 +906,26 @@ struct BacklogView: View {
         )
         guard let task = try? modelContext.fetch(descriptor).first else { return }
         _ = LocalTask.postpone(task, byDays: days, context: modelContext)
+        Task {
+            await SmartNotificationEngine.reconcile(
+                reason: .taskChanged,
+                context: modelContext,
+                eventKitRepo: eventKitRepo
+            )
+            await loadTasks()
+        }
+    }
+
+    // Feature #293 — "Eigenes Datum" Bestaetigen-Aktion
+    private func applyCustomDatePostpone() {
+        guard let id = customDateTaskID,
+              let taskUUID = UUID(uuidString: id) else { return }
+        let descriptor = FetchDescriptor<LocalTask>(
+            predicate: #Predicate<LocalTask> { $0.uuid == taskUUID }
+        )
+        guard let task = try? modelContext.fetch(descriptor).first else { return }
+        LocalTask.postpone(task, to: customDate, context: modelContext)
+        customDateTaskID = nil
         Task {
             await SmartNotificationEngine.reconcile(
                 reason: .taskChanged,
