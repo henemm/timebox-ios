@@ -556,91 +556,18 @@ struct FocusBloxApp: App {
     }
 
     /// Remove duplicate tasks sharing the same externalID (Bug 34 v2).
-    /// Groups by externalID, keeps the most enriched task per group.
+    /// Wrapper to `TaskDeduplicationService.cleanupRemindersDuplicates` (cross-platform).
     /// Returns number of deleted tasks, or -1 on error.
     @discardableResult
     static func cleanupRemindersDuplicates(in context: ModelContext) -> Int {
-        do {
-            let allTasks = try context.fetch(FetchDescriptor<LocalTask>())
-            let tasksWithExternalID = allTasks.filter { $0.externalID != nil }
-            guard !tasksWithExternalID.isEmpty else { return 0 }
-
-            // Group by externalID
-            var groups: [String: [LocalTask]] = [:]
-            for task in tasksWithExternalID {
-                let key = task.externalID!
-                groups[key, default: []].append(task)
-            }
-
-            var deletedCount = 0
-            for (_, tasks) in groups where tasks.count > 1 {
-                // Sort by attribute score descending, then by createdAt ascending (older first)
-                let sorted = tasks.sorted { a, b in
-                    let scoreA = Self.attributeScore(a)
-                    let scoreB = Self.attributeScore(b)
-                    if scoreA != scoreB { return scoreA > scoreB }
-                    return a.createdAt < b.createdAt
-                }
-                // Keep first (highest score / oldest), delete rest
-                for task in sorted.dropFirst() {
-                    context.delete(task)
-                    deletedCount += 1
-                }
-            }
-
-            if deletedCount > 0 {
-                try context.save()
-            }
-            return deletedCount
-        } catch {
-            return -1
-        }
-    }
-
-    /// Score how many enrichment attributes a task has filled.
-    private static func attributeScore(_ task: LocalTask) -> Int {
-        var score = 0
-        if task.importance != nil { score += 1 }
-        if task.urgency != nil { score += 1 }
-        if task.estimatedDuration != nil { score += 1 }
-        if !task.taskType.isEmpty { score += 1 }
-        if !(task.tags ?? []).isEmpty { score += 1 }
-        return score
+        TaskDeduplicationService.cleanupRemindersDuplicates(in: context)
     }
 
     /// Bug 255: Remove duplicate LocalTasks with identical UUIDs (CloudKit sync artifact).
+    /// Wrapper to `TaskDeduplicationService.cleanupUUIDDuplicates` (cross-platform).
     @discardableResult
     static func cleanupUUIDDuplicates(in context: ModelContext) -> Int {
-        do {
-            let allTasks = try context.fetch(FetchDescriptor<LocalTask>())
-            guard allTasks.count > 1 else { return 0 }
-
-            var groups: [UUID: [LocalTask]] = [:]
-            for task in allTasks {
-                groups[task.uuid, default: []].append(task)
-            }
-
-            var deletedCount = 0
-            for (_, tasks) in groups where tasks.count > 1 {
-                let sorted = tasks.sorted { a, b in
-                    let scoreA = Self.attributeScore(a)
-                    let scoreB = Self.attributeScore(b)
-                    if scoreA != scoreB { return scoreA > scoreB }
-                    return a.createdAt < b.createdAt
-                }
-                for task in sorted.dropFirst() {
-                    context.delete(task)
-                    deletedCount += 1
-                }
-            }
-
-            if deletedCount > 0 {
-                try context.save()
-            }
-            return deletedCount
-        } catch {
-            return -1
-        }
+        TaskDeduplicationService.cleanupUUIDDuplicates(in: context)
     }
 
     /// Bug 52: Clear orphaned assignedFocusBlockID on tasks that are not in Next Up and not completed.

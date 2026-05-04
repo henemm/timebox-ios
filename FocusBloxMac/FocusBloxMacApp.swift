@@ -371,6 +371,9 @@ struct FocusBloxMacApp: App {
                         syncMonitor.startRemoteChangeMonitoring(container: container)
                         // One-time cleanup: Remove leaked test data from persistent store
                         Self.cleanupLeakedTestData(in: container.mainContext)
+                        // bug-mac-duplicate-tasks: Paritaet zu iOS — UUID- und Reminders-Duplikate aufraeumen
+                        TaskDeduplicationService.cleanupRemindersDuplicates(in: container.mainContext)
+                        TaskDeduplicationService.cleanupUUIDDuplicates(in: container.mainContext)
                         // MAC_025b: Migrate reminders-sourced tasks to local (idempotent, same as iOS)
                         RemindersImportService.migrateRemindersToLocal(in: container.mainContext)
                         // Bug 38: Force CloudKit to sync all extended attribute fields
