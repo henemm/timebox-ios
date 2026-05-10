@@ -282,6 +282,10 @@ def _new_workflow(name: str) -> dict:
         # #308-A: Override flags
         "loc_limit_override": False,
         "adversary_override_ambiguous": False,
+        # #310: Execution Log + Phase Transition Audit Trail
+        "phase_transitions": [],
+        "fix_loop_count": 0,
+        "execution_log_written": False,
     }
 
 
@@ -478,6 +482,8 @@ def cmd_status(args: list[str]) -> None:
     verdict = data.get("adversary_verdict") or "Not run"
     run_count = data.get("adversary_run_count", 0)
     print(f"Adversary Verdict: {verdict} (runs: {run_count})")
+    fix_loops = data.get("fix_loop_count", 0)
+    print(f"Fix-Loop-Count: {fix_loops}")
     findings = data.get("adversary_findings", [])
     if findings:
         unresolved = sum(1 for f in findings if f.get("status") is None)
@@ -490,6 +496,7 @@ def cmd_phase(args: list[str]) -> None:
         sys.exit(1)
     target = PHASE_ALIASES.get(args[0], args[0])
     data, name = _read_active()
+    old_phase = data.get("current_phase")
     error = _validate_transition(data, target)
     if error:
         print(f"BLOCKED: {error}", file=sys.stderr)
@@ -498,6 +505,15 @@ def cmd_phase(args: list[str]) -> None:
     # Reset inspect_ui_done when re-entering TDD RED
     if target == "phase4_tdd_red":
         data["inspect_ui_done"] = False
+    # #310: Phase Transition Audit Trail
+    data.setdefault("phase_transitions", []).append({
+        "from": old_phase,
+        "to": target,
+        "at": datetime.now().isoformat(),
+    })
+    # #310: Fix-Loop-Counter — nur bei BROKEN → phase5_implement
+    if target == "phase5_implement" and data.get("adversary_verdict") == "BROKEN":
+        data["fix_loop_count"] = data.get("fix_loop_count", 0) + 1
     _save_active(data)
     print(f"Set phase to: {target}")
 
@@ -882,8 +898,59 @@ def cmd_override_ambiguous(args: list[str]) -> None:
     print("Adversary AMBIGUOUS Override gesetzt. Commit jetzt erlaubt.")
 
 
+def _write_execution_log(data: dict, name: str) -> None:
+    """Schreibt Execution Log nach .claude/workflows/_logs/."""
+    # LoC-Delta berechnen (Pattern aus _validate_transition wiederverwenden)
+    scope_loc_delta = 0
+    try:
+        result = subprocess.run(
+            ["git", "diff", "HEAD", "--numstat"],
+            capture_output=True, text=True, cwd=_project_root()
+        )
+        for line in result.stdout.splitlines():
+            parts = line.split("\t")
+            if len(parts) >= 2:
+                added = int(parts[0]) if parts[0].isdigit() else 0
+                deleted = int(parts[1]) if parts[1].isdigit() else 0
+                scope_loc_delta += added + deleted
+    except Exception:
+        pass
+
+    # phases_completed aus phase_transitions ableiten (unique to-Werte in Reihenfolge)
+    seen: set = set()
+    phases_completed = []
+    for t in data.get("phase_transitions", []):
+        to = t.get("to")
+        if to and to not in seen:
+            seen.add(to)
+            phases_completed.append(to)
+
+    log = {
+        "workflow": name,
+        "workflow_type": data.get("workflow_type"),
+        "outcome": "success",
+        "phases_completed": phases_completed,
+        "tdd_red_confirmed": data.get("red_test_done", False),
+        "adversary_verdict": data.get("adversary_verdict"),
+        "adversary_run_count": data.get("adversary_run_count", 0),
+        "fix_loop_count": data.get("fix_loop_count", 0),
+        "scope_loc_delta": scope_loc_delta,
+        "completed_at": datetime.now().isoformat(),
+    }
+
+    logs_dir = _workflows_dir() / "_logs"
+    logs_dir.mkdir(parents=True, exist_ok=True)
+    timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+    log_path = logs_dir / f"{name}-{timestamp}.json"
+    _atomic_write(log_path, log)
+    data["execution_log_written"] = True
+
+
 def cmd_complete(args: list[str]) -> None:
     data, name = _read_active()
+    # #310: Execution Log automatisch schreiben
+    if not data.get("execution_log_written"):
+        _write_execution_log(data, name)
     data["current_phase"] = "phase7_done"
     # Auto-close GitHub Issues for "fix" findings
     import subprocess as _sp
