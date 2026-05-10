@@ -26,13 +26,56 @@ Lies die Spec und extrahiere:
 
 ## Schritt 2: Acceptance-Criteria-Checkliste erstellen
 
-Fuer JEDEN Punkt aus "Expected Behavior" eine pruefbare Aussage formulieren:
+**PFLICHT:** Rufe das Helfer-Skript auf — manuelles Abtippen ist NICHT erlaubt:
 
+```bash
+python3 .claude/hooks/adversary_dialog.py generate-checklist <spec-pfad>
 ```
-[ ] Punkt 1: [Konkrete Aussage die wahr sein muss]
-[ ] Punkt 2: [Konkrete Aussage die wahr sein muss]
+
+Das Skript extrahiert alle Punkte aus dem `## Expected Behavior` Abschnitt der Spec
+und gibt eine pruefbare Checkliste aus. Schlaegt das Skript fehl (Exit 1), darf kein
+Adversary-Dialog beginnen — zuerst die Spec reparieren.
+
+Ergebnis-Beispiel:
+```
+## Adversary-Checkliste
+- [ ] Punkt 1: [Konkrete Aussage die wahr sein muss]
+- [ ] Punkt 2: [Konkrete Aussage die wahr sein muss]
 ...
 ```
+
+## Dialog-Format (PFLICHT)
+
+Der Adversary-Dialog MUSS mindestens zwei Runden enthalten und in diesem Format dokumentiert werden:
+
+```markdown
+### Runde 1
+Adversary: [Frage / Pruefpunkt]
+Implementierer: [Antwort + Beweis]
+
+### Runde 2
+Adversary: [Folgefrage oder Bestaetigung]
+Implementierer: [Antwort]
+```
+
+## Verdict-Format (PFLICHT)
+
+Am Ende des Dialogs MUSS eines dieser drei Verdicts gesetzt werden:
+
+- `**VERDICT: VERIFIED**` — Alle Acceptance Criteria erfuellt, kein Blocker
+- `**VERDICT: BROKEN**` — Mindestens ein Blocker gefunden
+- `**VERDICT: AMBIGUOUS**` — Befunde unklar, weiterer Input benoetigt
+
+## Artifact-Validierung (PFLICHT am Ende)
+
+Nach Abschluss des Dialogs MUSS das Artifact validiert werden:
+
+```bash
+python3 .claude/hooks/adversary_dialog.py validate-artifact <artifact-pfad> <spec-pfad>
+```
+
+Schlaegt das Skript fehl (Exit 1 wegen fehlendem Verdict oder weniger als 2 Runden),
+darf KEIN Verdict gesetzt werden — zuerst den Dialog vervollstaendigen.
 
 ## Schritt 3: Prompt generieren
 
