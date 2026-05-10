@@ -39,6 +39,8 @@ Usage:
 import fcntl
 import json
 import os
+import re
+import subprocess
 import sys
 import tempfile
 from contextlib import contextmanager
@@ -277,6 +279,9 @@ def _new_workflow(name: str) -> dict:
         "adversary_verdict": None,
         "adversary_run_count": 0,
         "green_test_done": False,
+        # #308-A: Override flags
+        "loc_limit_override": False,
+        "adversary_override_ambiguous": False,
     }
 
 
@@ -352,6 +357,47 @@ def _validate_transition(data: dict, target: str) -> str | None:
             return ("Checkpoint 2 nicht bestanden — präsentiere Henning die Tests "
                     "(Testname + was er prüft + FAILED Output). "
                     "Henning muss 'go' sagen.")
+
+    # --- Gate: Scope-Limit (kumulativer LoC-Delta) ---
+    if tgt_idx >= PHASES.index("phase5_implement"):
+        if not data.get("loc_limit_override"):
+            loc_threshold = 150 if data.get("workflow_type") == "bug" else 250
+            try:
+                result = subprocess.run(
+                    ["git", "diff", "HEAD", "--numstat"],
+                    capture_output=True, text=True, cwd=_project_root()
+                )
+                total_loc = 0
+                for line in result.stdout.splitlines():
+                    parts = line.split("\t")
+                    if len(parts) >= 2:
+                        added = int(parts[0]) if parts[0].isdigit() else 0
+                        deleted = int(parts[1]) if parts[1].isdigit() else 0
+                        total_loc += added + deleted
+                if total_loc > loc_threshold:
+                    return (
+                        f"BLOCKED: {total_loc} LoC geändert — Limit ist {loc_threshold} "
+                        f"({'bug' if data.get('workflow_type') == 'bug' else 'feature'}-Workflow). "
+                        f"Ticket aufteilen oder 'override-loc' ausführen."
+                    )
+            except Exception:
+                pass
+
+    # --- Gate: Spec muss Acceptance Criteria enthalten ---
+    if tgt_idx >= PHASES.index("phase5_implement"):
+        spec_path = data.get("spec_file")
+        if spec_path:
+            try:
+                spec_content = Path(spec_path).read_text()
+                has_ac_section = "## Acceptance Criteria" in spec_content
+                has_ac_item = bool(re.search(r'\*\*AC-\d+\*\*|- AC-\d+:', spec_content))
+                if not has_ac_section or not has_ac_item:
+                    return (
+                        "BLOCKED: Spec enthält keinen gültigen ## Acceptance Criteria-Abschnitt "
+                        "mit mindestens einem 'AC-1' Item. Spec aktualisieren."
+                    )
+            except OSError:
+                pass
 
     # --- Gate: GREEN tests before adversary ---
     if tgt_idx >= PHASES.index("phase6_adversary"):
@@ -822,6 +868,20 @@ def cmd_list_findings(args: list[str]) -> None:
     print(f"\n{len(findings)} findings total, {unresolved} open")
 
 
+def cmd_override_loc(args: list[str]) -> None:
+    data, _ = _read_active()
+    data["loc_limit_override"] = True
+    _save_active(data)
+    print("LoC-Limit Override gesetzt.")
+
+
+def cmd_override_ambiguous(args: list[str]) -> None:
+    data, _ = _read_active()
+    data["adversary_override_ambiguous"] = True
+    _save_active(data)
+    print("Adversary AMBIGUOUS Override gesetzt. Commit jetzt erlaubt.")
+
+
 def cmd_complete(args: list[str]) -> None:
     data, name = _read_active()
     data["current_phase"] = "phase7_done"
@@ -931,6 +991,8 @@ COMMANDS = {
     "complete": cmd_complete,
     "list": cmd_list,
     "snapshot-tests": cmd_snapshot_tests,
+    "override-loc": cmd_override_loc,
+    "override-ambiguous": cmd_override_ambiguous,
 }
 
 

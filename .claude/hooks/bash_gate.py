@@ -363,7 +363,33 @@ def main():
                           "Jedes Finding muss von Henning beantwortet werden.",
                           file=sys.stderr)
                     sys.exit(2)
-                # 6d. Localize Gate — kein Commit ohne Lokalisierungs-Check
+                # 6d. Adversary-Verdict Gate
+                verdict = active_wf.get("adversary_verdict")
+                ambiguous_override = active_wf.get("adversary_override_ambiguous", False)
+
+                if verdict is None:
+                    print(
+                        "BLOCKED: Kein Adversary-Lauf für diesen Workflow. "
+                        "Phase 6 (Adversary) muss vor dem Commit abgeschlossen sein.",
+                        file=sys.stderr
+                    )
+                    sys.exit(2)
+                elif verdict == "BROKEN":
+                    print(
+                        "BLOCKED: Adversary-Verdict ist BROKEN. "
+                        "Implementation muss korrigiert werden.",
+                        file=sys.stderr
+                    )
+                    sys.exit(2)
+                elif verdict == "AMBIGUOUS" and not ambiguous_override:
+                    print(
+                        "BLOCKED: Adversary-Verdict ist AMBIGUOUS. "
+                        "Entweder Befunde klären oder 'override-ambiguous' ausführen.",
+                        file=sys.stderr
+                    )
+                    sys.exit(2)
+
+                # 6e. Localize Gate — kein Commit ohne Lokalisierungs-Check
                 loc_checked = active_wf.get("localize_checked", False)
                 no_strings = active_wf.get("no_user_strings", False)
                 if not loc_checked and not no_strings:
