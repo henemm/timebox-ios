@@ -447,6 +447,7 @@ enum RecurrenceService {
         // 3. For each orphaned series, create successor from most recent completion
         var seenGroupIDs = Set<String>()
         var repaired = 0
+        var anySkippedDateReset = false
 
         let sorted = recurringCompleted.sorted {
             ($0.completedAt ?? .distantPast) > ($1.completedAt ?? .distantPast)
@@ -463,12 +464,25 @@ enum RecurrenceService {
             // If no template exists, user deliberately ended the series — don't resurrect.
             guard let template = findTemplate(groupID: groupID, in: modelContext) else { continue }
 
-            // Bug #209: Don't repair if user manually deleted an instance after last completion.
-            // lastSkippedDate on template means "user deleted a single instance" — if it's newer
-            // than the most recent completion, the deletion was intentional.
-            if let skippedDate = template.lastSkippedDate,
-               skippedDate > (task.completedAt ?? .distantPast) {
-                continue
+            // Bug #209 / Bug #KlavierSpielen: Don't repair if user manually deleted an instance
+            // within the current recurrence cycle. "Within cycle" = lastSkippedDate is newer
+            // than completedAt AND less than one full cycle has passed since the skip.
+            // After one full cycle, the skip is considered expired → repair is allowed.
+            if let skippedDate = template.lastSkippedDate {
+                let reference = task.completedAt ?? .distantPast
+                if skippedDate > reference {
+                    let cycleSeconds = cycleLength(
+                        pattern: template.recurrencePattern,
+                        interval: template.recurrenceInterval
+                    )
+                    let elapsed = Date().timeIntervalSince(skippedDate)
+                    if elapsed < cycleSeconds {
+                        continue  // Still within the cycle — honour the deletion
+                    }
+                    // Cycle has passed — reset the skip marker and allow repair
+                    template.lastSkippedDate = nil
+                    anySkippedDateReset = true
+                }
             }
 
             // Bug #279: Create ALL missed instances (not just one successor).
@@ -488,8 +502,26 @@ enum RecurrenceService {
             repaired += created
         }
 
-        if repaired > 0 { try? modelContext.save() }
+        if repaired > 0 || anySkippedDateReset { try? modelContext.save() }
         return repaired
+    }
+
+    /// Returns the approximate cycle length in seconds for a recurrence pattern.
+    /// Used to determine when a manual deletion (lastSkippedDate) has "expired".
+    private static func cycleLength(pattern: String, interval: Int?) -> TimeInterval {
+        let n = Double(max(interval ?? 1, 1))
+        switch pattern {
+        case "daily":        return n * 86400
+        case "weekdays",
+             "weekends":     return 86400
+        case "weekly":       return n * 7 * 86400
+        case "biweekly":     return 14 * 86400
+        case "monthly":      return n * 30 * 86400
+        case "quarterly":    return 90 * 86400
+        case "semiannually": return 180 * 86400
+        case "yearly":       return n * 365 * 86400
+        default:             return 86400
+        }
     }
 
     // MARK: - Private Helpers

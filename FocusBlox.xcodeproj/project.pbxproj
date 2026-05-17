@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		657CD346438AA7C8EA1ABABA /* RecurrenceServiceRepairTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D188A8348B181435CF78051 /* RecurrenceServiceRepairTests.swift */; };
+		CDBDEC343DE4202B5A69635D /* RecurrenceServiceRepairTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7DA938FA284432AB1729B81 /* RecurrenceServiceRepairTests.swift */; };
 		718C3EE79229B77DBBC1EE6E /* TaskDeduplicationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 996E4B0BA4773F04C6BD0CB0 /* TaskDeduplicationService.swift */; };
 		00D5BA0CADF18DC0EB52865B /* TaskDeduplicationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 996E4B0BA4773F04C6BD0CB0 /* TaskDeduplicationService.swift */; };
 		BBF67BD362B4378E8CC11283 /* MacStartupCleanupTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8386D00DBF027EF8470E031C /* MacStartupCleanupTests.swift */; };
@@ -745,6 +747,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		5D188A8348B181435CF78051 /* RecurrenceServiceRepairTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = RecurrenceServiceRepairTests.swift; path = FocusBloxMacTests/RecurrenceServiceRepairTests.swift; sourceTree = SOURCE_ROOT; };
+		F7DA938FA284432AB1729B81 /* RecurrenceServiceRepairTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = RecurrenceServiceRepairTests.swift; path = FocusBloxTests/RecurrenceServiceRepairTests.swift; sourceTree = SOURCE_ROOT; };
 		996E4B0BA4773F04C6BD0CB0 /* TaskDeduplicationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TaskDeduplicationService.swift; path = Sources/Services/TaskDeduplicationService.swift; sourceTree = SOURCE_ROOT; };
 		8386D00DBF027EF8470E031C /* MacStartupCleanupTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MacStartupCleanupTests.swift; path = FocusBloxTests/Services/MacStartupCleanupTests.swift; sourceTree = SOURCE_ROOT; };
 		C2285B8A337B3108BC65C2EC /* CustomDatePostponeUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CustomDatePostponeUITests.swift; path = FocusBloxUITests/CustomDatePostponeUITests.swift; sourceTree = SOURCE_ROOT; };
@@ -1787,6 +1791,7 @@
 		A6B3805EF19D1B131D346DDD /* FocusBloxTests */ = {
 			isa = PBXGroup;
 			children = (
+				F7DA938FA284432AB1729B81 /* RecurrenceServiceRepairTests.swift */,
 				8386D00DBF027EF8470E031C /* MacStartupCleanupTests.swift */,
 				109B433962D98A3A08A65345 /* OverdueMarkerTests.swift */,
 				87DC66EEDAF69079597761A7 /* MenuBarFilterTests.swift */,
@@ -3026,6 +3031,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CDBDEC343DE4202B5A69635D /* RecurrenceServiceRepairTests.swift in Sources */,
 				BBF67BD362B4378E8CC11283 /* MacStartupCleanupTests.swift in Sources */,
 				6208D0FD53AD09B023B55524 /* OverdueMarkerTests.swift in Sources */,
 				11B7D9FF086B3BF218B79F8D /* MenuBarFilterTests.swift in Sources */,
@@ -3329,6 +3335,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				657CD346438AA7C8EA1ABABA /* RecurrenceServiceRepairTests.swift in Sources */,
 				9AFD59340CE46F3A4DA969EB /* MenuBarTierGroupingTests.swift in Sources */,
 				2F42B12BABD0CAB500D1936F /* TaskInspectorSaveTests.swift in Sources */,
 				CA1535634F6A1689F63F5D2C /* MacCoachVisibleSectionsTests.swift in Sources */,
