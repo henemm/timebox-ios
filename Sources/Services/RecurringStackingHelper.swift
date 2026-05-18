@@ -14,48 +14,19 @@ import Foundation
 /// - Entfernt die uebrigen Instanzen aus der Liste
 enum RecurringStackingHelper {
 
-    /// Wendet Recurring-Stacking auf `items` an: gruppiert nach
-    /// (recurrenceGroupID, isParked), waehlt das aelteste Child als Repraesentant,
-    /// setzt `stackedInstanceCount` und `stackedOldestDueDate` auf den Repraesentanten
-    /// und entfernt die anderen Children.
+    /// Wendet virtuelles Recurring-Stacking auf `items` an.
+    /// Berechnet "missed cycles" fuer wiederkehrende Tasks deren dueDate in der Vergangenheit liegt.
+    /// Pfad A (echte Gruppierung nach recurrenceGroupID) ist deaktiviert — die Konsolidierung
+    /// erfolgt jetzt per Migration (consolidateMultipleInstances), nicht mehr per View-Collapsing.
     static func apply(to items: [PlanItem]) -> [PlanItem] {
         var planItems = items
-        var groups: [String: [Int]] = [:]
-        for (index, item) in planItems.enumerated() {
-            guard let groupID = item.recurrenceGroupID,
-                  !item.isTemplate,
-                  !item.isCompleted,
-                  !item.isNextUp else { continue }
-            let key = "\(groupID)_\(item.isParked ? "parked" : "active")"
-            groups[key, default: []].append(index)
-        }
-
-        var indicesToRemove: Set<Int> = []
-        for (_, indices) in groups where indices.count >= 2 {
-            // Repraesentant: juengstes Child (groesstes dueDate) — wie #279 fuer Tier-Konsistenz.
-            let representativeIndex = indices.max { a, b in
-                (planItems[a].dueDate ?? .distantPast) < (planItems[b].dueDate ?? .distantPast)
-            } ?? indices[0]
-
-            planItems[representativeIndex].stackedInstanceCount = indices.count
-            planItems[representativeIndex].stackedOldestDueDate = indices
-                .compactMap { planItems[$0].dueDate }
-                .min()
-            for idx in indices where idx != representativeIndex {
-                indicesToRemove.insert(idx)
-            }
-        }
-
-        for idx in indicesToRemove.sorted().reversed() {
-            planItems.remove(at: idx)
-        }
 
         // MARK: - Pfad B: Single-Task-Cycle-Auflauf (#279 — bug-stacking-real-data)
         // Berechnet "missed cycles" fuer einzelne wiederkehrende Tasks ohne recurrenceGroupID
         // (echte User-Daten / Bestandsdaten / aus Reminders importiert / manuell angelegt).
         // Wenn dueDate weit genug in der Vergangenheit liegt, dass mindestens 2 Cycles verpasst sind,
         // setzt stackedInstanceCount auf die Anzahl der verpassten Cycles.
-        // Bei bereits gestackten Items (Pfad A) wird das MAX aus beiden Werten verwendet.
+        // Setzt stackedInstanceCount auf die Anzahl der verpassten Cycles.
         for index in planItems.indices {
             let item = planItems[index]
 

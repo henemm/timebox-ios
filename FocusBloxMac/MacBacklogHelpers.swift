@@ -34,49 +34,16 @@ enum MacBacklogStackingHelper {
         let oldestDueDate: Date?
     }
 
-    /// Groups tasks by recurrenceGroupID. Repraesentant ist das JUENGSTE Child
-    /// (Bug `bug-recurring-stack-count-badge`) — so bleibt der "aktuelle" Eintrag
-    /// in der Sektion sichtbar; oldestDueDate liefert das aelteste dueDate fuer
-    /// die Counter-Bar.
+    /// Applies virtual stacking to tasks. Path A (grouping by recurrenceGroupID) is removed;
+    /// consolidation now happens at migration time. Only Path B (virtual cycle calculation) remains.
     static func applyStacking(_ tasks: [LocalTask]) -> [StackedItem] {
-        var grouped: [String: [LocalTask]] = [:]
-        var ungrouped: [LocalTask] = []
-
-        for task in tasks {
-            if let gid = task.recurrenceGroupID, !gid.isEmpty,
-               !task.isTemplate, !task.isCompleted, !task.isNextUp {
-                grouped[gid, default: []].append(task)
-            } else {
-                ungrouped.append(task)
-            }
-        }
-
-        // Pfad A: ungruppierte Tasks (kein groupID) erstmal mit count=0 sammeln
-        var result: [StackedItem] = ungrouped.map {
+        var result: [StackedItem] = tasks.map {
             StackedItem(task: $0, stackedCount: 0, oldestDueDate: nil)
         }
 
-        for (_, group) in grouped {
-            // Sortiert aufsteigend nach dueDate (aelteste zuerst, juengste zuletzt).
-            let sorted = group.sorted {
-                ($0.dueDate ?? .distantFuture) < ($1.dueDate ?? .distantFuture)
-            }
-            // Repraesentant = juengstes Child (groesstes dueDate).
-            let representative = sorted.last ?? sorted[0]
-            let oldest = sorted.first?.dueDate
-            let extraCount = sorted.count - 1
-            result.append(StackedItem(
-                task: representative,
-                stackedCount: extraCount,
-                oldestDueDate: oldest
-            ))
-        }
-
         // MARK: - Pfad B: Single-Task-Cycle-Auflauf (#279 — bug-stacking-real-data)
-        // Auf macOS analog zu iOS: einzelne recurring Tasks ohne groupID, deren
-        // dueDate weit genug in der Vergangenheit liegt, bekommen einen stackedCount,
-        // der sich aus den verpassten Cycles berechnet. Bei bereits gestackten Items
-        // (Pfad A) wird MAX(Pfad A, Pfad B) gewaehlt.
+        // Auf macOS analog zu iOS: recurring Tasks deren dueDate weit genug in der
+        // Vergangenheit liegt, bekommen einen stackedCount aus verpassten Cycles.
         // Hinweis: stackedCount ist hier der EXTRA-Counter (instanceCount - 1).
         for index in result.indices {
             let item = result[index]

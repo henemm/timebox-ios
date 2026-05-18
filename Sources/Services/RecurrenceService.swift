@@ -485,25 +485,61 @@ enum RecurrenceService {
                 }
             }
 
-            // Bug #279: Create ALL missed instances (not just one successor).
-            // Loop forward from last completion's dueDate until we reach today.
-            // Max 30 instances per series to prevent unbounded growth.
-            var created = 0
-            var currentSource = task
-            while created < 30 {
-                guard let instance = createNextInstance(
-                    from: currentSource, in: modelContext
-                ) else { break }
-                created += 1
-                // If the new instance's dueDate is in the future, stop
-                if let due = instance.dueDate, due > Date() { break }
-                currentSource = instance
+            // Bug #279 revert: Nur 1 Instanz erzeugen — virtuelles Stacking berechnet den Rest
+            if let _ = createNextInstance(from: task, in: modelContext) {
+                repaired += 1
             }
-            repaired += created
         }
 
         if repaired > 0 || anySkippedDateReset { try? modelContext.save() }
         return repaired
+    }
+
+    // MARK: - Consolidate Multiple Instances
+
+    /// Removes excess open instances within the same recurring series.
+    /// Keeps the instance with the earliest dueDate per recurrenceGroupID,
+    /// deletes the rest. Returns the number of deleted instances.
+    @MainActor
+    @discardableResult
+    static func consolidateMultipleInstances(in modelContext: ModelContext) -> Int {
+        let descriptor = FetchDescriptor<LocalTask>(
+            predicate: #Predicate<LocalTask> {
+                !$0.isCompleted && !$0.isTemplate
+            }
+        )
+        guard let openTasks = try? modelContext.fetch(descriptor) else { return 0 }
+
+        // Only recurring tasks with a groupID
+        let recurring = openTasks.filter {
+            $0.recurrenceGroupID != nil && $0.recurrencePattern != "none"
+        }
+
+        // Group by recurrenceGroupID
+        var groups: [String: [LocalTask]] = [:]
+        for task in recurring {
+            guard let gid = task.recurrenceGroupID else { continue }
+            groups[gid, default: []].append(task)
+        }
+
+        var deleted = 0
+        for (_, group) in groups where group.count > 1 {
+            // Keep the instance with the earliest dueDate
+            let sorted = group.sorted {
+                ($0.dueDate ?? .distantFuture) < ($1.dueDate ?? .distantFuture)
+            }
+            for excess in sorted.dropFirst() {
+                modelContext.delete(excess)
+                deleted += 1
+            }
+        }
+
+        if deleted > 0 {
+            try? modelContext.save()
+            print("[Consolidate] Deleted \(deleted) excess recurring instance(s)")
+        }
+
+        return deleted
     }
 
     /// Returns the approximate cycle length in seconds for a recurrence pattern.

@@ -986,18 +986,7 @@ struct BacklogView: View {
     private func completeTask(_ item: PlanItem) {
         completeFeedback.toggle()
 
-        // For stacked recurring tasks: complete the oldest instance (earliest dueDate)
-        let targetID: String
-        if item.stackedInstanceCount > 1, let groupID = item.recurrenceGroupID {
-            let siblings = planItems.filter {
-                $0.recurrenceGroupID == groupID && !$0.isCompleted && !$0.isTemplate
-            }
-            targetID = siblings
-                .sorted { ($0.dueDate ?? .distantFuture) < ($1.dueDate ?? .distantFuture) }
-                .first?.id ?? item.id
-        } else {
-            targetID = item.id
-        }
+        let targetID = item.id
 
         deferredCompletion.scheduleCompletion(id: item.id) { [modelContext] in
             do {
