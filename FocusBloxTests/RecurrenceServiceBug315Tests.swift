@@ -388,6 +388,44 @@ final class RecurrenceServiceBug315Tests: XCTestCase {
         )
     }
 
+    // MARK: - AC-6: Legacy-Tasks ohne recurrenceGroupID erzeugen KEINE Duplikate
+
+    /// Verhalten: repairOrphanedRecurringSeries darf für Tasks ohne recurrenceGroupID
+    ///            KEINE neuen Instanzen erstellen — sonst entstehen N Duplikate
+    ///            (Bug: 10× "Zehnagel" nach 10 abgeschlossenen legacy Tasks).
+    ///
+    /// Bricht wenn: `task.recurrenceGroupID ?? task.id` statt `guard let groupID` verwendet wird.
+    func test_AC6_repairOrphaned_legacyTasksWithoutGroupID_createNoDuplicates() throws {
+        // 10 abgeschlossene Tasks OHNE recurrenceGroupID (Legacy-Daten)
+        for i in 0..<10 {
+            let task = LocalTask(title: "Zehnagel", recurrencePattern: "daily")
+            task.recurrenceGroupID = nil
+            task.isCompleted = true
+            task.completedAt = Calendar.current.date(byAdding: .day, value: -i, to: Date())
+            context.insert(task)
+        }
+        try context.save()
+
+        let repaired = RecurrenceService.repairOrphanedRecurringSeries(in: context)
+
+        XCTAssertEqual(
+            repaired,
+            0,
+            "AC-6: Legacy Tasks ohne recurrenceGroupID dürfen NICHT repariert werden — sonst entstehen Duplikate"
+        )
+
+        // Keine neuen offenen Instanzen entstanden
+        let openDescriptor = FetchDescriptor<LocalTask>(
+            predicate: #Predicate<LocalTask> { !$0.isCompleted && !$0.isTemplate }
+        )
+        let openTasks = try context.fetch(openDescriptor)
+        XCTAssertEqual(
+            openTasks.count,
+            0,
+            "AC-6: Kein offener Task darf durch Repair für Legacy-Daten entstanden sein"
+        )
+    }
+
     // MARK: - Hilfsmethoden
 
     private func makeDate(_ year: Int, _ month: Int, _ day: Int) -> Date {

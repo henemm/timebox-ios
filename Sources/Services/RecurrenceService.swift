@@ -525,7 +525,7 @@ enum RecurrenceService {
         }
 
         for task in sorted {
-            let groupID = task.recurrenceGroupID ?? task.id
+            guard let groupID = task.recurrenceGroupID else { continue }
             guard !seenGroupIDs.contains(groupID) else { continue }
             seenGroupIDs.insert(groupID)
 
