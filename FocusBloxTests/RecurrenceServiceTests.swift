@@ -655,12 +655,14 @@ final class RecurrenceServiceTests: XCTestCase {
     /// should NOT be repaired (user deliberately ended the series).
     /// Bricht wenn: repairOrphanedRecurringSeries() erstellt Instanz ohne Template-Check.
     @MainActor
-    func test_repairOrphaned_skipsSeriesWithDeletedTemplate() throws {
+    // Bug #315 fix: kein Template = Datenfehler, nicht User-Intent.
+    // ensureNextInstance erstellt lazy ein Template und repariert die Serie.
+    func test_repairOrphaned_repairsSeriesWithoutTemplate() throws {
         let container = try ModelContainer(for: LocalTask.self, configurations: .init(isStoredInMemoryOnly: true))
         let context = container.mainContext
-        let groupID = "ended-series"
+        let groupID = "no-template-series"
 
-        // Completed recurring task — NO template exists (user ended the series)
+        // Completed recurring task — NO template (data error / pre-migration state)
         let completed = LocalTask(
             title: "Zehnagel",
             dueDate: Calendar.current.startOfDay(for: Date()),
@@ -672,16 +674,43 @@ final class RecurrenceServiceTests: XCTestCase {
         context.insert(completed)
         try context.save()
 
-        // Verify: no template exists for this series
-        let template = RecurrenceService.findTemplate(groupID: groupID, in: context)
-        XCTAssertNil(template, "No template should exist (series was ended)")
+        // Verify: no template exists (precondition)
+        let templateBefore = RecurrenceService.findTemplate(groupID: groupID, in: context)
+        XCTAssertNil(templateBefore, "Precondition: no template should exist")
 
-        // Run repair
+        // Run repair — should create lazy template + new instance
         let repaired = RecurrenceService.repairOrphanedRecurringSeries(in: context)
 
-        // Verify: NO new instance created (series was deliberately ended)
-        XCTAssertEqual(repaired, 0, "Should NOT repair series without template (user ended it)")
+        XCTAssertEqual(repaired, 1, "Should repair series and create next instance")
 
+        let openTasks = try context.fetch(FetchDescriptor<LocalTask>(
+            predicate: #Predicate { !$0.isCompleted && !$0.isTemplate }
+        ))
+        XCTAssertEqual(openTasks.count, 1, "One new open instance should exist")
+    }
+
+    // "User deliberately ended series" signal: recurrencePattern == "none" (set by deleteRecurringTemplate)
+    @MainActor
+    func test_repairOrphaned_skipsIntentionallyEndedSeries() throws {
+        let container = try ModelContainer(for: LocalTask.self, configurations: .init(isStoredInMemoryOnly: true))
+        let context = container.mainContext
+        let groupID = "ended-series"
+
+        // deleteRecurringTemplate() sets recurrencePattern = "none" on completed children
+        let completed = LocalTask(
+            title: "Zehnagel",
+            dueDate: Calendar.current.startOfDay(for: Date()),
+            recurrencePattern: "none",
+            recurrenceGroupID: groupID
+        )
+        completed.isCompleted = true
+        completed.completedAt = Date()
+        context.insert(completed)
+        try context.save()
+
+        let repaired = RecurrenceService.repairOrphanedRecurringSeries(in: context)
+
+        XCTAssertEqual(repaired, 0, "Should NOT repair intentionally ended series (pattern=none)")
         let openTasks = try context.fetch(FetchDescriptor<LocalTask>(
             predicate: #Predicate { !$0.isCompleted }
         ))

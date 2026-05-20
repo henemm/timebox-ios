@@ -140,6 +140,77 @@ enum RecurrenceService {
         return instance
     }
 
+    /// Robust successor creation for a recurring task. Fixes RC-1/RC-2/RC-3 from Bug #315.
+    /// Returns nil only when the series is intentionally ended (recurrencePattern == "none").
+    @MainActor
+    @discardableResult
+    static func ensureNextInstance(for task: LocalTask, in modelContext: ModelContext) -> LocalTask? {
+        guard task.recurrencePattern != "none" else { return nil }
+
+        // RC-1: fall back to today when dueDate is nil — no silent nil-return
+        let baseDate = task.dueDate ?? Date()
+        guard let newDueDate = nextDueDate(
+            pattern: task.recurrencePattern,
+            weekdays: task.recurrenceWeekdays,
+            monthDay: task.recurrenceMonthDay,
+            interval: task.recurrenceInterval,
+            from: baseDate
+        ) else { return nil }
+
+        // Lazy groupID assignment for legacy tasks
+        let groupID: String
+        if let existing = task.recurrenceGroupID {
+            groupID = existing
+        } else {
+            groupID = UUID().uuidString
+            task.recurrenceGroupID = groupID
+        }
+
+        // RC-2: lazy template creation — missing template is a data error, not user intent
+        let source: LocalTask
+        if let existing = findTemplate(groupID: groupID, in: modelContext) {
+            source = existing
+        } else {
+            let newTemplate = createTemplateFrom(task, groupID: groupID)
+            modelContext.insert(newTemplate)
+            source = newTemplate
+        }
+
+        // Dedup: bail if open instance for this date already exists
+        let cal = Calendar.current
+        let targetDay = cal.startOfDay(for: newDueDate)
+        let dedupDescriptor = FetchDescriptor<LocalTask>(
+            predicate: #Predicate<LocalTask> {
+                $0.recurrenceGroupID == groupID && !$0.isCompleted && !$0.isTemplate
+            }
+        )
+        if let openSiblings = try? modelContext.fetch(dedupDescriptor),
+           openSiblings.contains(where: { sibling in
+               guard let due = sibling.dueDate else { return false }
+               return cal.startOfDay(for: due) == targetDay
+           }) {
+            return nil
+        }
+
+        let instance = LocalTask(
+            title: source.title,
+            importance: source.importance,
+            tags: source.tags,
+            dueDate: newDueDate,
+            estimatedDuration: source.estimatedDuration,
+            urgency: source.urgency,
+            taskType: source.taskType,
+            recurrencePattern: source.recurrencePattern,
+            recurrenceWeekdays: source.recurrenceWeekdays,
+            recurrenceMonthDay: source.recurrenceMonthDay,
+            recurrenceInterval: source.recurrenceInterval,
+            recurrenceGroupID: groupID,
+            taskDescription: source.taskDescription
+        )
+        modelContext.insert(instance)
+        return instance
+    }
+
     /// Finds the template (mother instance) for a recurring series.
     @MainActor
     static func findTemplate(groupID: String, in modelContext: ModelContext) -> LocalTask? {
@@ -460,33 +531,31 @@ enum RecurrenceService {
 
             guard !openGroupIDs.contains(groupID) else { continue }
 
-            // Only repair series that still have a template.
-            // If no template exists, user deliberately ended the series — don't resurrect.
-            guard let template = findTemplate(groupID: groupID, in: modelContext) else { continue }
-
-            // Bug #209 / Bug #KlavierSpielen: Don't repair if user manually deleted an instance
-            // within the current recurrence cycle. "Within cycle" = lastSkippedDate is newer
-            // than completedAt AND less than one full cycle has passed since the skip.
-            // After one full cycle, the skip is considered expired → repair is allowed.
-            if let skippedDate = template.lastSkippedDate {
-                let reference = task.completedAt ?? .distantPast
-                if skippedDate > reference {
-                    let cycleSeconds = cycleLength(
-                        pattern: template.recurrencePattern,
-                        interval: template.recurrenceInterval
-                    )
-                    let elapsed = Date().timeIntervalSince(skippedDate)
-                    if elapsed < cycleSeconds {
-                        continue  // Still within the cycle — honour the deletion
+            // RC-2 fix: missing template is a data error, not user intent.
+            // ensureNextInstance creates a lazy template if needed.
+            // lastSkippedDate check still applies when a template exists.
+            if let template = findTemplate(groupID: groupID, in: modelContext) {
+                // Bug #209 / Bug #KlavierSpielen: Don't repair if user manually deleted an instance
+                // within the current recurrence cycle.
+                if let skippedDate = template.lastSkippedDate {
+                    let reference = task.completedAt ?? .distantPast
+                    if skippedDate > reference {
+                        let cycleSeconds = cycleLength(
+                            pattern: template.recurrencePattern,
+                            interval: template.recurrenceInterval
+                        )
+                        let elapsed = Date().timeIntervalSince(skippedDate)
+                        if elapsed < cycleSeconds {
+                            continue  // Still within the cycle — honour the deletion
+                        }
+                        // Cycle has passed — reset the skip marker and allow repair
+                        template.lastSkippedDate = nil
+                        anySkippedDateReset = true
                     }
-                    // Cycle has passed — reset the skip marker and allow repair
-                    template.lastSkippedDate = nil
-                    anySkippedDateReset = true
                 }
             }
 
-            // Bug #279 revert: Nur 1 Instanz erzeugen — virtuelles Stacking berechnet den Rest
-            if let _ = createNextInstance(from: task, in: modelContext) {
+            if let _ = ensureNextInstance(for: task, in: modelContext) {
                 repaired += 1
             }
         }

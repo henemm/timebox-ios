@@ -178,10 +178,10 @@ final class SyncEngine {
         // DEP-1: Free all tasks that depend on this blocker
         try freeDependents(of: task.id)
 
-        // Generate next instance for recurring tasks
+        // Generate next instance for recurring tasks (ensureNextInstance handles RC-1/RC-2/RC-3)
         var newInstanceID: String?
         if task.recurrencePattern != "none" {
-            let newInstance = RecurrenceService.createNextInstance(from: task, in: modelContext)
+            let newInstance = RecurrenceService.ensureNextInstance(for: task, in: modelContext)
             newInstanceID = newInstance?.id
 
             // Bug #209: Reset lastSkippedDate on template — series continues normally
