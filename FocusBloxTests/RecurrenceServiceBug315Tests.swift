@@ -428,6 +428,114 @@ final class RecurrenceServiceBug315Tests: XCTestCase {
 
     // MARK: - Hilfsmethoden
 
+    // MARK: - AC-7: Einmalige Migration für Legacy-Tasks ohne GroupID
+
+    /// Verhalten: migrateLegacyTasksWithoutGroupID erstellt für jeden Titel-Cluster
+    ///            genau EINE neue offene Instanz.
+    /// Bricht wenn: Funktion nicht existiert oder mehrere Instanzen erstellt.
+    func test_AC7_migration_createsOneInstancePerTitleCluster() throws {
+        // 3 abgeschlossene "Sport"-Tasks ohne groupID
+        for i in 0..<3 {
+            let task = LocalTask(title: "Sport", recurrencePattern: "daily")
+            task.recurrenceGroupID = nil
+            task.isCompleted = true
+            task.completedAt = Calendar.current.date(byAdding: .day, value: -i, to: Date())
+            context.insert(task)
+        }
+        // 2 abgeschlossene "Lesen"-Tasks ohne groupID
+        for i in 0..<2 {
+            let task = LocalTask(title: "Lesen", recurrencePattern: "weekly")
+            task.recurrenceGroupID = nil
+            task.isCompleted = true
+            task.completedAt = Calendar.current.date(byAdding: .weekOfYear, value: -i, to: Date())
+            context.insert(task)
+        }
+        try context.save()
+
+        let migrated = RecurrenceService.migrateLegacyTasksWithoutGroupID(in: context)
+
+        XCTAssertEqual(migrated, 2, "AC-7: Für 2 unterschiedliche Titel müssen genau 2 Instanzen erstellt werden")
+
+        let openDescriptor = FetchDescriptor<LocalTask>(
+            predicate: #Predicate<LocalTask> { !$0.isCompleted && !$0.isTemplate }
+        )
+        let openTasks = try context.fetch(openDescriptor)
+        XCTAssertEqual(openTasks.count, 2, "AC-7: Genau 2 offene Instanzen (eine pro Titel)")
+    }
+
+    /// Verhalten: Migration überspringt Serien, für die bereits eine offene Instanz existiert.
+    /// Bricht wenn: Duplikat zu einem bereits offenen Task erstellt wird.
+    func test_AC7_migration_skipsIfOpenInstanceExists() throws {
+        // Abgeschlossener Legacy-Task ohne groupID
+        let completed = LocalTask(title: "Yoga", recurrencePattern: "daily")
+        completed.recurrenceGroupID = nil
+        completed.isCompleted = true
+        completed.completedAt = Date()
+        context.insert(completed)
+
+        // Bereits eine offene "Yoga"-Instanz (mit groupID — neuerer Task)
+        let existing = LocalTask(title: "Yoga", recurrencePattern: "daily")
+        existing.recurrenceGroupID = UUID().uuidString
+        existing.isCompleted = false
+        context.insert(existing)
+        try context.save()
+
+        let migrated = RecurrenceService.migrateLegacyTasksWithoutGroupID(in: context)
+
+        XCTAssertEqual(migrated, 0, "AC-7: Wenn bereits eine offene Instanz existiert, darf keine neue erstellt werden")
+
+        let openDescriptor = FetchDescriptor<LocalTask>(
+            predicate: #Predicate<LocalTask> { !$0.isCompleted && !$0.isTemplate }
+        )
+        let openTasks = try context.fetch(openDescriptor)
+        XCTAssertEqual(openTasks.count, 1, "AC-7: Nur die bereits existierende Instanz darf offen sein")
+    }
+
+    /// Verhalten: Migration weist allen Tasks eines Clusters dieselbe groupID zu.
+    /// Bricht wenn: Jeder Task eine eigene groupID bekommt (Duplikat-Risiko bleibt).
+    func test_AC7_migration_assignsSameGroupIDToCluster() throws {
+        let groupDate = Date()
+        for i in 0..<3 {
+            let task = LocalTask(title: "Meditation", recurrencePattern: "daily")
+            task.recurrenceGroupID = nil
+            task.isCompleted = true
+            task.completedAt = Calendar.current.date(byAdding: .day, value: -i, to: groupDate)
+            context.insert(task)
+        }
+        try context.save()
+
+        _ = RecurrenceService.migrateLegacyTasksWithoutGroupID(in: context)
+
+        let allDescriptor = FetchDescriptor<LocalTask>(
+            predicate: #Predicate<LocalTask> { $0.title == "Meditation" }
+        )
+        let allTasks = try context.fetch(allDescriptor)
+        let groupIDs = Set(allTasks.compactMap(\.recurrenceGroupID))
+        XCTAssertEqual(groupIDs.count, 1, "AC-7: Alle Tasks eines Clusters müssen dieselbe groupID bekommen")
+    }
+
+    /// Verhalten: Migration ist idempotent — zweiter Aufruf erstellt keine weiteren Instanzen.
+    /// Bricht wenn: Migration bei zweitem Aufruf erneut Instanzen erstellt.
+    func test_AC7_migration_isIdempotent() throws {
+        let task = LocalTask(title: "Journaling", recurrencePattern: "daily")
+        task.recurrenceGroupID = nil
+        task.isCompleted = true
+        task.completedAt = Date()
+        context.insert(task)
+        try context.save()
+
+        _ = RecurrenceService.migrateLegacyTasksWithoutGroupID(in: context)
+        let secondRun = RecurrenceService.migrateLegacyTasksWithoutGroupID(in: context)
+
+        XCTAssertEqual(secondRun, 0, "AC-7: Zweiter Migrations-Aufruf darf keine weiteren Instanzen erstellen")
+
+        let openDescriptor = FetchDescriptor<LocalTask>(
+            predicate: #Predicate<LocalTask> { !$0.isCompleted && !$0.isTemplate }
+        )
+        let openTasks = try context.fetch(openDescriptor)
+        XCTAssertEqual(openTasks.count, 1, "AC-7: Nach zweitem Aufruf noch immer genau eine offene Instanz")
+    }
+
     private func makeDate(_ year: Int, _ month: Int, _ day: Int) -> Date {
         var components = DateComponents()
         components.year = year

@@ -564,6 +564,59 @@ enum RecurrenceService {
         return repaired
     }
 
+    // MARK: - Legacy Migration
+
+    /// One-time migration: groups completed legacy recurring tasks (those without a recurrenceGroupID)
+    /// by title+pattern, assigns a shared groupID to each group, and creates one open successor.
+    /// Skips groups that already have an open instance with the same title.
+    /// Safe to call multiple times (idempotent).
+    @MainActor
+    @discardableResult
+    static func migrateLegacyTasksWithoutGroupID(in modelContext: ModelContext) -> Int {
+        let completedDescriptor = FetchDescriptor<LocalTask>(
+            predicate: #Predicate<LocalTask> { $0.isCompleted && $0.recurrenceGroupID == nil }
+        )
+        guard let legacyTasks = try? modelContext.fetch(completedDescriptor),
+              !legacyTasks.isEmpty else { return 0 }
+
+        let recurring = legacyTasks.filter { $0.recurrencePattern != "none" }
+        guard !recurring.isEmpty else { return 0 }
+
+        // Build set of existing open task titles to avoid duplicates
+        let openDescriptor = FetchDescriptor<LocalTask>(
+            predicate: #Predicate<LocalTask> { !$0.isCompleted && !$0.isTemplate }
+        )
+        let existingOpenTitles = Set((try? modelContext.fetch(openDescriptor))?.map(\.title) ?? [])
+
+        // Group by title+pattern (best proxy for "same series" in legacy data)
+        var groups: [String: [LocalTask]] = [:]
+        for task in recurring {
+            let key = "\(task.title)|\(task.recurrencePattern)"
+            groups[key, default: []].append(task)
+        }
+
+        var migrated = 0
+        for (_, tasks) in groups {
+            guard let representative = tasks.max(by: {
+                ($0.completedAt ?? .distantPast) < ($1.completedAt ?? .distantPast)
+            }) else { continue }
+
+            // Skip if an open instance with this title already exists
+            if existingOpenTitles.contains(representative.title) { continue }
+
+            // Assign same groupID to all tasks in this cluster
+            let groupID = UUID().uuidString
+            for task in tasks { task.recurrenceGroupID = groupID }
+
+            if ensureNextInstance(for: representative, in: modelContext) != nil {
+                migrated += 1
+            }
+        }
+
+        if migrated > 0 { try? modelContext.save() }
+        return migrated
+    }
+
     // MARK: - Consolidate Multiple Instances
 
     /// Removes excess open instances within the same recurring series.

@@ -367,6 +367,7 @@ struct FocusBloxApp: App {
                     RecurrenceService.deduplicateChildInstances(in: sharedModelContainer.mainContext)
                     RecurrenceService.consolidateMultipleInstances(in: sharedModelContainer.mainContext)
                     RecurrenceService.repairOrphanedRecurringSeries(in: sharedModelContainer.mainContext)
+                    RecurrenceService.migrateLegacyTasksWithoutGroupID(in: sharedModelContainer.mainContext)
                     // RW 1.5: Migrate any leftover "raw" tasks to "active"
                     Self.migrateRawTasksToActive(in: sharedModelContainer.mainContext)
                     // Background title improvement for tasks from Share Extension, Siri, Watch
