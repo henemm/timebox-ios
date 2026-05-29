@@ -6,7 +6,7 @@ struct BacklogView: View {
     enum ViewMode: String, CaseIterable, Identifiable {
         case priority = "Priorität"
         case recent = "Zuletzt"
-        case overdue = "Überfällig"
+        case tags = "Tags"
         case recurring = "Wiederkehrend"
         case completed = "Erledigt"
 
@@ -16,7 +16,7 @@ struct BacklogView: View {
             switch self {
             case .priority: return "chart.bar.fill"
             case .recent: return "clock.arrow.circlepath"
-            case .overdue: return "exclamationmark.circle"
+            case .tags: return "tag.fill"
             case .completed: return "checkmark.circle"
             case .recurring: return "arrow.triangle.2.circlepath"
             }
@@ -28,8 +28,8 @@ struct BacklogView: View {
                 return ("Keine Tasks", "Tippe auf + um einen neuen Task zu erstellen.")
             case .recent:
                 return ("Keine Tasks", "Tippe auf + um einen neuen Task zu erstellen.")
-            case .overdue:
-                return ("Keine überfälligen Tasks", "Alle Tasks sind im Zeitplan.")
+            case .tags:
+                return ("Keine Tags", "Weise Tasks Tags zu, um sie hier gruppiert zu sehen.")
             case .completed:
                 return ("Keine erledigten Tasks", "Erledigte Tasks der letzten 7 Tage erscheinen hier.")
             case .recurring:
@@ -165,6 +165,30 @@ struct BacklogView: View {
         }
     }
 
+    // MARK: - Tags Grouped Tasks
+    private var tasksByTag: [(tagName: String, tasks: [PlanItem])] {
+        let nextUpIDs = Set(nextUpTasks.map(\.id))
+        let recurringIDs = Set(allRecurringItems.map(\.id))
+        let filtered = backlogTasks.filter { !nextUpIDs.contains($0.id) && !recurringIDs.contains($0.id) }
+
+        var groups: [String: [PlanItem]] = [:]
+        for task in filtered {
+            let key = task.tags.first ?? "noTag"
+            groups[key, default: []].append(task)
+        }
+
+        let sortedGroups = groups
+            .filter { !$0.value.isEmpty }
+            .sorted { a, b in
+                if a.key == "noTag" { return false }
+                if b.key == "noTag" { return true }
+                return a.key.localizedCaseInsensitiveCompare(b.key) == .orderedAscending
+            }
+            .map { (tagName: $0.key, tasks: $0.value.sorted { effectivePriorityScore(for: $0) > effectivePriorityScore(for: $1) }) }
+
+        return sortedGroups
+    }
+
     // MARK: - Body
     var body: some View {
         NavigationStack {
@@ -190,8 +214,8 @@ struct BacklogView: View {
                         priorityView
                     case .recent:
                         recentView
-                    case .overdue:
-                        overdueView
+                    case .tags:
+                        tagsView
                     case .recurring:
                         recurringView
                     case .completed:
@@ -1047,6 +1071,7 @@ struct BacklogView: View {
             )
         }
         .accessibilityIdentifier("viewModeSwitcher")
+        .accessibilityLabel("Ansicht: \(selectedMode.rawValue)")
     }
 
     // MARK: - Next Up Section (inline in List)
@@ -1441,6 +1466,59 @@ struct BacklogView: View {
                             .padding(.vertical, 2)
                             .background(Color.red.opacity(0.2))
                             .clipShape(Capsule())
+                    }
+                }
+            }
+        }
+        .listStyle(.plain)
+        .scrollContentBackground(.hidden)
+        .refreshable {
+            await loadTasks()
+        }
+    }
+
+    // MARK: - Tags View (Tasks gruppiert nach erstem Tag)
+    private var tagsView: some View {
+        List {
+            nextUpListSection
+
+            if tasksByTag.isEmpty {
+                let emptyState = ViewMode.tags.emptyStateMessage
+                ContentUnavailableView(
+                    emptyState.title,
+                    systemImage: "tag",
+                    description: Text(emptyState.description)
+                )
+                .listRowInsets(EdgeInsets())
+                .listRowBackground(Color.clear)
+                .listRowSeparator(.hidden)
+            } else {
+                ForEach(tasksByTag, id: \.tagName) { group in
+                    Section {
+                        ForEach(group.tasks) { item in
+                            backlogRowWithSwipe(item)
+                        }
+                    } header: {
+                        HStack {
+                            if group.tagName == "noTag" {
+                                Text("Kein Tag")
+                                    .font(.headline)
+                                    .foregroundStyle(.secondary)
+                            } else {
+                                Label(group.tagName, systemImage: "tag.fill")
+                                    .font(.headline)
+                                    .foregroundStyle(.primary)
+                            }
+                            Spacer()
+                            Text("\(group.tasks.count)")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 2)
+                                .background(Color.secondary.opacity(0.15))
+                                .clipShape(Capsule())
+                        }
+                        .accessibilityIdentifier("tagSection_\(group.tagName)")
                     }
                 }
             }

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		459A642F44CC484552374CC5 /* BacklogTagsViewUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67831A947E5D314FCE12BCED /* BacklogTagsViewUITests.swift */; };
 		5D40DF4A9377D45A5FCFB5C5 /* Bug319IntakeAnalyserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75DF4ED0F527B0879DD17723 /* Bug319IntakeAnalyserTests.swift */; };
 		9E5C4C9EBB2884C634D9E93C /* RecurringCompletionRegressionUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E33FE324504DEFE7045F35CC /* RecurringCompletionRegressionUITests.swift */; };
 		AC90395EDB3D48499F4F4A54 /* RecurrenceServiceBug315Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B77B881FDC04B0B2CBD44B /* RecurrenceServiceBug315Tests.swift */; };
@@ -750,6 +751,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		67831A947E5D314FCE12BCED /* BacklogTagsViewUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = BacklogTagsViewUITests.swift; path = FocusBloxUITests/BacklogTagsViewUITests.swift; sourceTree = SOURCE_ROOT; };
 		75DF4ED0F527B0879DD17723 /* Bug319IntakeAnalyserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Bug319IntakeAnalyserTests.swift; path = FocusBloxTests/Bug319IntakeAnalyserTests.swift; sourceTree = SOURCE_ROOT; };
 		E33FE324504DEFE7045F35CC /* RecurringCompletionRegressionUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = RecurringCompletionRegressionUITests.swift; path = FocusBloxUITests/RecurringCompletionRegressionUITests.swift; sourceTree = SOURCE_ROOT; };
 		A1B77B881FDC04B0B2CBD44B /* RecurrenceServiceBug315Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = RecurrenceServiceBug315Tests.swift; path = FocusBloxTests/RecurrenceServiceBug315Tests.swift; sourceTree = SOURCE_ROOT; };
@@ -1495,6 +1497,7 @@
 		05D90FB2A2CE48689EC309B4 /* FocusBloxUITests */ = {
 			isa = PBXGroup;
 			children = (
+				67831A947E5D314FCE12BCED /* BacklogTagsViewUITests.swift */,
 				E33FE324504DEFE7045F35CC /* RecurringCompletionRegressionUITests.swift */,
 				C2285B8A337B3108BC65C2EC /* CustomDatePostponeUITests.swift */,
 				AC237B3E9BE8B646E550BC0D /* TaskPreviewLongPressTests.swift */,
@@ -2897,6 +2900,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				459A642F44CC484552374CC5 /* BacklogTagsViewUITests.swift in Sources */,
 				9E5C4C9EBB2884C634D9E93C /* RecurringCompletionRegressionUITests.swift in Sources */,
 				38DB52183A9C71562EEC70F1 /* CustomDatePostponeUITests.swift in Sources */,
 				50A6E216AD80C0AC6E42C63E /* TaskPreviewLongPressTests.swift in Sources */,
