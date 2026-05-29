@@ -536,6 +536,109 @@ final class RecurrenceServiceBug315Tests: XCTestCase {
         XCTAssertEqual(openTasks.count, 1, "AC-7: Nach zweitem Aufruf noch immer genau eine offene Instanz")
     }
 
+    // MARK: - AC-8: Bestehende Duplikate (exakter Bruchzustand) werden bereinigt
+
+    /// Simuliert exakt den Zustand der durch den Bug entstand:
+    /// 10 offene Instanzen des gleichen Titels, jede mit einer eigenen groupID.
+    /// Das ist der tatsächliche Zustand in der Datenbank.
+    /// Erwartet: Nach cleanupDuplicateOpenInstances bleibt genau 1 Instanz übrig.
+    func test_AC8_cleanup_reducesExistingDuplicatesToOne() throws {
+        // Exakter Bruchzustand: 10 offene "Aufgelaufen"-Instanzen, jede mit eigener groupID
+        for i in 0..<10 {
+            let task = LocalTask(title: "Aufgelaufen", recurrencePattern: "daily")
+            task.recurrenceGroupID = UUID().uuidString  // jede hat ihre eigene (Bug-erzeugte) groupID
+            task.isCompleted = false
+            task.dueDate = Calendar.current.date(byAdding: .day, value: i + 1, to: Date())
+            context.insert(task)
+        }
+        try context.save()
+
+        let removed = RecurrenceService.cleanupDuplicateOpenInstances(in: context)
+
+        XCTAssertEqual(removed, 9, "AC-8: 9 von 10 Duplikaten müssen entfernt werden")
+
+        let openDescriptor = FetchDescriptor<LocalTask>(
+            predicate: #Predicate<LocalTask> { !$0.isCompleted && !$0.isTemplate }
+        )
+        let remaining = try context.fetch(openDescriptor)
+        XCTAssertEqual(remaining.count, 1, "AC-8: Genau 1 Instanz darf übrig bleiben")
+    }
+
+    /// Cleanup lässt den Task mit dem frühesten dueDate stehen.
+    func test_AC8_cleanup_keepsEarliestInstance() throws {
+        let today = Calendar.current.startOfDay(for: Date())
+        for i in 0..<5 {
+            let task = LocalTask(title: "Morgenroutine", recurrencePattern: "daily")
+            task.recurrenceGroupID = UUID().uuidString
+            task.isCompleted = false
+            task.dueDate = Calendar.current.date(byAdding: .day, value: i + 1, to: today)
+            context.insert(task)
+        }
+        try context.save()
+
+        _ = RecurrenceService.cleanupDuplicateOpenInstances(in: context)
+
+        let remaining = try context.fetch(FetchDescriptor<LocalTask>(
+            predicate: #Predicate<LocalTask> { !$0.isCompleted && !$0.isTemplate }
+        ))
+        let kept = try XCTUnwrap(remaining.first)
+        let keptDay = Calendar.current.startOfDay(for: try XCTUnwrap(kept.dueDate))
+        let expectedDay = Calendar.current.date(byAdding: .day, value: 1, to: today)!
+        XCTAssertEqual(keptDay, Calendar.current.startOfDay(for: expectedDay),
+                       "AC-8: Der früheste Task (morgen) muss erhalten bleiben")
+    }
+
+    /// Cleanup lässt unabhängige Serien (verschiedene Titel) unberührt.
+    func test_AC8_cleanup_doesNotTouchDistinctTitles() throws {
+        for title in ["Sport", "Lesen", "Meditation"] {
+            let task = LocalTask(title: title, recurrencePattern: "daily")
+            task.recurrenceGroupID = UUID().uuidString
+            task.isCompleted = false
+            task.dueDate = Calendar.current.date(byAdding: .day, value: 1, to: Date())
+            context.insert(task)
+        }
+        try context.save()
+
+        let removed = RecurrenceService.cleanupDuplicateOpenInstances(in: context)
+
+        XCTAssertEqual(removed, 0, "AC-8: Verschiedene Titel dürfen nicht gelöscht werden")
+
+        let remaining = try context.fetch(FetchDescriptor<LocalTask>(
+            predicate: #Predicate<LocalTask> { !$0.isCompleted && !$0.isTemplate }
+        ))
+        XCTAssertEqual(remaining.count, 3, "AC-8: Alle 3 verschiedenen Tasks müssen erhalten bleiben")
+    }
+
+    // MARK: - AC-9: Deduplikation — keine zwei offenen Instanzen für dasselbe Datum
+
+    /// Verhalten: Wenn bereits eine offene Instanz für das Zieldatum existiert,
+    ///            darf ensureNextInstance keine weitere erstellen (Deduplikation).
+    /// Bricht wenn: Dedup-Check in ensureNextInstance fehlerhaft ist.
+    func test_AC9_ensureNextInstance_deduplicatesForSameDate() throws {
+        let groupID = UUID().uuidString
+        let baseDate = makeDate(2026, 5, 20)
+        let task1 = makeCompletedTask(dueDate: baseDate, groupID: groupID)
+        let _ = makeTemplate(groupID: groupID)
+        try context.save()
+
+        // Erste Instanz erstellen (für 21.05.)
+        let instance1 = try XCTUnwrap(RecurrenceService.ensureNextInstance(for: task1, in: context))
+        XCTAssertNotNil(instance1.dueDate)
+        try context.save()
+
+        // Zweiter Task aus derselben Serie am selben Tag (z.B. Concurrent Completion)
+        let task2 = makeCompletedTask(dueDate: baseDate, groupID: groupID)
+        try context.save()
+
+        // Zweiter Versuch darf KEINE neue Instanz erstellen
+        let instance2 = RecurrenceService.ensureNextInstance(for: task2, in: context)
+        XCTAssertNil(instance2, "AC-9: Zweite Instanz für dasselbe Datum muss dedupliziert werden (nil-Return)")
+
+        // Verifizieren: Insgesamt nur 1 offene Instanz (plus das Template)
+        let open = try openInstances(groupID: groupID)
+        XCTAssertEqual(open.count, 1, "AC-9: Es darf nur genau eine offene Instanz in der Datenbank existieren")
+    }
+
     private func makeDate(_ year: Int, _ month: Int, _ day: Int) -> Date {
         var components = DateComponents()
         components.year = year

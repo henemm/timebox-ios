@@ -71,7 +71,7 @@ enum RecurrenceService {
     }
 
     /// Creates a new task instance for a recurring series.
-    /// Copies attributes from the series template if one exists, otherwise from the completed task.
+    /// Robust replacement for the legacy fragile logic, delegates to ensureNextInstance.
     /// Returns nil if the task is not recurring (pattern == "none").
     @MainActor
     @discardableResult
@@ -79,65 +79,7 @@ enum RecurrenceService {
         from completedTask: LocalTask,
         in modelContext: ModelContext
     ) -> LocalTask? {
-        guard completedTask.recurrencePattern != "none" else { return nil }
-
-        guard let baseDate = completedTask.dueDate else { return nil }
-        let newDueDate = nextDueDate(
-            pattern: completedTask.recurrencePattern,
-            weekdays: completedTask.recurrenceWeekdays,
-            monthDay: completedTask.recurrenceMonthDay,
-            interval: completedTask.recurrenceInterval,
-            from: baseDate
-        )
-
-        // Lazy migration: generate GroupID if nil (legacy task)
-        let groupID: String
-        if let existingGroupID = completedTask.recurrenceGroupID {
-            groupID = existingGroupID
-        } else {
-            groupID = UUID().uuidString
-            completedTask.recurrenceGroupID = groupID
-        }
-
-        // Dedup: check if an open instance for this series already exists with the same due date
-        if let newDueDate {
-            let cal = Calendar.current
-            let targetDay = cal.startOfDay(for: newDueDate)
-            let descriptor = FetchDescriptor<LocalTask>(
-                predicate: #Predicate<LocalTask> {
-                    $0.recurrenceGroupID == groupID && !$0.isCompleted && !$0.isTemplate
-                }
-            )
-            if let openSiblings = try? modelContext.fetch(descriptor),
-               openSiblings.contains(where: { task in
-                   guard let due = task.dueDate else { return false }
-                   return cal.startOfDay(for: due) == targetDay
-               }) {
-                return nil  // Duplicate - already have an open instance for this date
-            }
-        }
-
-        // Use template as attribute source if one exists, fallback to completed task
-        let source = findTemplate(groupID: groupID, in: modelContext) ?? completedTask
-
-        let instance = LocalTask(
-            title: source.title,
-            importance: source.importance,
-            tags: source.tags,
-            dueDate: newDueDate,
-            estimatedDuration: source.estimatedDuration,
-            urgency: source.urgency,
-            taskType: source.taskType,
-            recurrencePattern: source.recurrencePattern,
-            recurrenceWeekdays: source.recurrenceWeekdays,
-            recurrenceMonthDay: source.recurrenceMonthDay,
-            recurrenceInterval: source.recurrenceInterval,
-            recurrenceGroupID: groupID,
-            taskDescription: source.taskDescription
-        )
-
-        modelContext.insert(instance)
-        return instance
+        return ensureNextInstance(for: completedTask, in: modelContext)
     }
 
     /// Robust successor creation for a recurring task. Fixes RC-1/RC-2/RC-3 from Bug #315.
@@ -166,6 +108,13 @@ enum RecurrenceService {
             task.recurrenceGroupID = groupID
         }
 
+        // Dedup: bail if open instance for this date already exists
+        let cal = Calendar.current
+        let targetDay = cal.startOfDay(for: newDueDate)
+        if let _ = findOpenInstance(groupID: groupID, targetDay: targetDay, calendar: cal, in: modelContext) {
+            return nil
+        }
+
         // RC-2: lazy template creation — missing template is a data error, not user intent
         let source: LocalTask
         if let existing = findTemplate(groupID: groupID, in: modelContext) {
@@ -174,22 +123,6 @@ enum RecurrenceService {
             let newTemplate = createTemplateFrom(task, groupID: groupID)
             modelContext.insert(newTemplate)
             source = newTemplate
-        }
-
-        // Dedup: bail if open instance for this date already exists
-        let cal = Calendar.current
-        let targetDay = cal.startOfDay(for: newDueDate)
-        let dedupDescriptor = FetchDescriptor<LocalTask>(
-            predicate: #Predicate<LocalTask> {
-                $0.recurrenceGroupID == groupID && !$0.isCompleted && !$0.isTemplate
-            }
-        )
-        if let openSiblings = try? modelContext.fetch(dedupDescriptor),
-           openSiblings.contains(where: { sibling in
-               guard let due = sibling.dueDate else { return false }
-               return cal.startOfDay(for: due) == targetDay
-           }) {
-            return nil
         }
 
         let instance = LocalTask(
@@ -211,12 +144,34 @@ enum RecurrenceService {
         return instance
     }
 
+    /// Finds an existing open instance for a specific date in a recurring series.
+    @MainActor
+    private static func findOpenInstance(
+        groupID: String,
+        targetDay: Date,
+        calendar: Calendar,
+        in modelContext: ModelContext
+    ) -> LocalTask? {
+        let gid = groupID // Explicit capture
+        let descriptor = FetchDescriptor<LocalTask>(
+            predicate: #Predicate<LocalTask> {
+                $0.recurrenceGroupID == gid && $0.isCompleted == false && $0.isTemplate == false
+            }
+        )
+        let tasks = (try? modelContext.fetch(descriptor)) ?? []
+        return tasks.first { task in
+            guard let due = task.dueDate else { return false }
+            return calendar.startOfDay(for: due) == targetDay
+        }
+    }
+
     /// Finds the template (mother instance) for a recurring series.
     @MainActor
     static func findTemplate(groupID: String, in modelContext: ModelContext) -> LocalTask? {
+        let gid = groupID // Explicit capture
         let descriptor = FetchDescriptor<LocalTask>(
             predicate: #Predicate<LocalTask> {
-                $0.recurrenceGroupID == groupID && $0.isTemplate == true
+                $0.recurrenceGroupID == gid && $0.isTemplate == true
             }
         )
         return try? modelContext.fetch(descriptor).first
@@ -562,6 +517,41 @@ enum RecurrenceService {
 
         if repaired > 0 || anySkippedDateReset { try? modelContext.save() }
         return repaired
+    }
+
+    // MARK: - Cleanup Duplicate Open Instances
+
+    /// Removes duplicate open instances that have the same title (created by the groupID-fallback bug).
+    /// For each title with > 1 open instance, keeps the one with the earliest dueDate, deletes the rest.
+    /// Returns the number of deleted tasks.
+    @MainActor
+    @discardableResult
+    static func cleanupDuplicateOpenInstances(in modelContext: ModelContext) -> Int {
+        let descriptor = FetchDescriptor<LocalTask>(
+            predicate: #Predicate<LocalTask> { !$0.isCompleted && !$0.isTemplate }
+        )
+        guard let openTasks = try? modelContext.fetch(descriptor) else { return 0 }
+
+        // Group by title — tasks with the same title are candidates for deduplication
+        var byTitle: [String: [LocalTask]] = [:]
+        for task in openTasks {
+            byTitle[task.title, default: []].append(task)
+        }
+
+        var deleted = 0
+        for (_, tasks) in byTitle where tasks.count > 1 {
+            // Keep the one with the earliest dueDate; delete the rest
+            let sorted = tasks.sorted {
+                ($0.dueDate ?? .distantFuture) < ($1.dueDate ?? .distantFuture)
+            }
+            for task in sorted.dropFirst() {
+                modelContext.delete(task)
+                deleted += 1
+            }
+        }
+
+        if deleted > 0 { try? modelContext.save() }
+        return deleted
     }
 
     // MARK: - Legacy Migration

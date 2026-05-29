@@ -241,9 +241,11 @@ final class RecurrenceServiceTests: XCTestCase {
         let instance2 = RecurrenceService.createNextInstance(from: task2, in: context)
         XCTAssertNil(instance2, "Duplicate instance should NOT be created")
 
-        // Verify: only ONE open instance for Feb 18
+        // Verify: only ONE open instance for Feb 18 (excluding the lazily created template)
         let descriptor = FetchDescriptor<LocalTask>(
-            predicate: #Predicate<LocalTask> { $0.recurrenceGroupID == groupID && !$0.isCompleted }
+            predicate: #Predicate<LocalTask> {
+                $0.recurrenceGroupID == groupID && !$0.isCompleted && !$0.isTemplate
+            }
         )
         let openTasks = try context.fetch(descriptor)
         XCTAssertEqual(openTasks.count, 1, "There should be exactly one open instance, got \(openTasks.count)")
@@ -890,12 +892,13 @@ final class RecurrenceServiceTests: XCTestCase {
         XCTAssertEqual(repaired, 1, "Bug 209: Stale lastSkippedDate should NOT block repair")
     }
 
-    // MARK: - Bug 95: createNextInstance darf NICHT dueDate aus Date() fallback setzen
+    // MARK: - Bug 95 / Bug 315: createNextInstance handling of missing dueDate
 
-    /// Verhalten: Recurring Task ohne dueDate darf bei Completion KEINEN Date()-Fallback verwenden
-    /// Bricht wenn: RecurrenceService.createNextInstance() Zeile 84 `dueDate ?? Date()` → dueDate auf nil prueft
+    /// Behavioral Change (Bug #315): Recurring Task without dueDate now FALLS BACK to today
+    /// to prevent "silent death" of recurring series (RC-1).
+    /// Legacy Bug 95 requirement was "return nil", but Bug 315 overrides this for robustness.
     @MainActor
-    func test_createNextInstance_returnsNil_whenNoDueDate() throws {
+    func test_createNextInstance_fallsBackToToday_whenNoDueDate() throws {
         let container = try ModelContainer(for: LocalTask.self, configurations: .init(isStoredInMemoryOnly: true))
         let context = container.mainContext
 
@@ -911,10 +914,9 @@ final class RecurrenceServiceTests: XCTestCase {
 
         let instance = RecurrenceService.createNextInstance(from: original, in: context)
 
-        // Bug 95: Aktuell wird Date() als Fallback verwendet und eine Instanz mit dueDate=heute erstellt
-        // Nach Fix: Keine neue Instanz wenn kein baseDate vorhanden
-        XCTAssertNil(instance,
-                     "Bug 95: Should NOT create instance with Date() fallback when completed task has no dueDate")
+        // Bug 315: Must NOT return nil. Fallback to today.
+        XCTAssertNotNil(instance, "Bug 315: Should create instance with Date() fallback")
+        XCTAssertNotNil(instance?.dueDate, "New instance must have a due date (fallback)")
     }
 
     private var calendar: Calendar { Calendar.current }
