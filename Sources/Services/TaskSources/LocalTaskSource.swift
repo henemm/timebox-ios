@@ -116,7 +116,7 @@ final class LocalTaskSource: @preconcurrency TaskSource, @preconcurrency TaskSou
         let task = LocalTask(
             title: cleanedTitle,
             importance: deterministicImportance,
-            tags: tags,
+            tags: tags.map { $0.lowercased() },
             dueDate: deterministicDueDate,
             sortOrder: nextSortOrder,
             estimatedDuration: deterministicDuration,
@@ -141,7 +141,6 @@ final class LocalTaskSource: @preconcurrency TaskSource, @preconcurrency TaskSou
         let preUrgency = task.urgency
         let preTaskType = task.taskType
         await enrichment.enrichTask(task)
-        task.confirmSuggestions()
 
         // Log enrichment changes
         var enrichChanges: [FieldChange] = []
@@ -199,7 +198,7 @@ final class LocalTaskSource: @preconcurrency TaskSource, @preconcurrency TaskSou
             task.title = title
         }
         if let tags = tags {
-            task.tags = tags
+            task.tags = tags.map { $0.lowercased() }
         }
         if let dueDate = dueDate {
             task.dueDate = dueDate

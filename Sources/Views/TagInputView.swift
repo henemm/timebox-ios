@@ -128,7 +128,7 @@ struct TagInputView: View {
     }
 
     private func addCurrentTag() {
-        let trimmed = newTag.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmed = newTag.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
         guard !trimmed.isEmpty, !tags.contains(trimmed) else { return }
         tags.append(trimmed)
         newTag = ""

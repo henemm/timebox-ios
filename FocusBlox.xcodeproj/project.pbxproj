@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5D40DF4A9377D45A5FCFB5C5 /* Bug319IntakeAnalyserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75DF4ED0F527B0879DD17723 /* Bug319IntakeAnalyserTests.swift */; };
 		9E5C4C9EBB2884C634D9E93C /* RecurringCompletionRegressionUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E33FE324504DEFE7045F35CC /* RecurringCompletionRegressionUITests.swift */; };
 		AC90395EDB3D48499F4F4A54 /* RecurrenceServiceBug315Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B77B881FDC04B0B2CBD44B /* RecurrenceServiceBug315Tests.swift */; };
 		657CD346438AA7C8EA1ABABA /* RecurrenceServiceRepairTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D188A8348B181435CF78051 /* RecurrenceServiceRepairTests.swift */; };
@@ -749,6 +750,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		75DF4ED0F527B0879DD17723 /* Bug319IntakeAnalyserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Bug319IntakeAnalyserTests.swift; path = FocusBloxTests/Bug319IntakeAnalyserTests.swift; sourceTree = SOURCE_ROOT; };
 		E33FE324504DEFE7045F35CC /* RecurringCompletionRegressionUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = RecurringCompletionRegressionUITests.swift; path = FocusBloxUITests/RecurringCompletionRegressionUITests.swift; sourceTree = SOURCE_ROOT; };
 		A1B77B881FDC04B0B2CBD44B /* RecurrenceServiceBug315Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = RecurrenceServiceBug315Tests.swift; path = FocusBloxTests/RecurrenceServiceBug315Tests.swift; sourceTree = SOURCE_ROOT; };
 		5D188A8348B181435CF78051 /* RecurrenceServiceRepairTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = RecurrenceServiceRepairTests.swift; path = FocusBloxMacTests/RecurrenceServiceRepairTests.swift; sourceTree = SOURCE_ROOT; };
@@ -1796,6 +1798,7 @@
 		A6B3805EF19D1B131D346DDD /* FocusBloxTests */ = {
 			isa = PBXGroup;
 			children = (
+				75DF4ED0F527B0879DD17723 /* Bug319IntakeAnalyserTests.swift */,
 				A1B77B881FDC04B0B2CBD44B /* RecurrenceServiceBug315Tests.swift */,
 				F7DA938FA284432AB1729B81 /* RecurrenceServiceRepairTests.swift */,
 				8386D00DBF027EF8470E031C /* MacStartupCleanupTests.swift */,
@@ -3038,6 +3041,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5D40DF4A9377D45A5FCFB5C5 /* Bug319IntakeAnalyserTests.swift in Sources */,
 				AC90395EDB3D48499F4F4A54 /* RecurrenceServiceBug315Tests.swift in Sources */,
 				CDBDEC343DE4202B5A69635D /* RecurrenceServiceRepairTests.swift in Sources */,
 				BBF67BD362B4378E8CC11283 /* MacStartupCleanupTests.swift in Sources */,

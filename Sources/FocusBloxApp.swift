@@ -370,6 +370,8 @@ struct FocusBloxApp: App {
                     RecurrenceService.repairOrphanedRecurringSeries(in: sharedModelContainer.mainContext)
                     // RW 1.5: Migrate any leftover "raw" tasks to "active"
                     Self.migrateRawTasksToActive(in: sharedModelContainer.mainContext)
+                    // Bug #319: One-time migration — normalize existing tags to lowercase
+                    Self.migrateTagsToLowercase(in: sharedModelContainer.mainContext)
                     // Background title improvement for tasks from Share Extension, Siri, Watch
                     let titleEngine = TaskTitleEngine(modelContext: sharedModelContainer.mainContext)
                     Task { await titleEngine.improveAllPendingTitles() }
@@ -640,6 +642,36 @@ struct FocusBloxApp: App {
         UserDefaults.standard.set(false, forKey: "remindersSyncEnabled")
         UserDefaults.standard.removeObject(forKey: "visibleReminderListIDs")
         UserDefaults.standard.synchronize()
+    }
+
+    /// Bug #319: One-time migration — normalize all existing task tags to lowercase.
+    @discardableResult
+    static func migrateTagsToLowercase(in context: ModelContext) -> Int {
+        let key = "tagLowercaseMigrationDone"
+        guard !UserDefaults.standard.bool(forKey: key) else { return 0 }
+
+        let descriptor = FetchDescriptor<LocalTask>()
+        guard let allTasks = try? context.fetch(descriptor) else {
+            UserDefaults.standard.set(true, forKey: key)
+            return 0
+        }
+
+        var migratedCount = 0
+        for task in allTasks {
+            guard let tags = task.tags, !tags.isEmpty else { continue }
+            let lowercased = tags.map { $0.lowercased() }
+            if lowercased != tags {
+                task.tags = lowercased
+                migratedCount += 1
+            }
+        }
+
+        try? context.save()
+        UserDefaults.standard.set(true, forKey: key)
+        if migratedCount > 0 {
+            print("[Bug319] Migrated tags to lowercase: \(migratedCount) task(s)")
+        }
+        return migratedCount
     }
 
     /// RW 1.5: One-time migration — promote leftover "raw" tasks to "active" and confirm suggestions.

@@ -355,6 +355,9 @@ extension LocalTask {
         if aiEnergyLevel == nil, let energy = suggestedEnergyLevel {
             aiEnergyLevel = energy
         }
+        if (tags ?? []).isEmpty, let st = suggestedTags, !st.isEmpty {
+            tags = st.map { $0.lowercased() }
+        }
 
         lifecycleStatus = TaskLifecycleStatus.active.rawValue
         modifiedAt = Date()

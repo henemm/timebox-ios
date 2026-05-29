@@ -423,6 +423,9 @@ final class SmartTaskEnrichmentService {
                 }
             }
 
+            // Promote staged suggestions (suggestedTags, suggestedDuration, etc.) to main fields
+            task.confirmSuggestions()
+
             try modelContext.save()
         } catch {
             print("[SmartEnrichment] Failed to enrich task '\(task.title)': \(error)")
