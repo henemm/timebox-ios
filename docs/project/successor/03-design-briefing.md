@@ -85,7 +85,9 @@ Eine Liste. Jede Zeile:
 - Bereich "Blockiert durch": Liste der Aufgaben, die vorher erledigt sein müssen.
 - Bereich "Unteraufgaben": eine Ebene, abhakbar, per Textfeld ergänzbar (siehe offene Frage 3).
 - Bereich "Quelle": Link zurück zur Mail, wenn vorhanden.
-- Aktion "Neu analysieren" (bewusst versteckt, im Menü), sonst passiert Veredelung nur einmal.
+- Tipp auf ein getöntes Merkmal: Popover mit Vorher, Nachher, Begründung, „Zurücksetzen“ (Wert vor der KI) und „Ändern“ (Picker). Beides ist eine Korrektur.
+- „Anzeigen“ neben „n Felder von der KI gesetzt“ öffnet das Änderungen-Sheet (Screen 5) mit allen Einträgen und „Alle zurücksetzen“.
+- Menü hinter „…“: Änderungen anzeigen, Neu analysieren, Als nächstes, Parken, Löschen (rot, mit Rückfrage, nicht rückgängig). „Neu analysieren“ ist die einzige zweite Verarbeitung und deshalb versteckt.
 
 ### 5. Revisions-Sheet
 
