@@ -23,6 +23,7 @@ passen: im Garten, fünf Minuten Zeit, wartet schon lange.
 - Nichts ist Pflicht. Kein Formular, kein leeres Feld, das nach Eingabe ruft.
 - Die App plant nicht. Sie zeigt. Kein Timer, kein Kalender-Raster, kein Coach.
 - SF Symbols, Systemschriften, Dynamic Type, Dark Mode, Englisch und Deutsch (Textlängen).
+- Farbbudget (ADR-14): Akzent heißt tippbar, Rot heißt Zeitdruck, Grau trägt Hierarchie, Grün nur beim Erledigen. Jeder Screen muss in Graustufen funktionieren.
 
 ## Plattformen
 
@@ -53,7 +54,8 @@ Der wichtigste Screen. Erreichbar über Control Center, Action Button, App-Butto
 
 Der Einstieg zeigt die Ansichten, nicht eine Aufgabenliste.
 
-Systemansichten mit Zähler: Als nächstes, Neu, Fällig, Schnell, Alt, Wartet, Wiederkehrend.
+Systemansichten als Kacheln mit Zähler: Als nächstes, Neu, Fällig, Schnell, Alt, Wartet, Wiederkehrend, Geparkt.
+Darunter Projekte (mit „Neues Projekt“), dann Kontexte, zuletzt eine Zeile „Erledigt“.
 Darunter Kontexte (Startset: Computer, Telefon, Haus, Garten, Unterwegs, Besorgung, alle löschbar)
 und Projekte. Erfassungs-Button ist auf jedem Screen an derselben Stelle erreichbar.
 
@@ -65,9 +67,10 @@ Eine Liste. Jede Zeile:
 
 - Titel (oder Rohtext, wenn ungeprüft, dann visuell als Rohtext erkennbar).
 - Höchstens drei kleine Merkmale: Fälligkeit, Dauer, ein Kontext. Der Rest ist im Detail.
-- KI-Marker, wenn die KI etwas geändert hat und der Nutzer es noch nicht gesehen hat.
+- KI-Marker (Variante C): Merkmale, die die KI gesetzt hat, sind akzentgetönt, bis der Nutzer sie gesehen hat. Ein geänderter Titel trägt zusätzlich den Funken.
 - Blockiert-Zeichen, wenn eine andere Aufgabe vorher erledigt werden muss.
-- Wisch rechts: Erledigt. Wisch links: Zu "Als nächstes" oder daraus entfernen.
+- Wisch rechts: Erledigt. Wisch links: Zu "Als nächstes" oder daraus entfernen. In "Alt": Wisch links parkt.
+- Halten: Vorschau plus Menü mit Als nächstes, Erledigt, Verschieben (Morgen, Wochenende, nächste Woche, Datum), Parken, Löschen.
 - Nur "Als nächstes" ist manuell sortierbar (Drag). Alle anderen Ansichten haben feste Sortierung.
 - Leerzustand je Ansicht in einem Satz, ohne Illustration.
 
@@ -111,7 +114,18 @@ Kein Lesen, kein Abhaken in Version 1.
 - Medium: die obersten drei.
 - Control Center: ein Button, der die Erfassungs-Szene öffnet.
 
-### 10. Onboarding
+### 10. Mitteilung
+
+Eine Art: „Heute fällig“ am Fälligkeitstag. Halten zeigt drei Aktionen, keine öffnet die App:
+Erledigt, Als nächstes, Morgen.
+
+### 11. Ansichten Alt, Geparkt, Erledigt
+
+„Alt“ zeigt das Alter je Zeile und wie oft verschoben, Wisch links parkt. „Geparkt“ ist die einzige
+Ansicht, die geparkte Aufgaben zeigt, Wisch rechts aktiviert. „Erledigt“ ist nach Tagen gruppiert,
+Wisch rechts holt zurück.
+
+### 12. Onboarding
 
 Drei Schritte, überspringbar: Siri-Zugriff, Mitteilungen, Startset der Kontexte ansehen.
 Hinweis, wenn Apple Intelligence auf dem Gerät nicht verfügbar ist (dann gibt es keine Veredelung).
@@ -124,6 +138,8 @@ Hinweis, wenn Apple Intelligence auf dem Gerät nicht verfügbar ist (dann gibt 
 | Unverarbeitet | Veredelung steht noch aus (offline, Modell nicht verfügbar) | Dezenter Hinweis, in "Neu" |
 | KI hat geändert | Ungesehene KI-Revisionen | Marker an der Zeile und am Feld |
 | Blockiert | Wartet auf andere Aufgabe | Zeichen an der Zeile, ausgeblendet in "Als nächstes" |
+| Geparkt | Bewusst beiseitegelegt | Nur in "Geparkt" sichtbar |
+| Überfällig | Fälligkeit vorbei | Datum in Rot mit Wort „überfällig“, der einzige Rotton |
 | Wiederkehrend | Rückt nach Erledigung weiter | Zeichen an der Zeile, Ansicht "Wiederkehrend" |
 | Aus Mail | Hat Quell-Link | Zeichen im Detail |
 

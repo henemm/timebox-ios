@@ -50,7 +50,8 @@ Was liegt schon ewig herum. Worauf warte ich. Diese Fragen beantwortet keine man
   Dauer, Energie, Kontexte, Personen, Projekt, Abhängigkeit
 - Lernen aus alten Aufgaben und aus Korrekturen
 - Jede KI-Änderung sichtbar an der Aufgabe und pro Feld rückgängig machbar
-- Berechnete Ansichten: Als nächstes, Neu, Fällig, Schnell, Alt, Wartet, Wiederkehrend, je Kontext, je Projekt
+- Berechnete Ansichten: Als nächstes, Neu, Fällig, Schnell, Alt, Wartet, Wiederkehrend, Geparkt, Erledigt, je Kontext, je Projekt
+- Parken aus „Alt“ heraus, Mitteilung am Fälligkeitstag mit drei Aktionen
 - Manuelle Sortierung nur in "Als nächstes"
 - Projekte als Listen, Unteraufgaben eine Ebene tief
 - Einfache Wiederholung
@@ -104,6 +105,10 @@ Was liegt schon ewig herum. Worauf warte ich. Diese Fragen beantwortet keine man
 | Veredelung mit Retrieval-Beispielen und Konfidenzschwelle | Must | Offen |
 | Revisionen, Marker, Rückgängig pro Feld | Must | Offen |
 | Ansichten: Als nächstes, Neu, Fällig, Schnell, Alt, Wartet, Kontext | Must | Offen |
+| Gesten: Wisch Erledigt, Wisch Als nächstes, Halten-Menü mit Verschieben | Must | Offen |
+| Parken und Geparkt-Ansicht | Must | Offen |
+| Mitteilung am Fälligkeitstag mit Erledigt, Als nächstes, Morgen | Must | Offen |
+| Erledigt-Ansicht mit Zurückholen | Must | Offen |
 | Projekte als Listen | Must | Offen |
 | Unteraufgaben, eine Ebene | Should | Offen |
 | Wiederholung einfach, Ansicht "Wiederkehrend" | Should | Offen |

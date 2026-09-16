@@ -61,6 +61,11 @@ alles in `FocusBloxMac/`, alle UI-Tests.
 | R2-15 | Sprachen | Englisch Default, Deutsch von Anfang an. |
 | R2-17 | Identität | Alles neu: Name, Bundle-ID, CloudKit-Container. |
 | R2-18 | Tests/Prozess | Fast-Track für Gerüst, Unit-Tests statt UI-Tests bis die UI steht. |
+| R3-1 | Navigation iPhone | Startscreen mit Kacheln (Option A). Tab-Leiste verworfen. |
+| R3-2 | KI-Marker | Variante C: getönte Merkmale. Geänderter Titel trägt zusätzlich den Funken. |
+| R3-3 | Farbe | Sehr einfarbig ist gewollt, aber mit Farbbudget (ADR-14). FocusBlox war bunt, nicht unübersichtlich. |
+| R3-4 | Parken | Ja, in Version 1. |
+| R3-5 | Mitteilungs-Aktionen | Ja, in Version 1: Erledigt, Als nächstes, Morgen. |
 
 ## Tech-Lead-Entscheidungen (ADR-Kurzform)
 
@@ -118,8 +123,31 @@ Container. Danach Standard-Workflow mit 250-LoC-Grenze. Kein `try?` ohne Behandl
 **ADR-13 Kalender.** EventKit nur schreibend: Aufgabe mit Fälligkeitszeit und Schalter
 "im Kalender anzeigen" erzeugt einen Termin in einem eigenen Kalender der App. Priorität Should, nicht Must.
 
+**ADR-14 Farbbudget.** Jede Farbe hat genau eine Bedeutung, nie Farbe als einziger Unterschied:
+Akzent = tippbar (inklusive KI-Tönung), Rot = Zeitdruck (überfällig, heute fällig, immer mit Text),
+Grau-Abstufung = Hierarchie (blockiert, erledigt, ungeprüft), Grün = nur im Moment des Erledigens.
+Wichtigkeit und Energie haben keine Farbe, sie sortieren und tragen ein Glyph. Projekte dürfen eine
+Nutzerfarbe zur Identifikation tragen (später), Kontexte bekommen Symbole. Jeder Screen muss in
+Graustufen funktionieren. Begründung: FocusBlox nutzte zehn Farbtöne für elf Bedeutungen, Rot stand
+für Wichtigkeit, Überfälligkeit, Tier und Löschen zugleich.
+
+**ADR-15 Parken.** Status `parked`. Geparkte Aufgaben verlassen alle Ansichten außer „Geparkt“,
+zählen in keinem Zähler und keiner Mitteilung, bleiben aber Lernkorpus und Wiederholungs-fähig.
+Parken per Wisch in „Alt“ und über das Halten-Menü, Aktivieren per Wisch in „Geparkt“.
+
+**ADR-16 Mitteilung mit Aktionen.** Version 1 kennt genau eine Mitteilung: am Fälligkeitstag zur
+eingestellten Uhrzeit. Drei Aktionen ohne App-Start: Erledigt, Als nächstes, Morgen (Fälligkeit +1 Tag,
+zählt als Korrektur). Keine Mitteilung für KI-Verarbeitung, keine Zusammenfassungen.
+
+**ADR-17 Ergänzte Screens nach Lückenprüfung.** Als nächstes (manuell sortiert), Neu (Eingang),
+Feld-Picker statt Formular, Wisch- und Halten-Gesten mit Verschieben (Morgen, Wochenende, nächste Woche,
+Datum), Erledigt mit Zurückholen, Erfassung aus Mail, Bestätigung, Alt mit Parken, Mitteilung.
+Aus FocusBlox übernommen: verzögertes Erledigen mit Abbrechen durch erneuten Tipp, Halten-Vorschau,
+Suche, Wiederherstellen aus Erledigt. Nicht übernommen: tippbare Badges in der Zeile, Kategoriefarben,
+Prioritäts-Score, Hygiene-Kartenstapel, Sprint-Button.
+
 ## Bewusst nicht in Version 1
 
 Fokusblöcke, Timer, Coaching, Tagesreview, Disziplin-Statistiken, Aufgabentyp (Einkommen,
 Wartung, Erholung), Standort, Erinnerungen-Sync, Teilen, freie Fragen in natürlicher Sprache,
-Kalender-Verschieben, Watch-Lesen.
+Kalender-Verschieben, Watch-Lesen, Projektfarben, Mehrfachauswahl.

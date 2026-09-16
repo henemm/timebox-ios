@@ -24,7 +24,8 @@
 | capturedAt | Date | System | |
 | capturedVia | enum CaptureChannel | System | siri, watch, control, share, mail, app, actionButton |
 | sourceURL | URL? | System | `message:` bei Mail, sonst Share-URL |
-| status | enum TaskStatus | System/Nutzer | unprocessed, unverified, active, done |
+| status | enum TaskStatus | System/Nutzer | unprocessed, unverified, active, parked, done |
+| parkedAt | Date? | Nutzer | gesetzt bei Parken, gelöscht bei Aktivieren |
 | processedAt | Date? | System | genau einmal gesetzt (ADR-4) |
 | nextRank | Double? | Nutzer | nur gesetzt, wenn in "Als nächstes" |
 | completedAt | Date? | Nutzer | bei Wiederholung: siehe CompletionRecord |
@@ -120,7 +121,7 @@ Beenden der Wiederholung: `repeatRule = nil`, dann normale Erledigung.
 |------|-----|-----------|
 | id | UUID | |
 | name | String | |
-| kind | enum ViewKind | next, new, due, quick, old, waiting, repeating, context, project |
+| kind | enum ViewKind | next, new, due, quick, old, waiting, repeating, parked, done, context, project |
 | contextID / projectID | UUID? | bei kind context/project |
 | isSystem | Bool | Systemansichten nicht löschbar, aber ausblendbar |
 | sortOrder | Int | |
@@ -129,8 +130,9 @@ Version 1 hat keine freien Filterregeln. Die Ansichtsarten sind im Code definier
 
 ## Ansichten (Berechnungsregeln)
 
-Alle Ansichten zeigen nur `status != done` und keine Aufgaben mit `parent != nil` (Unteraufgaben
-erscheinen in ihrer Elternaufgabe). Ausnahme "Alt": zeigt auch blockierte.
+Alle Ansichten zeigen nur `status in (unprocessed, unverified, active)` und keine Aufgaben mit
+`parent != nil` (Unteraufgaben erscheinen in ihrer Elternaufgabe). Ausnahmen: "Alt" zeigt auch
+blockierte, "Geparkt" zeigt nur `parked`, "Erledigt" zeigt nur `done`.
 
 | Ansicht | Regel | Sortierung |
 |---------|-------|------------|
@@ -141,10 +143,31 @@ erscheinen in ihrer Elternaufgabe). Ausnahme "Alt": zeigt auch blockierte.
 | Alt | `capturedAt < heute − 30 Tage` | capturedAt aufsteigend |
 | Wartet | `blockedBy` enthält mindestens eine offene Aufgabe | blockierende Aufgabe zuerst |
 | Wiederkehrend | `repeatRule != nil` | dueDate aufsteigend |
+| Geparkt | `status == parked` | parkedAt absteigend |
+| Erledigt | `status == done` | completedAt absteigend, nach Tagen gruppiert |
 | Kontext X | `contexts` enthält X | urgency, importance, dann capturedAt |
 | Projekt P | `project == P` | manuell innerhalb des Projekts, sonst capturedAt |
 
 "Blockiert" heißt: mindestens eine Aufgabe in `blockedBy` hat `status != done`.
+
+## Aktionen auf einer Aufgabe
+
+| Aktion | Wo | Wirkung |
+|--------|----|---------|
+| Erledigt | Wisch rechts, Halten-Menü, Mitteilung | `status = done`, `completedAt`; bei repeatRule: CompletionRecord und nächste Fälligkeit. Drei Sekunden abbrechbar durch erneuten Tipp. |
+| Als nächstes | Wisch links, Halten-Menü, Mitteilung | `nextRank` setzen oder entfernen |
+| Verschieben | Halten-Menü: Morgen, Wochenende, nächste Woche, Datum; Mitteilung: Morgen | `dueDate` ändern, Revision `author == user` |
+| Parken / Aktivieren | Wisch in „Alt“ und „Geparkt“, Halten-Menü | `status = parked` bzw. `active`, `parkedAt` |
+| Zurückholen | Wisch rechts in „Erledigt“ | `status = active`, `completedAt = nil`, letzter CompletionRecord bleibt |
+| Feld ändern | Detail, Picker je Feld | Revision `author == user`, Lernbeispiel |
+| Löschen | Halten-Menü, Detail-Menü | hart, nach Rückfrage, nicht rückgängig |
+| Neu analysieren | Detail-Menü | zweite Verarbeitung, ausdrücklich |
+
+## Mitteilungen
+
+Genau eine Art in Version 1: „Heute fällig“ am Fälligkeitstag zur eingestellten Uhrzeit (Standard 9:00),
+nur für `status == active`. Aktionen ohne App-Start: Erledigt, Als nächstes, Morgen. Keine Mitteilung
+für KI-Verarbeitung.
 
 ## Veredelungs-Pipeline
 
