@@ -1,7 +1,7 @@
 # User Story: Nachfolger-App (Arbeitstitel: Capture)
 
 > Erstellt: 2026-09-16
-> Status: Entwurf, wartet auf "approved" durch Henning
+> Status: Approved (Henning, 2026-09-16)
 > Produkt: Nachfolger von FocusBlox
 
 ## JTBD Statement
